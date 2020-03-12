@@ -82,7 +82,7 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const byte_string_type,size_t>> byte_string_size_allocator_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
 
-    Sink result_;
+    Sink sink_;
     const cbor_encode_options options_;
     allocator_type alloc_;
 
@@ -95,9 +95,9 @@ private:
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
     basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
 public:
-    explicit basic_cbor_encoder(sink_type sink, 
+    explicit basic_cbor_encoder(Sink&& sink, 
                                 const allocator_type& alloc = allocator_type())
-       : result_(std::move(sink)), 
+       : sink_(std::forward<Sink>(sink)), 
          options_(cbor_encode_options()), 
          alloc_(alloc),
          stack_(alloc)
@@ -107,10 +107,10 @@ public:
 #endif
     {
     }
-    basic_cbor_encoder(sink_type sink, 
+    basic_cbor_encoder(sink_type&& sink, 
                        const cbor_encode_options& options, 
                        const allocator_type& alloc = allocator_type())
-       : result_(std::move(sink)), 
+       : sink_(std::forward<Sink>(sink)), 
          options_(options), 
          alloc_(alloc),
          stack_(alloc)
@@ -129,7 +129,7 @@ public:
     {
         JSONCONS_TRY
         {
-            result_.flush();
+            sink_.flush();
         }
         JSONCONS_CATCH(...)
         {
@@ -141,14 +141,14 @@ private:
 
     void do_flush() override
     {
-        result_.flush();
+        sink_.flush();
     }
 
     bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
-        result_.push_back(0xbf);
+        sink_.push_back(0xbf);
         return true;
     }
 
@@ -159,35 +159,35 @@ private:
         if (length <= 0x17)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0xa0 + length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0xb8), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint8_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0xb9), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint16_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0xba), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint32_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xffffffffffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0xbb), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint64_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         }
 
         return true;
@@ -198,7 +198,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
         {
-            result_.push_back(0xff);
+            sink_.push_back(0xff);
         }
         else
         {
@@ -223,7 +223,7 @@ private:
     bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
-        result_.push_back(0x9f);
+        sink_.push_back(0x9f);
         return true;
     }
 
@@ -233,35 +233,35 @@ private:
         if (length <= 0x17)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x80 + length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x98), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint8_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x99), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint16_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x9a), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint32_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         } 
         else if (length <= 0xffffffffffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x9b), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint64_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         }
         return true;
     }
@@ -272,7 +272,7 @@ private:
 
         if (stack_.back().is_indefinite_length())
         {
-            result_.push_back(0xff);
+            sink_.push_back(0xff);
         }
         else
         {
@@ -304,11 +304,11 @@ private:
     {
         if (tag == semantic_tag::undefined)
         {
-            result_.push_back(0xf7);
+            sink_.push_back(0xf7);
         }
         else
         {
-            result_.push_back(0xf6);
+            sink_.push_back(0xf6);
         }
 
         end_value();
@@ -352,40 +352,40 @@ private:
         {
             // fixstr stores a byte array whose length is upto 31 bytes
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x60 + length), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (length <= 0xff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x78), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint8_t>(length), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (length <= 0xffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x79), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint16_t>(length), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (length <= 0xffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x7a), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint32_t>(length), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (length <= 0xffffffffffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x7b), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint64_t>(length), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
 
         for (auto c : sv)
         {
-            result_.push_back(c);
+            sink_.push_back(c);
         }
     }
 
@@ -409,40 +409,40 @@ private:
         {
             // fixstr stores a byte array whose length is upto 31 bytes
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x40 + length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         }
         else if (length <= 0xff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x58), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint8_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         }
         else if (length <= 0xffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x59), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint16_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         }
         else if (length <= 0xffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x5a), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint32_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         }
         else if (length <= 0xffffffffffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x5b), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint64_t>(length), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
         }
 
         for (auto c : data)
         {
-            result_.push_back(c);
+            sink_.push_back(c);
         }
     }
 
@@ -802,21 +802,21 @@ private:
             }
             case semantic_tag::uri:
             {
-                result_.push_back(32);
+                sink_.push_back(32);
                 write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64url:
             {
-                result_.push_back(33);
+                sink_.push_back(33);
                 write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64:
             {
-                result_.push_back(34);
+                sink_.push_back(34);
                 write_string(sv);
                 end_value();
                 break;
@@ -855,13 +855,13 @@ private:
         switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:
-                result_.push_back(0xd5);
+                sink_.push_back(0xd5);
                 break;
             case byte_string_chars_format::base64:
-                result_.push_back(0xd6);
+                sink_.push_back(0xd6);
                 break;
             case byte_string_chars_format::base16:
-                result_.push_back(0xd7);
+                sink_.push_back(0xd7);
                 break;
             default:
                 break;
@@ -896,40 +896,40 @@ private:
         {
             // fixstr stores a byte array whose length is upto 31 bytes
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x40 + b.size()), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (b.size() <= 0xff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x58), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint8_t>(b.size()), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (b.size() <= 0xffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x59), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint16_t>(b.size()), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (b.size() <= 0xffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x5a), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint32_t>(b.size()), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else // if (b.size() <= 0xffffffffffffffff)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x5b), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
             jsoncons::detail::native_to_big(static_cast<uint64_t>(b.size()), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
 
         for (auto c : b)
         {
-            result_.push_back(c);
+            sink_.push_back(c);
         }
     }
 
@@ -947,14 +947,14 @@ private:
         if ((double)valf == val)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0xfa), 
-                                  std::back_inserter(result_));
-            jsoncons::detail::native_to_big(valf, std::back_inserter(result_));
+                                  std::back_inserter(sink_));
+            jsoncons::detail::native_to_big(valf, std::back_inserter(sink_));
         }
         else
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0xfb), 
-                                  std::back_inserter(result_));
-            jsoncons::detail::native_to_big(val, std::back_inserter(result_));
+                                  std::back_inserter(sink_));
+            jsoncons::detail::native_to_big(val, std::back_inserter(sink_));
         }
 
         // write double
@@ -977,35 +977,35 @@ private:
             if (value <= 0x17)
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(value), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (value <= (std::numeric_limits<uint8_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x18), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(value), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (value <= (std::numeric_limits<uint16_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x19), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<uint16_t>(value), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (value <= (std::numeric_limits<uint32_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x1a), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<uint32_t>(value), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (value <= (std::numeric_limits<int64_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x1b), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<int64_t>(value), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             }
         } else
         {
@@ -1013,35 +1013,35 @@ private:
             if (value >= -24)
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x20 + posnum), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (posnum <= (std::numeric_limits<uint8_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x38), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(posnum), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (posnum <= (std::numeric_limits<uint16_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x39), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<uint16_t>(posnum), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (posnum <= (std::numeric_limits<uint32_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x3a), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<uint32_t>(posnum), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             } 
             else if (posnum <= (std::numeric_limits<int64_t>::max)())
             {
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(0x3b), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<int64_t>(posnum), 
-                                  std::back_inserter(result_));
+                                  std::back_inserter(sink_));
             }
         }
         end_value();
@@ -1067,30 +1067,30 @@ private:
     {
         if (value <= 0x17)
         {
-            result_.push_back(0xc0 | static_cast<uint8_t>(value)); 
+            sink_.push_back(0xc0 | static_cast<uint8_t>(value)); 
         } 
         else if (value <=(std::numeric_limits<uint8_t>::max)())
         {
-            result_.push_back(0xd8);
-            result_.push_back(static_cast<uint8_t>(value));
+            sink_.push_back(0xd8);
+            sink_.push_back(static_cast<uint8_t>(value));
         } 
         else if (value <=(std::numeric_limits<uint16_t>::max)())
         {
-            result_.push_back(0xd9);
+            sink_.push_back(0xd9);
             jsoncons::detail::native_to_big(static_cast<uint16_t>(value), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else if (value <=(std::numeric_limits<uint32_t>::max)())
         {
-            result_.push_back(0xda);
+            sink_.push_back(0xda);
             jsoncons::detail::native_to_big(static_cast<uint32_t>(value), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
         else 
         {
-            result_.push_back(0xdb);
+            sink_.push_back(0xdb);
             jsoncons::detail::native_to_big(static_cast<uint64_t>(value), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
     }
 
@@ -1098,30 +1098,30 @@ private:
     {
         if (value <= 0x17)
         {
-            result_.push_back(static_cast<uint8_t>(value));
+            sink_.push_back(static_cast<uint8_t>(value));
         } 
         else if (value <=(std::numeric_limits<uint8_t>::max)())
         {
-            result_.push_back(static_cast<uint8_t>(0x18));
-            result_.push_back(static_cast<uint8_t>(value));
+            sink_.push_back(static_cast<uint8_t>(0x18));
+            sink_.push_back(static_cast<uint8_t>(value));
         } 
         else if (value <=(std::numeric_limits<uint16_t>::max)())
         {
-            result_.push_back(static_cast<uint8_t>(0x19));
+            sink_.push_back(static_cast<uint8_t>(0x19));
             jsoncons::detail::native_to_big(static_cast<uint16_t>(value), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         } 
         else if (value <=(std::numeric_limits<uint32_t>::max)())
         {
-            result_.push_back(static_cast<uint8_t>(0x1a));
+            sink_.push_back(static_cast<uint8_t>(0x1a));
             jsoncons::detail::native_to_big(static_cast<uint32_t>(value), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         } 
         else if (value <=(std::numeric_limits<uint64_t>::max)())
         {
-            result_.push_back(static_cast<uint8_t>(0x1b));
+            sink_.push_back(static_cast<uint8_t>(0x1b));
             jsoncons::detail::native_to_big(static_cast<uint64_t>(value), 
-                                            std::back_inserter(result_));
+                                            std::back_inserter(sink_));
         }
     }
 
@@ -1129,11 +1129,11 @@ private:
     {
         if (value)
         {
-            result_.push_back(0xf5);
+            sink_.push_back(0xf5);
         }
         else
         {
-            result_.push_back(0xf4);
+            sink_.push_back(0xf4);
         }
 
         end_value();
