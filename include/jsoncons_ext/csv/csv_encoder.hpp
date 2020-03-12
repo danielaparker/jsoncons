@@ -89,6 +89,8 @@ private:
 
     Sink sink_;
     const basic_csv_encode_options<CharT> options_;
+    allocator_type alloc_;
+
     std::vector<stack_item> stack_;
     jsoncons::detail::write_double fp_;
     std::vector<string_type,string_allocator_type> strings_buffer_;
@@ -102,15 +104,18 @@ private:
     basic_csv_encoder(const basic_csv_encoder&) = delete;
     basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
 public:
-    basic_csv_encoder(Sink&& sink)
-       : basic_csv_encoder(std::forward<Sink>(sink), basic_csv_encode_options<CharT>())
+    basic_csv_encoder(Sink&& sink, 
+                      const Allocator& alloc = Allocator())
+       : basic_csv_encoder(std::forward<Sink>(sink), basic_csv_encode_options<CharT>(), alloc)
     {
     }
 
     basic_csv_encoder(Sink&& sink,
-                      const basic_csv_encode_options<CharT>& options)
+                      const basic_csv_encode_options<CharT>& options, 
+                      const Allocator& alloc = Allocator())
       : sink_(std::forward<Sink>(sink)),
         options_(options),
+        alloc_(alloc),
         stack_(),
         fp_(options.float_format(), options.precision()),
         column_index_(0)

@@ -22,11 +22,12 @@
 
 namespace jsoncons { namespace bson {
 
-template<class Sink=jsoncons::binary_stream_sink>
+template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
 class basic_bson_encoder final : public basic_json_content_handler<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
+    typedef Allocator allocator_type;
     typedef char char_type;
     using typename basic_json_content_handler<char>::string_view_type;
     typedef Sink sink_type;
@@ -73,6 +74,7 @@ private:
     };
 
     sink_type sink_;
+    allocator_type alloc_;
 
     std::vector<stack_item> stack_;
     std::vector<uint8_t> buffer_;
@@ -81,8 +83,10 @@ private:
     basic_bson_encoder(const basic_bson_encoder&) = delete;
     basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;
 public:
-    explicit basic_bson_encoder(Sink&& sink)
-       : sink_(std::forward<Sink>(sink))
+    explicit basic_bson_encoder(Sink&& sink, 
+                                const Allocator& alloc = Allocator())
+       : sink_(std::forward<Sink>(sink)),
+         alloc_(alloc)
     {
     }
 

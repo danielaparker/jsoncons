@@ -32,8 +32,8 @@ class basic_cbor_encoder final : public basic_json_content_handler<char>
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
-    typedef Allocator allocator_type;
 public:
+    typedef Allocator allocator_type;
     typedef Sink sink_type;
     using typename super_type::char_type;
     using typename super_type::string_view_type;
@@ -96,7 +96,7 @@ private:
     basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
 public:
     explicit basic_cbor_encoder(Sink&& sink, 
-                                const allocator_type& alloc = allocator_type())
+                                const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 
          options_(cbor_encode_options()), 
          alloc_(alloc),
@@ -109,7 +109,7 @@ public:
     }
     basic_cbor_encoder(sink_type&& sink, 
                        const cbor_encode_options& options, 
-                       const allocator_type& alloc = allocator_type())
+                       const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 
          options_(options), 
          alloc_(alloc),
