@@ -29,7 +29,7 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_bson_encoder(sink_type sink)
+    explicit basic_bson_encoder(Sink&& sink)
 Constructs a new encoder that writes to the specified destination.
 
 #### Destructor

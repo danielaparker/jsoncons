@@ -33,10 +33,10 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_csv_encoder(sink_type sink)
+    explicit basic_csv_encoder(Sink&& sink)
 Constructs a new csv encoder that is associated with the destination `sink`.
 
-    basic_csv_encoder(sink_type sink, 
+    basic_csv_encoder(Sink&& sink, 
                          const basic_csv_options<CharT>& options)
 Constructs a new csv encoder that is associated with the destination `sink` 
 and uses the specified [csv options](basic_csv_options.md). 

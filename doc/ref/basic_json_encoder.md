@@ -42,10 +42,10 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_json_encoder(sink_type sink)
+    explicit basic_json_encoder(Sink&& sink)
 Constructs a new encoder that is associated with the destination `sink`.
 
-    basic_json_encoder(sink_type sink, 
+    basic_json_encoder(Sink&& sink, 
                           const basic_json_options<CharT>& options)
 Constructs a new encoder that is associated with the destination `sink` 
 and uses the specified [json options](basic_json_options.md). 
