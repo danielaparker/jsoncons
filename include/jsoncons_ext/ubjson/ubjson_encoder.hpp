@@ -67,7 +67,7 @@ private:
 
     };
 
-    Sink result_;
+    Sink sink_;
 
     std::vector<stack_item> stack_;
 
