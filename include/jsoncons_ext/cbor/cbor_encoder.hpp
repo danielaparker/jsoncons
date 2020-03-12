@@ -104,9 +104,9 @@ public:
 #if !defined(JSONCONS_NO_MAP_TAKING_ALLOCATOR) 
          , stringref_map_(alloc),
          bytestringref_map_(alloc)
+#endif
     {
     }
-#endif
     basic_cbor_encoder(sink_type sink, 
                        const cbor_encode_options& options, 
                        const allocator_type& alloc = allocator_type())
