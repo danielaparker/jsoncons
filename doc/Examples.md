@@ -775,15 +775,15 @@ public:
 JSONCONS_ENUM_NAMED_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
 
 JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
-                                                   (title,"Title"),(price,"Price"))
+                                           (title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
-                                                   (title_,"Title"),(price_,"Price"))
+                                           (title_,"Title"),(price_,"Price"))
 JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
-                                                 (title,"Title"),(price,"Price"))
+                                                (title,"Title"),(price,"Price"))
 JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
-                                                          (getAuthor,setAuthor,"Author"),
-                                                          (getTitle,setTitle,"Title"),
-                                                          (getPrice,setPrice,"Price"))
+                                                  (getAuthor,setAuthor,"Author"),
+                                                  (getTitle,setTitle,"Title"),
+                                                  (getPrice,setPrice,"Price"))
 
 using namespace jsoncons; // for convenience
 
