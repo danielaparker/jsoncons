@@ -1885,7 +1885,7 @@ public:
     public:
 
         typedef proxy<typename ParentT::proxy_type> proxy_type;
-
+/*
         operator basic_json&()
         {
             return evaluate();
@@ -1895,7 +1895,7 @@ public:
         {
             return evaluate();
         }
-
+*/
         range<object_iterator> object_range()
         {
             return evaluate().object_range();
@@ -3180,6 +3180,18 @@ public:
 
     basic_json(object&& other, semantic_tag tag = semantic_tag::none)
         : var_(std::forward<object>(other), tag)
+    {
+    }
+
+    template <class ParentT>
+    basic_json(const proxy<ParentT>& other)
+        : var_(other.evaluate().var_)
+    {
+    }
+
+    template <class ParentT>
+    basic_json(const proxy<ParentT>& other, const Allocator& alloc)
+        : var_(other.evaluate().var_,alloc)
     {
     }
 
