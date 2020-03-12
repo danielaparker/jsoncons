@@ -100,7 +100,7 @@ public:
        : basic_cbor_encoder(std::forward<Sink>(sink), cbor_encode_options(), alloc)
     {
     }
-    basic_cbor_encoder(sink_type&& sink, 
+    basic_cbor_encoder(Sink&& sink, 
                        const cbor_encode_options& options, 
                        const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 

@@ -4,6 +4,7 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
+
 #ifndef JSONCONS_CBOR_CBOR_HPP
 #define JSONCONS_CBOR_CBOR_HPP
 
@@ -23,3 +24,4 @@
 #include <jsoncons/ser_traits.hpp>
 
 #endif
+
