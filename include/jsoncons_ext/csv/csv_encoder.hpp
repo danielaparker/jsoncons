@@ -23,7 +23,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<CharT>>
+template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
 class basic_csv_encoder final : public basic_json_content_handler<CharT>
 {
 public:

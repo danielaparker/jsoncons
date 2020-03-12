@@ -97,14 +97,7 @@ private:
 public:
     explicit basic_cbor_encoder(Sink&& sink, 
                                 const Allocator& alloc = Allocator())
-       : sink_(std::forward<Sink>(sink)), 
-         options_(cbor_encode_options()), 
-         alloc_(alloc),
-         stack_(alloc)
-#if !defined(JSONCONS_NO_MAP_TAKING_ALLOCATOR) 
-         , stringref_map_(alloc),
-         bytestringref_map_(alloc)
-#endif
+       : basic_cbor_encoder(std::forward<Sink>(sink), cbor_encode_options(), alloc)
     {
     }
     basic_cbor_encoder(sink_type&& sink, 
