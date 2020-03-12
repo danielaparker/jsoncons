@@ -107,9 +107,11 @@ public:
                        const allocator_type& alloc = allocator_type())
        : result_(std::move(sink)), 
          options_(options), 
-         alloc_(alloc),
-         stringref_map_(alloc),
+         alloc_(alloc)
+#if !defined(JSONCONS_NO_MAP_TAKING_ALLOCATOR) 
+         , stringref_map_(alloc),
          bytestringref_map_(alloc)
+#endif
     {
         if (options.pack_strings())
         {
