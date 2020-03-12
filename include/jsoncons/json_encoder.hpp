@@ -287,11 +287,9 @@ private:
 
     };
 
+    Sink sink_;
     const basic_json_encode_options<CharT> options_;
-
     jsoncons::detail::write_double fp_;
-
-    Sink result_;
 
     std::vector<encoding_context> stack_;
     int indent_amount_;
@@ -307,16 +305,16 @@ private:
     basic_json_encoder(const basic_json_encoder&) = delete;
     basic_json_encoder& operator=(const basic_json_encoder&) = delete;
 public:
-    basic_json_encoder(sink_type sink)
-        : basic_json_encoder(std::move(sink), basic_json_encode_options<CharT>())
+    basic_json_encoder(Sink&& sink)
+        : basic_json_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>())
     {
     }
 
-    basic_json_encoder(sink_type sink, 
+    basic_json_encoder(Sink&& sink, 
                        const basic_json_encode_options<CharT>& options)
-       : options_(options),
+       : sink_(std::forward<Sink>(sink)), 
+         options_(options),
          fp_(options.float_format(), options.precision()),
-         result_(std::move(sink)), 
          indent_amount_(0), 
          column_(0)
     {
@@ -376,7 +374,7 @@ public:
     {
         JSONCONS_TRY
         {
-            result_.flush();
+            sink_.flush();
         }
         JSONCONS_CATCH(...)
         {
@@ -387,14 +385,14 @@ private:
     // Implementing methods
     void do_flush() override
     {
-        result_.flush();
+        sink_.flush();
     }
 
     bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.append(comma_str_.data(),comma_str_.length());
+            sink_.append(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
 
@@ -453,7 +451,7 @@ private:
         }
         indent();
         
-        result_.append(open_object_brace_str_.data(), open_object_brace_str_.length());
+        sink_.append(open_object_brace_str_.data(), open_object_brace_str_.length());
         column_ += open_object_brace_str_.length();
         return true;
     }
@@ -467,7 +465,7 @@ private:
             new_line();
         }
         stack_.pop_back();
-        result_.append(close_object_brace_str_.data(), close_object_brace_str_.length());
+        sink_.append(close_object_brace_str_.data(), close_object_brace_str_.length());
         column_ += close_object_brace_str_.length();
 
         end_value();
@@ -478,7 +476,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.append(comma_str_.data(),comma_str_.length());
+            sink_.append(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
         if (!stack_.empty())
@@ -538,7 +536,7 @@ private:
                                 column_, column_+open_array_bracket_str_.length());
         }
         indent();
-        result_.append(open_array_bracket_str_.data(), open_array_bracket_str_.length());
+        sink_.append(open_array_bracket_str_.data(), open_array_bracket_str_.length());
         column_ += open_array_bracket_str_.length();
         return true;
     }
@@ -552,7 +550,7 @@ private:
             new_line();
         }
         stack_.pop_back();
-        result_.append(close_array_bracket_str_.data(), close_array_bracket_str_.length());
+        sink_.append(close_array_bracket_str_.data(), close_array_bracket_str_.length());
         column_ += close_array_bracket_str_.length();
         end_value();
         return true;
@@ -563,7 +561,7 @@ private:
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().count() > 0)
         {
-            result_.append(comma_str_.data(),comma_str_.length());
+            sink_.append(comma_str_.data(),comma_str_.length());
             column_ += comma_str_.length();
         }
 
@@ -582,10 +580,10 @@ private:
         {
             stack_.back().set_position(column_);
         }
-        result_.push_back('\"');
-        std::size_t length = jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
-        result_.push_back('\"');
-        result_.append(colon_str_.data(),colon_str_.length());
+        sink_.push_back('\"');
+        std::size_t length = jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
+        sink_.push_back('\"');
+        sink_.append(colon_str_.data(),colon_str_.length());
         column_ += (length+2+colon_str_.length());
         return true;
     }
@@ -604,7 +602,7 @@ private:
             }
         }
 
-        result_.append(null_k().data(), null_k().size());
+        sink_.append(null_k().data(), null_k().size());
         column_ += null_k().size();
 
         end_value();
@@ -632,9 +630,9 @@ private:
                 break;
             default:
             {
-                result_.push_back('\"');
-                std::size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                std::size_t length = jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
+                sink_.push_back('\"');
                 column_ += (length+2);
                 break;
             }
@@ -685,25 +683,25 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                result_.push_back('\"');
-                std::size_t length = encode_base16(b.begin(),b.end(),result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                std::size_t length = encode_base16(b.begin(),b.end(),sink_);
+                sink_.push_back('\"');
                 column_ += (length + 2);
                 break;
             }
             case byte_string_chars_format::base64:
             {
-                result_.push_back('\"');
-                std::size_t length = encode_base64(b.begin(), b.end(), result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                std::size_t length = encode_base64(b.begin(), b.end(), sink_);
+                sink_.push_back('\"');
                 column_ += (length + 2);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                result_.push_back('\"');
-                std::size_t length = encode_base64url(b.begin(),b.end(),result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                std::size_t length = encode_base64url(b.begin(),b.end(),sink_);
+                sink_.push_back('\"');
                 column_ += (length + 2);
                 break;
             }
@@ -740,7 +738,7 @@ private:
             {
                 if (options_.enable_nan_to_num())
                 {
-                    result_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
+                    sink_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
                     column_ += options_.nan_to_num().length();
                 }
                 else if (options_.enable_nan_to_str())
@@ -749,7 +747,7 @@ private:
                 }
                 else
                 {
-                    result_.append(null_k().data(), null_k().size());
+                    sink_.append(null_k().data(), null_k().size());
                     column_ += null_k().size();
                 }
             }
@@ -757,7 +755,7 @@ private:
             {
                 if (options_.enable_inf_to_num())
                 {
-                    result_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
+                    sink_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
                     column_ += options_.inf_to_num().length();
                 }
                 else if (options_.enable_inf_to_str())
@@ -766,7 +764,7 @@ private:
                 }
                 else
                 {
-                    result_.append(null_k().data(), null_k().size());
+                    sink_.append(null_k().data(), null_k().size());
                     column_ += null_k().size();
                 }
             }
@@ -774,7 +772,7 @@ private:
             {
                 if (options_.enable_neginf_to_num())
                 {
-                    result_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                    sink_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
                     column_ += options_.neginf_to_num().length();
                 }
                 else if (options_.enable_neginf_to_str())
@@ -783,14 +781,14 @@ private:
                 }
                 else
                 {
-                    result_.append(null_k().data(), null_k().size());
+                    sink_.append(null_k().data(), null_k().size());
                     column_ += null_k().size();
                 }
             }
         }
         else
         {
-            std::size_t length = fp_(value, result_);
+            std::size_t length = fp_(value, sink_);
             column_ += length;
         }
 
@@ -814,7 +812,7 @@ private:
                 break_line();
             }
         }
-        std::size_t length = jsoncons::detail::write_integer(value, result_);
+        std::size_t length = jsoncons::detail::write_integer(value, sink_);
         column_ += length;
         end_value();
         return true;
@@ -836,7 +834,7 @@ private:
                 break_line();
             }
         }
-        std::size_t length = jsoncons::detail::write_integer(value, result_);
+        std::size_t length = jsoncons::detail::write_integer(value, sink_);
         column_ += length;
         end_value();
         return true;
@@ -858,12 +856,12 @@ private:
 
         if (value)
         {
-            result_.append(true_k().data(), true_k().size());
+            sink_.append(true_k().data(), true_k().size());
             column_ += true_k().size();
         }
         else
         {
-            result_.append(false_k().data(), false_k().size());
+            sink_.append(false_k().data(), false_k().size());
             column_ += false_k().size();
         }
 
@@ -877,7 +875,7 @@ private:
         {
             if (stack_.back().count() > 0)
             {
-                result_.append(comma_str_.data(),comma_str_.length());
+                sink_.append(comma_str_.data(),comma_str_.length());
                 column_ += comma_str_.length();
             }
             if (stack_.back().is_multi_line() || stack_.back().is_indent_once())
@@ -894,7 +892,7 @@ private:
         {
             case bigint_chars_format::number:
             {
-                result_.append(sv.data(),sv.size());
+                sink_.append(sv.data(),sv.size());
                 column_ += sv.size();
                 break;
             }
@@ -905,14 +903,14 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                result_.push_back('\"');
+                sink_.push_back('\"');
                 if (signum == -1)
                 {
-                    result_.push_back('~');
+                    sink_.push_back('~');
                     ++column_;
                 }
-                std::size_t length = encode_base64(v.begin(), v.end(), result_);
-                result_.push_back('\"');
+                std::size_t length = encode_base64(v.begin(), v.end(), sink_);
+                sink_.push_back('\"');
                 column_ += (length+2);
                 break;
             }
@@ -923,22 +921,22 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                result_.push_back('\"');
+                sink_.push_back('\"');
                 if (signum == -1)
                 {
-                    result_.push_back('~');
+                    sink_.push_back('~');
                     ++column_;
                 }
-                std::size_t length = encode_base64url(v.begin(), v.end(), result_);
-                result_.push_back('\"');
+                std::size_t length = encode_base64url(v.begin(), v.end(), sink_);
+                sink_.push_back('\"');
                 column_ += (length+2);
                 break;
             }
             default:
             {
-                result_.push_back('\"');
-                result_.append(sv.data(),sv.size());
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                sink_.append(sv.data(),sv.size());
+                sink_.push_back('\"');
                 column_ += (sv.size() + 2);
                 break;
             }
@@ -965,20 +963,20 @@ private:
 
     void new_line()
     {
-        result_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
+        sink_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
         for (int i = 0; i < indent_amount_; ++i)
         {
-            result_.push_back(' ');
+            sink_.push_back(' ');
         }
         column_ = indent_amount_;
     }
 
     void new_line(std::size_t len)
     {
-        result_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
+        sink_.append(options_.new_line_chars().data(),options_.new_line_chars().length());
         for (std::size_t i = 0; i < len; ++i)
         {
-            result_.push_back(' ');
+            sink_.push_back(' ');
         }
         column_ = len;
     }
@@ -1043,26 +1041,28 @@ private:
         }
     };
 
+
+    Sink sink_;
     const basic_json_encode_options<CharT> options_;
+    jsoncons::detail::write_double fp_;
 
     std::vector<encoding_context> stack_;
-    jsoncons::detail::write_double fp_;
-    Sink result_;
 
     // Noncopyable and nonmoveable
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
-    basic_json_compressed_encoder(sink_type sink)
-        : basic_json_compressed_encoder(std::move(sink), basic_json_encode_options<CharT>())
+    basic_json_compressed_encoder(Sink&& sink)
+        : basic_json_compressed_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>())
     {
     }
 
-    basic_json_compressed_encoder(sink_type sink, 
-                                     const basic_json_encode_options<CharT>& options)
-       : options_(options),
-         fp_(options.float_format(), options.precision()),
-         result_(std::move(sink))
+    basic_json_compressed_encoder(Sink&& sink, 
+                                  const basic_json_encode_options<CharT>& options)
+       : sink_(std::forward<Sink>(sink)),
+         options_(options),
+         fp_(options.float_format(), options.precision())
+         
     {
     }
 
@@ -1070,7 +1070,7 @@ public:
     {
         JSONCONS_TRY
         {
-            result_.flush();
+            sink_.flush();
         }
         JSONCONS_CATCH(...)
         {
@@ -1082,18 +1082,18 @@ private:
     // Implementing methods
     void do_flush() override
     {
-        result_.flush();
+        sink_.flush();
     }
 
     bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
 
         stack_.emplace_back(container_type::object);
-        result_.push_back('{');
+        sink_.push_back('{');
         return true;
     }
 
@@ -1101,7 +1101,7 @@ private:
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
-        result_.push_back('}');
+        sink_.push_back('}');
 
         if (!stack_.empty())
         {
@@ -1115,10 +1115,10 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
         stack_.emplace_back(container_type::array);
-        result_.push_back('[');
+        sink_.push_back('[');
         return true;
     }
 
@@ -1126,7 +1126,7 @@ private:
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
-        result_.push_back(']');
+        sink_.push_back(']');
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1138,13 +1138,13 @@ private:
     {
         if (!stack_.empty() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
 
-        result_.push_back('\"');
-        jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
-        result_.push_back('\"');
-        result_.push_back(':');
+        sink_.push_back('\"');
+        jsoncons::detail::escape_string(name.data(), name.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
+        sink_.push_back('\"');
+        sink_.push_back(':');
         return true;
     }
 
@@ -1152,10 +1152,10 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
 
-        result_.append(null_k().data(), null_k().size());
+        sink_.append(null_k().data(), null_k().size());
 
         if (!stack_.empty())
         {
@@ -1170,7 +1170,7 @@ private:
         {
             case bigint_chars_format::number:
             {
-                result_.append(sv.data(),sv.size());
+                sink_.append(sv.data(),sv.size());
                 break;
             }
             case bigint_chars_format::base64:
@@ -1180,13 +1180,13 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                result_.push_back('\"');
+                sink_.push_back('\"');
                 if (signum == -1)
                 {
-                    result_.push_back('~');
+                    sink_.push_back('~');
                 }
-                encode_base64(v.begin(), v.end(), result_);
-                result_.push_back('\"');
+                encode_base64(v.begin(), v.end(), sink_);
+                sink_.push_back('\"');
                 break;
             }
             case bigint_chars_format::base64url:
@@ -1196,20 +1196,20 @@ private:
                 std::vector<uint8_t> v;
                 n.dump(signum, v);
 
-                result_.push_back('\"');
+                sink_.push_back('\"');
                 if (signum == -1)
                 {
-                    result_.push_back('~');
+                    sink_.push_back('~');
                 }
-                encode_base64url(v.begin(), v.end(), result_);
-                result_.push_back('\"');
+                encode_base64url(v.begin(), v.end(), sink_);
+                sink_.push_back('\"');
                 break;
             }
             default:
             {
-                result_.push_back('\"');
-                result_.append(sv.data(),sv.size());
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                sink_.append(sv.data(),sv.size());
+                sink_.push_back('\"');
                 break;
             }
         }
@@ -1219,7 +1219,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
 
         switch (tag)
@@ -1229,9 +1229,9 @@ private:
                 break;
             default:
             {
-                result_.push_back('\"');
-                jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                jsoncons::detail::escape_string(sv.data(), sv.length(),options_.escape_all_non_ascii(),options_.escape_solidus(),sink_);
+                sink_.push_back('\"');
                 break;
             }
         }
@@ -1250,7 +1250,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
 
         byte_string_chars_format encoding_hint;
@@ -1277,23 +1277,23 @@ private:
         {
             case byte_string_chars_format::base16:
             {
-                result_.push_back('\"');
-                encode_base16(b.begin(),b.end(),result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                encode_base16(b.begin(),b.end(),sink_);
+                sink_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64:
             {
-                result_.push_back('\"');
-                encode_base64(b.begin(), b.end(), result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                encode_base64(b.begin(), b.end(), sink_);
+                sink_.push_back('\"');
                 break;
             }
             case byte_string_chars_format::base64url:
             {
-                result_.push_back('\"');
-                encode_base64url(b.begin(),b.end(),result_);
-                result_.push_back('\"');
+                sink_.push_back('\"');
+                encode_base64url(b.begin(),b.end(),sink_);
+                sink_.push_back('\"');
                 break;
             }
             default:
@@ -1316,7 +1316,7 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
 
         if (JSONCONS_UNLIKELY(!std::isfinite(value)))
@@ -1325,7 +1325,7 @@ private:
             {
                 if (options_.enable_nan_to_num())
                 {
-                    result_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
+                    sink_.append(options_.nan_to_num().data(), options_.nan_to_num().length());
                 }
                 else if (options_.enable_nan_to_str())
                 {
@@ -1333,14 +1333,14 @@ private:
                 }
                 else
                 {
-                    result_.append(null_k().data(), null_k().size());
+                    sink_.append(null_k().data(), null_k().size());
                 }
             }
             else if (value == std::numeric_limits<double>::infinity())
             {
                 if (options_.enable_inf_to_num())
                 {
-                    result_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
+                    sink_.append(options_.inf_to_num().data(), options_.inf_to_num().length());
                 }
                 else if (options_.enable_inf_to_str())
                 {
@@ -1348,14 +1348,14 @@ private:
                 }
                 else
                 {
-                    result_.append(null_k().data(), null_k().size());
+                    sink_.append(null_k().data(), null_k().size());
                 }
             }
             else 
             {
                 if (options_.enable_neginf_to_num())
                 {
-                    result_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
+                    sink_.append(options_.neginf_to_num().data(), options_.neginf_to_num().length());
                 }
                 else if (options_.enable_neginf_to_str())
                 {
@@ -1363,13 +1363,13 @@ private:
                 }
                 else
                 {
-                    result_.append(null_k().data(), null_k().size());
+                    sink_.append(null_k().data(), null_k().size());
                 }
             }
         }
         else
         {
-            fp_(value, result_);
+            fp_(value, sink_);
         }
 
         if (!stack_.empty())
@@ -1386,9 +1386,9 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
-        jsoncons::detail::write_integer(value, result_);
+        jsoncons::detail::write_integer(value, sink_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1403,9 +1403,9 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
-        jsoncons::detail::write_integer(value, result_);
+        jsoncons::detail::write_integer(value, sink_);
         if (!stack_.empty())
         {
             stack_.back().increment_count();
@@ -1417,16 +1417,16 @@ private:
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
-            result_.push_back(',');
+            sink_.push_back(',');
         }
 
         if (value)
         {
-            result_.append(true_k().data(), true_k().size());
+            sink_.append(true_k().data(), true_k().size());
         }
         else
         {
-            result_.append(false_k().data(), false_k().size());
+            sink_.append(false_k().data(), false_k().size());
         }
 
         if (!stack_.empty())

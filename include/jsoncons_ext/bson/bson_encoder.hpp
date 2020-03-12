@@ -72,16 +72,17 @@ private:
 
     };
 
+    sink_type sink_;
+
     std::vector<stack_item> stack_;
     std::vector<uint8_t> buffer_;
-    sink_type result_;
 
     // Noncopyable and nonmoveable
     basic_bson_encoder(const basic_bson_encoder&) = delete;
     basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;
 public:
-    explicit basic_bson_encoder(sink_type sink)
-       : result_(std::move(sink))
+    explicit basic_bson_encoder(Sink&& sink)
+       : sink_(std::forward<Sink>(sink))
     {
     }
 
@@ -89,7 +90,7 @@ public:
     {
         JSONCONS_TRY
         {
-            result_.flush();
+            sink_.flush();
         }
         JSONCONS_CATCH(...)
         {
@@ -101,7 +102,7 @@ private:
 
     void do_flush() override
     {
-        result_.flush();
+        sink_.flush();
     }
 
     bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
@@ -130,7 +131,7 @@ private:
         {
             for (auto c : buffer_)
             {
-                result_.push_back(c);
+                sink_.push_back(c);
             }
         }
         return true;
@@ -161,7 +162,7 @@ private:
         {
             for (auto c : buffer_)
             {
-                result_.push_back(c);
+                sink_.push_back(c);
             }
         }
         return true;
