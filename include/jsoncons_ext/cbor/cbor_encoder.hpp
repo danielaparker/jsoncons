@@ -24,20 +24,30 @@ namespace jsoncons { namespace cbor {
 
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
-template<class Sink=jsoncons::binary_stream_sink>
-class basic_cbor_encoder final : public json_content_handler
+template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
+class basic_cbor_encoder final : public basic_json_content_handler<char>
 {
-    using super_type = json_content_handler;
+    using super_type = basic_json_content_handler<char>;
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
+    typedef Allocator allocator_type;
 public:
     typedef Sink sink_type;
     using typename super_type::char_type;
     using typename super_type::string_view_type;
 
 private:
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+
+    using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
+    using byte_string_type = basic_byte_string<byte_allocator_type>;
+
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,size_t>> string_size_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const byte_string_type,size_t>> byte_string_size_allocator_type;
+
     struct stack_item
     {
         cbor_container_type type_;
@@ -73,21 +83,33 @@ private:
     std::vector<stack_item> stack_;
     Sink result_;
     const cbor_encode_options options_;
+    allocator_type alloc_;
 
     // Noncopyable and nonmoveable
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
     basic_cbor_encoder& operator=(const basic_cbor_encoder&) = delete;
 
-    std::map<std::string,size_t> stringref_map_;
-    std::map<byte_string,size_t> bytestringref_map_;
+    std::map<string_type,size_t,std::less<string_type>,string_size_allocator_type> stringref_map_;
+    std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
 public:
-    explicit basic_cbor_encoder(sink_type sink)
-       : result_(std::move(sink)), options_(cbor_encode_options())
+    explicit basic_cbor_encoder(sink_type sink, 
+                                const allocator_type& alloc = allocator_type())
+       : result_(std::move(sink)), 
+         options_(cbor_encode_options()), 
+         alloc_(alloc),
+         stringref_map_(alloc),
+         bytestringref_map_(alloc)
     {
     }
-    basic_cbor_encoder(sink_type sink, const cbor_encode_options& options)
-       : result_(std::move(sink)), options_(options)
+    basic_cbor_encoder(sink_type sink, 
+                       const cbor_encode_options& options, 
+                       const allocator_type& alloc = allocator_type())
+       : result_(std::move(sink)), 
+         options_(options), 
+         alloc_(alloc),
+         stringref_map_(alloc),
+         bytestringref_map_(alloc)
     {
         if (options.pack_strings())
         {
@@ -295,11 +317,11 @@ private:
 
         if (options_.pack_strings() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
-            std::string s(sv);
+            string_type s(sv.data(), sv.size(), alloc_);
             auto it = stringref_map_.find(s);
             if (it == stringref_map_.end())
             {
-                stringref_map_.insert(std::make_pair(std::move(s), next_stringref_++));
+                stringref_map_.emplace(std::make_pair(std::move(s), next_stringref_++));
                 write_utf8_string(sv);
             }
             else
@@ -838,11 +860,12 @@ private:
         }
         if (options_.pack_strings() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
         {
-            auto it = bytestringref_map_.find(byte_string(b));
+            byte_string_type bs(b.data(), b.size(), alloc_);
+            auto it = bytestringref_map_.find(bs);
             if (it == bytestringref_map_.end())
             {
-                bytestringref_map_.insert(std::make_pair(byte_string(b), next_stringref_++));
-                write_byte_string_value(b);
+                bytestringref_map_.emplace(std::make_pair(bs, next_stringref_++));
+                write_byte_string_value(bs);
             }
             else
             {

@@ -83,12 +83,12 @@ class basic_cbor_parser : public ser_context
 {
     typedef char char_type;
     typedef std::char_traits<char> char_traits_type;
-    typedef Allocator temp_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
 
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
 
@@ -99,7 +99,7 @@ class basic_cbor_parser : public ser_context
 
     std::bitset<num_of_tags> other_tags_;
 
-    temp_allocator_type alloc_;
+    allocator_type alloc_;
     Src source_;
     bool more_;
     bool done_;
