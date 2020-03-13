@@ -97,15 +97,6 @@ namespace detail {
         typename std::enable_if<!std::integral_constant<bool, json_type_traits<Json, T>::is_compatible>::value>::type
     > : std::true_type {};
 
-    // is_json_type_traits_specialized
-    template<class Json, class T, class Enable=void>
-    struct is_json_type_traits_specialized : std::false_type {};
-
-    template<class Json, class T>
-    struct is_json_type_traits_specialized<Json,T, 
-        typename std::enable_if<!is_json_type_traits_unspecialized<Json,T>::value
-    >::type> : std::true_type {};
-
     // is_compatible_array_type
     template<class Json, class T, class Enable=void>
     struct is_compatible_array_type : std::false_type {};
@@ -128,6 +119,15 @@ namespace detail {
     >::type> : std::true_type {};
 
 } // namespace detail
+
+    // is_json_type_traits_specialized
+    template<class Json, class T, class Enable=void>
+    struct is_json_type_traits_specialized : std::false_type {};
+
+    template<class Json, class T>
+    struct is_json_type_traits_specialized<Json,T, 
+        typename std::enable_if<!jsoncons::detail::is_json_type_traits_unspecialized<Json,T>::value
+    >::type> : std::true_type {};
 
     template<class Json>
     struct json_type_traits<Json, const typename std::decay<typename Json::char_type>::type*>
@@ -595,7 +595,7 @@ namespace detail {
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
-                                                    jsoncons::detail::is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
+                                                    is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         typedef typename T::mapped_type mapped_type;
@@ -648,7 +648,7 @@ namespace detail {
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     std::is_integral<typename T::key_type>::value &&
-                                                    jsoncons::detail::is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
+                                                    is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         typedef typename T::mapped_type mapped_type;

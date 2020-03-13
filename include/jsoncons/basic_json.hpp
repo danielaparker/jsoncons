@@ -1883,7 +1883,7 @@ public:
             return evaluate().at(index);
         }
     public:
-
+        typedef ParentT jsoncons_json_parent_type;
         typedef proxy<typename ParentT::proxy_type> proxy_type;
 
         operator basic_json&()
@@ -2167,7 +2167,8 @@ public:
         }
 
         template<class T>
-        T as() const
+        typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
+        as() const
         {
             return evaluate().template as<T>();
         }
@@ -2904,6 +2905,16 @@ public:
 #endif
     };
 
+    // is_proxy
+    template<class T, class Enable = void>
+    struct is_proxy : std::false_type {};
+
+    // is_proxy
+    template<class T>
+    struct is_proxy<T,
+        typename std::enable_if<!std::is_void<typename T::jsoncons_json_parent_type>::value>::type
+    > : std::true_type {};
+
     typedef proxy<basic_json> proxy_type;
 
     static basic_json parse(std::basic_istream<char_type>& is)
@@ -3183,26 +3194,16 @@ public:
     {
     }
 
-    template <class ParentT>
-    basic_json(const proxy<ParentT>& other)
-        : var_(other.evaluate().var_)
-    {
-    }
-
-    template <class ParentT>
-    basic_json(const proxy<ParentT>& other, const Allocator& alloc)
-        : var_(other.evaluate().var_,alloc)
-    {
-    }
-
     template <class T>
-    basic_json(const T& val)
+    basic_json(const T& val,
+               typename std::enable_if<!is_proxy<T>::value>::type* = 0)
         : var_(json_type_traits<basic_json,T>::to_json(val).var_)
     {
     }
 
     template <class T>
-    basic_json(const T& val, const Allocator& alloc)
+    basic_json(const T& val, const Allocator& alloc,
+               typename std::enable_if<!is_proxy<T>::value>::type* = 0)
         : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
     {
     }
@@ -3824,7 +3825,8 @@ public:
     }
 
     template<class T>
-    T as() const
+    typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
+    as() const
     {
         std::error_code ec;
         T val = json_type_traits<basic_json,T>::as(*this);
