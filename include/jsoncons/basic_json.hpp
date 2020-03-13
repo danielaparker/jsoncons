@@ -1885,7 +1885,7 @@ public:
     public:
 
         typedef proxy<typename ParentT::proxy_type> proxy_type;
-/*
+
         operator basic_json&()
         {
             return evaluate();
@@ -1895,7 +1895,7 @@ public:
         {
             return evaluate();
         }
-*/
+
         range<object_iterator> object_range()
         {
             return evaluate().object_range();
