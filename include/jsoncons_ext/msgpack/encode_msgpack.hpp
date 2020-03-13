@@ -66,6 +66,54 @@ namespace msgpack {
         }
     }
 
+    // with temp_allocator_arg_t
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc, const T& j, std::vector<uint8_t>& v)
+    {
+        typedef typename T::char_type char_type;
+        basic_msgpack_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v, temp_alloc);
+        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        j.dump(adaptor);
+    }
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc, const T& val, std::vector<uint8_t>& v)
+    {
+        basic_msgpack_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v, temp_alloc);
+        std::error_code ec;
+        ser_traits<T>::serialize(val, encoder, json(), ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+    }
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc, const T& j, std::ostream& os)
+    {
+        typedef typename T::char_type char_type;
+        basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os, temp_alloc);
+        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        j.dump(adaptor);
+    }
+
+    template<class T,class TempAllocator>
+    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    encode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc, const T& val, std::ostream& os)
+    {
+        basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os, temp_alloc);
+        std::error_code ec;
+        ser_traits<T>::serialize(val, encoder, json(), ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+    }
+
 } // msgpack
 } // jsoncons
 
