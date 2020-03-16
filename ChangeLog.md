@@ -11,7 +11,7 @@ Changes:
 - Fixed some deprecated `json_type_traits` convenience macro names. All
   of the convenience macro names that have ever been deprecated should work.
 
-Enhancments:
+Enhancements:
 
 - Added overload with leading `temp_allocator_arg_t` parameter to `encode_json`, `encode_bson`, `encode_csv`,
 `encode_cbor`, `encode_msgpack` and `encode_ubjson`, which allows the user to supply a custom allocator 
