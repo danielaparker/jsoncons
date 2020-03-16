@@ -1,3 +1,22 @@
+v0.148.0
+--------
+
+Changes:
+
+- The `json_type_traits` convenience macro names ending in `NAMED_TRAITS` 
+  have been deprecated and now end in `NAME_TRAITS`, e.g. the old name 
+  `JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS` is now `JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS`. 
+  Rationale: name consistency.
+
+- Fixed some deprecated `json_type_traits` convenience macro names. All
+  of the convenience macro names that have ever been deprecated should work.
+
+Enhancments:
+
+- Added overload with leading `temp_allocator_arg_t` parameter to `encode_json`, `encode_bson`, `encode_csv`,
+`encode_cbor`, `encode_msgpack` and `encode_ubjson`, which allows the user to supply a custom allocator 
+that serialization will use for temporary work areas.
+
 v0.147.0
 --------
 
