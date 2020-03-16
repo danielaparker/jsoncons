@@ -172,21 +172,6 @@ matrix:
       env: CXXFLAGS="-std=c++11"
 
     - os: osx
-      osx_image: xcode8
-      compiler: clang
-      env: CXXFLAGS="-std=c++11"
-
-    - os: osx
-      osx_image: xcode8.1
-      compiler: clang
-      env: CXXFLAGS="-std=c++11"
-
-    - os: osx
-      osx_image: xcode8.2
-      compiler: clang
-      env: CXXFLAGS="-std=c++11"
-
-    - os: osx
       osx_image: xcode8.3
       compiler: clang
       env: CXXFLAGS="-std=c++11"
