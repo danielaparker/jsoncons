@@ -194,7 +194,7 @@ namespace jsoncons {
 } // namespace jsoncons
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 // First four members listed are mandatory, confidence and expires are optional

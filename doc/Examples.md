@@ -22,7 +22,7 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Serialize with the C++ member names of the class](#G1)  
-[Serialize with provided names using the `_NAMED_` macros](#G2)  
+[Serialize with provided names using the `_NAME_` macros](#G2)  
 [Mapping to C++ data structures with and without defaults allowed](#G3)  
 [Serialize non-mandatory std::optional values using the convenience macros](#G4)  
 [An example with std::shared_ptr and std::unique_ptr](#G5)  
@@ -674,7 +674,7 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G2"/>
 
-#### Serialize with provided names using the `_NAMED_` macros
+#### Serialize with provided names using the `_NAME_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -772,18 +772,18 @@ public:
 } // namespace ns
 
 // Declare the traits at global scope
-JSONCONS_ENUM_NAMED_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
+JSONCONS_ENUM_NAME_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
 
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
-                                           (title,"Title"),(price,"Price"))
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
-                                           (title_,"Title"),(price_,"Price"))
-JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
-                                                (title,"Title"),(price,"Price"))
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
-                                                  (getAuthor,setAuthor,"Author"),
-                                                  (getTitle,setTitle,"Title"),
-                                                  (getPrice,setPrice,"Price"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
+                                          (title,"Title"),(price,"Price"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
+                                          (title_,"Title"),(price_,"Price"))
+JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
+                                               (title,"Title"),(price,"Price"))
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
+                                                 (getAuthor,setAuthor,"Author"),
+                                                 (getTitle,setTitle,"Title"),
+                                                 (getPrice,setPrice,"Price"))
 
 using namespace jsoncons; // for convenience
 
@@ -1520,8 +1520,8 @@ derived classes cannot be distinguished in this way,
 you can introduce extra members. The convenience
 macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
 `JSONCONS_TPL_N_MEMBER_TRAITS`, `JSONCONS_TPL_ALL_MEMBER_TRAITS`,
-`JSONCONS_N_MEMBER_NAMED_TRAITS`, `JSONCONS_ALL_MEMBER_NAMED_TRAITS`,
-`JSONCONS_TPL_N_MEMBER_NAMED_TRAITS`, and `JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS`
+`JSONCONS_N_MEMBER_NAME_TRAITS`, `JSONCONS_ALL_MEMBER_NAME_TRAITS`,
+`JSONCONS_TPL_N_MEMBER_NAME_TRAITS`, and `JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS`
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
