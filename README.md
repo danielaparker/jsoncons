@@ -969,7 +969,7 @@ On UNIX:
 
 ## Acknowledgements
 
-A big thanks to the comp.lang.c++ community for help with implementation details, especially to Martin Bonner and Öö Tiib. 
+A big thanks to the comp.lang.c++ community for help with implementation details. 
 
 The jsoncons platform dependent binary configuration draws on to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor).
 
