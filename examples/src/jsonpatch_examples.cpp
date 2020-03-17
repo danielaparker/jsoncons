@@ -10,18 +10,18 @@ void jsonpatch_add_add()
 {
     // Apply a JSON Patch
 
-    json doc = R"(
+    json doc = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
     json doc2 = doc;
 
-    json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] }
         ]
-    )"_json;
+    )");
 
     std::error_code ec;
     jsonpatch::apply_patch(doc, patch, ec);
@@ -41,17 +41,17 @@ void jsonpatch_add_add()
 
 void jsonpatch_add_add_add_failed1()
 {
-    json target = R"(
+    json target = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
-    json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
             { "op": "add", "path": "/baz/bat", "value": "qux" } // nonexistent target
         ]
-    )"_json;
+    )");
 
     try
     {
@@ -66,17 +66,17 @@ void jsonpatch_add_add_add_failed1()
 
 void jsonpatch_add_add_add_failed2()
 {
-    json target = R"(
+    json target = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
-    json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
             { "op": "add", "path": "/baz/bat", "value": "qux" } // nonexistent target
         ]
-    )"_json;
+    )");
 
     std::error_code ec;
     jsonpatch::apply_patch(target, patch, ec);
@@ -87,13 +87,13 @@ void jsonpatch_add_add_add_failed2()
 
 void create_a_json_patch()
 {
-    json source = R"(
+    json source = json::parse(R"(
         {"/": 9, "foo": "bar"}
-    )"_json;
+    )");
 
-    json target = R"(
+    json target = json::parse(R"(
         { "baz":"qux", "foo": [ "bar", "baz" ]}
-    )"_json;
+    )");
 
     auto patch = jsonpatch::from_diff(source, target);
 

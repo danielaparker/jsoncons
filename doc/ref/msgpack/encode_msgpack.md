@@ -1,10 +1,10 @@
 ### jsoncons::msgpack::encode_msgpack
 
-__`jsoncons_ext/msgpack/msgpack.hpp`__
-
 Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.html) data format.
 
 ```c++
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+
 template<class T>
 void encode_msgpack(const T& jval, std::vector<uint8_t>& v); // (1)
 

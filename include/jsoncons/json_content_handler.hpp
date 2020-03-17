@@ -111,10 +111,10 @@ namespace jsoncons {
             return more;
         }
 
-        bool name(const string_view_type& name, const ser_context& context=null_ser_context())
+        bool key(const string_view_type& name, const ser_context& context=null_ser_context())
         {
             std::error_code ec;
-            bool more = do_name(name, context, ec);
+            bool more = do_key(name, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -267,9 +267,9 @@ namespace jsoncons {
             return do_end_array(context, ec);
         }
 
-        bool name(const string_view_type& name, const ser_context& context, std::error_code& ec)
+        bool key(const string_view_type& name, const ser_context& context, std::error_code& ec)
         {
-            return do_name(name, context, ec);
+            return do_key(name, context, ec);
         }
 
         bool null_value(semantic_tag tag,
@@ -427,7 +427,19 @@ namespace jsoncons {
 
     #if !defined(JSONCONS_NO_DEPRECATED)
 
-        JSONCONS_DEPRECATED_MSG("Instead, use const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
+        JSONCONS_DEPRECATED_MSG("Instead, use key(const string_view_type&, const ser_context&=null_ser_context())") 
+        bool name(const string_view_type& name, const ser_context& context=null_ser_context())
+        {
+            return key(name, context);
+        }
+
+        JSONCONS_DEPRECATED_MSG("Instead, use key(const string_view_type&, const ser_context&, std::error_code&)") 
+        bool name(const string_view_type& name, const ser_context& context, std::error_code& ec)
+        {
+            return key(name, context, ec);
+        }
+
+        JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const byte_string_view&, semantic_tag=semantic_tag::none, const ser_context&=null_ser_context()") 
         bool byte_string_value(const byte_string_view& b, 
                                byte_string_chars_format encoding_hint, 
                                semantic_tag tag=semantic_tag::none, 
@@ -521,7 +533,7 @@ namespace jsoncons {
             end_document();
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use name(const string_view_type&, const ser_context&=null_ser_context())") 
+        JSONCONS_DEPRECATED_MSG("Instead, use key(const string_view_type&, const ser_context&=null_ser_context())") 
         void name(const char_type* p, std::size_t length, const ser_context& context) 
         {
             name(string_view_type(p, length), context);
@@ -604,7 +616,7 @@ namespace jsoncons {
         virtual bool do_end_array(const ser_context& context, 
                                   std::error_code& ec) = 0;
 
-        virtual bool do_name(const string_view_type& name, 
+        virtual bool do_key(const string_view_type& name, 
                              const ser_context& context, 
                              std::error_code&) = 0;
 
@@ -923,7 +935,7 @@ namespace jsoncons {
             return parse_more_;
         }
 
-        bool do_name(const string_view_type&, const ser_context&, std::error_code& ec) override
+        bool do_key(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
             if (ec_)
             {

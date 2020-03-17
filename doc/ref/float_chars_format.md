@@ -1,8 +1,8 @@
 ### jsoncons::float_chars_format
 
-__`jsoncons/json_options.hpp>`
-
 ```c++
+#include <jsoncons/json_options.hpp>
+
 enum class float_chars_format : uint8_t {general,fixed,scientific,hex};
 ```
 

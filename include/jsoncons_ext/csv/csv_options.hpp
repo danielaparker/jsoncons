@@ -127,7 +127,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         Container& column_types)
 {
     using char_type = CharT;
-    const std::map<jsoncons::basic_string_view<CharT>,csv_column_type> type_dictionary =
+    const std::map<basic_string_view<CharT>,csv_column_type> type_dictionary =
     {
 
         {detail::string_literal<char_type>(),csv_column_type::string_t},
@@ -733,7 +733,7 @@ public:
     using basic_csv_encode_options<CharT>::line_delimiter;
     using basic_csv_encode_options<CharT>::quote_style;
 
-    static const size_t default_indent = 4;
+    static constexpr size_t default_indent = 4;
 
 //  Constructors
 

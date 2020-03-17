@@ -1,6 +1,10 @@
 ### jsoncons::ser_error
 
-__`jsoncons/json_exception.hpp`__
+```c++
+#include <jsoncons/json_exception.hpp>
+```
+
+<br>
 
 `jsoncons::ser_error` defines an exception type for reporting serialization and deserialization failures.
 

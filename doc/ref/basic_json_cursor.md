@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_cursor
 
-__`jsoncons/json_cursor.hpp`__
-
 ```c++
+#include <jsoncons/json_cursor.hpp>
+
 template<
     class CharT,
     class Src=jsoncons::stream_source<CharT>,
@@ -31,13 +31,15 @@ wjson_cursor    |basic_json_cursor<wchar_t>
     template <class Source>
     basic_json_cursor(Source&& source, 
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (1)
+                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
+                      const Allocator& alloc = Allocator()); // (1)
 
     template <class Source>
     basic_json_cursor(Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (2)
+                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
+                      const Allocator& alloc = Allocator()); // (2)
 
     template <class Source>
     basic_json_cursor(Source&& source, std::error_code& ec); // (3)
@@ -71,10 +73,17 @@ wjson_cursor    |basic_json_cursor<wchar_t>
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec) // (8)
 
+    template <class Source>
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
+                      Source&& source, 
+                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
+                      const basic_json_decode_options<CharT>& options,
+                      std::function<bool(json_errc,const ser_context&)> err_handler,
+                      std::error_code& ec); // (9)
 
 Constructors (1)-(2) read from a character sequence or stream and throw a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
-Constructors (3)-(8) read from a character sequence or stream and set `ec`
+Constructors (3)-(9) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive any source or 

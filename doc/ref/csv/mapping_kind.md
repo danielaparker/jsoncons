@@ -1,8 +1,8 @@
 ### jsoncons::csv::mapping_kind
 
-__`jsoncons_ext/csv/csv_options.hpp`__
-
 ```c++
+#include <jsoncons_ext/csv/csv_options.hpp>
+
 enum class mapping_kind
 {
     n_rows = 1, 

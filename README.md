@@ -51,26 +51,6 @@ cpp can get from languages with reflection behavior for serialization/deserializ
 
 _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"amazing work"_ _"Your repo rocks!!!!!"_
 
-## Supported compilers
-
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
-
-| Compiler                | Version                   |Architecture | Operating System  | Notes |
-|-------------------------|---------------------------|-------------|-------------------|-------|
-| Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10        |       |
-|                         | vs2017                    | x86,x64     | Windows 10        |       |
-|                         | vs2019                    | x86,x64     | Windows 10        |       |
-| g++                     | 4.8 and above             | x64         | Ubuntu            |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
-|                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
-|                         | 4.9.2                     | i386        | Debian 8          |       |
-| clang                   | 3.8 and above             | x64         | Ubuntu            |       |
-| clang xcode             | 6.4 and above             | x64         | OSX               |       |
-
-It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
-
-[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
-
 ## Get jsoncons
 
 You can use the [vcpkg](https://github.com/Microsoft/vcpkg) platform library manager to install the [jsoncons package](https://github.com/microsoft/vcpkg/tree/master/ports/jsoncons).
@@ -88,18 +68,6 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 
 The library uses exceptions and in some cases `std::error_code`'s to report errors.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
-
-## Benchmarks
-
-[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
-
-- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
-
-- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
-
-- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
-
-[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
 
 ## Examples
 
@@ -132,7 +100,8 @@ std::string data = R"(
            "rater": "HikingAsylum",
            "assertion": "advanced",
            "rated": "Marilyn C",
-           "rating": 0.90
+           "rating": 0.90,
+           "confidence": 0.99
          }
        ]
     }
@@ -152,31 +121,31 @@ jsoncons allows you to work with the data in a number of ways:
 ```c++
 int main()
 {
-        // Parse the string of data into a json value
-        json j = json::parse(data);
+    // Parse the string of data into a json value
+    json j = json::parse(data);
 
-        // Does object member reputons exist?
-        std::cout << "(1) " << std::boolalpha << j.contains("reputons") << "\n\n";
+    // Does object member reputons exist?
+    std::cout << "(1) " << std::boolalpha << j.contains("reputons") << "\n\n";
 
-        // Get a reference to reputons array 
-        const json& v = j["reputons"]; 
+    // Get a reference to reputons array 
+    const json& v = j["reputons"]; 
 
-        // Iterate over reputons array 
-        std::cout << "(2)\n";
-        for (const auto& item : v.array_range())
-        {
-            // Access rated as string and rating as double
-            std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
-        }
-        std::cout << "\n";
+    // Iterate over reputons array 
+    std::cout << "(2)\n";
+    for (const auto& item : v.array_range())
+    {
+        // Access rated as string and rating as double
+        std::cout << item["rated"].as<std::string>() << ", " << item["rating"].as<double>() << "\n";
+    }
+    std::cout << "\n";
 
-        // Select all "rated" with JSONPath
-        std::cout << "(3)\n";
-        json result = jsonpath::json_query(j,"$..rated");
-        std::cout << pretty_print(result) << "\n\n";
+    // Select all "rated" with JSONPath
+    std::cout << "(3)\n";
+    json result = jsonpath::json_query(j,"$..rated");
+    std::cout << pretty_print(result) << "\n\n";
 
-        // Serialize back to JSON
-        std::cout << "(4)\n" << pretty_print(j) << "\n\n";
+    // Serialize back to JSON
+    std::cout << "(4)\n" << pretty_print(j) << "\n\n";
 }
 ```
 Output:
@@ -184,7 +153,7 @@ Output:
 (1) true
 
 (2)
-Marilyn C, 0.90
+Marilyn C, 0.9
 
 (3)
 [
@@ -197,6 +166,7 @@ Marilyn C, 0.90
     "reputons": [
         {
             "assertion": "advanced",
+            "confidence": 0.99,
             "rated": "Marilyn C",
             "rater": "HikingAsylum",
             "rating": 0.9
@@ -226,12 +196,17 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
+        std::optional<double> confidence_; // assumes C++17, otherwise use jsoncons::optional
+        std::optional<uint64_t> expires_;
     public:
         hiking_reputon(const std::string& rater,
                        hiking_experience assertion,
                        const std::string& rated,
-                       double rating)
-            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+                       double rating,
+                       const std::optional<double>& confidence = std::optional<double>(),
+                       const std::optional<uint64_t>& expires = std::optional<uint64_t>())
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
+              confidence_(confidence), expires_(expires)
         {
         }
 
@@ -239,6 +214,8 @@ namespace ns {
         hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
+        std::optional<double> confidence() const {return confidence_;}
+        std::optional<uint64_t> expires() const {return expires_;}
     };
 
     class hiking_reputation
@@ -261,7 +238,10 @@ namespace ns {
 // Declare the traits. Specify which data members need to be serialized.
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+// First four members listed are mandatory, confidence and expires are optional
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
+                              confidence, expires)
+// All members are mandatory
 JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
@@ -293,6 +273,7 @@ Marilyn C, 0.9
     "reputons": [
         {
             "assertion": "advanced",
+            "confidence": 0.99,
             "rated": "Marilyn C",
             "rater": "HikingAsylum",
             "rating": 0.9
@@ -301,13 +282,14 @@ Marilyn C, 0.9
 }
 ```
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
-and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
+`JSONCONS_N_GETTER_CTOR_TRAITS`, and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
-`ns::hiking_experience` and the classes `ns::hiking_reputon` and 
-`ns::hiking_reputation`.
+`ns::hiking_experience`, the class `ns::hiking_reputon` (with some non-mandatory members), and the class
+`ns::hiking_reputation` (with all mandatory members.)
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
-the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
-generates the code from the getter functions and a constructor. 
+the enum identifiers, and the macros `JSONCONS_N_GETTER_CTOR_TRAITS`
+and `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
+generate the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
 See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
@@ -367,6 +349,7 @@ int main()
 ```
 Output:
 ```
+Marilyn C
 begin_object
 name: application
 string_value: hiking
@@ -381,10 +364,11 @@ name: rated
 string_value: Marilyn C
 name: rating
 double_value: 0.9
+name: confidence
+double_value: 0.99
 end_object
 end_array
 end_object
-string_value: Marilyn C
 ```
 
 You can apply a filter to the stream, for example,
@@ -926,7 +910,37 @@ foo,UHVzcw,-18446744073709551617
 bar,UHVzcw==,273.15
 ```
 
-<div id="E5"/> 
+## Benchmarks
+
+[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
+
+- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
+
+- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
+
+- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
+
+[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
+
+## Supported compilers
+
+jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+
+| Compiler                | Version                   |Architecture | Operating System  | Notes |
+|-------------------------|---------------------------|-------------|-------------------|-------|
+| Microsoft Visual Studio | vs2015 (MSVC 19.0.24241.7)| x86,x64     | Windows 10        |       |
+|                         | vs2017                    | x86,x64     | Windows 10        |       |
+|                         | vs2019                    | x86,x64     | Windows 10        |       |
+| g++                     | 4.8 and above             | x64         | Ubuntu            |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
+|                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
+|                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
+|                         | 4.9.2                     | i386        | Debian 8          |       |
+| clang                   | 3.8 and above             | x64         | Ubuntu            |       |
+| clang xcode             | 6.4 and above             | x64         | OSX               |       |
+
+It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
+
+[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 
 ## Building the test suite and examples with CMake
 
@@ -955,7 +969,7 @@ On UNIX:
 
 ## Acknowledgements
 
-A big thanks to the comp.lang.c++ community for help with implementation details, especially to Martin Bonner and Öö Tiib. 
+A big thanks to the comp.lang.c++ community for help with implementation details. 
 
 The jsoncons platform dependent binary configuration draws on to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor).
 

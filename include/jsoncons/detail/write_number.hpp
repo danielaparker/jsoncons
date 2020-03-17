@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_PRINT_NUMBER_HPP
-#define JSONCONS_DETAIL_PRINT_NUMBER_HPP
+#ifndef JSONCONS_DETAIL_WRITE_NUMBER_HPP
+#define JSONCONS_DETAIL_WRITE_NUMBER_HPP
 
 #include <stdexcept>
 #include <string>
@@ -20,24 +20,28 @@
 
 namespace jsoncons { namespace detail {
 
-// print_integer
+// write_integer
 
-template<class Result>
-size_t print_integer(int64_t value, Result& result)
+template<class Integer,class Result>
+typename std::enable_if<std::is_integral<Integer>::value && std::is_signed<Integer>::value,std::size_t>::type
+write_integer(Integer value, Result& result)
 {
     typedef typename Result::value_type char_type;
-
-    std::size_t count = 0;
+    typedef typename std::make_unsigned<Integer>::type unsigned_type;
 
     char_type buf[255];
-    uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
+    unsigned_type u = (value < 0) ? static_cast<unsigned_type>(-value) : static_cast<unsigned_type>(value);
     char_type *p = buf;
+    const char_type* last = buf+255;
+
     do
     {
         *p++ = static_cast<char_type>(48 + u % 10);
     }
-    while (u /= 10);
-    count += (p - buf);
+    while ((u /= 10) && (p < last));
+    JSONCONS_ASSERT(p != last);
+
+    std::size_t count = (p - buf);
     if (value < 0)
     {
         result.push_back('-');
@@ -51,31 +55,29 @@ size_t print_integer(int64_t value, Result& result)
     return count;
 }
 
-// print_uinteger
-
-template<class Result>
-size_t print_uinteger(uint64_t value, Result& result)
+template<class Integer,class Result>
+typename std::enable_if<std::is_integral<Integer>::value && !std::is_signed<Integer>::value,std::size_t>::type
+write_integer(Integer value, Result& result)
 {
     typedef typename Result::value_type char_type;
 
-    std::size_t count = 0;
-
     char_type buf[255];
     char_type *p = buf;
+    const char_type* last = buf+255;
     do
     {
         *p++ = static_cast<char_type>(48 + value % 10);
     }
-    while (value /= 10);
-    count += (p - buf);
+    while ((value /= 10) && (p < last));
+    JSONCONS_ASSERT(p != last);
+
+    std::size_t count = (p - buf);
     while (--p >= buf)
     {
         result.push_back(*p);
     }
     return count;
 }
-
-// print_integer
 
 template<class Result>
 size_t integer_to_hex_string(int64_t value, Result& result)
@@ -106,7 +108,7 @@ size_t integer_to_hex_string(int64_t value, Result& result)
     return count;
 }
 
-// print_uinteger
+// write_integer
 
 template<class Result>
 size_t uinteger_to_hex_string(uint64_t value, Result& result)
@@ -130,7 +132,7 @@ size_t uinteger_to_hex_string(uint64_t value, Result& result)
     return count;
 }
 
-// print_double
+// write_double
 
 template<class Result>
 void dump_buffer(const char *buffer, std::size_t length, char decimal_point, Result& result)
@@ -359,7 +361,7 @@ bool dtoa_general(double v, char decimal_point, Result& result)
     return dtoa_general(v, decimal_point, result, std::integral_constant<bool, std::numeric_limits<double>::is_iec559>());
 }
 
-class print_double
+class write_double
 {
 private:
     string_to_double to_double_;
@@ -367,7 +369,7 @@ private:
     int precision_;
     char decimal_point_;
 public:
-    print_double(float_chars_format float_format, int precision)
+    write_double(float_chars_format float_format, int precision)
        : float_format_(float_format), precision_(precision), decimal_point_('.')
     {
 #if !defined(JSONCONS_NO_LOCALECONV)
@@ -396,7 +398,7 @@ public:
                     length = snprintf(number_buffer, sizeof(number_buffer), "%1.*f", precision_, val);
                     if (length < 0)
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
                     }
                     dump_buffer(number_buffer, length, decimal_point_, result);
                 }
@@ -404,7 +406,7 @@ public:
                 {
                     if (!dtoa_fixed(val, decimal_point_, result))
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
                     }
                 }
             }
@@ -416,7 +418,7 @@ public:
                     length = snprintf(number_buffer, sizeof(number_buffer), "%1.*e", precision_, val);
                     if (length < 0)
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
                     }
                     dump_buffer(number_buffer, length, decimal_point_, result);
                 }
@@ -424,7 +426,7 @@ public:
                 {
                     if (!dtoa_scientific(val, decimal_point_, result))
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
                     }
                 }
             }
@@ -436,7 +438,7 @@ public:
                     length = snprintf(number_buffer, sizeof(number_buffer), "%1.*g", precision_, val);
                     if (length < 0)
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
                     }
                     dump_buffer(number_buffer, length, decimal_point_, result);
                 }
@@ -444,13 +446,13 @@ public:
                 {
                     if (!dtoa_general(val, decimal_point_, result))
                     {
-                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                        JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
                     }
                 }             
                 break;
             }
             default:
-                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("print_double failed."));
+                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("write_double failed."));
                 break;
         }
         return count;

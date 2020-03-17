@@ -169,6 +169,19 @@ namespace json_type_traits_macros_examples_ns {
             return baseSalary_ + commission_*sales_;
         }
     };
+
+    struct smart_pointer_test
+    {
+        std::shared_ptr<std::string> field1;
+        std::unique_ptr<std::string> field2;
+        std::shared_ptr<std::string> field3;
+        std::unique_ptr<std::string> field4;
+        std::shared_ptr<std::string> field5;
+        std::unique_ptr<std::string> field6;
+        std::shared_ptr<std::string> field7;
+        std::unique_ptr<std::string> field8;
+    };
+
 #if defined(JSONCONS_HAS_STD_OPTIONAL)
     class MetaDataReplyTest 
     {
@@ -195,6 +208,7 @@ namespace json_type_traits_macros_examples_ns {
         std::string payload;
         std::optional<std::string> description;
     };
+
 #endif
 
 } // json_type_traits_macros_examples_ns
@@ -220,9 +234,13 @@ JSONCONS_POLYMORPHIC_TRAITS(ns::Foo, ns::Bar, ns::Baz)
 JSONCONS_N_MEMBER_TRAITS(ns::MetaDataReplyTest, 2, status, payload, description)
 #endif
 
-namespace {
-    using namespace jsoncons;
+// Declare the traits, first 4 members mandatory, last 4 non-mandatory
+JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_test,4,field1,field2,field3,field4,field5,field6,field7,field8)
 
+namespace {
+
+    using namespace jsoncons;
+    
 #if defined(JSONCONS_HAS_STD_OPTIONAL)
     void json_type_traits_optional_examples()
     {
@@ -259,7 +277,37 @@ namespace {
         std::cout << "(2)\n";
         std::cout << output2 << "\n\n";
     }
+
 #endif
+
+    void smart_pointer_traits_test()
+    {
+        ns::smart_pointer_test val;
+        val.field1 = std::make_shared<std::string>("Field 1"); 
+        val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
+        val.field3 = std::shared_ptr<std::string>(nullptr);
+        val.field4 = std::unique_ptr<std::string>(nullptr);
+        val.field5 = std::make_shared<std::string>("Field 5"); 
+        val.field6 = jsoncons::make_unique<std::string>("Field 6"); 
+        val.field7 = std::shared_ptr<std::string>(nullptr);
+        val.field8 = std::unique_ptr<std::string>(nullptr);
+
+        std::string buf;
+        encode_json(val, buf, indenting::indent);
+
+        std::cout << buf << "\n";
+
+        auto other = decode_json<ns::smart_pointer_test>(buf);
+
+        assert(*other.field1 == *val.field1);
+        assert(*other.field2 == *val.field2);
+        assert(!other.field3);
+        assert(!other.field4);
+        assert(*other.field5 == *val.field5);
+        assert(*other.field6 == *val.field6);
+        assert(!other.field7);
+        assert(!other.field8);
+    }
 
     void json_type_traits_book_examples()
     {
@@ -393,7 +441,7 @@ namespace {
             } 
         }
     }
-} // annonymous
+} // namespace
 
 void json_traits_macros_examples()
 {
@@ -408,6 +456,7 @@ void json_traits_macros_examples()
 #if defined(JSONCONS_HAS_STD_OPTIONAL)
     json_type_traits_optional_examples();
 #endif
+    smart_pointer_traits_test();
 
     std::cout << std::endl;
 }

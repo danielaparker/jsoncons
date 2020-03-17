@@ -22,11 +22,12 @@
 
 namespace jsoncons { namespace bson {
 
-template<class Sink=jsoncons::binary_stream_sink>
+template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
 class basic_bson_encoder final : public basic_json_content_handler<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
+    typedef Allocator allocator_type;
     typedef char char_type;
     using typename basic_json_content_handler<char>::string_view_type;
     typedef Sink sink_type;
@@ -72,16 +73,20 @@ private:
 
     };
 
+    sink_type sink_;
+    allocator_type alloc_;
+
     std::vector<stack_item> stack_;
     std::vector<uint8_t> buffer_;
-    sink_type result_;
 
     // Noncopyable and nonmoveable
     basic_bson_encoder(const basic_bson_encoder&) = delete;
     basic_bson_encoder& operator=(const basic_bson_encoder&) = delete;
 public:
-    explicit basic_bson_encoder(sink_type sink)
-       : result_(std::move(sink))
+    explicit basic_bson_encoder(Sink&& sink, 
+                                const Allocator& alloc = Allocator())
+       : sink_(std::forward<Sink>(sink)),
+         alloc_(alloc)
     {
     }
 
@@ -89,7 +94,7 @@ public:
     {
         JSONCONS_TRY
         {
-            result_.flush();
+            sink_.flush();
         }
         JSONCONS_CATCH(...)
         {
@@ -101,7 +106,7 @@ private:
 
     void do_flush() override
     {
-        result_.flush();
+        sink_.flush();
     }
 
     bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
@@ -130,7 +135,7 @@ private:
         {
             for (auto c : buffer_)
             {
-                result_.push_back(c);
+                sink_.push_back(c);
             }
         }
         return true;
@@ -161,13 +166,13 @@ private:
         {
             for (auto c : buffer_)
             {
-                result_.push_back(c);
+                sink_.push_back(c);
             }
         }
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         stack_.back().member_offset(buffer_.size());
         buffer_.push_back(0x00); // reserve space for code

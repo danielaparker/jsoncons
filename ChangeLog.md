@@ -1,17 +1,72 @@
-master
-------
+v0.148.0
+--------
+
+Changes:
+
+- The `json_type_traits` convenience macro names ending in `NAMED_TRAITS` 
+  have been deprecated and now end in `NAME_TRAITS`, e.g. the old name 
+  `JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS` is now `JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS`. 
+  Rationale: name consistency.
+
+- Fixed some deprecated `json_type_traits` convenience macro names. All
+  of the convenience macro names that have ever been deprecated should work.
+
+Enhancements:
+
+- Added overload with leading `temp_allocator_arg_t` parameter to `encode_json`, `encode_bson`, `encode_csv`,
+`encode_cbor`, `encode_msgpack` and `encode_ubjson`, which allows the user to supply a custom allocator 
+that serialization will use for temporary work areas.
+
+v0.147.0
+--------
+
+Fixed bugs:
+
+- Fixed an issue with the `jsonpatch_error` class implementation of `what()`, likely related to
+  [issue #212 ](https://github.com/danielaparker/jsoncons/issues/212)
+
+Enhancements:
+
+- Added support to the convenience macros `JSONCONS_N_GETTER_CTOR_TRAITS` and `JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS` 
+  for-non mandatory members to be omitted altogether from the serialized JSON. These macros had been overlooked
+  when this feature was added to the `_N_` macros in v0.146.0.
+
+- Added jsonpointer function `flatten` to flatten a json object or array into a single depth object of JSONPointer-value pairs.
+
+- Added overload with leading `temp_allocator_arg_t` parameter to `decode_json`, `decode_bson`, `decode_csv`,
+`decode_cbor`, `decode_msgpack` and `decode_ubjson`, which allows the user to supply a custom allocator 
+that deserialization will use for temporary work areas.
+
+v0.146.1
+--------
+
+Fixed issue with `json_type_traits` specializations of `std::shared_ptr<T>` and 
+`std::unique_ptr<T>` when converting from JSON null.
+
+v0.146.0
+--------
 
 Changes:
 
 - The name `rename_object_member_filter` has been deprecated and renamed to 
 `rename_object_key_filter`
- 
+
+- The `json_content_handler` public function `name` has been deprecated and renamed to `key`.
+Rationale: in the future we'll likely support overloads for non-string keys for binary formats
+
+- The `json_content_handler` private virtual function `do_name` has been removed and replaced with `do_key`.
+Rationale: in the future we'll likely support overloads for non-string keys for binary formats
+  
 Enhancements:
  
 -  New json_type_traits specialization for `std::shared_ptr<T>` for `T` that is not a polymorphic class,
 i.e., does not have any virtual functions 
 
 -  New json_type_traits specialization for `std::unique_ptr<T>` for `T` that is not a polymorphic class  
+
+- For the `_N_` convenience macros that allow some non-mandatory members, the generated 
+traits `to_json` function will exclude altogether empty values for `std::shared_ptr` 
+and `std::unique_ptr` non-mandatory members, as they do currently for `std::optional`.
 
 v0.145.2
 --------

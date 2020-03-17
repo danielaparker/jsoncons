@@ -1,10 +1,8 @@
 ### jsoncons::jsonpointer::insert_or_assign
 
-__`jsoncons_ext/jsonpointer/jsonpointer.hpp`__
-
-Adds a `json` value.
-
 ```c++
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
 template<class J>
 void insert_or_assign(J& target, const typename J::string_view_type& path, const J& value); // (1)
 

@@ -102,15 +102,15 @@ public:
 namespace ns = json_type_traits_macro_examples_ns;
 
 // Declare the traits at global scope
-JSONCONS_ENUM_NAMED_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
+JSONCONS_ENUM_NAME_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
 
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
                                                 (title,"Title"),(price,"Price"))
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
                                                 (title_,"Title"),(price_,"Price"))
-JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
+JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
                                                  (title,"Title"),(price,"Price"))
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
                                                        (getAuthor,setAuthor,"Author"),
                                                        (getTitle,setTitle,"Title"),
                                                        (getPrice,setPrice,"Price"))
@@ -206,6 +206,7 @@ namespace {
         encode_json(books4, std::cout, indenting::indent);
         std::cout << "\n\n";
     }
+
 } // namespace
 
 void json_traits_macros_named_examples()

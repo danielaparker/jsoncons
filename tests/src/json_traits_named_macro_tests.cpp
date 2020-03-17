@@ -93,12 +93,15 @@ namespace json_type_traits_named_macro_tests
         std::string title_;
         double price_;
         std::string isbn_;
+        jsoncons::optional<std::string> publisher_;
     public:
         book2b(const std::string& author,
               const std::string& title,
               double price,
-              const std::string& isbn)
-            : author_(author), title_(title), price_(price), isbn_(isbn)
+              const std::string& isbn,
+              const jsoncons::optional<std::string>& publisher)
+            : author_(author), title_(title), price_(price), isbn_(isbn),
+              publisher_(publisher)
         {
         }
 
@@ -125,6 +128,11 @@ namespace json_type_traits_named_macro_tests
         const std::string& isbn() const
         {
             return isbn_;
+        }
+
+        const jsoncons::optional<std::string>& publisher() const
+        {
+            return publisher_;
         }
     };
 
@@ -322,17 +330,17 @@ namespace json_type_traits_named_macro_tests
 
 namespace ns = json_type_traits_named_macro_tests;
 
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::book1a,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::book1b,(author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(ns::book2a, (author,"Author"),(title,"Title"),(price,"Price"))
-JSONCONS_N_GETTER_CTOR_NAMED_TRAITS(ns::book2b, 2, (author,"Author"),(title,"Title"),(price,"Price"), (isbn, "Isbn"))
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(ns::book3a, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
-JSONCONS_N_GETTER_SETTER_NAMED_TRAITS(ns::book3b, 2, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"),(get_isbn,set_isbn,"Isbn"))
-JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
-JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
-JSONCONS_ENUM_NAMED_TRAITS(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1a,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1b,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS(ns::book2a, (author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_N_GETTER_CTOR_NAME_TRAITS(ns::book2b, 2, (author,"Author"),(title,"Title"),(price,"Price"), (isbn, "Isbn"), (publisher, "Publisher"))
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::book3a, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
+JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::book3b, 2, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"),(get_isbn,set_isbn,"Isbn"))
+JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(1,ns::TemplatedStruct1,(typeContent,"type-content"),(someString,"some-string"))
+JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(2,ns::TemplatedStruct2,(aT1,"a-t1"),(aT2,"a-t2"))
+JSONCONS_ENUM_NAME_TRAITS(ns::float_format, (scientific,"Exponential"), (fixed,"Fixed"), (hex,"Hex"), (general,"General"))
 
-TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS tests 1")
+TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 1")
 {
    std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -366,7 +374,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS tests 1")
     }
 } 
 
-TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS tests 2")
+TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 2")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -400,7 +408,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAMED_TRAITS tests 2")
     }
 }
 
-TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAMED_TRAITS tests 1")
+TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAME_TRAITS tests 1")
 {
     SECTION("TemplatedStruct1<std::pair<int,int>>")
     {
@@ -452,7 +460,7 @@ TEST_CASE("JSONCONS_ALL_TPL_MEMBER_NAMED_TRAITS tests 1")
     }
 }
 
-TEST_CASE("JSONCONS_ENUM_NAMED_TRAITS tests")
+TEST_CASE("JSONCONS_ENUM_NAME_TRAITS tests")
 {
     SECTION("float_format default")
     {
@@ -482,7 +490,7 @@ TEST_CASE("JSONCONS_ENUM_NAMED_TRAITS tests")
     }
 }
 
-TEST_CASE("JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS tests")
+TEST_CASE("JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -524,12 +532,12 @@ TEST_CASE("JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS tests")
     }
 }
 
-TEST_CASE("JSONCONS_N_GETTER_CTOR_NAMED_TRAITS tests")
+TEST_CASE("JSONCONS_N_GETTER_CTOR_NAME_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
-    //double a_price = 25.17;
-    //std::string an_isbn = "1400079276";
+    double a_price = 25.17;
+    std::string an_isbn = "1400079276";
 
     SECTION("decode")
     {
@@ -548,9 +556,26 @@ TEST_CASE("JSONCONS_N_GETTER_CTOR_NAMED_TRAITS tests")
         CHECK(book.price() == double());
         CHECK(book.isbn() == std::string());
     }
+
+    SECTION("encode_json")
+    {
+        ns::book2b book(an_author, a_title, a_price, an_isbn, jsoncons::optional<std::string>());
+
+        std::string buffer;
+        encode_json(book, buffer, indenting::indent);
+        //std::cout << buffer << "\n";
+
+        json j = json::parse(buffer);
+
+        CHECK(j["Author"].as<std::string>() == an_author);
+        CHECK(j["Title"].as<std::string>() == a_title);
+        CHECK(j["Price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK(j["Isbn"].as<std::string>() == an_isbn);
+        CHECK_FALSE(j.contains("Publisher"));
+    }
 }
 
-TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS tests")
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";
@@ -593,7 +618,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS tests")
     }
 }
 
-TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS tests 2")
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS tests 2")
 {
     std::string an_author = "Haruki Murakami"; 
     std::string a_title = "Kafka on the Shore";

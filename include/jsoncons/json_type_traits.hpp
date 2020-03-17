@@ -97,37 +97,6 @@ namespace detail {
         typename std::enable_if<!std::integral_constant<bool, json_type_traits<Json, T>::is_compatible>::value>::type
     > : std::true_type {};
 
-    // is_json_type_traits_specialized
-    template<class Json, class T, class Enable=void>
-    struct is_json_type_traits_specialized : std::false_type {};
-
-    template<class Json, class T>
-    struct is_json_type_traits_specialized<Json,T, 
-        typename std::enable_if<!is_json_type_traits_unspecialized<Json,T>::value
-    >::type> : std::true_type {};
-
-    // is_compatible_string_type
-    template<class Json, class T, class Enable=void>
-    struct is_compatible_string_type : std::false_type {};
-
-    template<class Json, class T>
-    struct is_compatible_string_type<Json,T, 
-        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        jsoncons::detail::is_string_like<T>::value && 
-        !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
-    >::type> : std::true_type {};
-
-    // is_compatible_string_view_type
-    template<class Json, class T, class Enable=void>
-    struct is_compatible_string_view_type : std::false_type {};
-
-    template<class Json, class T>
-    struct is_compatible_string_view_type<Json,T, 
-        typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        jsoncons::detail::is_string_view_like<T>::value && 
-        !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
-    >::type> : std::true_type {};
-
     // is_compatible_array_type
     template<class Json, class T, class Enable=void>
     struct is_compatible_array_type : std::false_type {};
@@ -150,6 +119,15 @@ namespace detail {
     >::type> : std::true_type {};
 
 } // namespace detail
+
+    // is_json_type_traits_specialized
+    template<class Json, class T, class Enable=void>
+    struct is_json_type_traits_specialized : std::false_type {};
+
+    template<class Json, class T>
+    struct is_json_type_traits_specialized<Json,T, 
+        typename std::enable_if<!jsoncons::detail::is_json_type_traits_unspecialized<Json,T>::value
+    >::type> : std::true_type {};
 
     template<class Json>
     struct json_type_traits<Json, const typename std::decay<typename Json::char_type>::type*>
@@ -519,7 +497,9 @@ namespace detail {
 
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
-                            typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_string_type<Json,T>::value>::type>
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_string<T>::value &&
+                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         typedef typename Json::allocator_type allocator_type;
 
@@ -546,7 +526,47 @@ namespace detail {
 
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
-                            typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_string_view_type<Json,T>::value>::type>
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_string<T>::value &&
+                                                    !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
+    {
+        typedef typename Json::char_type char_type;
+        typedef typename Json::allocator_type allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_string();
+        }
+
+        static T as(const Json& j)
+        {
+            auto s = j.as_string();
+            T val;
+            unicons::convert(s.begin(), s.end(), std::back_inserter(val));
+            return val;
+        }
+
+        static Json to_json(const T& val)
+        {
+            std::basic_string<char_type> s;
+            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+
+            return Json(s, semantic_tag::none);
+        }
+
+        static Json to_json(const T& val, const allocator_type& alloc)
+        {
+            std::basic_string<char_type> s;
+            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+            return Json(s, semantic_tag::none, alloc);
+        }
+    };
+
+    template<class Json, typename T>
+    struct json_type_traits<Json, T, 
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_string_view<T>::value &&
+                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         typedef typename Json::allocator_type allocator_type;
 
@@ -575,7 +595,7 @@ namespace detail {
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
-                                                    jsoncons::detail::is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
+                                                    is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         typedef typename T::mapped_type mapped_type;
@@ -628,7 +648,7 @@ namespace detail {
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     std::is_integral<typename T::key_type>::value &&
-                                                    jsoncons::detail::is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
+                                                    is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
         typedef typename T::mapped_type mapped_type;
@@ -666,7 +686,7 @@ namespace detail {
             for (const auto& item : val)
             {
                 typename Json::key_type key;
-                jsoncons::detail::print_integer(item.first,key);
+                jsoncons::detail::write_integer(item.first,key);
                 j.try_emplace(key, item.second);
             }
             return j;
@@ -679,7 +699,7 @@ namespace detail {
             for (const auto& item : val)
             {
                 typename Json::key_type key{alloc};
-                jsoncons::detail::print_integer(item.first,key);
+                jsoncons::detail::write_integer(item.first,key);
                 j.try_emplace(key, item.second, alloc);
             }
             return j;
@@ -879,7 +899,7 @@ namespace detail
 
         static std::shared_ptr<ValueType> as(const Json& j) 
         {
-            return std::make_shared<ValueType>(j.template as<ValueType>());
+            return j.is_null() ? std::shared_ptr<ValueType>(nullptr) : std::make_shared<ValueType>(j.template as<ValueType>());
         }
 
         static Json to_json(const std::shared_ptr<ValueType>& ptr) 
@@ -909,7 +929,7 @@ namespace detail
 
         static std::unique_ptr<ValueType> as(const Json& j) 
         {
-            return jsoncons::make_unique<ValueType>(j.template as<ValueType>());
+            return j.is_null() ? std::unique_ptr<ValueType>(nullptr) : jsoncons::make_unique<ValueType>(j.template as<ValueType>());
         }
 
         static Json to_json(const std::unique_ptr<ValueType>& ptr) 
@@ -943,7 +963,7 @@ namespace detail
         
         static Json to_json(const jsoncons::optional<T>& val)
         {
-            return val.has_value() ? Json(val.value()) : Json::null();
+            return val.has_value() ? Json(*val) : Json::null();
         }
     };
 

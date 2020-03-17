@@ -153,7 +153,7 @@ TEST_CASE("decode indefinite length ubjson arrays and maps")
     SECTION("{\"oc\": [0]}")
     {
         encoder.begin_object();
-        encoder.name("oc");
+        encoder.key("oc");
         encoder.begin_array();
         encoder.uint64_value(0);
         encoder.end_array();
@@ -165,7 +165,7 @@ TEST_CASE("decode indefinite length ubjson arrays and maps")
     SECTION("{\"oc\": [0,1,2,3]}")
     {
         encoder.begin_object();
-        encoder.name("oc");
+        encoder.key("oc");
         encoder.begin_array();
         encoder.uint64_value(0);
         encoder.uint64_value(1);

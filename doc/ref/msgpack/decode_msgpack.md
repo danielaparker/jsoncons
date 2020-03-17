@@ -1,13 +1,21 @@
 ### jsoncons::msgpack::decode_msgpack
 
-__`jsoncons_ext/msgpack/msgpack.hpp`__
-
 ```c++
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+
 template<class T>
 T decode_msgpack(const std::vector<uint8_t>& v); // (1)
 
 template<class T>
 T decode_msgpack(std::istream& is); // (2)
+
+template<class T,class TempAllocator>
+T decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                 const std::vector<uint8_t>& v); // (3)
+
+template<class T,class TempAllocator>
+T decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                 std::istream& is); // (4)
 ```
 
 Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ data structure.

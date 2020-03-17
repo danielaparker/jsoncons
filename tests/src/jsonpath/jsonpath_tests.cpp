@@ -359,7 +359,6 @@ TEST_CASE("jsonpath store tests")
         CHECK(result7[0] == store["store"]["book"][2]);
         CHECK(result7[1] == store["store"]["book"][3]);
     }
-
     SECTION("test_jsonpath_filter1")
     {
         json book_list = store["store"]["book"];
@@ -839,11 +838,9 @@ TEST_CASE("jsonpath store tests")
 
         CHECK(result == expected);
     }
-
 }
 
 // store tests
-
 TEST_CASE("test_jsonpath_last_of_two_arrays")
 {
     json val = json::parse(R"(
@@ -1875,7 +1872,13 @@ TEST_CASE("jsonpath intersection tests")
         json root = json::parse(input);
 
         json result = jsonpath::json_query(root,"$..[?(@.'Bid')][?(@.'Ask')]");
-        std::cout << "result: " << result << "\n";
+
+        json expected = json::parse(R"(
+        [{"Ask":"200","Bid":"100","Last":"300"},{"Ask":"220","Bid":"110"}]
+        )");
+
+        CHECK(result == expected);
+        //std::cout << "result: " << result << "\n";
     }
 }
 
@@ -1885,33 +1888,52 @@ TEST_CASE("jsonpath-tests")
     std::fstream is(fpath);
     REQUIRE(is);
 
-    json tests = json::parse(is);
+    ojson tests = ojson::parse(is);
     for (const auto& test : tests.array_range())
     {
-        std::string input = test["input"].as<std::string>();
-        std::string path = test["path"].as<std::string>();
-        if (test.contains("expected"))
-        {
-            std::string expected = test["expected"].as<std::string>();
+        const ojson& root = test["given"];
 
-            ojson root = ojson::parse(input);
-            ojson result = jsonpath::json_query(root, path);
-            ojson expected_result = ojson::parse(expected);
-            if (result != expected_result)
-            {
-                std::cout << "\n" << test["annotation"] << "\n";
-                std::cout << root << "\n";
-                std::cout << path << "\n\n";
-                std::cout << "actual: " << result << "\n\n";
-                std::cout << "expected: " << expected << "\n\n";
-            }
-            CHECK(result == expected_result);
-        }
-        else
+        for (const auto& item : test["cases"].array_range())
         {
-            std::string error = test["error"].as<std::string>();
-            ojson root = ojson::parse(input);
-            REQUIRE_THROWS_WITH(jsonpath::json_query(root, path), error);
+            std::string path = item["expression"].as<std::string>();
+            if (item.contains("result"))
+            {
+                const ojson& expected = item["result"];
+
+                std::error_code ec;
+                try
+                {
+                    ojson result = jsonpath::json_query(root, path);
+                    if (result != expected)
+                    {
+                        if (item.contains("annotation"))
+                        {
+                            std::cout << "\n" << item["annotation"] << "\n";
+                        }
+                        std::cout << "input\n" << pretty_print(root) << "\n";
+                        std::cout << path << "\n\n";
+                        std::cout << "actual\n: " << pretty_print(result) << "\n\n";
+                        std::cout << "expected: " << pretty_print(expected) << "\n\n";
+                    }
+                    CHECK(result == expected);
+                }
+                catch (const std::exception& e)
+                {
+                    std::cout << e.what() << "\n";
+                    if (item.contains("annotation"))
+                    {
+                        std::cout << "\n" << item["annotation"] << "\n";
+                    }
+                    std::cout << "input\n" << pretty_print(root) << "\n";
+                    std::cout << "expression\n" << path << "\n";
+                    std::cout << "expected: " << expected << "\n\n";
+                }
+            }
+            else
+            {
+                std::string error = item["error"].as<std::string>();
+                REQUIRE_THROWS_WITH(jsonpath::json_query(root, path), error);
+            }
         }
     }
 }

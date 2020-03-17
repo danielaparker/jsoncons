@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_content_handler
 
-__`jsoncons/json_content_handler.hpp`__
-
 ```c++
+#include <jsoncons/json_content_handler.hpp>
+
 template <
     class CharT
 > class basic_json_content_handler
@@ -46,7 +46,7 @@ Member type                         |Definition
 
     bool end_array(const ser_context& context=null_ser_context()); // (7)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context=null_ser_context()); // (8)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
@@ -104,7 +104,7 @@ Member type                         |Definition
     bool end_array(const ser_context& context, 
                    std::error_code& ec); // (22)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context, 
               std::error_code& ec); // (23)
 
@@ -356,7 +356,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
     virtual bool do_end_array(const ser_context& context, 
                               std::error_code& ec) = 0; // (7)
 
-    virtual bool do_name(const string_view_type& name, 
+    virtual bool do_key(const string_view_type& name, 
                          const ser_context& context, 
                          std::error_code&) = 0; // (8)
 

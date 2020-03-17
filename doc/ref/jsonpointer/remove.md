@@ -1,10 +1,10 @@
 ### jsoncons::jsonpointer::remove
 
-__`jsoncons_ext/jsonpointer/jsonpointer.hpp`__
-
 Removes a `json` element.
 
 ```c++
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
 template<class J>
 void remove(J& target, const typename J::string_view_type& path); // (1)
 

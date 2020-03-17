@@ -1,8 +1,8 @@
 ### jsoncons::semantic_tag
 
-__`jsoncons/tag_type.hpp`__
-
 ```c++
+#include <jsoncons/tag_type.hpp>
+
 enum class semantic_tag : uint8_t 
 {
     none = 0,

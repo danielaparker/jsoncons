@@ -1,15 +1,23 @@
 ### jsoncons::bson::decode_bson
 
-__`jsoncons_ext/bson/bson.hpp`__
-
 Decodes a [Binary JSON (BSON)](http://bsonspec.org/) data format into a C++ data structure.
 
 ```c++
+#include <jsoncons_ext/bson/bson.hpp>
+
 template<class T>
 T decode_bson(const std::vector<uint8_t>& v); // (1)
 
 template<class T>
 T decode_bson(std::istream& is); // (2)
+
+template<class T,class TempAllocator>
+T decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+              const std::vector<uint8_t>& v); // (3)
+
+template<class T,class TempAllocator>
+T decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+              std::istream& is); // (4)
 ```
 
 (1) Reads a BSON bytes buffer into a type T if T is an instantiation of [basic_json](../basic_json.md) 

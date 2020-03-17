@@ -42,7 +42,8 @@ against an empty object
 - [Stefano Sinigardi](https://github.com/cenit) for contributing workaround for vs2017 platform issue
 
 - [xezon](https://github.com/danielaparker/jsoncons/pull/140) for proposing decode_csv and encode_csv functions, the
-ignore_empty_lines option, and fixes to mismatched allocator types. Also for fixes and improvements in string_view code. 
+ignore_empty_lines option, fixes to mismatched allocator types, and fixes and improvements in string_view code. 
+Also for contributing a refactoring of the basic_json variant as a union.
 
 - Vojtech Fried for contributing patches to JSONCONS_DEFINE_LITERAL 
 and to json::as_string to remove warnings
@@ -81,3 +82,4 @@ has virtual functions and accessible non-virtual destructor
 and [Rodrigo Broggi](https://github.com/rbroggi) for providing feedback and helpful suggestions regarding the `json_type_traits`
 convenience macros.
 
+- [dvzubarev](https://github.com/dvzubarev) for contributing suggestions for improving the `ser_traits` implementation.

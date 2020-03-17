@@ -18,10 +18,10 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
 #include <jsoncons/bignum.hpp>
-#include <jsoncons/parse_error_handler.hpp>
+#include <jsoncons/json_parser.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/sink.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 
 namespace jsoncons {
 
@@ -210,7 +210,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<jsoncons::detail::is_string_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get() const
     {
         T s;
@@ -223,19 +223,19 @@ public:
         case staj_event_type::int64_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_integer(value_.int64_value_, sink);
+            jsoncons::detail::write_integer(value_.int64_value_, sink);
             break;
         }
         case staj_event_type::uint64_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_uinteger(value_.uint64_value_, sink);
+            jsoncons::detail::write_integer(value_.uint64_value_, sink);
             break;
         }
         case staj_event_type::half_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_double f{float_chars_format::general,0};
+            jsoncons::detail::write_double f{float_chars_format::general,0};
             double x = jsoncons::detail::decode_half(value_.half_value_);
             f(x, sink);
             break;
@@ -243,7 +243,7 @@ public:
         case staj_event_type::double_value:
         {
             jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::print_double f{float_chars_format::general,0};
+            jsoncons::detail::write_double f{float_chars_format::general,0};
             f(value_.double_value_, sink);
             break;
         }
@@ -273,7 +273,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<jsoncons::detail::is_string_view_like<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<jsoncons::detail::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get() const
     {
         T s;
@@ -1061,7 +1061,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_name(const string_view_type& name, const ser_context& context, std::error_code&) override
+    bool do_key(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(name, staj_event_type::name);
         return !filter_(event_, context);
@@ -1297,7 +1297,7 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
         case staj_event_type::end_object:
             return handler.end_object(context, ec);
         case staj_event_type::name:
-            return handler.name(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
+            return handler.key(ev.template get<basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
             return handler.string_value(ev.template get<basic_string_view<CharT>>(), ev.tag(), context);
         case staj_event_type::byte_string_value:

@@ -1,8 +1,8 @@
 ### jsoncons::indenting
 
-__`jsoncons/json_options.hpp`__
-
 ```c++
+#include <jsoncons/json_options.hpp>
+
 enum class indenting {no_indent, indent}
 ```
 

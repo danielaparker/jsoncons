@@ -85,6 +85,15 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-9
+      env: COMPILER=gcc VERSION=9 JSONCONS_SANITIZE=1 CXXFLAGS="-std=c++17 -Werror -Wall -Wextra -Wimplicit-fallthrough -pedantic -Wcast-align -Wcast-qual" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
       env: COMPILER=gcc VERSION=9 JSONCONS_SANITIZE=1 CXXFLAGS="-std=c++2a -DJSONCONS_HAS_STRING_VIEW" 
 
     - os: linux
@@ -172,21 +181,6 @@ matrix:
       env: CXXFLAGS="-std=c++11"
 
     - os: osx
-      osx_image: xcode8
-      compiler: clang
-      env: CXXFLAGS="-std=c++11"
-
-    - os: osx
-      osx_image: xcode8.1
-      compiler: clang
-      env: CXXFLAGS="-std=c++11"
-
-    - os: osx
-      osx_image: xcode8.2
-      compiler: clang
-      env: CXXFLAGS="-std=c++11"
-
-    - os: osx
       osx_image: xcode8.3
       compiler: clang
       env: CXXFLAGS="-std=c++11"
@@ -215,6 +209,26 @@ matrix:
       osx_image: xcode9.4
       compiler: clang
       env: CXXFLAGS="-std=c++11"
+
+    - os: osx
+      osx_image: xcode10
+      compiler: clang
+      env: CXXFLAGS="-std=c++17"
+
+    - os: osx
+      osx_image: xcode10.1
+      compiler: clang
+      env: CXXFLAGS="-std=c++14"
+
+    - os: osx
+      osx_image: xcode10.2
+      compiler: clang
+      env: CXXFLAGS="-std=c++17"
+
+    - os: osx
+      osx_image: xcode11.2
+      compiler: clang
+      env: CXXFLAGS="-std=c++17"
 
 before_install:
     - |

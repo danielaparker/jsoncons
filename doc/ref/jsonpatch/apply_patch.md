@@ -1,8 +1,8 @@
 ### jsoncons::jsonpatch::apply_patch
 
-__`jsoncons_ext/jsonpatch/jsonpatch.hpp`__
-
 ```c++
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
+
 template <class Json>
 void apply_patch(Json& target, const Json& patch); // (1)
 
@@ -30,21 +30,20 @@ None
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons::literals;
 namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    jsoncons::json target = R"(
+    json doc = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
-    jsoncons::json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] }
         ]
-    )"_json;
+    )");
 
     std::error_code ec;
     jp::apply_patch(target,patch,ec);
@@ -66,22 +65,21 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons::literals;
 namespace jp = jsoncons::jsonpatch;
 
 int main()
 {
-    jsoncons::json target = R"(
+    json target = json::parse(R"(
         { "foo": "bar"}
-    )"_json;
+    )");
 
-    jsoncons::json patch = R"(
+    json patch = json::parse(R"(
         [
             { "op": "add", "path": "/baz", "value": "qux" },
             { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
             { "op": "add", "path": "/baz/bat", "value": "qux" } // nonexistent target
         ]
-    )"_json;
+    )");
 
     std::error_code ec;
     jp::apply_patch(target, patch, ec);

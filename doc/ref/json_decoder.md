@@ -1,9 +1,9 @@
 ### jsoncons::json_decoder
 
-__`jsoncons/json_decoder.hpp`__
-
 ```c++
-template <class Json,class WorkAllocator>
+#include <jsoncons/json_decoder.hpp>
+
+template <class Json,class TempAllocator>
 json_decoder
 ```
 
@@ -14,12 +14,17 @@ json_decoder
 Member type                         |Definition
 ------------------------------------|------------------------------
 `result_allocator_type`|Json::allocator_type
-`work_allocator_type`|WorkAllocator
+`temp_allocator_type`|TempAllocator
 
 #### Constructors
 
-    json_decoder(const result_allocator_type& rallocator = result_allocator_type(), 
-                 const work_allocator_type& wallocator = work_allocator_type())
+    json_decoder(const temp_allocator_type& temp_alloc); // (1)
+
+    json_decoder(result_allocator_arg_t, const result_allocator_type& result_alloc, 
+                 const temp_allocator_type& temp_alloc); // (2)
+
+    json_decoder(result_allocator_arg_t, const result_allocator_type& result_alloc, 
+                 const temp_allocator_type& temp_alloc); // (3)
 
 #### Member functions
 

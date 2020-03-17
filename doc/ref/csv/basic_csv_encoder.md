@@ -1,8 +1,8 @@
 ### jsoncons::csv::basic_csv_encoder
 
-__`jsoncons_ext/csv/csv_encoder.hpp__
-
 ```c++
+#include <jsoncons_ext/csv/csv_encoder.hpp>
+
 template<
     class CharT,
     class Sink,
@@ -33,10 +33,10 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_csv_encoder(sink_type sink)
+    explicit basic_csv_encoder(Sink&& sink)
 Constructs a new csv encoder that is associated with the destination `sink`.
 
-    basic_csv_encoder(sink_type sink, 
+    basic_csv_encoder(Sink&& sink, 
                          const basic_csv_options<CharT>& options)
 Constructs a new csv encoder that is associated with the destination `sink` 
 and uses the specified [csv options](basic_csv_options.md). 
@@ -66,7 +66,7 @@ and uses the specified [csv options](basic_csv_options.md).
 
     bool end_array(const ser_context& context=null_ser_context()); 
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context=null_ser_context()); 
 
     bool string_value(const string_view_type& value, 

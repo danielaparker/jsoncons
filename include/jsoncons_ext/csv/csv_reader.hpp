@@ -25,7 +25,7 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Src=jsoncons::stream_source<CharT>,class WorkAllocator=std::allocator<char>>
+template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
 class basic_csv_reader 
 {
     struct stack_item
@@ -38,8 +38,8 @@ class basic_csv_reader
         bool array_begun_;
     };
     typedef CharT char_type;
-    typedef WorkAllocator work_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef Allocator temp_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
@@ -48,7 +48,7 @@ class basic_csv_reader
 
     basic_json_content_handler<CharT>& handler_;
 
-    basic_csv_parser<CharT,WorkAllocator> parser_;
+    basic_csv_parser<CharT,Allocator> parser_;
     Src source_;
     std::size_t buffer_length_;
     bool eof_;
@@ -56,7 +56,7 @@ class basic_csv_reader
     std::vector<CharT, char_allocator_type> buffer_;
 public:
     // Structural characters
-    static const size_t default_max_buffer_length = 16384;
+    static constexpr size_t default_max_buffer_length = 16384;
     //!  Parse an input stream of CSV text into a json object
     /*!
       \param is The input stream to read from
@@ -65,7 +65,7 @@ public:
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler, 
-                     const WorkAllocator& alloc = WorkAllocator())
+                     const Allocator& alloc = Allocator())
 
        : basic_csv_reader(std::forward<Source>(source), 
                           handler, 
@@ -79,7 +79,7 @@ public:
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options, 
-                     const WorkAllocator& alloc = WorkAllocator())
+                     const Allocator& alloc = Allocator())
 
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
@@ -93,7 +93,7 @@ public:
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const WorkAllocator& alloc = WorkAllocator())
+                     const Allocator& alloc = Allocator())
         : basic_csv_reader(std::forward<Source>(source), 
                            handler, 
                            basic_csv_decode_options<CharT>(), 
@@ -107,7 +107,7 @@ public:
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const WorkAllocator& alloc = WorkAllocator(),
+                     const Allocator& alloc = Allocator(),
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
          parser_(options, err_handler, alloc),
@@ -125,7 +125,7 @@ public:
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const WorkAllocator& alloc = WorkAllocator(),
+                     const Allocator& alloc = Allocator(),
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : handler_(handler),
          parser_(options, err_handler, alloc),
@@ -134,7 +134,7 @@ public:
          begin_(false),
          buffer_(alloc)
     {
-        basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {

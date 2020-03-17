@@ -1,12 +1,12 @@
 ### jsoncons::csv::basic_csv_reader
 
-__`jsoncons_ext/csv/csv_reader.hpp`__
-
 ```c++
+#include <jsoncons_ext/csv/csv_reader.hpp>
+
 template<
     class CharT,
     class Src=jsoncons::stream_source<CharT>,
-    class WorkAllocator=std::allocator<char>>
+    class TempAllocator=std::allocator<char>>
 class basic_csv_reader 
 ```
 
@@ -33,27 +33,27 @@ source_type                |Src
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler, 
-                     const WorkAllocator& alloc = WorkAllocator()); // (1)
+                     const TempAllocator& alloc = TempAllocator()); // (1)
 
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_options<CharT>& options, 
-                     const WorkAllocator& alloc = WorkAllocator()); // (2)
+                     const TempAllocator& alloc = TempAllocator()); // (2)
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const WorkAllocator& alloc = WorkAllocator()); // (3)
+                     const TempAllocator& alloc = TempAllocator()); // (3)
 
     template <class Source>
     basic_csv_reader(Source&& source,
                      basic_json_content_handler<CharT>& handler,
                      const basic_csv_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
-                     const WorkAllocator& alloc = WorkAllocator()); // (4)
+                     const TempAllocator& alloc = TempAllocator()); // (4)
 
 (1) Constructs a `basic_csv_reader` that reads from a character sequence or stream `source`
 and a [basic_json_content_handler](../basic_json_content_handler.md) that receives

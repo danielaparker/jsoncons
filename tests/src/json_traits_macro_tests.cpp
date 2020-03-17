@@ -121,12 +121,15 @@ namespace json_type_traits_macro_tests
         std::string title_;
         double price_;
         std::string isbn_;
+        jsoncons::optional<std::string> publisher_; 
     public:
         book2b(const std::string& author,
               const std::string& title,
               double price,
-              const std::string& isbn)
-            : author_(author), title_(title), price_(price), isbn_(isbn)
+              const std::string& isbn,
+              const jsoncons::optional<std::string>& publisher)
+            : author_(author), title_(title), price_(price), isbn_(isbn),
+              publisher_(publisher)
         {
         }
 
@@ -153,6 +156,11 @@ namespace json_type_traits_macro_tests
         const std::string& isbn() const
         {
             return isbn_;
+        }
+
+        const jsoncons::optional<std::string>& publisher() const
+        {
+            return publisher_;
         }
     };
 
@@ -449,6 +457,22 @@ namespace json_type_traits_macro_tests
             return !(lhs == rhs);
         };
     };
+
+    struct smart_pointer_and_optional_test1
+    {
+        std::shared_ptr<std::string> field1;
+        std::unique_ptr<std::string> field2;
+        jsoncons::optional<std::string> field3;
+        std::shared_ptr<std::string> field4;
+        std::unique_ptr<std::string> field5;
+        jsoncons::optional<std::string> field6;
+        std::shared_ptr<std::string> field7;
+        std::unique_ptr<std::string> field8;
+        jsoncons::optional<std::string> field9;
+        std::shared_ptr<std::string> field10;
+        std::unique_ptr<std::string> field11;
+        jsoncons::optional<std::string> field12;
+    };
 } // namespace json_type_traits_macro_tests
  
 namespace ns = json_type_traits_macro_tests;
@@ -459,7 +483,7 @@ JSONCONS_N_MEMBER_TRAITS(ns::book1b,3,author,title,price,isbn)
 JSONCONS_N_MEMBER_TRAITS(ns::book1c,3,author,title,price,isbn)
 
 JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::book2a, author, title, price)
-JSONCONS_N_GETTER_CTOR_TRAITS(ns::book2b, 2, author, title, price, isbn)
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::book2b, 2, author, title, price, isbn, publisher)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::MyStruct,typeContent,someString)
 JSONCONS_TPL_ALL_MEMBER_TRAITS(1,ns::MyStruct2,typeContent,someString)
 JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS(1,ns::MyStruct3,typeContent,someString)
@@ -477,9 +501,57 @@ JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
 JSONCONS_ALL_MEMBER_TRAITS(ns::hiking_reputation, application, reputons)
 
+// Declare the traits, first 6 members mandatory, last 6 non-mandatory
+JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test1,6,
+                         field1,field2,field3,field4,field5,field6,
+                         field7,field8,field9,field10,field11,field12)
+
 void test_is_json_type_traits_declared(std::true_type)
 {
 }
+
+namespace 
+{
+    template <class T>
+    struct MyAlloc
+    {
+        using value_type = T;
+        using size_type = std::size_t;
+        using propagate_on_container_move_assignment = std::true_type;
+
+        #if _GLIBCXX_FULLY_DYNAMIC_STRING == 0
+        MyAlloc() = default;
+        #endif
+        MyAlloc(int) {}
+
+        template< class U >
+        MyAlloc(const MyAlloc<U>&) noexcept {}
+
+        T* allocate(size_type n)
+        {
+            return static_cast<T*>(::operator new(n * sizeof(T)));
+        }
+
+        void deallocate(T* ptr, size_type) noexcept
+        {
+            ::operator delete(ptr);
+        }
+
+        bool operator==(const MyAlloc&) const { return true; }
+        bool operator!=(const MyAlloc&) const { return false; }
+
+        template<typename U>
+        struct rebind
+        {
+            typedef MyAlloc<U> other;
+        };
+        typedef T* pointer;
+        typedef const T* const_pointer;
+        typedef T& reference;
+        typedef const T& const_reference;
+        typedef std::ptrdiff_t difference_type;
+    };
+} // namespace
 
 TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 {
@@ -655,7 +727,7 @@ TEST_CASE("JSONCONS_N_GETTER_CTOR_TRAITS tests")
 
     SECTION("to_json")
     {
-        ns::book2b book(an_author,a_title,a_price,an_isbn);
+        ns::book2b book(an_author,a_title,a_price,an_isbn,jsoncons::optional<std::string>());
 
         json j(book);
 
@@ -691,6 +763,22 @@ TEST_CASE("JSONCONS_N_GETTER_CTOR_TRAITS tests")
         CHECK(book.title() == a_title);
         CHECK(book.price() == double());
         CHECK(book.isbn() == std::string());
+    }
+
+    SECTION("encode_json")
+    {
+        ns::book2b book(an_author, a_title, a_price, an_isbn, jsoncons::optional<std::string>());
+
+        std::string buffer;
+        encode_json(book, buffer, indenting::indent);
+
+        json j = json::parse(buffer);
+
+        CHECK(j["author"].as<std::string>() == an_author);
+        CHECK(j["title"].as<std::string>() == a_title);
+        CHECK(j["price"].as<double>() == Approx(a_price).epsilon(0.001));
+        CHECK(j["isbn"].as<std::string>() == an_isbn);
+        CHECK_FALSE(j.contains("publisher"));
     }
 }
 
@@ -1095,16 +1183,17 @@ TEST_CASE("hiking_reputation")
     SECTION("4")
     {
         std::string s;
-        encode_json(val, s, json_options(), indenting::no_indent, ojson());
-        auto val2 = decode_json<ns::hiking_reputation>(s, json_options(), ojson());
+        encode_json(val, s, json_options(), indenting::no_indent);
+        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1), s);
         CHECK(val2 == val);
     }
 
     SECTION("5")
     {
         std::string s;
-        encode_json(val, s, json_options(), indenting::indent, ojson());
-        auto val2 = decode_json<ns::hiking_reputation>(s, json_options(), ojson());
+        encode_json(val, s, json_options(), indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
+                                                       s, json_options());
         CHECK(val2 == val);
     }
 
@@ -1112,8 +1201,9 @@ TEST_CASE("hiking_reputation")
     {
         std::string s;
         json_options options;
-        encode_json(val, s, options, indenting::indent, ojson());
-        auto val2 = decode_json<ns::hiking_reputation>(s, options, ojson());
+        encode_json(val, s, options, indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
+                                                       s, options);
         CHECK(val2 == val);
     }
 
@@ -1145,16 +1235,18 @@ TEST_CASE("hiking_reputation")
     SECTION("os 4")
     {
         std::stringstream os;
-        encode_json(val, os, json_options(), indenting::no_indent, ojson());
-        auto val2 = decode_json<ns::hiking_reputation>(os, json_options(), ojson());
+        encode_json(val, os, json_options(), indenting::no_indent);
+        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
+                                                       os, json_options());
         CHECK(val2 == val);
     }
 
     SECTION("os 5")
     {
         std::stringstream os;
-        encode_json(val, os, json_options(), indenting::indent, ojson());
-        auto val2 = decode_json<ns::hiking_reputation>(os, json_options(), ojson());
+        encode_json(val, os, json_options(), indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
+                                                       os, json_options());
         CHECK(val2 == val);
     }
 
@@ -1162,9 +1254,72 @@ TEST_CASE("hiking_reputation")
     {
         std::stringstream os;
         json_options options;
-        encode_json(val, os, options, indenting::indent, ojson());
-        auto val2 = decode_json<ns::hiking_reputation>(os, options, ojson());
+        encode_json(val, os, options, indenting::indent);
+        auto val2 = decode_json<ns::hiking_reputation>(temp_allocator_arg, MyAlloc<char>(1),
+                                                       os, options);
         CHECK(val2 == val);
     }
 }
 
+TEST_CASE("JSONCONS_N_MEMBER_TRAITS pointer and optional test")
+{
+    SECTION("test 1")
+    {
+        ns::smart_pointer_and_optional_test1 val;
+        val.field1 = std::make_shared<std::string>("Field 1"); 
+        val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
+        val.field3 = "Field 3";
+        val.field4 = std::shared_ptr<std::string>(nullptr);
+        val.field5 = std::unique_ptr<std::string>(nullptr);
+        val.field6 = jsoncons::optional<std::string>();
+        val.field7 = std::make_shared<std::string>("Field 7"); 
+        val.field8 = jsoncons::make_unique<std::string>("Field 8"); 
+        val.field9 = "Field 9";
+        val.field10 = std::shared_ptr<std::string>(nullptr);
+        val.field11 = std::unique_ptr<std::string>(nullptr);
+        val.field12 = jsoncons::optional<std::string>();
+
+        std::string buf;
+        encode_json(val, buf, indenting::indent);
+        //std::cout << buf << "\n";
+
+        json j = decode_json<json>(buf);
+        CHECK(j.contains("field1"));
+        CHECK(j.contains("field2"));
+        CHECK(j.contains("field3"));
+        CHECK(j.contains("field4"));
+        CHECK(j.contains("field5"));
+        CHECK(j.contains("field6"));
+        CHECK(j.contains("field7"));
+        CHECK(j.contains("field8"));
+        CHECK(j.contains("field9"));
+        CHECK_FALSE(j.contains("field10"));
+        CHECK_FALSE(j.contains("field11"));
+        CHECK_FALSE(j.contains("field12"));
+
+        CHECK(j["field1"].as<std::string>() == std::string("Field 1"));
+        CHECK(j["field2"].as<std::string>() == std::string("Field 2"));
+        CHECK(j["field3"].as<std::string>() == std::string("Field 3"));
+        CHECK(j["field4"].is_null());
+        CHECK(j["field5"].is_null());
+        CHECK(j["field6"].is_null());
+        CHECK(j["field7"].as<std::string>() == std::string("Field 7"));
+        CHECK(j["field8"].as<std::string>() == std::string("Field 8"));
+        CHECK(j["field9"].as<std::string>() == std::string("Field 9"));
+
+        auto other = decode_json<ns::smart_pointer_and_optional_test1>(buf);
+
+        CHECK(*other.field1 == *val.field1);
+        CHECK(*other.field2 == *val.field2);
+        CHECK(*other.field3 == *val.field3);
+        CHECK_FALSE(other.field4);
+        CHECK_FALSE(other.field5);
+        CHECK_FALSE(other.field6);
+        CHECK(*other.field7 == *val.field7);
+        CHECK(*other.field8 == *val.field8);
+        CHECK(*other.field9 == *val.field9);
+        CHECK_FALSE(other.field10);
+        CHECK_FALSE(other.field11);
+        CHECK_FALSE(other.field12);
+    }
+}

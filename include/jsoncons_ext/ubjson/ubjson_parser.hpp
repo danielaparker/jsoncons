@@ -37,15 +37,15 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class WorkAllocator=std::allocator<char>>
+template <class Src,class TempAllocator=std::allocator<char>>
 class basic_ubjson_parser : public ser_context
 {
     typedef char char_type;
     typedef std::char_traits<char> char_traits_type;
-    typedef WorkAllocator work_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    typedef TempAllocator temp_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
 
     Src source_;
     int nesting_depth_;
@@ -56,7 +56,7 @@ class basic_ubjson_parser : public ser_context
 public:
     template <class Source>
     basic_ubjson_parser(Source&& source,
-                        const WorkAllocator alloc=WorkAllocator())
+                        const TempAllocator alloc=TempAllocator())
        : source_(std::forward<Source>(source)), 
          nesting_depth_(0),
          more_(true), 
@@ -744,7 +744,7 @@ private:
             ec = ubjson_errc::invalid_utf8_text_string;
             return;
         }
-        more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+        more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
     }
 };
 

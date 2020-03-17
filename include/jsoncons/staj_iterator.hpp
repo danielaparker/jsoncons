@@ -26,6 +26,7 @@ class staj_array_iterator
 
     basic_staj_reader<char_type>* reader_;
     optional<T> value_;
+    json_decoder<Json> decoder_;
 public:
     typedef T value_type;
     typedef std::ptrdiff_t difference_type;
@@ -100,7 +101,7 @@ public:
 
     const T& operator*() const
     {
-        return value_.value();
+        return *value_;
     }
 
     const T* operator->() const
@@ -182,6 +183,7 @@ public:
 private:
     basic_staj_reader<char_type>* reader_;
     optional<value_type> key_value_;
+    json_decoder<Json> decoder_;
 public:
 
     staj_object_iterator() noexcept
@@ -250,7 +252,7 @@ public:
 
     const value_type& operator*() const
     {
-        return key_value_.value();
+        return *key_value_;
     }
 
     const value_type* operator->() const
@@ -334,7 +336,7 @@ void staj_array_iterator<Json,T>::next()
         if (!done())
         {
             std::error_code ec;
-            value_ = deser_traits<T>::deserialize(*reader_, Json(), ec);
+            value_ = deser_traits<T>::deserialize(*reader_, decoder_, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -355,7 +357,7 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            value_ = deser_traits<T>::deserialize(*reader_, Json(), ec);
+            value_ = deser_traits<T>::deserialize(*reader_, decoder_, ec);
         }
     }
 }
@@ -372,7 +374,7 @@ void staj_object_iterator<Json,T>::next()
         if (!done())
         {
             std::error_code ec;
-            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, Json(), ec));
+            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, decoder_, ec));
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -400,7 +402,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, Json(), ec));
+            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, decoder_, ec));
         }
     }
 }

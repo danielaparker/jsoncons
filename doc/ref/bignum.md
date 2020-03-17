@@ -1,8 +1,8 @@
 ### jsoncons::bignum
 
-__`jsoncons/bignum.hpp`__
-
 ```c++
+#include <jsoncons/bignum.hpp>
+
 typedef basic_bignum<Allocator = std::allocator<uint8_t>> bignum;
 ```
 The `bignum` class is an instantiation of the `basic_bignum` class template that uses `std::allocator<uint8_t>` as the allocator type.

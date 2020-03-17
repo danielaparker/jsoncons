@@ -1,8 +1,8 @@
 ### jsoncons::csv::basic_csv_options
 
-__`jsoncons_ext/csv/csv_options.hpp`__
-
 ```c++
+#include <jsoncons_ext/csv/csv_options.hpp>
+
 template< 
     class CharT
 > class basic_csv_options;

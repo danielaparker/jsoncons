@@ -93,13 +93,13 @@ struct default_csv_parsing
 
 namespace detail {
 
-    template <class CharT,class WorkAllocator>
+    template <class CharT,class TempAllocator>
     class parse_event
     {
-        typedef WorkAllocator work_allocator_type;
+        typedef TempAllocator temp_allocator_type;
         typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
-        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
         typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
         typedef basic_byte_string<byte_allocator_type> byte_string_type;
 
@@ -115,7 +115,7 @@ namespace detail {
         };
         semantic_tag tag;
     public:
-        parse_event(staj_event_type event_type, semantic_tag tag, const WorkAllocator& alloc)
+        parse_event(staj_event_type event_type, semantic_tag tag, const TempAllocator& alloc)
             : event_type(event_type), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -123,7 +123,7 @@ namespace detail {
         {
         }
 
-        parse_event(const string_view_type& value, semantic_tag tag, const WorkAllocator& alloc)
+        parse_event(const string_view_type& value, semantic_tag tag, const TempAllocator& alloc)
             : event_type(staj_event_type::string_value), 
               string_value(value.data(),value.length(),alloc), 
               byte_string_value(alloc),
@@ -131,7 +131,7 @@ namespace detail {
         {
         }
 
-        parse_event(const byte_string_view& value, semantic_tag tag, const WorkAllocator& alloc)
+        parse_event(const byte_string_view& value, semantic_tag tag, const TempAllocator& alloc)
             : event_type(staj_event_type::byte_string_value), 
               string_value(alloc),
               byte_string_value(value.data(),value.size(),alloc), 
@@ -139,7 +139,7 @@ namespace detail {
         {
         }
 
-        parse_event(bool value, semantic_tag tag, const WorkAllocator& alloc)
+        parse_event(bool value, semantic_tag tag, const TempAllocator& alloc)
             : event_type(staj_event_type::bool_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -148,7 +148,7 @@ namespace detail {
         {
         }
 
-        parse_event(int64_t value, semantic_tag tag, const WorkAllocator& alloc)
+        parse_event(int64_t value, semantic_tag tag, const TempAllocator& alloc)
             : event_type(staj_event_type::int64_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -157,7 +157,7 @@ namespace detail {
         {
         }
 
-        parse_event(uint64_t value, semantic_tag tag, const WorkAllocator& alloc)
+        parse_event(uint64_t value, semantic_tag tag, const TempAllocator& alloc)
             : event_type(staj_event_type::uint64_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -166,7 +166,7 @@ namespace detail {
         {
         }
 
-        parse_event(double value, semantic_tag tag, const WorkAllocator& alloc)
+        parse_event(double value, semantic_tag tag, const TempAllocator& alloc)
             : event_type(staj_event_type::double_value), 
               string_value(alloc),
               byte_string_value(alloc),
@@ -207,23 +207,23 @@ namespace detail {
         }
     };
 
-    template <class CharT, class WorkAllocator>
+    template <class CharT, class TempAllocator>
     class m_columns_filter : public basic_json_content_handler<CharT>
     {
     public:
         typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
         typedef CharT char_type;
-        typedef WorkAllocator work_allocator_type;
+        typedef TempAllocator temp_allocator_type;
 
-        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
         typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
 
-        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event<CharT,WorkAllocator>> parse_event_allocator_type;
-        typedef std::vector<parse_event<CharT,WorkAllocator>, parse_event_allocator_type> parse_event_vector_type;
-        typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_event_vector_type> parse_event_vector_allocator_type;
+        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event<CharT,TempAllocator>> parse_event_allocator_type;
+        typedef std::vector<parse_event<CharT,TempAllocator>, parse_event_allocator_type> parse_event_vector_type;
+        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event_vector_type> parse_event_vector_allocator_type;
     private:
-        WorkAllocator alloc_;
+        TempAllocator alloc_;
         std::size_t name_index_;
         int level_;
         cached_state state_;
@@ -234,7 +234,7 @@ namespace detail {
         std::vector<parse_event_vector_type,parse_event_vector_allocator_type> cached_events_;
     public:
 
-        m_columns_filter(const WorkAllocator& alloc)
+        m_columns_filter(const TempAllocator& alloc)
             : alloc_(alloc),
               name_index_(0), 
               level_(0), 
@@ -289,7 +289,7 @@ namespace detail {
                     case cached_state::name:
                         if (column_index_ < column_names_.size())
                         {
-                            more = handler.name(column_names_[column_index_], null_ser_context());
+                            more = handler.key(column_names_[column_index_], null_ser_context());
                             state_ = cached_state::begin_array;
                         }
                         else
@@ -368,7 +368,7 @@ namespace detail {
             return true;
         }
 
-        bool do_name(const string_view_type&, const ser_context&, std::error_code& ec) override
+        bool do_key(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
             return false;
@@ -481,7 +481,7 @@ namespace detail {
 
 } // namespace detail
 
-template<class CharT,class WorkAllocator=std::allocator<char>>
+template<class CharT,class TempAllocator=std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
 public:
@@ -498,18 +498,18 @@ private:
         }
     };
 
-    typedef WorkAllocator work_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef TempAllocator temp_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<csv_mode> csv_mode_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_mode> csv_mode_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<std::vector<string_type,string_allocator_type>> string_vector_allocator_type;
+    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_parse_state> csv_parse_state_allocator_type;
 
-    static const int default_depth = 3;
+    static constexpr int default_depth = 3;
 
-    work_allocator_type alloc_;
+    temp_allocator_type alloc_;
     csv_parse_state state_;
     basic_json_content_handler<CharT>* handler_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
@@ -527,7 +527,7 @@ private:
     bool more_;
     std::size_t header_line_;
 
-    detail::m_columns_filter<CharT,WorkAllocator> m_columns_filter_;
+    detail::m_columns_filter<CharT,TempAllocator> m_columns_filter_;
     std::vector<csv_mode,csv_mode_allocator_type> stack_;
     std::vector<string_type,string_allocator_type> column_names_;
     std::vector<csv_type_info,csv_type_info_allocator_type> column_types_;
@@ -537,7 +537,7 @@ private:
     std::vector<std::pair<string_view_type,double>> string_double_map_;
 
 public:
-    basic_csv_parser(const WorkAllocator& alloc = WorkAllocator())
+    basic_csv_parser(const TempAllocator& alloc = TempAllocator())
        : basic_csv_parser(basic_csv_decode_options<CharT>(), 
                           default_csv_parsing(),
                           alloc)
@@ -545,7 +545,7 @@ public:
     }
 
     basic_csv_parser(const basic_csv_decode_options<CharT>& options,
-                     const WorkAllocator& alloc = WorkAllocator())
+                     const TempAllocator& alloc = TempAllocator())
         : basic_csv_parser(options, 
                            default_csv_parsing(),
                            alloc)
@@ -553,7 +553,7 @@ public:
     }
 
     basic_csv_parser(std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     const WorkAllocator& alloc = WorkAllocator())
+                     const TempAllocator& alloc = TempAllocator())
         : basic_csv_parser(basic_csv_decode_options<CharT>(), 
                            err_handler,
                            alloc)
@@ -562,7 +562,7 @@ public:
 
     basic_csv_parser(const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     const WorkAllocator& alloc = WorkAllocator())
+                     const TempAllocator& alloc = TempAllocator())
        : alloc_(alloc),
          handler_(nullptr),
          err_handler_(err_handler),
@@ -1324,7 +1324,7 @@ private:
                     {
                         if (column_index_ < column_names_.size() + offset_)
                         {
-                            more_ = handler_->name(column_names_[column_index_ - offset_], *this, ec);
+                            more_ = handler_->key(column_names_[column_index_ - offset_], *this, ec);
                         }
                     }
                 }
@@ -1636,7 +1636,7 @@ private:
                         {
                             if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                             {
-                                basic_json_parser<CharT,work_allocator_type> parser(alloc_);
+                                basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                 parser.parse_some(*handler_);
                                 parser.finish_parse(*handler_);
@@ -1667,7 +1667,7 @@ private:
                             {
                                 if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                                 {
-                                    basic_json_parser<CharT,work_allocator_type> parser(alloc_);
+                                    basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                                     parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                     parser.parse_some(*handler_);
                                     parser.finish_parse(*handler_);
@@ -1702,7 +1702,7 @@ private:
                         {
                             if (column_index_ - offset_ < column_defaults_.size() && column_defaults_[column_index_ - offset_].length() > 0)
                             {
-                                basic_json_parser<CharT,work_allocator_type> parser(alloc_);
+                                basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                                 parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                                 parser.parse_some(*handler_);
                                 parser.finish_parse(*handler_);
@@ -1723,7 +1723,7 @@ private:
                     {
                         if (column_index_ < column_defaults_.size() + offset_ && column_defaults_[column_index_ - offset_].length() > 0)
                         {
-                            basic_json_parser<CharT,work_allocator_type> parser(alloc_);
+                            basic_json_parser<CharT,temp_allocator_type> parser(alloc_);
                             parser.update(column_defaults_[column_index_ - offset_].data(),column_defaults_[column_index_ - offset_].length());
                             parser.parse_some(*handler_);
                             parser.finish_parse(*handler_);

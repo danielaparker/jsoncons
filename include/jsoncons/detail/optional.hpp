@@ -16,7 +16,7 @@
 namespace jsoncons 
 { 
 namespace detail 
-{
+{ 
     template <typename T>
     class optional;
 

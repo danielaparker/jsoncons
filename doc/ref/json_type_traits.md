@@ -1,6 +1,10 @@
 ### jsoncons::json_type_traits
 
-__`jsoncons/json_type_traits.hpp`__
+```c++
+#include <jsoncons/json_type_traits.hpp>
+```
+
+<br>
 
 `json_type_traits` defines a compile time template based interface for accessing and modifying `basic_json` values.
 
@@ -40,7 +44,7 @@ which inherits from [std::false_type](http://www.cplusplus.com/reference/type_tr
 This traits class may be specialized for a user-defined type with member constant `value` equal `true`
 to inform the `jsoncons` library that the type is already specialized.  
 
-### Specializations
+### jsoncons specializations
 
 `T`|`j.is<T>()`|`j.as<T>()`|j is assignable from `T`
 --------|-----------|--------------|---
@@ -49,21 +53,39 @@ to inform the `jsoncons` library that the type is already specialized.
 `Json::array`|`true` if `j.is_array()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `bool`|`true` if `j.is_bool()`, otherwise `false`|as `bool`|<em>&#x2713;</em>
 `null_type`|`true` if `j.is_null()`, otherwise `false`|`null_type()` value if j.is_null(), otherwise throws|<em>&#x2713;</em>
-`const char_type*`|`true` if string, otherwise `false`|as `const char_type*`|<em>&#x2713;</em>
-`char_type*`|`true` if `j.is_string()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
 `integral types`|`true` if `j.is_int64()` or `j.is_uint64()` and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
 `floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
-`string`|`true` if j.is_string(), otherwise `false`|as string|<em>&#x2713;</em>
+`std::basic_string<CharT>`<sup>1</sup>|`true` if `j.is<std::basic_string<CharT>>()`, otherwise `false`|j.as<std::basic_string<CharT>>|<em>&#x2713;</em>
+`jsoncons::basic_string_view<CharT>`<sup>1</sup><sup>,2</sup>|`true` if `j.is<jsoncons::basic_string_view<CharT>>()`, otherwise `false`|j.as<std::basic_string_view<CharT>>|<em>&#x2713;</em>
 STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
-STL associative container e.g. std::map|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
-`std::tuple`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
-`std::pair`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
-`std::optional<T>` (since C++17) |`true` if `j.is_null()` or `j` is convertible as `T`|`std::optional<T>()` if `j.is_null()`, otherwise `std::optional<T>(j.as<T>())`|<em>&#x2713;</em>
+STL associative container e.g. `std::map<K,U>`|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
+`std::tuple<Args...>`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
+`std::pair<U,V>`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
+`std::shared_ptr<U>`<sup>3</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty shared_ptr if `j.is_null()`, otherwise `make_shared(j.as<U>())`|<em>&#x2713;</em>
+`std::unique_ptr<U>`<sup>4</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty unique_ptr if `j.is_null()`, otherwise `make_unique(j.as<U>())`|<em>&#x2713;</em>
+`jsoncons::optional<U>`<sup>5</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `std::optional<U>` if `j.is_null()`, otherwise `std::optional<U>(j.as<U>())`|<em>&#x2713;</em>
+  
+1. For `CharT` `char` or `wchar_t`.
+2. `jsoncons::basic_string_view<CharT>` is aliased to [std::basic_string_view<CharT>](https://en.cppreference.com/w/cpp/utility/optional) if 
+jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_STRING_VIEW` is defined.  
+3. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.  
+4. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.   
+5. `jsoncons::optional<U>` is aliased to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
+jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
 
 ### Convenience Macros
 
 The `jsoncons` library provides a number of macros that can be used to generate the code to specialize `json_type_traits`
 for a user-defined class.
+
+Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated traits require all
+members be present in the JSON, or only a specified number be present. For non-mandatory members,
+empty values for `std::shared_ptr`, `std::unique_ptr` and `std::optional` are excluded altogether
+when serializing. For mandatory members, empty values for `std::shared_ptr`, `std::unique_ptr` and `std::optional` 
+become JSON null when serializing.
+
+The qualifer `_TPL` indicates that the generated traits are for a template class with a specified number
+of template parameters.
 
 ```c++
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
@@ -80,29 +102,29 @@ JSONCONS_TPL_ALL_MEMBER_TRAITS(num_template_params,
                                class_name,
                                member_name0,member_name1,...) // (4)
 
-JSONCONS_N_MEMBER_NAMED_TRAITS(class_name,num_mandatory,
-                               (member_name0,"name0"),
-                               (member_name1,"name1")...) // (5)
+JSONCONS_N_MEMBER_NAME_TRAITS(class_name,num_mandatory,
+                              (member_name0,serialized_name0),
+                              (member_name1,serialized_name1)...) // (5)
 
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(class_name,
-                                 (member_name0,"name0"),
-                                 (member_name1,"name1")...) // (6)
+JSONCONS_ALL_MEMBER_NAME_TRAITS(class_name,
+                                (member_name0,serialized_name0),
+                                (member_name1,serialized_name1)...) // (6)
 
-JSONCONS_TPL_N_MEMBER_NAMED_TRAITS(num_template_params,
-                                   class_name,num_mandatory,
-                                   (member_name0,"name0"),
-                                   (member_name1,"name1")...) // (7)
+JSONCONS_TPL_N_MEMBER_NAME_TRAITS(num_template_params,
+                                  class_name,num_mandatory,
+                                  (member_name0,serialized_name0),
+                                  (member_name1,serialized_name1)...) // (7)
 
-JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS(num_template_params,
-                                     class_name,
-                                     (member_name0,"name0"),
-                                     (member_name1,"name1")...) // (8)
+JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(num_template_params,
+                                    class_name,
+                                    (member_name0,serialized_name0),
+                                    (member_name1,serialized_name1)...) // (8)
 
 JSONCONS_ENUM_TRAITS(enum_name,identifier0,identifier1,...) // (9)
 
-JSONCONS_ENUM_NAMED_TRAITS(enum_name,
-                           (identifier0,"name0"),
-                           (identifier1,"name1")...) // (10)
+JSONCONS_ENUM_NAME_TRAITS(enum_name,
+                           (identifier0,serialized_name0),
+                           (identifier1,serialized_name1)...) // (10)
 
 JSONCONS_N_GETTER_CTOR_TRAITS(class_name,num_mandatory,
                               getter_name0,
@@ -119,64 +141,64 @@ JSONCONS_TPL_ALL_GETTER_CTOR_TRAITS(num_template_params,
                                     class_name,
                                     getter_name0,getter_name1,...) // (14)
 
-JSONCONS_N_GETTER_CTOR_NAMED_TRAITS(class_name,num_mandatory,
-                                    (getter_name0,"name0"),
-                                    (getter_name1,"name1")...) // (15)
+JSONCONS_N_GETTER_CTOR_NAME_TRAITS(class_name,num_mandatory,
+                                   (getter_name0,serialized_name0),
+                                   (getter_name1,serialized_name1)...) // (15)
 
-JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(class_name,
-                                      (getter_name0,"name0"),
-                                      (getter_name1,"name1")...) // (16)
+JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS(class_name,
+                                     (getter_name0,serialized_name0),
+                                     (getter_name1,serialized_name1)...) // (16)
 
-JSONCONS_TPL_N_GETTER_CTOR_NAMED_TRAITS(num_template_params,
-                                        class_name,num_mandatory,
-                                        (getter_name0,"name0"),
-                                        (getter_name1,"name1")...) // (17)
+JSONCONS_TPL_N_GETTER_CTOR_NAME_TRAITS(num_template_params,
+                                       class_name,num_mandatory,
+                                       (getter_name0,serialized_name0),
+                                       (getter_name1,serialized_name1)...) // (17)
 
-JSONCONS_TPL_ALL_GETTER_CTOR_NAMED_TRAITS(num_template_params,
-                                          class_name,
-                                          (getter_name0,"name0"),
-                                          (getter_name1,"name1")...) // (18)
+JSONCONS_TPL_ALL_GETTER_CTOR_NAME_TRAITS(num_template_params,
+                                         class_name,
+                                         (getter_name0,serialized_name0),
+                                         (getter_name1,serialized_name1)...) // (18)
 
 JSONCONS_N_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,num_mandatory,
-                                property_name0,property_name1,...) // (19)
+                                field_name0,field_name1,...) // (19)
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,
-                                  property_name0,property_name1,...) // (20)
+                                  field_name0,field_name1,...) // (20)
 
 JSONCONS_TPL_N_GETTER_SETTER_TRAITS(num_template_params,
                                     class_name,get_prefix,set_prefix,num_mandatory,
-                                    property_name0,property_name1,...) // (21)  
+                                    field_name0,field_name1,...) // (21)  
 
 JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(num_template_params,
                                       class_name,get_prefix,set_prefix,
-                                      property_name0,property_name1,...) // (22)
+                                      field_name0,field_name1,...) // (22)
 
-JSONCONS_N_GETTER_SETTER_NAMED_TRAITS(class_name,num_mandatory,
-                                      (getter_name0,setter_name0,"name0"),
-                                      (getter_name1,setter_name1,"name1")...) // (23)
+JSONCONS_N_GETTER_SETTER_NAME_TRAITS(class_name,num_mandatory,
+                                     (getter_name0,setter_name0,serialized_name0),
+                                     (getter_name1,setter_name1,serialized_name1)...) // (23)
 
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(class_name,
-                                        (getter_name0,setter_name0,"name0"),
-                                        (getter_name1,setter_name1,"name1")...) // (24)
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(class_name,
+                                       (getter_name0,setter_name0,serialized_name0),
+                                       (getter_name1,setter_name1,serialized_name1)...) // (24)
 
-JSONCONS_TPL_N_GETTER_SETTER_NAMED_TRAITS(num_template_params,
-                                          class_name,num_mandatory,
-                                          (getter_name0,setter_name0,"name0"),
-                                          (getter_name1,setter_name1,"name1")...) // (25)
+JSONCONS_TPL_N_GETTER_SETTER_NAME_TRAITS(num_template_params,
+                                         class_name,num_mandatory,
+                                         (getter_name0,setter_name0,serialized_name0),
+                                         (getter_name1,setter_name1,serialized_name1)...) // (25)
 
-JSONCONS_TPL_ALL_GETTER_SETTER_NAMED_TRAITS(num_template_params,
-                                            class_name,
-                                            (getter_name0,setter_name0,"name0"),
-                                            (getter_name1,setter_name1,"name1")...) // (26)
+JSONCONS_TPL_ALL_GETTER_SETTER_NAME_TRAITS(num_template_params,
+                                           class_name,
+                                           (getter_name0,setter_name0,serialized_name0),
+                                           (getter_name1,setter_name1,serialized_name1)...) // (26)
 
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) // (27)
 ```
 
-(1)-(8) generate the code to specialize `json_type_traits` from the member data of a class. 
-(1)-(4) will serialize to the stringified member names, (5)-(8) will serialize to the provided names. 
+(1)-(4) generate the code to specialize `json_type_traits` from the member data of a class and 
+serialize to the stringified member names. 
 When decoding to a C++ data structure, 
-(1), (3), (5) and (7) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (2), (4), (6) and (8), however, 
+(1) and (3) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (2) and (4)
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
 will make them accessible to `json_type_traits`, used so
@@ -189,35 +211,66 @@ class MyClass
 };
 ```
 
-(3)-(4) and (7)-(8) generate the code to specialize `json_type_traits` from the member data of a class template. 
+(3)-(4) generate the code to specialize `json_type_traits` from the member data of a class template. 
 
-(9)-(10) generate the code to specialize `json_type_traits` from the identifiers of an enumeration.
-(9) will serialize to the stringified identifier names, (10) will serialize to the provided names. 
-
-(11)-(18) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a class. 
-(11)-(14) will serialize to the stringified getter names, (15)-(18) will serialize to the provided names. 
+(5)-(8) generate the code to specialize `json_type_traits` from the member data of a class
+and serialize to the provided names. The sequence of `(member_nameN,serialized_nameN)`
+pairs declares the member name and serialized name for each of the class members
+that are part of the sequence.
 When decoding to a C++ data structure, 
-(11), (13), (15) and (17) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (12), (14), (16) and (18), however, 
+(5) and (7) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (6) and (8) 
+require that all member names be present in the JSON. The class must have a default constructor.
+If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
+will make them accessible to `json_type_traits`.
+(7)-(8) generate the code to specialize `json_type_traits` from the member data of a class template. 
+
+(9) generates the code to specialize `json_type_traits` from the identifiers of an enumeration
+and serialize to the stringified identifier names. 
+
+(10) generates the code to specialize `json_type_traits` from the identifiers of an enumeration
+and serialize to the provided names. The sequence of `(identifierN,serialized_nameN)`
+pairs declares the identifier and serialized name for each of the enum identifiers
+that are part of the sequence.
+
+(11)-(14) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class, 
+and serialize to the stringified field names.. 
+When decoding to a C++ data structure, 
+(11) and (13) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (12) and (14) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
-of the getter functions are convertible to its parameters, taken in order. 
-(21)-(22) and (25)-(26) generate the code to specialize `json_type_traits` from the getter functions and a constructor of a
+of the get functions are convertible to its parameters, taken in order. 
+(13)-(14) generate the code to specialize `json_type_traits` from the get functions and a constructor of a
 class template.  
 
-(19)-(22) generate the code to specialize `json_type_traits` from the getter and setter functions of a
-class, and will serialize to the stringified property names. The getter and setter function names are
-formed from the concatenation of `get_prefix` and `set_prefix` with property name.
-(19) and (21) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (20) and (22), however, 
-require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
-from the getter and setter functions of a class template.
+(15)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class,
+and serialize to the provided names. The sequence of `(getter_nameN,serialized_nameN)`
+pairs declares the get functions and serialized name for each of the class properties
+that are part of the sequence. 
+When decoding to a C++ data structure, 
+(15) and (17) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (16) and (18) 
+require that all member names be present in the JSON. The class must have a constructor such that the return types 
+of the get functions are convertible to its parameters, taken in order. 
+(17)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a
+class template.  
 
-(23)-(26) generate the code to specialize `json_type_traits` from the getter and setter functions of a
-class, and will serialize to the provided names. When decoding to a C++ data structure, 
+(19)-(22) generate the code to specialize `json_type_traits` from the get and set functions of a
+class, and serialize to the stringified field names. The get and set function names are
+formed from the concatenation of `get_prefix` and `set_prefix` with field name.
+(19) and (21) require that the first `num_mandatory` member names be present in the JSON,
+the rest can have default values. (20) and (22) 
+require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
+from the get and set functions of a class template.
+
+(23)-(26) generate the code to specialize `json_type_traits` from the get and set functions of a
+class, and serialize to the provided names. The sequence of `(getter_nameN,setter_nameN,serialized_nameN)`
+triples declares the get and set functions and serialized name for each of the class properties
+that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
-the rest can have default values. (24) and (26), however, 
+the rest can have default values. (24) and (26) 
 require that all member names be present in the JSON. The class must have a default constructor. 
-(25)-(26) generate the code to specialize `json_type_traits` from the getter and setter functions of a
+(25)-(26) generate the code to specialize `json_type_traits` from the get and set functions of a
 class template.
 
 (27) generates the code to specialize `json_type_traits` for `std::shared_ptr<base_class>` and `std::unique_ptr<base_class>`.
@@ -234,15 +287,14 @@ in the derived classes.
 `enum_name` - the name of an enum type or enum class type  
 `num_template_params` - for a class template, the number of template parameters  
 `member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
-`static const`, `const` or `static const` data members are one-way serialized.  
+`static const`. Data members that are `const` or `static const` are one-way serialized.  
 `getter_nameN` - the getter for a class data member  
-`(identifierN,"nameN")` - an enum identifier and corresponding JSON name  
-`(getter_nameN,"nameN")` - the getter for a class data member and corresponding JSON name  
-`property_nameN` - the name of a class getter or setter stripped of its get or set prefix.  
-`(getter_nameN,setter_nameN,"nameN")` - the getter and setter for a class data member, and corresponding JSON name  
+`(identifierN,serialized_nameN)` - an enum identifier and corresponding JSON name  
+`(getter_nameN,serialized_nameN)` - the getter for a class data member and corresponding JSON name  
+`field_nameN` - the base name of a class getter or setter with prefix `get` or `set` stripped out.  
+`(getter_nameN,setter_nameN,serialized_nameN)` - the getter and setter for a class data member, and corresponding JSON name  
 `base_class_name` - the name of a base class  
-`derived_class_nameN` - a class that is derived from the base class,
-and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
+`derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name`, 
 `base_class_name` and `derived_class_nameN` must be a fully namespace qualified names.
@@ -258,21 +310,22 @@ All of the `json_type_traits` specializations for type `T` generated by the conv
 [Convert from and to std::tuple](#A4)  
 [Extend json_type_traits to support `boost::gregorian` dates.](#A5)  
 [Specialize json_type_traits to support a book class.](#A6)  
-[Using JSONCONS_N_MEMBER_TRAITS to generate the json_type_traits](#A7)  
-[Serialize a polymorphic type based on the presence of members](#A8)  
-[Ensuring type selection is possible](#A9)  
-[Specialize json_type_traits for a container type that the jsoncons library also supports](#A10)  
-[Convert JSON to/from boost matrix](#A11)
+[Using JSONCONS_ALL_GETTER_CTOR_TRAITS to generate the json_type_traits](#A7)  
+[Example with std::shared_ptr, std::unique_ptr and std::optional](#A8)  
+[Serialize a polymorphic type based on the presence of members](#A9)  
+[Ensuring type selection is possible](#A10)  
+[Specialize json_type_traits for a container type that the jsoncons library also supports](#A11)  
+[Convert JSON to/from boost matrix](#A12)
 
 <div id="A1"/> 
 
 #### Convert from and to standard library sequence containers
 
 ```c++
-    std::vector<int> v{1, 2, 3, 4};
-    json j(v);
-    std::cout << "(1) "<< j << std::endl;
-    std::deque<int> d = j.as<std::deque<int>>();
+std::vector<int> v{1, 2, 3, 4};
+json j(v);
+std::cout << "(1) "<< j << std::endl;
+std::deque<int> d = j.as<std::deque<int>>();
 ```
 Output:
 ```
@@ -544,7 +597,7 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="A6"/> 
+<div id="A7"/> 
 
 #### Using JSONCONS_ALL_GETTER_CTOR_TRAITS to generate the json_type_traits 
 
@@ -654,6 +707,95 @@ Output:
 ```
 
 <div id="A8"/> 
+
+#### Example with std::shared_ptr, std::unique_ptr and std::optional
+
+This example assumes C++17 language support for `std::optional`.
+Lacking that, you can use `jsoncons::optional`.
+
+```c++
+#include <cassert>
+#include <iostream>
+#include <jsoncons/json.hpp>
+
+namespace ns {
+    struct smart_pointer_and_optional_test
+    {
+        std::shared_ptr<std::string> field1;
+        std::unique_ptr<std::string> field2;
+        std::optional<std::string> field3;
+        std::shared_ptr<std::string> field4;
+        std::unique_ptr<std::string> field5;
+        std::optional<std::string> field6;
+        std::shared_ptr<std::string> field7;
+        std::unique_ptr<std::string> field8;
+        std::optional<std::string> field9;
+        std::shared_ptr<std::string> field10;
+        std::unique_ptr<std::string> field11;
+        std::optional<std::string> field12;
+    };
+
+} // namespace ns
+
+// Declare the traits, first 6 members mandatory, last 6 non-mandatory
+JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_and_optional_test,6,
+                         field1,field2,field3,field4,field5,field6,
+                         field7,field8,field9,field10,field11,field12)
+
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    ns::smart_pointer_and_optional_test val;
+    val.field1 = std::make_shared<std::string>("Field 1"); 
+    val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
+    val.field3 = "Field 3";
+    val.field4 = std::shared_ptr<std::string>(nullptr);
+    val.field5 = std::unique_ptr<std::string>(nullptr);
+    val.field6 = std::optional<std::string>();
+    val.field7 = std::make_shared<std::string>("Field 7"); 
+    val.field8 = jsoncons::make_unique<std::string>("Field 8"); 
+    val.field9 = "Field 9";
+    val.field10 = std::shared_ptr<std::string>(nullptr);
+    val.field11 = std::unique_ptr<std::string>(nullptr);
+    val.field12 = std::optional<std::string>();
+
+    std::string buf;
+    encode_json(val, buf, indenting::indent);
+    std::cout << buf << "\n";
+
+    auto other = decode_json<ns::smart_pointer_and_optional_test>(buf);
+
+    assert(*other.field1 == *val.field1);
+    assert(*other.field2 == *val.field2);
+    assert(*other.field3 == *val.field3);
+    assert(!other.field4);
+    assert(!other.field5);
+    assert(!other.field6);
+    assert(*other.field7 == *val.field7);
+    assert(*other.field8 == *val.field8);
+    assert(*other.field9 == *val.field9);
+    assert(!other.field10);
+    assert(!other.field11);
+    assert(!other.field12);
+}
+```
+Output:
+```
+{
+    "field1": "Field 1",
+    "field2": "Field 2",
+    "field3": "Field 3",
+    "field4": null,
+    "field5": null,
+    "field6": null,
+    "field7": "Field 7",
+    "field8": "Field 8",
+    "field9": "Field 9"
+}
+```
+
+<div id="A9"/> 
 
 #### Serialize a polymorphic type based on the presence of members
 
@@ -839,7 +981,7 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="A9"/>
+<div id="A10"/>
 
 #### Ensuring type selection is possible
 
@@ -851,8 +993,8 @@ derived classes cannot be distinguished in this way,
 you can introduce extra members. The convenience
 macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
 `JSONCONS_TPL_N_MEMBER_TRAITS`, `JSONCONS_TPL_ALL_MEMBER_TRAITS`,
-`JSONCONS_N_MEMBER_NAMED_TRAITS`, `JSONCONS_ALL_MEMBER_NAMED_TRAITS`,
-`JSONCONS_TPL_N_MEMBER_NAMED_TRAITS`, and `JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS`
+`JSONCONS_N_MEMBER_NAME_TRAITS`, `JSONCONS_ALL_MEMBER_NAME_TRAITS`,
+`JSONCONS_TPL_N_MEMBER_NAME_TRAITS`, and `JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS`
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
@@ -920,7 +1062,7 @@ A bar
 A baz
 ```
 
-<div id="A9"/> 
+<div id="A10"/> 
 
 #### Specialize json_type_traits for a container type that the jsoncons library also supports
 
@@ -984,7 +1126,7 @@ Output:
 {"1":2,"3":4}
 ```
 
-<div id="A11"/>
+<div id="A12"/>
 
 #### Convert JSON to/from boost matrix
 

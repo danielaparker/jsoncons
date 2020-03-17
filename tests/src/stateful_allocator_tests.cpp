@@ -50,7 +50,7 @@ TEST_CASE("test_string_allocation")
         std::string s = "String too long for short string";
         std::string input = "\"" + s + "\"";
 
-        json_decoder<my_json,FreelistAllocator<char>> decoder(alloc, alloc2);
+        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, alloc, alloc2);
         JSONCONS_TRY
         {
             json_reader reader(input,decoder);

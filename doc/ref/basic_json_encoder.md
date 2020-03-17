@@ -1,8 +1,8 @@
 ### jsoncons::basic_json_encoder
 
-__`jsoncons/json_encoder.hpp`__
-
 ```c++
+#include <jsoncons/json_encoder.hpp>
+
 template<
     class CharT,
     class Sink>
@@ -42,11 +42,11 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_json_encoder(sink_type sink)
+    explicit basic_json_encoder(Sink&& sink)
 Constructs a new encoder that is associated with the destination `sink`.
 
-    basic_json_encoder(sink_type sink, 
-                          const basic_json_options<CharT>& options)
+    basic_json_encoder(Sink&& sink, 
+                       const basic_json_options<CharT>& options)
 Constructs a new encoder that is associated with the destination `sink` 
 and uses the specified [json options](basic_json_options.md). 
 
@@ -77,7 +77,7 @@ and uses the specified [json options](basic_json_options.md).
 
     bool end_array(const ser_context& context=null_ser_context()); 
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context=null_ser_context()); 
 
     bool string_value(const string_view_type& value, 

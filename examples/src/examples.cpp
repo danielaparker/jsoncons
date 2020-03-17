@@ -389,8 +389,6 @@ int main()
 
         comment_example();
 
-        jsonpatch_examples();
-
         max_nesting_path_example();
 
         get_example();
@@ -415,8 +413,6 @@ int main()
 
         run_cbor_examples();
 
-        readme_examples();
-
         type_extensibility_examples();
 
         json_reader_examples();
@@ -435,9 +431,13 @@ int main()
 
         json_accessor_examples();
 
+        run_cbor_typed_array_examples();
+
         json_traits_macros_examples();
 
-        run_cbor_typed_array_examples();
+        jsonpatch_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

@@ -83,12 +83,17 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
+        jsoncons::optional<double> confidence_; // use std::optional if C++17
+        jsoncons::optional<uint64_t> expires_;
     public:
         hiking_reputon(const std::string& rater,
                        hiking_experience assertion,
                        const std::string& rated,
-                       double rating)
-            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+                       double rating,
+                       const jsoncons::optional<double>& confidence = jsoncons::optional<double>(),
+                       const jsoncons::optional<uint64_t>& expires = jsoncons::optional<uint64_t>())
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
+              confidence_(confidence), expires_(expires)
         {
         }
 
@@ -96,11 +101,14 @@ namespace ns {
         hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
+        jsoncons::optional<double> confidence() const {return confidence_;}
+        jsoncons::optional<uint64_t> expires() const {return expires_;}
 
         friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
-                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
+                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_ &&
+                   lhs.confidence_ == rhs.confidence_ && lhs.expires_ == rhs.expires_;
         }
 
         friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
@@ -186,10 +194,13 @@ namespace jsoncons {
 } // namespace jsoncons
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::bond, (principal,"notional"), (maturity,"maturityDate"), (coupon,"couponRate"), (period,"frequency"))
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+// First four members listed are mandatory, confidence and expires are optional
+JSONCONS_N_GETTER_CTOR_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
+                              confidence, expires)
+// All members are mandatory
 JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
 
 JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::fixing, index_id, observation_date, rate)

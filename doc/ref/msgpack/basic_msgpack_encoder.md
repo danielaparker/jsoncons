@@ -1,8 +1,8 @@
 ### jsoncons::msgpack::basic_msgpack_encoder
 
-__`jsoncons_ext/msgpack/msgpack_encoder.hpp`__
-
 ```c++
+#include <jsoncons_ext/msgpack/msgpack_encoder.hpp>
+
 template<
     class Sink>
 > class basic_msgpack_encoder : public jsoncons::json_content_handler
@@ -30,7 +30,7 @@ string_view_type           |
 
 #### Constructors
 
-    explicit basic_msgpack_encoder(sink_type sink)
+    explicit basic_msgpack_encoder(Sink&& sink)
 Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
@@ -58,7 +58,7 @@ Constructs a new encoder that writes to the specified destination.
 
     bool end_array(const ser_context& context=null_ser_context()); // (6)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context=null_ser_context()); // (7)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
@@ -116,7 +116,7 @@ Constructs a new encoder that writes to the specified destination.
     bool end_array(const ser_context& context, 
                    std::error_code& ec); // (21)
 
-    bool name(const string_view_type& name, 
+    bool key(const string_view_type& name, 
               const ser_context& context, 
               std::error_code& ec); // (22)
 

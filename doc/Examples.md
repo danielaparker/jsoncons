@@ -22,15 +22,16 @@
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
 [Serialize with the C++ member names of the class](#G1)  
-[Serialize with provided names using the `_NAMED_` macros](#G2)  
-[Serialize non-mandatory std::optional values using the convenience macros](#G3)  
-[Serialize a templated class with the `_TPL_` macros](#G4)  
-[Specialize json_type_traits explicitly](#G5)  
-[Mapping to C++ data structures with and without defaults allowed](#G6)  
+[Serialize with provided names using the `_NAME_` macros](#G2)  
+[Mapping to C++ data structures with and without defaults allowed](#G3)  
+[Serialize non-mandatory std::optional values using the convenience macros](#G4)  
+[An example with std::shared_ptr and std::unique_ptr](#G5)  
+[Serialize a templated class with the `_TPL_` macros](#G6)  
 [An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS](#G7)  
 [Serialize a polymorphic type based on the presence of members](#G8)  
 [Ensuring type selection is possible](#G9)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G10)
+[Specialize json_type_traits explicitly](#G10)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G11)
 
 ### Construct
 
@@ -673,7 +674,7 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G2"/>
 
-#### Serialize with provided names using the `_NAMED_` macros
+#### Serialize with provided names using the `_NAME_` macros
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -771,18 +772,18 @@ public:
 } // namespace ns
 
 // Declare the traits at global scope
-JSONCONS_ENUM_NAMED_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
+JSONCONS_ENUM_NAME_TRAITS(ns::BookCategory,(fiction,"Fiction"),(biography,"Biography"))
 
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
-                                                   (title,"Title"),(price,"Price"))
-JSONCONS_ALL_MEMBER_NAMED_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
-                                                   (title_,"Title"),(price_,"Price"))
-JSONCONS_ALL_GETTER_CTOR_NAMED_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
-                                                 (title,"Title"),(price,"Price"))
-JSONCONS_ALL_GETTER_SETTER_NAMED_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
-                                                          (getAuthor,setAuthor,"Author"),
-                                                          (getTitle,setTitle,"Title"),
-                                                          (getPrice,setPrice,"Price"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book1,(category,"Category"),(author,"Author"),
+                                          (title,"Title"),(price,"Price"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
+                                          (title_,"Title"),(price_,"Price"))
+JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
+                                               (title,"Title"),(price,"Price"))
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
+                                                 (getAuthor,setAuthor,"Author"),
+                                                 (getTitle,setTitle,"Title"),
+                                                 (getPrice,setPrice,"Price"))
 
 using namespace jsoncons; // for convenience
 
@@ -901,10 +902,98 @@ The output for (2), (3) and (4) is the same.
 
 <div id="G3"/>
 
+#### Mapping to C++ data structures with and without defaults allowed
+
+`JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
+the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
+does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS` does.
+More generaly, the qualifier _N_ in the macro name indicates that only a specified number of members
+must be present in the JSON.
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+
+    class Person
+    {
+    public:
+        Person(const std::string& name, const std::string& surname,
+               const std::string& ssn, unsigned int age)
+           : name(name), surname(surname), ssn(ssn), age(age) { }
+
+    private:
+        // Make json_type_traits specializations friends to give accesses to private members
+        JSONCONS_TYPE_TRAITS_FRIEND
+
+        Person() : age(0) {}
+
+        std::string name;
+        std::string surname;
+        std::string ssn;
+        unsigned int age;
+    };
+
+} // namespace ns
+
+// Declare the traits. Specify which data members need to be serialized, and how many are mandatory.
+JSONCONS_N_MEMBER_TRAITS(ns::Person, 2, name, surname, ssn, age)
+
+int main()
+{
+    try
+    {
+        // Incomplete JSON data: field ssn missing
+        std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
+        auto person = jsoncons::decode_json<ns::Person>(data);
+
+        std::string s;
+        jsoncons::encode_json(person, s, indenting::indent);
+        std::cout << s << "\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << "";
+    }
+}
+```
+Output:
+```
+{
+    "age": 30,
+    "name": "Rod",
+    "ssn": "",
+    "surname": "Bro"
+}
+```
+
+If all members of the JSON data must be present, use
+```
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
+```
+instead. This will cause an exception to be thrown with the message
+```
+Key 'ssn' not found
+```
+
+<div id="G4"/>
+
 #### Serialize non-mandatory std::optional values using the convenience macros
 
-This example assumes C++17 language support for `std::optional`.
-Lacking that, you can use `jsoncons::optional`.
+The jsoncons library includes a [json_type_traits](ref/json_type_traits.md) specialization for 
+`jsoncons::optional<T>` if `T` is also specialized. `jsoncons::optional<T>` is aliased to 
+[std::optional<T>](https://en.cppreference.com/w/cpp/utility/optional) if 
+jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.
+An empty `jsoncons::optional<T>` value correspond to JSON null.
+
+This example assumes C++17 language support (otherwise substitute `jsoncons::optional`.)
+
+Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated traits require all
+members be present in the JSON, or a specified number be present. For non-mandatory members, the generated 
+traits `to_json` function will exclude altogether empty values for `std::optional`.
 
 ```c++
 #include <cassert>
@@ -995,7 +1084,82 @@ Output:
 }
 ```
 
-<div id="G4"/>
+<div id="G5"/>
+
+#### An example with std::shared_ptr and std::unique_ptr
+
+The jsoncons library includes [json_type_traits](ref/json_type_traits.md) specializations for 
+`std::shared_ptr<T>` and `std::unique_ptr<T>` if `T` is not a [polymorphic class](https://en.cppreference.com/w/cpp/language/object#Polymorphic_objects), 
+i.e., does not have any virtual functions, and if `T` is also specialized. Empty `std::shared_ptr<T>` and `std::unique_ptr<T>` values correspond to JSON null.
+In addition, users can implement `json_type_traits` for `std::shared_ptr` and `std::unique_ptr`
+with polymorphic classes using the convenience macro `JSONCONS_POLYMORPHIC_TRAITS`, or by specializing `json_type_traits` explicitly.
+
+The convenience macros whose names include the qualifier `_N_` do not require all members to be present in the JSON.
+For these, the generated traits `to_json` function will exclude altogether empty values 
+for `std::shared_ptr` and `std::unique_ptr`.
+
+```c++
+namespace ns {
+
+    struct smart_pointer_test
+    {
+        std::shared_ptr<std::string> field1;
+        std::unique_ptr<std::string> field2;
+        std::shared_ptr<std::string> field3;
+        std::unique_ptr<std::string> field4;
+        std::shared_ptr<std::string> field5;
+        std::unique_ptr<std::string> field6;
+        std::shared_ptr<std::string> field7;
+        std::unique_ptr<std::string> field8;
+    };
+
+} // namespace ns
+
+// Declare the traits, first 4 members mandatory, last 4 non-mandatory
+JSONCONS_N_MEMBER_TRAITS(ns::smart_pointer_test,4,field1,field2,field3,field4,field5,field6,field7,field8)
+
+int main()
+{
+    ns::smart_pointer_test val;
+    val.field1 = std::make_shared<std::string>("Field 1"); 
+    val.field2 = jsoncons::make_unique<std::string>("Field 2"); 
+    val.field3 = std::shared_ptr<std::string>(nullptr);
+    val.field4 = std::unique_ptr<std::string>(nullptr);
+    val.field5 = std::make_shared<std::string>("Field 5"); 
+    val.field6 = jsoncons::make_unique<std::string>("Field 6"); 
+    val.field7 = std::shared_ptr<std::string>(nullptr);
+    val.field8 = std::unique_ptr<std::string>(nullptr);
+
+    std::string buf;
+    encode_json(val, buf, indenting::indent);
+
+    std::cout << buf << "\n";
+
+    auto other = decode_json<ns::smart_pointer_test>(buf);
+
+    assert(*other.field1 == *val.field1);
+    assert(*other.field2 == *val.field2);
+    assert(!other.field3);
+    assert(!other.field4);
+    assert(*other.field5 == *val.field5);
+    assert(*other.field6 == *val.field6);
+    assert(!other.field7);
+    assert(!other.field8);
+}
+```
+Output:
+```
+{
+    "field1": "Field 1",
+    "field2": "Field 2",
+    "field3": null,
+    "field4": null,
+    "field5": "Field 5",
+    "field6": "Field 6"
+}
+```
+
+<div id="G6"/>
 
 #### Serialize a templated class with the `_TPL_` macros
 
@@ -1042,221 +1206,18 @@ int main()
 }
 ```
 
-<div id="G5"/>
-
-#### Specialize json_type_traits explicitly
-
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
-Decode and encode work for all C++ classes that have 
-[json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined. The standard library containers are already supported, 
-and your own types will be supported too if you specialize `json_type_traits`
-in the `jsoncons` namespace. 
-
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
-
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        typedef typename Json::allocator_type allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
-} // namespace jsoncons
-```
-
-To save typing and enhance readability, the jsoncons library defines macros, 
-so you could also write
-
-```c++
-JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
-```
-
-which expands to the code above.
-
-```c++
-using namespace jsoncons; // for convenience
-
-int main()
-{
-    const std::string s = R"(
-    [
-        {
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
-        },
-        {
-            "author" : "Charles Bukowski",
-            "title" : "Pulp",
-            "price" : 22.48
-        }
-    ]
-    )";
-
-    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
-
-    std::cout << "(1)\n";
-    for (const auto& item : book_list)
-    {
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-
-    std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
-    std::cout << "\n\n";
-}
-```
-Output:
-```
-(1)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Pulp, 22.48
-
-(2)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 22.48,
-        "title": "Pulp"
-    }
-]
-```
-
-<div id="G6"/>
-
-#### Mapping to C++ data structures with and without defaults allowed
-
-The macros `JSONCONS_N_MEMBER_TRAITS` and `JSONCONS_ALL_MEMBER_TRAITS` both generate
-the code to specialize `json_type_traits` from member data. The difference is that `JSONCONS_N_MEMBER_TRAITS`
-does not require all member names to be present in the JSON data, while `JSONCONS_ALL_MEMBER_TRAITS` does.
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
-
-namespace ns {
-
-    class Person
-    {
-    public:
-        Person(const std::string& name, const std::string& surname,
-               const std::string& ssn, unsigned int age)
-           : name(name), surname(surname), ssn(ssn), age(age) { }
-
-    private:
-        // Make json_type_traits specializations friends to give accesses to private members
-        JSONCONS_TYPE_TRAITS_FRIEND
-
-        Person() : age(0) {}
-
-        std::string name;
-        std::string surname;
-        std::string ssn;
-        unsigned int age;
-    };
-
-} // namespace ns
-
-// Declare the traits. Specify which data members need to be serialized, and how many are mandatory.
-JSONCONS_N_MEMBER_TRAITS(ns::Person, 2, name, surname, ssn, age)
-
-int main()
-{
-    try
-    {
-        // Incomplete JSON data: field ssn missing
-        std::string data = R"({"name":"Rod","surname":"Bro","age":30})";
-        auto person = jsoncons::decode_json<ns::Person>(data);
-
-        std::string s;
-        jsoncons::encode_json(person, s, indenting::indent);
-        std::cout << s << "\n";
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << "";
-    }
-}
-```
-Output:
-```
-{
-    "age": 30,
-    "name": "Rod",
-    "ssn": "",
-    "surname": "Bro"
-}
-```
-
-If all members of the JSON data must be present, use
-```
-JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
-```
-instead. This will cause an exception to be thrown with the message
-```
-Key 'ssn' not found
-```
-
 <div id="G7"/>
 
 #### An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_GETTER_CTOR_TRAITS
 
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
 and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
-[json_type_traits](doc/ref/json_type_traits.md) for the enum type
+[json_type_traits](ref/json_type_traits.md) for the enum type
 `ns::hiking_experience` and the classes `ns::hiking_reputon` and 
 `ns::hiking_reputation`.
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
 the enum values, and the macro `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
-generates the code from the getter functions and a constructor. 
+generates the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
 ```c++
@@ -1366,7 +1327,7 @@ Output:
 #### Serialize a polymorphic type based on the presence of members
 
 This example uses the convenience macro `JSONCONS_N_GETTER_CTOR_TRAITS`
-to generate the `json_type_traits` boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
+to generate the [json_type_traits](ref/json_type_traits.md) boilerplate for the `HourlyEmployee` and `CommissionedEmployee` 
 derived classes, and `JSONCONS_POLYMORPHIC_TRAITS` to generate the `json_type_traits` boilerplate
 for `std::shared_ptr<Employee>` and `std::unique_ptr<Employee>`. The type selection strategy is based
 on the presence of mandatory members, in particular, to the `firstName`, `lastName`, and `wage` members of an
@@ -1554,13 +1515,13 @@ Jane Doe, 30250
 When deserializing a polymorphic type, jsoncons needs to know how
 to convert a json value to the proper derived class. In the Employee
 example above, the type selection strategy is based
-on the presence of members in the derived classes. If
+on the presence of mandatory members in the derived classes. If
 derived classes cannot be distinguished in this way, 
 you can introduce extra members. The convenience
 macros `JSONCONS_N_MEMBER_TRAITS`, `JSONCONS_ALL_MEMBER_TRAITS`,
 `JSONCONS_TPL_N_MEMBER_TRAITS`, `JSONCONS_TPL_ALL_MEMBER_TRAITS`,
-`JSONCONS_N_MEMBER_NAMED_TRAITS`, `JSONCONS_ALL_MEMBER_NAMED_TRAITS`,
-`JSONCONS_TPL_N_MEMBER_NAMED_TRAITS`, and `JSONCONS_TPL_ALL_MEMBER_NAMED_TRAITS`
+`JSONCONS_N_MEMBER_NAME_TRAITS`, `JSONCONS_ALL_MEMBER_NAME_TRAITS`,
+`JSONCONS_TPL_N_MEMBER_NAME_TRAITS`, and `JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS`
 allow you to have `const` or `static const` data members that are serialized and that 
 particpate in the type selection strategy during deserialization. 
 
@@ -1629,6 +1590,132 @@ A baz
 ```
 
 <div id="G10"/>
+
+#### Specialize json_type_traits explicitly
+
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](ref/json_type_traits.md) 
+defined. The standard library containers are already supported, 
+and your own types will be supported too if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
+
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
+
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        typedef typename Json::allocator_type allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
+        }
+        static ns::book as(const Json& j)
+        {
+            ns::book val;
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
+            return val;
+        }
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
+        {
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
+            return j;
+        }
+    };
+} // namespace jsoncons
+```
+
+To save typing and enhance readability, the jsoncons library defines macros, 
+so you could also write
+
+```c++
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
+```
+
+which expands to the code above.
+
+```c++
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
+
+    std::cout << "(1)\n";
+    for (const auto& item : book_list)
+    {
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
+    }
+
+    std::cout << "\n(2)\n";
+    encode_json(book_list, std::cout, indenting::indent);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
+
+(2)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 22.48,
+        "title": "Pulp"
+    }
+]
+```
+
+<div id="G11"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 

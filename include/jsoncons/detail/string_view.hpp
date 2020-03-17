@@ -34,7 +34,7 @@ namespace detail {
         typedef const CharT& const_reference;
         typedef Traits traits_type;
         typedef std::size_t size_type;
-        static const size_type npos = size_type(-1);
+        static constexpr size_type npos = size_type(-1);
         typedef const CharT* const_iterator;
         typedef const CharT* iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -53,8 +53,8 @@ namespace detail {
         }
         constexpr basic_string_view(const basic_string_view& other) noexcept = default;
 
-        template <class Allocator>
-        basic_string_view(const std::basic_string<CharT,Traits,Allocator>& s)
+        template <class Tr, class Allocator>
+        basic_string_view(const std::basic_string<CharT,Tr,Allocator>& s) noexcept
             : data_(s.data()), length_(s.length())
         {
         }

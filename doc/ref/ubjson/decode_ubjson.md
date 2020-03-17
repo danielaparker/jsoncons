@@ -1,15 +1,23 @@
 ### jsoncons::ubjson::decode_ubjson
 
-__`jsoncons_ext/ubjson/ubjson.hpp`__
-
 Decodes a [Universal Binary JSON Specification (JSON)](http://ubjson.org/) data format into a C++ data structure.
 
 ```c++
+#include <jsoncons_ext/ubjson/ubjson.hpp>
+
 template<class T>
 T decode_ubjson(const std::vector<uint8_t>& v); // (1)
 
 template<class T>
 T decode_ubjson(std::istream>& is); // (2)
+
+template<class T,class TempAllocator>
+T decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                const std::vector<uint8_t>& v); // (3)
+
+template<class T,class TempAllocator>
+T decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                std::istream>& is); // (4)
 ```
 
 (1) Reads a UBJSON bytes buffer into a type T if T is an instantiation of [basic_json](../basic_json.md) 

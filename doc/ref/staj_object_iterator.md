@@ -1,8 +1,8 @@
 ### jsoncons::staj_object_iterator
 
-__`jsoncons/staj_iterator.hpp`__
-
 ```c++
+#include <jsoncons/staj_iterator.hpp>
+
 template<
     class Json, 
     class T=Json> class staj_object_iterator

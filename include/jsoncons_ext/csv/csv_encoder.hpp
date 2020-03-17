@@ -9,7 +9,6 @@
 
 #include <array> // std::array
 #include <string>
-#include <sstream>
 #include <vector>
 #include <ostream>
 #include <utility> // std::move
@@ -18,13 +17,13 @@
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_content_handler.hpp>
-#include <jsoncons/detail/print_number.hpp>
+#include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons/sink.hpp>
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<CharT>>
+template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
 class basic_csv_encoder final : public basic_json_content_handler<CharT>
 {
 public:
@@ -88,10 +87,12 @@ private:
         }
     };
 
-    Sink result_;
+    Sink sink_;
     const basic_csv_encode_options<CharT> options_;
+    allocator_type alloc_;
+
     std::vector<stack_item> stack_;
-    jsoncons::detail::print_double fp_;
+    jsoncons::detail::write_double fp_;
     std::vector<string_type,string_allocator_type> strings_buffer_;
 
     std::unordered_map<string_type,string_type, std::hash<string_type>,std::equal_to<string_type>,string_string_allocator_type> buffered_line_;
@@ -103,15 +104,18 @@ private:
     basic_csv_encoder(const basic_csv_encoder&) = delete;
     basic_csv_encoder& operator=(const basic_csv_encoder&) = delete;
 public:
-    basic_csv_encoder(sink_type sink)
-       : basic_csv_encoder(std::move(sink), basic_csv_encode_options<CharT>())
+    basic_csv_encoder(Sink&& sink, 
+                      const Allocator& alloc = Allocator())
+       : basic_csv_encoder(std::forward<Sink>(sink), basic_csv_encode_options<CharT>(), alloc)
     {
     }
 
-    basic_csv_encoder(sink_type sink,
-                      const basic_csv_encode_options<CharT>& options)
-      : result_(std::move(sink)),
+    basic_csv_encoder(Sink&& sink,
+                      const basic_csv_encode_options<CharT>& options, 
+                      const Allocator& alloc = Allocator())
+      : sink_(std::forward<Sink>(sink)),
         options_(options),
+        alloc_(alloc),
         stack_(),
         fp_(options.float_format(), options.precision()),
         column_index_(0)
@@ -123,7 +127,7 @@ public:
     {
         JSONCONS_TRY
         {
-            result_.flush();
+            sink_.flush();
         }
         JSONCONS_CATCH(...)
         {
@@ -157,7 +161,7 @@ private:
 
     void do_flush() override
     {
-        result_.flush();
+        sink_.flush();
     }
 
     bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
@@ -190,35 +194,35 @@ private:
                     {
                         if (i > 0)
                         {
-                            result_.push_back(options_.field_delimiter());
+                            sink_.push_back(options_.field_delimiter());
                         }
-                        result_.append(strings_buffer_[i].data(),
+                        sink_.append(strings_buffer_[i].data(),
                                       strings_buffer_[i].length());
                     }
-                    result_.append(options_.line_delimiter().data(),
+                    sink_.append(options_.line_delimiter().data(),
                                   options_.line_delimiter().length());
                 }
                 for (std::size_t i = 0; i < strings_buffer_.size(); ++i)
                 {
                     if (i > 0)
                     {
-                        result_.push_back(options_.field_delimiter());
+                        sink_.push_back(options_.field_delimiter());
                     }
                     auto it = buffered_line_.find(strings_buffer_[i]);
                     if (it != buffered_line_.end())
                     {
-                        result_.append(it->second.data(),it->second.length());
+                        sink_.append(it->second.data(),it->second.length());
                         it->second.clear();
                     }
                 }
-                result_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                 break;
             case stack_item_kind::column_mapping:
              {
                  for (const auto& item : strings_buffer_)
                  {
-                     result_.append(item.data(), item.size());
-                     result_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
+                     sink_.append(item.data(), item.size());
+                     sink_.append(options_.line_delimiter().data(), options_.line_delimiter().length());
                  }
                  break;
              }
@@ -250,13 +254,13 @@ private:
                     {
                         if (i > 0)
                         {
-                            result_.push_back(options_.field_delimiter());
+                            sink_.push_back(options_.field_delimiter());
                         }
-                        result_.append(strings_buffer_[i].data(),strings_buffer_[i].length());
+                        sink_.append(strings_buffer_[i].data(),strings_buffer_[i].length());
                     }
                     if (strings_buffer_.size() > 0)
                     {
-                        result_.append(options_.line_delimiter().data(),
+                        sink_.append(options_.line_delimiter().data(),
                                       options_.line_delimiter().length());
                     }
                 }
@@ -284,7 +288,7 @@ private:
                 return true;
             }
             case stack_item_kind::row:
-                begin_value(result_);
+                begin_value(sink_);
                 stack_.emplace_back(stack_item_kind::row_multi_valued_field);
                 return true;
             default: // error
@@ -299,7 +303,7 @@ private:
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::row:
-                result_.append(options_.line_delimiter().data(),
+                sink_.append(options_.line_delimiter().data(),
                               options_.line_delimiter().length());
                 break;
             case stack_item_kind::column:
@@ -317,7 +321,7 @@ private:
         return true;
     }
 
-    bool do_name(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -376,7 +380,7 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                write_null_value(result_);
+                write_null_value(sink_);
                 break;
             case stack_item_kind::column:
             {
@@ -425,7 +429,7 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                write_string_value(sv,result_);
+                write_string_value(sv,sink_);
                 break;
             case stack_item_kind::column:
             {
@@ -530,7 +534,7 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                write_double_value(val, context, result_, ec);
+                write_double_value(val, context, sink_, ec);
                 break;
             case stack_item_kind::column:
             {
@@ -582,7 +586,7 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                write_int64_value(val,result_);
+                write_int64_value(val,sink_);
                 break;
             case stack_item_kind::column:
             {
@@ -634,7 +638,7 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                write_uint64_value(val,result_);
+                write_uint64_value(val,sink_);
                 break;
             case stack_item_kind::column:
             {
@@ -683,7 +687,7 @@ private:
             }
             case stack_item_kind::row:
             case stack_item_kind::row_multi_valued_field:
-                write_bool_value(val,result_);
+                write_bool_value(val,sink_);
                 break;
             case stack_item_kind::column:
             {
@@ -802,9 +806,7 @@ private:
     {
         begin_value(sink);
 
-        std::basic_ostringstream<CharT> ss;
-        ss << val;
-        sink.append(ss.str().data(),ss.str().length());
+        jsoncons::detail::write_integer(val,sink);
 
         end_value();
     }
@@ -814,9 +816,7 @@ private:
     {
         begin_value(sink);
 
-        std::basic_ostringstream<CharT> ss;
-        ss << val;
-        sink.append(ss.str().data(),ss.str().length());
+        jsoncons::detail::write_integer(val,sink);
 
         end_value();
     }

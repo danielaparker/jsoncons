@@ -1,8 +1,8 @@
 ### jsoncons::bigint_chars_format
 
-__`jsoncons/json_options.hpp`__
-
 ```c++
+#include <jsoncons/json_options.hpp>
+
 enum class bigint_chars_format : uint8_t {number, base10, base64, base64url};
 ```
 

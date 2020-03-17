@@ -278,9 +278,9 @@ TEST_CASE("test_indefinite_length_object_iterator")
     std::vector<uint8_t> v;
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_object(); // indefinite length object
-    encoder.name("City");
+    encoder.key("City");
     encoder.string_value("Toronto");
-    encoder.name("Province");
+    encoder.key("Province");
     encoder.string_value("Ontario");
     encoder.end_object(); 
     encoder.flush();
@@ -365,11 +365,11 @@ TEST_CASE("cbor object comparison")
     std::vector<uint8_t> v;
     cbor::cbor_bytes_encoder encoder1(v);
     encoder1.begin_object(); // indefinite length array
-    encoder1.name("City");
+    encoder1.key("City");
     encoder1.string_value("Montreal");
-    encoder1.name("Amount");
+    encoder1.key("Amount");
     encoder1.string_value("273.15", semantic_tag::bigdec);
-    encoder1.name("Date");
+    encoder1.key("Date");
     encoder1.string_value("2018-05-07 12:41:07-07:00", semantic_tag::datetime) ;
     encoder1.end_object(); 
     encoder1.flush();
@@ -382,11 +382,11 @@ TEST_CASE("cbor object comparison")
     std::vector<uint8_t> buf2;
     cbor::cbor_bytes_encoder serializer2(buf2);
     serializer2.begin_object(); // indefinite length array
-    serializer2.name("City");
+    serializer2.key("City");
     serializer2.string_value("Toronto");
-    serializer2.name("Amount");
+    serializer2.key("Amount");
     serializer2.string_value("273.15", semantic_tag::bigdec);
-    serializer2.name("Date");
+    serializer2.key("Date");
     serializer2.string_value("2018-10-18 12:41:07-07:00", semantic_tag::datetime) ;
     serializer2.end_object(); 
     serializer2.flush();
@@ -396,15 +396,15 @@ TEST_CASE("cbor object comparison")
     std::vector<uint8_t> buf3;
     cbor::cbor_bytes_encoder serializer3(buf3);
     serializer3.begin_object(); // indefinite length array
-    serializer3.name("empty-object");
+    serializer3.key("empty-object");
     serializer3.begin_object(0);
     serializer3.end_object();
-    serializer3.name("empty-array");
+    serializer3.key("empty-array");
     serializer3.begin_array(0);
     serializer3.end_array();
-    serializer3.name("empty-string");
+    serializer3.key("empty-string");
     serializer3.string_value("");
-    serializer3.name("empty-byte_string");
+    serializer3.key("empty-byte_string");
     serializer3.byte_string_value(jsoncons::byte_string{});
     serializer3.end_object(); 
     serializer3.flush();
@@ -446,22 +446,22 @@ TEST_CASE("cbor member tests")
     std::vector<uint8_t> v;
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_object(); // indefinite length object
-    encoder.name("empty-object");
+    encoder.key("empty-object");
     encoder.begin_object(0);
     encoder.end_object();
-    encoder.name("empty-array");
+    encoder.key("empty-array");
     encoder.begin_array(0);
     encoder.end_array();
-    encoder.name("empty-string");
+    encoder.key("empty-string");
     encoder.string_value("");
-    encoder.name("empty-byte_string");
+    encoder.key("empty-byte_string");
     encoder.byte_string_value(jsoncons::byte_string{});
 
-    encoder.name("City");
+    encoder.key("City");
     encoder.string_value("Montreal");
-    encoder.name("Amount");
+    encoder.key("Amount");
     encoder.string_value("273.15", semantic_tag::bigdec);
-    encoder.name("Date");
+    encoder.key("Date");
     encoder.string_value("2018-05-07 12:41:07-07:00", semantic_tag::datetime) ;
 
     encoder.end_object(); 

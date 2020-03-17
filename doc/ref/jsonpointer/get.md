@@ -1,10 +1,10 @@
 ### jsoncons::jsonpointer::get
 
-__`jsoncons_ext/jsonpointer/jsonpointer.hpp`__
-
 Selects a `json` value.
 
 ```c++
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
 template<class J>
 J& get(J& root, const typename J::string_view_type& path); // (1)
 

@@ -47,7 +47,7 @@ TEST_CASE("array_iterator test")
     auto end = jsoncons::end(it);
 
     const auto& j1 = *it;
-    std::cout << j1 << ", is_object: " << j1.is_object() << "\n";
+    REQUIRE(j1.is_object());
     CHECK(j1["firstName"].as<std::string>() == std::string("Tom"));
     ++it;
     const auto& j2 = *it;

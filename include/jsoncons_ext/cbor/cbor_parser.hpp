@@ -78,17 +78,17 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class WorkAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     typedef char char_type;
     typedef std::char_traits<char> char_traits_type;
-    typedef WorkAllocator work_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
-    typedef typename std::allocator_traits<work_allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
+    typedef Allocator allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
 
     typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
 
@@ -99,7 +99,7 @@ class basic_cbor_parser : public ser_context
 
     std::bitset<num_of_tags> other_tags_;
 
-    work_allocator_type alloc_;
+    allocator_type alloc_;
     Src source_;
     bool more_;
     bool done_;
@@ -134,9 +134,9 @@ class basic_cbor_parser : public ser_context
 
     struct read_byte_string_from_source
     {
-        basic_cbor_parser<Src,WorkAllocator>* source;
+        basic_cbor_parser<Src,Allocator>* source;
 
-        read_byte_string_from_source(basic_cbor_parser<Src,WorkAllocator>* source)
+        read_byte_string_from_source(basic_cbor_parser<Src,Allocator>* source)
             : source(source)
         {
         }
@@ -150,7 +150,7 @@ class basic_cbor_parser : public ser_context
 public:
     template <class Source>
     basic_cbor_parser(Source&& source,
-                      const WorkAllocator alloc=WorkAllocator())
+                      const Allocator alloc=Allocator())
        : alloc_(alloc),
          source_(std::forward<Source>(source)),
          more_(true), 
@@ -712,7 +712,7 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::byte_string:
@@ -724,7 +724,7 @@ private:
                 }
                 text_buffer_.clear();
                 encode_base64url(bytes_buffer_.begin(),bytes_buffer_.end(),text_buffer_);
-                more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -756,14 +756,14 @@ private:
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
                         {
-                            more_ = handler.name(basic_string_view<char>(val.s.data(),val.s.length()), *this);
+                            more_ = handler.key(basic_string_view<char>(val.s.data(),val.s.length()), *this);
                             break;
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
                             text_buffer_.clear();
                             encode_base64url(val.bytes.begin(),val.bytes.end(),text_buffer_);
-                            more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                            more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                             break;
                         }
                         default:
@@ -790,7 +790,7 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = handler.name(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
             }
         }
     }
@@ -1266,7 +1266,7 @@ private:
                 {
                     return s;
                 }
-                jsoncons::detail::print_uinteger(val, s);
+                jsoncons::detail::write_integer(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1276,7 +1276,7 @@ private:
                 {
                     return s;
                 }
-                jsoncons::detail::print_integer(val, s);
+                jsoncons::detail::write_integer(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1485,14 +1485,14 @@ private:
 
     static jsoncons::cbor::detail::cbor_major_type get_major_type(uint8_t type)
     {
-        static const uint8_t major_type_shift = 0x05;
+        static constexpr uint8_t major_type_shift = 0x05;
         uint8_t value = type >> major_type_shift;
         return static_cast<jsoncons::cbor::detail::cbor_major_type>(value);
     }
 
     static uint8_t get_additional_information_value(uint8_t type)
     {
-        static const uint8_t additional_information_mask = (1U << 5) - 1;
+        static constexpr uint8_t additional_information_mask = (1U << 5) - 1;
         uint8_t value = type & additional_information_mask;
         return value;
     }

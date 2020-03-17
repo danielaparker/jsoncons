@@ -1,8 +1,8 @@
 ### jsoncons::jsonpointer::basic_json_ptr
 
-__`jsoncons_ext/jsonpointer/jsonpointer.hpp`__
-
 ```c++
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
 template <class CharT>
 class basic_json_ptr
 ```

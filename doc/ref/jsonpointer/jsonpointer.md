@@ -46,6 +46,10 @@ When applied to a JSON array, the character `-` indicates one past the last elem
     <td><a href="replace.md">replace</a></td>
     <td>Replaces a value in a JSON document using JSON Pointer path notation.</td> 
   </tr>
+  <tr>
+    <td><a href="flatten.md">flatten</a></td>
+    <td>Flattens a json object or array into a single depth object of JSONPointer-value pairs.</td> 
+  </tr>
 </table>
 
 ### Examples

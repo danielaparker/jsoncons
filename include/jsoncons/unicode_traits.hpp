@@ -321,7 +321,7 @@ struct is_same_size : std::false_type
 template<class T1, class T2>
 struct is_same_size<T1, T2, typename std::enable_if<!std::is_void<T1>::value && !std::is_void<T2>::value>::type>
 {
-    static const bool value = (sizeof(T1) == sizeof(T2));
+    static constexpr bool value = (sizeof(T1) == sizeof(T2));
 }; 
 
 template<class OutputIt, class CharT, class Enable = void>

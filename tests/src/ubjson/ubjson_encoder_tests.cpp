@@ -73,13 +73,13 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
     SECTION("Too many items in object")
     {
         CHECK(encoder.begin_object(3));
-        CHECK(encoder.name("a"));
+        CHECK(encoder.key("a"));
         CHECK(encoder.bool_value(true));
-        CHECK(encoder.name("b"));
+        CHECK(encoder.key("b"));
         CHECK(encoder.bool_value(false));
-        CHECK(encoder.name("c"));
+        CHECK(encoder.key("c"));
         CHECK(encoder.null_value());
-        CHECK(encoder.name("d"));
+        CHECK(encoder.key("d"));
         CHECK(encoder.begin_array(2));
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
@@ -90,13 +90,13 @@ TEST_CASE("Too many and too few items in UBJSON object or array")
     SECTION("Too few items in object")
     {
         CHECK(encoder.begin_object(5));
-        CHECK(encoder.name("a"));
+        CHECK(encoder.key("a"));
         CHECK(encoder.bool_value(true));
-        CHECK(encoder.name("b"));
+        CHECK(encoder.key("b"));
         CHECK(encoder.bool_value(false));
-        CHECK(encoder.name("c"));
+        CHECK(encoder.key("c"));
         CHECK(encoder.null_value());
-        CHECK(encoder.name("d"));
+        CHECK(encoder.key("d"));
         CHECK(encoder.begin_array(2));
         CHECK(encoder.string_value("cat"));
         CHECK(encoder.string_value("feline"));
