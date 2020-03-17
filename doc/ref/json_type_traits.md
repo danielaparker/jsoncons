@@ -160,18 +160,18 @@ JSONCONS_TPL_ALL_GETTER_CTOR_NAME_TRAITS(num_template_params,
                                          (getter_name1,serialized_name1)...) // (18)
 
 JSONCONS_N_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,num_mandatory,
-                                property_name0,property_name1,...) // (19)
+                                field_name0,field_name1,...) // (19)
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,
-                                  property_name0,property_name1,...) // (20)
+                                  field_name0,field_name1,...) // (20)
 
 JSONCONS_TPL_N_GETTER_SETTER_TRAITS(num_template_params,
                                     class_name,get_prefix,set_prefix,num_mandatory,
-                                    property_name0,property_name1,...) // (21)  
+                                    field_name0,field_name1,...) // (21)  
 
 JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(num_template_params,
                                       class_name,get_prefix,set_prefix,
-                                      property_name0,property_name1,...) // (22)
+                                      field_name0,field_name1,...) // (22)
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(class_name,num_mandatory,
                                      (getter_name0,setter_name0,serialized_name0),
@@ -234,7 +234,7 @@ pairs declares the identifier and serialized name for each of the enum identifie
 that are part of the sequence.
 
 (11)-(14) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class, 
-and serialize to the stringified property names.. 
+and serialize to the stringified field names.. 
 When decoding to a C++ data structure, 
 (11) and (13) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (12) and (14) 
@@ -256,8 +256,8 @@ of the get functions are convertible to its parameters, taken in order.
 class template.  
 
 (19)-(22) generate the code to specialize `json_type_traits` from the get and set functions of a
-class, and serialize to the stringified property names. The get and set function names are
-formed from the concatenation of `get_prefix` and `set_prefix` with property name.
+class, and serialize to the stringified field names. The get and set function names are
+formed from the concatenation of `get_prefix` and `set_prefix` with field name.
 (19) and (21) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (20) and (22) 
 require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
@@ -287,11 +287,11 @@ in the derived classes.
 `enum_name` - the name of an enum type or enum class type  
 `num_template_params` - for a class template, the number of template parameters  
 `member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
-`static const`, `const` or `static const` data members are one-way serialized.  
+`static const`. Data members that are `const` or `static const` are one-way serialized.  
 `getter_nameN` - the getter for a class data member  
 `(identifierN,serialized_nameN)` - an enum identifier and corresponding JSON name  
 `(getter_nameN,serialized_nameN)` - the getter for a class data member and corresponding JSON name  
-`property_nameN` - the name of a class getter or setter stripped of its get or set prefix.  
+`field_nameN` - the base name of a class getter or setter with prefix `get` or `set` stripped out.  
 `(getter_nameN,setter_nameN,serialized_nameN)` - the getter and setter for a class data member, and corresponding JSON name  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
