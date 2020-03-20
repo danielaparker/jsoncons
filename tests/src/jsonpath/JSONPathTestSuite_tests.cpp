@@ -16,18 +16,15 @@
 #include <fstream>
 #include <catch/catch.hpp>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900
+#if (defined JSONCONS_HAS_2017)
 #include <filesystem>
-namespace fs = std::experimental::filesystem;
-#else
-//#include <filesystem>
-//namespace fs = std::filesystem;
+namespace fs = std::filesystem;
 #endif
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900
+#if (defined JSONCONS_HAS_2017)
 TEST_CASE("JSONPath Test Suite")
 {
     ojson document;
