@@ -12,7 +12,7 @@
 
 namespace jsoncons { namespace jmespath {
 
-class jmespath_error : public std::system_error, public virtual json_exception
+class jmespath_error : public std::system_error
 {
     std::string buffer_;
     std::size_t line_number_;

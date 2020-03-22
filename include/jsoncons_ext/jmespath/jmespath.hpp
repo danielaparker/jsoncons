@@ -912,6 +912,7 @@ class selector_base
     std::vector<path_state> state_stack_;
     std::vector<std::size_t> structure_offset_stack_;
     std::vector<key_selector> key_selector_stack_;
+    std::vector<std::unique_ptr<selector_base>> output_stack_;
     jmespath_context temp_factory_;
 
 public:
@@ -1020,7 +1021,6 @@ public:
                             ++column_;
                             break;
                         case '*':
-                            //state_stack_.pop_back();
                             key_selector_stack_.back() = key_selector(jsoncons::make_unique<object_projection>(std::move(key_selector_stack_.back().selector)));
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
