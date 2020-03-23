@@ -28,10 +28,9 @@ namespace jsoncons { namespace jsonpath {
     {
         for (auto c : s)
         {
-            if (c == '\"')
+            if (c == '\'')
             {
-                result.push_back('\\');
-                result.push_back('"');
+                // error
             }
             else
             {
@@ -82,9 +81,9 @@ namespace jsoncons { namespace jsonpath {
                     {
                         string_type key(parent_key);
                         key.push_back('[');
-                        key.push_back('"');
+                        key.push_back('\'');
                         escape(jsoncons::basic_string_view<char_type>(item.key().data(),item.key().size()), key);
-                        key.push_back('"');
+                        key.push_back('\'');
                         key.push_back(']');
                         flatten_(key, item.value(), result);
                     }
@@ -94,7 +93,6 @@ namespace jsoncons { namespace jsonpath {
 
             default:
             {
-                // add primitive parent_value with its reference string
                 result[parent_key] = parent_value;
                 break;
             }
@@ -110,7 +108,162 @@ namespace jsoncons { namespace jsonpath {
         return result;
     }
 
+    enum class unflatten_state 
+    {
+        start,
+        expect_left_bracket,
+        left_bracket,
+        name_state,
+        index_state,
+        expect_right_bracket
+    };
 
+    template<class Json>
+    Json unflatten(const Json& value)
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+
+        if (JSONCONS_UNLIKELY(!value.is_object()))
+        {
+            //JSONCONS_THROW
+        }
+
+        Json result;
+
+        for (const auto& item : value.object_range())
+        {
+            Json* part = &result;
+            string_type buffer;
+            unflatten_state state = unflatten_state::start;
+
+            auto it = item.key().begin();
+            auto last = item.key().end();
+
+            for (; it != last; ++it)
+            {
+                switch (state)
+                {
+                    case unflatten_state::start:
+                    {
+                        switch (*it)
+                        {
+                            case '$':
+                                state = unflatten_state::expect_left_bracket;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    case unflatten_state::expect_left_bracket:
+                    {
+                        switch (*it)
+                        {
+                            case '[':
+                                state = unflatten_state::left_bracket;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    case unflatten_state::left_bracket:
+                    {
+                        switch (*it)
+                        {
+                            case '\'':
+                                state = unflatten_state::name_state;
+                                break;
+                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                                buffer.push_back(*it);
+                                state = unflatten_state::index_state;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    case unflatten_state::name_state:
+                    {
+                        switch (*it)
+                        {
+                            case '\'':
+                                if (it != last-2)
+                                {
+                                    part->try_emplace(buffer,Json());
+                                }
+                                else
+                                {
+                                    part->try_emplace(buffer,item.value());
+                                }
+                                part = &part->at(buffer);
+                                buffer.clear();
+                                state = unflatten_state::expect_right_bracket;
+                                break;
+                            default:
+                                buffer.push_back(*it);
+                                break;
+                        }
+                        break;
+                    }
+                    case unflatten_state::index_state:
+                    {
+                        switch (*it)
+                        {
+                            case ']':
+                            {
+                                auto r = jsoncons::detail::to_integer<size_t>(buffer.data(), buffer.size());
+                                if (r)
+                                {
+                                    if (!part->is_array())
+                                    {
+                                        *part = Json(json_array_arg);
+                                    }
+                                    if (it != last-1)
+                                    {
+                                        if (r.value()+1 > part->size())
+                                        {
+                                            part->push_back(Json());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        part->push_back(item.value());
+                                    }
+                                    part = &part->at(r.value());
+                                }
+                                buffer.clear();
+                                state = unflatten_state::expect_left_bracket;
+                                break;
+                            }
+                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                                buffer.push_back(*it);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    case unflatten_state::expect_right_bracket:
+                    {
+                        switch (*it)
+                        {
+                            case ']':
+                                state = unflatten_state::expect_left_bracket;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return result;
+    }
 }}
 
 #endif

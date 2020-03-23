@@ -29,12 +29,12 @@ TEST_CASE("flatten test")
                "rated": "Marilyn C",
                "rating": 0.90
             },
-           {
+            {
                "rater": "HikingAsylum",
                "assertion": "intermediate",
                "rated": "Hongmin",
                "rating": 0.75
-            }       
+            }    
         ]
     }
     )");
@@ -46,20 +46,44 @@ TEST_CASE("flatten test")
         REQUIRE(result.is_object());
         REQUIRE(result.size() == 9);
 
-        std::cout << pretty_print(result) << "\n";
+        //std::cout << pretty_print(result) << "\n";
 
-        CHECK(result["$[\"application\"]"].as<std::string>() == std::string("hiking"));
-        CHECK(result["$reputons[0][\"assertion\"]"].as<std::string>() == std::string("advanced"));
-        CHECK(result["$reputons[0][\"rated\"]"].as<std::string>() == std::string("Marilyn C"));
-        CHECK(result["$reputons[0][\"rater\"]"].as<std::string>() == std::string("HikingAsylum"));
-        CHECK(result["$reputons[0][\"rating\"]"].as<double>() == Approx(0.9).epsilon(0.0000001));
-        CHECK(result["$reputons[1][\"assertion\"]"].as<std::string>() == std::string("intermediate"));
-        CHECK(result["$reputons[1][\"rated\"]"].as<std::string>() == std::string("Hongmin"));
-        CHECK(result["$reputons[1][\"rater\"]"].as<std::string>() == std::string("HikingAsylum"));
-        CHECK(result["$reputons[1][\"rating\"]"].as<double>() == Approx(0.75).epsilon(0.0000001));
+        CHECK(result["$['application']"].as<std::string>() == std::string("hiking"));
+        CHECK(result["$['reputons'][0]['assertion']"].as<std::string>() == std::string("advanced"));
+        CHECK(result["$['reputons'][0]['rated']"].as<std::string>() == std::string("Marilyn C"));
+        CHECK(result["$['reputons'][0]['rater']"].as<std::string>() == std::string("HikingAsylum"));
+        CHECK(result["$['reputons'][0]['rating']"].as<double>() == Approx(0.9).epsilon(0.0000001));
+        CHECK(result["$['reputons'][1]['assertion']"].as<std::string>() == std::string("intermediate"));
+        CHECK(result["$['reputons'][1]['rated']"].as<std::string>() == std::string("Hongmin"));
+        CHECK(result["$['reputons'][1]['rater']"].as<std::string>() == std::string("HikingAsylum"));
+        CHECK(result["$['reputons'][1]['rating']"].as<double>() == Approx(0.75).epsilon(0.0000001));
 
         //std::cout << pretty_print(result) << "\n";
     }
+
+    SECTION("unflatten")
+    {
+        json result = jsonpath::flatten(input);
+        //std::cout << pretty_print(result) << "\n";
+
+        json original = jsonpath::unflatten(result);
+        //std::cout << pretty_print(original) << "\n";
+        CHECK(original == input);
+    }
 }
 
+TEST_CASE("flatten array test")
+{
+    json input = json::parse(R"([1,2,3,"4\u0027s"])");
 
+    SECTION("flatten array and unflatten")
+    {
+        json result = jsonpath::flatten(input);
+        //std::cout << pretty_print(result) << "\n";
+
+        json original = jsonpath::unflatten(result);
+        //std::cout << pretty_print(original) << "\n";
+        CHECK(original == input);
+    }
+
+}
