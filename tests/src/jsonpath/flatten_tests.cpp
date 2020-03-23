@@ -17,7 +17,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("flatten test")
+TEST_CASE("jsonpath flatten test")
 {
     json input = json::parse(R"(
     {
@@ -72,7 +72,7 @@ TEST_CASE("flatten test")
     }
 }
 
-TEST_CASE("flatten array test")
+TEST_CASE("jsonpath flatten array test")
 {
     json input = json::parse(R"([1,2,3,"4\u0027s"])");
 
