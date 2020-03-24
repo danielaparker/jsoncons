@@ -287,13 +287,13 @@ private:
         }
 
     };
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
     const basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
-    allocator_type alloc_;
 
-    std::vector<encoding_context> stack_;
+    std::vector<encoding_context,encoding_context_allocator_type> stack_;
     int indent_amount_;
     std::size_t column_;
     std::basic_string<CharT> colon_str_;
@@ -319,7 +319,7 @@ public:
        : sink_(std::forward<Sink>(sink)), 
          options_(options),
          fp_(options.float_format(), options.precision()),
-         alloc_(alloc),
+         stack_(alloc),
          indent_amount_(0), 
          column_(0)
     {
@@ -1046,14 +1046,13 @@ private:
             return type_ == container_type::array;
         }
     };
-
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
     const basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
-    allocator_type alloc_;
 
-    std::vector<encoding_context> stack_;
+    std::vector<encoding_context,encoding_context_allocator_type> stack_;
 
     // Noncopyable and nonmoveable
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
@@ -1071,8 +1070,7 @@ public:
        : sink_(std::forward<Sink>(sink)),
          options_(options),
          fp_(options.float_format(), options.precision()),
-         alloc_(alloc)
-         
+         stack_(alloc)         
     {
     }
 
