@@ -145,12 +145,12 @@ namespace jsoncons {
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
+            basic_json_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
             val.dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
+            basic_json_compressed_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
             val.dump(encoder);
         }
     }
@@ -165,12 +165,12 @@ namespace jsoncons {
     { 
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
+            basic_json_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
             encode_json(temp_allocator_arg, temp_alloc, val, encoder);
         }
         else
         {
-            basic_json_compressed_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
+            basic_json_compressed_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
             encode_json(temp_allocator_arg, temp_alloc, val, encoder);
         }
     }
@@ -194,12 +194,12 @@ namespace jsoncons {
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<CharT> encoder(os, options);
+            basic_json_encoder<CharT,jsoncons::stream_sink<CharT>,TempAllocator> encoder(os, options, temp_alloc);
             val.dump(encoder);
         }
         else
         {
-            basic_json_compressed_encoder<CharT> encoder(os, options);
+            basic_json_compressed_encoder<CharT,jsoncons::stream_sink<CharT>,TempAllocator> encoder(os, options, temp_alloc);
             val.dump(encoder);
         }
     }

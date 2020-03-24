@@ -1,7 +1,5 @@
 ### jsoncons::jsonpointer::flatten
 
-Flattens a json object or array into a single depth object of JSONPointer-value pairs.
-
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 

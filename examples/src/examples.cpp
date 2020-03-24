@@ -405,8 +405,6 @@ int main()
 
         jsonpointer_examples();
 
-        jsonpath_examples();
-
         json_cursor_examples();
 
         run_ubjson_examples();
@@ -438,6 +436,8 @@ int main()
         jsonpatch_examples();
 
         readme_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {

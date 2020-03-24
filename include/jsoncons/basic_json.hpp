@@ -76,9 +76,9 @@ namespace detail {
         random_access_iterator_wrapper& operator=(const random_access_iterator_wrapper&) = default;
         random_access_iterator_wrapper& operator=(random_access_iterator_wrapper&&) = default;
 
-        template <class Iter>
-        random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other,
-                                       typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type* = 0)
+        template <class Iter,
+                  class=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
+        random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other)
             : it_(other.it_), has_value_(true)
         {
         }
@@ -3194,16 +3194,16 @@ public:
     {
     }
 
-    template <class T>
-    basic_json(const T& val,
-               typename std::enable_if<!is_proxy<T>::value,int>::type = 0)
+    template <class T,
+              class = typename std::enable_if<!is_proxy<T>::value>::type>
+    basic_json(const T& val)
         : var_(json_type_traits<basic_json,T>::to_json(val).var_)
     {
     }
 
-    template <class T>
-    basic_json(const T& val, const Allocator& alloc,
-               typename std::enable_if<!is_proxy<T>::value,int>::type = 0)
+    template <class T,
+              class = typename std::enable_if<!is_proxy<T>::value>::type>
+    basic_json(const T& val, const Allocator& alloc)
         : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
     {
     }
@@ -3229,13 +3229,15 @@ public:
     }
 
     template <class Unsigned>
-    basic_json(Unsigned val, semantic_tag tag, typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value>::type* = 0)
+    basic_json(Unsigned val, semantic_tag tag, 
+               typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value, int>::type = 0)
         : var_(static_cast<uint64_t>(val), tag)
     {
     }
 
     template <class Signed>
-    basic_json(Signed val, semantic_tag tag, typename std::enable_if<std::is_integral<Signed>::value && std::is_signed<Signed>::value>::type* = 0)
+    basic_json(Signed val, semantic_tag tag,
+               typename std::enable_if<std::is_integral<Signed>::value&& std::is_signed<Signed>::value,int>::type = 0)
         : var_(static_cast<int64_t>(val), tag)
     {
     }

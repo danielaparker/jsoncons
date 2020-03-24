@@ -3,9 +3,20 @@
 The jsonpath extension implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
 It provides functions for search and "search and replace" using JSONPath expressions:
 
-[json_query](json_query.md)
-
-[json_replace](json_replace.md)
+<table border="0">
+  <tr>
+    <td><a href="json_query.md">json_query</a></td>
+    <td>Searches for all values that match a JSONPath expression</td> 
+  </tr>
+  <tr>
+    <td><a href="json_replace.md">json_replace</a></td>
+    <td>Search and replace using JSONPath expressions.</td> 
+  </tr>
+  <tr>
+    <td><a href="flatten.md">flatten<br>unflatten</a></td>
+    <td>Flattens a json object or array.</td> 
+  </tr>
+</table>
     
 ### Stefan Goessner's JSONPath
 

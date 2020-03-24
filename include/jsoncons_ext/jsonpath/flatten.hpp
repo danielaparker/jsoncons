@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSON_QUERY_HPP
-#define JSONCONS_JSONPATH_JSON_QUERY_HPP
+#ifndef JSONCONS_JSONPATH_FLATTEN_HPP
+#define JSONCONS_JSONPATH_FLATTEN_HPP
 
 #include <array> // std::array
 #include <string>
