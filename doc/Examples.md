@@ -57,8 +57,9 @@
 [Iterate over a json object](#D2)  
 
 ### Flatten
-[Flatten a json object or array with JSONPointer keys](#H1)
-[Flatten and unflatten a json object or array with JSONPath keys](#H2)
+
+[Flatten a json object or array with JSONPointer keys](#H1)  
+[Flatten and unflatten a json object or array with JSONPath keys](#H2)  
 
 ### Search and Replace
 
@@ -2382,6 +2383,37 @@ int main()
     jsonpath::json_replace(j,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
     std::cout << pretty_print(booklist) << std::endl;
 }
+```
+Output:
+```json
+{
+    "store": {
+        "book": [
+            {
+                "author": "Nigel Rees",
+                "category": "reference",
+                "price": 8.95,
+                "title": "Sayings of the Century"
+            },
+            {
+                "author": "Evelyn Waugh",
+                "category": "fiction",
+                "price": 12.99,
+                "title": "Sword of Honour"
+            },
+            {
+                "author": "Herman Melville",
+                "category": "fiction",
+                "isbn": "0-553-21311-3",
+                "price": 10.0,
+                "title": "Moby Dick"
+            }
+        ]
+    }
+}
+```
+
+### Flatten
  
 <div id="H1"/> 
 
@@ -2496,3 +2528,4 @@ Output:
     "$['reputons'][1]['rating']": 0.75
 }
 ```
+
