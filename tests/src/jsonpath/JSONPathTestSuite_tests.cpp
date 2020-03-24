@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
-#if (defined JSONCONS_HAS_2017)
+#if (defined JSONCONS_HAS_2017 && defined(_MSC_VER))
 TEST_CASE("JSONPath Test Suite")
 {
     ojson document;

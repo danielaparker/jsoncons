@@ -3196,14 +3196,14 @@ public:
 
     template <class T>
     basic_json(const T& val,
-               typename std::enable_if<!is_proxy<T>::value>::type* = 0)
+               typename std::enable_if<!is_proxy<T>::value,int>::type = 0)
         : var_(json_type_traits<basic_json,T>::to_json(val).var_)
     {
     }
 
     template <class T>
     basic_json(const T& val, const Allocator& alloc,
-               typename std::enable_if<!is_proxy<T>::value>::type* = 0)
+               typename std::enable_if<!is_proxy<T>::value,int>::type = 0)
         : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
     {
     }
