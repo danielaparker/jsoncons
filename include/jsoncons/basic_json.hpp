@@ -5364,48 +5364,6 @@ public:
         return is_number();
     }
 
-    template<int size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array()")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
-    {
-        return make_array();
-    }
-    template<std::size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(std::size_t n)
-    {
-        return make_array(n);
-    }
-    template<std::size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, T)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(std::size_t n, T val)
-    {
-        return make_array(n,val);
-    }
-    template<std::size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(std::size_t m, std::size_t n)
-    {
-        return make_array<2>(m, n);
-    }
-    template<std::size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, T)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(std::size_t m, std::size_t n, T val)
-    {
-        return make_array<2>(m, n, val);
-    }
-    template<std::size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, std::size_t)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(std::size_t m, std::size_t n, std::size_t k)
-    {
-        return make_array<3>(m, n, k);
-    }
-    template<std::size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, std::size_t, T)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(std::size_t m, std::size_t n, std::size_t k, T val)
-    {
-        return make_array<3>(m, n, k, val);
-    }
     JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
     range<object_iterator> members()
     {
