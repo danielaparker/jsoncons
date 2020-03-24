@@ -87,3 +87,22 @@ TEST_CASE("jsonpath flatten array test")
     }
 
 }
+
+TEST_CASE("jsonpath flatten with single quote test")
+{
+    json input = json::parse(R"(
+    {
+       "like'd": "pizza"
+    }
+    )");
+
+    SECTION("flatten array and unflatten")
+    {
+        json result = jsonpath::flatten(input);
+
+        json original = jsonpath::unflatten(result);
+        //std::cout << pretty_print(original) << "\n";
+        CHECK(original == input);
+    }
+
+}

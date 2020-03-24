@@ -8,6 +8,7 @@
 ```
 Flattens a json object or array into a single depth object of key-value pairs.
 The keys in the flattened object are JSONPointer's.
+The values are primitive (string, number, boolean, or null). Empty objects or arrays become null.
 
 #### Return value
 

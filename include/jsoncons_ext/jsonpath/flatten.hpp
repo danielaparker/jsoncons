@@ -7,37 +7,17 @@
 #ifndef JSONCONS_JSONPATH_FLATTEN_HPP
 #define JSONCONS_JSONPATH_FLATTEN_HPP
 
-#include <array> // std::array
 #include <string>
 #include <vector>
 #include <memory>
 #include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
-#include <regex>
-#include <set> // std::set
-#include <iterator> // std::make_move_iterator
-#include <jsoncons/json.hpp>
+#include <algorithm> // std::copy
+#include <iterator> // std::back_inserter
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 
 namespace jsoncons { namespace jsonpath {
-
-    template <class String,class Result>
-    typename std::enable_if<std::is_convertible<typename String::value_type,typename Result::value_type>::value>::type
-    escape(const String& s, Result& result)
-    {
-        for (auto c : s)
-        {
-            if (c == '\'')
-            {
-                JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
-            }
-            else
-            {
-                result.push_back(c);
-            }
-        }
-    }
 
     template<class Json>
     void flatten_(const std::basic_string<typename Json::char_type>& parent_key,
@@ -80,10 +60,11 @@ namespace jsoncons { namespace jsonpath {
                     for (const auto& item : parent_value.object_range())
                     {
                         string_type key(parent_key);
+                        bool no_single_quote = item.key().find('\'') == string_type::npos;
                         key.push_back('[');
-                        key.push_back('\'');
-                        escape(jsoncons::basic_string_view<char_type>(item.key().data(),item.key().size()), key);
-                        key.push_back('\'');
+                        key.push_back(no_single_quote ? '\'' : '\"');
+                        std::copy(item.key().begin(),item.key().end(), std::back_inserter(key));
+                        key.push_back(no_single_quote ? '\'' : '\"');
                         key.push_back(']');
                         flatten_(key, item.value(), result);
                     }
@@ -113,7 +94,8 @@ namespace jsoncons { namespace jsonpath {
         start,
         expect_left_bracket,
         left_bracket,
-        name_state,
+        single_quoted_name_state,
+        double_quoted_name_state,
         index_state,
         expect_right_bracket
     };
@@ -164,7 +146,6 @@ namespace jsoncons { namespace jsonpath {
                                 state = unflatten_state::left_bracket;
                                 break;
                             default:
-                                std::cout << "check1\n";
                                 JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
                                 break;
                         }
@@ -175,7 +156,10 @@ namespace jsoncons { namespace jsonpath {
                         switch (*it)
                         {
                             case '\'':
-                                state = unflatten_state::name_state;
+                                state = unflatten_state::single_quoted_name_state;
+                                break;
+                            case '\"':
+                                state = unflatten_state::double_quoted_name_state;
                                 break;
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 buffer.push_back(*it);
@@ -187,11 +171,34 @@ namespace jsoncons { namespace jsonpath {
                         }
                         break;
                     }
-                    case unflatten_state::name_state:
+                    case unflatten_state::single_quoted_name_state:
                     {
                         switch (*it)
                         {
                             case '\'':
+                                if (it != last-2)
+                                {
+                                    part->try_emplace(buffer,Json());
+                                }
+                                else
+                                {
+                                    part->try_emplace(buffer,item.value());
+                                }
+                                part = &part->at(buffer);
+                                buffer.clear();
+                                state = unflatten_state::expect_right_bracket;
+                                break;
+                            default:
+                                buffer.push_back(*it);
+                                break;
+                        }
+                        break;
+                    }
+                    case unflatten_state::double_quoted_name_state:
+                    {
+                        switch (*it)
+                        {
+                            case '\"':
                                 if (it != last-2)
                                 {
                                     part->try_emplace(buffer,Json());
@@ -244,7 +251,6 @@ namespace jsoncons { namespace jsonpath {
                                 buffer.push_back(*it);
                                 break;
                             default:
-                                std::cout << "check3\n";
                                 JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
                                 break;
                         }
@@ -258,7 +264,6 @@ namespace jsoncons { namespace jsonpath {
                                 state = unflatten_state::expect_left_bracket;
                                 break;
                             default:
-                                std::cout << "check4\n";
                                 JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
                                 break;
                         }

@@ -11,6 +11,7 @@ Json unflatten(const Json& value)
 ```
 Flattens a json object or array to a single depth or object of key-value pairs, and unflattens that object back to the original json.
 The keys in the flattened object are normalized json paths.
+The values are primitive (string, number, boolean, or null), empty object (`{}`) or empty array (`[]`).
 
 #### Return value
 
