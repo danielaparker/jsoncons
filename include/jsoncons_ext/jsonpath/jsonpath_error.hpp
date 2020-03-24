@@ -145,7 +145,7 @@ namespace std {
 
 namespace jsoncons { namespace jsonpath {
 
-    class jsonpath_error : public std::system_error
+    class jsonpath_error : public std::system_error, public virtual json_exception
     {
         std::string buffer_;
         std::size_t line_number_;
