@@ -21,6 +21,7 @@
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
+[Specialize json_type_traits explicitly](#G10)  
 [Serialize with the C++ member names of the class](#G1)  
 [Serialize with provided names using the `_NAME_` macros](#G2)  
 [Mapping to C++ data structures with and without defaults allowed](#G3)  
@@ -30,7 +31,6 @@
 [An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS](#G7)  
 [Serialize a polymorphic type based on the presence of members](#G8)  
 [Ensuring type selection is possible](#G9)  
-[Specialize json_type_traits explicitly](#G10)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G11)
 
 ### Construct
@@ -55,6 +55,10 @@
 
 [Iterate over a json array](#D1)  
 [Iterate over a json object](#D2)  
+
+### Flatten
+[Flatten a json object or array with JSONPointer keys](#H1)
+[Flatten and unflatten a json object or array with JSONPath keys](#H2)
 
 ### Search and Replace
 
@@ -494,6 +498,132 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 <div id="G0"/>
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
+
+<div id="G10"/>
+
+#### Specialize json_type_traits explicitly
+
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](ref/json_type_traits.md) 
+defined. The standard library containers are already supported, 
+and your own types will be supported too if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
+
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
+
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        typedef typename Json::allocator_type allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
+        }
+        static ns::book as(const Json& j)
+        {
+            ns::book val;
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
+            return val;
+        }
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
+        {
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
+            return j;
+        }
+    };
+} // namespace jsoncons
+```
+
+To save typing and enhance readability, the jsoncons library defines macros, 
+so you could also write
+
+```c++
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
+```
+
+which expands to the code above.
+
+```c++
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
+
+    std::cout << "(1)\n";
+    for (const auto& item : book_list)
+    {
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
+    }
+
+    std::cout << "\n(2)\n";
+    encode_json(book_list, std::cout, indenting::indent);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
+
+(2)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 22.48,
+        "title": "Pulp"
+    }
+]
+```
 
 <div id="G1"/>
 
@@ -1589,132 +1719,6 @@ A bar
 A baz
 ```
 
-<div id="G10"/>
-
-#### Specialize json_type_traits explicitly
-
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
-Decode and encode work for all C++ classes that have 
-[json_type_traits](ref/json_type_traits.md) 
-defined. The standard library containers are already supported, 
-and your own types will be supported too if you specialize `json_type_traits`
-in the `jsoncons` namespace. 
-
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
-
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        typedef typename Json::allocator_type allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
-} // namespace jsoncons
-```
-
-To save typing and enhance readability, the jsoncons library defines macros, 
-so you could also write
-
-```c++
-JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
-```
-
-which expands to the code above.
-
-```c++
-using namespace jsoncons; // for convenience
-
-int main()
-{
-    const std::string s = R"(
-    [
-        {
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
-        },
-        {
-            "author" : "Charles Bukowski",
-            "title" : "Pulp",
-            "price" : 22.48
-        }
-    ]
-    )";
-
-    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
-
-    std::cout << "(1)\n";
-    for (const auto& item : book_list)
-    {
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-
-    std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
-    std::cout << "\n\n";
-}
-```
-Output:
-```
-(1)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Pulp, 22.48
-
-(2)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 22.48,
-        "title": "Pulp"
-    }
-]
-```
-
 <div id="G11"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
@@ -2378,4 +2382,117 @@ int main()
     jsonpath::json_replace(j,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
     std::cout << pretty_print(booklist) << std::endl;
 }
+ 
+<div id="H1"/> 
 
+#### Flatten a json object or array with JSONPointer keys
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+// for brevity
+using jsoncons::json; 
+namespace jptr = jsoncons::jsonpointer;
+
+int main()
+{
+    json input = json::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+           {
+               "rater": "HikingAsylum",
+               "assertion": "advanced",
+               "rated": "Marilyn C",
+               "rating": 0.90
+            },
+           {
+               "rater": "HikingAsylum",
+               "assertion": "intermediate",
+               "rated": "Hongmin",
+               "rating": 0.75
+            }       
+        ]
+    }
+    )");
+
+    json result = jptr::flatten(input);
+
+    std::cout << pretty_print(result) << "\n";
+}
+```
+Output:
+```
+{
+    "/application": "hiking",
+    "/reputons/0/assertion": "advanced",
+    "/reputons/0/rated": "Marilyn C",
+    "/reputons/0/rater": "HikingAsylum",
+    "/reputons/0/rating": 0.9,
+    "/reputons/1/assertion": "intermediate",
+    "/reputons/1/rated": "Hongmin",
+    "/reputons/1/rater": "HikingAsylum",
+    "/reputons/1/rating": 0.75
+}
+```
+ 
+<div id="H2"/> 
+
+#### Flatten and unflatten a json object or array with JSONPath keys
+
+```c++
+#include <iostream>
+#include <cassert>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+// for brevity
+using jsoncons::json; 
+namespace jpath = jsoncons::jsonpath;
+
+int main()
+{
+    json input = json::parse(R"(
+    {
+       "application": "hiking",
+       "reputons": [
+           {
+               "rater": "HikingAsylum",
+               "assertion": "advanced",
+               "rated": "Marilyn C",
+               "rating": 0.90
+            },
+            {
+               "rater": "HikingAsylum",
+               "assertion": "intermediate",
+               "rated": "Hongmin",
+               "rating": 0.75
+            }    
+        ]
+    }
+    )");
+
+    json result = jpath::flatten(input);
+
+    std::cout << pretty_print(result) << "\n";
+
+    json original = jpath::unflatten(result);
+    assert(original == input);
+}
+```
+Output:
+```
+{
+    "$['application']": "hiking",
+    "$['reputons'][0]['assertion']": "advanced",
+    "$['reputons'][0]['rated']": "Marilyn C",
+    "$['reputons'][0]['rater']": "HikingAsylum",
+    "$['reputons'][0]['rating']": 0.9,
+    "$['reputons'][1]['assertion']": "intermediate",
+    "$['reputons'][1]['rated']": "Hongmin",
+    "$['reputons'][1]['rater']": "HikingAsylum",
+    "$['reputons'][1]['rating']": 0.75
+}
+```

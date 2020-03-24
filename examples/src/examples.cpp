@@ -28,7 +28,6 @@ void run_csv_examples();
 void jsonpath_examples();
 void json_accessor_examples();
 void msgpack_examples();
-void jsonpointer_examples();
 void jsonpatch_examples();
 void run_cbor_examples();
 void run_ubjson_examples();
@@ -42,6 +41,7 @@ void json_traits_macros_named_examples();
 void run_cbor_typed_array_examples();
 void byte_string_examples();
 void json_constructor_examples();
+void jsonpointer_examples();
 
 void comment_example()
 {
