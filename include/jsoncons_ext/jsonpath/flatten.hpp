@@ -30,7 +30,7 @@ namespace jsoncons { namespace jsonpath {
         {
             if (c == '\'')
             {
-                // error
+                JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
             }
             else
             {
@@ -126,7 +126,7 @@ namespace jsoncons { namespace jsonpath {
 
         if (JSONCONS_UNLIKELY(!value.is_object()))
         {
-            //JSONCONS_THROW
+            JSONCONS_THROW(jsonpath_error(jsonpath_errc::argument_to_unflatten_invalid));
         }
 
         Json result;
@@ -164,6 +164,8 @@ namespace jsoncons { namespace jsonpath {
                                 state = unflatten_state::left_bracket;
                                 break;
                             default:
+                                std::cout << "check1\n";
+                                JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
                                 break;
                         }
                         break;
@@ -178,7 +180,9 @@ namespace jsoncons { namespace jsonpath {
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 buffer.push_back(*it);
                                 state = unflatten_state::index_state;
+                                break;
                             default:
+                                JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
                                 break;
                         }
                         break;
@@ -240,6 +244,8 @@ namespace jsoncons { namespace jsonpath {
                                 buffer.push_back(*it);
                                 break;
                             default:
+                                std::cout << "check3\n";
+                                JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
                                 break;
                         }
                         break;
@@ -252,11 +258,14 @@ namespace jsoncons { namespace jsonpath {
                                 state = unflatten_state::expect_left_bracket;
                                 break;
                             default:
+                                std::cout << "check4\n";
+                                JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_flattened_key));
                                 break;
                         }
                         break;
                     }
                     default:
+                        JSONCONS_UNREACHABLE();
                         break;
                 }
             }

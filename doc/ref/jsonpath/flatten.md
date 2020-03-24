@@ -9,7 +9,8 @@ Json flatten(const Json& value)
 template<class Json>
 Json unflatten(const Json& value)
 ```
-Flattens a json object or array into a single depth object of JSONPath-value pairs.
+Flattens a json object or array to a single depth or object of key-value pairs, and unflattens that object back to the original json.
+The keys in the flattened object are normalized json paths.
 
 #### Return value
 
@@ -73,4 +74,6 @@ Output:
     "$['reputons'][1]['rating']": 0.75
 }
 ```
+### See also
 
+[jsoncons::jsonpointer::flatten](../jsonpointer/flatten.md)

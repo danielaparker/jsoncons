@@ -41,7 +41,9 @@ namespace jsoncons { namespace jsonpath {
         parse_error_in_filter,
         argument_parse_error,
         unidentified_error,
-        unexpected_end_of_input
+        unexpected_end_of_input,
+        argument_to_unflatten_invalid,
+        invalid_flattened_key
     };
 
     class jsonpath_error_category_impl
@@ -108,6 +110,10 @@ namespace jsoncons { namespace jsonpath {
                     return "Unidentified error";
                 case jsonpath_errc::unexpected_end_of_input:
                     return "Unexpected end of jsonpath input";
+                case jsonpath_errc::argument_to_unflatten_invalid:
+                    return "Argument to unflatten must be an object";
+                case jsonpath_errc::invalid_flattened_key:
+                    return "Flattened key is invalid";
                 default:
                     return "Unknown jsonpath parser error";
             }
