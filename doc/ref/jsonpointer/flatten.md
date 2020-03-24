@@ -24,7 +24,7 @@ A flattened json object of JSONPointer-value pairs
 
 // for brevity
 using jsoncons::json; 
-namespace jptr = jsoncons::jsonpointer;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
@@ -48,7 +48,7 @@ int main()
     }
     )");
 
-    json result = jptr::flatten(input);
+    json result = jsonpointer::flatten(input);
 
     std::cout << pretty_print(result) << "\n";
 }

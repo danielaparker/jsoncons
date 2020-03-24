@@ -6,7 +6,7 @@
 
 // for brevity
 using jsoncons::json; 
-namespace jptr = jsoncons::jsonpointer;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 namespace {
 
@@ -30,32 +30,32 @@ namespace {
 
         try
         {
-            const json& result1 = jptr::get(j, "");
+            const json& result1 = jsonpointer::get(j, "");
             std::cout << "(1) " << result1 << std::endl;
-            const json& result2 = jptr::get(j, "/foo");
+            const json& result2 = jsonpointer::get(j, "/foo");
             std::cout << "(2) " << result2 << std::endl;
-            const json& result3 = jptr::get(j, "/foo/0");
+            const json& result3 = jsonpointer::get(j, "/foo/0");
             std::cout << "(3) " << result3 << std::endl;
-            const json& result4 = jptr::get(j, "/");
+            const json& result4 = jsonpointer::get(j, "/");
             std::cout << "(4) " << result4 << std::endl;
-            const json& result5 = jptr::get(j, "/a~1b");
+            const json& result5 = jsonpointer::get(j, "/a~1b");
             std::cout << "(5) " << result5 << std::endl;
-            const json& result6 = jptr::get(j, "/c%d");
+            const json& result6 = jsonpointer::get(j, "/c%d");
             std::cout << "(6) " << result6 << std::endl;
-            const json& result7 = jptr::get(j, "/e^f");
+            const json& result7 = jsonpointer::get(j, "/e^f");
             std::cout << "(7) " << result7 << std::endl;
-            const json& result8 = jptr::get(j, "/g|h");
+            const json& result8 = jsonpointer::get(j, "/g|h");
             std::cout << "(8) " << result8 << std::endl;
-            const json& result9 = jptr::get(j, "/i\\j");
+            const json& result9 = jsonpointer::get(j, "/i\\j");
             std::cout << "(9) " << result9 << std::endl;
-            const json& result10 = jptr::get(j, "/k\"l");
+            const json& result10 = jsonpointer::get(j, "/k\"l");
             std::cout << "(10) " << result10 << std::endl;
-            const json& result11 = jptr::get(j, "/ ");
+            const json& result11 = jsonpointer::get(j, "/ ");
             std::cout << "(11) " << result11 << std::endl;
-            const json& result12 = jptr::get(j, "/m~0n");
+            const json& result12 = jsonpointer::get(j, "/m~0n");
             std::cout << "(12) " << result12 << std::endl;
         }
-        catch (const jptr::jsonpointer_error& e)
+        catch (const jsonpointer::jsonpointer_error& e)
         {
             std::cerr << e.what() << std::endl;
         }
@@ -79,8 +79,8 @@ namespace {
            }
         )");
 
-        std::cout << "(1) " << jptr::contains(j, "/foo/0") << std::endl;
-        std::cout << "(2) " << jptr::contains(j, "e^g") << std::endl;
+        std::cout << "(1) " << jsonpointer::contains(j, "/foo/0") << std::endl;
+        std::cout << "(2) " << jsonpointer::contains(j, "e^g") << std::endl;
     }
 
     void jsonpointer_select_author()
@@ -103,17 +103,17 @@ namespace {
         // Using exceptions to report errors
         try
         {
-            json result = jptr::get(j, "/1/author");
+            json result = jsonpointer::get(j, "/1/author");
             std::cout << "(1) " << result << std::endl;
         }
-        catch (const jptr::jsonpointer_error& e)
+        catch (const jsonpointer::jsonpointer_error& e)
         {
             std::cout << e.what() << std::endl;
         }
 
         // Using error codes to report errors
         std::error_code ec;
-        const json& result = jptr::get(j, "/0/title", ec);
+        const json& result = jsonpointer::get(j, "/0/title", ec);
 
         if (ec)
         {
@@ -132,7 +132,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::insert(target, "/baz", json("qux"), ec);
+        jsonpointer::insert(target, "/baz", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -150,7 +150,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::insert(target, "/foo/1", json("qux"), ec);
+        jsonpointer::insert(target, "/foo/1", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -168,7 +168,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::insert(target, "/foo/-", json("qux"), ec);
+        jsonpointer::insert(target, "/foo/-", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -186,7 +186,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::insert(target, "/baz", json("qux"), ec);
+        jsonpointer::insert(target, "/baz", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -204,7 +204,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::insert_or_assign(target, "/foo/3", json("qux"), ec);
+        jsonpointer::insert_or_assign(target, "/foo/3", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -222,7 +222,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::insert_or_assign(target, "/baz", json("qux"), ec);
+        jsonpointer::insert_or_assign(target, "/baz", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -240,7 +240,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::remove(target, "/baz", ec);
+        jsonpointer::remove(target, "/baz", ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -258,7 +258,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::remove(target, "/foo/1", ec);
+        jsonpointer::remove(target, "/foo/1", ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -279,7 +279,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::replace(target, "/baz", json("boo"), ec);
+        jsonpointer::replace(target, "/baz", json("boo"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -297,7 +297,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jptr::replace(target, "/foo/1", json("qux"), ec);
+        jsonpointer::replace(target, "/foo/1", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -327,11 +327,11 @@ namespace {
 
         try
         {
-            json result = jptr::get(j, "/1/isbn");
+            json result = jsonpointer::get(j, "/1/isbn");
             std::cout << "succeeded?" << std::endl;
             std::cout << result << std::endl;
         }
-        catch (const jptr::jsonpointer_error& e)
+        catch (const jsonpointer::jsonpointer_error& e)
         {
             std::cout << "Caught jsonpointer_error with category " << e.code().category().name() 
                       << ", code " << e.code().value() 
@@ -343,7 +343,7 @@ namespace {
     {
         {
             json j(jsoncons::json_array_arg, {"baz","foo"});
-            json& item = jptr::get(j,"/0");
+            json& item = jsonpointer::get(j,"/0");
             std::cout << "(1) " << item << std::endl;
 
             //std::vector<uint8_t> u;
@@ -356,21 +356,21 @@ namespace {
         }
         {
             const json j(jsoncons::json_array_arg, {"baz","foo"});
-            const json& item = jptr::get(j,"/1");
+            const json& item = jsonpointer::get(j,"/1");
             std::cout << "(2) " << item << std::endl;
         }
         {
             json j(jsoncons::json_array_arg, {"baz","foo"});
 
             std::error_code ec;
-            json& item = jptr::get(j,"/1",ec);
+            json& item = jsonpointer::get(j,"/1",ec);
             std::cout << "(4) " << item << std::endl;
         }
         {
             const json j(jsoncons::json_array_arg, {"baz","foo"});
 
             std::error_code ec;
-            const json& item = jptr::get(j,"/0",ec);
+            const json& item = jsonpointer::get(j,"/0",ec);
             std::cout << "(5) " << item << std::endl;
         }
     }
@@ -384,7 +384,7 @@ namespace {
            }
         )");
 
-        jptr::json_ptr ptr;
+        jsonpointer::json_ptr ptr;
         ptr /= "m~n";
         ptr /= "1";
 
@@ -397,13 +397,13 @@ namespace {
         }
         std::cout << "\n";
 
-        json item = jptr::get(j, ptr);
+        json item = jsonpointer::get(j, ptr);
         std::cout << "(3) " << item << "\n";
     }
 
     void jsonpointer_address_iterator_example()
     {
-        jptr::json_ptr ptr("/store/book/1/author");
+        jsonpointer::json_ptr ptr("/store/book/1/author");
 
         std::cout << "(1) " << ptr << "\n\n";
 
@@ -418,7 +418,7 @@ namespace {
 
     void jsonpointer_address_append_tokens()
     {
-        jptr::json_ptr ptr;
+        jsonpointer::json_ptr ptr;
 
         ptr /= "a/b";
         ptr /= "";
@@ -437,9 +437,9 @@ namespace {
 
     void jsonpointer_address_concatenate()
     {
-        jptr::json_ptr ptr("/a~1b");
+        jsonpointer::json_ptr ptr("/a~1b");
 
-        ptr += jptr::json_ptr("//m~0n");
+        ptr += jsonpointer::json_ptr("//m~0n");
 
         std::cout << "(1) " << ptr << "\n\n";
 
@@ -474,7 +474,7 @@ namespace {
         }
         )");
 
-        json result = jptr::flatten(input);
+        json result = jsonpointer::flatten(input);
 
         std::cout << pretty_print(result) << "\n";
     }
