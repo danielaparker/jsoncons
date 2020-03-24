@@ -16,7 +16,7 @@
 #include <fstream>
 #include <catch/catch.hpp>
 
-#if (defined JSONCONS_HAS_2017)
+#if (defined JSONCONS_HAS_FILESYSTEM && defined(_MSC_VER))
 #include <filesystem>
 namespace fs = std::filesystem;
 #endif
@@ -24,7 +24,7 @@ namespace fs = std::filesystem;
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
-#if (defined JSONCONS_HAS_2017 && defined(_MSC_VER))
+#if (defined JSONCONS_HAS_FILESYSTEM && defined(_MSC_VER))
 TEST_CASE("JSONPath Test Suite")
 {
     ojson document;

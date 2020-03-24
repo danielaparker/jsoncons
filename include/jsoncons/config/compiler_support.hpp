@@ -144,6 +144,18 @@
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
+#if !defined(JSONCONS_HAS_FILESYSTEM)
+#  if (defined JSONCONS_HAS_2017)
+#    if defined(__clang__)
+#      if __has_include(<filesystem>)
+#        define JSONCONS_HAS_FILESYSTEM 1
+#     endif // __has_include(<filesystem>)
+#   else
+#      define JSONCONS_HAS_FILESYSTEM 1
+#   endif 
+#  endif // defined(JSONCONS_HAS_2017)
+#endif // !defined(JSONCONS_HAS_FILESYSTEM)
+
 #if (!defined(JSONCONS_NO_EXCEPTIONS))
 // Check if exceptions are disabled.
 #  if defined( __cpp_exceptions) && __cpp_exceptions == 0
