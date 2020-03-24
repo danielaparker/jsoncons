@@ -198,12 +198,12 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::bond, (principal,"notional"), (maturity,"mat
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 // First four members listed are mandatory, confidence and expires are optional
-JSONCONS_N_GETTER_CTOR_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
+JSONCONS_N_CTOR_GETTER_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
                               confidence, expires)
 // All members are mandatory
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputation, application, reputons)
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::fixing, index_id, observation_date, rate)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::fixing, index_id, observation_date, rate)
 JSONCONS_ALL_MEMBER_TRAITS(ns::employee, employeeNo, name, title)
 
 // Declare the traits. Specify which data members need to be serialized.

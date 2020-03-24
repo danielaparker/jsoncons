@@ -108,7 +108,7 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book1,(category,"Category"),(author,"Author"
                                                 (title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Book2,(category_,"Category"),(author_,"Author"),
                                                 (title_,"Title"),(price_,"Price"))
-JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Book3,(category,"Category"),(author,"Author"),
                                                  (title,"Title"),(price,"Price"))
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Book4,(getCategory,setCategory,"Category"),
                                                        (getAuthor,setAuthor,"Author"),

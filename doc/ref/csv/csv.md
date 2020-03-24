@@ -155,7 +155,7 @@ struct json_type_traits<Json,boost::gregorian::date>
     }
 };
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::fixing, index_id, observation_date, rate)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::fixing, index_id, observation_date, rate)
 
 int main()
 {

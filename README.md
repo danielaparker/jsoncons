@@ -239,10 +239,10 @@ namespace ns {
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 // First four members listed are mandatory, confidence and expires are optional
-JSONCONS_N_GETTER_CTOR_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
+JSONCONS_N_CTOR_GETTER_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
                               confidence, expires)
 // All members are mandatory
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
 {
@@ -282,13 +282,13 @@ Marilyn C, 0.9
 }
 ```
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
-`JSONCONS_N_GETTER_CTOR_TRAITS`, and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
+`JSONCONS_N_CTOR_GETTER_TRAITS`, and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
 `ns::hiking_experience`, the class `ns::hiking_reputon` (with some non-mandatory members), and the class
 `ns::hiking_reputation` (with all mandatory members.)
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
-the enum identifiers, and the macros `JSONCONS_N_GETTER_CTOR_TRAITS`
-and `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
+the enum identifiers, and the macros `JSONCONS_N_CTOR_GETTER_TRAITS`
+and `JSONCONS_ALL_CTOR_GETTER_TRAITS` 
 generate the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
