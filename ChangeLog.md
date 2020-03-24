@@ -1,3 +1,23 @@
+v0.149.0
+--------
+
+Defects fixed:
+
+- Fixed vs issue (since v0.148.0) with basic_json constructor disambiguation with 
+a combination of type tag and `std::initializer_list` arguments.
+
+Non-breaking change:
+
+- For consistency with naming conventions across `json_type_traits` convenience macros,
+macro names containing `GETTER_CTOR` now contain `CTOR_GETTER`, e.g. 
+`JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS` is now `JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS`.
+The old names are still supported.
+
+Enhancements:
+
+- Added jsonpath functions `flatten` and `unflatten` that flatten a json object or array 
+to a single depth object of key-value pairs, and unflatten that object back to the original json.
+
 v0.148.0
 --------
 
