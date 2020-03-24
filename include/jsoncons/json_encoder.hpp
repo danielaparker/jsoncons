@@ -993,7 +993,7 @@ private:
     }
 };
 
-template<class CharT,class Sink=jsoncons::stream_sink<CharT>>
+template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
 class basic_json_compressed_encoder final : public basic_json_content_handler<CharT>
 {
     static const std::array<CharT, 4>& null_k()
@@ -1012,6 +1012,7 @@ class basic_json_compressed_encoder final : public basic_json_content_handler<Ch
         return k;
     }
 public:
+    typedef Allocator allocator_type;
     typedef CharT char_type;
     using typename basic_json_content_handler<CharT>::string_view_type;
     typedef Sink sink_type;
@@ -1050,6 +1051,7 @@ private:
     Sink sink_;
     const basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
+    allocator_type alloc_;
 
     std::vector<encoding_context> stack_;
 
@@ -1057,16 +1059,19 @@ private:
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
-    basic_json_compressed_encoder(Sink&& sink)
-        : basic_json_compressed_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>())
+    basic_json_compressed_encoder(Sink&& sink, 
+                                  const Allocator& alloc = Allocator())
+        : basic_json_compressed_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>(), alloc)
     {
     }
 
     basic_json_compressed_encoder(Sink&& sink, 
-                                  const basic_json_encode_options<CharT>& options)
+                                  const basic_json_encode_options<CharT>& options, 
+                                  const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
          options_(options),
-         fp_(options.float_format(), options.precision())
+         fp_(options.float_format(), options.precision()),
+         alloc_(alloc)
          
     {
     }
