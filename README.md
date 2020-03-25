@@ -24,7 +24,7 @@ supports semantic tagging of date-time values, timestamp values, big integers,
 big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
-jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
+jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html). 
 
 ## Extensions
 
@@ -65,6 +65,8 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [Examples](doc/Examples.md)
 - [Reference](doc/Reference.md)
 - [Roadmap](Roadmap.md)
+
+A C++ Compiler with C++11 support is required.
 
 The library uses exceptions and in some cases `std::error_code`'s to report errors.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
