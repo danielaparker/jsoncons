@@ -21,16 +21,16 @@
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-[Specialize json_type_traits explicitly](#G10)  
-[Serialize with the C++ member names of the class](#G1)  
-[Serialize with provided names using the `_NAME_` macros](#G2)  
-[Mapping to C++ data structures with and without defaults allowed](#G3)  
-[Serialize non-mandatory std::optional values using the convenience macros](#G4)  
-[An example with std::shared_ptr and std::unique_ptr](#G5)  
-[Serialize a templated class with the `_TPL_` macros](#G6)  
-[An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS](#G7)  
-[Serialize a polymorphic type based on the presence of members](#G8)  
-[Ensuring type selection is possible](#G9)  
+[Specialize json_type_traits explicitly](#G1)  
+[Serialize with the C++ member names of the class](#G2)  
+[Serialize with provided names using the `_NAME_` macros](#G3)  
+[Mapping to C++ data structures with and without defaults allowed](#G4)  
+[Serialize non-mandatory std::optional values using the convenience macros](#G5)  
+[An example with std::shared_ptr and std::unique_ptr](#G6)  
+[Serialize a templated class with the `_TPL_` macros](#G7)  
+[An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS](#G8)  
+[Serialize a polymorphic type based on the presence of members](#G9)  
+[Ensuring type selection is possible](#G10)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G11)
 
 ### Construct
@@ -500,7 +500,7 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-<div id="G10"/>
+<div id="G1"/>
 
 #### Specialize json_type_traits explicitly
 
@@ -626,7 +626,7 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="G1"/>
+<div id="G2"/>
 
 #### Serialize with the C++ member names of the class
 
@@ -803,7 +803,7 @@ biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.
 
 The output for (2), (3) and (4) is the same.
 
-<div id="G2"/>
+<div id="G3"/>
 
 #### Serialize with provided names using the `_NAME_` macros
 
@@ -1031,7 +1031,7 @@ biography, Robert A. Caro, The Path to Power: The Years of Lyndon Johnson I, 16.
 
 The output for (2), (3) and (4) is the same.
 
-<div id="G3"/>
+<div id="G4"/>
 
 #### Mapping to C++ data structures with and without defaults allowed
 
@@ -1110,7 +1110,7 @@ instead. This will cause an exception to be thrown with the message
 Key 'ssn' not found
 ```
 
-<div id="G4"/>
+<div id="G5"/>
 
 #### Serialize non-mandatory std::optional values using the convenience macros
 
@@ -1215,7 +1215,7 @@ Output:
 }
 ```
 
-<div id="G5"/>
+<div id="G6"/>
 
 #### An example with std::shared_ptr and std::unique_ptr
 
@@ -1290,7 +1290,7 @@ Output:
 }
 ```
 
-<div id="G6"/>
+<div id="G7"/>
 
 #### Serialize a templated class with the `_TPL_` macros
 
@@ -1337,7 +1337,7 @@ int main()
 }
 ```
 
-<div id="G7"/>
+<div id="G8"/>
 
 #### An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS
 
@@ -1453,7 +1453,7 @@ Output:
 }
 ```
 
-<div id="G8"/>
+<div id="G9"/>
 
 #### Serialize a polymorphic type based on the presence of members
 
@@ -1639,7 +1639,7 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="G9"/>
+<div id="G10"/>
 
 #### Ensuring type selection is possible
 

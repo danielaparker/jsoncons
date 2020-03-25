@@ -294,7 +294,7 @@ and `JSONCONS_ALL_CTOR_GETTER_TRAITS`
 generate the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
-See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
+See [examples](doc/Examples.md#G0) for other ways of specializing `json_type_traits`.
 
 #### As a stream of parse events
 
