@@ -2482,7 +2482,7 @@ Output:
 
 // for brevity
 using jsoncons::json; 
-namespace jpath = jsoncons::jsonpath;
+namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
@@ -2506,11 +2506,11 @@ int main()
     }
     )");
 
-    json result = jpath::flatten(input);
+    json result = jsonpath::flatten(input);
 
     std::cout << pretty_print(result) << "\n";
 
-    json original = jpath::unflatten(result);
+    json original = jsonpath::unflatten(result);
     assert(original == input);
 }
 ```
