@@ -283,7 +283,7 @@ Marilyn C, 0.9
     ]
 }
 ```
-This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`,
 `JSONCONS_N_CTOR_GETTER_TRAITS`, and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
 `ns::hiking_experience`, the class `ns::hiking_reputon` (with some non-mandatory members), and the class
