@@ -38,6 +38,24 @@ namespace jsoncons {
 
     // specializations
 
+    // primitive
+
+    template <class T>
+    struct deser_traits<T,
+        typename std::enable_if<std::is_integral<T>::value ||
+                                std::is_floating_point<T>::value
+    >::type>
+    {
+        template <class Json,class TempAllocator>
+        static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+                             json_decoder<Json,TempAllocator>&, 
+                             std::error_code&)
+        {
+            T v = reader.current().get<T>();
+            return v;
+        }
+    };
+
     // vector like
     template <class T>
     struct deser_traits<T,

@@ -363,12 +363,12 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                auto sink = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
-                if (!sink)
+                auto result = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
+                if (!result)
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(sink.error_code().message()));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
                 }
-                value = sink.value();
+                value = result.value();
                 break;
             }
             case staj_event_type::double_value:
@@ -397,12 +397,12 @@ private:
             case staj_event_type::name:
             case staj_event_type::string_value:
             {
-                auto sink = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
-                if (!sink)
+                auto result = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
+                if (!result)
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(sink.error_code().message()));
+                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
                 }
-                value = sink.value();
+                value = result.value();
                 break;
             }
             case staj_event_type::double_value:
