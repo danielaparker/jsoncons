@@ -42,8 +42,7 @@ namespace jsoncons {
 
     template <class T>
     struct deser_traits<T,
-        typename std::enable_if<std::is_integral<T>::value ||
-                                std::is_floating_point<T>::value
+        typename std::enable_if<jsoncons::detail::is_primitive<T>::value
     >::type>
     {
         template <class Json,class TempAllocator>
@@ -51,7 +50,7 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code&)
         {
-            T v = reader.current().get<T>();
+            T v = reader.current().template get<T>();
             return v;
         }
     };

@@ -82,6 +82,19 @@ namespace detail {
         return (ptr);
     }  
 
+    // is_primitive
+
+    template <class T, class Enable=void>
+    struct is_primitive : std::false_type {};
+
+    template <class T>
+    struct is_primitive<T, 
+           typename std::enable_if<std::is_integral<T>::value ||
+                                   std::is_floating_point<T>::value
+    >::type> : std::true_type {};
+
+    // has_char_traits_member_type
+
     // is_character
 
     template <class T, class Enable=void>
