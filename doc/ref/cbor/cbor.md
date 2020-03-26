@@ -70,7 +70,7 @@ jsoncons strings tagged with `semantic_tag::base64url` and `semantic_tag::base64
 256, 25 [stringref-namespace, stringref](http://cbor.schmorp.de/stringref)  
 Tags 256 and 25 are automatically decoded when detected. They are encoded when CBOR option `pack_strings` is set to true.
 
-64-87 [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)  
+64-87 [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)  
 Tags 64-82 (excepting float128 big endian) and 84-86 (excepting float128 little endian) are automatically decoded when detected. They may be encoded when CBOR option `enable_typed_arrays` is set to true.
 
 #### Mappings between CBOR and jsoncons data items

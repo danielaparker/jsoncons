@@ -347,7 +347,7 @@ d8 56 58 20 00 00 00 00 00 00 24 40 00 00 00 00 00 00 34 40 00 00 00 00 00 00 3e
 
 #### Navigating Typed Arrays with cursor - multi-dimensional row major with typed array
 
-This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
@@ -416,7 +416,7 @@ end_array (n/a)
 
 #### Navigating Typed Arrays with cursor - multi-dimensional column major with classical CBOR array
 
-This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
