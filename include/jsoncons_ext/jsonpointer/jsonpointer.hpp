@@ -1053,7 +1053,6 @@ enum class pointer_state
     Json unflatten(const Json& value)
     {
         using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type>;
 
         if (JSONCONS_UNLIKELY(!value.is_object()))
         {
