@@ -914,6 +914,8 @@ enum class pointer_state
         return result;
     }
 
+    // flatten
+
     template<class Json>
     void flatten_(const std::basic_string<typename Json::char_type>& parent_key,
                   const Json& parent_value,
@@ -979,6 +981,96 @@ enum class pointer_state
         Json result;
         std::basic_string<typename Json::char_type> parent_key;
         flatten_(parent_key, value, result);
+        return result;
+    }
+
+    // unflatten
+
+    template <class Key, class Value>
+    struct mapping
+    {
+        using char_type = typename Value::char_type;
+
+        basic_json_ptr<char_type> ptr;
+        const Value* value;
+        Value* result;
+        typename basic_json_ptr<char_type>::iterator first;
+        typename basic_json_ptr<char_type>::iterator last;
+
+        mapping(const Key& key, const Value* value, Value* result)
+            : ptr(key), value(value), result(result), first(ptr.begin()), last(ptr.end()) 
+        {
+        }
+    };
+
+    template<class Json>
+    bool unflatten_object_once(std::vector<mapping<typename Json::key_type,Json>>& parts)
+    {
+        bool more = false;
+        for (auto& item : parts)
+        {
+            if (item.first != item.last)
+            {
+                auto it = item.first++;
+                auto p = (*it).data();
+                auto size = (*it).size();
+                auto r = jsoncons::detail::to_integer<std::size_t>(p,size);
+                if (r && item.result->is_object())
+                {
+                    *(item.result) = Json(json_array_arg);
+                }
+                if (item.first == item.last)
+                {
+                    if (r)
+                    {
+                        item.result->push_back(*(item.value));
+                    }
+                    else
+                    {
+                        item.result->try_emplace(*it, *(item.value));
+                    }
+                }
+                else
+                {
+                    if (r)
+                    {
+                        item.result->push_back(Json{});
+                        item.result = std::addressof(item.result->at(r.value()));
+                    }
+                    else
+                    {
+                        item.result->try_emplace(*it, Json{});
+                        item.result = std::addressof(item.result->at(*it));
+                    }
+                    more = true;
+                }
+            }
+        }
+        return more;
+    }
+
+    template<class Json>
+    Json unflatten(const Json& value)
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+
+        if (JSONCONS_UNLIKELY(!value.is_object()))
+        {
+            JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::argument_to_unflatten_invalid));
+        }
+        Json result;
+
+        std::vector<mapping<typename Json::key_type,Json>> parts;
+
+        for (const auto& item: value.object_range())
+        {
+            parts.emplace_back(item.key(), std::addressof(item.value()),std::addressof(result));
+        }
+
+        while (unflatten_object_once(parts))
+        { }
+
         return result;
     }
 

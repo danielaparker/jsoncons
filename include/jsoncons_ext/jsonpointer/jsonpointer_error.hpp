@@ -47,7 +47,10 @@ enum class jsonpointer_errc
     name_not_found,
     key_already_exists,
     expected_object_or_array,
-    end_of_input
+    end_of_input,
+    unexpected_end_of_input,
+    argument_to_unflatten_invalid,
+    invalid_flattened_key
 };
 
 class jsonpointer_error_category_impl
@@ -78,6 +81,12 @@ public:
                 return "Expected object or array";
             case jsonpointer_errc::end_of_input:
                 return "Unexpected end of input";
+            case jsonpointer_errc::unexpected_end_of_input:
+                return "Unexpected end of jsonpointer input";
+            case jsonpointer_errc::argument_to_unflatten_invalid:
+                return "Argument to unflatten must be an object";
+            case jsonpointer_errc::invalid_flattened_key:
+                return "Flattened key is invalid";
             default:
                 return "Unknown jsonpointer error";
         }

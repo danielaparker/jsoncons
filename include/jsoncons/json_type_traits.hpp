@@ -108,16 +108,6 @@ namespace detail {
         !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
-    // is_compatible_object_type
-    template<class Json, class T, class Enable=void>
-    struct is_compatible_object_type : std::false_type {};
-
-    template<class Json, class T>
-    struct is_compatible_object_type<Json,T, 
-                           typename std::enable_if<
-        !is_json_type_traits_unspecialized<Json,typename T::mapped_type>::value
-    >::type> : std::true_type {};
-
 } // namespace detail
 
     // is_json_type_traits_specialized

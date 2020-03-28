@@ -240,6 +240,7 @@ TEST_CASE("jsonpointer path tests")
         auto it = ptr.begin();
         auto end = ptr.end();
 
+        CHECK(it != end);
         CHECK((*it++ == "a/b"));
         CHECK(it == end);
     }
@@ -250,6 +251,7 @@ TEST_CASE("jsonpointer path tests")
         auto it = ptr.begin();
         auto end = ptr.end();
 
+        CHECK(it != end);
         CHECK((*it++ == "m~n"));
         CHECK(it == end);
     }
@@ -260,7 +262,9 @@ TEST_CASE("jsonpointer path tests")
         auto it = ptr.begin();
         auto end = ptr.end();
 
+        CHECK(it != end);
         CHECK((*it++ == "0"));
+        CHECK(it != end);
         CHECK((*it++ == "1"));
         CHECK(it == end);
     }
