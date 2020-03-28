@@ -1039,8 +1039,8 @@ enum class pointer_state
                     }
                     else
                     {
-                        item.result->try_emplace(*it, Json{});
-                        item.result = std::addressof(item.result->at(*it));
+                        auto res = item.result->try_emplace(*it, Json{});
+                        item.result = &(res.first->value()); 
                     }
                     more = true;
                 }

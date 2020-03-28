@@ -178,13 +178,14 @@ namespace jsoncons { namespace jsonpath {
                             case '\'':
                                 if (it != last-2)
                                 {
-                                    part->try_emplace(buffer,Json());
+                                    auto res = part->try_emplace(buffer,Json());
+                                    part = &(res.first->value());
                                 }
                                 else
                                 {
-                                    part->try_emplace(buffer,item.value());
+                                    auto res = part->try_emplace(buffer,item.value());
+                                    part = &(res.first->value());
                                 }
-                                part = &part->at(buffer);
                                 buffer.clear();
                                 state = unflatten_state::expect_right_bracket;
                                 break;
@@ -201,13 +202,14 @@ namespace jsoncons { namespace jsonpath {
                             case '\"':
                                 if (it != last-2)
                                 {
-                                    part->try_emplace(buffer,Json());
+                                    auto res = part->try_emplace(buffer,Json());
+                                    part = &(res.first->value());
                                 }
                                 else
                                 {
-                                    part->try_emplace(buffer,item.value());
+                                    auto res = part->try_emplace(buffer,item.value());
+                                    part = &(res.first->value());
                                 }
-                                part = &part->at(buffer);
                                 buffer.clear();
                                 state = unflatten_state::expect_right_bracket;
                                 break;
