@@ -1023,7 +1023,7 @@ enum class pointer_state
                 {
                     if (r)
                     {
-                        item.result->push_back(*(item.value));
+                        item.result->emplace_back(*(item.value));
                     }
                     else
                     {
@@ -1034,7 +1034,7 @@ enum class pointer_state
                 {
                     if (r)
                     {
-                        item.result->push_back(Json{});
+                        item.result->emplace_back();
                         item.result = std::addressof(item.result->at(r.value()));
                     }
                     else

@@ -236,12 +236,12 @@ namespace jsoncons { namespace jsonpath {
                                     {
                                         if (r.value()+1 > part->size())
                                         {
-                                            part->push_back(Json());
+                                            part->emplace_back();
                                         }
                                     }
                                     else
                                     {
-                                        part->push_back(item.value());
+                                        part->emplace_back(item.value());
                                     }
                                     part = &part->at(r.value());
                                 }
