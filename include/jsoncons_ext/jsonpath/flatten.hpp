@@ -236,14 +236,19 @@ namespace jsoncons { namespace jsonpath {
                                     {
                                         if (r.value()+1 > part->size())
                                         {
-                                            part->emplace_back();
+                                            Json& ref = part->emplace_back();
+                                            part = std::addressof(ref);
+                                        }
+                                        else
+                                        {
+                                            part = &part->at(r.value());
                                         }
                                     }
                                     else
                                     {
-                                        part->emplace_back(item.value());
+                                        Json& ref = part->emplace_back(item.value());
+                                        part = std::addressof(ref);
                                     }
-                                    part = &part->at(r.value());
                                 }
                                 buffer.clear();
                                 state = unflatten_state::expect_left_bracket;

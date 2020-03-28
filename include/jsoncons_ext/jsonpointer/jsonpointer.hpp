@@ -1034,8 +1034,8 @@ enum class pointer_state
                 {
                     if (r)
                     {
-                        item.result->emplace_back();
-                        item.result = std::addressof(item.result->at(r.value()));
+                        Json& ref = item.result->emplace_back();
+                        item.result = std::addressof(ref);
                     }
                     else
                     {
