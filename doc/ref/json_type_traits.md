@@ -233,17 +233,16 @@ and serialize to the provided names. The sequence of `(identifierN,serialized_na
 pairs declares the identifier and serialized name for each of the enum identifiers
 that are part of the sequence.
 
-(11)-(14) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class, 
-and serialize to the stringified field names.. 
+(11)-(14) generate the code to specialize `json_type_traits` for a class from a constructor and get functions, 
+and serialize to the stringified field names. 
 When decoding to a C++ data structure, 
 (11) and (13) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (12) and (14) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
 of the get functions are convertible to its parameters, taken in order. 
-(13)-(14) generate the code to specialize `json_type_traits` from the get functions and a constructor of a
-class template.  
+(13)-(14) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
 
-(15)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a class,
+(15)-(18) generate the code to specialize `json_type_traits` for a class from a constructor and get functions,
 and serialize to the provided names. The sequence of `(getter_nameN,serialized_nameN)`
 pairs declares the get functions and serialized name for each of the class properties
 that are part of the sequence. 
@@ -252,8 +251,7 @@ When decoding to a C++ data structure,
 the rest can have default values. (16) and (18) 
 require that all member names be present in the JSON. The class must have a constructor such that the return types 
 of the get functions are convertible to its parameters, taken in order. 
-(17)-(18) generate the code to specialize `json_type_traits` from the get functions and a constructor of a
-class template.  
+(17)-(18) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
 
 (19)-(22) generate the code to specialize `json_type_traits` from the get and set functions of a
 class, and serialize to the stringified field names. The get and set function names are
