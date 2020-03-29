@@ -19,7 +19,7 @@ using namespace jsoncons;
 
 TEST_CASE("flatten test")
 {
-    /*json input = json::parse(R"(
+    json input = json::parse(R"(
     {
        "application": "hiking",
        "reputons": [
@@ -37,16 +37,7 @@ TEST_CASE("flatten test")
             }       
         ]
     }
-    )");*/
-        json input = json::parse(R"(
-        {
-           "reputons": [
-               {
-                   "rater": "HikingAsylum"
-               }       
-            ]
-        }
-        )");
+    )");
 #if 0
     SECTION("json_ptr")
     {
