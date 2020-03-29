@@ -194,8 +194,8 @@ JSONCONS_TPL_ALL_GETTER_SETTER_NAME_TRAITS(num_template_params,
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) // (27)
 ```
 
-(1)-(4) generate the code to specialize `json_type_traits` for a class from member data and 
-serialize to the stringified member names. 
+(1)-(4) generate the code to specialize `json_type_traits` for a class from member data. 
+The serialized names are the stringified member names. 
 When decoding to a C++ data structure, 
 (1) and (3) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (2) and (4)
@@ -213,8 +213,8 @@ class MyClass
 
 (3)-(4) generate the code to specialize `json_type_traits` for a class template from member data. 
 
-(5)-(8) generate the code to specialize `json_type_traits` for a class from member data
-and serialize to the provided names. The sequence of `(member_nameN,serialized_nameN)`
+(5)-(8) generate the code to specialize `json_type_traits` for a class from member data.
+The serialized names are the provided names. The sequence of `(member_nameN,serialized_nameN)`
 pairs declares the member name and serialized name for each of the class members
 that are part of the sequence.
 When decoding to a C++ data structure, 
@@ -233,8 +233,8 @@ and serialize to the provided names. The sequence of `(identifierN,serialized_na
 pairs declares the identifier and serialized name for each of the enum identifiers
 that are part of the sequence.
 
-(11)-(14) generate the code to specialize `json_type_traits` for a class from a constructor and get functions, 
-and serialize to the stringified field names. 
+(11)-(14) generate the code to specialize `json_type_traits` for a class from a constructor and get functions. 
+The serialized names are the stringified field names. 
 When decoding to a C++ data structure, 
 (11) and (13) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (12) and (14) 
@@ -242,8 +242,8 @@ require that all member names be present in the JSON. The class must have a cons
 of the get functions are convertible to its parameters, taken in order. 
 (13)-(14) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
 
-(15)-(18) generate the code to specialize `json_type_traits` for a class from a constructor and get functions,
-and serialize to the provided names. The sequence of `(getter_nameN,serialized_nameN)`
+(15)-(18) generate the code to specialize `json_type_traits` for a class from a constructor and get functions.
+The serialized names are the provided names. The sequence of `(getter_nameN,serialized_nameN)`
 pairs declares the get functions and serialized name for each of the class properties
 that are part of the sequence. 
 When decoding to a C++ data structure, 
@@ -253,16 +253,16 @@ require that all member names be present in the JSON. The class must have a cons
 of the get functions are convertible to its parameters, taken in order. 
 (17)-(18) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
 
-(19)-(22) generate the code to specialize `json_type_traits` for a class from get and set functions,
-and serialize to the stringified field names. The get and set function names are
+(19)-(22) generate the code to specialize `json_type_traits` for a class from get and set functions.
+The serialized names are the stringified field names. The get and set function names are
 formed from the concatenation of `get_prefix` and `set_prefix` with field name.
 (19) and (21) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (20) and (22) 
 require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
 for a class template from get and set functions.
 
-(23)-(26) generate the code to specialize `json_type_traits` for a class from get and set functions,
-and serialize to the provided names. The sequence of `(getter_nameN,setter_nameN,serialized_nameN)`
+(23)-(26) generate the code to specialize `json_type_traits` for a class from get and set functions.
+The serialized names are the provided names. The sequence of `(getter_nameN,setter_nameN,serialized_nameN)`
 triples declares the get and set functions and serialized name for each of the class properties
 that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
