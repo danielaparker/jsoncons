@@ -120,11 +120,11 @@ JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(num_template_params,
                                     (member_name0,serialized_name0),
                                     (member_name1,serialized_name1)...) // (8)
 
-JSONCONS_ENUM_TRAITS(enum_name,identifier0,identifier1,...) // (9)
+JSONCONS_ENUM_TRAITS(enum_name,enumerator0,enumerator1,...) // (9)
 
 JSONCONS_ENUM_NAME_TRAITS(enum_name,
-                           (identifier0,serialized_name0),
-                           (identifier1,serialized_name1)...) // (10)
+                           (enumerator0,serialized_name0),
+                           (enumerator1,serialized_name1)...) // (10)
 
 JSONCONS_N_CTOR_GETTER_TRAITS(class_name,num_mandatory,
                               getter_name0,
@@ -225,12 +225,12 @@ If the member data or default constructor are private, the macro `JSONCONS_TYPE_
 will make them accessible to `json_type_traits`.
 (7)-(8) generate the code to specialize `json_type_traits` for a class template from member data. 
 
-(9) generates the code to specialize `json_type_traits` from the identifiers of an enumeration.
-The serialized name is the stringified identifier name. 
+(9) generates the code to specialize `json_type_traits` for an enumerated type from its enumerators.
+The serialized name is the stringified enumerator name. 
 
-(10) generates the code to specialize `json_type_traits` from the identifiers of an enumeration.
-The serialized name is the provided name. The sequence of `(identifierN,serialized_nameN)`
-pairs declares the identifier and provided name for each of the enum identifiers
+(10) generates the code to specialize `json_type_traits` for an enumeration from its enumerators.
+The serialized name is the provided name. The sequence of `(enumeratorN,serialized_nameN)`
+pairs declares the named constant and provided name for each of the enumerators
 that are part of the sequence.
 
 (11)-(14) generate the code to specialize `json_type_traits` for a class from a constructor and get functions. 
@@ -286,10 +286,10 @@ in the derived classes.
 `member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
 `static const`. Data members that are `const` or `static const` are one-way serialized.  
 `getter_nameN` - the getter for a class data member  
-`(identifierN,serialized_nameN)` - an enum identifier and corresponding JSON name  
-`(getter_nameN,serialized_nameN)` - the getter for a class data member and corresponding JSON name  
+`(enumeratorN,serialized_nameN)` - an enumerator and corresponding serialized name  
+`(getter_nameN,serialized_nameN)` - the getter for a class data member and corresponding serialized name  
 `field_nameN` - the base name of a class getter or setter with prefix `get` or `set` stripped out.  
-`(getter_nameN,setter_nameN,serialized_nameN)` - the getter and setter for a class data member, and corresponding JSON name  
+`(getter_nameN,setter_nameN,serialized_nameN)` - the getter and setter for a class data member, and corresponding serialized name  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
