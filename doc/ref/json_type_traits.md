@@ -228,7 +228,7 @@ will make them accessible to `json_type_traits`.
 (9) generates the code to specialize `json_type_traits` for an enumerated type from its enumerators.
 The serialized name is the stringified enumerator name. 
 
-(10) generates the code to specialize `json_type_traits` for an enumeration from its enumerators.
+(10) generates the code to specialize `json_type_traits` for an enumerated type from its enumerators.
 The serialized name is the provided name. The sequence of `(enumeratorN,serialized_nameN)`
 pairs declares the named constant and provided name for each of the enumerators
 that are part of the sequence.
