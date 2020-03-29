@@ -194,7 +194,7 @@ JSONCONS_TPL_ALL_GETTER_SETTER_NAME_TRAITS(num_template_params,
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) // (27)
 ```
 
-(1)-(4) generate the code to specialize `json_type_traits` from the member data of a class and 
+(1)-(4) generate the code to specialize `json_type_traits` for a class from member data and 
 serialize to the stringified member names. 
 When decoding to a C++ data structure, 
 (1) and (3) require that the first `num_mandatory` member names be present in the JSON,
@@ -211,9 +211,9 @@ class MyClass
 };
 ```
 
-(3)-(4) generate the code to specialize `json_type_traits` from the member data of a class template. 
+(3)-(4) generate the code to specialize `json_type_traits` for a class template from member data. 
 
-(5)-(8) generate the code to specialize `json_type_traits` from the member data of a class
+(5)-(8) generate the code to specialize `json_type_traits` for a class from member data
 and serialize to the provided names. The sequence of `(member_nameN,serialized_nameN)`
 pairs declares the member name and serialized name for each of the class members
 that are part of the sequence.
@@ -223,7 +223,7 @@ the rest can have default values. (6) and (8)
 require that all member names be present in the JSON. The class must have a default constructor.
 If the member data or default constructor are private, the macro `JSONCONS_TYPE_TRAITS_FRIEND`
 will make them accessible to `json_type_traits`.
-(7)-(8) generate the code to specialize `json_type_traits` from the member data of a class template. 
+(7)-(8) generate the code to specialize `json_type_traits` for a class template from member data. 
 
 (9) generates the code to specialize `json_type_traits` from the identifiers of an enumeration
 and serialize to the stringified identifier names. 
@@ -259,7 +259,7 @@ formed from the concatenation of `get_prefix` and `set_prefix` with field name.
 (19) and (21) require that the first `num_mandatory` member names be present in the JSON,
 the rest can have default values. (20) and (22) 
 require that all member names be present in the JSON. (21)-(22) generate the code to specialize `json_type_traits` 
-from the get and set functions of a class template.
+for a class template from get and set functions.
 
 (23)-(26) generate the code to specialize `json_type_traits` from the get and set functions of a
 class, and serialize to the provided names. The sequence of `(getter_nameN,setter_nameN,serialized_nameN)`
