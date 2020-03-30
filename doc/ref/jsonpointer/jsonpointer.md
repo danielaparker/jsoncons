@@ -60,7 +60,9 @@ When applied to a JSON array, the character `-` indicates one past the last elem
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+// for brevity
+using jsoncons::json; 
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
@@ -116,7 +118,8 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+using jsoncons::json; 
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
