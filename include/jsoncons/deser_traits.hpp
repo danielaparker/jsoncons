@@ -42,7 +42,8 @@ namespace jsoncons {
 
     template <class T>
     struct deser_traits<T,
-        typename std::enable_if<jsoncons::detail::is_primitive<T>::value
+        typename std::enable_if<jsoncons::detail::is_primitive<T>::value ||
+                                jsoncons::detail::is_string<T>::value
     >::type>
     {
         template <class Json,class TempAllocator>
