@@ -986,69 +986,6 @@ enum class pointer_state
 
     // unflatten
 
-    template <class Key, class Value>
-    struct mapping
-    {
-        using char_type = typename Value::char_type;
-
-        basic_json_ptr<char_type> ptr;
-        const Value* value;
-        Value* result;
-        typename basic_json_ptr<char_type>::iterator first;
-        typename basic_json_ptr<char_type>::iterator last;
-
-        mapping(const Key& key, const Value* value, Value* result)
-            : ptr(key), value(value), result(result), first(ptr.begin()), last(ptr.end()) 
-        {
-        }
-    };
-
-    template<class Json>
-    bool unflatten_object_once(std::vector<mapping<typename Json::key_type,Json>>& parts)
-    {
-        bool more = false;
-        for (auto& item : parts)
-        {
-            if (item.first != item.last)
-            {
-                auto it = item.first++;
-                auto p = (*it).data();
-                auto size = (*it).size();
-                auto r = jsoncons::detail::to_integer<std::size_t>(p,size);
-                if (r && item.result->is_object())
-                {
-                    *(item.result) = Json(json_array_arg);
-                }
-                if (item.first == item.last)
-                {
-                    if (r)
-                    {
-                        item.result->emplace_back(*(item.value));
-                    }
-                    else
-                    {
-                        item.result->try_emplace(*it, *(item.value));
-                    }
-                }
-                else
-                {
-                    if (r)
-                    {
-                        Json& ref = item.result->emplace_back();
-                        item.result = std::addressof(ref);
-                    }
-                    else
-                    {
-                        auto res = item.result->try_emplace(*it, Json{});
-                        item.result = &(res.first->value()); 
-                    }
-                    more = true;
-                }
-            }
-        }
-        return more;
-    }
-
     template<class Json>
     Json unflatten(const Json& value)
     {
@@ -1060,15 +997,25 @@ enum class pointer_state
         }
         Json result;
 
-        std::vector<mapping<typename Json::key_type,Json>> parts;
-
         for (const auto& item: value.object_range())
         {
-            parts.emplace_back(item.key(), std::addressof(item.value()),std::addressof(result));
+            Json* part = &result;
+            basic_json_ptr<char_type> ptr(item.key());
+            for (auto it = ptr.begin(); it != ptr.end(); )
+            {
+                auto s = *it;
+                if (++it != ptr.end())
+                {
+                    auto res = part->try_emplace(s,Json());
+                    part = &(res.first->value());
+                }
+                else
+                {
+                    auto res = part->try_emplace(s, item.value());
+                    part = &(res.first->value());
+                }
+            }
         }
-
-        while (unflatten_object_once(parts))
-        { }
 
         return result;
     }

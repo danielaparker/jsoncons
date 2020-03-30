@@ -452,7 +452,7 @@ namespace {
         std::cout << "\n";
     }
 
-    void flatten()
+    void flatten_and_unflatten()
     {
         json input = json::parse(R"(
         {
@@ -474,9 +474,13 @@ namespace {
         }
         )");
 
-        json result = jsonpointer::flatten(input);
+        json flattened = jsonpointer::flatten(input);
 
-        std::cout << pretty_print(result) << "\n";
+        std::cout << "(1)\n" << pretty_print(flattened) << "\n\n";
+
+        json unflattened = jsonpointer::unflatten(flattened);
+
+        std::cout << "(2)\n" << pretty_print(unflattened) << "\n";
     }
 } // namespace
 
@@ -502,6 +506,6 @@ void jsonpointer_examples()
     jsonpointer_address_iterator_example();
     jsonpointer_address_append_tokens();
     jsonpointer_address_concatenate();
-    flatten();
+    flatten_and_unflatten();
 }
 

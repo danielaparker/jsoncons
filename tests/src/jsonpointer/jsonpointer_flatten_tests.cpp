@@ -38,32 +38,32 @@ TEST_CASE("flatten test")
         ]
     }
     )");
-#if 0
-    SECTION("json_ptr")
+
+    json expected_unflattened = json::parse(R"(
     {
-        jsonpointer::json_ptr ptr("/reputons/0/assertion");
-        auto it = ptr.begin();
-        auto last = ptr.end();
-        CHECK(it != last);
-        auto p = it++;
-        auto q = it++;
-        auto s = it++;
-
-
-        CHECK(it == last);
-
-        //json j;
-        //jsonpointer::mapping mapping("/application", &j);
-
-        //CHECK(mapping.ptr.begin() != mapping.ptr.end());
-        //CHECK(mapping.first != mapping.last);
+        "application": "hiking",
+        "reputons": {
+            "0": {
+                "assertion": "advanced",
+                "rated": "Marilyn C",
+                "rater": "HikingAsylum",
+                "rating": 0.9
+            },
+            "1": {
+                "assertion": "intermediate",
+                "rated": "Hongmin",
+                "rater": "HikingAsylum",
+                "rating": 0.75
+            }
+        }
     }
-#endif
+    )");
+
     SECTION("flatten")
     {
         json result = jsonpointer::flatten(input);
 
-        /*REQUIRE(result.is_object());
+        REQUIRE(result.is_object());
         REQUIRE(result.size() == 9);
 
         CHECK(result["/application"].as<std::string>() == std::string("hiking"));
@@ -74,11 +74,12 @@ TEST_CASE("flatten test")
         CHECK(result["/reputons/1/assertion"].as<std::string>() == std::string("intermediate"));
         CHECK(result["/reputons/1/rated"].as<std::string>() == std::string("Hongmin"));
         CHECK(result["/reputons/1/rater"].as<std::string>() == std::string("HikingAsylum"));
-        CHECK(result["/reputons/1/rating"].as<double>() == Approx(0.75).epsilon(0.0000001));*/
+        CHECK(result["/reputons/1/rating"].as<double>() == Approx(0.75).epsilon(0.0000001));
 
         //std::cout << pretty_print(result) << "\n";
-        json original = jsonpointer::unflatten(result);
-        std::cout << pretty_print(original) << "\n";
+        json unflattened = jsonpointer::unflatten(result);
+        CHECK(unflattened == expected_unflattened);
+        std::cout << pretty_print(unflattened) << "\n";
 
     }
 }

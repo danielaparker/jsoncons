@@ -4,10 +4,10 @@
 #include <jsoncons_ext/jsonpath/filter.hpp>
 
 template<class Json>
-Json flatten(const Json& value)
+Json flatten(const Json& value); // (1)
 
 template<class Json>
-Json unflatten(const Json& value)
+Json unflatten(const Json& value); // (2)
 ```
 Flattens a json object or array to a single depth object of key-value pairs, and unflattens that object back to the original json.
 The keys in the flattened object are normalized json paths.
@@ -15,7 +15,9 @@ The values are primitive (string, number, boolean, or null), empty object (`{}`)
 
 #### Return value
 
-A flattened json object of JSONPath-value pairs
+(1) A flattened json object of JSONPath-value pairs
+
+(2) An unflattened json object
 
 ### Examples
 
@@ -53,11 +55,11 @@ int main()
     }
     )");
 
-    json result = jsonpath::flatten(input);
+    json flattened = jsonpath::flatten(input);
 
-    std::cout << pretty_print(result) << "\n";
+    std::cout << pretty_print(flattened) << "\n";
 
-    json original = jsonpath::unflatten(result);
+    json original = jsonpath::unflatten(flattened);
     assert(original == input);
 }
 ```
