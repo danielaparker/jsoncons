@@ -91,11 +91,13 @@ Performs stream output
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+// for brevity
+using jsoncons::json; 
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::json_ptr ptr("/store/book/1/author");
+    jsonpointer::json_ptr ptr("/store/book/1/author");
 
     std::cout << "(1) " << ptr << "\n\n";
 
@@ -129,7 +131,7 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::json_ptr ptr;
+    jsonpointer::json_ptr ptr;
 
     ptr /= "a/b";
     ptr /= "";
@@ -166,9 +168,9 @@ namespace jp = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::json_ptr ptr("/a~1b");
+    jsonpointer::json_ptr ptr("/a~1b");
 
-    ptr += jp::json_ptr("//m~0n");
+    ptr += jsonpointer::json_ptr("//m~0n");
 
     std::cout << "(1) " << ptr << "\n\n";
 
