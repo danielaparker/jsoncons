@@ -4,7 +4,8 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons;
+using jsoncons::json;
+namespace jsonpatch = jsoncons::jsonpatch;
 
 void jsonpatch_add_add()
 {

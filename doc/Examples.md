@@ -58,7 +58,7 @@
 
 ### Flatten
 
-[Flatten a json object or array with JSONPointer keys](#H1)  
+[Flatten a json object or array with JSON Pointer keys](#H1)  
 [Flatten and unflatten a json object or array with JSONPath keys](#H2)  
 
 ### Search and Replace
@@ -2223,7 +2223,7 @@ int main()
     std::string result2 = j.at("reputons").at(0).at("rated").as<std::string>();
     std::cout << "(2) " << result2 << std::endl;
 
-    // Using JSONPointer
+    // Using JSON Pointer
     std::string result3 = jsonpointer::get(j, "/reputons/0/rated").as<std::string>();
     std::cout << "(3) " << result3 << std::endl;
 
@@ -2417,7 +2417,7 @@ Output:
  
 <div id="H1"/> 
 
-#### Flatten a json object or array with JSONPointer keys
+#### Flatten a json object or array with JSON Pointer keys
 
 ```c++
 #include <iostream>

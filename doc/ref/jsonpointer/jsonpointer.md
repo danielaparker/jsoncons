@@ -1,11 +1,11 @@
 ### jsonpointer extension
 
-[JSONPointer](https://tools.ietf.org/html/rfc6901) defines a string syntax to locate a specific value in a JSON document. 
-A JSONPointer is a string of zero or more tokens, each token prefixed by `/` characters. 
+[JSON Pointer](https://tools.ietf.org/html/rfc6901) defines a string syntax to locate a specific value in a JSON document. 
+A JSON Pointer is a string of zero or more tokens, each token prefixed by `/` characters. 
 These tokens denote keys in JSON objects or indexes in JSON arrays. An empty string with zero tokens points 
 to the root of a json document.
 
-The characters `~` and `/` have special meanings in JSONPointer, 
+The characters `~` and `/` have special meanings in JSON Pointer, 
 so if a key in a JSON object has these characters, `~` needs to be escaped as `~0`,
 and `/` needs to be escaped as `~1`. 
 
@@ -24,31 +24,31 @@ When applied to a JSON array, the character `-` indicates one past the last elem
 <table border="0">
   <tr>
     <td><a href="contains.md">contains</a></td>
-    <td>Returns <code>true</code> if the json document contains the given JSONPointer</td> 
+    <td>Returns <code>true</code> if the json document contains the given JSON Pointer</td> 
   </tr>
   <tr>
     <td><a href="get.md">get</a></td>
-    <td>Get a value from a JSON document using JSONPointer path notation.</td> 
+    <td>Get a value from a JSON document using JSON Pointer path notation.</td> 
   </tr>
   <tr>
     <td><a href="insert.md">insert</a></td>
-    <td>Inserts a value in a JSON document using JSONPointer path notation, if the path doesn't specify an object member that already has the same key.</td> 
+    <td>Inserts a value in a JSON document using JSON Pointer path notation, if the path doesn't specify an object member that already has the same key.</td> 
   </tr>
   <tr>
     <td><a href="insert_or_assign.md">insert_or_assign</a></td>
-    <td>Inserts a value in a JSON document using JSONPointer path notation, or if the path specifies an object member that already has the same key, assigns the new value to that member.</td> 
+    <td>Inserts a value in a JSON document using JSON Pointer path notation, or if the path specifies an object member that already has the same key, assigns the new value to that member.</td> 
   </tr>
   <tr>
     <td><a href="remove.md">remove</a></td>
-    <td>Removes a value from a JSON document using JSONPointer path notation.</td> 
+    <td>Removes a value from a JSON document using JSON Pointer path notation.</td> 
   </tr>
   <tr>
     <td><a href="replace.md">replace</a></td>
-    <td>Replaces a value in a JSON document using JSONPointer path notation.</td> 
+    <td>Replaces a value in a JSON document using JSON Pointer path notation.</td> 
   </tr>
   <tr>
     <td><a href="flatten.md">flatten</a></td>
-    <td>Flattens a json object or array into a single depth object of JSONPointer-value pairs.</td> 
+    <td>Flattens a json object or array into a single depth object of JSON Pointer-value pairs.</td> 
   </tr>
 </table>
 

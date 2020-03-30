@@ -48,7 +48,7 @@ iterator    | An alias to `const_iterator`
 #### Modifiers
 
     basic_json_ptr& operator/=(const string_type& s)
-First, appends the JSONPointer separator `/`. Then appends the token s, escaping any `/` or `~` characters.
+First, appends the JSON Pointer separator `/`. Then appends the token s, escaping any `/` or `~` characters.
 
     basic_json_ptr& operator+=(const basic_json_ptr& ptr)
 Concatenates the current pointer and the specified pointer `ptr`. 
@@ -66,11 +66,11 @@ Checks if the pointer is empty
 
     const string_view_type& string_view() const
     operator string_view_type() const;
-Access the JSONPointer pointer as a string view.
+Access the JSON Pointer pointer as a string view.
 
 #### Non-member functions
     basic_json_ptr<CharT> operator/(const basic_json_ptr<CharT>& lhs, const string_type& rhs);
-Concatenates a JSONPointer pointer and a token. Effectively returns basic_json_ptr<CharT>(lhs) /= rhs.
+Concatenates a JSON Pointer pointer and a token. Effectively returns basic_json_ptr<CharT>(lhs) /= rhs.
 
     basic_json_ptr<CharT> operator+( const basic_json_ptr<CharT>& lhs, const basic_json_ptr<CharT>& rhs );
 Concatenates two JSON Pointers. Effectively returns basic_json_ptr<CharT>(lhs) += rhs.
@@ -85,7 +85,7 @@ Performs stream output
 
 ### Examples
 
-#### Iterate over the tokens in a JSONPointer
+#### Iterate over the tokens in a JSON Pointer
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -120,7 +120,7 @@ book
 author
 ```
 
-#### Append tokens to a JSONPointer
+#### Append tokens to a JSON Pointer
 
 ```c++
 #include <jsoncons/json.hpp>

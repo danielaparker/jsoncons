@@ -10,19 +10,19 @@ template<class Json>
 Json unflatten(const Json& value); // (2) (since v0.150.0)
 ```
 
-Flattens a json object or array into a single depth object of JSONPointer-value pairs.
+Flattens a json object or array into a single depth object of JSON Pointer-value pairs.
 The keys in the flattened object are JSONPointer's.
 The values are primitive (string, number, boolean, or null). Empty objects or arrays become null.
 
 #### Return value
 
-(1) A flattened json object of JSONPointer-value pairs
+(1) A flattened json object of JSON Pointer-value pairs
 
 (2) An unflattened json object
 
 #### Remarks
 
-There is no unique solution for unflattening a single depth object of JSONPointer-value pairs. 
+There is no unique solution for unflattening a single depth object of JSON Pointer-value pairs. 
 An integer appearing in a path could be an index or it could be an object key.
 The unflatten function assumes it is an object key.
 

@@ -9,7 +9,7 @@ bool contains(const Json& doc, const typename Json::string_view_type& path);
 
 #### Return value
 
-Returns `true` if the json doc contains the given JSONPointer, otherwise `false'
+Returns `true` if the json doc contains the given JSON Pointer, otherwise `false'
 
 ### Examples
 

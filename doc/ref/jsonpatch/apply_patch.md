@@ -30,7 +30,8 @@ None
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-namespace jp = jsoncons::jsonpatch;
+using jsoncons::json;
+namespace jsonpatch = jsoncons::jsonpatch;
 
 int main()
 {
@@ -46,7 +47,7 @@ int main()
     )");
 
     std::error_code ec;
-    jp::apply_patch(target,patch,ec);
+    jsonpatch::apply_patch(target,patch,ec);
 
     std::cout << pretty_print(target) << std::endl;
 }
@@ -65,7 +66,8 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-namespace jp = jsoncons::jsonpatch;
+using jsoncons::json;
+namespace jsonpatch = jsoncons::jsonpatch;
 
 int main()
 {
@@ -82,7 +84,7 @@ int main()
     )");
 
     std::error_code ec;
-    jp::apply_patch(target, patch, ec);
+    jsonpatch::apply_patch(target, patch, ec);
 
     std::cout << "(1) " << ec.message() << std::endl;
     std::cout << "(2) " << target << std::endl;
