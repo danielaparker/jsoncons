@@ -2223,7 +2223,7 @@ int main()
     std::string result2 = j.at("reputons").at(0).at("rated").as<std::string>();
     std::cout << "(2) " << result2 << std::endl;
 
-    // Using JSON Pointer
+    // Using JSONPointer
     std::string result3 = jsonpointer::get(j, "/reputons/0/rated").as<std::string>();
     std::cout << "(3) " << result3 << std::endl;
 
