@@ -92,7 +92,6 @@ Performs stream output
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 // for brevity
-using jsoncons::json; 
 namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
@@ -127,7 +126,6 @@ author
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using jsoncons::json; 
 namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
@@ -165,7 +163,6 @@ m~n
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using jsoncons::json; 
 namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()

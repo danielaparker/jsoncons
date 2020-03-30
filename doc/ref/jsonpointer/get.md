@@ -95,11 +95,12 @@ at(key)        |`reference` or `value_type`|
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto j = jsoncons::json::parse(R"(
+    auto j = json::parse(R"(
     [
       { "category": "reference",
         "author": "Nigel Rees",
@@ -117,17 +118,17 @@ int main()
     // Using exceptions to report errors
     try
     {
-        jsoncons::json result = jp::get(j, "/1/author");
+        json result = jsonpointer::get(j, "/1/author");
         std::cout << "(1) " << result << std::endl;
     }
-    catch (const jp::jsonpointer_error& e)
+    catch (const jsonpointer::jsonpointer_error& e)
     {
         std::cout << e.what() << std::endl;
     }
 
     // Using error codes to report errors
     std::error_code ec;
-    const jsoncons::json& result = jp::get(j, "/0/title", ec);
+    const json& result = jsonpointer::get(j, "/0/title", ec);
 
     if (ec)
     {
@@ -151,18 +152,19 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto j = jsoncons::json::parse(R"(
+    auto j = json::parse(R"(
        {
           "a/b": ["bar", "baz"],
           "m~n": ["foo", "qux"]
        }
     )");
 
-    jp::json_ptr ptr;
+    jsonpointer::json_ptr ptr;
     ptr /= "m~n";
     ptr /= "1";
 
@@ -175,7 +177,7 @@ int main()
     }
     std::cout << "\n";
 
-    jsoncons::json item = jp::get(j, ptr);
+    json item = jsonpointer::get(j, ptr);
     std::cout << "(3) " << item << "\n";
 }
 ```
@@ -196,11 +198,12 @@ m~n
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto j = jsoncons::json::parse(R"(
+    auto j = json::parse(R"(
        {
           "foo": ["bar", "baz"],
           "": 0,
@@ -217,32 +220,32 @@ int main()
 
     try
     {
-        const jsoncons::json& result1 = jp::get(j, "");
+        const json& result1 = jsonpointer::get(j, "");
         std::cout << "(1) " << result1 << std::endl;
-        const jsoncons::json& result2 = jp::get(j, "/foo");
+        const json& result2 = jsonpointer::get(j, "/foo");
         std::cout << "(2) " << result2 << std::endl;
-        const jsoncons::json& result3 = jp::get(j, "/foo/0");
+        const json& result3 = jsonpointer::get(j, "/foo/0");
         std::cout << "(3) " << result3 << std::endl;
-        const jsoncons::json& result4 = jp::get(j, "/");
+        const json& result4 = jsonpointer::get(j, "/");
         std::cout << "(4) " << result4 << std::endl;
-        const jsoncons::json& result5 = jp::get(j, "/a~1b");
+        const json& result5 = jsonpointer::get(j, "/a~1b");
         std::cout << "(5) " << result5 << std::endl;
-        const jsoncons::json& result6 = jp::get(j, "/c%d");
+        const json& result6 = jsonpointer::get(j, "/c%d");
         std::cout << "(6) " << result6 << std::endl;
-        const jsoncons::json& result7 = jp::get(j, "/e^f");
+        const json& result7 = jsonpointer::get(j, "/e^f");
         std::cout << "(7) " << result7 << std::endl;
-        const jsoncons::json& result8 = jp::get(j, "/g|h");
+        const json& result8 = jsonpointer::get(j, "/g|h");
         std::cout << "(8) " << result8 << std::endl;
-        const jsoncons::json& result9 = jp::get(j, "/i\\j");
+        const json& result9 = jsonpointer::get(j, "/i\\j");
         std::cout << "(9) " << result9 << std::endl;
-        const jsoncons::json& result10 = jp::get(j, "/k\"l");
+        const json& result10 = jsonpointer::get(j, "/k\"l");
         std::cout << "(10) " << result10 << std::endl;
-        const jsoncons::json& result11 = jp::get(j, "/ ");
+        const json& result11 = jsonpointer::get(j, "/ ");
         std::cout << "(11) " << result11 << std::endl;
-        const jsoncons::json& result12 = jp::get(j, "/m~0n");
+        const json& result12 = jsonpointer::get(j, "/m~0n");
         std::cout << "(12) " << result12 << std::endl;
     }
-    catch (const jp::jsonpointer_error& e)
+    catch (const jsonpointer::jsonpointer_error& e)
     {
         std::cerr << e.what() << std::endl;
     }

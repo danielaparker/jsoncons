@@ -19,7 +19,7 @@ Returns `true` if the json doc contains the given JSONPointer, otherwise `false'
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
@@ -39,8 +39,8 @@ int main()
        }
     )");
 
-    std::cout << "(1) " << jp::contains(j, "/foo/0") << std::endl;
-    std::cout << "(2) " << jp::contains(j, "e^g") << std::endl;
+    std::cout << "(1) " << jsonpointer::contains(j, "/foo/0") << std::endl;
+    std::cout << "(2) " << jsonpointer::contains(j, "e^g") << std::endl;
 }
 ```
 Output:
