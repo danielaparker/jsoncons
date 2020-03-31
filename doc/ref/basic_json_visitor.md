@@ -1,11 +1,11 @@
-### jsoncons::basic_json_vistor
+### jsoncons::basic_json_visitor
 
 ```c++
-#include <jsoncons/json_vistor.hpp>
+#include <jsoncons/json_visitor.hpp>
 
 template <
     class CharT
-> class basic_json_vistor
+> class basic_json_visitor
 ```
 
 Defines an interface for producing and consuming JSON events. 
@@ -14,8 +14,8 @@ Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-json_visitor    |`basic_json_vistor<char>`
-wjson_visitor   |`basic_json_vistor<wchar_t>`
+json_visitor    |`basic_json_visitor<char>`
+wjson_visitor   |`basic_json_visitor<wchar_t>`
 
 #### Member types
 
@@ -548,7 +548,7 @@ The overloads that take a `std::error_code&` parameter set it to the error code 
 
 - [semantic_tag](semantic_tag.md)
 
-- [basic_default_json_visitor](basic_default_json_vistor.md)
+- [basic_default_json_visitor](basic_default_json_visitor.md)
 
 - [basic_json_filter](basic_json_filter.md)
 

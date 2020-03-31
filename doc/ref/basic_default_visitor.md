@@ -1,17 +1,17 @@
 ### jsoncons::basic_default_json_visitor
 
 ```c++
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 
 template <
     class CharT
 > class basic_default_json_visitor
 ```
 
-A [basic_json_content_handler](basic_json_content_handler.md) that discards all incoming json events. Serves as a base class for user defined content handlers.
+A [basic_json_visitor](basic_json_visitor.md) that discards all incoming json events. Serves as a base class for user defined content handlers.
 `basic_default_json_visitor` is noncopyable and nonmoveable.
 
-![basic_default_json_visitor](./diagrams/basic_default_json_content_handler.png)
+![basic_default_json_visitor](./diagrams/basic_default_json_visitor.png)
 
 Typedefs for common character types are provided:
 
