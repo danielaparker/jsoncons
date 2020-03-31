@@ -1,3 +1,13 @@
+master
+------
+
+Changes:
+
+- The names `basic_json_content_handler` and `basic_default_json_content_handler`
+have been deprecated and renamed to `basic_json_visitor` and `basic_default_json_visitor`.
+The private visitor functions `do_xxx` have been renamed to `visit_xxx`.
+This change should be transparent to most users.
+
 v0.149.0
 --------
 
