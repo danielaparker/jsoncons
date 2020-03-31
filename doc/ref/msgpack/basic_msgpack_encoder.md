@@ -5,7 +5,7 @@
 
 template<
     class Sink>
-> class basic_msgpack_encoder : public jsoncons::json_content_handler
+> class basic_msgpack_encoder : public jsoncons::json_visitor
 ```
 
 `basic_msgpack_encoder` is noncopyable.
@@ -38,7 +38,7 @@ Constructs a new encoder that writes to the specified destination.
     virtual ~basic_msgpack_encoder()
 
 
-#### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
+#### Inherited from [jsoncons::basic_json_visitor](basic_json_visitor.md)
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
                       const ser_context& context=null_ser_context()); // (1)

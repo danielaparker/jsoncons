@@ -13,7 +13,7 @@
 #include <memory>
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp> // jsoncons::ser_error
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/parse_number.hpp>
@@ -25,9 +25,9 @@ namespace jsoncons { namespace cbor {
 enum class cbor_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
-class basic_cbor_encoder final : public basic_json_content_handler<char>
+class basic_cbor_encoder final : public basic_json_visitor<char>
 {
-    using super_type = basic_json_content_handler<char>;
+    using super_type = basic_json_visitor<char>;
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
@@ -132,12 +132,12 @@ public:
 private:
     // Implementing methods
 
-    void do_flush() override
+    void visit_flush() override
     {
         sink_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
@@ -145,7 +145,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::object, length));
 
@@ -186,7 +186,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code& ec) override
+    bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -213,14 +213,14 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
         sink_.push_back(0x9f);
         return true;
     }
 
-    bool do_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(cbor_container_type::array, length));
         if (length <= 0x17)
@@ -259,7 +259,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&, std::error_code& ec) override
+    bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -287,13 +287,13 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         write_string(name);
         return true;
     }
 
-    bool do_null(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (tag == semantic_tag::undefined)
         {
@@ -551,7 +551,7 @@ private:
         }
 
         write_tag(4);
-        more = do_begin_array((std::size_t)2, semantic_tag::none, context, ec);
+        more = visit_begin_array((std::size_t)2, semantic_tag::none, context, ec);
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
@@ -563,13 +563,13 @@ private:
             }
             scale += sink.value();
         }
-        more = do_int64(scale, semantic_tag::none, context, ec);
+        more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
         auto sink = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
         if (sink)
         {
-            more = do_int64(sink.value(), semantic_tag::none, context, ec);
+            more = visit_int64(sink.value(), semantic_tag::none, context, ec);
             if (!more) {return more;}
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
@@ -583,7 +583,7 @@ private:
             ec = sink.error_code();
             return false;
         }
-        more = do_end_array(context, ec);
+        more = visit_end_array(context, ec);
 
         return more;
     }
@@ -731,7 +731,7 @@ private:
         }
 
         write_tag(5);
-        more = do_begin_array((std::size_t)2, semantic_tag::none, context, ec);
+        more = visit_begin_array((std::size_t)2, semantic_tag::none, context, ec);
         if (!more) return more;
 
         if (exponent.length() > 0)
@@ -744,13 +744,13 @@ private:
             }
             scale += sink.value();
         }
-        more = do_int64(scale, semantic_tag::none, context, ec);
+        more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) return more;
 
         auto sink = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
         if (sink)
         {
-            more = do_int64(sink.value(), semantic_tag::none, context, ec);
+            more = visit_int64(sink.value(), semantic_tag::none, context, ec);
             if (!more) return more;
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
@@ -763,10 +763,10 @@ private:
         {
             JSONCONS_THROW(json_runtime_error<std::invalid_argument>(sink.error_code().message()));
         }
-        return do_end_array(context, ec);
+        return visit_end_array(context, ec);
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         switch (tag)
         {
@@ -824,7 +824,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -926,7 +926,7 @@ private:
         }
     }
 
-    bool do_double(double val, 
+    bool visit_double(double val, 
                          semantic_tag tag,
                          const ser_context&,
                          std::error_code&) override
@@ -956,7 +956,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t value, 
+    bool visit_int64(int64_t value, 
                         semantic_tag tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -1041,7 +1041,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t value, 
+    bool visit_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -1118,7 +1118,7 @@ private:
         }
     }
 
-    bool do_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (value)
         {
@@ -1133,7 +1133,7 @@ private:
         return true;
     }
 
-    bool do_typed_array(const span<const uint8_t>& v, 
+    bool visit_typed_array(const span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1167,7 +1167,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const uint16_t>& data,  
+    bool visit_typed_array(const span<const uint16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1197,7 +1197,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const uint32_t>& data,  
+    bool visit_typed_array(const span<const uint32_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1227,7 +1227,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const uint64_t>& data,  
+    bool visit_typed_array(const span<const uint64_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1257,7 +1257,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const int8_t>& data,  
+    bool visit_typed_array(const span<const int8_t>& data,  
                         semantic_tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1285,7 +1285,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const int16_t>& data,  
+    bool visit_typed_array(const span<const int16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1315,7 +1315,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const int32_t>& data,  
+    bool visit_typed_array(const span<const int32_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1345,7 +1345,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const int64_t>& data,  
+    bool visit_typed_array(const span<const int64_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1375,7 +1375,7 @@ private:
         }
     }
 
-    bool do_typed_array(half_arg_t, const span<const uint16_t>& data,  
+    bool visit_typed_array(half_arg_t, const span<const uint16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1405,7 +1405,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const float>& data,  
+    bool visit_typed_array(const span<const float>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1435,7 +1435,7 @@ private:
         }
     }
 
-    bool do_typed_array(const span<const double>& data,  
+    bool visit_typed_array(const span<const double>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1465,7 +1465,7 @@ private:
         }
     }
 /*
-    bool do_typed_array(const span<const float128_type>&, 
+    bool visit_typed_array(const span<const float128_type>&, 
                         semantic_tag,
                         const ser_context&, 
                         std::error_code&) override
@@ -1473,7 +1473,7 @@ private:
         return true;
     }
 */
-    bool do_begin_multi_dim(const span<const size_t>& shape,
+    bool visit_begin_multi_dim(const span<const size_t>& shape,
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1487,23 +1487,23 @@ private:
                 write_tag(40);
                 break;
         }
-        bool more = do_begin_array(2, semantic_tag::none, context, ec);
-        more = do_begin_array(shape.size(), semantic_tag::none, context, ec);
+        bool more = visit_begin_array(2, semantic_tag::none, context, ec);
+        more = visit_begin_array(shape.size(), semantic_tag::none, context, ec);
         for (auto it = shape.begin(); more && it != shape.end(); ++it)
         {
-            more = do_uint64(*it, semantic_tag::none, context, ec);
+            more = visit_uint64(*it, semantic_tag::none, context, ec);
         }
         if (more)
         {
-            more = do_end_array(context, ec);
+            more = visit_end_array(context, ec);
         }
         return more;
     }
 
-    bool do_end_multi_dim(const ser_context& context,
+    bool visit_end_multi_dim(const ser_context& context,
                           std::error_code& ec) override
     {
-        bool more = do_end_array(context, ec);
+        bool more = visit_end_array(context, ec);
         return more;
     }
 

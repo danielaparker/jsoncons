@@ -14,7 +14,7 @@
 #include <bitset> // std::bitset
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/staj_reader.hpp> // typed_array
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
@@ -199,7 +199,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_content_handler& handler, std::error_code& ec)
+    void parse(json_visitor& handler, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -355,7 +355,7 @@ public:
         }
     }
 private:
-    void read_item(json_content_handler& handler, std::error_code& ec)
+    void read_item(json_visitor& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -592,7 +592,7 @@ private:
         other_tags_[item_tag] = false;
     }
 
-    void produce_begin_array(json_content_handler& handler, uint8_t info, std::error_code& ec)
+    void produce_begin_array(json_visitor& handler, uint8_t info, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         bool pop_stringref_map_stack = false;
@@ -625,7 +625,7 @@ private:
         }
     }
 
-    void produce_end_array(json_content_handler& handler, std::error_code&)
+    void produce_end_array(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
         if (state_stack_.back().pop_stringref_map_stack)
@@ -635,7 +635,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_content_handler& handler, uint8_t info, std::error_code& ec)
+    void produce_begin_map(json_visitor& handler, uint8_t info, std::error_code& ec)
     {
         bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
@@ -667,7 +667,7 @@ private:
         }
     }
 
-    void produce_end_map(json_content_handler& handler, std::error_code&)
+    void produce_end_map(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
         if (state_stack_.back().pop_stringref_map_stack)
@@ -677,7 +677,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void read_name(json_content_handler& handler, std::error_code& ec)
+    void read_name(json_visitor& handler, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -1574,7 +1574,7 @@ private:
         }
     }
 
-    void handle_string(json_content_handler& handler, const basic_string_view<char>& v, std::error_code&)
+    void handle_string(json_visitor& handler, const basic_string_view<char>& v, std::error_code&)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])
@@ -1615,7 +1615,7 @@ private:
     }
 
     template <typename Read>
-    void write_byte_string(Read read, json_content_handler& handler, std::error_code& ec)
+    void write_byte_string(Read read, json_visitor& handler, std::error_code& ec)
     {
         if (other_tags_[item_tag])
         {
@@ -1987,7 +1987,7 @@ private:
         }
     }
 
-    void produce_begin_multi_dim(json_content_handler& handler, 
+    void produce_begin_multi_dim(json_visitor& handler, 
                                  semantic_tag tag,
                                  std::error_code& ec)
     {
@@ -2012,7 +2012,7 @@ private:
         more_ = handler.begin_multi_dim(shape_, tag, *this, ec);
     }
 
-    void produce_end_multi_dim(json_content_handler& handler, std::error_code& ec)
+    void produce_end_multi_dim(json_visitor& handler, std::error_code& ec)
     {
         more_ = handler.end_multi_dim(*this, ec);
         state_stack_.pop_back();

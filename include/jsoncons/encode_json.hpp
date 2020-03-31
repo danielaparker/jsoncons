@@ -115,7 +115,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     void encode_json(const T& val, 
-                     basic_json_content_handler<CharT>& encoder)
+                     basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
         ser_traits<T>::serialize(val, encoder, basic_json<CharT>(), ec);
@@ -228,7 +228,7 @@ namespace jsoncons {
     typename std::enable_if<!is_basic_json_class<T>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
-                basic_json_content_handler<CharT>& encoder)
+                basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
         basic_json<CharT,sorted_policy,TempAllocator> context_j(temp_alloc);

@@ -26,7 +26,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         ubjson_bytes_encoder encoder(v);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -49,7 +49,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         ubjson_stream_encoder encoder(os);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -74,7 +74,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         basic_ubjson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v,temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -97,7 +97,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os,temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 

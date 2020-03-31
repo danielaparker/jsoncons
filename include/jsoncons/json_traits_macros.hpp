@@ -16,7 +16,7 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
 #include <jsoncons/detail/more_type_traits.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <string>

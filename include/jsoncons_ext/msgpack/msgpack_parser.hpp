@@ -13,7 +13,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
@@ -98,7 +98,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_content_handler& handler, std::error_code& ec)
+    void parse(json_visitor& handler, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -173,7 +173,7 @@ public:
     }
 private:
 
-    void parse_item(json_content_handler& handler, std::error_code& ec)
+    void parse_item(json_visitor& handler, std::error_code& ec)
     {
         if (source_.is_error())
         {
@@ -580,7 +580,7 @@ private:
         }
     }
 
-    void parse_name(json_content_handler& handler, std::error_code& ec)
+    void parse_name(json_visitor& handler, std::error_code& ec)
     {
         uint8_t type{};
         source_.get(type);
@@ -696,7 +696,7 @@ private:
         }
     }
 
-    void produce_begin_array(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void produce_begin_array(json_visitor& handler, uint8_t type, std::error_code& ec)
     {
         std::size_t len = 0;
         switch (type)
@@ -736,13 +736,13 @@ private:
         more_ = handler.begin_array(len, semantic_tag::none, *this, ec);
     }
 
-    void produce_end_array(json_content_handler& handler, std::error_code&)
+    void produce_end_array(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void produce_begin_map(json_visitor& handler, uint8_t type, std::error_code& ec)
     {
         std::size_t len = 0;
         switch (type)
@@ -782,7 +782,7 @@ private:
         more_ = handler.begin_object(len, semantic_tag::none, *this, ec);
     }
 
-    void produce_end_map(json_content_handler& handler, std::error_code&)
+    void produce_end_map(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
         state_stack_.pop_back();

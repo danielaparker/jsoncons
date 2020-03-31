@@ -12,7 +12,7 @@
 #include <array>
 #include <memory>
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_encoder.hpp>
@@ -28,7 +28,7 @@ namespace jsoncons {
     {
         template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<CharT>& encoder,
+                              basic_json_visitor<CharT>& encoder,
                               const Json& context_j, 
                               std::error_code& ec)
         {
@@ -39,7 +39,7 @@ namespace jsoncons {
         template <class CharT,class Json>
         static void serialize(std::true_type,
                               const T& val, 
-                              basic_json_content_handler<CharT>& encoder,
+                              basic_json_visitor<CharT>& encoder,
                               const Json& /*context_j*/, 
                               std::error_code& ec)
         {
@@ -49,7 +49,7 @@ namespace jsoncons {
         template <class CharT,class Json>
         static void serialize(std::false_type, 
                               const T& val, 
-                              basic_json_content_handler<CharT>& encoder,
+                              basic_json_visitor<CharT>& encoder,
                               const Json& context_j, 
                               std::error_code& ec)
         {
@@ -72,7 +72,7 @@ namespace jsoncons {
 
         template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<CharT>& encoder, 
+                              basic_json_visitor<CharT>& encoder, 
                               const Json& context_j, 
                               std::error_code& ec)
         {
@@ -97,7 +97,7 @@ namespace jsoncons {
 
         template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<CharT>& encoder, 
+                              basic_json_visitor<CharT>& encoder, 
                               const Json&,
                               std::error_code& ec)
         {
@@ -114,7 +114,7 @@ namespace jsoncons {
 
         template <class CharT,class Json>
         static void serialize(const std::array<T, N>& val, 
-                           basic_json_content_handler<CharT>& encoder, 
+                           basic_json_visitor<CharT>& encoder, 
                            const Json& context_j, 
                            std::error_code& ec)
         {
@@ -143,7 +143,7 @@ namespace jsoncons {
 
         template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<CharT>& encoder, 
+                              basic_json_visitor<CharT>& encoder, 
                               const Json& context_j, 
                               std::error_code& ec)
         {
@@ -179,7 +179,7 @@ namespace jsoncons {
 
         template <class CharT,class Json>
         static void serialize(const T& val, 
-                              basic_json_content_handler<CharT>& encoder, 
+                              basic_json_visitor<CharT>& encoder, 
                               const Json& context_j, 
                               std::error_code& ec)
         {

@@ -14,7 +14,7 @@
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 // 0x00..0x17 (0..23)

@@ -13,7 +13,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
@@ -99,7 +99,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_content_handler& handler, std::error_code& ec)
+    void parse(json_visitor& handler, std::error_code& ec)
     {
         if (source_.is_error())
         {
@@ -173,7 +173,7 @@ public:
 
 private:
 
-    void begin_document(json_content_handler& handler, std::error_code& ec)
+    void begin_document(json_visitor& handler, std::error_code& ec)
     {
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -188,13 +188,13 @@ private:
         state_stack_.emplace_back(parse_mode::document,length);
     }
 
-    void end_document(json_content_handler& handler, std::error_code&)
+    void end_document(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
         state_stack_.pop_back();
     }
 
-    void begin_array(json_content_handler& handler, std::error_code& ec)
+    void begin_array(json_visitor& handler, std::error_code& ec)
     {
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -209,13 +209,13 @@ private:
         state_stack_.emplace_back(parse_mode::array,0);
     }
 
-    void end_array(json_content_handler& handler, std::error_code&)
+    void end_array(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void read_e_name(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
+    void read_e_name(json_visitor& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
         text_buffer_.clear();
         uint8_t c{};
@@ -235,7 +235,7 @@ private:
         }
     }
 
-    void read_value(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void read_value(json_visitor& handler, uint8_t type, std::error_code& ec)
     {
         switch (type)
         {

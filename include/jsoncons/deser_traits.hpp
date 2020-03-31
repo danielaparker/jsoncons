@@ -12,7 +12,7 @@
 #include <array>
 #include <memory>
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_reader.hpp>
@@ -89,19 +89,19 @@ namespace jsoncons {
     };
 
     template <class T>
-    struct typed_array_content_handler : public default_json_content_handler
+    struct typed_array_visitor : public default_json_visitor
     {
         T& v_;
         int level_;
     public:
         typedef typename T::value_type value_type;
 
-        typed_array_content_handler(T& v)
-            : default_json_content_handler(false,conversion_errc::json_not_vector), v_(v), level_(0)
+        typed_array_visitor(T& v)
+            : default_json_visitor(false,conversion_errc::json_not_vector), v_(v), level_(0)
         {
         }
     private:
-        bool do_begin_array(semantic_tag, 
+        bool visit_begin_array(semantic_tag, 
                             const ser_context&, 
                             std::error_code& ec) override
         {      
@@ -113,7 +113,7 @@ namespace jsoncons {
             return true;
         }
 
-        bool do_begin_array(std::size_t size, 
+        bool visit_begin_array(std::size_t size, 
                             semantic_tag, 
                             const ser_context&, 
                             std::error_code& ec) override
@@ -127,7 +127,7 @@ namespace jsoncons {
             return true;
         }
 
-        bool do_end_array(const ser_context&, 
+        bool visit_end_array(const ser_context&, 
                           std::error_code& ec) override
         {
             if (level_ != 1)
@@ -138,7 +138,7 @@ namespace jsoncons {
             return false;
         }
 
-        bool do_uint64(uint64_t value, 
+        bool visit_uint64(uint64_t value, 
                              semantic_tag, 
                              const ser_context&,
                              std::error_code&) override
@@ -147,7 +147,7 @@ namespace jsoncons {
             return true;
         }
 
-        bool do_int64(int64_t value, 
+        bool visit_int64(int64_t value, 
                             semantic_tag,
                             const ser_context&,
                             std::error_code&) override
@@ -156,27 +156,27 @@ namespace jsoncons {
             return true;
         }
 
-        bool do_half(uint16_t value, 
+        bool visit_half(uint16_t value, 
                            semantic_tag,
                            const ser_context&,
                            std::error_code&) override
         {
-            return do_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
+            return visit_half_(typename std::integral_constant<bool, std::is_integral<value_type>::value>::type(), value);
         }
 
-        bool do_half_(std::true_type, uint16_t value)
+        bool visit_half_(std::true_type, uint16_t value)
         {
             v_.push_back(static_cast<value_type>(value));
             return true;
         }
 
-        bool do_half_(std::false_type, uint16_t value)
+        bool visit_half_(std::false_type, uint16_t value)
         {
             v_.push_back(static_cast<value_type>(jsoncons::detail::decode_half(value)));
             return true;
         }
 
-        bool do_double(double value, 
+        bool visit_double(double value, 
                              semantic_tag,
                              const ser_context&,
                              std::error_code&) override
@@ -185,7 +185,7 @@ namespace jsoncons {
             return true;
         }
 
-        bool do_typed_array(const span<const value_type>& data,  
+        bool visit_typed_array(const span<const value_type>& data,  
                             semantic_tag,
                             const ser_context&,
                             std::error_code&) override
@@ -217,7 +217,7 @@ namespace jsoncons {
                 return v;
             }
 
-            typed_array_content_handler<T> handler(v);
+            typed_array_visitor<T> handler(v);
             reader.read(handler, ec);
             return v;
         }

@@ -28,13 +28,13 @@ class name_fix_up_filter : public json_filter
 public:
     std::vector<warning> warnings;
 
-    name_fix_up_filter(json_content_handler& handler)
+    name_fix_up_filter(json_visitor& handler)
         : json_filter(handler)
     {
     }
 
 private:
-    bool do_key(const string_view_type& name,
+    bool visit_key(const string_view_type& name,
                  const ser_context& context,
                  std::error_code& ec) override
     {
@@ -49,7 +49,7 @@ private:
         }
     }
 
-    bool do_string(const string_view_type& s,
+    bool visit_string(const string_view_type& s,
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code&) override

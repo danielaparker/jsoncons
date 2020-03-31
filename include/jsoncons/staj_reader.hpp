@@ -16,7 +16,7 @@
 #include <array> // std::array
 #include <functional> // std::function
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/ser_context.hpp>
@@ -730,9 +730,9 @@ public:
 };
 
 template <class CharT>
-class basic_staj_event_handler : public basic_json_content_handler<CharT>
+class basic_staj_event_handler : public basic_json_visitor<CharT>
 {
-    using super_type = basic_json_content_handler<CharT>;
+    using super_type = basic_json_visitor<CharT>;
 public:
     using char_type = CharT;
     using typename super_type::string_view_type;
@@ -895,7 +895,7 @@ public:
         }
     }
 
-    bool dump(basic_json_content_handler<CharT>& handler, const ser_context& context, std::error_code& ec)
+    bool dump(basic_json_visitor<CharT>& handler, const ser_context& context, std::error_code& ec)
     {
         bool more = true;
         if (data_.type() != typed_array_type())
@@ -1048,55 +1048,55 @@ private:
         return true;
     }
 
-    bool do_begin_object(semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_object, tag);
         return !filter_(event_, context);
     }
 
-    bool do_end_object(const ser_context& context, std::error_code&) override
+    bool visit_end_object(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_object);
         return !filter_(event_, context);
     }
 
-    bool do_begin_array(semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array, tag);
         return !filter_(event_, context);
     }
 
-    bool do_end_array(const ser_context& context, std::error_code&) override
+    bool visit_end_array(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_array);
         return !filter_(event_, context);
     }
 
-    bool do_key(const string_view_type& name, const ser_context& context, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(name, staj_event_type::name);
         return !filter_(event_, context);
     }
 
-    bool do_null(semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool visit_null(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_string(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
+    bool visit_string(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
         return !filter_(event_, context);
     }
 
-    bool do_byte_string(const byte_string_view& s, 
+    bool visit_byte_string(const byte_string_view& s, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code&) override
@@ -1105,7 +1105,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_uint64(uint64_t value, 
+    bool visit_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context& context,
                          std::error_code&) override
@@ -1114,7 +1114,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_int64(int64_t value, 
+    bool visit_int64(int64_t value, 
                   semantic_tag tag,
                   const ser_context& context,
                   std::error_code&) override
@@ -1123,7 +1123,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_half(uint16_t value, 
+    bool visit_half(uint16_t value, 
                  semantic_tag tag,
                  const ser_context& context,
                  std::error_code&) override
@@ -1132,7 +1132,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_double(double value, 
+    bool visit_double(double value, 
                    semantic_tag tag, 
                    const ser_context& context,
                    std::error_code&) override
@@ -1141,7 +1141,7 @@ private:
         return !filter_(event_, context);
     }
 
-    bool do_typed_array(const span<const uint8_t>& v, 
+    bool visit_typed_array(const span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1152,7 +1152,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const uint16_t>& data, 
+    bool visit_typed_array(const span<const uint16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1163,7 +1163,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const uint32_t>& data, 
+    bool visit_typed_array(const span<const uint32_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1174,7 +1174,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const uint64_t>& data, 
+    bool visit_typed_array(const span<const uint64_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1185,7 +1185,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const int8_t>& data, 
+    bool visit_typed_array(const span<const int8_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1196,7 +1196,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const int16_t>& data, 
+    bool visit_typed_array(const span<const int16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1207,7 +1207,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const int32_t>& data, 
+    bool visit_typed_array(const span<const int32_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1218,7 +1218,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const int64_t>& data, 
+    bool visit_typed_array(const span<const int64_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1229,7 +1229,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(half_arg_t, const span<const uint16_t>& data, 
+    bool visit_typed_array(half_arg_t, const span<const uint16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1240,7 +1240,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const float>& data, 
+    bool visit_typed_array(const span<const float>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1251,7 +1251,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool do_typed_array(const span<const double>& data, 
+    bool visit_typed_array(const span<const double>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1262,7 +1262,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 /*
-    bool do_typed_array(const span<const float128_type>&, 
+    bool visit_typed_array(const span<const float128_type>&, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -1270,7 +1270,7 @@ private:
         return true;
     }
 */
-    bool do_begin_multi_dim(const span<const size_t>& shape,
+    bool visit_begin_multi_dim(const span<const size_t>& shape,
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1280,20 +1280,20 @@ private:
         return this->begin_array(2, tag, context, ec);
     }
 
-    bool do_end_multi_dim(const ser_context& context,
+    bool visit_end_multi_dim(const ser_context& context,
                           std::error_code& ec) override
     {
         return this->end_array(context, ec);
     }
 
-    void do_flush() override
+    void visit_flush() override
     {
     }
 };
 
 template<class CharT>
 bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
-                       basic_json_content_handler<CharT>& handler,
+                       basic_json_visitor<CharT>& handler,
                        const ser_context& context,
                        std::error_code& ec)
 {
@@ -1340,9 +1340,9 @@ public:
 
     virtual const basic_staj_event<CharT>& current() const = 0;
 
-    virtual void read(basic_json_content_handler<CharT>& handler) = 0;
+    virtual void read(basic_json_visitor<CharT>& handler) = 0;
 
-    virtual void read(basic_json_content_handler<CharT>& handler,
+    virtual void read(basic_json_visitor<CharT>& handler,
                       std::error_code& ec) = 0;
 
     virtual void next() = 0;

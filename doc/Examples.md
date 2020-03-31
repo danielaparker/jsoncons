@@ -2321,7 +2321,7 @@ int main()
     rename_object_key_filter filter2("fifth", "fourth", encoder);
     rename_object_key_filter filter1("fourth", "third", filter2);
 
-    // A filter can be passed to any function that takes a json_content_handler ...
+    // A filter can be passed to any function that takes a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
     json_reader reader(is, filter1);

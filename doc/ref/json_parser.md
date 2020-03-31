@@ -79,30 +79,30 @@ Returns `true` if the parser is finished parsing, `false` otherwise.
     bool source_exhausted() const
 Returns `true` if the input in the source buffer has been exhausted, `false` otherwise
 
-    void parse_some(json_content_handler& handler)
+    void parse_some(json_visitor& handler)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Parse events are sent to the supplied `handler`.
 Throws [ser_error](ser_error.md) if parsing fails.
 
-    void parse_some(json_content_handler<CharT>& handler,
+    void parse_some(json_visitor<CharT>& handler,
                     std::error_code& ec)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
 Parse events are sent to the supplied `handler`.
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
-    void finish_parse(json_content_handler<CharT>& handler)
+    void finish_parse(json_visitor<CharT>& handler)
 Called after `source_exhausted()` is `true` and there is no more input. 
 Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
 Throws [ser_error](ser_error.md) if parsing fails.
 
-    void finish_parse(json_content_handler<CharT>& handler,
+    void finish_parse(json_visitor<CharT>& handler,
                    std::error_code& ec)
 Called after `source_exhausted()` is `true` and there is no more input. 
 Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void skip_bom()
-Reads the next JSON text from the stream and reports JSON events to a [basic_json_content_handler](basic_json_content_handler.md), such as a [json_decoder](json_decoder.md).
+Reads the next JSON text from the stream and reports JSON events to a [basic_json_visitor](basic_json_visitor.md), such as a [json_decoder](json_decoder.md).
 Throws [ser_error](ser_error.md) if parsing fails.
 
     void check_done()

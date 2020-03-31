@@ -1,11 +1,11 @@
-### jsoncons::basic_json_content_handler
+### jsoncons::basic_json_visitor
 
 ```c++
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 
 template <
     class CharT
-> class basic_json_content_handler
+> class basic_json_visitor
 ```
 
 Defines an interface for producing and consuming JSON events. 
@@ -14,8 +14,8 @@ Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-json_content_handler    |`basic_json_content_handler<char>`
-wjson_content_handler   |`basic_json_content_handler<wchar_t>`
+json_visitor    |`basic_json_visitor<char>`
+wjson_visitor   |`basic_json_visitor<wchar_t>`
 
 #### Member types
 
@@ -330,142 +330,142 @@ Throws a [ser_error](ser_error.md) on parse errors.
 
 #### Private event consumer interface
 
-    virtual void do_flush() = 0; // (1)
+    virtual void visit_flush() = 0; // (1)
 
-    virtual bool do_begin_object(semantic_tag tag, 
+    virtual bool visit_begin_object(semantic_tag tag, 
                                  const ser_context& context, 
                                  std::error_code& ec) = 0; // (2)
 
-    virtual bool do_begin_object(std::size_t length, 
+    virtual bool visit_begin_object(std::size_t length, 
                                  semantic_tag tag, 
                                  const ser_context& context, 
                                  std::error_code& ec); // (3)
 
-    virtual bool do_end_object(const ser_context& context, 
+    virtual bool visit_end_object(const ser_context& context, 
                                std::error_code& ec) = 0; // (4)
 
-    virtual bool do_begin_array(semantic_tag tag, 
+    virtual bool visit_begin_array(semantic_tag tag, 
                                 const ser_context& context, 
                                 std::error_code& ec) = 0; // (5)
 
-    virtual bool do_begin_array(std::size_t length, 
+    virtual bool visit_begin_array(std::size_t length, 
                                 semantic_tag tag, 
                                 const ser_context& context, 
                                 std::error_code& ec); // (6)
 
-    virtual bool do_end_array(const ser_context& context, 
+    virtual bool visit_end_array(const ser_context& context, 
                               std::error_code& ec) = 0; // (7)
 
-    virtual bool do_key(const string_view_type& name, 
+    virtual bool visit_key(const string_view_type& name, 
                          const ser_context& context, 
                          std::error_code&) = 0; // (8)
 
-    virtual bool do_null(semantic_tag tag, 
+    virtual bool visit_null(semantic_tag tag, 
                          const ser_context& context, 
                          std::error_code& ec) = 0; // (9)
 
-    virtual bool do_bool(bool value, 
+    virtual bool visit_bool(bool value, 
                          semantic_tag tag, 
                          const ser_context& context, 
                          std::error_code&) = 0; // (10)
 
-    virtual bool do_string(const string_view_type& value, 
+    virtual bool visit_string(const string_view_type& value, 
                            semantic_tag tag, 
                            const ser_context& context, 
                            std::error_code& ec) = 0; // (11)
 
-    virtual bool do_byte_string(const byte_string_view& value, 
+    virtual bool visit_byte_string(const byte_string_view& value, 
                                 semantic_tag tag, 
                                 const ser_context& context,
                                 std::error_code& ec) = 0; // (12)
 
-    virtual bool do_uint64(uint64_t value, 
+    virtual bool visit_uint64(uint64_t value, 
                            semantic_tag tag, 
                            const ser_context& context,
                            std::error_code& ec) = 0; // (13)
 
-    virtual bool do_int64(int64_t value, 
+    virtual bool visit_int64(int64_t value, 
                           semantic_tag tag,
                           const ser_context& context,
                           std::error_code& ec) = 0; // (14)
 
-    virtual bool do_half(uint16_t value, 
+    virtual bool visit_half(uint16_t value, 
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code& ec); // (15)
 
-    virtual bool do_double(double value, 
+    virtual bool visit_double(double value, 
                            semantic_tag tag,
                            const ser_context& context,
                            std::error_code& ec) = 0; // (16)
 
-    virtual bool do_typed_array(const span<const uint8_t>& data, 
+    virtual bool visit_typed_array(const span<const uint8_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (17)
 
-    virtual bool do_typed_array(const span<const uint16_t>& data, 
+    virtual bool visit_typed_array(const span<const uint16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (18)
 
-    virtual bool do_typed_array(const span<const uint32_t>& data, 
+    virtual bool visit_typed_array(const span<const uint32_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (19)
 
-    virtual bool do_typed_array(const span<const uint64_t>& data, 
+    virtual bool visit_typed_array(const span<const uint64_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (20)
 
-    virtual bool do_typed_array(const span<const int8_t>& data, 
+    virtual bool visit_typed_array(const span<const int8_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (21)
 
-    virtual bool do_typed_array(const span<const int16_t>& data, 
+    virtual bool visit_typed_array(const span<const int16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (22)
 
-    virtual bool do_typed_array(const span<const int32_t>& data, 
+    virtual bool visit_typed_array(const span<const int32_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (23)
 
-    virtual bool do_typed_array(const span<const int64_t>& data, 
+    virtual bool visit_typed_array(const span<const int64_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (24)
 
-    virtual bool do_typed_array(half_arg_t, 
+    virtual bool visit_typed_array(half_arg_t, 
                                 const span<const uint16_t>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (25)
 
-    virtual bool do_typed_array(const span<const float>& data, 
+    virtual bool visit_typed_array(const span<const float>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (26)
 
-    virtual bool do_typed_array(const span<const double>& data, 
+    virtual bool visit_typed_array(const span<const double>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (27)
 
-    virtual bool do_typed_array(const span<const float128_type>& data, 
+    virtual bool visit_typed_array(const span<const float128_type>& data, 
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec); // (28)
 
-    virtual bool do_begin_multi_dim(const span<const size_t>& shape,
+    virtual bool visit_begin_multi_dim(const span<const size_t>& shape,
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec); // (29)
 
-    virtual bool do_end_multi_dim(const ser_context& context,
+    virtual bool visit_end_multi_dim(const ser_context& context,
                                   std::error_code& ec); // (30)
 
 (1) Allows producers of json events to flush any buffered data.
@@ -548,7 +548,7 @@ The overloads that take a `std::error_code&` parameter set it to the error code 
 
 - [semantic_tag](semantic_tag.md)
 
-- [basic_default_json_content_handler](basic_default_json_content_handler.md)
+- [basic_default_json_visitor](basic_default_json_visitor.md)
 
 - [basic_json_filter](basic_json_filter.md)
 

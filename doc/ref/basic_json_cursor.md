@@ -103,15 +103,15 @@ Checks if there are no more events.
     const basic_staj_event& current() const override;
 Returns the current [basic_staj_event](staj_event.md).
 
-    void read(json_content_handler& handler) override
+    void read(json_visitor& handler) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_content_handler.md), until the handler indicates
+[handler](basic_json_visitor.md), until the handler indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read(basic_json_content_handler<char_type>& handler,
+    void read(basic_json_visitor<char_type>& handler,
                 std::error_code& ec) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_content_handler.md), until the handler indicates
+[handler](basic_json_visitor.md), until the handler indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
     void next() override;

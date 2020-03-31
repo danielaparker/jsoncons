@@ -15,7 +15,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons_ext/csv/csv_error.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
 #include <jsoncons/json.hpp>
@@ -44,9 +44,9 @@ class basic_csv_reader
     basic_csv_reader(const basic_csv_reader&) = delete; 
     basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
-    basic_default_json_content_handler<CharT> default_content_handler_;
+    basic_default_json_visitor<CharT> default_visitor_;
 
-    basic_json_content_handler<CharT>& handler_;
+    basic_json_visitor<CharT>& handler_;
 
     basic_csv_parser<CharT,Allocator> parser_;
     Src source_;
@@ -64,7 +64,7 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_content_handler<CharT>& handler, 
+                     basic_json_visitor<CharT>& handler, 
                      const Allocator& alloc = Allocator())
 
        : basic_csv_reader(std::forward<Source>(source), 
@@ -77,7 +77,7 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_content_handler<CharT>& handler,
+                     basic_json_visitor<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options, 
                      const Allocator& alloc = Allocator())
 
@@ -91,7 +91,7 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_content_handler<CharT>& handler,
+                     basic_json_visitor<CharT>& handler,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator())
         : basic_csv_reader(std::forward<Source>(source), 
@@ -104,7 +104,7 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_content_handler<CharT>& handler,
+                     basic_json_visitor<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator(),
@@ -122,7 +122,7 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_content_handler<CharT>& handler,
+                     basic_json_visitor<CharT>& handler,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator(),

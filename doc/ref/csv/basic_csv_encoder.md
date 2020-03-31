@@ -7,7 +7,7 @@ template<
     class CharT,
     class Sink,
     class Allocator=std::allocator<CharT>=std::allocator<CharT>>
-> class basic_csv_encoder : public jsoncons::basic_json_content_handler<CharT>
+> class basic_csv_encoder : public jsoncons::basic_json_visitor<CharT>
 ```
 
 `basic_csv_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
@@ -45,7 +45,7 @@ and uses the specified [csv options](basic_csv_options.md).
 
     virtual ~basic_csv_encoder()
 
-#### Inherited from [basic_json_content_handler](../basic_json_content_handler.md)
+#### Inherited from [basic_json_visitor](../basic_json_visitor.md)
 
 #### Member functions
 

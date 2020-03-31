@@ -12,13 +12,13 @@ using namespace jsoncons;
 class name_fix_up_filter : public json_filter
 {
 public:
-    name_fix_up_filter(json_content_handler& handler)
+    name_fix_up_filter(json_visitor& handler)
         : json_filter(handler)
     {
     }
 
 private:
-    bool do_key(const string_view_type& name, 
+    bool visit_key(const string_view_type& name, 
                  const ser_context& context,
                  std::error_code&) override
     {
@@ -30,7 +30,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& s, 
+    bool visit_string(const string_view_type& s, 
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code&) override
@@ -104,14 +104,14 @@ void change_member_name_example()
     rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
-    // a json_content_handler ...
+    // a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
     json_reader reader(is, filter1);
     reader.read();
     std::cout << std::endl;
 
-    // or a json_content_handler    
+    // or a json_visitor    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);

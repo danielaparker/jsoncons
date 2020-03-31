@@ -16,7 +16,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
 #include <jsoncons_ext/csv/csv_cursor.hpp>
@@ -260,7 +260,7 @@ public:
         return event_handler_.event();
     }
 
-    void read(basic_json_content_handler<CharT>& handler) override
+    void read(basic_json_visitor<CharT>& handler) override
     {
         std::error_code ec;
         read(handler, ec);
@@ -270,7 +270,7 @@ public:
         }
     }
 
-    void read(basic_json_content_handler<CharT>& handler,
+    void read(basic_json_visitor<CharT>& handler,
                 std::error_code& ec) override
     {
         if (!staj_to_saj_event(event_handler_.event(), handler, *this, ec))
@@ -333,7 +333,7 @@ public:
         read_next(event_handler_, ec);
     }
 
-    void read_next(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    void read_next(basic_json_visitor<CharT>& handler, std::error_code& ec)
     {
         parser_.restart();
         while (!parser_.finished())
@@ -423,14 +423,14 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<CharT>&)")
-    void read_to(basic_json_content_handler<CharT>& handler) 
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<CharT>&)")
+    void read_to(basic_json_visitor<CharT>& handler) 
     {
         read(handler);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<CharT>&, std::error_code&)")
-    void read_to(basic_json_content_handler<CharT>& handler,
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<CharT>&, std::error_code&)")
+    void read_to(basic_json_visitor<CharT>& handler,
                  std::error_code& ec) 
     {
         read(handler, ec);

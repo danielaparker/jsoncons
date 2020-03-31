@@ -15,7 +15,7 @@
 #include <system_error>
 #include <cctype>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/json.hpp>
@@ -97,7 +97,7 @@ namespace detail {
     class parse_event
     {
         typedef TempAllocator temp_allocator_type;
-        typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+        typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
         typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
         typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
         typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
@@ -180,7 +180,7 @@ namespace detail {
         parse_event& operator=(const parse_event&) = default;
         parse_event& operator=(parse_event&&) = default;
 
-        bool replay(basic_json_content_handler<CharT>& handler) const
+        bool replay(basic_json_visitor<CharT>& handler) const
         {
             switch (event_type)
             {
@@ -208,10 +208,10 @@ namespace detail {
     };
 
     template <class CharT, class TempAllocator>
-    class m_columns_filter : public basic_json_content_handler<CharT>
+    class m_columns_filter : public basic_json_visitor<CharT>
     {
     public:
-        typedef typename basic_json_content_handler<CharT>::string_view_type string_view_type;
+        typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
         typedef CharT char_type;
         typedef TempAllocator temp_allocator_type;
 
@@ -270,7 +270,7 @@ namespace detail {
             ++name_index_;
         }
 
-        bool replay_parse_events(basic_json_content_handler<CharT>& handler)
+        bool replay_parse_events(basic_json_visitor<CharT>& handler)
         {
             bool more = true;
             while (more)
@@ -326,23 +326,23 @@ namespace detail {
             return more;
         }
 
-        void do_flush() override
+        void visit_flush() override
         {
         }
 
-        bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
-        {
-            ec = csv_errc::invalid_parse_state;
-            return false;
-        }
-
-        bool do_end_object(const ser_context&, std::error_code& ec) override
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
             return false;
         }
 
-        bool do_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
+        bool visit_end_object(const ser_context&, std::error_code& ec) override
+        {
+            ec = csv_errc::invalid_parse_state;
+            return false;
+        }
+
+        bool visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -353,7 +353,7 @@ namespace detail {
             return true;
         }
 
-        bool do_end_array(const ser_context&, std::error_code&) override
+        bool visit_end_array(const ser_context&, std::error_code&) override
         {
             if (level_ > 0)
             {
@@ -368,13 +368,13 @@ namespace detail {
             return true;
         }
 
-        bool do_key(const string_view_type&, const ser_context&, std::error_code& ec) override
+        bool visit_key(const string_view_type&, const ser_context&, std::error_code& ec) override
         {
             ec = csv_errc::invalid_parse_state;
             return false;
         }
 
-        bool do_null(semantic_tag tag, const ser_context&, std::error_code&) override
+        bool visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -387,7 +387,7 @@ namespace detail {
             return true;
         }
 
-        bool do_string(const string_view_type& value, semantic_tag tag, const ser_context&, std::error_code&) override
+        bool visit_string(const string_view_type& value, semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -401,7 +401,7 @@ namespace detail {
             return true;
         }
 
-        bool do_byte_string(const byte_string_view& value,
+        bool visit_byte_string(const byte_string_view& value,
                                   semantic_tag tag,
                                   const ser_context&,
                                   std::error_code&) override
@@ -417,7 +417,7 @@ namespace detail {
             return true;
         }
 
-        bool do_double(double value,
+        bool visit_double(double value,
                              semantic_tag tag, 
                              const ser_context&,
                              std::error_code&) override
@@ -433,7 +433,7 @@ namespace detail {
             return true;
         }
 
-        bool do_int64(int64_t value,
+        bool visit_int64(int64_t value,
                             semantic_tag tag,
                             const ser_context&,
                             std::error_code&) override
@@ -449,7 +449,7 @@ namespace detail {
             return true;
         }
 
-        bool do_uint64(uint64_t value,
+        bool visit_uint64(uint64_t value,
                              semantic_tag tag,
                              const ser_context&,
                              std::error_code&) override
@@ -465,7 +465,7 @@ namespace detail {
             return true;
         }
 
-        bool do_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+        bool visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
         {
             if (name_index_ < column_names_.size())
             {
@@ -511,7 +511,7 @@ private:
 
     temp_allocator_type alloc_;
     csv_parse_state state_;
-    basic_json_content_handler<CharT>* handler_;
+    basic_json_visitor<CharT>* handler_;
     std::function<bool(csv_errc,const ser_context&)> err_handler_;
     std::size_t column_;
     std::size_t line_;
@@ -655,7 +655,7 @@ public:
         more_ = true;
     }
 
-    void parse_some(basic_json_content_handler<CharT>& handler)
+    void parse_some(basic_json_visitor<CharT>& handler)
     {
         std::error_code ec;
         parse_some(handler,ec);
@@ -665,7 +665,7 @@ public:
         }
     }
 
-    void parse_some(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    void parse_some(basic_json_visitor<CharT>& handler, std::error_code& ec)
     {
         switch (options_.mapping())
         {

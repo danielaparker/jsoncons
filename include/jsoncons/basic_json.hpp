@@ -2482,7 +2482,7 @@ public:
             evaluate().dump(os, options, line_indent);
         }
 
-        void dump(basic_json_content_handler<char_type>& handler) const
+        void dump(basic_json_visitor<char_type>& handler) const
         {
             evaluate().dump(handler);
         }
@@ -2519,7 +2519,7 @@ public:
             evaluate().dump(os, line_indent, ec);
         }
 
-        void dump(basic_json_content_handler<char_type>& handler,
+        void dump(basic_json_visitor<char_type>& handler,
                   std::error_code& ec) const
         {
             evaluate().dump(handler, ec);
@@ -2715,8 +2715,8 @@ public:
         {
             return evaluate().to_string(alloc);
         }
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-        void write(basic_json_content_handler<char_type>& handler) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+        void write(basic_json_visitor<char_type>& handler) const
         {
             evaluate().write(handler);
         }
@@ -2745,8 +2745,8 @@ public:
         {
             return evaluate().to_string(options,alloc);
         }
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-        void to_stream(basic_json_content_handler<char_type>& handler) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+        void to_stream(basic_json_visitor<char_type>& handler) const
         {
             evaluate().to_stream(handler);
         }
@@ -3450,7 +3450,7 @@ public:
         }
     }
 
-    void dump(basic_json_content_handler<char_type>& handler) const
+    void dump(basic_json_visitor<char_type>& handler) const
     {
         std::error_code ec;
         dump(handler, ec);
@@ -3530,7 +3530,7 @@ public:
         }
     }
 
-    void dump(basic_json_content_handler<char_type>& handler, 
+    void dump(basic_json_visitor<char_type>& handler, 
               std::error_code& ec) const
     {
         dump_noflush(handler, ec);
@@ -4896,14 +4896,14 @@ public:
         : var_(first,last,alloc)
     {
     }
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void dump_fragment(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void dump_fragment(basic_json_visitor<char_type>& handler) const
     {
         dump(handler);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void dump_body(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void dump_body(basic_json_visitor<char_type>& handler) const
     {
         dump(handler);
     }
@@ -4938,14 +4938,14 @@ public:
         }
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void write_body(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void write_body(basic_json_visitor<char_type>& handler) const
     {
         dump(handler);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void write(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void write(basic_json_visitor<char_type>& handler) const
     {
         dump(handler);
     }
@@ -4968,8 +4968,8 @@ public:
         dump(os,options,pprint);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void to_stream(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void to_stream(basic_json_visitor<char_type>& handler) const
     {
         dump(handler);
     }
@@ -5501,7 +5501,7 @@ public:
 
 private:
 
-    void dump_noflush(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
+    void dump_noflush(basic_json_visitor<char_type>& handler, std::error_code& ec) const
     {
         const null_ser_context context{};
         switch (var_.storage())

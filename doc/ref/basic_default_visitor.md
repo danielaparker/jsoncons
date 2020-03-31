@@ -1,24 +1,24 @@
-### jsoncons::basic_default_json_content_handler
+### jsoncons::basic_default_json_visitor
 
 ```c++
 #include <jsoncons/json_content_handler.hpp>
 
 template <
     class CharT
-> class basic_default_json_content_handler
+> class basic_default_json_visitor
 ```
 
 A [basic_json_content_handler](basic_json_content_handler.md) that discards all incoming json events. Serves as a base class for user defined content handlers.
-`basic_default_json_content_handler` is noncopyable and nonmoveable.
+`basic_default_json_visitor` is noncopyable and nonmoveable.
 
-![basic_default_json_content_handler](./diagrams/basic_default_json_content_handler.png)
+![basic_default_json_visitor](./diagrams/basic_default_json_content_handler.png)
 
 Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-default_json_content_handler    |`basic_default_json_content_handler<char>`
-wdefault_json_content_handler   |`basic_default_json_content_handler<wchar_t>`
+default_json_visitor    |`basic_default_json_visitor<char>`
+wdefault_json_visitor   |`basic_default_json_visitor<wchar_t>`
 
 #### Member types
 
@@ -29,9 +29,9 @@ Member type                         |Definition
 
 #### Constructors
 
-    basic_default_json_content_handler(bool accept_more = true)
+    basic_default_json_visitor(bool accept_more = true)
 
-Constructs a `basic_default_json_content_handler`. The parameter
+Constructs a `basic_default_json_visitor`. The parameter
 `accept_more` indicates whether the content handler will, after
 consuming an event, accept more events.
 

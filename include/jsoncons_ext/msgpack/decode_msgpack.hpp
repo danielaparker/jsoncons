@@ -26,7 +26,7 @@ namespace msgpack {
     decode_msgpack(const std::vector<uint8_t>& v)
     {
         jsoncons::json_decoder<T> decoder;
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor);
         reader.read();
         return decoder.get_result();
@@ -53,7 +53,7 @@ namespace msgpack {
     decode_msgpack(std::istream& is)
     {
         jsoncons::json_decoder<T> decoder;
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         msgpack_stream_reader reader(is, adaptor);
         reader.read();
         return decoder.get_result();
@@ -83,7 +83,7 @@ namespace msgpack {
                    const std::vector<uint8_t>& v)
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_msgpack_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, temp_alloc);
         reader.read();
         return decoder.get_result();
@@ -112,7 +112,7 @@ namespace msgpack {
                    std::istream& is)
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_msgpack_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, temp_alloc);
         reader.read();
         return decoder.get_result();

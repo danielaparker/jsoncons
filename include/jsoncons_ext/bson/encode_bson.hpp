@@ -26,7 +26,7 @@ namespace bson {
     {
         typedef typename T::char_type char_type;
         bson_bytes_encoder encoder(v);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -49,7 +49,7 @@ namespace bson {
     {
         typedef typename T::char_type char_type;
         bson_stream_encoder encoder(os);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -75,7 +75,7 @@ namespace bson {
     {
         typedef typename T::char_type char_type;
         basic_bson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v,temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -100,7 +100,7 @@ namespace bson {
     {
         typedef typename T::char_type char_type;
         basic_bson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os,temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 

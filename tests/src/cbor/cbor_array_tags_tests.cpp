@@ -41,16 +41,16 @@ static void check_native(std::false_type,
 {
 }
 
-struct my_cbor_content_handler : public default_json_content_handler
+struct my_cbor_visitor : public default_json_visitor
 {
     std::vector<double> v;
 private:
-    bool do_typed_array(const span<const double>& data,  
+    bool visit_typed_array(const span<const double>& data,  
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
     {
-        //std::cout << "do_typed_array size: " << data.size() << "\n";
+        //std::cout << "visit_typed_array size: " << data.size() << "\n";
         v = std::vector<double>(data.begin(),data.end());
         return false;
     }
@@ -89,7 +89,7 @@ TEST_CASE("cbor typed array cursor tests")
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         CHECK(cursor.is_typed_array());
 
-        my_cbor_content_handler handler;
+        my_cbor_visitor handler;
         cursor.read(handler);
         //for (auto item : handler.v)
         //{

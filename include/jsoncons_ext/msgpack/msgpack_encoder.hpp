@@ -13,7 +13,7 @@
 #include <memory>
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/parse_number.hpp>
@@ -25,13 +25,13 @@ namespace jsoncons { namespace msgpack {
 enum class msgpack_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
-class basic_msgpack_encoder final : public basic_json_content_handler<char>
+class basic_msgpack_encoder final : public basic_json_visitor<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
     typedef Allocator allocator_type;
     typedef char char_type;
-    using typename basic_json_content_handler<char>::string_view_type;
+    using typename basic_json_visitor<char>::string_view_type;
     typedef Sink sink_type;
 
 private:
@@ -98,18 +98,18 @@ public:
 private:
     // Implementing methods
 
-    void do_flush() override
+    void visit_flush() override
     {
         sink_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         ec = msgpack_errc::object_length_required;
         return false;
     }
 
-    bool do_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(msgpack_container_type::object, length));
 
@@ -139,7 +139,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code& ec) override
+    bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -159,13 +159,13 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         ec = msgpack_errc::array_length_required;
         return false;
     }
 
-    bool do_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(msgpack_container_type::array, length));
         if (length <= 15)
@@ -188,7 +188,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&, std::error_code& ec) override
+    bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -208,13 +208,13 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         write_string_value(name);
         return true;
     }
 
-    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         // nil
         jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::msgpack::detail::msgpack_format ::nil_cd), std::back_inserter(sink_));
@@ -222,7 +222,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
     {
         write_string_value(sv);
         end_value();
@@ -268,7 +268,7 @@ private:
         }
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -303,7 +303,7 @@ private:
         return true;
     }
 
-    bool do_double(double val, 
+    bool visit_double(double val, 
                          semantic_tag,
                          const ser_context&,
                          std::error_code&) override
@@ -328,7 +328,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t val, 
+    bool visit_int64(int64_t val, 
                         semantic_tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -401,7 +401,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t val, 
+    bool visit_uint64(uint64_t val, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -439,7 +439,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         // true and false
         sink_.push_back(static_cast<uint8_t>(val ? jsoncons::msgpack::detail::msgpack_format ::true_cd : jsoncons::msgpack::detail::msgpack_format ::false_cd));

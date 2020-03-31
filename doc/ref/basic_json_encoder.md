@@ -6,12 +6,12 @@
 template<
     class CharT,
     class Sink>
-> basic_json_encoder : public jsoncons::basic_json_content_handler<CharT>
+> basic_json_encoder : public jsoncons::basic_json_visitor<CharT>
 
 template<
     class CharT,
     class Sink>
-> basic_json_compressed_encoder : public jsoncons::basic_json_content_handler<CharT>
+> basic_json_compressed_encoder : public jsoncons::basic_json_visitor<CharT>
 ```
 
 `basic_json_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
@@ -54,7 +54,7 @@ and uses the specified [json options](basic_json_options.md).
 
     virtual ~basic_json_encoder()
 
-#### Inherited from [basic_json_content_handler](../basic_json_content_handler.md)
+#### Inherited from [basic_json_visitor](../basic_json_visitor.md)
 
 #### Member functions
 

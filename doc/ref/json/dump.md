@@ -17,7 +17,7 @@
               const basic_json_encode_options<char_type>& options, 
               indenting line_indent = indenting::no_indent) const; // (4)
 
-    void dump(basic_json_content_handler<char_type>& handler) const; // (5)
+    void dump(basic_json_visitor<char_type>& handler) const; // (5)
 
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
@@ -39,7 +39,7 @@
               indenting line_indent,
               std::error_code& ec) const; // (9)
 
-    void dump(basic_json_content_handler<char_type>& handler, 
+    void dump(basic_json_visitor<char_type>& handler, 
               std::error_code& ec) const; // (10)
 ```
 
@@ -53,7 +53,7 @@
 (4) Dumps a json value to an output stream using the specified [encoding options](../basic_json_options.md)
     and [indenting](../indenting.md).
 
-(5) Dumps a json value to the specified [content handler](../basic_json_content_handler.md).
+(5) Dumps a json value to the specified [content handler](../basic_json_visitor.md).
 
 (6) - (10) Same as (1)-(5), except set `ec` on serialization errors. 
 

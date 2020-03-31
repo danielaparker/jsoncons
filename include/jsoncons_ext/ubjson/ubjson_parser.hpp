@@ -12,7 +12,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
@@ -100,7 +100,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_content_handler& handler, std::error_code& ec)
+    void parse(json_visitor& handler, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -284,7 +284,7 @@ public:
         }
     }
 private:
-    void read_type_and_value(json_content_handler& handler, std::error_code& ec)
+    void read_type_and_value(json_visitor& handler, std::error_code& ec)
     {
         if (source_.is_error())
         {
@@ -301,7 +301,7 @@ private:
         read_value(handler, type, ec);
     }
 
-    void read_value(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void read_value(json_visitor& handler, uint8_t type, std::error_code& ec)
     {
         switch (type)
         {
@@ -504,7 +504,7 @@ private:
         }
     }
 
-    void produce_begin_array(json_content_handler& handler, std::error_code& ec)
+    void produce_begin_array(json_visitor& handler, std::error_code& ec)
     {
         if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
@@ -542,13 +542,13 @@ private:
         }
     }
 
-    void produce_end_array(json_content_handler& handler, std::error_code&)
+    void produce_end_array(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_content_handler& handler, std::error_code& ec)
+    void produce_begin_map(json_visitor& handler, std::error_code& ec)
     {
         if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
@@ -589,7 +589,7 @@ private:
         }
     }
 
-    void produce_end_map(json_content_handler& handler, std::error_code&)
+    void produce_end_map(json_visitor& handler, std::error_code&)
     {
         more_ = handler.end_object(*this);
         state_stack_.pop_back();
@@ -724,7 +724,7 @@ private:
         return length;
     }
 
-    void read_name(json_content_handler& handler, std::error_code& ec)
+    void read_name(json_visitor& handler, std::error_code& ec)
     {
         std::size_t length = get_length(ec);
         if (ec)
