@@ -651,8 +651,8 @@ public:
 
 private:
     bool visit_key(const string_view_type& name, 
-                 const ser_context& context,
-                 std::error_code&) override
+                   const ser_context& context,
+                   std::error_code&) override
     {
         member_name_ = name;
         if (member_name_ != "name")

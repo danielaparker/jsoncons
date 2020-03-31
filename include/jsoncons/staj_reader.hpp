@@ -31,7 +31,7 @@ enum class staj_event_type
     end_array,
     begin_object,
     end_object,
-    name,
+    key,
     string_value,
     byte_string_value,
     null_value,
@@ -40,6 +40,9 @@ enum class staj_event_type
     uint64_value,
     half_value,
     double_value
+#if !defined(JSONCONS_NO_DEPRECATED)
+    ,name = key
+#endif
 };
 
 template <class CharT>
@@ -81,7 +84,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
             os << end_object_name;
             break;
         }
-        case staj_event_type::name:
+        case staj_event_type::key:
         {
             os << name_name;
             break;
@@ -216,7 +219,7 @@ public:
         T s;
         switch (event_type_)
         {
-        case staj_event_type::name:
+        case staj_event_type::key:
         case staj_event_type::string_value:
             s = T(value_.string_data_, length_);
             break;
@@ -290,7 +293,7 @@ public:
         T s;
         switch (event_type_)
         {
-        case staj_event_type::name:
+        case staj_event_type::key:
         case staj_event_type::string_value:
             s = T(value_.string_data_, length_);
             break;
@@ -371,7 +374,7 @@ private:
         int64_t value = 0;
         switch (event_type_)
         {
-            case staj_event_type::name:
+            case staj_event_type::key:
             case staj_event_type::string_value:
             {
                 auto result = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
@@ -405,7 +408,7 @@ private:
         uint64_t value = 0;
         switch (event_type_)
         {
-            case staj_event_type::name:
+            case staj_event_type::key:
             case staj_event_type::string_value:
             {
                 auto result = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
@@ -438,7 +441,7 @@ private:
     {
         switch (event_type_)
         {
-            case staj_event_type::name:
+            case staj_event_type::key:
             case staj_event_type::string_value:
             {
                 jsoncons::detail::string_to_double f;
@@ -1074,7 +1077,7 @@ private:
 
     bool visit_key(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
-        event_ = basic_staj_event<CharT>(name, staj_event_type::name);
+        event_ = basic_staj_event<CharT>(name, staj_event_type::key);
         return !filter_(event_, context);
     }
 
@@ -1307,7 +1310,7 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
             return visitor.begin_object(ev.tag(), context, ec);
         case staj_event_type::end_object:
             return visitor.end_object(context, ec);
-        case staj_event_type::name:
+        case staj_event_type::key:
             return visitor.key(ev.template get<basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
             return visitor.string_value(ev.template get<basic_string_view<CharT>>(), ev.tag(), context);

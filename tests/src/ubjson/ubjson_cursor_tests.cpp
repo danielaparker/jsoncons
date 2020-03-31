@@ -41,29 +41,29 @@ TEST_CASE("ubjson_cursor reputon test")
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::begin_object);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::string_value);
         cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::name);
+        CHECK(cursor.current().event_type() == staj_event_type::key);
         cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::double_value);
         cursor.next();
@@ -83,7 +83,7 @@ struct remove_mark_ubjson_filter
 
     bool operator()(const staj_event& event, const ser_context&) 
     {
-        if (event.event_type()  == staj_event_type::name &&
+        if (event.event_type()  == staj_event_type::key &&
             event.get<jsoncons::string_view>() == "mark")
         {
             reject_next_ = true;
@@ -138,19 +138,19 @@ TEST_CASE("ubjson_cursor with filter tests")
     CHECK(cursor.current().event_type() == staj_event_type::begin_object);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
@@ -162,19 +162,19 @@ TEST_CASE("ubjson_cursor with filter tests")
     CHECK(cursor.current().event_type() == staj_event_type::begin_object);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
@@ -186,19 +186,19 @@ TEST_CASE("ubjson_cursor with filter tests")
     CHECK(cursor.current().event_type() == staj_event_type::begin_object);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::name);
+    CHECK(cursor.current().event_type() == staj_event_type::key);
     cursor.next();
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);

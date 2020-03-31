@@ -131,7 +131,7 @@ namespace readme
                 case staj_event_type::end_object:
                     std::cout << event.event_type() << " " << "\n";
                     break;
-                case staj_event_type::name:
+                case staj_event_type::key:
                     // Or std::string_view, if supported
                     std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                     break;
@@ -181,7 +181,7 @@ namespace readme
         std::string name;
         auto filter = [&](const staj_event& ev, const ser_context&) -> bool
         {
-            if (ev.event_type() == staj_event_type::name)
+            if (ev.event_type() == staj_event_type::key)
             {
                 name = ev.get<std::string>();
                 return false;

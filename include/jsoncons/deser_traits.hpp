@@ -279,7 +279,7 @@ namespace jsoncons {
 
             while (reader.current().event_type() != staj_event_type::end_object && !ec)
             {
-                if (reader.current().event_type() != staj_event_type::name)
+                if (reader.current().event_type() != staj_event_type::key)
                 {
                     ec = json_errc::expected_name;
                     return val;
@@ -319,7 +319,7 @@ namespace jsoncons {
 
             while (reader.current().event_type() != staj_event_type::end_object && !ec)
             {
-                if (reader.current().event_type() != staj_event_type::name)
+                if (reader.current().event_type() != staj_event_type::key)
                 {
                     ec = json_errc::expected_name;
                     return val;
