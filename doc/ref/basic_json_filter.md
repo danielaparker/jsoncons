@@ -700,7 +700,7 @@ std::ofstream os("output/new-address-book.json");
 json_stream_encoder encoder(os);
 name_fix_up_filter filter(encoder);
 ```
-Parse the input and send the json events into the filter ...
+Parse the input and send the json events through the filter ...
 ```c++
 std::cout << "(1) ";
 std::ifstream is("input/address-book.json");
