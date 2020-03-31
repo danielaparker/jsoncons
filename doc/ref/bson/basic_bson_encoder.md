@@ -10,7 +10,7 @@ template<
 
 `basic_bson_encoder` is noncopyable.
 
-![basic_bson_encoder](./diagrams/bson_encoder.png)
+![basic_bson_encoder](./diagrams/basic_bson_encoder.png)
 
 Two specializations for common sink types are defined:
 

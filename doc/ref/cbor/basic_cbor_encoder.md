@@ -10,7 +10,7 @@ template<
 
 `basic_cbor_encoder` is noncopyable
 
-![basic_cbor_encoder](./diagrams/cbor_encoder.png)
+![basic_cbor_encoder](./diagrams/basic_cbor_encoder.png)
 
 Four specializations for common sink types are defined:
 

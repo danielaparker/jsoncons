@@ -46,7 +46,7 @@ class basic_csv_reader
 
     basic_default_json_visitor<CharT> default_visitor_;
 
-    basic_json_visitor<CharT>& handler_;
+    basic_json_visitor<CharT>& visitor_;
 
     basic_csv_parser<CharT,Allocator> parser_;
     Src source_;
@@ -64,11 +64,11 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler, 
+                     basic_json_visitor<CharT>& visitor, 
                      const Allocator& alloc = Allocator())
 
        : basic_csv_reader(std::forward<Source>(source), 
-                          handler, 
+                          visitor, 
                           basic_csv_decode_options<CharT>(), 
                           default_csv_parsing(), 
                           alloc)
@@ -77,12 +77,12 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler,
+                     basic_json_visitor<CharT>& visitor,
                      const basic_csv_decode_options<CharT>& options, 
                      const Allocator& alloc = Allocator())
 
         : basic_csv_reader(std::forward<Source>(source), 
-                           handler, 
+                           visitor, 
                            options, 
                            default_csv_parsing(),
                            alloc)
@@ -91,11 +91,11 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler,
+                     basic_json_visitor<CharT>& visitor,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator())
         : basic_csv_reader(std::forward<Source>(source), 
-                           handler, 
+                           visitor, 
                            basic_csv_decode_options<CharT>(), 
                            err_handler,
                            alloc)
@@ -104,12 +104,12 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler,
+                     basic_json_visitor<CharT>& visitor,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator(),
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : handler_(handler),
+       : visitor_(visitor),
          parser_(options, err_handler, alloc),
          source_(std::forward<Source>(source)),
          buffer_length_(default_max_buffer_length),
@@ -122,12 +122,12 @@ public:
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler,
+                     basic_json_visitor<CharT>& visitor,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator(),
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : handler_(handler),
+       : visitor_(visitor),
          parser_(options, err_handler, alloc),
          buffer_length_(0),
          eof_(false),
@@ -221,7 +221,7 @@ private:
                     eof_ = true;
                 }
             }
-            parser_.parse_some(handler_, ec);
+            parser_.parse_some(visitor_, ec);
             if (ec) return;
         }
     }

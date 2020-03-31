@@ -56,24 +56,24 @@ string_view_type           |
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      basic_json_visitor<CharT>& handler, 
+                      basic_json_visitor<CharT>& visitor, 
                       const TempAllocator& alloc = TempAllocator()); // (5)
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      basic_json_visitor<CharT>& handler,
+                      basic_json_visitor<CharT>& visitor,
                       const basic_json_options<CharT>& options, 
                       const TempAllocator& alloc = TempAllocator()); // (6)
 
     template <class Source>
     basic_json_reader(Source&& source,
-                      basic_json_visitor<CharT>& handler,
+                      basic_json_visitor<CharT>& visitor,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const TempAllocator& alloc = TempAllocator()); // (7)
 
     template <class Source>
     basic_json_reader(Source&& source,
-                      basic_json_visitor<CharT>& handler, 
+                      basic_json_visitor<CharT>& visitor, 
                       const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const TempAllocator& alloc = TempAllocator()); // (8)
@@ -117,7 +117,7 @@ uses the specified [options](basic_json_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
 Note: It is the programmer's responsibility to ensure that `basic_json_reader` does not outlive any source or 
-content handler passed in the constuctor, as `basic_json_reader` holds pointers to but does not own these resources.
+visitor passed in the constuctor, as `basic_json_reader` holds pointers to but does not own these resources.
 
 #### Parameters
 

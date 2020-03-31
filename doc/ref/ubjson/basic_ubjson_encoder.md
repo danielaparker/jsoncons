@@ -10,7 +10,7 @@ template<
 
 `basic_ubjson_encoder` is noncopyable and nonmoveable.
 
-![basic_ubjson_encoder](./diagrams/ubjson_encoder.png)
+![basic_ubjson_encoder](./diagrams/basic_ubjson_encoder.png)
 
 Four specializations for common character types and result types are defined:
 

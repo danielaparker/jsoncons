@@ -72,14 +72,14 @@ Checks if there are no more events.
     const staj_event& current() const override;
 Returns the current [staj_event](staj_event.md).
 
-    void read(json_visitor& handler) override
+    void read(json_visitor& visitor) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_visitor.md), until the handler indicates
+[visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read(json_visitor& handler, std::error_code& ec) override
+    void read(json_visitor& visitor, std::error_code& ec) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_visitor.md), until the handler indicates
+[visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
     void next() override;
@@ -323,8 +323,8 @@ int main()
     assert(cursor.current().event_type() == staj_event_type::begin_array);
     assert(cursor.is_typed_array());
 
-    my_cbor_visitor handler;
-    cursor.read(handler);
+    my_cbor_visitor visitor;
+    cursor.read(visitor);
     std::cout << "(2)\n";
     for (auto item : handler.v)
     {

@@ -89,9 +89,9 @@ TEST_CASE("cbor typed array cursor tests")
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
         CHECK(cursor.is_typed_array());
 
-        my_cbor_visitor handler;
-        cursor.read(handler);
-        //for (auto item : handler.v)
+        my_cbor_visitor visitor;
+        cursor.read(visitor);
+        //for (auto item : visitor.v)
         //{
         //    std::cout << item << "\n";
         //}

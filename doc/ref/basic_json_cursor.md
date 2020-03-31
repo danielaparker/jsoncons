@@ -86,8 +86,8 @@ Constructors (1)-(2) read from a character sequence or stream and throw a
 Constructors (3)-(9) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
-Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive any source or 
-content handler, as `basic_json_cursor` holds pointers to but does not own these resources.
+Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive the source, 
+as `basic_json_cursor` holds a pointer to but does not own this resource.
 
 #### Parameters
 
@@ -103,15 +103,15 @@ Checks if there are no more events.
     const basic_staj_event& current() const override;
 Returns the current [basic_staj_event](staj_event.md).
 
-    void read(json_visitor& handler) override
+    void read(json_visitor& visitor) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_visitor.md), until the handler indicates
+[visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read(basic_json_visitor<char_type>& handler,
+    void read(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_visitor.md), until the handler indicates
+[visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
     void next() override;

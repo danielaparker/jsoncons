@@ -12,8 +12,8 @@ using namespace jsoncons;
 class name_fix_up_filter : public json_filter
 {
 public:
-    name_fix_up_filter(json_visitor& handler)
-        : json_filter(handler)
+    name_fix_up_filter(json_visitor& visitor)
+        : json_filter(visitor)
     {
     }
 
@@ -25,7 +25,7 @@ private:
         member_name_ = std::string(name);
         if (member_name_ != "name")
         {
-            this->to_handler().key(name, context);
+            this->destination().key(name, context);
         }
         return true;
     }
@@ -39,14 +39,14 @@ private:
         {
             std::size_t end_first = s.find_first_of(" \t");
             std::size_t start_last = s.find_first_not_of(" \t", end_first);
-            this->to_handler().key("first-name", context);
+            this->destination().key("first-name", context);
             string_view_type first = s.substr(0, end_first);
-            this->to_handler().string_value(first, tag, context);
+            this->destination().string_value(first, tag, context);
             if (start_last != string_view_type::npos)
             {
-                this->to_handler().key("last-name", context);
+                this->destination().key("last-name", context);
                 string_view_type last = s.substr(start_last);
-                this->to_handler().string_value(last, tag, context);
+                this->destination().string_value(last, tag, context);
             }
             else
             {
@@ -57,7 +57,7 @@ private:
         }
         else
         {
-            this->to_handler().string_value(s, tag, context);
+            this->destination().string_value(s, tag, context);
         }
         return true;
     }

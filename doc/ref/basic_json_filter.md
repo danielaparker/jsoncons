@@ -12,7 +12,7 @@ Defines an interface for filtering JSON events.
 
 `basic_json_filter` is noncopyable and nonmoveable.
 
-![json_filter](./diagrams/json_filter.png)
+![basic_json_filter](./diagrams/basic_json_filter.png)
 
 Typedefs for common character types are provided:
 
@@ -30,14 +30,14 @@ Member type                         |Definition
 
 #### Constructors
 
-    basic_json_filter(basic_json_visitor<char_type>& handler)
-All JSON events that pass through the `basic_json_filter` go to the specified [handler](basic_json_visitor.md).
-You must ensure that the `handler` exists as long as does `basic_json_filter`, as `basic_json_filter` holds a pointer to but does not own this object.
+    basic_json_filter(basic_json_visitor<char_type>& visitor)
+All JSON events that pass through the `basic_json_filter` go to the specified [visitor](basic_json_visitor.md).
+You must ensure that the `visitor` exists as long as does `basic_json_filter`, as `basic_json_filter` holds a pointer to but does not own this object.
 
 #### Accessors
 
-    basic_json_visitor<char_type>& to_handler()
-Returns a reference to the JSON handler that sends json events to the destination handler. 
+    basic_json_visitor<char_type>& destination()
+Returns a reference to the JSON visitor that sends json events to the destination handler. 
 
 ### Inherited from [jsoncons::basic_json_visitor](basic_json_visitor.md)
 
@@ -643,8 +643,8 @@ class name_fix_up_filter : public json_filter
     std::string member_name_;
 
 public:
-    name_fix_up_filter(json_visitor& handler)
-        : json_filter(handler)
+    name_fix_up_filter(json_visitor& visitor)
+        : json_filter(visitor)
     {
     }
 
@@ -656,7 +656,7 @@ private:
         member_name_ = name;
         if (member_name_ != "name")
         {
-            this->to_handler().key(name, context);
+            this->destination().key(name, context);
         }
         return true;
     }
@@ -669,14 +669,14 @@ private:
         {
             std::size_t end_first = val.find_first_of(" \t");
             std::size_t start_last = val.find_first_not_of(" \t", end_first);
-            this->to_handler().key("first-name", context);
+            this->destination().key("first-name", context);
             string_view_type first = val.substr(0, end_first);
-            this->to_handler().value(first, context);
+            this->destination().value(first, context);
             if (start_last != string_view_type::npos)
             {
-                this->to_handler().key("last-name", context);
+                this->destination().key("last-name", context);
                 string_view_type last = val.substr(start_last);
-                this->to_handler().value(last, context);
+                this->destination().value(last, context);
             }
             else
             {
@@ -687,7 +687,7 @@ private:
         }
         else
         {
-            this->to_handler().value(s, context);
+            this->destination().value(s, context);
         }
         return true;
     }
@@ -720,7 +720,7 @@ Output:
 (1) Incomplete name "John" at line 9 and column 26 
 (2) Incomplete name "John" at line 0 and column 0
 ```
-Note that when filtering `json` events written from a `json` value to an output handler, contexual line and column information in the original file has been lost. 
+Note that when filtering `json` events written from a `json` value to an output visitor, contexual line and column information in the original file has been lost. 
 ```
 
 The output JSON file `address-book-new.json` with name fixes is

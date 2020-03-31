@@ -288,10 +288,10 @@ void read_to_cbor_visitor()
     assert(cursor.current().event_type() == staj_event_type::begin_array);
     assert(cursor.is_typed_array());
 
-    my_cbor_visitor handler;
-    cursor.read(handler);
+    my_cbor_visitor visitor;
+    cursor.read(visitor);
     std::cout << "(2)\n";
-    for (auto item : handler.v)
+    for (auto item : visitor.v)
     {
         std::cout << item << "\n";
     }

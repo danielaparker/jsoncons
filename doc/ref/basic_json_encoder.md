@@ -16,7 +16,7 @@ template<
 
 `basic_json_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
 
-![basic_json_encoder](./diagrams/json_encoder.png)
+![basic_json_encoder](./diagrams/basic_json_encoder.png)
 
 Four specializations for common character types and sink types are defined
 for both the pretty print and compressed serializers:

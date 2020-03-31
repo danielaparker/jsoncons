@@ -12,7 +12,7 @@ template<
 
 `basic_csv_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
 
-![csv_encoder](./diagrams/csv_encoder.png)
+![basic_csv_encoder](./diagrams/basic_csv_encoder.png)
 
 Four specializations for common character types and result types are defined:
 

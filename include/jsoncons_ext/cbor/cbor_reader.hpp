@@ -25,14 +25,14 @@ template <class Src,class Allocator=std::allocator<char>>
 class basic_cbor_reader : public ser_context
 {
     basic_cbor_parser<Src,Allocator> parser_;
-    json_visitor& handler_;
+    json_visitor& visitor_;
 public:
     template <class Source>
     basic_cbor_reader(Source&& source, 
-                      json_visitor& handler,
+                      json_visitor& visitor,
                       const Allocator alloc=Allocator())
        : parser_(std::forward<Source>(source),alloc),
-         handler_(handler)
+         visitor_(visitor)
     {
     }
 
@@ -49,7 +49,7 @@ public:
     void read(std::error_code& ec)
     {
         parser_.reset();
-        parser_.parse(handler_, ec);
+        parser_.parse(visitor_, ec);
         if (ec)
         {
             return;

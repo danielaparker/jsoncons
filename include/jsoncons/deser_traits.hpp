@@ -217,8 +217,8 @@ namespace jsoncons {
                 return v;
             }
 
-            typed_array_visitor<T> handler(v);
-            reader.read(handler, ec);
+            typed_array_visitor<T> visitor(v);
+            reader.read(visitor, ec);
             return v;
         }
     };

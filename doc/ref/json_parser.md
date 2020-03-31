@@ -18,7 +18,7 @@ and `source_exhausted()` will return `true`. Additional JSON text can be supplie
 
 A typical application will repeatedly call the `parse_some` function 
 until `stopped()` returns true. A stopped state indicates that a content
-handler function returned `false`, an error occured, or a complete JSON 
+visitor function returned `false`, an error occured, or a complete JSON 
 text has been consumed. If the latter, `done() `will return `true`.
   
 As an alternative to repeatedly calling `parse_some()` until `stopped()`
@@ -56,7 +56,7 @@ and a specified [parse_error_handler](parse_error_handler.md).
 (4) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any error handler passed in the constuctor.
+Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any error visitor passed in the constuctor.
 
 #### Member functions
 
@@ -69,7 +69,7 @@ Returns `true` when the parser has consumed a complete JSON text, `false` otherw
 
     bool stopped() const
 Returns `true` if the parser is stopped, `false` otherwise.
-The parser may enter a stopped state as a result of a content handler
+The parser may enter a stopped state as a result of a visitor
 function returning `false`, an error occurred,
 or after having consumed a complete JSON text.
 
@@ -79,26 +79,26 @@ Returns `true` if the parser is finished parsing, `false` otherwise.
     bool source_exhausted() const
 Returns `true` if the input in the source buffer has been exhausted, `false` otherwise
 
-    void parse_some(json_visitor& handler)
+    void parse_some(json_visitor& visitor)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
-Parse events are sent to the supplied `handler`.
+Parse events are sent to the supplied `visitor`.
 Throws [ser_error](ser_error.md) if parsing fails.
 
-    void parse_some(json_visitor<CharT>& handler,
+    void parse_some(json_visitor<CharT>& visitor,
                     std::error_code& ec)
 Parses the source until a complete json text has been consumed or the source has been exhausted.
-Parse events are sent to the supplied `handler`.
+Parse events are sent to the supplied `visitor`.
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
-    void finish_parse(json_visitor<CharT>& handler)
+    void finish_parse(json_visitor<CharT>& visitor)
 Called after `source_exhausted()` is `true` and there is no more input. 
-Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
+Repeatedly calls `parse_some(visitor)` until `finished()` returns `true`
 Throws [ser_error](ser_error.md) if parsing fails.
 
-    void finish_parse(json_visitor<CharT>& handler,
+    void finish_parse(json_visitor<CharT>& visitor,
                    std::error_code& ec)
 Called after `source_exhausted()` is `true` and there is no more input. 
-Repeatedly calls `parse_some(handler)` until `finished()` returns `true`
+Repeatedly calls `parse_some(visitor)` until `finished()` returns `true`
 Sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void skip_bom()

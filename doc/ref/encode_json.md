@@ -72,7 +72,7 @@ void encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
 
 (4) Encode `val` to output stream with the specified options and line indenting.
 
-(5) Convert `val` to json events and stream through content handler.
+(5) Convert `val` to json events and stream through encoder.
 
 Functions (6)-(10) are the same except `temp_alloc` is used to allocate temporary work areas.
 
@@ -84,8 +84,8 @@ Functions (6)-(10) are the same except `temp_alloc` is used to allocate temporar
     <td>C++ data structure</td> 
   </tr>
   <tr>
-    <td>handler</td>
-    <td>JSON output handler</td> 
+    <td>visitor</td>
+    <td>JSON output visitor</td> 
   </tr>
   <tr>
     <td>options</td>

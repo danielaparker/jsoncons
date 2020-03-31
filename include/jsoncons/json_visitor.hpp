@@ -1025,6 +1025,17 @@ namespace jsoncons {
     typedef basic_default_json_visitor<wchar_t> wdefault_json_visitor;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+template<class CharT>
+using basic_json_content_handler = basic_json_visitor<CharT>; 
+
+JSONCONS_DEPRECATED_MSG("Instead, use json_visitor") typedef json_visitor json_content_handler;
+JSONCONS_DEPRECATED_MSG("Instead, use wjson_visitor") typedef wjson_visitor wjson_content_handler;
+
+template<class CharT>
+using basic_default_json_content_handler = basic_default_json_visitor<CharT>; 
+
+JSONCONS_DEPRECATED_MSG("Instead, use default_json_visitor") typedef default_json_visitor default_json_content_handler;
+JSONCONS_DEPRECATED_MSG("Instead, use default_wjson_visitor") typedef wdefault_json_visitor default_wjson_content_handler;
 #endif
 
 } // namespace jsoncons

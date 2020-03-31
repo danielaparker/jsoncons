@@ -30,7 +30,7 @@ public:
     using json_visitor::string_view_type;
 private:
     basic_default_json_visitor<CharT> default_visitor_;
-    basic_json_visitor<CharT>& other_handler_;
+    basic_json_visitor<CharT>& other_visitor_;
     //std::function<bool(json_errc,const ser_context&)> err_handler_;
 
     // noncopyable and nonmoveable
@@ -39,13 +39,13 @@ private:
 
 public:
     json_utf8_other_visitor_adapter()
-        : other_handler_(default_visitor_)
+        : other_visitor_(default_visitor_)
     {
     }
 
-    json_utf8_other_visitor_adapter(basic_json_visitor<CharT>& other_handler/*,
+    json_utf8_other_visitor_adapter(basic_json_visitor<CharT>& other_visitor/*,
                                           std::function<bool(json_errc,const ser_context&)> err_handler*/)
-        : other_handler_(other_handler)/*,
+        : other_visitor_(other_visitor)/*,
           err_handler_(err_handler)*/
     {
     }
@@ -54,27 +54,27 @@ private:
 
     void visit_flush() override
     {
-        other_handler_.flush();
+        other_visitor_.flush();
     }
 
     bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.begin_object(tag, context, ec);
+        return other_visitor_.begin_object(tag, context, ec);
     }
 
     bool visit_end_object(const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.end_object(context, ec);
+        return other_visitor_.end_object(context, ec);
     }
 
     bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.begin_array(tag, context, ec);
+        return other_visitor_.begin_array(tag, context, ec);
     }
 
     bool visit_end_array(const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.end_array(context, ec);
+        return other_visitor_.end_array(context, ec);
     }
 
     bool visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
@@ -87,7 +87,7 @@ private:
         {
             JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
         }
-        return other_handler_.key(target, context, ec);
+        return other_visitor_.key(target, context, ec);
     }
 
     bool visit_string(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -101,7 +101,7 @@ private:
             ec = result.ec;
             return false;
         }
-        return other_handler_.string_value(target, tag, context, ec);
+        return other_visitor_.string_value(target, tag, context, ec);
     }
 
     bool visit_int64(int64_t value, 
@@ -109,7 +109,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        return other_handler_.int64_value(value, tag, context, ec);
+        return other_visitor_.int64_value(value, tag, context, ec);
     }
 
     bool visit_uint64(uint64_t value, 
@@ -117,7 +117,7 @@ private:
                          const ser_context& context,
                          std::error_code& ec) override
     {
-        return other_handler_.uint64_value(value, tag, context, ec);
+        return other_visitor_.uint64_value(value, tag, context, ec);
     }
 
     bool visit_half(uint16_t value, 
@@ -125,7 +125,7 @@ private:
                        const ser_context& context,
                        std::error_code& ec) override
     {
-        return other_handler_.half_value(value, tag, context, ec);
+        return other_visitor_.half_value(value, tag, context, ec);
     }
 
     bool visit_double(double value, 
@@ -133,17 +133,17 @@ private:
                          const ser_context& context,
                          std::error_code& ec) override
     {
-        return other_handler_.double_value(value, tag, context, ec);
+        return other_visitor_.double_value(value, tag, context, ec);
     }
 
     bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.bool_value(value, tag, context, ec);
+        return other_visitor_.bool_value(value, tag, context, ec);
     }
 
     bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return other_handler_.null_value(tag, context, ec);
+        return other_visitor_.null_value(tag, context, ec);
     }
 };
 
@@ -162,7 +162,7 @@ private:
 
     basic_default_json_visitor<CharT> default_visitor_;
 
-    basic_json_visitor<CharT>& handler_;
+    basic_json_visitor<CharT>& visitor_;
 
     basic_json_parser<CharT,Allocator> parser_;
 
@@ -226,10 +226,10 @@ public:
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      basic_json_visitor<CharT>& handler, 
+                      basic_json_visitor<CharT>& visitor, 
                       const Allocator& alloc = Allocator())
         : basic_json_reader(std::forward<Source>(source),
-                            handler,
+                            visitor,
                             basic_json_decode_options<CharT>(),
                             default_json_parsing(),
                             alloc)
@@ -238,11 +238,11 @@ public:
 
     template <class Source>
     basic_json_reader(Source&& source, 
-                      basic_json_visitor<CharT>& handler,
+                      basic_json_visitor<CharT>& visitor,
                       const basic_json_decode_options<CharT>& options, 
                       const Allocator& alloc = Allocator())
         : basic_json_reader(std::forward<Source>(source),
-                            handler,
+                            visitor,
                             options,
                             default_json_parsing(),
                             alloc)
@@ -251,11 +251,11 @@ public:
 
     template <class Source>
     basic_json_reader(Source&& source,
-                      basic_json_visitor<CharT>& handler,
+                      basic_json_visitor<CharT>& visitor,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const Allocator& alloc = Allocator())
         : basic_json_reader(std::forward<Source>(source),
-                            handler,
+                            visitor,
                             basic_json_decode_options<CharT>(),
                             err_handler,
                             alloc)
@@ -264,12 +264,12 @@ public:
 
     template <class Source>
     basic_json_reader(Source&& source,
-                      basic_json_visitor<CharT>& handler, 
+                      basic_json_visitor<CharT>& visitor, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : handler_(handler),
+       : visitor_(visitor),
          parser_(options,err_handler,alloc),
          source_(std::forward<Source>(source)),
          eof_(false),
@@ -282,12 +282,12 @@ public:
 
     template <class Source>
     basic_json_reader(Source&& source,
-                      basic_json_visitor<CharT>& handler, 
+                      basic_json_visitor<CharT>& visitor, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : handler_(handler),
+       : visitor_(visitor),
          parser_(options,err_handler,alloc),
          eof_(false),
          begin_(false),
@@ -359,7 +359,7 @@ public:
                     eof_ = true;
                 }
             }
-            parser_.parse_some(handler_, ec);
+            parser_.parse_some(visitor_, ec);
             if (ec) return;
         }
         

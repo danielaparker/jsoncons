@@ -34,7 +34,7 @@ public:
     typedef Allocator allocator_type;
 private:
     basic_cbor_parser<Src,Allocator> parser_;
-    basic_staj_event_handler<char_type> event_handler_;
+    basic_staj_visitor<char_type> event_handler_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -118,24 +118,24 @@ public:
         return event_handler_.event();
     }
 
-    void read(basic_json_visitor<char_type>& handler) override
+    void read(basic_json_visitor<char_type>& visitor) override
     {
         std::error_code ec;
-        read(handler, ec);
+        read(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read(basic_json_visitor<char_type>& handler,
+    void read(basic_json_visitor<char_type>& visitor,
               std::error_code& ec) override
     {
-        if (!event_handler_.dump(handler, *this, ec))
+        if (!event_handler_.dump(visitor, *this, ec))
         {
             return;
         }
-        read_next(handler, ec);
+        read_next(visitor, ec);
     }
 
     void next() override
@@ -170,12 +170,12 @@ public:
         }
     }
 
-    void read_next(basic_json_visitor<char_type>& handler, std::error_code& ec)
+    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         parser_.restart();
         while (!parser_.stopped())
         {
-            parser_.parse(handler, ec);
+            parser_.parse(visitor, ec);
             if (ec) return;
         }
     }
@@ -201,16 +201,16 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&)")
-    void read_to(basic_json_visitor<char_type>& handler)
+    void read_to(basic_json_visitor<char_type>& visitor)
     {
-        read(handler);
+        read(visitor);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&, std::error_code&)")
-    void read_to(basic_json_visitor<char_type>& handler,
+    void read_to(basic_json_visitor<char_type>& visitor,
                  std::error_code& ec) 
     {
-        read(handler, ec);
+        read(visitor, ec);
     }
 #endif
 private:

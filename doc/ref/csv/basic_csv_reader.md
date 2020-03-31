@@ -32,25 +32,25 @@ source_type                |Src
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler, 
+                     basic_json_visitor<CharT>& visitor, 
                      const TempAllocator& alloc = TempAllocator()); // (1)
 
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler,
+                     basic_json_visitor<CharT>& visitor,
                      const basic_csv_options<CharT>& options, 
                      const TempAllocator& alloc = TempAllocator()); // (2)
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler,
+                     basic_json_visitor<CharT>& visitor,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const TempAllocator& alloc = TempAllocator()); // (3)
 
     template <class Source>
     basic_csv_reader(Source&& source,
-                     basic_json_visitor<CharT>& handler,
+                     basic_json_visitor<CharT>& visitor,
                      const basic_csv_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const TempAllocator& alloc = TempAllocator()); // (4)
@@ -71,7 +71,7 @@ JSON events, [basic_csv_options](basic_csv_options.md),
 and the specified [parse_error_handler](../parse_error_handler.md).
 
 Note: It is the programmer's responsibility to ensure that `basic_csv_reader` does not outlive any source or 
-content handler passed in the constuctor, as `basic_csv_reader` holds pointers to but does not own these resources.
+visitor passed in the constuctor, as `basic_csv_reader` holds pointers to but does not own these resources.
 
 #### Parameters
 
