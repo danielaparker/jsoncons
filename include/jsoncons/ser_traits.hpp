@@ -60,6 +60,87 @@ namespace jsoncons {
 
     // specializations
 
+    // bool
+    template <class T>
+    struct ser_traits<T,
+        typename std::enable_if<jsoncons::detail::is_bool<T>::value 
+    >::type>
+    {
+        template <class CharT,class Json>
+        static void serialize(const T& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json&, 
+                              std::error_code& ec)
+        {
+            encoder.bool_value(val,semantic_tag::none,null_ser_context(),ec);
+        }
+    };
+
+    // uint
+    template <class T>
+    struct ser_traits<T,
+        typename std::enable_if<jsoncons::detail::is_u8_u16_u32_or_u64<T>::value 
+    >::type>
+    {
+        template <class CharT,class Json>
+        static void serialize(const T& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json&, 
+                              std::error_code& ec)
+        {
+            encoder.uint64_value(val,semantic_tag::none,null_ser_context(),ec);
+        }
+    };
+
+    // int
+    template <class T>
+    struct ser_traits<T,
+        typename std::enable_if<jsoncons::detail::is_i8_i16_i32_or_i64<T>::value 
+    >::type>
+    {
+        template <class CharT,class Json>
+        static void serialize(const T& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json&, 
+                              std::error_code& ec)
+        {
+            encoder.int64_value(val,semantic_tag::none,null_ser_context(),ec);
+        }
+    };
+
+    // float or double
+    template <class T>
+    struct ser_traits<T,
+        typename std::enable_if<jsoncons::detail::is_float_or_double<T>::value 
+    >::type>
+    {
+        template <class CharT,class Json>
+        static void serialize(const T& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json&, 
+                              std::error_code& ec)
+        {
+            encoder.double_value(val,semantic_tag::none,null_ser_context(),ec);
+        }
+    };
+
+    // string
+    template <class T>
+    struct ser_traits<T,
+        typename std::enable_if<jsoncons::detail::is_string<T>::value 
+    >::type>
+    {
+        template <class CharT,class Json>
+        static void serialize(const T& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json&, 
+                              std::error_code& ec)
+        {
+            encoder.string_value(jsoncons::string_view(val,val.data(),val.size()),
+                                 semantic_tag::none,null_ser_context(),ec);
+        }
+    };
+
     // vector like
     template <class T>
     struct ser_traits<T,

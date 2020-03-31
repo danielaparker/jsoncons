@@ -116,6 +116,52 @@ namespace detail {
                                        typename std::enable_if<std::is_same<typename T::traits_type::char_type, typename T::value_type>::value
     >::type> : std::true_type {};
 
+    // is_int
+
+    template <class T, class Enable=void>
+    struct is_bool : std::false_type {};
+
+    template <class T>
+    struct is_bool<T, 
+                   typename std::enable_if<std::is_same<T,bool>::value
+    >::type> : std::true_type {};
+
+    // is_uint
+
+    template <class T, class Enable=void>
+    struct is_u8_u16_u32_or_u64 : std::false_type {};
+
+    template <class T>
+    struct is_u8_u16_u32_or_u64<T, 
+                                typename std::enable_if<std::is_same<T,uint8_t>::value ||
+                                                        std::is_same<T,uint16_t>::value ||
+                                                        std::is_same<T,uint32_t>::value ||
+                                                        std::is_same<T,uint64_t>::value
+    >::type> : std::true_type {};
+
+    // is_int
+
+    template <class T, class Enable=void>
+    struct is_i8_i16_i32_or_i64 : std::false_type {};
+
+    template <class T>
+    struct is_i8_i16_i32_or_i64<T, 
+                                typename std::enable_if<std::is_same<T,int8_t>::value ||
+                                                        std::is_same<T,int16_t>::value ||
+                                                        std::is_same<T,int32_t>::value ||
+                                                        std::is_same<T,int64_t>::value
+    >::type> : std::true_type {};
+
+    // is_float_or_double
+
+    template <class T, class Enable=void>
+    struct is_float_or_double : std::false_type {};
+
+    template <class T>
+    struct is_float_or_double<T, 
+                              typename std::enable_if<std::is_same<T,float>::value ||
+                                                      std::is_same<T,double>::value
+    >::type> : std::true_type {};
 
     // is_string
 
