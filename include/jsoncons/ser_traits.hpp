@@ -123,24 +123,37 @@ namespace jsoncons {
             encoder.double_value(val,semantic_tag::none,null_ser_context(),ec);
         }
     };
-
+/*
     // string
     template <class T>
     struct ser_traits<T,
-        typename std::enable_if<jsoncons::detail::is_string<T>::value 
+        typename std::enable_if<jsoncons::detail::is_string<T>::value
     >::type>
     {
-        template <class CharT,class Json>
+        template <class T2=T,class CharT,class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json&, 
-                              std::error_code& ec)
+                              std::error_code& ec,
+                              typename std::enable_if<std::is_same<CharT, typename T2::value_type>::value>::type = 0)
         {
-            encoder.string_value(jsoncons::string_view(val,val.data(),val.size()),
+            encoder.string_value(jsoncons::string_view(val.data(),val.size()),
                                  semantic_tag::none,null_ser_context(),ec);
         }
+        template <class T2=T,class CharT, class Json>
+        static void serialize(const T& val,
+            basic_json_visitor<CharT>& encoder,
+            const Json&,
+            std::error_code& ec,
+            typename std::enable_if<!std::is_same<CharT, typename T2::value_type>::value>::type = 0)
+        {
+            std::basic_string<CharT> s;
+            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+            encoder.string_value(jsoncons::basic_string_view<CharT>(s.data(), s.size()),
+                semantic_tag::none, null_ser_context(), ec);
+        }
     };
-
+*/
     // vector like
     template <class T>
     struct ser_traits<T,
