@@ -8,6 +8,10 @@ have been deprecated and renamed to `basic_json_visitor` and `basic_default_json
 The private visitor functions `do_xxx` have been renamed to `visit_xxx`.
 This change should be transparent to most users.
 
+Enhancements:
+
+- Added jsonpointer `unflatten` function
+
 v0.149.0
 --------
 
