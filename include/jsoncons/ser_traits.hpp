@@ -174,12 +174,24 @@ namespace jsoncons {
                               const Json& context_j, 
                               std::error_code& ec)
         {
-            encoder.begin_array(val.size());
+            encoder.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
+            if (ec)
+            {
+                return;
+            }
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 ser_traits<value_type,CharT>::serialize(*it, encoder, context_j, ec);
+                if (ec)
+                {
+                    return;
+                }
             }
-            encoder.end_array();
+            encoder.end_array(ser_context(), ec);
+            if (ec)
+            {
+                return;
+            }
             encoder.flush();
         }
     };

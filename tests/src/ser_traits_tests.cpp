@@ -14,7 +14,7 @@ using jsoncons::wjson;
 using jsoncons::decode_json;
 using jsoncons::encode_json;
 
-namespace deser_traits_tests {
+namespace ser_traits_tests {
 
     struct book
     {
@@ -25,10 +25,15 @@ namespace deser_traits_tests {
         book() = default;
         book(const book&) = default;
         book(book&&) = default;
-    };
-} // namespace deser_traits_tests
 
-namespace ns = deser_traits_tests;
+        book(const std::string& author, const std::string& title, double price)
+            : author(author), title(title), price(price)
+        {
+        }
+    };
+} // namespace ser_traits_tests
+
+namespace ns = ser_traits_tests;
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
