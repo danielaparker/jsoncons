@@ -98,7 +98,7 @@ namespace jsoncons {
     {
         template <class Json, class TempAllocator>
         static std::pair<T1, T2> deserialize(basic_staj_reader<CharT>& reader,
-            json_decoder<Json, TempAllocator>&,
+            json_decoder<Json, TempAllocator>& decoder,
             std::error_code& ec)
         {
             using value_type = std::pair<T1, T2>;
@@ -113,14 +113,25 @@ namespace jsoncons {
                 ec = conversion_errc::json_not_pair;
                 return value_type();
             }
-            T1 v1 = reader.current().template get<T1>();
+
+            T1 v1 = deser_traits<T1,CharT>::deserialize(reader, decoder, ec);
+            if (ec)
+            {
+                ec = conversion_errc::json_not_pair;
+                return value_type();
+            }
             reader.next(ec);
             if (ec)
             {
                 ec = conversion_errc::json_not_pair;
                 return value_type();
             }
-            T2 v2 = reader.current().template get<T2>();
+            T2 v2 = deser_traits<T2, CharT>::deserialize(reader, decoder, ec);
+            if (ec)
+            {
+                ec = conversion_errc::json_not_pair;
+                return value_type();
+            }
             reader.next(ec);
             if (ec || reader.current().event_type() != staj_event_type::end_array)
             {
