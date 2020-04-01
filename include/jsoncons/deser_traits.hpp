@@ -42,8 +42,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct deser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_primitive<T>::value ||
-                                jsoncons::detail::is_string<T>::value
+        typename std::enable_if<jsoncons::detail::is_primitive<T>::value
     >::type>
     {
         template <class Json,class TempAllocator>
@@ -53,6 +52,42 @@ namespace jsoncons {
         {
             T v = reader.current().template get<T>();
             return v;
+        }
+    };
+
+    // string
+
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
+        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+                                std::is_same<typename T::value_type,CharT>::value
+    >::type>
+    {
+        template <class Json,class TempAllocator>
+        static T deserialize(basic_staj_reader<CharT>& reader, 
+                             json_decoder<Json,TempAllocator>&, 
+                             std::error_code&)
+        {
+            T v = reader.current().template get<T>();
+            return v;
+        }
+    };
+
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
+        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+                                !std::is_same<typename T::value_type,CharT>::value
+    >::type>
+    {
+        template <class Json,class TempAllocator>
+        static T deserialize(basic_staj_reader<CharT>& reader, 
+                             json_decoder<Json,TempAllocator>&, 
+                             std::error_code&)
+        {
+            auto val = reader.current().template get<std::basic_string<CharT>>();
+            T s;
+            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+            return s;
         }
     };
 

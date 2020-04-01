@@ -228,23 +228,25 @@ TEST_CASE("convert_tuple_test")
 {
     typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
 
-    employee_collection employees = 
+    employee_collection input = 
     { 
         {"John Smith",{"Hourly","Software Engineer",10000}},
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
     std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
-    std::cout << "(1)\n" << s << std::endl;
-    auto employees2 = jsoncons::decode_json<employee_collection>(s);
-    REQUIRE(employees2.size() == employees.size());
+    jsoncons::encode_json(input, s, jsoncons::indenting::indent);
 
-    std::cout << "\n(2)\n";
-    for (const auto& pair : employees2)
-    {
-        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
-    }
+    json j = json::parse(s);
+    REQUIRE(j.is_object());
+    REQUIRE(j.size() == 2);
+    CHECK(j.contains("John Smith"));
+    CHECK(j.contains("Jane Doe"));
+
+    auto employees2 = jsoncons::decode_json<employee_collection>(s);
+    REQUIRE(employees2.size() == input.size());
+    CHECK(employees2 == input);
+
 }
 
 TEST_CASE("convert_tuple_test, temp_allocator")
@@ -259,16 +261,10 @@ TEST_CASE("convert_tuple_test, temp_allocator")
 
     std::string s;
     jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
-    std::cout << "(1)\n" << s << std::endl;
     auto employees2 = jsoncons::decode_json<employee_collection>(
         temp_allocator_arg, MyAlloc<char>(1), s);
     REQUIRE(employees2.size() == employees.size());
-
-    std::cout << "\n(2)\n";
-    for (const auto& pair : employees2)
-    {
-        std::cout << pair.first << ": " << std::get<1>(pair.second) << std::endl;
-    }
+    CHECK(employees2 == employees);
 }
 #endif
 
