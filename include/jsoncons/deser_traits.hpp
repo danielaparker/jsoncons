@@ -22,11 +22,11 @@ namespace jsoncons {
 
     // deser_traits
 
-    template <class T, class Enable = void>
+    template <class T, class CharT, class Enable = void>
     struct deser_traits
     {
         template <class Json,class TempAllocator>
-        static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+        static T deserialize(basic_staj_reader<CharT>& reader, 
                              json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
@@ -40,14 +40,14 @@ namespace jsoncons {
 
     // primitive
 
-    template <class T>
-    struct deser_traits<T,
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
         typename std::enable_if<jsoncons::detail::is_primitive<T>::value ||
                                 jsoncons::detail::is_string<T>::value
     >::type>
     {
         template <class Json,class TempAllocator>
-        static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+        static T deserialize(basic_staj_reader<CharT>& reader, 
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code&)
         {
@@ -57,8 +57,8 @@ namespace jsoncons {
     };
 
     // vector like
-    template <class T>
-    struct deser_traits<T,
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_vector_like<T>::value &&
                  !jsoncons::detail::is_typed_array<T>::value 
@@ -67,7 +67,7 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
 
         template <class Json,class TempAllocator>
-        static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+        static T deserialize(basic_staj_reader<CharT>& reader, 
                              json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
@@ -81,7 +81,7 @@ namespace jsoncons {
             reader.next(ec);
             while (reader.current().event_type() != staj_event_type::end_array && !ec)
             {
-                v.push_back(deser_traits<value_type>::deserialize(reader, decoder, ec));
+                v.push_back(deser_traits<value_type,CharT>::deserialize(reader, decoder, ec));
                 reader.next(ec);
             }
             return v;
@@ -102,8 +102,8 @@ namespace jsoncons {
         }
     private:
         bool visit_begin_array(semantic_tag, 
-                            const ser_context&, 
-                            std::error_code& ec) override
+                               const ser_context&, 
+                               std::error_code& ec) override
         {      
             if (++level_ != 1)
             {
@@ -195,8 +195,8 @@ namespace jsoncons {
         }
     };
 
-    template <class T>
-    struct deser_traits<T,
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_vector_like<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value 
@@ -205,7 +205,7 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
 
         template <class Json,class TempAllocator>
-        static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+        static T deserialize(basic_staj_reader<CharT>& reader, 
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
@@ -225,13 +225,13 @@ namespace jsoncons {
 
     // std::array
 
-    template <class T, std::size_t N>
-    struct deser_traits<std::array<T,N>>
+    template <class T, class CharT, std::size_t N>
+    struct deser_traits<std::array<T,N>,CharT>
     {
         typedef typename std::array<T,N>::value_type value_type;
 
         template <class Json,class TempAllocator>
-        static std::array<T, N> deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+        static std::array<T, N> deserialize(basic_staj_reader<CharT>& reader, 
                                             json_decoder<Json,TempAllocator>& decoder, 
                                             std::error_code& ec)
         {
@@ -244,7 +244,7 @@ namespace jsoncons {
             reader.next(ec);
             for (std::size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
             {
-                v[i] = deser_traits<value_type>::deserialize(reader, decoder, ec);
+                v[i] = deser_traits<value_type,CharT>::deserialize(reader, decoder, ec);
                 reader.next(ec);
             }
             return v;
@@ -253,8 +253,8 @@ namespace jsoncons {
 
     // map like
 
-    template <class T>
-    struct deser_traits<T,
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                 jsoncons::detail::is_map_like<T>::value &&
                                 jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
@@ -265,7 +265,7 @@ namespace jsoncons {
         typedef typename T::key_type key_type;
 
         template <class Json,class TempAllocator>
-        static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+        static T deserialize(basic_staj_reader<CharT>& reader, 
                              json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
@@ -286,15 +286,15 @@ namespace jsoncons {
                 }
                 auto key = reader.current(). template get<key_type>();
                 reader.next(ec);
-                val.emplace(std::move(key),deser_traits<mapped_type>::deserialize(reader, decoder, ec));
+                val.emplace(std::move(key),deser_traits<mapped_type,CharT>::deserialize(reader, decoder, ec));
                 reader.next(ec);
             }
             return val;
         }
     };
 
-    template <class T>
-    struct deser_traits<T,
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                 jsoncons::detail::is_map_like<T>::value &&
                                 std::is_integral<typename T::key_type>::value
@@ -305,7 +305,7 @@ namespace jsoncons {
         typedef typename T::key_type key_type;
 
         template <class Json,class TempAllocator>
-        static T deserialize(basic_staj_reader<typename Json::char_type>& reader, 
+        static T deserialize(basic_staj_reader<CharT>& reader, 
                              json_decoder<Json,TempAllocator>& decoder, 
                              std::error_code& ec)
         {
@@ -327,7 +327,7 @@ namespace jsoncons {
                 auto s = reader.current().template get<basic_string_view<typename Json::char_type>>();
                 auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 reader.next(ec);
-                val.emplace(key.value(),deser_traits<mapped_type>::deserialize(reader, decoder, ec));
+                val.emplace(key.value(),deser_traits<mapped_type,CharT>::deserialize(reader, decoder, ec));
                 reader.next(ec);
             }
             return val;

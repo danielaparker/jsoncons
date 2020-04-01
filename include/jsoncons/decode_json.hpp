@@ -38,7 +38,7 @@ namespace jsoncons {
         basic_json_cursor<CharT,string_source<CharT>> cursor(s, options, default_json_parsing());
         jsoncons::json_decoder<basic_json<CharT>> decoder;
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -66,7 +66,7 @@ namespace jsoncons {
         json_decoder<basic_json<CharT>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -99,7 +99,7 @@ namespace jsoncons {
         json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(result_allocator_arg, temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -130,7 +130,7 @@ namespace jsoncons {
         json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(result_allocator_arg, temp_alloc,temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

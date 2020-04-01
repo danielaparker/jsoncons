@@ -36,7 +36,7 @@ namespace csv {
         jsoncons::json_decoder<basic_json<CharT>> decoder;
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -65,7 +65,7 @@ namespace csv {
         jsoncons::json_decoder<basic_json<CharT>> decoder;
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -100,7 +100,7 @@ namespace csv {
         json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -133,7 +133,7 @@ namespace csv {
         json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
