@@ -118,7 +118,7 @@ namespace jsoncons {
                      basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, basic_json<CharT>(), ec);
+        ser_traits<T,CharT>::serialize(val, encoder, basic_json<CharT>(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -232,7 +232,7 @@ namespace jsoncons {
     {
         std::error_code ec;
         basic_json<CharT,sorted_policy,TempAllocator> context_j(temp_alloc);
-        ser_traits<T>::serialize(val, encoder, context_j, ec);
+        ser_traits<T,CharT>::serialize(val, encoder, context_j, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));

@@ -36,7 +36,7 @@ namespace msgpack {
     {
         msgpack_bytes_encoder encoder(v);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -59,7 +59,7 @@ namespace msgpack {
     {
         msgpack_stream_encoder encoder(os);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -84,7 +84,7 @@ namespace msgpack {
     {
         basic_msgpack_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v, temp_alloc);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -107,7 +107,7 @@ namespace msgpack {
     {
         basic_msgpack_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os, temp_alloc);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));

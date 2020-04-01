@@ -23,10 +23,10 @@ namespace jsoncons {
 
     // ser_traits
 
-    template <class T, class Enable = void>
+    template <class T, class CharT, class Enable = void>
     struct ser_traits
     {
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder,
                               const Json& context_j, 
@@ -36,7 +36,7 @@ namespace jsoncons {
                       val, encoder, context_j, ec);
         }
     private:
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(std::true_type,
                               const T& val, 
                               basic_json_visitor<CharT>& encoder,
@@ -46,7 +46,7 @@ namespace jsoncons {
             auto j = json_type_traits<Json,T>::to_json(val);
             j.dump(encoder, ec);
         }
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(std::false_type, 
                               const T& val, 
                               basic_json_visitor<CharT>& encoder,
@@ -61,12 +61,12 @@ namespace jsoncons {
     // specializations
 
     // bool
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<jsoncons::detail::is_bool<T>::value 
     >::type>
     {
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json&, 
@@ -77,12 +77,12 @@ namespace jsoncons {
     };
 
     // uint
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<jsoncons::detail::is_u8_u16_u32_or_u64<T>::value 
     >::type>
     {
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json&, 
@@ -93,12 +93,12 @@ namespace jsoncons {
     };
 
     // int
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<jsoncons::detail::is_i8_i16_i32_or_i64<T>::value 
     >::type>
     {
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json&, 
@@ -109,12 +109,12 @@ namespace jsoncons {
     };
 
     // float or double
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<jsoncons::detail::is_float_or_double<T>::value 
     >::type>
     {
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json&, 
@@ -124,9 +124,43 @@ namespace jsoncons {
         }
     };
 
+    // string
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
+        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+                                std::is_same<typename T::value_type,CharT>::value 
+    >::type>
+    {
+        template <class Json>
+        static void serialize(const T& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json&, 
+                              std::error_code& ec)
+        {
+            encoder.string_value(val,semantic_tag::none,ser_context(),ec);
+        }
+    };
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
+        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+                                !std::is_same<typename T::value_type,CharT>::value 
+    >::type>
+    {
+        template <class Json>
+        static void serialize(const T& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json&, 
+                              std::error_code& ec)
+        {
+            std::basic_string<CharT> s;
+            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+            encoder.string_value(s,semantic_tag::none,ser_context(),ec);
+        }
+    };
+
     // vector like
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_vector_like<T>::value &&
                  !jsoncons::detail::is_typed_array<T>::value 
@@ -134,7 +168,7 @@ namespace jsoncons {
     {
         typedef typename T::value_type value_type;
 
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json& context_j, 
@@ -143,15 +177,15 @@ namespace jsoncons {
             encoder.begin_array(val.size());
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
-                ser_traits<value_type>::serialize(*it, encoder, context_j, ec);
+                ser_traits<value_type,CharT>::serialize(*it, encoder, context_j, ec);
             }
             encoder.end_array();
             encoder.flush();
         }
     };
 
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_vector_like<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value 
@@ -159,7 +193,7 @@ namespace jsoncons {
     {
         typedef typename T::value_type value_type;
 
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json&,
@@ -171,12 +205,12 @@ namespace jsoncons {
 
     // std::array
 
-    template <class T, std::size_t N>
-    struct ser_traits<std::array<T,N>>
+    template <class T, class CharT, std::size_t N>
+    struct ser_traits<std::array<T,N>,CharT>
     {
         typedef typename std::array<T,N>::value_type value_type;
 
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const std::array<T, N>& val, 
                            basic_json_visitor<CharT>& encoder, 
                            const Json& context_j, 
@@ -185,7 +219,7 @@ namespace jsoncons {
             encoder.begin_array(val.size());
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
-                ser_traits<value_type>::serialize(*it, encoder, context_j, ec);
+                ser_traits<value_type,CharT>::serialize(*it, encoder, context_j, ec);
             }
             encoder.end_array();
             encoder.flush();
@@ -194,8 +228,8 @@ namespace jsoncons {
 
     // map like
 
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                 jsoncons::detail::is_map_like<T>::value &&
                                 jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
@@ -205,7 +239,7 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
         typedef typename T::key_type key_type;
 
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json& context_j, 
@@ -219,7 +253,7 @@ namespace jsoncons {
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 encoder.key(it->first);
-                ser_traits<mapped_type>::serialize(it->second, encoder, context_j, ec);
+                ser_traits<mapped_type,CharT>::serialize(it->second, encoder, context_j, ec);
             }
             encoder.end_object(ser_context(), ec);
             if (ec)
@@ -230,8 +264,8 @@ namespace jsoncons {
         }
     };
 
-    template <class T>
-    struct ser_traits<T,
+    template <class T, class CharT>
+    struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                 jsoncons::detail::is_map_like<T>::value &&
                                 std::is_integral<typename T::key_type>::value
@@ -241,7 +275,7 @@ namespace jsoncons {
         typedef typename T::value_type value_type;
         typedef typename T::key_type key_type;
 
-        template <class CharT,class Json>
+        template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
                               const Json& context_j, 
@@ -257,7 +291,7 @@ namespace jsoncons {
                 std::basic_string<typename Json::char_type> s;
                 jsoncons::detail::write_integer(it->first,s);
                 encoder.key(s);
-                ser_traits<mapped_type>::serialize(it->second, encoder, context_j, ec);
+                ser_traits<mapped_type,CharT>::serialize(it->second, encoder, context_j, ec);
             }
             encoder.end_object(ser_context(), ec);
             if (ec)
