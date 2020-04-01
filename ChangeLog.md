@@ -8,6 +8,10 @@ have been deprecated and renamed to `basic_json_visitor` and `basic_default_json
 The private visitor functions `do_xxx` have been renamed to `visit_xxx`.
 This change should be transparent to most users.
 
+- The name `staj_event_type::name` has been deprecated and renamed to
+`staj_event_type::key`. Rationale: consistency with other names. The old
+name is still supported.
+
 Enhancements:
 
 - Added jsonpointer `unflatten` function
