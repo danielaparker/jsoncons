@@ -59,61 +59,61 @@ and uses the specified [json options](basic_json_options.md).
 #### Member functions
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
     bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
-    bool end_object(const ser_context& context = null_ser_context())
+    bool end_object(const ser_context& context = ser_context())
 
     bool end_object(const ser_context& context, std::errr_code& ec)
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); 
+                     const ser_context& context=ser_context()); 
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); 
+                     const ser_context& context=ser_context()); 
 
-    bool end_array(const ser_context& context=null_ser_context()); 
+    bool end_array(const ser_context& context=ser_context()); 
 
     bool key(const string_view_type& name, 
-              const ser_context& context=null_ser_context()); 
+              const ser_context& context=ser_context()); 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context());
+                      const ser_context& context=ser_context());
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); 
+                           const ser_context& context=ser_context()); 
 
     bool byte_string_value(const uint8_t* p, std::size_t size, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); 
+                           const ser_context& context=ser_context()); 
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context());
+                     const ser_context& context=ser_context());
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
     bool half_value(uint16_t value, 
                     semantic_tag tag = semantic_tag::none, 
-                    const ser_context& context=null_ser_context()); 
+                    const ser_context& context=ser_context()); 
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context());  
+                    const ser_context& context=ser_context());  
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context());  
+                    const ser_context& context=ser_context());  
 
     void flush()
 

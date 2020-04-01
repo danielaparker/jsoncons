@@ -72,7 +72,7 @@ namespace jsoncons {
                               const Json&, 
                               std::error_code& ec)
         {
-            encoder.bool_value(val,semantic_tag::none,null_ser_context(),ec);
+            encoder.bool_value(val,semantic_tag::none,ser_context(),ec);
         }
     };
 
@@ -88,7 +88,7 @@ namespace jsoncons {
                               const Json&, 
                               std::error_code& ec)
         {
-            encoder.uint64_value(val,semantic_tag::none,null_ser_context(),ec);
+            encoder.uint64_value(val,semantic_tag::none,ser_context(),ec);
         }
     };
 
@@ -104,7 +104,7 @@ namespace jsoncons {
                               const Json&, 
                               std::error_code& ec)
         {
-            encoder.int64_value(val,semantic_tag::none,null_ser_context(),ec);
+            encoder.int64_value(val,semantic_tag::none,ser_context(),ec);
         }
     };
 
@@ -120,7 +120,7 @@ namespace jsoncons {
                               const Json&, 
                               std::error_code& ec)
         {
-            encoder.double_value(val,semantic_tag::none,null_ser_context(),ec);
+            encoder.double_value(val,semantic_tag::none,ser_context(),ec);
         }
     };
 
@@ -165,7 +165,7 @@ namespace jsoncons {
                               const Json&,
                               std::error_code& ec)
         {
-            encoder.typed_array(span<const value_type>(val), semantic_tag::none, null_ser_context(), ec);
+            encoder.typed_array(span<const value_type>(val), semantic_tag::none, ser_context(), ec);
         }
     };
 
@@ -211,7 +211,7 @@ namespace jsoncons {
                               const Json& context_j, 
                               std::error_code& ec)
         {
-            encoder.begin_object(val.size(), semantic_tag::none, null_ser_context(), ec);
+            encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
             if (ec)
             {
                 return;
@@ -221,7 +221,7 @@ namespace jsoncons {
                 encoder.key(it->first);
                 ser_traits<mapped_type>::serialize(it->second, encoder, context_j, ec);
             }
-            encoder.end_object(null_ser_context(), ec);
+            encoder.end_object(ser_context(), ec);
             if (ec)
             {
                 return;
@@ -247,7 +247,7 @@ namespace jsoncons {
                               const Json& context_j, 
                               std::error_code& ec)
         {
-            encoder.begin_object(val.size(), semantic_tag::none, null_ser_context(), ec);
+            encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
             if (ec)
             {
                 return;
@@ -259,7 +259,7 @@ namespace jsoncons {
                 encoder.key(s);
                 ser_traits<mapped_type>::serialize(it->second, encoder, context_j, ec);
             }
-            encoder.end_object(null_ser_context(), ec);
+            encoder.end_object(ser_context(), ec);
             if (ec)
             {
                 return;

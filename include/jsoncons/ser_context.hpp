@@ -14,9 +14,15 @@ class ser_context
 public:
     virtual ~ser_context() = default;
 
-    virtual size_t line() const = 0;
+    virtual size_t line() const
+    {
+        return 0;
+    }
 
-    virtual size_t column() const = 0; 
+    virtual size_t column() const
+    {
+        return 0;
+    }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use line()")
@@ -33,6 +39,7 @@ public:
 #endif
 };
 
+#if !defined(JSONCONS_NO_DEPRECATED)
 class null_ser_context : public ser_context
 {
 private:
@@ -40,6 +47,7 @@ private:
 
     std::size_t column() const override { return 0; }
 };
+#endif
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context parsing_context;

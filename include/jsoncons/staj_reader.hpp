@@ -806,57 +806,57 @@ public:
                 {
                     case typed_array_type::uint8_value:
                     {
-                        this->uint64_value(data_.data(uint8_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->uint64_value(data_.data(uint8_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::uint16_value:
                     {
-                        this->uint64_value(data_.data(uint16_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->uint64_value(data_.data(uint16_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::uint32_value:
                     {
-                        this->uint64_value(data_.data(uint32_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->uint64_value(data_.data(uint32_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::uint64_value:
                     {
-                        this->uint64_value(data_.data(uint64_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->uint64_value(data_.data(uint64_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::int8_value:
                     {
-                        this->int64_value(data_.data(int8_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->int64_value(data_.data(int8_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::int16_value:
                     {
-                        this->int64_value(data_.data(int16_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->int64_value(data_.data(int16_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::int32_value:
                     {
-                        this->int64_value(data_.data(int32_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->int64_value(data_.data(int32_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::int64_value:
                     {
-                        this->int64_value(data_.data(int64_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->int64_value(data_.data(int64_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::half_value:
                     {
-                        this->half_value(data_.data(half_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->half_value(data_.data(half_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::float_value:
                     {
-                        this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->double_value(data_.data(float_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     case typed_array_type::double_value:
                     {
-                        this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, null_ser_context(), ec);
+                        this->double_value(data_.data(double_array_arg)[index_], semantic_tag::none, ser_context(), ec);
                         break;
                     }
                     default:
@@ -880,18 +880,18 @@ public:
         {
             if (state_ == staj_reader_state::multi_dim)
             {
-                this->begin_array(shape_.size(), semantic_tag::none, null_ser_context(), ec);
+                this->begin_array(shape_.size(), semantic_tag::none, ser_context(), ec);
                 state_ = staj_reader_state::shape;
             }
             else if (index_ < shape_.size())
             {
-                this->uint64_value(shape_[index_], semantic_tag::none, null_ser_context(), ec);
+                this->uint64_value(shape_[index_], semantic_tag::none, ser_context(), ec);
                 ++index_;
             }
             else
             {
                 state_ = staj_reader_state();
-                this->end_array(null_ser_context(), ec);
+                this->end_array(ser_context(), ec);
                 shape_ = span<const size_t>();
                 index_ = 0;
             }

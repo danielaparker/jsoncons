@@ -40,56 +40,56 @@ Constructs a new encoder that writes to the specified destination.
 #### Inherited from [jsoncons::basic_json_visitor](basic_json_visitor.md)
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); // (1)
+                      const ser_context& context=ser_context()); // (1)
 
     bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none, 
-                      const ser_context& context = null_ser_context()); // (2)
+                      const ser_context& context = ser_context()); // (2)
 
-    bool end_object(const ser_context& context = null_ser_context()); // (3)
+    bool end_object(const ser_context& context = ser_context()); // (3)
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); // (4)
+                     const ser_context& context=ser_context()); // (4)
 
     bool begin_array(std::size_t length, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); // (5)
+                     const ser_context& context=ser_context()); // (5)
 
-    bool end_array(const ser_context& context=null_ser_context()); // (6)
+    bool end_array(const ser_context& context=ser_context()); // (6)
 
     bool key(const string_view_type& name, 
-              const ser_context& context=null_ser_context()); // (7)
+              const ser_context& context=ser_context()); // (7)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()); // (8) 
+                    const ser_context& context=ser_context()); // (8) 
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()); // (9) 
+                    const ser_context& context=ser_context()); // (9) 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (10) 
+                      const ser_context& context=ser_context()); // (10) 
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); // (11)
+                           const ser_context& context=ser_context()); // (11)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (12)
+                      const ser_context& context=ser_context()); // (12)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context()); // (13)
+                     const ser_context& context=ser_context()); // (13)
 
     bool half_value(uint16_t value, 
                     semantic_tag tag = semantic_tag::none, 
-                    const ser_context& context=null_ser_context()); // (14)
+                    const ser_context& context=ser_context()); // (14)
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (15)
+                      const ser_context& context=ser_context()); // (15)
 
     bool begin_object(semantic_tag tag,
                       const ser_context& context,

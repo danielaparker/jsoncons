@@ -185,22 +185,22 @@ namespace detail {
             switch (event_type)
             {
                 case staj_event_type::begin_array:
-                    return visitor.begin_array(tag, null_ser_context());
+                    return visitor.begin_array(tag, ser_context());
                 case staj_event_type::end_array:
-                    return visitor.end_array(null_ser_context());
+                    return visitor.end_array(ser_context());
                 case staj_event_type::string_value:
-                    return visitor.string_value(string_value, tag, null_ser_context());
+                    return visitor.string_value(string_value, tag, ser_context());
                 case staj_event_type::byte_string_value:
                 case staj_event_type::null_value:
-                    return visitor.null_value(tag, null_ser_context());
+                    return visitor.null_value(tag, ser_context());
                 case staj_event_type::bool_value:
-                    return visitor.bool_value(bool_value, tag, null_ser_context());
+                    return visitor.bool_value(bool_value, tag, ser_context());
                 case staj_event_type::int64_value:
-                    return visitor.int64_value(int64_value, tag, null_ser_context());
+                    return visitor.int64_value(int64_value, tag, ser_context());
                 case staj_event_type::uint64_value:
-                    return visitor.uint64_value(uint64_value, tag, null_ser_context());
+                    return visitor.uint64_value(uint64_value, tag, ser_context());
                 case staj_event_type::double_value:
-                    return visitor.double_value(double_value, tag, null_ser_context());
+                    return visitor.double_value(double_value, tag, ser_context());
                 default:
                     return false;
             }
@@ -278,18 +278,18 @@ namespace detail {
                 switch (state_)
                 {
                     case cached_state::begin_object:
-                        more = visitor.begin_object(semantic_tag::none, null_ser_context());
+                        more = visitor.begin_object(semantic_tag::none, ser_context());
                         column_index_ = 0;
                         state_ = cached_state::name;
                         break;
                     case cached_state::end_object:
-                        more = visitor.end_object(null_ser_context());
+                        more = visitor.end_object(ser_context());
                         state_ = cached_state::done;
                         break;
                     case cached_state::name:
                         if (column_index_ < column_names_.size())
                         {
-                            more = visitor.key(column_names_[column_index_], null_ser_context());
+                            more = visitor.key(column_names_[column_index_], ser_context());
                             state_ = cached_state::begin_array;
                         }
                         else
@@ -298,12 +298,12 @@ namespace detail {
                         }
                         break;
                     case cached_state::begin_array:
-                        more = visitor.begin_array(semantic_tag::none, null_ser_context());
+                        more = visitor.begin_array(semantic_tag::none, ser_context());
                         row_index_ = 0;
                         state_ = cached_state::item;
                         break;
                     case cached_state::end_array:
-                        more = visitor.end_array(null_ser_context());
+                        more = visitor.end_array(ser_context());
                         ++column_index_;
                         state_ = cached_state::name;
                         break;

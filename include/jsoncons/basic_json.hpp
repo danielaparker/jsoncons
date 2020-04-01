@@ -5503,7 +5503,7 @@ private:
 
     void dump_noflush(basic_json_visitor<char_type>& visitor, std::error_code& ec) const
     {
-        const null_ser_context context{};
+        const ser_context context{};
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
