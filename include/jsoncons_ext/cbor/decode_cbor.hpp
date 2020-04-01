@@ -14,11 +14,11 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
+#include <jsoncons/deser_traits.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
-#include <jsoncons/ser_traits.hpp>
 
 namespace jsoncons { 
 namespace cbor {

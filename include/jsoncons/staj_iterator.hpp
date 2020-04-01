@@ -323,8 +323,6 @@ staj_object_iterator<Json,T> end(const staj_object_iterator<Json,T>&) noexcept
 
 }
 
-#include <jsoncons/ser_traits.hpp>
-
 namespace jsoncons {
 
 template <class Json, class T>
