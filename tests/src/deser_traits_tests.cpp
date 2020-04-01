@@ -14,6 +14,24 @@ using jsoncons::wjson;
 using jsoncons::decode_json;
 using jsoncons::encode_json;
 
+namespace deser_traits_tests {
+
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+
+        book() = default;
+        book(const book&) = default;
+        book(book&&) = default;
+    };
+} // namespace deser_traits_tests
+
+namespace ns = deser_traits_tests;
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
+
 TEST_CASE("deser_traits string tests")
 {
     SECTION("test 1")
@@ -89,6 +107,21 @@ TEST_CASE("deser_traits std::pair tests")
         auto p2 = decode_json<std::pair<int,std::wstring>>(buf);
 
         CHECK(p2 == p);
+    }
+    SECTION("test 3")
+    {
+        ns::book book{"Haruki Murakami","Kafka on the Shore",25.17};
+
+        auto p = std::make_pair(1,book);
+
+        std::wstring buf;
+        encode_json(p,buf);
+
+        auto p2 = decode_json<std::pair<int,ns::book>>(buf);
+
+        CHECK(p2.second.author == book.author);
+        CHECK(p2.second.title == book.title);
+        CHECK(p2.second.price == book.price);
     }
 }
 
