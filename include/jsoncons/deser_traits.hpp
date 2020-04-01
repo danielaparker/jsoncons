@@ -113,14 +113,14 @@ namespace jsoncons {
                 ec = conversion_errc::json_not_pair;
                 return value_type();
             }
-            T1 v1 = reader.current().get<T1>();
+            T1 v1 = reader.current().template get<T1>();
             reader.next(ec);
             if (ec)
             {
                 ec = conversion_errc::json_not_pair;
                 return value_type();
             }
-            T2 v2 = reader.current().get<T2>();
+            T2 v2 = reader.current().template get<T2>();
             reader.next(ec);
             if (ec || reader.current().event_type() != staj_event_type::end_array)
             {
