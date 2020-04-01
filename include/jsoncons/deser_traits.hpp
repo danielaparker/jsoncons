@@ -91,6 +91,46 @@ namespace jsoncons {
         }
     };
 
+    // std::pair
+
+    template <class T1, class T2, class CharT>
+    struct deser_traits<std::pair<T1, T2>, CharT>
+    {
+        template <class Json, class TempAllocator>
+        static std::pair<T1, T2> deserialize(basic_staj_reader<CharT>& reader,
+            json_decoder<Json, TempAllocator>&,
+            std::error_code& ec)
+        {
+            using value_type = std::pair<T1, T2>;
+            if (reader.current().event_type() != staj_event_type::begin_array)
+            {
+                ec = conversion_errc::json_not_pair;
+                return value_type();
+            }
+            reader.next(ec);
+            if (ec)
+            {
+                ec = conversion_errc::json_not_pair;
+                return value_type();
+            }
+            T1 v1 = reader.current().get<T1>();
+            reader.next(ec);
+            if (ec)
+            {
+                ec = conversion_errc::json_not_pair;
+                return value_type();
+            }
+            T2 v2 = reader.current().get<T2>();
+            reader.next(ec);
+            if (ec || reader.current().event_type() != staj_event_type::end_array)
+            {
+                ec = conversion_errc::json_not_pair;
+                return value_type();
+            }
+            return std::make_pair(v1, v2);
+        }
+    };
+
     // vector like
     template <class T, class CharT>
     struct deser_traits<T,CharT,
