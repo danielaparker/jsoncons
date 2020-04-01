@@ -40,20 +40,12 @@ public:
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-class null_ser_context : public ser_context
-{
-private:
-    std::size_t line() const override { return 0; }
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context null_ser_context;
 
-    std::size_t column() const override { return 0; }
-};
-#endif
-
-#if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context parsing_context;
 JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context serializing_context;
-JSONCONS_DEPRECATED_MSG("Instead, use null_ser_context") typedef null_ser_context null_parsing_context;
-JSONCONS_DEPRECATED_MSG("Instead, use null_ser_context") typedef null_ser_context null_serializing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context null_parsing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context null_serializing_context;
 #endif
 
 }

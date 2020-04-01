@@ -12,6 +12,9 @@ This change should be transparent to most users.
 `staj_event_type::key`. Rationale: consistency with other names. The old
 name is still supported.
 
+- The class `null_ser_context` has been deprecated, for defaults, `ser_context()` 
+is now used in place of `null_ser_context()`.
+
 Enhancements:
 
 - Added jsonpointer `unflatten` function
