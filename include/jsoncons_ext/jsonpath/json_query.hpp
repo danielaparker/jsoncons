@@ -130,6 +130,7 @@ enum class path_state
     single_quoted_name,
     double_quoted_name,
     bracketed_unquoted_name,
+    bracketed_unquoted_name2,
     bracketed_single_quoted_name,
     bracketed_double_quoted_name,
     bracketed_name_or_path,
@@ -1232,6 +1233,28 @@ public:
                 case path_state::bracketed_unquoted_name:
                     switch (*p_)
                     {
+                        case ' ':case '\t':case '\r':case '\n':
+                        case ':':
+                        case '.':
+                        case '[':
+                        case ',': 
+                        case ']': 
+                            state_stack_.back().state = path_state::bracketed_unquoted_name2;
+                            break;
+                        default:
+                            buffer.push_back(*p_);
+                            ++p_;
+                            ++column_;
+                            break;
+                    }
+                    break;
+                case path_state::bracketed_unquoted_name2:
+                    switch (*p_)
+                    {
+                        case ' ':case '\t':case '\r':case '\n':
+                            advance_past_space_character();
+                            break;
+
                         case ':':
                         {
                             auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
@@ -1253,9 +1276,7 @@ public:
                             state_stack_.back().state = path_state::bracketed_name_or_path;
                             break;
                         default:
-                            buffer.push_back(*p_);
-                            ++p_;
-                            ++column_;
+                            ec = jsonpath_errc::expected_colon_dot_left_bracket_comma_or_right_bracket;
                             break;
                     }
                     break;

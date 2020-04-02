@@ -296,5 +296,15 @@
                 "result" : ["string",42,{"key": "value"},[0,1]]
             }
         ]
+    },
+    {
+        "given" : ["first", "second", "third"],
+        "cases" : [
+            {
+                "annotation" : "Union with spaces",
+                "expression" : "$[ 0 , 1 ]",
+                "result" : ["first","second"]
+            }
+        ]
     }
 ]
