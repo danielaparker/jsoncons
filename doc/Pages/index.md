@@ -771,7 +771,7 @@ Example JSON file (booklist.json):
 ```
 JSONPath examples:
 ```c++    
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using jsoncons::jsonpath::json_query;
 

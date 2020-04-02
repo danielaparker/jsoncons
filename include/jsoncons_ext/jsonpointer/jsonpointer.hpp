@@ -984,10 +984,120 @@ enum class pointer_state
         return result;
     }
 
+
     // unflatten
 
+    enum class unflatten_method {object=1,safe};
+
     template<class Json>
-    Json unflatten(const Json& value)
+    Json unflatten_to_safe_array (Json& value)
+    {
+        if (!value.is_object())
+        {
+            return value;
+        }
+        bool safe = true;
+        std::size_t index = 0;
+        for (const auto& item : value.object_range())
+        {
+            auto r = jsoncons::detail::to_integer<std::size_t>(item.key().data(),item.key().size());
+            if (!r || (index++ != r.value()))
+            {
+                safe = false;
+                break;
+            }
+        }
+
+        if (safe)
+        {
+            Json j(json_array_arg);
+            j.reserve(value.size());
+            for (auto& item : value.object_range())
+            {
+                j.emplace_back(std::move(item.value()));
+            }
+            Json a(json_array_arg);
+            for (auto& item : j.array_range())
+            {
+                a.emplace_back(unflatten_to_safe_array (item));
+            }
+            return a;
+        }
+        else
+        {
+            Json o(json_object_arg);
+            for (auto& item : value.object_range())
+            {
+                o.try_emplace(item.key(), unflatten_to_safe_array (item.value()));
+            }
+            return o;
+        }
+    }
+
+    template<class Json>
+    Json unflatten_to_default(const Json& value)
+    {
+        using char_type = typename Json::char_type;
+
+        if (JSONCONS_UNLIKELY(!value.is_object()))
+        {
+            JSONCONS_THROW(jsonpointer_error(jsonpointer_errc::argument_to_unflatten_invalid));
+        }
+        Json result;
+
+        for (const auto& item: value.object_range())
+        {
+            Json* part = &result;
+            basic_json_ptr<char_type> ptr(item.key());
+            for (auto it = ptr.begin(); it != ptr.end(); )
+            {
+                auto s = *it;
+                auto r = jsoncons::detail::to_integer<size_t>(s.data(), s.size());
+                if (r && (part->is_array() || r.value() == 0))
+                {
+                    if (!part->is_array())
+                    {
+                        *part = Json(json_array_arg);
+                    }
+                    if (++it != ptr.end())
+                    {
+                        if (r.value()+1 > part->size())
+                        {
+                            Json& ref = part->emplace_back();
+                            part = std::addressof(ref);
+                        }
+                        else
+                        {
+                            part = &part->at(r.value());
+                        }
+                    }
+                    else
+                    {
+                        Json& ref = part->emplace_back(item.value());
+                        part = std::addressof(ref);
+                    }
+                }
+                else
+                {
+                    if (++it != ptr.end())
+                    {
+                        auto res = part->try_emplace(s,Json());
+                        part = &(res.first->value());
+                    }
+                    else
+                    {
+                        auto res = part->try_emplace(s, item.value());
+                        part = &(res.first->value());
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    template<class Json>
+    Json unflatten_to_object(const Json& value, unflatten_method method = unflatten_method::safe)
     {
         using char_type = typename Json::char_type;
 
@@ -1017,7 +1127,13 @@ enum class pointer_state
             }
         }
 
-        return result;
+        return method == unflatten_method::safe ? unflatten_to_safe_array (result) : result;
+    }
+
+    template<class Json>
+    Json unflatten(const Json& value, unflatten_method method = unflatten_method())
+    {
+        return method == unflatten_method() ? unflatten_to_default(value) : unflatten_to_object(value,method);
     }
 
 } // namespace jsonpointer

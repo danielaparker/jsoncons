@@ -85,7 +85,7 @@ The examples below use the JSON text from [Stefan Goessner's JSONPath](http://go
 
 ```c++    
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <fstream>
 
 using namespace jsoncons;
@@ -244,7 +244,7 @@ Output:
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons;
 

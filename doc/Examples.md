@@ -2199,7 +2199,7 @@ double sale_price = j.get_value_or<double>("sale_price", 22.0); // returns 22.0
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 int main()
 {
@@ -2349,7 +2349,7 @@ You can use [json_replace](ref/jsonpath/json_replace.md) in the `jsonpath` exten
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons;
 

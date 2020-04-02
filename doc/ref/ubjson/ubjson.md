@@ -39,7 +39,7 @@ For the examples below you need to include some header files and initialize a bu
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons; // for convenience
 
