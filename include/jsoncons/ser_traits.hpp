@@ -158,6 +158,30 @@ namespace jsoncons {
         }
     };
 
+    // std::pair
+
+    template <class T1, class T2, class CharT>
+    struct ser_traits<std::pair<T1, T2>, CharT>
+    {
+        using value_type = std::pair<T1, T2>;
+
+        template <class Json>
+        static void serialize(const value_type& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json& context_j, 
+                              std::error_code& ec)
+        {
+            encoder.begin_array(2,semantic_tag::none,ser_context(),ec);
+            if (ec) return;
+            ser_traits<T1,CharT>::serialize(val.first, encoder, context_j, ec);
+            if (ec) return;
+            ser_traits<T2,CharT>::serialize(val.second, encoder, context_j, ec);
+            if (ec) return;
+            encoder.end_array(ser_context(),ec);
+            if (ec) return;
+        }
+    };
+
     // vector like
     template <class T, class CharT>
     struct ser_traits<T,CharT,
