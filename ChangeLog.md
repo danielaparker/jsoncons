@@ -1,18 +1,23 @@
 master
 ------
 
+Defects fixed:
+
+- Fixed jsonpath issue "union with spaces" identified in 
+[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/)
+
 Changes:
 
 - The names `basic_json_content_handler` and `basic_default_json_content_handler`
 have been deprecated and renamed to `basic_json_visitor` and `basic_default_json_visitor`.
 The private visitor functions `do_xxx` have been renamed to `visit_xxx`.
-This change should be transparent to most users.
+This change should be transparent to most users. 
 
 - The name `staj_event_type::name` has been deprecated and renamed to
 `staj_event_type::key`. Rationale: consistency with other names. The old
 name is still supported.
 
-- The class `null_ser_context` has been deprecated, for defaults, `ser_context()` 
+- The class `null_ser_context` has been deprecated. For defaults, `ser_context()` 
 is now used in place of `null_ser_context()`.
 
 Enhancements:
