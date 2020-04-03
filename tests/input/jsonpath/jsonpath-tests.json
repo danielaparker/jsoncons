@@ -306,5 +306,30 @@
                 "result" : ["first","second"]
             }
         ]
+    },
+    {
+        "given" : {"": 42, "''": 123, "\"\"": 222},
+        "cases" : [
+            {
+                "annotation" : "Bracket notation with empty string",
+                "expression" : "$['']",
+                "result" : [42]
+            },
+            {
+                "annotation" : "Bracket notation with empty string doubled quoted",
+                "expression" : "$[\"\"]",
+                "result" : [42]
+            }
+        ]
+    },
+    {
+        "given" : {"0": "value"},
+        "cases" : [
+            {
+                "annotation" : "Bracket notation with number on object",
+                "expression" : "$[0]",
+                "result" : ["value"] // jsoncons allows unquoted names in square brackets
+            }
+        ]
     }
 ]

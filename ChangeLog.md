@@ -3,8 +3,11 @@ master
 
 Defects fixed:
 
-- Fixed jsonpath issue "union with spaces" identified in 
-[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/)
+- Fixed jsonpath issue [union with spaces](https://cburgmer.github.io/json-path-comparison/results/union_with_spaces.html)
+
+- Fixed jsonpath issue [Bracket notation with empty string](https://cburgmer.github.io/json-path-comparison/results/bracket_notation_with_empty_string.html)
+
+- Fixed jsonpath issue [Bracket notation with empty string doubled quoted](https://cburgmer.github.io/json-path-comparison/results/bracket_notation_with_empty_string_doubled_quoted.html)
 
 Changes:
 
