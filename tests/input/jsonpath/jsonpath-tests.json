@@ -306,5 +306,15 @@
                 "result" : ["first","second"]
             }
         ]
+    },
+    {
+        "given" : {"": 42, "''": 123, "\"\"": 222},
+        "cases" : [
+            {
+                "annotation" : "Bracket notation with empty string",
+                "expression" : "$['']",
+                "result" : [42]
+            }
+        ]
     }
 ]

@@ -1300,11 +1300,8 @@ public:
                             break;
                         case ',': 
                         case ']': 
-                            if (!buffer.empty())
-                            {
-                                selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
-                                buffer.clear();
-                            }
+                            selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
+                            buffer.clear();
                             state_stack_.pop_back();
                             break;
                         default:
