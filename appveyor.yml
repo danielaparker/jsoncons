@@ -1,8 +1,4 @@
-build: false 
-
-configuration:
-- Release
-- Debug
+version: '{build}'
 
 environment:
   vsversion: none
@@ -52,7 +48,9 @@ environment:
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
 
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-      platform: x64
+      vsversion: 2019
+      platform: vs
+      arch: x64
       CXX_FLAGS: ""
       LINKER_FLAGS: ""
       GENERATOR: Visual Studio 16 2019
@@ -79,6 +77,9 @@ before_build:
     )
   - if %vsversion%==2017 (
       set "makecommand=%makecommand% 15 %vsversion%"
+    )
+  - if %vsversion%==2019 (
+      set "makecommand=%GENERATOR%"
     )
   - if %arch%==x64 (
       set "makecommand=%makecommand% Win64"
