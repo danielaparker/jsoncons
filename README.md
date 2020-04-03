@@ -940,8 +940,6 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 | clang                   | 3.8 and above             | x64         | Ubuntu            |       |
 | clang xcode             | 6.4 and above             | x64         | OSX               |       |
 
-It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
-
 [UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 
 ## Building the test suite and examples with CMake
