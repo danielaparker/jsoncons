@@ -49,8 +49,8 @@ environment:
 
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       vsversion: 2019
-      platform: vs
-      arch: x64
+      configuration: Debug
+      platform: x64
       CXX_FLAGS: ""
       LINKER_FLAGS: ""
       GENERATOR: Visual Studio 16 2019
