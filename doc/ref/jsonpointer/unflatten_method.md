@@ -3,15 +3,14 @@
 ```c++
 #include <jsoncons/jsonpointer/jsonpointer.hpp>
 
-enum class unflatten_method{object=1,safe};
+enum class unflatten_method{try_array,object};
 ```
 `unflatten_method` is used to specify how to unflatten a single depth 
 object of JSON Pointer-value pairs. There is no unique solution.
-An integer appearing in a path could be an index or it could be an object key.
+An integer appearing in a path could be an array index or it could be an object key.
 
 Value      |Definition
 -----------|-----------
-unflatten_method()|If there is a zero in a path, it will start a new array.
-object|Arrays will not be created when calling unflatten, rather, an integer appearing in a path is assumed to be an object key
-safe|
+try_array|If there is a zero in a path, start a new array. If this leads to an error, back up and translate to an object.
+object|Assume an integer appearing in a path is an object key
 

@@ -987,7 +987,7 @@ enum class pointer_state
 
     // unflatten
 
-    enum class unflatten_method {object=1,safe};
+    enum class unflatten_method {try_array,object};
 
     template<class Json>
     Json unflatten_to_safe_array (Json& value)
@@ -1035,7 +1035,7 @@ enum class pointer_state
     }
 
     template<class Json>
-    Json unflatten_to_default(const Json& value)
+    jsoncons::optional<Json> unflatten_try_array(const Json& value)
     {
         using char_type = typename Json::char_type;
 
@@ -1077,7 +1077,7 @@ enum class pointer_state
                         part = std::addressof(ref);
                     }
                 }
-                else
+                else if (part->is_object())
                 {
                     if (++it != ptr.end())
                     {
@@ -1090,6 +1090,10 @@ enum class pointer_state
                         part = &(res.first->value());
                     }
                 }
+                else 
+                {
+                    return jsoncons::optional<Json>();
+                }
             }
         }
 
@@ -1097,7 +1101,7 @@ enum class pointer_state
     }
 
     template<class Json>
-    Json unflatten_to_object(const Json& value, unflatten_method method = unflatten_method::safe)
+    Json unflatten_to_object(const Json& value, unflatten_method method = unflatten_method::try_array)
     {
         using char_type = typename Json::char_type;
 
@@ -1127,13 +1131,21 @@ enum class pointer_state
             }
         }
 
-        return method == unflatten_method::safe ? unflatten_to_safe_array (result) : result;
+        return method == unflatten_method::try_array ? unflatten_to_safe_array (result) : result;
     }
 
     template<class Json>
-    Json unflatten(const Json& value, unflatten_method method = unflatten_method())
+    Json unflatten(const Json& value, unflatten_method method = unflatten_method::try_array)
     {
-        return method == unflatten_method() ? unflatten_to_default(value) : unflatten_to_object(value,method);
+        if (method == unflatten_method::try_array)
+        {
+            jsoncons::optional<Json> j = unflatten_try_array(value);
+            return j ? *j : unflatten_to_object(value,method);
+        }
+        else
+        {
+            return unflatten_to_object(value,method);
+        }
     }
 
 } // namespace jsonpointer

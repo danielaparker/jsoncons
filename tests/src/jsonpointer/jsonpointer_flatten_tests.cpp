@@ -43,10 +43,6 @@ TEST_CASE("jsonpointer unflatten tests 1")
         json unflattened2 = jsonpointer::unflatten(flattened,
             jsonpointer::unflatten_method::object);
         std::cout << "(2)\n" << pretty_print(unflattened2) << "\n";
-
-        json unflattened3 = jsonpointer::unflatten(flattened,
-            jsonpointer::unflatten_method::safe);
-        std::cout << "(3)\n" << pretty_print(unflattened3) << "\n";
     }
 }
 
@@ -106,23 +102,6 @@ TEST_CASE("jsonpointer unflatten tests 2")
         json unflattened = jsonpointer::unflatten(flattened, jsonpointer::unflatten_method::object);
         CHECK(unflattened == expected);
         std::cout << "(2)\n" << pretty_print(unflattened) << "\n";
-    }
-    SECTION("safe test")
-    {
-        json expected = json::parse(R"(
-        [
-            {
-                "1000": "Record does not exist",
-                "1004": "Queue limit exceeded",
-                "1010": "Discarding timed-out partial msg"
-            },
-            ["Phone number missing country code", "State code missing", "Zip code missing"]
-        ]        
-        )");
-
-        json unflattened = jsonpointer::unflatten(flattened, jsonpointer::unflatten_method::safe);
-        CHECK(unflattened == expected);
-        std::cout << "(3)\n" << pretty_print(unflattened) << "\n";
     }
 }
 

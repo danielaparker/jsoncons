@@ -510,10 +510,6 @@ namespace {
         json unflattened2 = jsonpointer::unflatten(flattened,
             jsonpointer::unflatten_method::object);
         std::cout << "(3)\n" << pretty_print(unflattened2) << "\n";
-
-        json unflattened3 = jsonpointer::unflatten(flattened,
-            jsonpointer::unflatten_method::safe);
-        std::cout << "(4)\n" << pretty_print(unflattened3) << "\n";
     }
 } // namespace
 
