@@ -12,11 +12,9 @@ to work with the data in a number of ways:
   in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
-SAX style parsers and serializers. Its [json parser](doc/ref/json_parser.md) is an 
-incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Its variant-like data structure is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/basic_json_cursor.md),
-built on top of its incremental parser.  
+SAX style parsers and serializers. It supports reading an entire JSON text in memory in a [variant-like structure].
+But it also supports incremental parsing into a user's preferred form, using
+information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
