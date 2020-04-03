@@ -2491,6 +2491,10 @@ Output:
 }
 ```
  
+Note that unflattening a json object of JSON Pointer-value pairs
+has no unique solution. An integer appearing in a path could be an 
+array index or it could be an object key.
+ 
 <div id="H2"/> 
 
 #### Flatten a json object to JSONPath/value pairs

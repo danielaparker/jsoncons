@@ -5,7 +5,7 @@
 
 enum class unflatten_method{try_array,object};
 ```
-`unflatten_method` is used to specify how to unflatten a single depth 
+`unflatten_method` is used to specify how to unflatten a json 
 object of JSON Pointer-value pairs. There is no unique solution.
 An integer appearing in a path could be an array index or it could be an object key.
 
