@@ -38,11 +38,11 @@ TEST_CASE("jsonpointer unflatten tests 1")
         json flattened = jsonpointer::flatten(input);
 
         json unflattened1 = jsonpointer::unflatten(flattened);
-        std::cout << "(1)\n" << pretty_print(unflattened1) << "\n";
+        //std::cout << "(1)\n" << pretty_print(unflattened1) << "\n";
 
         json unflattened2 = jsonpointer::unflatten(flattened,
             jsonpointer::unflatten_method::object);
-        std::cout << "(2)\n" << pretty_print(unflattened2) << "\n";
+        //std::cout << "(2)\n" << pretty_print(unflattened2) << "\n";
     }
 }
 
@@ -80,7 +80,7 @@ TEST_CASE("jsonpointer unflatten tests 2")
 
         json unflattened = jsonpointer::unflatten(flattened);
         CHECK(unflattened == expected);
-        std::cout << "(1)\n" << pretty_print(unflattened) << "\n";
+        //std::cout << "(1)\n" << pretty_print(unflattened) << "\n";
     }
     SECTION("object test")
     {
@@ -101,7 +101,7 @@ TEST_CASE("jsonpointer unflatten tests 2")
 
         json unflattened = jsonpointer::unflatten(flattened, jsonpointer::unflatten_method::object);
         CHECK(unflattened == expected);
-        std::cout << "(2)\n" << pretty_print(unflattened) << "\n";
+        //std::cout << "(2)\n" << pretty_print(unflattened) << "\n";
     }
 }
 

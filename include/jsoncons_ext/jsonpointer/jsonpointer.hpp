@@ -990,7 +990,7 @@ enum class pointer_state
     enum class unflatten_method {try_array,object};
 
     template<class Json>
-    Json unflatten_to_safe_array (Json& value)
+    Json safe_unflatten (Json& value)
     {
         if (!value.is_object())
         {
@@ -1019,7 +1019,7 @@ enum class pointer_state
             Json a(json_array_arg);
             for (auto& item : j.array_range())
             {
-                a.emplace_back(unflatten_to_safe_array (item));
+                a.emplace_back(safe_unflatten (item));
             }
             return a;
         }
@@ -1028,14 +1028,14 @@ enum class pointer_state
             Json o(json_object_arg);
             for (auto& item : value.object_range())
             {
-                o.try_emplace(item.key(), unflatten_to_safe_array (item.value()));
+                o.try_emplace(item.key(), safe_unflatten (item.value()));
             }
             return o;
         }
     }
 
     template<class Json>
-    jsoncons::optional<Json> unflatten_try_array(const Json& value)
+    jsoncons::optional<Json> try_unflatten_array(const Json& value)
     {
         using char_type = typename Json::char_type;
 
@@ -1049,11 +1049,12 @@ enum class pointer_state
         {
             Json* part = &result;
             basic_json_ptr<char_type> ptr(item.key());
+            std::size_t index = 0;
             for (auto it = ptr.begin(); it != ptr.end(); )
             {
                 auto s = *it;
                 auto r = jsoncons::detail::to_integer<size_t>(s.data(), s.size());
-                if (r && (part->is_array() || r.value() == 0))
+                if (r && (index++ == r.value()))
                 {
                     if (!part->is_array())
                     {
@@ -1131,7 +1132,7 @@ enum class pointer_state
             }
         }
 
-        return method == unflatten_method::try_array ? unflatten_to_safe_array (result) : result;
+        return method == unflatten_method::try_array ? safe_unflatten (result) : result;
     }
 
     template<class Json>
@@ -1139,7 +1140,7 @@ enum class pointer_state
     {
         if (method == unflatten_method::try_array)
         {
-            jsoncons::optional<Json> j = unflatten_try_array(value);
+            jsoncons::optional<Json> j = try_unflatten_array(value);
             return j ? *j : unflatten_to_object(value,method);
         }
         else
