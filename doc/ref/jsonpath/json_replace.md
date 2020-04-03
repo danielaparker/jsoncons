@@ -63,7 +63,7 @@ Input JSON file `booklist.json`:
 ```
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;

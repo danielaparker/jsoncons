@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include "sample_types.hpp"
 #include <string>
 #include <iomanip>
