@@ -34,7 +34,10 @@ to work with the data in a number of ways:
 - As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
 
-The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
+Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
+SAX style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
+But it also supports incremental parsing into a user's preferred form, using
+information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
 
 The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
