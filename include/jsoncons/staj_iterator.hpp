@@ -323,20 +323,20 @@ staj_object_iterator<Json,T> end(const staj_object_iterator<Json,T>&) noexcept
 
 }
 
-#include <jsoncons/ser_traits.hpp>
-
 namespace jsoncons {
 
 template <class Json, class T>
 void staj_array_iterator<Json,T>::next()
 {
+    using char_type = typename Json::char_type;
+
     if (!done())
     {
         reader_->next();
         if (!done())
         {
             std::error_code ec;
-            value_ = deser_traits<T>::deserialize(*reader_, decoder_, ec);
+            value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -348,6 +348,8 @@ void staj_array_iterator<Json,T>::next()
 template<class Json, class T>
 void staj_array_iterator<Json,T>::next(std::error_code& ec)
 {
+    using char_type = typename Json::char_type;
+
     if (!done())
     {
         reader_->next(ec);
@@ -357,7 +359,7 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            value_ = deser_traits<T>::deserialize(*reader_, decoder_, ec);
+            value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
         }
     }
 }
@@ -365,16 +367,18 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
 template<class Json, class T>
 void staj_object_iterator<Json,T>::next()
 {
+    using char_type = typename Json::char_type;
+
     reader_->next();
     if (!done())
     {
-        JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
+        JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
         key_type key = reader_->current(). template get<key_type>();
         reader_->next();
         if (!done())
         {
             std::error_code ec;
-            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, decoder_, ec));
+            key_value_ = value_type(std::move(key),deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec));
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
@@ -386,6 +390,8 @@ void staj_object_iterator<Json,T>::next()
 template<class Json, class T>
 void staj_object_iterator<Json,T>::next(std::error_code& ec)
 {
+    using char_type = typename Json::char_type;
+
     reader_->next(ec);
     if (ec)
     {
@@ -393,7 +399,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
     }
     if (!done())
     {
-        JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
+        JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
         auto key = reader_->current(). template get<key_type>();
         reader_->next(ec);
         if (ec)
@@ -402,7 +408,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
         }
         if (!done())
         {
-            key_value_ = value_type(std::move(key),deser_traits<T>::deserialize(*reader_, decoder_, ec));
+            key_value_ = value_type(std::move(key),deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec));
         }
     }
 }

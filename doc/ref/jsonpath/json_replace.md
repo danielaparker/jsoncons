@@ -1,7 +1,5 @@
 ### jsoncons::jsonpath::json_replace
 
-Searches for all values that match a JSONPath expression and replaces them with the specified value
-
 ```c++
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 
@@ -10,6 +8,9 @@ void json_replace(Json& root,
                   const typename Json::string_view_type& path, 
                   T&& new_value)
 ```
+
+Searches for all values that match a JSONPath expression and replaces them with the specified value
+
 #### Parameters
 
 <table>
@@ -62,7 +63,7 @@ Input JSON file `booklist.json`:
 ```
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;

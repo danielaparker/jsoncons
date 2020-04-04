@@ -72,14 +72,14 @@ Checks if there are no more events.
     const staj_event& current() const override;
 Returns the current [staj_event](staj_event.md).
 
-    void read(json_content_handler& handler) override
+    void read(json_visitor& visitor) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_content_handler.md), until the handler indicates
+[visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read(json_content_handler& handler, std::error_code& ec) override
+    void read(json_visitor& visitor, std::error_code& ec) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
-[handler](basic_json_content_handler.md), until the handler indicates
+[visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
     void next() override;
@@ -149,7 +149,7 @@ int main()
             case staj_event_type::end_object:
                 std::cout << "end_object\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
                 break;
@@ -229,7 +229,7 @@ struct author_filter
 
     bool operator()(const staj_event& event, const ser_context&) 
     {
-        if (event.event_type()  == staj_event_type::name &&
+        if (event.event_type()  == staj_event_type::key &&
             event.get<jsoncons::string_view>() == "author")
         {
             accept_next_ = true;
@@ -284,11 +284,11 @@ Graham Greene
 #include <iomanip>
 #include <cassert>
 
-struct my_cbor_content_handler : public default_json_content_handler
+struct my_cbor_visitor : public default_json_visitor
 {
     std::vector<double> v;
 private:
-    bool do_typed_array(const span<const double>& data,  
+    bool visit_typed_array(const span<const double>& data,  
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -323,8 +323,8 @@ int main()
     assert(cursor.current().event_type() == staj_event_type::begin_array);
     assert(cursor.is_typed_array());
 
-    my_cbor_content_handler handler;
-    cursor.read(handler);
+    my_cbor_visitor visitor;
+    cursor.read(visitor);
     std::cout << "(2)\n";
     for (auto item : handler.v)
     {
@@ -347,7 +347,7 @@ d8 56 58 20 00 00 00 00 00 00 24 40 00 00 00 00 00 00 34 40 00 00 00 00 00 00 3e
 
 #### Navigating Typed Arrays with cursor - multi-dimensional row major with typed array
 
-This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
@@ -416,7 +416,7 @@ end_array (n/a)
 
 #### Navigating Typed Arrays with cursor - multi-dimensional column major with classical CBOR array
 
-This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08)
+This example is taken from [CBOR Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>

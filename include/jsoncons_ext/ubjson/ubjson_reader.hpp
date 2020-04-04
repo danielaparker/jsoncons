@@ -12,7 +12,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
@@ -24,14 +24,14 @@ template <class Src,class Allocator=std::allocator<char>>
 class basic_ubjson_reader : public ser_context
 {
     basic_ubjson_parser<Src,Allocator> parser_;
-    json_content_handler& handler_;
+    json_visitor& visitor_;
 public:
     template <class Source>
     basic_ubjson_reader(Source&& source, 
-                        json_content_handler& handler,
+                        json_visitor& visitor,
                         const Allocator alloc=Allocator())
         : parser_(std::forward<Source>(source), alloc), 
-          handler_(handler)
+          visitor_(visitor)
     {
     }
 
@@ -48,7 +48,7 @@ public:
     void read(std::error_code& ec)
     {
         parser_.reset();
-        parser_.parse(handler_, ec);
+        parser_.parse(visitor_, ec);
         if (ec)
         {
             return;

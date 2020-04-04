@@ -13,7 +13,7 @@
 #include <memory>
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/parse_number.hpp>
@@ -23,13 +23,13 @@
 namespace jsoncons { namespace bson {
 
 template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
-class basic_bson_encoder final : public basic_json_content_handler<char>
+class basic_bson_encoder final : public basic_json_visitor<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
     typedef Allocator allocator_type;
     typedef char char_type;
-    using typename basic_json_content_handler<char>::string_view_type;
+    using typename basic_json_visitor<char>::string_view_type;
     typedef Sink sink_type;
 
 private:
@@ -104,12 +104,12 @@ public:
 private:
     // Implementing methods
 
-    void do_flush() override
+    void visit_flush() override
     {
         sink_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (buffer_.size() > 0)
         {
@@ -121,7 +121,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code&) override
+    bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -141,7 +141,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (buffer_.size() > 0)
         {
@@ -152,7 +152,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&, std::error_code&) override
+    bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
 
@@ -172,7 +172,7 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         stack_.back().member_offset(buffer_.size());
         buffer_.push_back(0x00); // reserve space for code
@@ -184,13 +184,13 @@ private:
         return true;
     }
 
-    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::null_cd);
         return true;
     }
 
-    bool do_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::bool_cd);
         if (val)
@@ -205,7 +205,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
+    bool visit_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
     {
         before_value(jsoncons::bson::detail::bson_format::string_cd);
 
@@ -230,7 +230,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -251,7 +251,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t val, 
+    bool visit_int64(int64_t val, 
                         semantic_tag tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -281,7 +281,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t val, 
+    bool visit_uint64(uint64_t val, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -311,7 +311,7 @@ private:
         return true;
     }
 
-    bool do_double(double val, 
+    bool visit_double(double val, 
                          semantic_tag,
                          const ser_context&,
                          std::error_code&) override

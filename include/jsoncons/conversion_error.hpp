@@ -17,7 +17,8 @@ namespace jsoncons {
         success = 0,
         json_not_vector,
         json_not_array,
-        json_not_map
+        json_not_map,
+        json_not_pair
     };
 }
 
@@ -49,6 +50,8 @@ namespace detail {
                     return "json cannot be converted to array";
                 case conversion_errc::json_not_map:
                     return "json cannot be converted to map";
+                case conversion_errc::json_not_pair:
+                    return "json cannot be converted to std::pair";
                 default:
                     return "Unknown conversion error";
             }

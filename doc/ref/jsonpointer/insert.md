@@ -36,16 +36,18 @@ None
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+// for brevity
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto target = jsoncons::json::parse(R"(
+    auto target = json::parse(R"(
         { "foo": "bar"}
     )");
 
     std::error_code ec;
-    jp::insert(target, "/baz", jsoncons::json("qux"), ec);
+    jsonpointer::insert(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -67,16 +69,17 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto target = jsoncons::json::parse(R"(
+    auto target = json::parse(R"(
         { "foo": [ "bar", "baz" ] }
     )");
 
     std::error_code ec;
-    jp::insert(target, "/foo/1", jsoncons::json("qux"), ec);
+    jsonpointer::insert(target, "/foo/1", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -98,16 +101,17 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto target = jsoncons::json::parse(R"(
+    auto target = json::parse(R"(
         { "foo": [ "bar", "baz" ] }
     )");
 
     std::error_code ec;
-    jp::insert(target, "/foo/-", jsoncons::json("qux"), ec);
+    jsonpointer::insert(target, "/foo/-", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -129,16 +133,17 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto target = jsoncons::json::parse(R"(
+    auto target = json::parse(R"(
         { "foo": "bar", "baz" : "abc"}
     )");
 
     std::error_code ec;
-    jp::insert(target, "/baz", jsoncons::json("qux"), ec);
+    jsonpointer::insert(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -160,16 +165,17 @@ Key already exists
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    auto target = jsoncons::json::parse(R"(
+    auto target = json::parse(R"(
     { "foo": [ "bar", "baz" ] }
     )");
 
     std::error_code ec;
-    jp::insert_or_assign(target, "/foo/3", jsoncons::json("qux"), ec);
+    jsonpointer::insert_or_assign(target, "/foo/3", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;

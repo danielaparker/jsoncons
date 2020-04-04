@@ -220,10 +220,10 @@ JSONCONS_ENUM_TRAITS(ns::BookCategory,fiction,biography)
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::Book1,category,author,title,price)
 JSONCONS_ALL_MEMBER_TRAITS(ns::Book2,category,author,title,price)
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::Book3,category,author,title,price)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::Book3,category,author,title,price)
 
-JSONCONS_N_GETTER_CTOR_TRAITS(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
-JSONCONS_N_GETTER_CTOR_TRAITS(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
+JSONCONS_N_CTOR_GETTER_TRAITS(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
+JSONCONS_N_CTOR_GETTER_TRAITS(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
 JSONCONS_POLYMORPHIC_TRAITS(ns::Employee, ns::HourlyEmployee, ns::CommissionedEmployee)
 
 JSONCONS_N_MEMBER_TRAITS(ns::Bar,1,bar)

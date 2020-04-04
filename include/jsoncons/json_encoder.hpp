@@ -20,7 +20,7 @@
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/write_number.hpp>
 
@@ -177,7 +177,7 @@ byte_string_chars_format resolve_byte_string_chars_format(byte_string_chars_form
 namespace jsoncons {
 
 template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
-class basic_json_encoder final : public basic_json_content_handler<CharT>
+class basic_json_encoder final : public basic_json_visitor<CharT>
 {
     static const std::array<CharT, 4>& null_k()
     {
@@ -197,7 +197,7 @@ class basic_json_encoder final : public basic_json_content_handler<CharT>
 public:
     typedef Allocator allocator_type;
     typedef CharT char_type;
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    using typename basic_json_visitor<CharT>::string_view_type;
     typedef Sink sink_type;
     typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
@@ -287,13 +287,13 @@ private:
         }
 
     };
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
     const basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
-    allocator_type alloc_;
 
-    std::vector<encoding_context> stack_;
+    std::vector<encoding_context,encoding_context_allocator_type> stack_;
     int indent_amount_;
     std::size_t column_;
     std::basic_string<CharT> colon_str_;
@@ -319,7 +319,7 @@ public:
        : sink_(std::forward<Sink>(sink)), 
          options_(options),
          fp_(options.float_format(), options.precision()),
-         alloc_(alloc),
+         stack_(alloc),
          indent_amount_(0), 
          column_(0)
     {
@@ -388,12 +388,12 @@ public:
 
 private:
     // Implementing methods
-    void do_flush() override
+    void visit_flush() override
     {
         sink_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -461,7 +461,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code&) override
+    bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
@@ -477,7 +477,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -546,7 +546,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&, std::error_code&) override
+    bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         unindent();
@@ -561,7 +561,7 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().count() > 0)
@@ -593,7 +593,7 @@ private:
         return true;
     }
 
-    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -614,7 +614,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -647,7 +647,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag tag,
                               const ser_context&,
                               std::error_code&) override
@@ -720,7 +720,7 @@ private:
         return true;
     }
 
-    bool do_double(double value, 
+    bool visit_double(double value, 
                          semantic_tag,
                          const ser_context& context,
                          std::error_code& ec) override
@@ -748,7 +748,7 @@ private:
                 }
                 else if (options_.enable_nan_to_str())
                 {
-                    do_string(options_.nan_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -765,7 +765,7 @@ private:
                 }
                 else if (options_.enable_inf_to_str())
                 {
-                    do_string(options_.inf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -782,7 +782,7 @@ private:
                 }
                 else if (options_.enable_neginf_to_str())
                 {
-                    do_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -801,7 +801,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t value, 
+    bool visit_int64(int64_t value, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -823,7 +823,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t value, 
+    bool visit_uint64(uint64_t value, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -845,7 +845,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty()) 
         {
@@ -993,8 +993,8 @@ private:
     }
 };
 
-template<class CharT,class Sink=jsoncons::stream_sink<CharT>>
-class basic_json_compressed_encoder final : public basic_json_content_handler<CharT>
+template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
+class basic_json_compressed_encoder final : public basic_json_visitor<CharT>
 {
     static const std::array<CharT, 4>& null_k()
     {
@@ -1012,8 +1012,9 @@ class basic_json_compressed_encoder final : public basic_json_content_handler<Ch
         return k;
     }
 public:
+    typedef Allocator allocator_type;
     typedef CharT char_type;
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    using typename basic_json_visitor<CharT>::string_view_type;
     typedef Sink sink_type;
     typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
@@ -1045,29 +1046,31 @@ private:
             return type_ == container_type::array;
         }
     };
-
+    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
     const basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
 
-    std::vector<encoding_context> stack_;
+    std::vector<encoding_context,encoding_context_allocator_type> stack_;
 
     // Noncopyable and nonmoveable
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
-    basic_json_compressed_encoder(Sink&& sink)
-        : basic_json_compressed_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>())
+    basic_json_compressed_encoder(Sink&& sink, 
+                                  const Allocator& alloc = Allocator())
+        : basic_json_compressed_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>(), alloc)
     {
     }
 
     basic_json_compressed_encoder(Sink&& sink, 
-                                  const basic_json_encode_options<CharT>& options)
+                                  const basic_json_encode_options<CharT>& options, 
+                                  const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
          options_(options),
-         fp_(options.float_format(), options.precision())
-         
+         fp_(options.float_format(), options.precision()),
+         stack_(alloc)         
     {
     }
 
@@ -1085,12 +1088,12 @@ public:
 
 private:
     // Implementing methods
-    void do_flush() override
+    void visit_flush() override
     {
         sink_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1102,7 +1105,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code&) override
+    bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -1116,7 +1119,7 @@ private:
     }
 
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1127,7 +1130,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&, std::error_code&) override
+    bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         stack_.pop_back();
@@ -1139,7 +1142,7 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().count() > 0)
         {
@@ -1153,7 +1156,7 @@ private:
         return true;
     }
 
-    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1220,7 +1223,7 @@ private:
         }
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
@@ -1248,7 +1251,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag tag,
                               const ser_context&,
                               std::error_code&) override
@@ -1314,7 +1317,7 @@ private:
         return true;
     }
 
-    bool do_double(double value, 
+    bool visit_double(double value, 
                          semantic_tag,
                          const ser_context& context,
                          std::error_code& ec) override
@@ -1334,7 +1337,7 @@ private:
                 }
                 else if (options_.enable_nan_to_str())
                 {
-                    do_string(options_.nan_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1349,7 +1352,7 @@ private:
                 }
                 else if (options_.enable_inf_to_str())
                 {
-                    do_string(options_.inf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1364,7 +1367,7 @@ private:
                 }
                 else if (options_.enable_neginf_to_str())
                 {
-                    do_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -1384,7 +1387,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t value, 
+    bool visit_int64(int64_t value, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -1401,7 +1404,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t value, 
+    bool visit_uint64(uint64_t value, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -1418,7 +1421,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool value, semantic_tag, const ser_context&, std::error_code&) override
     {
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {

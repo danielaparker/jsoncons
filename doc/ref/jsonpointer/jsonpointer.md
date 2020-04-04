@@ -47,8 +47,8 @@ When applied to a JSON array, the character `-` indicates one past the last elem
     <td>Replaces a value in a JSON document using JSON Pointer path notation.</td> 
   </tr>
   <tr>
-    <td><a href="flatten.md">flatten</a></td>
-    <td>Flattens a json object or array into a single depth object of JSONPointer-value pairs.</td> 
+    <td><a href="flatten.md">flatten<br>unflatten</a></td>
+    <td>Flattens a json object or array into a single depth object of JSON Pointer-value pairs.</td> 
   </tr>
 </table>
 
@@ -60,7 +60,9 @@ When applied to a JSON array, the character `-` indicates one past the last elem
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+// for brevity
+using jsoncons::json; 
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
@@ -116,7 +118,8 @@ Output:
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-using namespace jsoncons;
+using jsoncons::json; 
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {

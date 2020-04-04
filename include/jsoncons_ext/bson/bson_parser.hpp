@@ -13,7 +13,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
@@ -99,7 +99,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_content_handler& handler, std::error_code& ec)
+    void parse(json_visitor& visitor, std::error_code& ec)
     {
         if (source_.is_error())
         {
@@ -113,7 +113,7 @@ public:
             {
                 case parse_mode::root:
                     state_stack_.back().mode = parse_mode::before_done;
-                    begin_document(handler, ec);
+                    begin_document(visitor, ec);
                     break;
                 case parse_mode::document:
                 {
@@ -125,13 +125,13 @@ public:
                     }
                     if (t != 0x00)
                     {
-                        read_e_name(handler,jsoncons::bson::detail::bson_container_type::document,ec);
+                        read_e_name(visitor,jsoncons::bson::detail::bson_container_type::document,ec);
                         state_stack_.back().mode = parse_mode::value;
                         state_stack_.back().type = t;
                     }
                     else
                     {
-                        end_document(handler,ec);
+                        end_document(visitor,ec);
                     }
                     break;
                 }
@@ -145,18 +145,18 @@ public:
                     }
                     if (t != 0x00)
                     {
-                        read_e_name(handler,jsoncons::bson::detail::bson_container_type::array,ec);
-                        read_value(handler,t,ec);
+                        read_e_name(visitor,jsoncons::bson::detail::bson_container_type::array,ec);
+                        read_value(visitor,t,ec);
                     }
                     else
                     {
-                        end_array(handler,ec);
+                        end_array(visitor,ec);
                     }
                     break;
                 }
                 case parse_mode::value:
                     state_stack_.back().mode = parse_mode::document;
-                    read_value(handler,state_stack_.back().type,ec);
+                    read_value(visitor,state_stack_.back().type,ec);
                     break;
                 case parse_mode::before_done:
                 {
@@ -164,7 +164,7 @@ public:
                     state_stack_.clear();
                     more_ = false;
                     done_ = true;
-                    handler.flush();
+                    visitor.flush();
                     break;
                 }
             }
@@ -173,7 +173,7 @@ public:
 
 private:
 
-    void begin_document(json_content_handler& handler, std::error_code& ec)
+    void begin_document(json_visitor& visitor, std::error_code& ec)
     {
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -184,17 +184,17 @@ private:
         const uint8_t* endp;
         auto length = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
-        more_ = handler.begin_object(semantic_tag::none, *this, ec);
+        more_ = visitor.begin_object(semantic_tag::none, *this, ec);
         state_stack_.emplace_back(parse_mode::document,length);
     }
 
-    void end_document(json_content_handler& handler, std::error_code&)
+    void end_document(json_visitor& visitor, std::error_code&)
     {
-        more_ = handler.end_object(*this);
+        more_ = visitor.end_object(*this);
         state_stack_.pop_back();
     }
 
-    void begin_array(json_content_handler& handler, std::error_code& ec)
+    void begin_array(json_visitor& visitor, std::error_code& ec)
     {
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -205,17 +205,17 @@ private:
         const uint8_t* endp;
         /* auto len = */ jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
 
-        more_ = handler.begin_array(semantic_tag::none, *this, ec);
+        more_ = visitor.begin_array(semantic_tag::none, *this, ec);
         state_stack_.emplace_back(parse_mode::array,0);
     }
 
-    void end_array(json_content_handler& handler, std::error_code&)
+    void end_array(json_visitor& visitor, std::error_code&)
     {
-        more_ = handler.end_array(*this);
+        more_ = visitor.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void read_e_name(json_content_handler& handler, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
+    void read_e_name(json_visitor& visitor, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
         text_buffer_.clear();
         uint8_t c{};
@@ -231,11 +231,11 @@ private:
                 ec = bson_errc::invalid_utf8_text_string;
                 return;
             }
-            more_ = handler.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
         }
     }
 
-    void read_value(json_content_handler& handler, uint8_t type, std::error_code& ec)
+    void read_value(json_visitor& visitor, uint8_t type, std::error_code& ec)
     {
         switch (type)
         {
@@ -249,7 +249,7 @@ private:
                 }
                 const uint8_t* endp;
                 double res = jsoncons::detail::little_to_native<double>(buf,buf+sizeof(buf),&endp);
-                more_ = handler.double_value(res, semantic_tag::none, *this, ec);
+                more_ = visitor.double_value(res, semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::string_cd:
@@ -278,23 +278,23 @@ private:
                     ec = bson_errc::invalid_utf8_text_string;
                     return;
                 }
-                more_ = handler.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
             {
-                begin_document(handler,ec);
+                begin_document(visitor,ec);
                 break;
             }
 
             case jsoncons::bson::detail::bson_format::array_cd: 
             {
-                begin_array(handler,ec);
+                begin_array(visitor,ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::null_cd: 
             {
-                more_ = handler.null_value(semantic_tag::none, *this, ec);
+                more_ = visitor.null_value(semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::bool_cd:
@@ -305,7 +305,7 @@ private:
                     ec = bson_errc::unexpected_eof;
                     return;
                 }
-                more_ = handler.bool_value(val != 0, semantic_tag::none, *this, ec);
+                more_ = visitor.bool_value(val != 0, semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::int32_cd: 
@@ -318,7 +318,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
-                more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
+                more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
 
@@ -332,7 +332,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
-                more_ = handler.uint64_value(val, semantic_tag::timestamp, *this);
+                more_ = visitor.uint64_value(val, semantic_tag::timestamp, *this);
                 break;
             }
 
@@ -346,7 +346,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<int64_t>(buf, buf+sizeof(int64_t),&endp);
-                more_ = handler.int64_value(val, semantic_tag::none, *this, ec);
+                more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
 
@@ -360,7 +360,7 @@ private:
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<int64_t>(buf, buf+sizeof(int64_t),&endp);
-                more_ = handler.int64_value(val, semantic_tag::timestamp, *this);
+                more_ = visitor.int64_value(val, semantic_tag::timestamp, *this);
                 break;
             }
             case jsoncons::bson::detail::bson_format::binary_cd: 
@@ -381,7 +381,7 @@ private:
                     return;
                 }
 
-                more_ = handler.byte_string_value(byte_string_view(v.data(),v.size()), 
+                more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
                                            semantic_tag::none, 
                                            *this);
                 break;

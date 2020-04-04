@@ -25,17 +25,17 @@ Check if there are no more events.
     virtual const staj_event& current() const = 0;
 Returns the current [staj_event](staj_event.md).
 
-    virtual void read(json_content_handler& handler) = 0;
+    virtual void read(json_visitor& visitor) = 0;
 Sends the parse events from the current event to the
-matching completion event to the supplied [handler](basic_json_content_handler.md)
+matching completion event to the supplied [visitor](basic_json_visitor.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    virtual void read(json_content_handler& handler,
+    virtual void read(json_visitor& visitor,
                         std::error_code& ec) = 0;
 Sends the parse events from the current event to the
-matching completion event to the supplied [handler](basic_json_content_handler.md)
+matching completion event to the supplied [visitor](basic_json_visitor.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, sets `ec`.

@@ -12,25 +12,25 @@ using namespace jsoncons;
 class name_fix_up_filter : public json_filter
 {
 public:
-    name_fix_up_filter(json_content_handler& handler)
-        : json_filter(handler)
+    name_fix_up_filter(json_visitor& visitor)
+        : json_filter(visitor)
     {
     }
 
 private:
-    bool do_key(const string_view_type& name, 
+    bool visit_key(const string_view_type& name, 
                  const ser_context& context,
                  std::error_code&) override
     {
         member_name_ = std::string(name);
         if (member_name_ != "name")
         {
-            this->to_handler().key(name, context);
+            this->destination().key(name, context);
         }
         return true;
     }
 
-    bool do_string(const string_view_type& s, 
+    bool visit_string(const string_view_type& s, 
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code&) override
@@ -39,14 +39,14 @@ private:
         {
             std::size_t end_first = s.find_first_of(" \t");
             std::size_t start_last = s.find_first_not_of(" \t", end_first);
-            this->to_handler().key("first-name", context);
+            this->destination().key("first-name", context);
             string_view_type first = s.substr(0, end_first);
-            this->to_handler().string_value(first, tag, context);
+            this->destination().string_value(first, tag, context);
             if (start_last != string_view_type::npos)
             {
-                this->to_handler().key("last-name", context);
+                this->destination().key("last-name", context);
                 string_view_type last = s.substr(start_last);
-                this->to_handler().string_value(last, tag, context);
+                this->destination().string_value(last, tag, context);
             }
             else
             {
@@ -57,7 +57,7 @@ private:
         }
         else
         {
-            this->to_handler().string_value(s, tag, context);
+            this->destination().string_value(s, tag, context);
         }
         return true;
     }
@@ -104,14 +104,14 @@ void change_member_name_example()
     rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
-    // a json_content_handler ...
+    // a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
     json_reader reader(is, filter1);
     reader.read();
     std::cout << std::endl;
 
-    // or a json_content_handler    
+    // or a json_visitor    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);

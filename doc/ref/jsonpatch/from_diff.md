@@ -21,7 +21,8 @@ Returns a JSON Patch.
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-namespace jp = jsoncons::jsonpatch;
+using jsoncons::json;
+namespace jsonpatch = jsoncons::jsonpatch;
 
 int main()
 {
@@ -33,10 +34,10 @@ int main()
         { "baz":"qux", "foo": [ "bar", "baz" ]}
     )");
 
-    auto patch = jp::from_diff(source, target);
+    auto patch = jsonpatch::from_diff(source, target);
 
     std::error_code ec;
-    jp::apply_patch(source, patch, ec);
+    jsonpatch::apply_patch(source, patch, ec);
 
     std::cout << "(1) " << pretty_print(patch) << std::endl;
     std::cout << "(2) " << pretty_print(source) << std::endl;

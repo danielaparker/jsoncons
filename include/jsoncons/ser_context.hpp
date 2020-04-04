@@ -14,9 +14,15 @@ class ser_context
 public:
     virtual ~ser_context() = default;
 
-    virtual size_t line() const = 0;
+    virtual size_t line() const
+    {
+        return 0;
+    }
 
-    virtual size_t column() const = 0; 
+    virtual size_t column() const
+    {
+        return 0;
+    }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use line()")
@@ -33,19 +39,13 @@ public:
 #endif
 };
 
-class null_ser_context : public ser_context
-{
-private:
-    std::size_t line() const override { return 0; }
-
-    std::size_t column() const override { return 0; }
-};
-
 #if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context null_ser_context;
+
 JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context parsing_context;
 JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context serializing_context;
-JSONCONS_DEPRECATED_MSG("Instead, use null_ser_context") typedef null_ser_context null_parsing_context;
-JSONCONS_DEPRECATED_MSG("Instead, use null_ser_context") typedef null_ser_context null_serializing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context null_parsing_context;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_context") typedef ser_context null_serializing_context;
 #endif
 
 }

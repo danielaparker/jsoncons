@@ -4,9 +4,10 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSON_SERIALIZER_HPP
-#define JSONCONS_JSON_SERIALIZER_HPP
+#ifndef JSONCONS_JSONPATH_JSONPATH_HPP
+#define JSONCONS_JSONPATH_JSONPATH_HPP
 
-#include <jsoncons/json_encoder.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/flatten.hpp>
 
 #endif

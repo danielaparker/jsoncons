@@ -26,7 +26,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         ubjson_bytes_encoder encoder(v);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -36,7 +36,7 @@ namespace ubjson {
     {
         ubjson_bytes_encoder encoder(v);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -49,7 +49,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         ubjson_stream_encoder encoder(os);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -59,7 +59,7 @@ namespace ubjson {
     {
         ubjson_stream_encoder encoder(os);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -74,7 +74,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         basic_ubjson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v,temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -84,7 +84,7 @@ namespace ubjson {
     {
         basic_ubjson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v,temp_alloc);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -97,7 +97,7 @@ namespace ubjson {
     {
         typedef typename T::char_type char_type;
         basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os,temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -107,7 +107,7 @@ namespace ubjson {
     {
         basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os,temp_alloc);
         std::error_code ec;
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));

@@ -16,7 +16,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
 #include <jsoncons_ext/csv/csv_cursor.hpp>
@@ -35,7 +35,7 @@ public:
 private:
     static constexpr size_t default_max_buffer_length = 16384;
 
-    basic_staj_event_handler<CharT> event_handler_;
+    basic_staj_visitor<CharT> event_handler_;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
@@ -260,24 +260,24 @@ public:
         return event_handler_.event();
     }
 
-    void read(basic_json_content_handler<CharT>& handler) override
+    void read(basic_json_visitor<CharT>& visitor) override
     {
         std::error_code ec;
-        read(handler, ec);
+        read(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read(basic_json_content_handler<CharT>& handler,
+    void read(basic_json_visitor<CharT>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(event_handler_.event(), handler, *this, ec))
+        if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
         {
             return;
         }
-        read_next(handler, ec);
+        read_next(visitor, ec);
     }
 
     void next() override
@@ -333,7 +333,7 @@ public:
         read_next(event_handler_, ec);
     }
 
-    void read_next(basic_json_content_handler<CharT>& handler, std::error_code& ec)
+    void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
         parser_.restart();
         while (!parser_.finished())
@@ -350,7 +350,7 @@ public:
                     eof_ = true;
                 }
             }
-            parser_.parse_some(handler, ec);
+            parser_.parse_some(visitor, ec);
             if (ec) return;
         }
     }
@@ -423,17 +423,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<CharT>&)")
-    void read_to(basic_json_content_handler<CharT>& handler) 
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<CharT>&)")
+    void read_to(basic_json_visitor<CharT>& visitor) 
     {
-        read(handler);
+        read(visitor);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<CharT>&, std::error_code&)")
-    void read_to(basic_json_content_handler<CharT>& handler,
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<CharT>&, std::error_code&)")
+    void read_to(basic_json_visitor<CharT>& visitor,
                  std::error_code& ec) 
     {
-        read(handler, ec);
+        read(visitor, ec);
     }
 #endif
 private:

@@ -30,7 +30,7 @@ void encode_json(const T& val,
 
 template <class T, class CharT>
 void encode_json(const T& val, 
-                 basic_json_content_handler<CharT>& encoder); // (5)
+                 basic_json_visitor<CharT>& encoder); // (5)
 
 template <class T, class CharT, class TempAllocator>
 void encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
@@ -61,7 +61,7 @@ void encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
 template <class T, class CharT, class TempAllocator>
 void encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                  const T& val, 
-                 basic_json_content_handler<CharT>& encoder); // (10)
+                 basic_json_visitor<CharT>& encoder); // (10)
 ```
 
 (1) Encode `val` to string with the specified line indenting.
@@ -72,7 +72,7 @@ void encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
 
 (4) Encode `val` to output stream with the specified options and line indenting.
 
-(5) Convert `val` to json events and stream through content handler.
+(5) Convert `val` to json events and stream through encoder.
 
 Functions (6)-(10) are the same except `temp_alloc` is used to allocate temporary work areas.
 
@@ -84,8 +84,8 @@ Functions (6)-(10) are the same except `temp_alloc` is used to allocate temporar
     <td>C++ data structure</td> 
   </tr>
   <tr>
-    <td>handler</td>
-    <td>JSON output handler</td> 
+    <td>visitor</td>
+    <td>JSON output visitor</td> 
   </tr>
   <tr>
     <td>options</td>
@@ -107,7 +107,7 @@ None
 
 ### See also
 
-- [basic_json_content_handler](basic_json_content_handler.md)
+- [basic_json_visitor](basic_json_visitor.md)
 - [basic_json_options](basic_json_options.md)
     
 ### Examples

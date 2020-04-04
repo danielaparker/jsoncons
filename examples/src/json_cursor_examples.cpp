@@ -55,7 +55,7 @@ void reading_a_json_stream()
             case staj_event_type::end_object:
                 std::cout << event.event_type() << " " << "\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
@@ -91,7 +91,7 @@ struct author_filter
 
     bool operator()(const staj_event& event, const ser_context&) 
     {
-        if (event.event_type()  == staj_event_type::name &&
+        if (event.event_type()  == staj_event_type::key &&
             event.get<jsoncons::string_view>() == "author")
         {
             accept_next_ = true;

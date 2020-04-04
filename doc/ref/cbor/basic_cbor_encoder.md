@@ -5,12 +5,12 @@
 
 template<
     class Sink>
-> class basic_cbor_encoder final : public json_content_handler
+> class basic_cbor_encoder final : public json_visitor
 ```
 
 `basic_cbor_encoder` is noncopyable
 
-![basic_cbor_encoder](./diagrams/cbor_encoder.png)
+![basic_cbor_encoder](./diagrams/basic_cbor_encoder.png)
 
 Four specializations for common sink types are defined:
 
@@ -37,61 +37,61 @@ Constructs a new encoder that writes to the specified destination.
     virtual ~basic_cbor_encoder()
 
 
-#### Inherited from [jsoncons::json_content_handler](../basic_json_content_handler.md)
+#### Inherited from [jsoncons::json_visitor](../basic_json_visitor.md)
 
     bool typed_array(const span<const uint8_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const uint16_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const uint32_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const uint64_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const int8_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const int16_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const int32_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const int64_t>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(half_arg_t, const span<const uint16_t>& data,
                      semantic_tag tag = semantic_tag::none,
-                     const ser_context& context = null_ser_context())
+                     const ser_context& context = ser_context())
 
     bool typed_array(const span<const float>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const double>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool typed_array(const span<const float128_type>& data, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context())
+                     const ser_context& context=ser_context())
 
     bool begin_multi_dim(const span<const size_t>& shape,
                          semantic_tag tag,
                          const ser_context& context) 
 
-    bool end_multi_dim(const ser_context& context=null_ser_context()) 
+    bool end_multi_dim(const ser_context& context=ser_context()) 
 
     bool typed_array(const span<const uint8_t>& v, 
                      semantic_tag tag,
@@ -156,59 +156,59 @@ Constructs a new encoder that writes to the specified destination.
     bool end_multi_dim(const ser_context& context,
                        std::error_code& ec) 
 
-#### Inherited from [jsoncons::basic_json_content_handler](basic_json_content_handler.md)
+#### Inherited from [jsoncons::basic_json_visitor](basic_json_visitor.md)
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); // (1)
+                      const ser_context& context=ser_context()); // (1)
 
     bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none, 
-                      const ser_context& context = null_ser_context()); // (2)
+                      const ser_context& context = ser_context()); // (2)
 
-    bool end_object(const ser_context& context = null_ser_context()); // (3)
+    bool end_object(const ser_context& context = ser_context()); // (3)
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); // (4)
+                     const ser_context& context=ser_context()); // (4)
 
     bool begin_array(std::size_t length, 
                      semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); // (5)
+                     const ser_context& context=ser_context()); // (5)
 
-    bool end_array(const ser_context& context=null_ser_context()); // (6)
+    bool end_array(const ser_context& context=ser_context()); // (6)
 
     bool key(const string_view_type& name, 
-              const ser_context& context=null_ser_context()); // (7)
+              const ser_context& context=ser_context()); // (7)
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()); // (8) 
+                    const ser_context& context=ser_context()); // (8) 
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context()); // (9) 
+                    const ser_context& context=ser_context()); // (9) 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (10) 
+                      const ser_context& context=ser_context()); // (10) 
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); // (11)
+                           const ser_context& context=ser_context()); // (11)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (12)
+                      const ser_context& context=ser_context()); // (12)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context()); // (13)
+                     const ser_context& context=ser_context()); // (13)
 
     bool half_value(uint16_t value, 
                     semantic_tag tag = semantic_tag::none, 
-                    const ser_context& context=null_ser_context()); // (14)
+                    const ser_context& context=ser_context()); // (14)
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); // (15)
+                      const ser_context& context=ser_context()); // (15)
 
     bool begin_object(semantic_tag tag,
                       const ser_context& context,

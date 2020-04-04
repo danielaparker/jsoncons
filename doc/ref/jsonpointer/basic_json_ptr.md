@@ -91,11 +91,12 @@ Performs stream output
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+// for brevity
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::json_ptr ptr("/store/book/1/author");
+    jsonpointer::json_ptr ptr("/store/book/1/author");
 
     std::cout << "(1) " << ptr << "\n\n";
 
@@ -125,11 +126,11 @@ author
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::json_ptr ptr;
+    jsonpointer::json_ptr ptr;
 
     ptr /= "a/b";
     ptr /= "";
@@ -156,19 +157,19 @@ a/b
 m~n
 ```
 
-#### Concatentate two JSON Pointers
+#### Concatentate two JSONPointers
 
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-namespace jp = jsoncons::jsonpointer;
+namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    jp::json_ptr ptr("/a~1b");
+    jsonpointer::json_ptr ptr("/a~1b");
 
-    ptr += jp::json_ptr("//m~0n");
+    ptr += jsonpointer::json_ptr("//m~0n");
 
     std::cout << "(1) " << ptr << "\n\n";
 

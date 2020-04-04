@@ -155,7 +155,7 @@ struct json_type_traits<Json,boost::gregorian::date>
     }
 };
 
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::fixing, index_id, observation_date, rate)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::fixing, index_id, observation_date, rate)
 
 int main()
 {
@@ -220,7 +220,7 @@ int main()
             case staj_event_type::end_object:
                 std::cout << event.event_type() << " " << "\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;

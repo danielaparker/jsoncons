@@ -13,7 +13,7 @@
 #include <memory>
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/parse_number.hpp>
@@ -25,13 +25,13 @@ namespace jsoncons { namespace ubjson {
 enum class ubjson_container_type {object, indefinite_length_object, array, indefinite_length_array};
 
 template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
-class basic_ubjson_encoder final : public basic_json_content_handler<char>
+class basic_ubjson_encoder final : public basic_json_visitor<char>
 {
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
     typedef Allocator allocator_type;
-    using typename basic_json_content_handler<char>::string_view_type;
+    using typename basic_json_visitor<char>::string_view_type;
     typedef Sink sink_type;
 
 private:
@@ -98,12 +98,12 @@ public:
 private:
     // Implementing methods
 
-    void do_flush() override
+    void visit_flush() override
     {
         sink_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_object));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_object_marker);
@@ -111,7 +111,7 @@ private:
         return true;
     }
 
-    bool do_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::object, length));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_object_marker);
@@ -121,7 +121,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code& ec) override
+    bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -146,7 +146,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_array));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
@@ -154,7 +154,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
     {
         stack_.push_back(stack_item(ubjson_container_type::array, length));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
@@ -164,7 +164,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&, std::error_code& ec) override
+    bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_indefinite_length())
@@ -189,7 +189,7 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code& ec) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code& ec) override
     {
         auto sink = unicons::validate(name.begin(), name.end());
         if (sink.ec != unicons::conv_errc())
@@ -207,7 +207,7 @@ private:
         return true;
     }
 
-    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         // nil
         jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::null_type), std::back_inserter(sink_));
@@ -215,7 +215,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
+    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
     {
         switch (tag)
         {
@@ -274,7 +274,7 @@ private:
         }
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -295,7 +295,7 @@ private:
         return true;
     }
 
-    bool do_double(double val, 
+    bool visit_double(double val, 
                          semantic_tag,
                          const ser_context&,
                          std::error_code&) override
@@ -320,7 +320,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t val, 
+    bool visit_int64(int64_t val, 
                         semantic_tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -387,7 +387,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t val, 
+    bool visit_uint64(uint64_t val, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -416,7 +416,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         // true and false
         sink_.push_back(static_cast<uint8_t>(val ? jsoncons::ubjson::detail::ubjson_format::true_type : jsoncons::ubjson::detail::ubjson_format::false_type));

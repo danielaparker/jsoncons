@@ -7,12 +7,12 @@ template<
     class CharT,
     class Sink,
     class Allocator=std::allocator<CharT>=std::allocator<CharT>>
-> class basic_csv_encoder : public jsoncons::basic_json_content_handler<CharT>
+> class basic_csv_encoder : public jsoncons::basic_json_visitor<CharT>
 ```
 
 `basic_csv_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
 
-![csv_encoder](./diagrams/csv_encoder.png)
+![basic_csv_encoder](./diagrams/basic_csv_encoder.png)
 
 Four specializations for common character types and result types are defined:
 
@@ -45,64 +45,64 @@ and uses the specified [csv options](basic_csv_options.md).
 
     virtual ~basic_csv_encoder()
 
-#### Inherited from [basic_json_content_handler](../basic_json_content_handler.md)
+#### Inherited from [basic_json_visitor](../basic_json_visitor.md)
 
 #### Member functions
 
     bool begin_object(semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
     bool begin_object(std::size_t length, 
                       semantic_tag tag=semantic_tag::none,
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
-    bool end_object(const ser_context& context = null_ser_context())
-
-    bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); 
+    bool end_object(const ser_context& context = ser_context())
 
     bool begin_array(semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=null_ser_context()); 
+                     const ser_context& context=ser_context()); 
 
-    bool end_array(const ser_context& context=null_ser_context()); 
+    bool begin_array(semantic_tag tag=semantic_tag::none,
+                     const ser_context& context=ser_context()); 
+
+    bool end_array(const ser_context& context=ser_context()); 
 
     bool key(const string_view_type& name, 
-              const ser_context& context=null_ser_context()); 
+              const ser_context& context=ser_context()); 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context());
+                      const ser_context& context=ser_context());
 
     bool byte_string_value(const byte_string_view& b, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); 
+                           const ser_context& context=ser_context()); 
 
     bool byte_string_value(const uint8_t* p, std::size_t size, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=null_ser_context()); 
+                           const ser_context& context=ser_context()); 
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=null_ser_context());
+                     const ser_context& context=ser_context());
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
     bool half_value(uint16_t value, 
                     semantic_tag tag = semantic_tag::none, 
-                    const ser_context& context=null_ser_context()); 
+                    const ser_context& context=ser_context()); 
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=null_ser_context()); 
+                      const ser_context& context=ser_context()); 
 
     bool bool_value(bool value, 
                     semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context());  
+                    const ser_context& context=ser_context());  
 
     bool null_value(semantic_tag tag = semantic_tag::none,
-                    const ser_context& context=null_ser_context());  
+                    const ser_context& context=ser_context());  
 
     void flush()
 

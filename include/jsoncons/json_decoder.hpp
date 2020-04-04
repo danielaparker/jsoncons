@@ -14,16 +14,16 @@
 #include <iterator> // std::make_move_iterator
 #include <utility> // std::move
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 
 namespace jsoncons {
 
 template <class Json,class TempAllocator=std::allocator<char>>
-class json_decoder final : public basic_json_content_handler<typename Json::char_type>
+class json_decoder final : public basic_json_visitor<typename Json::char_type>
 {
 public:
     typedef typename Json::char_type char_type;
-    using typename basic_json_content_handler<char_type>::string_view_type;
+    using typename basic_json_visitor<char_type>::string_view_type;
 
     typedef typename Json::key_value_type key_value_type;
     typedef typename Json::key_type key_type;
@@ -174,11 +174,11 @@ public:
 
 private:
 
-    void do_flush() override
+    void visit_flush() override
     {
     }
 
-    bool do_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (structure_stack_.back().type_ == structure_type::root_t)
         {
@@ -190,7 +190,7 @@ private:
         return true;
     }
 
-    bool do_end_object(const ser_context&, std::error_code&) override
+    bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);
@@ -216,7 +216,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         if (structure_stack_.back().type_ == structure_type::root_t)
         {
@@ -228,7 +228,7 @@ private:
         return true;
     }
 
-    bool do_end_array(const ser_context&, std::error_code&) override
+    bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
@@ -256,13 +256,13 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         name_ = key_type(name.data(),name.length(),string_allocator_);
         return true;
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -278,7 +278,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag tag, 
                               const ser_context&,
                               std::error_code&) override
@@ -297,7 +297,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t value, 
+    bool visit_int64(int64_t value, 
                         semantic_tag tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -316,7 +316,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t value, 
+    bool visit_uint64(uint64_t value, 
                          semantic_tag tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -335,7 +335,7 @@ private:
         return true;
     }
 
-    bool do_half(uint16_t value, 
+    bool visit_half(uint16_t value, 
                        semantic_tag tag,   
                        const ser_context&,
                        std::error_code&) override
@@ -354,7 +354,7 @@ private:
         return true;
     }
 
-    bool do_double(double value, 
+    bool visit_double(double value, 
                          semantic_tag tag,   
                          const ser_context&,
                          std::error_code&) override
@@ -373,7 +373,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool value, semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
@@ -389,7 +389,7 @@ private:
         return true;
     }
 
-    bool do_null(semantic_tag tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag tag, const ser_context&, std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {

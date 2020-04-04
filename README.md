@@ -12,11 +12,9 @@ to work with the data in a number of ways:
   in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
-SAX style parsers and serializers. Its [json parser](doc/ref/json_parser.md) is an 
-incremental parser that can be fed its input in chunks, and does not require an entire file to be loaded in memory at one time. 
-Its variant-like data structure is more compact than most, and can be made more compact still with a user-supplied
-allocator. It also supports memory efficient parsing of very large JSON texts with a [pull parser](doc/ref/basic_json_cursor.md),
-built on top of its incremental parser.  
+SAX style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
+But it also supports incremental parsing into a user's preferred form, using
+information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
@@ -24,7 +22,7 @@ supports semantic tagging of date-time values, timestamp values, big integers,
 big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
-jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html).
+jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html). 
 
 ## Extensions
 
@@ -32,7 +30,7 @@ jsoncons is distributed under the [Boost Software License](http://www.boost.org/
 - [jsonpatch](doc/ref/jsonpatch/jsonpatch.md) implements the IETF standard [JavaScript Object Notation (JSON) Patch](https://tools.ietf.org/html/rfc6902)
 - [jsonpath](doc/ref/jsonpath/jsonpath.md) implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).  It also supports search and replace using JSONPath expressions.
 - [cbor](doc/ref/cbor/cbor.md) implements decode from and encode to the IETF standard [Concise Binary Object Representation](http://cbor.io/) data format.
-  In addition it supports tags for [stringref](http://cbor.schmorp.de/stringref) and tags for [typed arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08). 
+  In addition it supports tags for [stringref](http://cbor.schmorp.de/stringref) and tags for [typed arrays](https://tools.ietf.org/html/rfc8746). 
 - [msgpack](doc/ref/msgpack/msgpack.md) implements decode from and encode to the [MessagePack](http://msgpack.org/index.html) data format.
 - [ubjson](doc/ref/ubjson/ubjson.md) implements decode from and encode to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 - [bson](doc/ref/bson/bson.md) implements decode from and encode to the [Binary JSON](http://bsonspec.org/) data format.
@@ -66,6 +64,8 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [Reference](doc/Reference.md)
 - [Roadmap](Roadmap.md)
 
+A C++ Compiler with C++11 support is required.
+
 The library uses exceptions and in some cases `std::error_code`'s to report errors.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
 
@@ -87,7 +87,7 @@ For the examples below you need to include some header files and initialize a st
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <iostream>
 
 using namespace jsoncons; // for convenience
@@ -239,10 +239,10 @@ namespace ns {
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
 // First four members listed are mandatory, confidence and expires are optional
-JSONCONS_N_GETTER_CTOR_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
+JSONCONS_N_CTOR_GETTER_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
                               confidence, expires)
 // All members are mandatory
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
 {
@@ -281,18 +281,18 @@ Marilyn C, 0.9
     ]
 }
 ```
-This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
-`JSONCONS_N_GETTER_CTOR_TRAITS`, and `JSONCONS_ALL_GETTER_CTOR_TRAITS` to specialize the 
+This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`,
+`JSONCONS_N_CTOR_GETTER_TRAITS`, and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
 `ns::hiking_experience`, the class `ns::hiking_reputon` (with some non-mandatory members), and the class
 `ns::hiking_reputation` (with all mandatory members.)
 The macro `JSONCONS_ENUM_TRAITS` generates the code from
-the enum identifiers, and the macros `JSONCONS_N_GETTER_CTOR_TRAITS`
-and `JSONCONS_ALL_GETTER_CTOR_TRAITS` 
+the enum identifiers, and the macros `JSONCONS_N_CTOR_GETTER_TRAITS`
+and `JSONCONS_ALL_CTOR_GETTER_TRAITS` 
 generate the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
-See [examples](doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
+See [examples](doc/Examples.md#G0) for other ways of specializing `json_type_traits`.
 
 #### As a stream of parse events
 
@@ -317,7 +317,7 @@ int main()
             case staj_event_type::end_object:
                 std::cout << event.event_type() << " " << "\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
@@ -379,7 +379,7 @@ int main()
     std::string name;
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool
     {
-        if (ev.event_type() == staj_event_type::name)
+        if (ev.event_type() == staj_event_type::key)
         {
             name = ev.get<std::string>();
             return false;
@@ -428,7 +428,7 @@ For the examples below you need to include some header files and initialize a bu
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons; // for convenience
 
@@ -589,7 +589,7 @@ int main()
             case staj_event_type::end_object:
                 std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
@@ -937,8 +937,6 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 |                         | 4.9.2                     | i386        | Debian 8          |       |
 | clang                   | 3.8 and above             | x64         | Ubuntu            |       |
 | clang xcode             | 6.4 and above             | x64         | OSX               |       |
-
-It is also cross compiled for ARMv8-A architecture on Travis using clang and executed using the emulator qemu. 
 
 [UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 

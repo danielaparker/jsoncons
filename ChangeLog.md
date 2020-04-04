@@ -1,3 +1,52 @@
+v0.150.0
+--------
+
+Defects fixed:
+
+- Fixed jsonpath issue [union with spaces](https://cburgmer.github.io/json-path-comparison/results/union_with_spaces.html)
+
+- Fixed jsonpath issue [Bracket notation with empty string](https://cburgmer.github.io/json-path-comparison/results/bracket_notation_with_empty_string.html)
+
+- Fixed jsonpath issue [Bracket notation with empty string doubled quoted](https://cburgmer.github.io/json-path-comparison/results/bracket_notation_with_empty_string_doubled_quoted.html)
+
+Changes:
+
+- The names `basic_json_content_handler` and `basic_default_json_content_handler`
+have been deprecated and renamed to `basic_json_visitor` and `basic_default_json_visitor`.
+The private visitor functions `do_xxx` have been renamed to `visit_xxx`.
+This change should be transparent to most users. 
+
+- The name `staj_event_type::name` has been deprecated and renamed to
+`staj_event_type::key`. Rationale: consistency with other names. The old
+name is still supported.
+
+- The class `null_ser_context` has been deprecated. For defaults, `ser_context()` 
+is now used in place of `null_ser_context()`.
+
+Enhancements:
+
+- Added jsonpointer `unflatten` function
+
+v0.149.0
+--------
+
+Defects fixed:
+
+- Fixed vs issue (since v0.148.0) with basic_json constructor disambiguation with 
+a combination of type tag and `std::initializer_list` arguments.
+
+Non-breaking change:
+
+- For consistency with naming conventions across `json_type_traits` convenience macros,
+macro names containing `GETTER_CTOR` now contain `CTOR_GETTER`, e.g. 
+`JSONCONS_ALL_GETTER_CTOR_NAME_TRAITS` is now `JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS`.
+The old names are still supported.
+
+Enhancements:
+
+- Added jsonpath functions `flatten` and `unflatten` that flatten a json object or array 
+to a single depth object of key-value pairs, and unflatten that object back to the original json.
+
 v0.148.0
 --------
 

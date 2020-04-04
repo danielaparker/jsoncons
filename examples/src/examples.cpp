@@ -7,7 +7,7 @@
 #include <map>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <fstream>
 
 using namespace jsoncons;
@@ -28,7 +28,6 @@ void run_csv_examples();
 void jsonpath_examples();
 void json_accessor_examples();
 void msgpack_examples();
-void jsonpointer_examples();
 void jsonpatch_examples();
 void run_cbor_examples();
 void run_ubjson_examples();
@@ -42,6 +41,7 @@ void json_traits_macros_named_examples();
 void run_cbor_typed_array_examples();
 void byte_string_examples();
 void json_constructor_examples();
+void jsonpointer_examples();
 
 void comment_example()
 {
@@ -403,10 +403,6 @@ int main()
 
         serialization_examples();
 
-        jsonpointer_examples();
-
-        jsonpath_examples();
-
         json_cursor_examples();
 
         run_ubjson_examples();
@@ -438,6 +434,10 @@ int main()
         jsonpatch_examples();
 
         readme_examples();
+
+        jsonpath_examples();
+
+        jsonpointer_examples();
     }
     catch (const std::exception& e)
     {

@@ -16,7 +16,7 @@
 #include <memory> // std::allocator
 #include <limits> // std::numeric_limits
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons/sink.hpp>
@@ -24,11 +24,11 @@
 namespace jsoncons { namespace csv {
 
 template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
-class basic_csv_encoder final : public basic_json_content_handler<CharT>
+class basic_csv_encoder final : public basic_json_visitor<CharT>
 {
 public:
     typedef CharT char_type;
-    using typename basic_json_content_handler<CharT>::string_view_type;
+    using typename basic_json_visitor<CharT>::string_view_type;
     typedef Sink sink_type;
 
     typedef Allocator allocator_type;
@@ -159,12 +159,12 @@ private:
         }
     }
 
-    void do_flush() override
+    void visit_flush() override
     {
         sink_.flush();
     }
 
-    bool do_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -182,7 +182,7 @@ private:
         }
     }
 
-    bool do_end_object(const ser_context&, std::error_code&) override
+    bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -237,7 +237,7 @@ private:
         return true;
     }
 
-    bool do_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -297,7 +297,7 @@ private:
         }
     }
 
-    bool do_end_array(const ser_context&, std::error_code&) override
+    bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -321,7 +321,7 @@ private:
         return true;
     }
 
-    bool do_key(const string_view_type& name, const ser_context&, std::error_code&) override
+    bool visit_key(const string_view_type& name, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -355,7 +355,7 @@ private:
         return true;
     }
 
-    bool do_null(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -404,7 +404,7 @@ private:
         return true;
     }
 
-    bool do_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -453,7 +453,7 @@ private:
         return true;
     }
 
-    bool do_byte_string(const byte_string_view& b, 
+    bool visit_byte_string(const byte_string_view& b, 
                               semantic_tag tag, 
                               const ser_context& context,
                               std::error_code& ec) override
@@ -482,19 +482,19 @@ private:
             case byte_string_chars_format::base16:
             {
                 encode_base16(b.begin(),b.end(),s);
-                do_string(s, semantic_tag::none, context, ec);
+                visit_string(s, semantic_tag::none, context, ec);
                 break;
             }
             case byte_string_chars_format::base64:
             {
                 encode_base64(b.begin(),b.end(),s);
-                do_string(s, semantic_tag::none, context, ec);
+                visit_string(s, semantic_tag::none, context, ec);
                 break;
             }
             case byte_string_chars_format::base64url:
             {
                 encode_base64url(b.begin(),b.end(),s);
-                do_string(s, semantic_tag::none, context, ec);
+                visit_string(s, semantic_tag::none, context, ec);
                 break;
             }
             default:
@@ -506,7 +506,7 @@ private:
         return true;
     }
 
-    bool do_double(double val, 
+    bool visit_double(double val, 
                          semantic_tag, 
                          const ser_context& context,
                          std::error_code& ec) override
@@ -558,7 +558,7 @@ private:
         return true;
     }
 
-    bool do_int64(int64_t val, 
+    bool visit_int64(int64_t val, 
                         semantic_tag, 
                         const ser_context&,
                         std::error_code&) override
@@ -610,7 +610,7 @@ private:
         return true;
     }
 
-    bool do_uint64(uint64_t val, 
+    bool visit_uint64(uint64_t val, 
                          semantic_tag, 
                          const ser_context&,
                          std::error_code&) override
@@ -662,7 +662,7 @@ private:
         return true;
     }
 
-    bool do_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)
@@ -754,7 +754,7 @@ private:
                 }
                 else if (options_.enable_nan_to_str())
                 {
-                    do_string(options_.nan_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.nan_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -769,7 +769,7 @@ private:
                 }
                 else if (options_.enable_inf_to_str())
                 {
-                    do_string(options_.inf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.inf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {
@@ -784,7 +784,7 @@ private:
                 }
                 else if (options_.enable_neginf_to_str())
                 {
-                    do_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
+                    visit_string(options_.neginf_to_str(), semantic_tag::none, context, ec);
                 }
                 else
                 {

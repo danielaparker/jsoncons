@@ -39,7 +39,7 @@ For the examples below you need to include some header files and initialize a bu
 #include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons; // for convenience
 
@@ -166,7 +166,7 @@ int main()
             case staj_event_type::end_object:
                 std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
@@ -390,8 +390,8 @@ namespace ns {
 
 // Declare the traits. Specify which data members need to be serialized.
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_ALL_GETTER_CTOR_TRAITS(ns::hiking_reputation, application, reputons)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
 {

@@ -1,7 +1,5 @@
 ### jsoncons::jsonpath::json_query
 
-Returns a `json` array of values or normalized path expressions selected from a root `json` structure.
-
 ```c++
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 
@@ -12,6 +10,9 @@ Json json_query(const Json& root,
                 const typename Json::string_view_type& path,
                 result_type result_t = result_type::value);
 ```
+
+Returns a `json` array of values or normalized path expressions selected from a root `json` structure.
+
 #### Parameters
 
 <table>
@@ -84,7 +85,7 @@ The examples below use the JSON text from [Stefan Goessner's JSONPath](http://go
 
 ```c++    
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <fstream>
 
 using namespace jsoncons;
@@ -243,7 +244,7 @@ Output:
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using namespace jsoncons;
 

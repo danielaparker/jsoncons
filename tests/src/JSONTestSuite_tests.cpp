@@ -15,17 +15,14 @@
 #include <iostream>
 #include <locale>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900
+#if (defined JSONCONS_HAS_FILESYSTEM && defined(_MSC_VER))
 #include <filesystem>
-namespace fs = std::experimental::filesystem;
-#else
-//#include <filesystem>
-//namespace fs = std::filesystem;
+namespace fs = std::filesystem;
 #endif
 
 using namespace jsoncons;
 
-#if defined(_MSC_VER) && _MSC_VER >= 1900
+#if (defined JSONCONS_HAS_FILESYSTEM && defined(_MSC_VER))
 TEST_CASE("JSON Parsing Test Suite")
 {
     SECTION("Expected success")

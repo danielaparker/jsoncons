@@ -35,7 +35,7 @@ namespace cbor {
     {
         typedef typename T::char_type char_type;
         cbor_bytes_encoder encoder(v, options);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -56,7 +56,7 @@ namespace cbor {
     encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options, std::error_code& ec)
     {
         cbor_bytes_encoder encoder(v, options);
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
     }
 
     // stream
@@ -73,7 +73,7 @@ namespace cbor {
     {
         typedef typename T::char_type char_type;
         cbor_stream_encoder encoder(os, options);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -97,7 +97,7 @@ namespace cbor {
                 std::error_code& ec)
     {
         cbor_stream_encoder encoder(os, options);
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
     }
 
     // temp_allocator_arg
@@ -121,7 +121,7 @@ namespace cbor {
     {
         typedef typename T::char_type char_type;
         cbor_bytes_encoder encoder(v, options);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -149,7 +149,7 @@ namespace cbor {
                 std::error_code& ec)
     {
         cbor_bytes_encoder encoder(v, options);
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
     }
 
     // stream
@@ -168,7 +168,7 @@ namespace cbor {
     {
         typedef typename T::char_type char_type;
         cbor_stream_encoder encoder(os, options);
-        auto adaptor = make_json_content_handler_adaptor<basic_json_content_handler<char_type>>(encoder);
+        auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
@@ -194,7 +194,7 @@ namespace cbor {
                 std::error_code& ec)
     {
         cbor_stream_encoder encoder(os, options);
-        ser_traits<T>::serialize(val, encoder, json(), ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
     }
 
 } // namespace cbor

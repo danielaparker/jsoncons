@@ -25,7 +25,7 @@ field_delimiter|A character that indicates the end of a field. Default is `,`.|C
 subfield_delimiter|A character that indicates the end of a single value in a multi-valued field. Default is no multi-valued fields.|Character to write between items in an array value.
 quote_char|A character to quote fields. Default is the double quote character `"`|A character to quote fields.
 quote_escape_char|A character to escape quote characters occuring inside quoted fields. The default is the double quote character (i.e. the quote character is doubled).|Character to escape quote characters occurring inside quoted fields. 
-quote_style| |Indicates what [quote_style](quote_style_type.md) to use when quoting fields. Default is minimal.
+quote_style| |Indicates what [quote_style](quote_style_kind.md) to use when quoting fields. Default is minimal.
 column_names|Use these column names when reading the file.|Write these column names to the header line.
 header_lines|Number of header lines in the CSV text. Defaults to 1 if assume_header is true, otherwise 0|
 assume_header|Assume first row in file is header, use field names to construct objects. Default is `false`.|
@@ -167,7 +167,7 @@ Character to escape quote character (by default the quote character is doubled).
 Character to comment out a line, must be at column 1. Default is no comments.
 
     basic_csv_options& quote_style(quote_style_kind value);
-Indicates what [quote_style](quote_style_type.md) to use when quoting fields. Default is minimal.
+Indicates what [quote_style](quote_style_kind.md) to use when quoting fields. Default is minimal.
 
     basic_csv_options& mapping(mapping_kind value);
 Indicates what [mapping kind](mapping_kind.md) to use when parsing a CSV file into a `basic_json`. If assume_header is true or column_names is not empty, defaults to `mapping_kind::n_rows`, otherwise `mapping_kind::n_columns`.

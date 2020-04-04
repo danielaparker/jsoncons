@@ -5,7 +5,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <string>
 #include <iomanip>
 #include <cassert>
@@ -145,7 +145,7 @@ void working_with_ubjson_3()
             case staj_event_type::end_object:
                 std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;

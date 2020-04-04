@@ -9,7 +9,8 @@ enum class staj_event_type
     end_array,
     begin_object,
     end_object,
-    name,
+    name, // until 0.150.0
+    key, // since 0.150.0
     string_value,
     byte_string_value,
     null_value,

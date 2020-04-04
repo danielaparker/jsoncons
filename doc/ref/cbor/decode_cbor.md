@@ -245,7 +245,7 @@ Output:
 
 #### Decode Typed Array tags
 
-jsoncons implements [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08).
+jsoncons implements [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746).
 Tags 64-82 and Tags 84-86 are automatically decoded when detected.
 
 ```c++
@@ -310,7 +310,7 @@ d8 56 50 ff ff ff ff ff ff ef ff ff ff ff ff ff ff ef 7f
 
 #### Decode Typed Array tags - multi-dimensional row major tag 
 
-jsoncons implements the tags for row-major and column-major order multi-dimensional arrays, as defined in [Tags for Typed Arrays](https://tools.ietf.org/html/draft-ietf-cbor-array-tags-08).
+jsoncons implements the tags for row-major and column-major order multi-dimensional arrays, as defined in [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746).
 
 ```c++
 #include <jsoncons/json.hpp>

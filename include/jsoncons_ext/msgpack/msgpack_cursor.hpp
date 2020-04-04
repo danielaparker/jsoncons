@@ -16,7 +16,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj_reader.hpp>
 #include <jsoncons/source.hpp>
@@ -33,7 +33,7 @@ public:
     typedef char char_type;
     typedef Allocator allocator_type;
 private:
-    basic_staj_event_handler<char_type> event_handler_;
+    basic_staj_visitor<char_type> event_handler_;
 
     basic_msgpack_parser<Src,Allocator> parser_;
     bool eof_;
@@ -115,24 +115,24 @@ public:
         return event_handler_.event();
     }
 
-    void read(basic_json_content_handler<char_type>& handler) override
+    void read(basic_json_visitor<char_type>& visitor) override
     {
         std::error_code ec;
-        read(handler, ec);
+        read(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read(basic_json_content_handler<char_type>& handler,
+    void read(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(event_handler_.event(), handler, *this, ec))
+        if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
         {
             return;
         }
-        read_next(handler, ec);
+        read_next(visitor, ec);
     }
 
     void next() override
@@ -155,12 +155,12 @@ public:
         read_next(event_handler_, ec);
     }
 
-    void read_next(basic_json_content_handler<char_type>& handler, std::error_code& ec)
+    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
         parser_.restart();
         while (!parser_.stopped())
         {
-            parser_.parse(handler, ec);
+            parser_.parse(visitor, ec);
             if (ec) return;
         }
     }
@@ -186,17 +186,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char_type>&)")
-    void read_to(basic_json_content_handler<char_type>& handler)
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&)")
+    void read_to(basic_json_visitor<char_type>& visitor)
     {
-        read(handler);
+        read(visitor);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_content_handler<char_type>&, std::error_code&)")
-    void read_to(basic_json_content_handler<char_type>& handler,
+    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&, std::error_code&)")
+    void read_to(basic_json_visitor<char_type>& visitor,
                  std::error_code& ec) 
     {
-        read(handler, ec);
+        read(visitor, ec);
     }
 #endif
 private:

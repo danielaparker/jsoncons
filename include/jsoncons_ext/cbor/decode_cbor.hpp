@@ -14,11 +14,11 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
+#include <jsoncons/deser_traits.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
-#include <jsoncons/ser_traits.hpp>
 
 namespace jsoncons { 
 namespace cbor {
@@ -28,7 +28,7 @@ namespace cbor {
     decode_cbor(const std::vector<uint8_t>& v)
     {
         jsoncons::json_decoder<T> decoder;
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::bytes_source> reader(v, adaptor);
         reader.read();
         return decoder.get_result();
@@ -42,7 +42,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -55,7 +55,7 @@ namespace cbor {
     decode_cbor(std::istream& is)
     {
         jsoncons::json_decoder<T> decoder;
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         cbor_stream_reader reader(is, adaptor);
         reader.read();
         return decoder.get_result();
@@ -69,7 +69,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -85,7 +85,7 @@ namespace cbor {
                 const std::vector<uint8_t>& v)
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, temp_alloc);
         reader.read();
         return decoder.get_result();
@@ -100,7 +100,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -114,7 +114,7 @@ namespace cbor {
                 std::istream& is)
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
-        auto adaptor = make_json_content_handler_adaptor<json_content_handler>(decoder);
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, temp_alloc);
         reader.read();
         return decoder.get_result();
@@ -129,7 +129,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

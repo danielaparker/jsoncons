@@ -76,9 +76,9 @@ namespace detail {
         random_access_iterator_wrapper& operator=(const random_access_iterator_wrapper&) = default;
         random_access_iterator_wrapper& operator=(random_access_iterator_wrapper&&) = default;
 
-        template <class Iter>
-        random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other,
-                                       typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type* = 0)
+        template <class Iter,
+                  class=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
+        random_access_iterator_wrapper(const random_access_iterator_wrapper<Iter>& other)
             : it_(other.it_), has_value_(true)
         {
         }
@@ -2482,9 +2482,9 @@ public:
             evaluate().dump(os, options, line_indent);
         }
 
-        void dump(basic_json_content_handler<char_type>& handler) const
+        void dump(basic_json_visitor<char_type>& visitor) const
         {
-            evaluate().dump(handler);
+            evaluate().dump(visitor);
         }
 
         template <class SAllocator=std::allocator<char_type>>
@@ -2519,10 +2519,10 @@ public:
             evaluate().dump(os, line_indent, ec);
         }
 
-        void dump(basic_json_content_handler<char_type>& handler,
+        void dump(basic_json_visitor<char_type>& visitor,
                   std::error_code& ec) const
         {
-            evaluate().dump(handler, ec);
+            evaluate().dump(visitor, ec);
         }
 
         void swap(basic_json& val) 
@@ -2715,10 +2715,10 @@ public:
         {
             return evaluate().to_string(alloc);
         }
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-        void write(basic_json_content_handler<char_type>& handler) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+        void write(basic_json_visitor<char_type>& visitor) const
         {
-            evaluate().write(handler);
+            evaluate().write(visitor);
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
@@ -2745,10 +2745,10 @@ public:
         {
             return evaluate().to_string(options,alloc);
         }
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-        void to_stream(basic_json_content_handler<char_type>& handler) const
+        JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+        void to_stream(basic_json_visitor<char_type>& visitor) const
         {
-            evaluate().to_stream(handler);
+            evaluate().to_stream(visitor);
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
@@ -2925,15 +2925,15 @@ public:
 
     static basic_json parse(std::basic_istream<char_type>& is, std::function<bool(json_errc,const ser_context&)> err_handler)
     {
-        json_decoder<basic_json> handler;
-        basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, err_handler);
+        json_decoder<basic_json> visitor;
+        basic_json_reader<char_type,stream_source<char_type>> reader(is, visitor, err_handler);
         reader.read_next();
         reader.check_done();
-        if (!handler.is_valid())
+        if (!visitor.is_valid())
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
         }
-        return handler.get_result();
+        return visitor.get_result();
     }
 
     static basic_json parse(const string_view_type& s)
@@ -2972,15 +2972,15 @@ public:
 
     static basic_json parse(std::basic_istream<char_type>& is, const basic_json_decode_options<char_type>& options, std::function<bool(json_errc,const ser_context&)> err_handler)
     {
-        json_decoder<basic_json> handler;
-        basic_json_reader<char_type,stream_source<char_type>> reader(is, handler, options, err_handler);
+        json_decoder<basic_json> visitor;
+        basic_json_reader<char_type,stream_source<char_type>> reader(is, visitor, options, err_handler);
         reader.read_next();
         reader.check_done();
-        if (!handler.is_valid())
+        if (!visitor.is_valid())
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
         }
-        return handler.get_result();
+        return visitor.get_result();
     }
 
     static basic_json parse(const string_view_type& s, const basic_json_decode_options<char_type>& options)
@@ -3194,16 +3194,16 @@ public:
     {
     }
 
-    template <class T>
-    basic_json(const T& val,
-               typename std::enable_if<!is_proxy<T>::value>::type* = 0)
+    template <class T,
+              class = typename std::enable_if<!is_proxy<T>::value>::type>
+    basic_json(const T& val)
         : var_(json_type_traits<basic_json,T>::to_json(val).var_)
     {
     }
 
-    template <class T>
-    basic_json(const T& val, const Allocator& alloc,
-               typename std::enable_if<!is_proxy<T>::value>::type* = 0)
+    template <class T,
+              class = typename std::enable_if<!is_proxy<T>::value>::type>
+    basic_json(const T& val, const Allocator& alloc)
         : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
     {
     }
@@ -3229,13 +3229,15 @@ public:
     }
 
     template <class Unsigned>
-    basic_json(Unsigned val, semantic_tag tag, typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value>::type* = 0)
+    basic_json(Unsigned val, semantic_tag tag, 
+               typename std::enable_if<std::is_integral<Unsigned>::value && !std::is_signed<Unsigned>::value, int>::type = 0)
         : var_(static_cast<uint64_t>(val), tag)
     {
     }
 
     template <class Signed>
-    basic_json(Signed val, semantic_tag tag, typename std::enable_if<std::is_integral<Signed>::value && std::is_signed<Signed>::value>::type* = 0)
+    basic_json(Signed val, semantic_tag tag,
+               typename std::enable_if<std::is_integral<Signed>::value&& std::is_signed<Signed>::value,int>::type = 0)
         : var_(static_cast<int64_t>(val), tag)
     {
     }
@@ -3448,10 +3450,10 @@ public:
         }
     }
 
-    void dump(basic_json_content_handler<char_type>& handler) const
+    void dump(basic_json_visitor<char_type>& visitor) const
     {
         std::error_code ec;
-        dump(handler, ec);
+        dump(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -3528,15 +3530,15 @@ public:
         }
     }
 
-    void dump(basic_json_content_handler<char_type>& handler, 
+    void dump(basic_json_visitor<char_type>& visitor, 
               std::error_code& ec) const
     {
-        dump_noflush(handler, ec);
+        dump_noflush(visitor, ec);
         if (ec)
         {
             return;
         }
-        handler.flush();
+        visitor.flush();
     }
 
     template <class SAllocator=std::allocator<char_type>>
@@ -4894,16 +4896,16 @@ public:
         : var_(first,last,alloc)
     {
     }
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void dump_fragment(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void dump_fragment(basic_json_visitor<char_type>& visitor) const
     {
-        dump(handler);
+        dump(visitor);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void dump_body(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void dump_body(basic_json_visitor<char_type>& visitor) const
     {
-        dump(handler);
+        dump(visitor);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, indenting)")
@@ -4936,16 +4938,16 @@ public:
         }
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void write_body(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void write_body(basic_json_visitor<char_type>& visitor) const
     {
-        dump(handler);
+        dump(visitor);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void write(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void write(basic_json_visitor<char_type>& visitor) const
     {
-        dump(handler);
+        dump(visitor);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
@@ -4966,10 +4968,10 @@ public:
         dump(os,options,pprint);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_content_handler<char_type>&)")
-    void to_stream(basic_json_content_handler<char_type>& handler) const
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
+    void to_stream(basic_json_visitor<char_type>& visitor) const
     {
-        dump(handler);
+        dump(visitor);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&)")
@@ -5362,48 +5364,6 @@ public:
         return is_number();
     }
 
-    template<int size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array()")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array()
-    {
-        return make_array();
-    }
-    template<std::size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(std::size_t n)
-    {
-        return make_array(n);
-    }
-    template<std::size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, T)")
-    static typename std::enable_if<size==1,basic_json>::type make_multi_array(std::size_t n, T val)
-    {
-        return make_array(n,val);
-    }
-    template<std::size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(std::size_t m, std::size_t n)
-    {
-        return make_array<2>(m, n);
-    }
-    template<std::size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, T)")
-    static typename std::enable_if<size==2,basic_json>::type make_multi_array(std::size_t m, std::size_t n, T val)
-    {
-        return make_array<2>(m, n, val);
-    }
-    template<std::size_t size>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, std::size_t)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(std::size_t m, std::size_t n, std::size_t k)
-    {
-        return make_array<3>(m, n, k);
-    }
-    template<std::size_t size,typename T>
-    JSONCONS_DEPRECATED_MSG("Instead, use make_array(std::size_t, std::size_t, std::size_t, T)")
-    static typename std::enable_if<size==3,basic_json>::type make_multi_array(std::size_t m, std::size_t n, std::size_t k, T val)
-    {
-        return make_array<3>(m, n, k, val);
-    }
     JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
     range<object_iterator> members()
     {
@@ -5541,68 +5501,68 @@ public:
 
 private:
 
-    void dump_noflush(basic_json_content_handler<char_type>& handler, std::error_code& ec) const
+    void dump_noflush(basic_json_visitor<char_type>& visitor, std::error_code& ec) const
     {
-        const null_ser_context context{};
+        const ser_context context{};
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
-                handler.string_value(as_string_view(), var_.tag(), context, ec);
+                visitor.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
-                handler.byte_string_value(var_.template cast<typename variant::byte_string_storage>().data(), var_.template cast<typename variant::byte_string_storage>().length(), 
+                visitor.byte_string_value(var_.template cast<typename variant::byte_string_storage>().data(), var_.template cast<typename variant::byte_string_storage>().length(), 
                                           var_.tag(), context, ec);
                 break;
             case storage_kind::half_value:
-                handler.half_value(var_.template cast<typename variant::half_storage>().value(), var_.tag(), context, ec);
+                visitor.half_value(var_.template cast<typename variant::half_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::double_value:
-                handler.double_value(var_.template cast<typename variant::double_storage>().value(), 
+                visitor.double_value(var_.template cast<typename variant::double_storage>().value(), 
                                      var_.tag(), context, ec);
                 break;
             case storage_kind::int64_value:
-                handler.int64_value(var_.template cast<typename variant::int64_storage>().value(), var_.tag(), context, ec);
+                visitor.int64_value(var_.template cast<typename variant::int64_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::uint64_value:
-                handler.uint64_value(var_.template cast<typename variant::uint64_storage>().value(), var_.tag(), context, ec);
+                visitor.uint64_value(var_.template cast<typename variant::uint64_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::bool_value:
-                handler.bool_value(var_.template cast<typename variant::bool_storage>().value(), var_.tag(), context, ec);
+                visitor.bool_value(var_.template cast<typename variant::bool_storage>().value(), var_.tag(), context, ec);
                 break;
             case storage_kind::null_value:
-                handler.null_value(var_.tag(), context, ec);
+                visitor.null_value(var_.tag(), context, ec);
                 break;
             case storage_kind::empty_object_value:
-                handler.begin_object(0, var_.tag(), context, ec);
-                handler.end_object(context, ec);
+                visitor.begin_object(0, var_.tag(), context, ec);
+                visitor.end_object(context, ec);
                 break;
             case storage_kind::object_value:
             {
-                bool more = handler.begin_object(size(), var_.tag(), context, ec);
+                bool more = visitor.begin_object(size(), var_.tag(), context, ec);
                 const object& o = object_value();
                 for (auto it = o.begin(); more && it != o.end(); ++it)
                 {
-                    handler.key(string_view_type((it->key()).data(),it->key().length()), context, ec);
-                    it->value().dump_noflush(handler, ec);
+                    visitor.key(string_view_type((it->key()).data(),it->key().length()), context, ec);
+                    it->value().dump_noflush(visitor, ec);
                 }
                 if (more)
                 {
-                    handler.end_object(context, ec);
+                    visitor.end_object(context, ec);
                 }
                 break;
             }
             case storage_kind::array_value:
             {
-                bool more = handler.begin_array(size(), var_.tag(), context, ec);
+                bool more = visitor.begin_array(size(), var_.tag(), context, ec);
                 const array& o = array_value();
                 for (const_array_iterator it = o.begin(); more && it != o.end(); ++it)
                 {
-                    it->dump_noflush(handler, ec);
+                    it->dump_noflush(visitor, ec);
                 }
                 if (more)
                 {
-                    handler.end_array(context, ec);
+                    visitor.end_array(context, ec);
                 }
                 break;
             }
@@ -5619,15 +5579,15 @@ private:
 
     friend std::basic_istream<char_type>& operator>>(std::basic_istream<char_type>& is, basic_json& o)
     {
-        json_decoder<basic_json> handler;
-        basic_json_reader<char_type,stream_source<char_type>> reader(is, handler);
+        json_decoder<basic_json> visitor;
+        basic_json_reader<char_type,stream_source<char_type>> reader(is, visitor);
         reader.read_next();
         reader.check_done();
-        if (!handler.is_valid())
+        if (!visitor.is_valid())
         {
             JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
         }
-        o = handler.get_result();
+        o = visitor.get_result();
         return is;
     }
 };

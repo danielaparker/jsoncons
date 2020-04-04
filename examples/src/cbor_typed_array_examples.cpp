@@ -4,7 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include "sample_types.hpp"
 #include <string>
 #include <iomanip>
@@ -249,11 +249,11 @@ void cursor_example_multi_dim_column_major_classical_cbor_array()
     }
 }
 
-struct my_cbor_content_handler : public default_json_content_handler
+struct my_cbor_visitor : public default_json_visitor
 {
     std::vector<double> v;
 private:
-    bool do_typed_array(const span<const double>& data,  
+    bool visit_typed_array(const span<const double>& data,  
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -263,7 +263,7 @@ private:
     }
 };
 
-void read_to_cbor_content_handler()
+void read_to_cbor_visitor()
 {
     std::vector<double> v{10.0,20.0,30.0,40.0};
 
@@ -288,10 +288,10 @@ void read_to_cbor_content_handler()
     assert(cursor.current().event_type() == staj_event_type::begin_array);
     assert(cursor.is_typed_array());
 
-    my_cbor_content_handler handler;
-    cursor.read(handler);
+    my_cbor_visitor visitor;
+    cursor.read(visitor);
     std::cout << "(2)\n";
-    for (auto item : handler.v)
+    for (auto item : visitor.v)
     {
         std::cout << item << "\n";
     }
@@ -309,7 +309,7 @@ void run_cbor_typed_array_examples()
     encode_half_array();
     cursor_example_multi_dim_row_major_typed_array();
     cursor_example_multi_dim_column_major_classical_cbor_array();
-    read_to_cbor_content_handler();
+    read_to_cbor_visitor();
     encode_decode_large_typed_array();
 
     std::cout << "\n\n";

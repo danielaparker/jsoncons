@@ -20,7 +20,7 @@
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/bignum.hpp>
-#include <jsoncons/json_content_handler.hpp>
+#include <jsoncons/json_visitor.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
 #include <string>
 #include <tuple>
@@ -106,16 +106,6 @@ namespace detail {
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
         jsoncons::detail::is_vector_like<T>::value && 
         !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
-    >::type> : std::true_type {};
-
-    // is_compatible_object_type
-    template<class Json, class T, class Enable=void>
-    struct is_compatible_object_type : std::false_type {};
-
-    template<class Json, class T>
-    struct is_compatible_object_type<Json,T, 
-                           typename std::enable_if<
-        !is_json_type_traits_unspecialized<Json,typename T::mapped_type>::value
     >::type> : std::true_type {};
 
 } // namespace detail
@@ -417,7 +407,7 @@ namespace detail {
             if (j.is_array())
             {
                 T result;
-                do_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
                     result.push_back(item.template as<value_type>());
@@ -438,7 +428,7 @@ namespace detail {
             if (j.is_array())
             {
                 T result;
-                do_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
                     result.push_back(item.template as<value_type>());
@@ -485,12 +475,12 @@ namespace detail {
             return j;
         }
 
-        static void do_reserve_(std::true_type, T& v, size_t size)
+        static void visit_reserve_(std::true_type, T& v, size_t size)
         {
             v.reserve(size);
         }
 
-        static void do_reserve_(std::false_type, T&, size_t)
+        static void visit_reserve_(std::false_type, T&, size_t)
         {
         }
     };

@@ -22,7 +22,8 @@ The patch function implements this requirement by generating the inverse command
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons;
+using jsoncons::json;
+namespace jsonpatch = jsoncons::jsonpatch;
 
 int main()
 {

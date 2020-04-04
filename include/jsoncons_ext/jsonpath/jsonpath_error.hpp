@@ -41,7 +41,10 @@ namespace jsoncons { namespace jsonpath {
         parse_error_in_filter,
         argument_parse_error,
         unidentified_error,
-        unexpected_end_of_input
+        unexpected_end_of_input,
+        expected_colon_dot_left_bracket_comma_or_right_bracket,
+        argument_to_unflatten_invalid,
+        invalid_flattened_key
     };
 
     class jsonpath_error_category_impl
@@ -108,6 +111,12 @@ namespace jsoncons { namespace jsonpath {
                     return "Unidentified error";
                 case jsonpath_errc::unexpected_end_of_input:
                     return "Unexpected end of jsonpath input";
+                case jsonpath_errc::expected_colon_dot_left_bracket_comma_or_right_bracket:
+                    return "Expected ':', '.', '[', ',', or ']'";
+                case jsonpath_errc::argument_to_unflatten_invalid:
+                    return "Argument to unflatten must be an object";
+                case jsonpath_errc::invalid_flattened_key:
+                    return "Flattened key is invalid";
                 default:
                     return "Unknown jsonpath parser error";
             }
@@ -139,7 +148,7 @@ namespace std {
 
 namespace jsoncons { namespace jsonpath {
 
-    class jsonpath_error : public std::system_error
+    class jsonpath_error : public std::system_error, public virtual json_exception
     {
         std::string buffer_;
         std::size_t line_number_;
