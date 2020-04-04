@@ -79,7 +79,8 @@ Output:
     "/reputons/1/rated": "Hongmin",
     "/reputons/1/rater": "HikingAsylum",
     "/reputons/1/rating": 0.75
-}```
+}
+```
 
 #### Flatten and unflatten a json object with number'ish keys
 
