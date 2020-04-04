@@ -34,7 +34,10 @@ to work with the data in a number of ways:
 - As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
 
-The jsoncons library is header-only: it consists solely of header files containing templates and inline functions, and requires no separately-compiled library binaries when linking. It has no dependence on other libraries. 
+Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
+SAX style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
+But it also supports incremental parsing into a user's preferred form, using
+information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
 
 The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
@@ -277,7 +280,7 @@ int main()
             case staj_event_type::end_object:
                 std::cout << event.event_type() << " " << "\n";
                 break;
-            case staj_event_type::name:
+            case staj_event_type::key:
                 // Or std::string_view, if supported
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
@@ -714,14 +717,14 @@ int main()
     rename_object_key_filter filter1("fourth", "third", filter2);
 
     // A filter can be passed to any function that takes
-    // a json_content_handler ...
+    // a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
     json_reader reader(is, filter1);
     reader.read();
     std::cout << std::endl;
 
-    // or a json_content_handler    
+    // or a json_visitor    
     std::cout << "(2) ";
     ojson j = ojson::parse(s);
     j.dump(filter1);
@@ -771,7 +774,7 @@ Example JSON file (booklist.json):
 ```
 JSONPath examples:
 ```c++    
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 using jsoncons::jsonpath::json_query;
 
