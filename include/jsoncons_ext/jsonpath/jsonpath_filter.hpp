@@ -1168,7 +1168,7 @@ public:
 
     bool evaluate(const string_type& subject) const
     {
-        return std::regex_match(subject, pattern_);
+        return std::regex_search(subject, pattern_);
     }
 };
 

@@ -1,9 +1,15 @@
+master
+
+Defects fixed:
+
+- Fixed jsonpath issue [Filter expression with regular expressions](https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_regular_expression.html)
+
 v0.150.0
 --------
 
 Defects fixed:
 
-- Fixed jsonpath issue [union with spaces](https://cburgmer.github.io/json-path-comparison/results/union_with_spaces.html)
+- Fixed jsonpath issue [Union with spaces](https://cburgmer.github.io/json-path-comparison/results/union_with_spaces.html)
 
 - Fixed jsonpath issue [Bracket notation with empty string](https://cburgmer.github.io/json-path-comparison/results/bracket_notation_with_empty_string.html)
 
