@@ -946,11 +946,6 @@ public:
                 case csv_parse_state::between_values:
                     switch (curr_char)
                     {
-                        case ' ':
-                        case '\t':
-                            ++column_;
-                            ++input_ptr_;
-                            break;
                         case '\r':
                         case '\n':
                         {
@@ -987,6 +982,11 @@ public:
                                 }
                                 before_value(ec);
                                 state_ = csv_parse_state::before_quoted_subfield;
+                            }
+                            else if (curr_char == ' ' || curr_char == '\t')
+                            {
+                                ++column_;
+                                ++input_ptr_;
                             }
                             else
                             {
