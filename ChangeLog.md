@@ -1,8 +1,11 @@
 master
+------
 
 Defects fixed:
 
 - Fixed jsonpath issue [Filter expression with regular expressions](https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_regular_expression.html)
+
+- Fixed issue #220
 
 v0.150.0
 --------
