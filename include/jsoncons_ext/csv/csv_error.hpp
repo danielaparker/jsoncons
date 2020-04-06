@@ -20,7 +20,8 @@ namespace jsoncons { namespace csv {
         expected_quote,
         invalid_csv_text,
         invalid_parse_state,
-        invalid_escaped_char
+        invalid_escaped_char,
+        unexpected_char_between_fields
     };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -51,6 +52,8 @@ public:
                 return "Invalid CSV parser state";
             case csv_errc::invalid_escaped_char:
                 return "Invalid character following quote escape character";
+            case csv_errc::unexpected_char_between_fields:
+                return "Unexpected character between fields";
             default:
                 return "Unknown CSV parser error";
         }

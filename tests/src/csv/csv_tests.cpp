@@ -1549,3 +1549,35 @@ TEST_CASE("csv_reader constructors")
     }
 }
 #endif
+
+TEST_CASE("infinite loop")
+{
+    SECTION("Whitespace follows quoted field")
+    {
+        char data[4] = {'\"', '\"', ' ', '\n'};
+        int size = 4;
+        std::string input(data, size);
+        json_decoder<ojson> decoder;
+        csv::csv_options options;
+        options.assume_header(true);
+        options.mapping(csv::mapping_kind::n_rows);
+        csv::csv_reader reader(input, decoder, options);
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(!ec);
+    }
+    SECTION("Invalid character follows quoted field")
+    {
+        char data[4] = {'\"', '\"', '\x01', '\n'};
+        int size = 4;
+        std::string input(data, size);
+        json_decoder<ojson> decoder;
+        csv::csv_options options;
+        options.assume_header(true);
+        options.mapping(csv::mapping_kind::n_rows);
+        csv::csv_reader reader(input, decoder, options);
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(ec == csv::csv_errc::unexpected_char_between_fields);
+    }
+}
