@@ -30,14 +30,14 @@ namespace detail {
         const CharT* data_;
         std::size_t length_;
     public:
-        typedef CharT value_type;
+        using value_type = CharT;
         typedef const CharT& const_reference;
-        typedef Traits traits_type;
-        typedef std::size_t size_type;
+        using traits_type = Traits;
+        using size_type = std::size_t;
         static constexpr size_type npos = size_type(-1);
         typedef const CharT* const_iterator;
         typedef const CharT* iterator;
-        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         constexpr basic_string_view() noexcept
             : data_(nullptr), length_(0)

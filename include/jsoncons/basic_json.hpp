@@ -223,7 +223,7 @@ struct sorted_policy
     template <class CharT, class CharTraits, class Allocator>
     using key_storage = std::basic_string<CharT, CharTraits,Allocator>;
 
-    typedef default_json_parsing parse_error_handler_type;
+    using parse_error_handler_type = default_json_parsing;
 };
 
 struct preserve_order_policy : public sorted_policy
@@ -274,14 +274,14 @@ class basic_json
 {
 public:
 
-    typedef Allocator allocator_type; 
+    using allocator_type = Allocator; 
 
-    typedef ImplementationPolicy implementation_policy;
+    using implementation_policy = ImplementationPolicy;
 
     typedef typename ImplementationPolicy::parse_error_handler_type parse_error_handler_type;
 
-    typedef CharT char_type;
-    typedef std::char_traits<char_type> char_traits_type;
+    using char_type = CharT;
+    using char_traits_type = std::char_traits<char_type>;
     typedef jsoncons::basic_string_view<char_type,char_traits_type> string_view_type;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
@@ -306,7 +306,7 @@ public:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
     using byte_string_storage_type = typename implementation_policy::template sequence_container_type<uint8_t, byte_allocator_type>;
 
-    typedef json_array<basic_json> array;
+    using array = json_array<basic_json>;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
 
@@ -1883,7 +1883,7 @@ public:
             return evaluate().at(index);
         }
     public:
-        typedef ParentT jsoncons_json_parent_type;
+        using jsoncons_json_parent_type = ParentT;
         typedef proxy<typename ParentT::proxy_type> proxy_type;
 
         operator basic_json&()
@@ -2915,7 +2915,7 @@ public:
         typename std::enable_if<!std::is_void<typename T::jsoncons_json_parent_type>::value>::type
     > : std::true_type {};
 
-    typedef proxy<basic_json> proxy_type;
+    using proxy_type = proxy<basic_json>;
 
     static basic_json parse(std::basic_istream<char_type>& is)
     {

@@ -54,8 +54,8 @@ namespace jsoncons {
     class stream_source 
     {
     public:
-        typedef CharT value_type;
-        typedef std::char_traits<CharT> traits_type;
+        using value_type = CharT;
+        using traits_type = std::char_traits<CharT>;
     private:
         basic_null_istream<CharT> null_is_;
         std::basic_istream<CharT>* is_;
@@ -260,9 +260,9 @@ namespace jsoncons {
     class string_source 
     {
     public:
-        typedef CharT value_type;
-        typedef std::char_traits<CharT> traits_type;
-        typedef basic_string_view<value_type> string_view_type;
+        using value_type = CharT;
+        using traits_type = std::char_traits<CharT>;
+        using string_view_type = basic_string_view<value_type>;
     private:
         const value_type* data_;
         const value_type* input_ptr_;
@@ -417,7 +417,7 @@ namespace jsoncons {
     {
     public:
         typedef uint8_t value_type;
-        typedef byte_traits traits_type;
+        using traits_type = byte_traits;
     private:
         basic_null_istream<char> null_is_;
         std::istream* is_;
@@ -600,7 +600,7 @@ namespace jsoncons {
     {
     public:
         typedef uint8_t value_type;
-        typedef byte_traits traits_type;
+        using traits_type = byte_traits;
     private:
         const value_type* data_;
         const value_type* input_ptr_;
@@ -740,7 +740,7 @@ namespace jsoncons {
     };
 
     #if !defined(JSONCONS_NO_DEPRECATED)
-    typedef binary_stream_source bin_stream_source;
+    using bin_stream_source = binary_stream_source;
     #endif
 
 } // namespace jsoncons

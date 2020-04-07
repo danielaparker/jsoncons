@@ -332,15 +332,15 @@ class byte_string_view
     const uint8_t* data_;
     std::size_t size_; 
 public:
-    typedef byte_traits traits_type;
+    using traits_type = byte_traits;
 
     typedef const uint8_t* const_iterator;
     typedef const uint8_t* iterator;
-    typedef std::size_t size_type;
+    using size_type = std::size_t;
     typedef uint8_t value_type;
     typedef uint8_t& reference;
     typedef const uint8_t& const_reference;
-    typedef std::ptrdiff_t difference_type;
+    using difference_type = std::ptrdiff_t;
     typedef uint8_t* pointer;
     typedef const uint8_t* const_pointer;
 
@@ -458,7 +458,7 @@ class basic_byte_string
     typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<uint8_t> byte_allocator_type;
     std::vector<uint8_t,byte_allocator_type> data_;
 public:
-    typedef byte_traits traits_type;
+    using traits_type = byte_traits;
 
     typedef typename std::vector<uint8_t,byte_allocator_type>::value_type value_type;
     typedef typename std::vector<uint8_t,byte_allocator_type>::size_type size_type;

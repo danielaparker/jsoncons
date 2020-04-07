@@ -1083,7 +1083,7 @@ class sequence_generator
     std::size_t length_;
     conv_errc err_cd_;
 public:
-    typedef sequence<Iterator> sequence_type;
+    using sequence_type = sequence<Iterator>;
 
     sequence_generator(Iterator first, Iterator last, 
                        conv_flags flags = conv_flags::strict) UNICONS_NOEXCEPT

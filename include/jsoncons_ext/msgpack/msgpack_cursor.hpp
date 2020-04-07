@@ -29,9 +29,9 @@ template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator
 class basic_msgpack_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
-    typedef Src source_type;
-    typedef char char_type;
-    typedef Allocator allocator_type;
+    using source_type = Src;
+    using char_type = char;
+    using allocator_type = Allocator;
 private:
     basic_staj_visitor<char_type> event_handler_;
 
@@ -43,7 +43,7 @@ private:
     basic_msgpack_cursor& operator=(const basic_msgpack_cursor&) = delete;
 
 public:
-    typedef string_view string_view_type;
+    using string_view_type = string_view;
 
     template <class Source>
     basic_msgpack_cursor(Source&& source,

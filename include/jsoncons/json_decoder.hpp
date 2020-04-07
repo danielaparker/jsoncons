@@ -67,7 +67,7 @@ private:
 
     };
 
-    typedef TempAllocator temp_allocator_type;
+    using temp_allocator_type = TempAllocator;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
  

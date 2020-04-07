@@ -130,7 +130,7 @@ private:
         }
     };
 
-    typedef TempAllocator temp_allocator_type;
+    using temp_allocator_type = TempAllocator;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_parse_state> parse_state_allocator_type;
 

@@ -701,7 +701,7 @@ namespace detail {
     {
         typedef typename Json::allocator_type allocator_type;
 
-        typedef E value_type;
+        using value_type = E;
 
         static bool is(const Json& j) noexcept
         {

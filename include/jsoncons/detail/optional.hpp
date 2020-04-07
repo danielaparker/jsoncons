@@ -45,7 +45,7 @@ namespace detail
     class optional
     {
     public:
-        typedef T value_type;
+        using value_type = T;
     private:
         bool has_value_;
         union {

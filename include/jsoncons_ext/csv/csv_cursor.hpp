@@ -29,9 +29,9 @@ template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=st
 class basic_csv_cursor : public basic_staj_reader<CharT>, private virtual ser_context
 {
 public:
-    typedef Src source_type;
-    typedef CharT char_type;
-    typedef Allocator allocator_type;
+    using source_type = Src;
+    using char_type = CharT;
+    using allocator_type = Allocator;
 private:
     static constexpr size_t default_max_buffer_length = 16384;
 
@@ -51,7 +51,7 @@ private:
     basic_csv_cursor& operator=(const basic_csv_cursor&) = delete;
 
 public:
-    typedef basic_string_view<CharT> string_view_type;
+    using string_view_type = basic_string_view<CharT>;
 
     // Constructors that throw parse exceptions
 

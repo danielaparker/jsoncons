@@ -22,8 +22,8 @@ namespace jsoncons {
     class basic_json_visitor
     {
     public:
-        typedef CharT char_type;
-        typedef std::char_traits<char_type> char_traits_type;
+        using char_type = CharT;
+        using char_traits_type = std::char_traits<char_type>;
 
         typedef basic_string_view<char_type,char_traits_type> string_view_type;
 
@@ -1018,11 +1018,11 @@ namespace jsoncons {
         }
     };
 
-    typedef basic_json_visitor<char> json_visitor;
-    typedef basic_json_visitor<wchar_t> wjson_visitor;
+    using json_visitor = basic_json_visitor<char>;
+    using wjson_visitor = basic_json_visitor<wchar_t>;
 
-    typedef basic_default_json_visitor<char> default_json_visitor;
-    typedef basic_default_json_visitor<wchar_t> wdefault_json_visitor;
+    using default_json_visitor = basic_default_json_visitor<char>;
+    using wdefault_json_visitor = basic_default_json_visitor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT>

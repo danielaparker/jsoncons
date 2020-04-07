@@ -45,8 +45,8 @@ template <class CharT>
 class basic_json_options_common
 {
 public:
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
 protected:
 #if !defined(JSONCONS_NO_DEPRECATED)
     bool can_read_nan_replacement_;
@@ -522,8 +522,8 @@ class basic_json_options final: public basic_json_decode_options<CharT>,
                                 public basic_json_encode_options<CharT>
 {
 public:
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
 
     using basic_json_decode_options<CharT>::enable_str_to_nan;
     using basic_json_decode_options<CharT>::enable_str_to_inf;

@@ -19,7 +19,7 @@ namespace csv {
     typename std::enable_if<is_basic_json_class<T>::value,T>::type 
     decode_csv(const std::basic_string<CharT>& s, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
 
         json_decoder<T> decoder;
 
@@ -48,7 +48,7 @@ namespace csv {
     typename std::enable_if<is_basic_json_class<T>::value,T>::type 
     decode_csv(std::basic_istream<CharT>& is, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
 
         json_decoder<T> decoder;
 
@@ -81,7 +81,7 @@ namespace csv {
                const std::basic_string<CharT>& s, 
                const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
 
         json_decoder<T,TempAllocator> decoder(temp_alloc);
 
@@ -114,7 +114,7 @@ namespace csv {
                std::basic_istream<CharT>& is, 
                const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
 
         json_decoder<T,TempAllocator> decoder(temp_alloc);
 

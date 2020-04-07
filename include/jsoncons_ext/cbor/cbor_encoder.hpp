@@ -33,8 +33,8 @@ class basic_cbor_encoder final : public basic_json_visitor<char>
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
 public:
-    typedef Allocator allocator_type;
-    typedef Sink sink_type;
+    using allocator_type = Allocator;
+    using sink_type = Sink;
     using typename super_type::char_type;
     using typename super_type::string_view_type;
 

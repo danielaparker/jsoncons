@@ -75,7 +75,7 @@ namespace jsoncons {
     template<class T> 
     struct unique_if 
     {
-        typedef std::unique_ptr<T> value_is_not_array;
+        using value_is_not_array = std::unique_ptr<T>;
     };
 
     template<class T> 
@@ -86,7 +86,7 @@ namespace jsoncons {
 
     template<class T, size_t N> 
     struct unique_if<T[N]> {
-        typedef void value_is_array_of_known_bound;
+        using value_is_array_of_known_bound = void;
     };
 
     template<class T, class... Args>

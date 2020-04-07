@@ -534,10 +534,10 @@ namespace jsoncons \
     struct json_type_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
-        typedef EnumType value_type; \
+        using value_type = EnumType; \
         typedef typename Json::char_type char_type; \
-        typedef std::basic_string<char_type> string_type; \
-        typedef basic_string_view<char_type> string_view_type; \
+        using string_type = std::basic_string<char_type>; \
+        using string_view_type = basic_string_view<char_type>; \
         typedef typename Json::allocator_type allocator_type; \
         typedef std::pair<EnumType,string_type> mapped_type; \
         \
@@ -638,10 +638,10 @@ namespace jsoncons \
     struct json_type_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
-        typedef EnumType value_type; \
+        using value_type = EnumType; \
         typedef typename Json::char_type char_type; \
-        typedef std::basic_string<char_type> string_type; \
-        typedef basic_string_view<char_type> string_view_type; \
+        using string_type = std::basic_string<char_type>; \
+        using string_view_type = basic_string_view<char_type>; \
         typedef typename Json::allocator_type allocator_type; \
         typedef std::pair<EnumType,string_type> mapped_type; \
         \

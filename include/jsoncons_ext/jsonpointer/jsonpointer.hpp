@@ -37,8 +37,8 @@ enum class pointer_state
     class json_ptr_iterator
     {
         typedef typename std::iterator_traits<InputIt>::value_type char_type;
-        typedef std::basic_string<char_type> string_type;
-        typedef InputIt base_iterator;
+        using string_type = std::basic_string<char_type>;
+        using base_iterator = InputIt;
 
         base_iterator path_ptr_;
         base_iterator end_input_;
@@ -49,11 +49,11 @@ enum class pointer_state
         std::size_t column_;
         std::basic_string<char_type> buffer_;
     public:
-        typedef string_type value_type;
-        typedef std::ptrdiff_t difference_type;
+        using value_type = string_type;
+        using difference_type = std::ptrdiff_t;
         typedef value_type* pointer;
         typedef const value_type& reference;
-        typedef std::input_iterator_tag iterator_category;
+        using iterator_category = std::input_iterator_tag;
 
         json_ptr_iterator(base_iterator first, base_iterator last)
             : json_ptr_iterator(first, last, first)
@@ -207,11 +207,11 @@ enum class pointer_state
         std::basic_string<CharT> path_;
     public:
         // Member types
-        typedef CharT char_type;
-        typedef std::basic_string<char_type> string_type;
-        typedef jsoncons::basic_string_view<char_type> string_view_type;
+        using char_type = CharT;
+        using string_type = std::basic_string<char_type>;
+        using string_view_type = jsoncons::basic_string_view<char_type>;
         typedef json_ptr_iterator<typename string_type::const_iterator> const_iterator;
-        typedef const_iterator iterator;
+        using iterator = const_iterator;
 
         // Constructors
         basic_json_ptr()
@@ -319,8 +319,8 @@ enum class pointer_state
         }
     };
 
-    typedef basic_json_ptr<char> json_ptr;
-    typedef basic_json_ptr<wchar_t> wjson_ptr;
+    using json_ptr = basic_json_ptr<char>;
+    using wjson_ptr = basic_json_ptr<wchar_t>;
 
     #if !defined(JSONCONS_NO_DEPRECATED)
     template<class CharT>

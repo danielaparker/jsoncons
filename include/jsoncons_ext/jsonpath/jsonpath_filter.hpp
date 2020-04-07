@@ -808,7 +808,7 @@ template <class Json>
 struct jsonpath_resources
 {
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
 
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
@@ -935,7 +935,7 @@ struct PathConstructor
 {
     typedef typename Json::char_type char_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
 
     string_type operator()(const string_type& path, std::size_t index) const
     {
@@ -964,7 +964,7 @@ template<class Json>
 struct VoidPathConstructor
 {
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
     typedef typename Json::string_view_type string_view_type;
 
     string_type operator()(const string_type&, std::size_t) const
@@ -1056,7 +1056,7 @@ class term
 {
 public:
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
 
     virtual ~term() {}
 
@@ -1146,7 +1146,7 @@ template <class Json>
 class regex_term final : public term<Json>
 {
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
     std::basic_regex<char_type> pattern_;
 public:
     regex_term(const string_type& pattern, std::regex::flag_type flags)
@@ -1176,7 +1176,7 @@ template <class Json>
 class path_term final : public term<Json>
 {
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
 
     string_type path_;
     std::size_t line_;
@@ -1637,7 +1637,7 @@ template <class Json>
 class jsonpath_filter_parser
 {
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
     typedef typename Json::string_view_type string_view_type;
 
     std::vector<token<Json>> output_stack_;

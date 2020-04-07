@@ -38,7 +38,7 @@ namespace detail {
     struct operation_unwinder
     {
         typedef typename Json::char_type char_type;
-        typedef std::basic_string<char_type> string_type;
+        using string_type = std::basic_string<char_type>;
         typedef typename Json::string_view_type string_view_type;
 
         struct entry
@@ -200,7 +200,7 @@ template <class Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
 {
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using string_type = std::basic_string<char_type>;
     typedef typename Json::string_view_type string_view_type;
 
    jsoncons::jsonpatch::detail::operation_unwinder<Json> unwinder(target);

@@ -27,10 +27,10 @@ class basic_bson_encoder final : public basic_json_visitor<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
-    typedef Allocator allocator_type;
-    typedef char char_type;
+    using allocator_type = Allocator;
+    using char_type = char;
     using typename basic_json_visitor<char>::string_view_type;
-    typedef Sink sink_type;
+    using sink_type = Sink;
 
 private:
     struct stack_item

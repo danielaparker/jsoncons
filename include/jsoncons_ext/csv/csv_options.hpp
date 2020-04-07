@@ -275,8 +275,8 @@ template <class CharT>
 class basic_csv_options_common 
 {
 public:
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
 protected:
     char_type field_delimiter_;
     char_type quote_char_;
@@ -692,8 +692,8 @@ public:
 template <class CharT>
 class basic_csv_options final : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
 {
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
 
 public:
     using basic_csv_decode_options<CharT>::enable_str_to_nan;

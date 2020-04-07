@@ -195,10 +195,10 @@ class basic_json_encoder final : public basic_json_visitor<CharT>
         return k;
     }
 public:
-    typedef Allocator allocator_type;
-    typedef CharT char_type;
+    using allocator_type = Allocator;
+    using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
-    typedef Sink sink_type;
+    using sink_type = Sink;
     typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
 private:
@@ -1012,10 +1012,10 @@ class basic_json_compressed_encoder final : public basic_json_visitor<CharT>
         return k;
     }
 public:
-    typedef Allocator allocator_type;
-    typedef CharT char_type;
+    using allocator_type = Allocator;
+    using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
-    typedef Sink sink_type;
+    using sink_type = Sink;
     typedef typename basic_json_encode_options<CharT>::string_type string_type;
 
 private:

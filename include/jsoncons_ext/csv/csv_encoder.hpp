@@ -27,11 +27,11 @@ template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std
 class basic_csv_encoder final : public basic_json_visitor<CharT>
 {
 public:
-    typedef CharT char_type;
+    using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
-    typedef Sink sink_type;
+    using sink_type = Sink;
 
-    typedef Allocator allocator_type;
+    using allocator_type = Allocator;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;

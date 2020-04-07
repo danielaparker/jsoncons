@@ -13,7 +13,7 @@ template <class Allocator>
 class allocator_holder
 {
 public:
-    typedef Allocator allocator_type;
+    using allocator_type = Allocator;
 private:
     allocator_type alloc_;
 public:

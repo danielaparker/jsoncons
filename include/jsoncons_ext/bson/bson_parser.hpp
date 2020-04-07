@@ -41,9 +41,9 @@ struct parse_state
 template <class Src,class Allocator=std::allocator<char>>
 class basic_bson_parser : public ser_context
 {
-    typedef char char_type;
-    typedef std::char_traits<char> char_traits_type;
-    typedef Allocator temp_allocator_type;
+    using char_type = char;
+    using char_traits_type = std::char_traits<char>;
+    using temp_allocator_type = Allocator;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;

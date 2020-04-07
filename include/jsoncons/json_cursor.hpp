@@ -28,10 +28,10 @@ template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=st
 class basic_json_cursor : public basic_staj_reader<CharT>, private virtual ser_context
 {
 public:
-    typedef Src source_type;
-    typedef CharT char_type;
-    typedef Allocator allocator_type;
-    typedef basic_string_view<CharT> string_view_type;
+    using source_type = Src;
+    using char_type = CharT;
+    using allocator_type = Allocator;
+    using string_view_type = basic_string_view<CharT>;
 private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     static constexpr size_t default_max_buffer_length = 16384;

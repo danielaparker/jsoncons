@@ -28,11 +28,11 @@ class staj_array_iterator
     optional<T> value_;
     json_decoder<Json> decoder_;
 public:
-    typedef T value_type;
-    typedef std::ptrdiff_t difference_type;
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
     typedef T* pointer;
     typedef T& reference;
-    typedef std::input_iterator_tag iterator_category;
+    using iterator_category = std::input_iterator_tag;
 
     staj_array_iterator() noexcept
         : reader_(nullptr)
@@ -173,12 +173,12 @@ class staj_object_iterator
 {
 public:
     typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> key_type;
+    using key_type = std::basic_string<char_type>;
     typedef std::pair<key_type,T> value_type;
-    typedef std::ptrdiff_t difference_type;
+    using difference_type = std::ptrdiff_t;
     typedef value_type* pointer;
     typedef value_type& reference;
-    typedef std::input_iterator_tag iterator_category;
+    using iterator_category = std::input_iterator_tag;
 
 private:
     basic_staj_reader<char_type>* reader_;

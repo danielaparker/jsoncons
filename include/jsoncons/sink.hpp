@@ -26,8 +26,8 @@ template <class CharT>
 class stream_sink
 {
 public:
-    typedef CharT value_type;
-    typedef std::basic_ostream<CharT> output_type;
+    using value_type = CharT;
+    using output_type = std::basic_ostream<CharT>;
 
 private:
     static constexpr size_t default_buffer_length = 16384;
@@ -110,7 +110,7 @@ class binary_stream_sink
 {
 public:
     typedef uint8_t value_type;
-    typedef std::basic_ostream<char> output_type;
+    using output_type = std::basic_ostream<char>;
 private:
     static constexpr size_t default_buffer_length = 16384;
 
@@ -200,7 +200,7 @@ class string_sink
 {
 public:
     typedef typename StringT::value_type value_type;
-    typedef StringT output_type;
+    using output_type = StringT;
 private:
     output_type* s_;
 

@@ -49,7 +49,7 @@ namespace jsoncons {
     template <class Json, class Backend>
     struct json_type_traits<Json,boost::multiprecision::number<Backend>>
     {
-        typedef boost::multiprecision::number<Backend> multiprecision_type;
+        using multiprecision_type = boost::multiprecision::number<Backend>;
 
         static bool is(const Json& val) noexcept
         {

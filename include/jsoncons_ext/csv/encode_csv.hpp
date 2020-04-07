@@ -18,7 +18,7 @@ namespace csv {
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
     encode_csv(const T& j, std::basic_string<CharT>& s, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(s,options);
         j.dump(encoder);
     }
@@ -27,7 +27,7 @@ namespace csv {
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
     encode_csv(const T& val, std::basic_string<CharT>& s, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(s,options);
         std::error_code ec;
         ser_traits<T,CharT>::serialize(val, encoder, json(), ec);
@@ -41,7 +41,7 @@ namespace csv {
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
     encode_csv(const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
         j.dump(encoder);
     }
@@ -50,7 +50,7 @@ namespace csv {
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
     encode_csv(const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
         std::error_code ec;
         ser_traits<T,CharT>::serialize(val, encoder, json(), ec);
@@ -67,7 +67,7 @@ namespace csv {
     encode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                const T& j, std::basic_string<CharT>& s, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>,TempAllocator> encoder(s, options, temp_alloc);
         j.dump(encoder);
     }
@@ -77,7 +77,7 @@ namespace csv {
     encode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                const T& val, std::basic_string<CharT>& s, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>,TempAllocator> encoder(s, options, temp_alloc);
         std::error_code ec;
         ser_traits<T,CharT>::serialize(val, encoder, json(), ec);
@@ -92,7 +92,7 @@ namespace csv {
     encode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                const T& j, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>,TempAllocator> encoder(os, options, temp_alloc);
         j.dump(encoder);
     }
@@ -102,7 +102,7 @@ namespace csv {
     encode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                const T& val, std::basic_ostream<CharT>& os, const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>())
     {
-        typedef CharT char_type;
+        using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>,TempAllocator> encoder(os, options, temp_alloc);
         std::error_code ec;
         ser_traits<T,CharT>::serialize(val, encoder, json(), ec);

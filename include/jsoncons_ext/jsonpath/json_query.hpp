@@ -194,7 +194,7 @@ class jsonpath_evaluator : public ser_context
     typedef typename Json::char_traits_type char_traits_type;
     typedef std::basic_string<char_type,char_traits_type> string_type;
     typedef typename Json::string_view_type string_view_type;
-    typedef JsonReference reference;
+    using reference = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
     typedef typename Json::const_pointer const_pointer;
 
@@ -229,7 +229,7 @@ class jsonpath_evaluator : public ser_context
         }
 
     };
-    typedef std::vector<node_type> node_set;
+    using node_set = std::vector<node_type>;
 
     struct node_less
     {
@@ -473,7 +473,7 @@ class jsonpath_evaluator : public ser_context
     std::vector<std::unique_ptr<selector_base>> selectors_;
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
-    typedef std::vector<pointer> argument_type;
+    using argument_type = std::vector<pointer>;
     std::vector<argument_type> function_stack_;
     std::vector<state_item> state_stack_;
 

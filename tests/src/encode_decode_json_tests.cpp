@@ -43,13 +43,13 @@ namespace
         template<typename U>
         struct rebind
         {
-            typedef MyAlloc<U> other;
+            using other = MyAlloc<U>;
         };
         typedef T* pointer;
         typedef const T* const_pointer;
         typedef T& reference;
         typedef const T& const_reference;
-        typedef std::ptrdiff_t difference_type;
+        using difference_type = std::ptrdiff_t;
     };
     //template <class U>
     //using MyAlloc = std::allocator<U>;

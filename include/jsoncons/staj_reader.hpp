@@ -154,7 +154,7 @@ class basic_staj_event
     } value_;
     std::size_t length_;
 public:
-    typedef basic_string_view<CharT> string_view_type;
+    using string_view_type = basic_string_view<CharT>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), length_(0)

@@ -96,12 +96,12 @@ namespace detail {
     template <class CharT,class TempAllocator>
     class parse_event
     {
-        typedef TempAllocator temp_allocator_type;
+        using temp_allocator_type = TempAllocator;
         typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
         typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
         typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
         typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
-        typedef basic_byte_string<byte_allocator_type> byte_string_type;
+        using byte_string_type = basic_byte_string<byte_allocator_type>;
 
         staj_event_type event_type;
         string_type string_value;
@@ -212,8 +212,8 @@ namespace detail {
     {
     public:
         typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
-        typedef CharT char_type;
-        typedef TempAllocator temp_allocator_type;
+        using char_type = CharT;
+        using temp_allocator_type = TempAllocator;
 
         typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
         typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
@@ -485,8 +485,8 @@ template<class CharT,class TempAllocator=std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
 public:
-    typedef basic_string_view<CharT> string_view_type;
-    typedef CharT char_type;
+    using string_view_type = basic_string_view<CharT>;
+    using char_type = CharT;
 private:
     struct string_maps_to_double
     {
@@ -498,7 +498,7 @@ private:
         }
     };
 
-    typedef TempAllocator temp_allocator_type;
+    using temp_allocator_type = TempAllocator;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;

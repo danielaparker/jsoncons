@@ -35,7 +35,7 @@ template <class Allocator>
 class basic_bignum_base
 {
 public:
-    typedef Allocator allocator_type;
+    using allocator_type = Allocator;
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t> basic_type_allocator_type;
 
 private:

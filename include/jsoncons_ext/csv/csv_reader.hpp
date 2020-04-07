@@ -37,8 +37,8 @@ class basic_csv_reader
 
         bool array_begun_;
     };
-    typedef CharT char_type;
-    typedef Allocator temp_allocator_type;
+    using char_type = CharT;
+    using temp_allocator_type = Allocator;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     basic_csv_reader(const basic_csv_reader&) = delete; 

@@ -151,10 +151,10 @@ template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=st
 class basic_json_reader 
 {
 public:
-    typedef CharT char_type;
-    typedef Src source_type;
-    typedef basic_string_view<CharT> string_view_type;
-    typedef Allocator temp_allocator_type;
+    using char_type = CharT;
+    using source_type = Src;
+    using string_view_type = basic_string_view<CharT>;
+    using temp_allocator_type = Allocator;
 private:
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
