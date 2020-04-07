@@ -255,8 +255,8 @@ private:
 
 };
 
-typedef basic_csv_reader<char> csv_reader;
-typedef basic_csv_reader<wchar_t> wcsv_reader;
+using csv_reader = basic_csv_reader<char>;
+using wcsv_reader = basic_csv_reader<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use csv_reader") typedef csv_reader csv_string_reader;

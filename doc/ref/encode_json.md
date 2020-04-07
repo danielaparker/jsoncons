@@ -124,7 +124,7 @@ using namespace jsoncons;
 
 int main()
 {
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+    using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
 
     employee_collection employees = 
     { 

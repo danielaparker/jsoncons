@@ -36,7 +36,7 @@ enum class pointer_state
     template <class InputIt>
     class json_ptr_iterator
     {
-        typedef typename std::iterator_traits<InputIt>::value_type char_type;
+        using char_type = typename std::iterator_traits<InputIt>::value_type;
         using string_type = std::basic_string<char_type>;
         using base_iterator = InputIt;
 
@@ -51,8 +51,8 @@ enum class pointer_state
     public:
         using value_type = string_type;
         using difference_type = std::ptrdiff_t;
-        typedef value_type* pointer;
-        typedef const value_type& reference;
+        using pointer = value_type*;
+        using reference = const value_type&;
         using iterator_category = std::input_iterator_tag;
 
         json_ptr_iterator(base_iterator first, base_iterator last)
@@ -210,7 +210,7 @@ enum class pointer_state
         using char_type = CharT;
         using string_type = std::basic_string<char_type>;
         using string_view_type = jsoncons::basic_string_view<char_type>;
-        typedef json_ptr_iterator<typename string_type::const_iterator> const_iterator;
+        using const_iterator = json_ptr_iterator<typename string_type::const_iterator>;
         using iterator = const_iterator;
 
         // Constructors
@@ -358,10 +358,10 @@ enum class pointer_state
     template<class J,class JReference>
     class jsonpointer_evaluator : public ser_context
     {
-        typedef typename handle_type<J,JReference>::type type;
-        typedef typename J::char_type char_type;
-        typedef typename std::basic_string<char_type> string_type;
-        typedef typename J::string_view_type string_view_type;
+        using type = typename handle_type<J,JReference>::type;
+        using char_type = typename J::char_type;
+        using string_type = typename std::basic_string<char_type>;
+        using string_view_type = typename J::string_view_type;
         using reference = JReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
 

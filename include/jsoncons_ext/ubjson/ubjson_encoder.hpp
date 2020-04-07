@@ -434,8 +434,8 @@ private:
     }
 };
 
-typedef basic_ubjson_encoder<jsoncons::binary_stream_sink> ubjson_stream_encoder;
-typedef basic_ubjson_encoder<jsoncons::bytes_sink> ubjson_bytes_encoder;
+using ubjson_stream_encoder = basic_ubjson_encoder<jsoncons::binary_stream_sink>;
+using ubjson_bytes_encoder = basic_ubjson_encoder<jsoncons::bytes_sink>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Sink=jsoncons::binary_stream_sink>

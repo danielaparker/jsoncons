@@ -199,7 +199,7 @@ public:
     using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
     using sink_type = Sink;
-    typedef typename basic_json_encode_options<CharT>::string_type string_type;
+    using string_type = typename basic_json_encode_options<CharT>::string_type;
 
 private:
     enum class container_type {object, array};
@@ -1016,7 +1016,7 @@ public:
     using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
     using sink_type = Sink;
-    typedef typename basic_json_encode_options<CharT>::string_type string_type;
+    using string_type = typename basic_json_encode_options<CharT>::string_type;
 
 private:
     enum class container_type {object, array};
@@ -1445,15 +1445,15 @@ private:
     }
 };
 
-typedef basic_json_encoder<char,jsoncons::stream_sink<char>> json_stream_encoder;
-typedef basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_stream_encoder;
-typedef basic_json_compressed_encoder<char,jsoncons::stream_sink<char>> json_compressed_stream_encoder;
-typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_compressed_stream_encoder;
+using json_stream_encoder = basic_json_encoder<char,jsoncons::stream_sink<char>>;
+using wjson_stream_encoder = basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>;
+using json_compressed_stream_encoder = basic_json_compressed_encoder<char,jsoncons::stream_sink<char>>;
+using wjson_compressed_stream_encoder = basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>;
 
-typedef basic_json_encoder<char,jsoncons::string_sink<std::string>> json_string_encoder;
-typedef basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_string_encoder;
-typedef basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>> json_compressed_string_encoder;
-typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_compressed_string_encoder;
+using json_string_encoder = basic_json_encoder<char,jsoncons::string_sink<std::string>>;
+using wjson_string_encoder = basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
+using json_compressed_string_encoder = basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>>;
+using wjson_compressed_string_encoder = basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Sink=jsoncons::stream_sink<CharT>>

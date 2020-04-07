@@ -21,7 +21,7 @@ TEST_CASE("test_string_allocation")
 
     FreelistAllocator<char> alloc(true); 
 
-    typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
+    using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
 
     SECTION("construct")
     {

@@ -1344,11 +1344,11 @@ public:
     virtual const ser_context& context() const = 0;
 };
 
-typedef basic_staj_event<char> staj_event;
-typedef basic_staj_event<wchar_t> wstaj_event;
+using staj_event = basic_staj_event<char>;
+using wstaj_event = basic_staj_event<wchar_t>;
 
-typedef basic_staj_reader<char> staj_reader;
-typedef basic_staj_reader<wchar_t> wstaj_reader;
+using staj_reader = basic_staj_reader<char>;
+using wstaj_reader = basic_staj_reader<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 

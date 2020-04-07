@@ -46,7 +46,7 @@ Functions (3)-(4) are the same except `temp_alloc` is used to allocate temporary
 
 int main()
 {
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+    using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
 
     std::string s = R"(
     {

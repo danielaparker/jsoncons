@@ -839,8 +839,8 @@ private:
     }
 };
 
-typedef basic_json_options<char> json_options;
-typedef basic_json_options<wchar_t> wjson_options;
+using json_options = basic_json_options<char>;
+using wjson_options = basic_json_options<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("json_options") typedef json_options output_format;

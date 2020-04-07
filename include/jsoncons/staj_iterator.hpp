@@ -22,7 +22,7 @@ namespace jsoncons {
 template<class Json, class T=Json>
 class staj_array_iterator
 {
-    typedef typename Json::char_type char_type;
+    using char_type = typename Json::char_type;
 
     basic_staj_reader<char_type>* reader_;
     optional<T> value_;
@@ -30,8 +30,8 @@ class staj_array_iterator
 public:
     using value_type = T;
     using difference_type = std::ptrdiff_t;
-    typedef T* pointer;
-    typedef T& reference;
+    using pointer = T*;
+    using reference = T&;
     using iterator_category = std::input_iterator_tag;
 
     staj_array_iterator() noexcept
@@ -172,12 +172,12 @@ template <class Json, class T=Json>
 class staj_object_iterator
 {
 public:
-    typedef typename Json::char_type char_type;
+    using char_type = typename Json::char_type;
     using key_type = std::basic_string<char_type>;
-    typedef std::pair<key_type,T> value_type;
+    using value_type = std::pair<key_type,T>;
     using difference_type = std::ptrdiff_t;
-    typedef value_type* pointer;
-    typedef value_type& reference;
+    using pointer = value_type*;
+    using reference = value_type&;
     using iterator_category = std::input_iterator_tag;
 
 private:

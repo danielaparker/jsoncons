@@ -76,7 +76,7 @@ int main()
     // working memory used by json_decoder, and my_alloc(3) to allocate
     // working memory used by basic_json_reader. 
 
-    typedef basic_json<char,sorted_policy,my_alloc> my_json;
+    using my_json = basic_json<char,sorted_policy,my_alloc>;
 
     std::ifstream is("book_catalog.json");
     json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
@@ -128,7 +128,7 @@ int main()
     // working memory used by json_decoder, and my_alloc(3) to allocate
     // working memory used by basic_csv_reader. 
 
-    typedef basic_json<char,sorted_policy,my_alloc> my_json;
+    using my_json = basic_json<char,sorted_policy,my_alloc>;
 
     csv::csv_options options;
     options.assume_header(true);

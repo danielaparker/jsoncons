@@ -339,8 +339,8 @@ private:
     }
 };
 
-typedef basic_bson_encoder<jsoncons::binary_stream_sink> bson_stream_encoder;
-typedef basic_bson_encoder<jsoncons::bytes_sink> bson_bytes_encoder;
+using bson_stream_encoder = basic_bson_encoder<jsoncons::binary_stream_sink>;
+using bson_bytes_encoder = basic_bson_encoder<jsoncons::bytes_sink>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Sink=jsoncons::binary_stream_sink>

@@ -65,7 +65,7 @@ namespace jsoncons {
     template <class Json, class T, class Enable=void>
     struct json_type_traits
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static constexpr bool is_compatible = false;
 
@@ -122,8 +122,8 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, const typename std::decay<typename Json::char_type>::type*>
     {
-        typedef typename Json::char_type char_type;
-        typedef typename Json::allocator_type allocator_type;
+        using char_type = typename Json::char_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -143,8 +143,8 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, typename std::decay<typename Json::char_type>::type*>
     {
-        typedef typename Json::char_type char_type;
-        typedef typename Json::allocator_type allocator_type;
+        using char_type = typename Json::char_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -164,7 +164,7 @@ namespace detail {
                             typename std::enable_if<jsoncons::detail::is_integer_like<T>::value
     >::type>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -195,7 +195,7 @@ namespace detail {
     struct json_type_traits<Json, T,
                             typename std::enable_if<jsoncons::detail::is_uinteger_like<T>::value>::type>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -229,7 +229,7 @@ namespace detail {
                             typename std::enable_if<std::is_floating_point<T>::value
     >::type>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -248,8 +248,8 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, typename Json::object>
     {
-        typedef typename Json::object json_object;
-        typedef typename Json::allocator_type allocator_type;
+        using json_object = typename Json::object;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -264,8 +264,8 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, typename Json::array>
     {
-        typedef typename Json::array json_array;
-        typedef typename Json::allocator_type allocator_type;
+        using json_array = typename Json::array;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -280,7 +280,7 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, Json>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json&) noexcept
         {
@@ -299,7 +299,7 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, jsoncons::null_type>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -319,7 +319,7 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, bool>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -341,7 +341,7 @@ namespace detail {
                          std::vector<bool>::const_reference,
                          void>::type>::value>::type>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -360,7 +360,7 @@ namespace detail {
     template<class Json>
     struct json_type_traits<Json, std::vector<bool>::reference>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -381,7 +381,7 @@ namespace detail {
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && jsoncons::detail::is_compatible_array_type<Json,T>::value>::type>
     {
         typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -491,7 +491,7 @@ namespace detail {
                                                     jsoncons::detail::is_string<T>::value &&
                                                     std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -520,8 +520,8 @@ namespace detail {
                                                     jsoncons::detail::is_string<T>::value &&
                                                     !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
-        typedef typename Json::char_type char_type;
-        typedef typename Json::allocator_type allocator_type;
+        using char_type = typename Json::char_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -558,7 +558,7 @@ namespace detail {
                                                     jsoncons::detail::is_string_view<T>::value &&
                                                     std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -588,10 +588,10 @@ namespace detail {
                                                     is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
-        typedef typename Json::allocator_type allocator_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -641,10 +641,10 @@ namespace detail {
                                                     is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
-        typedef typename Json::allocator_type allocator_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& val) noexcept {
             if (!val.is_object())
@@ -699,7 +699,7 @@ namespace detail {
     template<class Json, class E, size_t N>
     struct json_type_traits<Json, std::array<E, N>>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         using value_type = E;
 
@@ -857,7 +857,7 @@ namespace detail
     struct json_type_traits<Json, basic_byte_string<Allocator>>
     {
     public:
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -960,7 +960,7 @@ namespace detail
     template<class Json>
     struct json_type_traits<Json, byte_string_view>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
     public:
         static bool is(const Json& j) noexcept
@@ -1034,7 +1034,7 @@ namespace detail
     template<class Json, class T>
     struct json_type_traits<Json, std::valarray<T>>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {

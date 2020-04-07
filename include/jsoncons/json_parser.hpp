@@ -118,7 +118,7 @@ class basic_json_parser : public ser_context
 {
 public:
     using char_type = CharT;
-    typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
+    using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
 private:
     struct string_maps_to_double
     {
@@ -2830,8 +2830,8 @@ private:
     }
 };
 
-typedef basic_json_parser<char> json_parser;
-typedef basic_json_parser<wchar_t> wjson_parser;
+using json_parser = basic_json_parser<char>;
+using wjson_parser = basic_json_parser<wchar_t>;
 
 }
 

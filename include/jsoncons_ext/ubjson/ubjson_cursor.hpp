@@ -205,8 +205,8 @@ private:
     }
 };
 
-typedef basic_ubjson_cursor<jsoncons::binary_stream_source> ubjson_stream_cursor;
-typedef basic_ubjson_cursor<jsoncons::bytes_source> ubjson_bytes_cursor;
+using ubjson_stream_cursor = basic_ubjson_cursor<jsoncons::binary_stream_source>;
+using ubjson_bytes_cursor = basic_ubjson_cursor<jsoncons::bytes_source>;
 
 } // namespace ubjson
 } // namespace jsoncons

@@ -170,7 +170,7 @@ void own_vector_extensibility_example()
 
 void templated_struct_example()
 {
-    typedef ns::TemplatedStruct<int,std::wstring> value_type;
+    using value_type = ns::TemplatedStruct<int,std::wstring>;
 
     value_type val{1, L"sss"};
 

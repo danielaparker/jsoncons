@@ -67,9 +67,9 @@ public:
     }
 };
 
-typedef basic_cbor_reader<jsoncons::binary_stream_source> cbor_stream_reader;
+using cbor_stream_reader = basic_cbor_reader<jsoncons::binary_stream_source>;
 
-typedef basic_cbor_reader<jsoncons::bytes_source> cbor_bytes_reader;
+using cbor_bytes_reader = basic_cbor_reader<jsoncons::bytes_source>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_stream_reader") typedef cbor_stream_reader cbor_reader;

@@ -67,8 +67,8 @@ public:
     }
 };
 
-typedef basic_bson_reader<jsoncons::binary_stream_source> bson_stream_reader;
-typedef basic_bson_reader<jsoncons::bytes_source> bson_bytes_reader;
+using bson_stream_reader = basic_bson_reader<jsoncons::binary_stream_source>;
+using bson_bytes_reader = basic_bson_reader<jsoncons::bytes_source>;
 
 #if !defined(JSONCONS_NO_DEPRECATED) 
 JSONCONS_DEPRECATED_MSG("Instead, use bson_stream_reader") typedef bson_stream_reader bson_reader;

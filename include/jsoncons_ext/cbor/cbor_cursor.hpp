@@ -220,8 +220,8 @@ private:
     }
 };
 
-typedef basic_cbor_cursor<jsoncons::binary_stream_source> cbor_stream_cursor;
-typedef basic_cbor_cursor<jsoncons::bytes_source> cbor_bytes_cursor;
+using cbor_stream_cursor = basic_cbor_cursor<jsoncons::binary_stream_source>;
+using cbor_bytes_cursor = basic_cbor_cursor<jsoncons::bytes_source>;
 
 } // namespace cbor
 } // namespace jsoncons

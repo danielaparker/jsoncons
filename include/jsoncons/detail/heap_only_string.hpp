@@ -63,7 +63,7 @@ class heap_only_string : public heap_only_string_base<Allocator>
 {
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<CharT> allocator_type;  
     using allocator_traits_type = std::allocator_traits<allocator_type>;
-    typedef typename allocator_traits_type::pointer pointer;
+    using pointer = typename allocator_traits_type::pointer;
 
     friend class heap_only_string_factory<CharT, Allocator>;
     friend class heap_only_string_wrapper<CharT, Allocator>;
@@ -109,12 +109,12 @@ class heap_only_string_wrapper
 {
     using char_type = CharT;
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<char> byte_allocator_type;  
-    typedef typename std::allocator_traits<byte_allocator_type>::pointer byte_pointer;
+    using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
 
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<heap_only_string<CharT,Allocator>> string_allocator_type;  
-    typedef typename std::allocator_traits<string_allocator_type>::pointer string_pointer;
+    using string_pointer = typename std::allocator_traits<string_allocator_type>::pointer;
 
-    typedef heap_only_string<CharT,Allocator> string_type;
+    using string_type = heap_only_string<CharT,Allocator>;
 
     struct string_storage
     {

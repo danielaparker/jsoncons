@@ -14,7 +14,7 @@ The default definition provided by the `jsoncons` library is
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
-    typedef typename Json::allocator_type allocator_type;
+    using allocator_type = typename Json::allocator_type;
 
     static constexpr bool is_compatible = false;
 
@@ -501,7 +501,7 @@ namespace jsoncons {
     template<class Json>
     struct json_type_traits<Json, ns::book>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {

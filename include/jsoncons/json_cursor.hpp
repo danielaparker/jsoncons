@@ -445,8 +445,8 @@ public:
 private:
 };
 
-typedef basic_json_cursor<char> json_cursor;
-typedef basic_json_cursor<wchar_t> wjson_cursor;
+using json_cursor = basic_json_cursor<char>;
+using wjson_cursor = basic_json_cursor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Src,class Allocator=std::allocator<CharT>>

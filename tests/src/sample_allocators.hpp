@@ -96,10 +96,10 @@ public:
     {
         using other = FreelistAllocator<U>;
     };
-    typedef T* pointer;
-    typedef const T* const_pointer;
-    typedef T& reference;
-    typedef const T& const_reference;
+    using pointer = T*;
+    using const_pointer = const T*;
+    using reference = T&;
+    using const_reference = const T&;
     using difference_type = std::ptrdiff_t;
 };
 

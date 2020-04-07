@@ -325,7 +325,7 @@ Or into strongly typed records:
 
 int main()
 {
-    typedef std::tuple<std::string,std::string,double> record_type;
+    using record_type = std::tuple<std::string,std::string,double>;
 
     csv::csv_options options;
     options.assume_header(true);

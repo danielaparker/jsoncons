@@ -366,7 +366,7 @@ int main()
     ioptions.header_lines(1)
             .mapping(csv::mapping_kind::n_rows);
 
-    typedef std::vector<std::tuple<std::string,double,double,double,double>> table_type;
+    using table_type = std::vector<std::tuple<std::string,double,double,double,double>>;
 
     table_type table = csv::decode_csv<table_type>(input,ioptions);
 

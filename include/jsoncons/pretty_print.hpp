@@ -26,7 +26,7 @@ template<class Json>
 class json_printable
 {
 public:
-    typedef typename Json::char_type char_type;
+    using char_type = typename Json::char_type;
 
     json_printable(const Json& j, indenting line_indent)
        : j_(&j), indenting_(line_indent)

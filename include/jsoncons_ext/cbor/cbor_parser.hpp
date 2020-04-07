@@ -60,7 +60,7 @@ struct mapped_string
     mapped_string& operator=(mapped_string&&) = default;
 };
 
-typedef std::vector<mapped_string> stringref_map;
+using stringref_map = std::vector<mapped_string>;
 
 struct parse_state 
 {
@@ -84,13 +84,13 @@ class basic_cbor_parser : public ser_context
     using char_type = char;
     using char_traits_type = std::char_traits<char>;
     using allocator_type = Allocator;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t> tag_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<stringref_map> stringref_map_allocator_type;
+    using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
+    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using tag_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t>;                 
+    using parse_state_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state>;                         
+    using stringref_map_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stringref_map>;                           
 
-    typedef std::basic_string<char_type,char_traits_type,char_allocator_type> string_type;
+    using string_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
 
     enum {stringref_tag, // 25
           stringref_namespace_tag, // 256

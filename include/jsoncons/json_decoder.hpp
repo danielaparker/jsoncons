@@ -22,17 +22,17 @@ template <class Json,class TempAllocator=std::allocator<char>>
 class json_decoder final : public basic_json_visitor<typename Json::char_type>
 {
 public:
-    typedef typename Json::char_type char_type;
+    using char_type = typename Json::char_type;
     using typename basic_json_visitor<char_type>::string_view_type;
 
-    typedef typename Json::key_value_type key_value_type;
-    typedef typename Json::key_type key_type;
-    typedef typename Json::array array;
-    typedef typename Json::object object;
-    typedef typename Json::allocator_type result_allocator_type;
-    typedef typename key_type::allocator_type json_string_allocator;
-    typedef typename array::allocator_type json_array_allocator;
-    typedef typename object::allocator_type json_object_allocator;
+    using key_value_type = typename Json::key_value_type;
+    using key_type = typename Json::key_type;
+    using array = typename Json::array;
+    using object = typename Json::object;
+    using result_allocator_type = typename Json::allocator_type;
+    using json_string_allocator = typename key_type::allocator_type;
+    using json_array_allocator = typename array::allocator_type;
+    using json_object_allocator = typename object::allocator_type;
     typedef typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
 private:
     struct stack_item

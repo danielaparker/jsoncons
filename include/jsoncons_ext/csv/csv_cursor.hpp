@@ -439,8 +439,8 @@ public:
 private:
 };
 
-typedef basic_csv_cursor<char> csv_cursor;
-typedef basic_csv_cursor<wchar_t> wcsv_cursor;
+using csv_cursor = basic_csv_cursor<char>;
+using wcsv_cursor = basic_csv_cursor<wchar_t>;
 
 }}
 

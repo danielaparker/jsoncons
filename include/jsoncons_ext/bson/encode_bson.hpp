@@ -24,7 +24,7 @@ namespace bson {
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
     encode_bson(const T& j, std::vector<uint8_t>& v)
     {
-        typedef typename T::char_type char_type;
+        using char_type = typename T::char_type;
         bson_bytes_encoder encoder(v);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
@@ -47,7 +47,7 @@ namespace bson {
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
     encode_bson(const T& j, std::ostream& os)
     {
-        typedef typename T::char_type char_type;
+        using char_type = typename T::char_type;
         bson_stream_encoder encoder(os);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
@@ -73,7 +73,7 @@ namespace bson {
     encode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, std::vector<uint8_t>& v)
     {
-        typedef typename T::char_type char_type;
+        using char_type = typename T::char_type;
         basic_bson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v,temp_alloc);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
@@ -98,7 +98,7 @@ namespace bson {
     encode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, std::ostream& os)
     {
-        typedef typename T::char_type char_type;
+        using char_type = typename T::char_type;
         basic_bson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os,temp_alloc);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);

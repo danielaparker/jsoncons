@@ -3,7 +3,7 @@
 ```c++
 #include <jsoncons/staj_reader.hpp>
 
-typedef basic_staj_event<char> staj_event;
+using staj_event = basic_staj_event<char>;
 ```
 
 A JSON-like data event.

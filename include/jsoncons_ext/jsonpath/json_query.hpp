@@ -190,13 +190,13 @@ template<class Json,
          class PathCons>
 class jsonpath_evaluator : public ser_context
 {
-    typedef typename Json::char_type char_type;
-    typedef typename Json::char_traits_type char_traits_type;
-    typedef std::basic_string<char_type,char_traits_type> string_type;
-    typedef typename Json::string_view_type string_view_type;
+    using char_type = typename Json::char_type;
+    using char_traits_type = typename Json::char_traits_type;
+    using string_type = std::basic_string<char_type,char_traits_type>;
+    using string_view_type = typename Json::string_view_type;
     using reference = JsonReference;
     using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-    typedef typename Json::const_pointer const_pointer;
+    using const_pointer = typename Json::const_pointer;
 
     struct node_type
     {

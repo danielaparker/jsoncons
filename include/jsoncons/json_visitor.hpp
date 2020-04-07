@@ -25,7 +25,7 @@ namespace jsoncons {
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
 
-        typedef basic_string_view<char_type,char_traits_type> string_view_type;
+        using string_view_type = basic_string_view<char_type,char_traits_type>;
 
         basic_json_visitor(basic_json_visitor&&) = default;
 

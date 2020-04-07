@@ -199,7 +199,7 @@ template <class StringT>
 class string_sink 
 {
 public:
-    typedef typename StringT::value_type value_type;
+    using value_type = typename StringT::value_type;
     using output_type = StringT;
 private:
     output_type* s_;

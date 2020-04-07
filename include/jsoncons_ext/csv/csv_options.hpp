@@ -970,8 +970,8 @@ public:
 
 };
 
-typedef basic_csv_options<char> csv_options;
-typedef basic_csv_options<wchar_t> wcsv_options;
+using csv_options = basic_csv_options<char>;
+using wcsv_options = basic_csv_options<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use csv_options") typedef csv_options csv_parameters;

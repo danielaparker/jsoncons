@@ -36,7 +36,7 @@ namespace jsoncons
     template <class Json>
     struct json_traits_helper
     {
-        typedef typename Json::string_view_type string_view_type; 
+        using string_view_type = typename Json::string_view_type; 
 
         template <class U> 
         static void set_member(const Json&, const string_view_type&, const U&) 
@@ -245,9 +245,9 @@ namespace jsoncons \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -325,9 +325,9 @@ namespace jsoncons \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -402,9 +402,9 @@ namespace jsoncons \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -473,9 +473,9 @@ namespace jsoncons \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -535,11 +535,11 @@ namespace jsoncons \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using value_type = EnumType; \
-        typedef typename Json::char_type char_type; \
+        using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = basic_string_view<char_type>; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef std::pair<EnumType,string_type> mapped_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using mapped_type = std::pair<EnumType,string_type>; \
         \
         static std::pair<const mapped_type*,const mapped_type*> get_values() \
         { \
@@ -639,11 +639,11 @@ namespace jsoncons \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
         using value_type = EnumType; \
-        typedef typename Json::char_type char_type; \
+        using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
         using string_view_type = basic_string_view<char_type>; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef std::pair<EnumType,string_type> mapped_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using mapped_type = std::pair<EnumType,string_type>; \
         \
         static std::pair<const mapped_type*,const mapped_type*> get_values() \
         { \
@@ -759,9 +759,9 @@ namespace jsoncons \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -837,9 +837,9 @@ namespace jsoncons \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
         typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \

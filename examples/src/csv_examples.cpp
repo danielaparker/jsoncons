@@ -160,7 +160,7 @@ void csv_source_to_cpp_object()
     ioptions.header_lines(1)
            .mapping(csv::mapping_kind::n_rows);
 
-    typedef std::vector<std::tuple<std::string,double,double,double,double>> table_type;
+    using table_type = std::vector<std::tuple<std::string,double,double,double,double>>;
 
     table_type table = csv::decode_csv<table_type>(input,ioptions);
 
@@ -628,7 +628,7 @@ void grouped_into_basic_json_records()
 
 void grouped_into_strongly_typed_records()
 {
-    typedef std::tuple<std::string,std::string,double> record_type;
+    using record_type = std::tuple<std::string,std::string,double>;
 
     csv::csv_options options;
     options.assume_header(true);

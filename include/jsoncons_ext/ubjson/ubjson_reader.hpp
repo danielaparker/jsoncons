@@ -66,9 +66,9 @@ public:
     }
 };
 
-typedef basic_ubjson_reader<jsoncons::binary_stream_source> ubjson_stream_reader;
+using ubjson_stream_reader = basic_ubjson_reader<jsoncons::binary_stream_source>;
 
-typedef basic_ubjson_reader<jsoncons::bytes_source> ubjson_bytes_reader;
+using ubjson_bytes_reader = basic_ubjson_reader<jsoncons::bytes_source>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use ubjson_stream_reader") typedef ubjson_stream_reader ubjson_reader;

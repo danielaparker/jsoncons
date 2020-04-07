@@ -190,7 +190,7 @@ namespace jsoncons {
                  !jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json>
         static void serialize(const T& val, 
@@ -216,7 +216,7 @@ namespace jsoncons {
                  jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json>
         static void serialize(const T& val, 
@@ -233,7 +233,7 @@ namespace jsoncons {
     template <class T, class CharT, std::size_t N>
     struct ser_traits<std::array<T,N>,CharT>
     {
-        typedef typename std::array<T,N>::value_type value_type;
+        using value_type = typename std::array<T,N>::value_type;
 
         template <class Json>
         static void serialize(const std::array<T, N>& val, 
@@ -261,9 +261,9 @@ namespace jsoncons {
                                 jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json>
         static void serialize(const T& val, 
@@ -291,9 +291,9 @@ namespace jsoncons {
                                 std::is_integral<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json>
         static void serialize(const T& val, 

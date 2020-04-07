@@ -26,8 +26,8 @@ template<class Integer,class Result>
 typename std::enable_if<std::is_integral<Integer>::value && std::is_signed<Integer>::value,std::size_t>::type
 write_integer(Integer value, Result& result)
 {
-    typedef typename Result::value_type char_type;
-    typedef typename std::make_unsigned<Integer>::type unsigned_type;
+    using char_type = typename Result::value_type;
+    using unsigned_type = typename std::make_unsigned<Integer>::type;
 
     char_type buf[255];
     unsigned_type u = (value < 0) ? static_cast<unsigned_type>(-value) : static_cast<unsigned_type>(value);
@@ -59,7 +59,7 @@ template<class Integer,class Result>
 typename std::enable_if<std::is_integral<Integer>::value && !std::is_signed<Integer>::value,std::size_t>::type
 write_integer(Integer value, Result& result)
 {
-    typedef typename Result::value_type char_type;
+    using char_type = typename Result::value_type;
 
     char_type buf[255];
     char_type *p = buf;
@@ -82,7 +82,7 @@ write_integer(Integer value, Result& result)
 template<class Result>
 size_t integer_to_hex_string(int64_t value, Result& result)
 {
-    typedef typename Result::value_type char_type;
+    using char_type = typename Result::value_type;
 
     std::size_t count = 0;
 
@@ -113,7 +113,7 @@ size_t integer_to_hex_string(int64_t value, Result& result)
 template<class Result>
 size_t uinteger_to_hex_string(uint64_t value, Result& result)
 {
-    typedef typename Result::value_type char_type;
+    using char_type = typename Result::value_type;
 
     std::size_t count = 0;
 

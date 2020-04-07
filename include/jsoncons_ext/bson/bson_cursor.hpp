@@ -206,8 +206,8 @@ private:
     }
 };
 
-typedef basic_bson_cursor<jsoncons::binary_stream_source> bson_stream_cursor;
-typedef basic_bson_cursor<jsoncons::bytes_source> bson_bytes_cursor;
+using bson_stream_cursor = basic_bson_cursor<jsoncons::binary_stream_source>;
+using bson_bytes_cursor = basic_bson_cursor<jsoncons::bytes_source>;
 
 } // namespace bson
 } // namespace jsoncons

@@ -150,7 +150,7 @@ namespace jsoncons {
                  !jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 
@@ -180,7 +180,7 @@ namespace jsoncons {
         T& v_;
         int level_;
     public:
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         typed_array_visitor(T& v)
             : default_json_visitor(false,conversion_errc::json_not_vector), v_(v), level_(0)
@@ -288,7 +288,7 @@ namespace jsoncons {
                  jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 
@@ -314,7 +314,7 @@ namespace jsoncons {
     template <class T, class CharT, std::size_t N>
     struct deser_traits<std::array<T,N>,CharT>
     {
-        typedef typename std::array<T,N>::value_type value_type;
+        using value_type = typename std::array<T,N>::value_type;
 
         template <class Json,class TempAllocator>
         static std::array<T, N> deserialize(basic_staj_reader<CharT>& reader, 
@@ -346,9 +346,9 @@ namespace jsoncons {
                                 jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 
@@ -386,9 +386,9 @@ namespace jsoncons {
                                 std::is_integral<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 

@@ -67,9 +67,9 @@ public:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::binary_stream_source> msgpack_stream_reader;
+using msgpack_stream_reader = basic_msgpack_reader<jsoncons::binary_stream_source>;
 
-typedef basic_msgpack_reader<jsoncons::bytes_source> msgpack_bytes_reader;
+using msgpack_bytes_reader = basic_msgpack_reader<jsoncons::bytes_source>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use msgpack_stream_reader") typedef msgpack_stream_reader msgpack_reader;

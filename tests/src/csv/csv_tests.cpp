@@ -1475,7 +1475,7 @@ TEST_CASE("csv detect bom")
 
 TEST_CASE("test_encode_decode csv string")
 {
-    typedef std::vector<std::tuple<std::string,int>> cpp_type;
+    using cpp_type = std::vector<std::tuple<std::string,int>>;
     std::string s1 = "\"a\",1\n\"b\",2";
     csv::csv_options options;
     options.mapping(csv::mapping_kind::n_rows)
@@ -1530,7 +1530,7 @@ TEST_CASE("csv_reader constructors")
 
     SECTION("stateful allocator")
     {
-        typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
+        using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
 
         FreelistAllocator<char> my_allocator{1}; 
 

@@ -915,10 +915,10 @@ private:
     }
 };
 
-typedef basic_csv_encoder<char> csv_stream_encoder;
-typedef basic_csv_encoder<char,jsoncons::string_sink<std::string>> csv_string_encoder;
-typedef basic_csv_encoder<wchar_t> csv_wstream_encoder;
-typedef basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wcsv_string_encoder;
+using csv_stream_encoder = basic_csv_encoder<char>;
+using csv_string_encoder = basic_csv_encoder<char,jsoncons::string_sink<std::string>>;
+using csv_wstream_encoder = basic_csv_encoder<wchar_t>;
+using wcsv_string_encoder = basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT, class Sink = jsoncons::stream_sink<CharT>, class Allocator = std::allocator<CharT>>

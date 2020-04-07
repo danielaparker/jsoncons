@@ -39,8 +39,8 @@ public:
     using typename super_type::string_view_type;
 
 private:
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
+    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
 
     using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
     using byte_string_type = basic_byte_string<byte_allocator_type>;
@@ -1633,8 +1633,8 @@ private:
     }
 };
 
-typedef basic_cbor_encoder<jsoncons::binary_stream_sink> cbor_stream_encoder;
-typedef basic_cbor_encoder<jsoncons::bytes_sink> cbor_bytes_encoder;
+using cbor_stream_encoder = basic_cbor_encoder<jsoncons::binary_stream_sink>;
+using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_bytes_serializer;

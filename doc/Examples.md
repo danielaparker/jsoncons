@@ -426,7 +426,7 @@ end_array
 // working memory used by json_decoder, and my_alloc(3) to allocate
 // working memory used by basic_json_reader. 
 
-typedef basic_json<char,sorted_policy,my_alloc> my_json;
+using my_json = basic_json<char,sorted_policy,my_alloc>;
 
 std::ifstream is("book_catalog.json");
 json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
@@ -533,7 +533,7 @@ namespace jsoncons {
     template<class Json>
     struct json_type_traits<Json, ns::book>
     {
-        typedef typename Json::allocator_type allocator_type;
+        using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
@@ -1325,7 +1325,7 @@ using namespace jsoncons; // for convenience
 
 int main()
 {
-    typedef ns::TemplatedStruct<int,std::wstring> value_type;
+    using value_type = ns::TemplatedStruct<int,std::wstring>;
 
     value_type val{1, L"sss"};
 

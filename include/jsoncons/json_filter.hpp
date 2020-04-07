@@ -437,9 +437,9 @@ template <class From,class To>
 class json_visitor_adaptor<From,To,typename std::enable_if<std::is_convertible<To*,From*>::value>::type>
 {
 public:
-    typedef typename From::char_type char_type;
-    typedef typename From::char_traits_type char_traits_type;
-    typedef typename From::string_view_type string_view_type;
+    using char_type = typename From::char_type;
+    using char_traits_type = typename From::char_traits_type;
+    using string_view_type = typename From::string_view_type;
 private:
     To* destination_;
 public:
@@ -470,10 +470,10 @@ json_visitor_adaptor<From,To> make_json_visitor_adaptor(To& to)
     return json_visitor_adaptor<From, To>(to);
 }
 
-typedef basic_json_filter<char> json_filter;
-typedef basic_json_filter<wchar_t> wjson_filter;
-typedef basic_rename_object_key_filter<char> rename_object_key_filter;
-typedef basic_rename_object_key_filter<wchar_t> wrename_object_key_filter;
+using json_filter = basic_json_filter<char>;
+using wjson_filter = basic_json_filter<wchar_t>;
+using rename_object_key_filter = basic_rename_object_key_filter<char>;
+using wrename_object_key_filter = basic_rename_object_key_filter<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template <class CharT>

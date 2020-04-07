@@ -76,7 +76,7 @@ TEST_CASE("json_reader constructors")
 
     SECTION("stateful allocator")
     {
-        typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
+        using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
 
         FreelistAllocator<char> my_allocator{1}; 
 

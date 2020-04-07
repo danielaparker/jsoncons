@@ -206,8 +206,8 @@ private:
     }
 };
 
-typedef basic_msgpack_cursor<jsoncons::binary_stream_source> msgpack_stream_cursor;
-typedef basic_msgpack_cursor<jsoncons::bytes_source> msgpack_bytes_cursor;
+using msgpack_stream_cursor = basic_msgpack_cursor<jsoncons::binary_stream_source>;
+using msgpack_bytes_cursor = basic_msgpack_cursor<jsoncons::bytes_source>;
 
 } // namespace msgpack
 } // namespace jsoncons

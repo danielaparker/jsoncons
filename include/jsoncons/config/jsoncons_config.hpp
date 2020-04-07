@@ -100,7 +100,7 @@ namespace jsoncons {
     typename unique_if<T>::value_is_array_of_unknown_bound
     make_unique(size_t n) 
     {
-        typedef typename std::remove_extent<T>::type U;
+        using U = typename std::remove_extent<T>::type;
         return std::unique_ptr<T>(new U[n]());
     }
 
