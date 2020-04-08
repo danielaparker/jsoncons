@@ -8,22 +8,14 @@
 #define JSONCONS_JSON_TRAITS_MACROS_HPP
 
 #include <algorithm> // std::swap
-#include <array>
-#include <cstring>
-#include <exception>
-#include <functional>
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
-#include <jsoncons/bignum.hpp>
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
 #include <jsoncons/detail/more_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <limits> // std::numeric_limits
-#include <memory>
 #include <string>
 #include <type_traits> // std::enable_if
-#include <unordered_map> // std::unordered_map
 #include <utility>
-#include <valarray>
 #include <jsoncons/json_type_traits.hpp>
 
 namespace jsoncons
@@ -39,11 +31,11 @@ namespace jsoncons
         using string_view_type = typename Json::string_view_type; 
 
         template <class U> 
-        static void set_member(const Json&, const string_view_type&, const U&) 
+        static void set_udt_member(const Json&, const string_view_type&, const U&) 
         { 
         } 
         template <class U> 
-        static void set_member(const Json& j, const string_view_type& key, U& val) 
+        static void set_udt_member(const Json& j, const string_view_type& key, U& val) 
         { 
             val = j.at(key).template as<U>(); 
         } 
@@ -218,11 +210,11 @@ namespace jsoncons
 #define JSONCONS_AS(Prefix,P2,P3, Member, Count) JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count) \
     if ((num_params-Count) < num_mandatory_params2 || ajson.contains(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}))) \
-        {json_traits_helper<Json>::set_member(ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);}
+        {json_traits_helper<Json>::set_udt_member(ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);}
 
 #define JSONCONS_ALL_AS(Prefix, P2,P3,Member, Count) JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count)
 #define JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count) \
-    json_traits_helper<Json>::set_member(ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);
+    json_traits_helper<Json>::set_udt_member(ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
 #define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count) if ((num_params-Count) < num_mandatory_params2) \
@@ -244,7 +236,7 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -300,12 +292,12 @@ namespace jsoncons \
 #define JSONCONS_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 || JSONCONS_EXPAND(JSONCONS_NAME_AS_ Seq)
 #define JSONCONS_NAME_AS_(Member, Name) ajson.contains(Name)) \
-    {json_traits_helper<Json>::set_member(ajson,Name,aval.Member);}
+    {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
 
 #define JSONCONS_ALL_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAME_AS_ Seq)
 #define JSONCONS_ALL_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAME_AS_ Seq)
 #define JSONCONS_ALL_NAME_AS_(Member, Name) \
-    json_traits_helper<Json>::set_member(ajson,Name,aval.Member);
+    json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);
 
 #define JSONCONS_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_NAME_TO_JSON_ Seq)
@@ -324,7 +316,7 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -401,7 +393,7 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -472,7 +464,7 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -758,7 +750,7 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \
@@ -836,7 +828,7 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
         using allocator_type = typename Json::allocator_type; \
         using char_type = typename Json::char_type; \
         using string_view_type = typename Json::string_view_type; \

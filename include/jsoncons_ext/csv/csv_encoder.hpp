@@ -32,10 +32,10 @@ public:
     using sink_type = Sink;
 
     using allocator_type = Allocator;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
+    using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
+    using string_type = std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type>;
+    using string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type>;
+    using string_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>>;
 
 private:
     static const std::array<CharT, 4>& null_k()

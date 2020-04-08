@@ -104,6 +104,7 @@ diy_fp_t cached_power(int k)
 
 // double
 
+/*
 typedef union {
     double d;
     uint64_t n;
@@ -114,6 +115,12 @@ uint64_t double_to_uint64(double d) { converter_t tmp; tmp.d = d; return tmp.n; 
 
 inline 
 double uint64_to_double(uint64_t d64) { converter_t tmp; tmp.n = d64; return tmp.d; }
+*/
+inline 
+uint64_t double_to_uint64(double d) {uint64_t d64; std::memcpy(&d64,&d,sizeof(double)); return d64; }
+
+inline 
+double uint64_to_double(uint64_t d64) {double d; std::memcpy(&d,&d64,sizeof(double)); return d; }
 
 constexpr int dp_significand_size = 52;
 constexpr int dp_exponent_bias = (0x3FF + dp_significand_size);
