@@ -30,6 +30,8 @@ are good online evaluators for checking JSONPath expressions.
 
 The jsoncons implementation follows these [ABNF rules](jsoncons-jsonpath-abnf.md).
 
+Go to [JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) to see how jsoncons JsonPath compares with other implementations.
+
 #### Differences with Stefan Goessner's implementation
 
 - Stefan Goessner's implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. 
@@ -103,7 +105,7 @@ JSONPath|       Description
 `*` |   Wildcard. All objects/elements regardless their names.
 `[]`    |Subscript operator. 
 `[,]`   |Union.
-`[start:end:step]`      |Array slice operator borrowed from [ES4](http://wiki.ecmascript.org/doku.php?id=proposals:slice_syntax&s=array+slice).
+`[start:end:step]`      |Array slice operator borrowed from [ES4](https://github.com/tc39/proposal-slice-notation).
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
 
