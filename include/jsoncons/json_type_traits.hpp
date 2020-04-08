@@ -757,15 +757,15 @@ namespace detail {
 
 namespace detail
 {
-    template<size_t Pos, class Json, class Tuple>
+    template<size_t Pos, size_t Size, class Json, class Tuple>
     struct json_tuple_helper
     {
-        using element_type = typename std::tuple_element<Pos - 1, Tuple>::type;
-        using next = json_tuple_helper<Pos - 1, Json, Tuple>;
+        using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
+        using next = json_tuple_helper<Pos-1, Size, Json, Tuple>;
         
         static bool is(const Json& j) noexcept
         {
-            if(j[Pos - 1].template is<element_type>())
+            if(j[Size-Pos].template is<element_type>())
             {
                 return next::is(j);
             }
@@ -777,19 +777,19 @@ namespace detail
 
         static void as(Tuple& tuple, const Json& j)
         {
-            std::get<Pos - 1>(tuple) = j[Pos - 1].template as<element_type>();
+            std::get<Size-Pos>(tuple) = j[Size-Pos].template as<element_type>();
             next::as(tuple, j);
         }
 
-        static void to_json(const Tuple& tuple, std::array<Json, std::tuple_size<Tuple>::value>& jsons)
+        static void to_json(const Tuple& tuple, Json& j)
         {
-            jsons[Pos - 1] = json_type_traits<Json, element_type>::to_json(std::get<Pos-1>(tuple));
-            next::to_json(tuple, jsons);
+            j.push_back(json_type_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple)));
+            next::to_json(tuple, j);
         }
     };
 
-    template<class Json, class Tuple>
-    struct json_tuple_helper<0, Json, Tuple>
+    template<size_t Size, class Json, class Tuple>
+    struct json_tuple_helper<0, Size, Json, Tuple>
     {
         static bool is(const Json&) noexcept
         {
@@ -800,7 +800,7 @@ namespace detail
         {
         }
 
-        static void to_json(const Tuple&, std::array<Json, std::tuple_size<Tuple>::value>&)
+        static void to_json(const Tuple&, Json&)
         {
         }
     };
@@ -810,7 +810,7 @@ namespace detail
     struct json_type_traits<Json, std::tuple<E...>>
     {
     private:
-        using helper = jsoncons::detail::json_tuple_helper<sizeof...(E), Json, std::tuple<E...>>;
+        using helper = jsoncons::detail::json_tuple_helper<sizeof...(E), sizeof...(E), Json, std::tuple<E...>>;
 
     public:
         static bool is(const Json& j) noexcept
@@ -827,9 +827,10 @@ namespace detail
          
         static Json to_json(const std::tuple<E...>& val)
         {
-            std::array<Json, sizeof...(E)> buf;
-            helper::to_json(val, buf);
-            return Json(typename Json::array(buf.begin(), buf.end()));
+            Json j(json_array_arg);
+            j.reserve(sizeof...(E));
+            helper::to_json(val, j);
+            return j;
         }
     };
 
