@@ -813,6 +813,8 @@ namespace detail
         using helper = jsoncons::detail::json_tuple_helper<sizeof...(E), sizeof...(E), Json, std::tuple<E...>>;
 
     public:
+        using allocator_type = typename Json::allocator_type;
+
         static bool is(const Json& j) noexcept
         {
             return helper::is(j);
@@ -832,12 +834,23 @@ namespace detail
             helper::to_json(val, j);
             return j;
         }
+
+        static Json to_json(const std::tuple<E...>& val,
+                            const allocator_type& alloc)
+        {
+            Json j(json_array_arg, alloc);
+            j.reserve(sizeof...(E));
+            helper::to_json(val, j);
+            return j;
+        }
     };
 
     template<class Json, class T1, class T2>
     struct json_type_traits<Json, std::pair<T1,T2>>
     {
     public:
+        using allocator_type = typename Json::allocator_type;
+
         static bool is(const Json& j) noexcept
         {
             return j.is_array() && j.size() == 2;
@@ -848,9 +861,14 @@ namespace detail
             return std::make_pair<T1,T2>(j[0].template as<T1>(),j[1].template as<T2>());
         }
         
-        static Json to_json(const std::pair<T1,T2>& val)
+        static Json to_json(const std::pair<T1,T2>& val, 
+                            const allocator_type& alloc = allocator_type())
         {
-            return Json(json_array_arg, { val.first, val.second });
+            Json j(json_array_arg, alloc);
+            j.reserve(2);
+            j.push_back(val.first);
+            j.push_back(val.second);
+            return j;
         }
     };
 
