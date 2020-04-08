@@ -178,7 +178,63 @@ namespace jsoncons {
             ser_traits<T2,CharT>::serialize(val.second, encoder, context_j, ec);
             if (ec) return;
             encoder.end_array(ser_context(),ec);
+        }
+    };
+
+    // std::tuple
+
+    namespace detail
+    {
+        template<size_t Pos, size_t Size, class Json, class Tuple>
+        struct json_serialize_tuple_helper
+        {
+            using char_type = typename Json::char_type;
+            using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
+            using next = json_serialize_tuple_helper<Pos-1, Size, Json, Tuple>;
+
+            static void serialize(const Tuple& tuple,
+                                  basic_json_visitor<char_type>& encoder, 
+                                  const Json& context_j, 
+                                  std::error_code& ec)
+            {
+                ser_traits<element_type,char_type>::serialize(std::get<Size-Pos>(tuple), encoder, context_j, ec);
+                if (ec) return;
+                next::serialize(tuple, encoder, context_j, ec);
+            }
+        };
+
+        template<size_t Size, class Json, class Tuple>
+        struct json_serialize_tuple_helper<0, Size, Json, Tuple>
+        {
+            using char_type = typename Json::char_type;
+            static void serialize(const Tuple&,
+                                  basic_json_visitor<char_type>&, 
+                                  const Json&, 
+                                  std::error_code&)
+            {
+            }
+        };
+    } // namespace detail
+
+
+    template <class CharT, typename... E>
+    struct ser_traits<std::tuple<E...>, CharT>
+    {
+        using value_type = std::tuple<E...>;
+        static constexpr std::size_t size = sizeof...(E);
+
+        template <class Json>
+        static void serialize(const value_type& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json& context_j, 
+                              std::error_code& ec)
+        {
+            using helper = jsoncons::detail::json_serialize_tuple_helper<size, size, Json, std::tuple<E...>>;
+            encoder.begin_array(semantic_tag::none,ser_context(),ec);
             if (ec) return;
+            helper::serialize(val, encoder, context_j, ec);
+            if (ec) return;
+            encoder.end_array(ser_context(),ec);
         }
     };
 

@@ -861,8 +861,16 @@ namespace detail
             return std::make_pair<T1,T2>(j[0].template as<T1>(),j[1].template as<T2>());
         }
         
-        static Json to_json(const std::pair<T1,T2>& val, 
-                            const allocator_type& alloc = allocator_type())
+        static Json to_json(const std::pair<T1,T2>& val)
+        {
+            Json j(json_array_arg);
+            j.reserve(2);
+            j.push_back(val.first);
+            j.push_back(val.second);
+            return j;
+        }
+
+        static Json to_json(const std::pair<T1, T2>& val, const allocator_type& alloc)
         {
             Json j(json_array_arg, alloc);
             j.reserve(2);
