@@ -85,7 +85,18 @@ TEST_CASE("clusterfuzz_issue 21589")
         {
             visitor.end_array();
         }
-        std::cout << pretty_print(visitor.get_result()) << "\n";
+        //std::cout << pretty_print(visitor.get_result()) << "\n";
+    }
+    SECTION("test 7")
+    {
+        json doc(json_array_arg);
+        json* ref = &doc;
+        for (size_t j = 0; j < 300; ++j)
+        {
+            ref->emplace_back(json_array_arg);
+            ref = &ref->at(0);
+        }
+        //std::cout << doc << "\n";
     }
 }
 
