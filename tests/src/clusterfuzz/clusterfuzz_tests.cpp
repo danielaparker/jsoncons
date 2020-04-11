@@ -77,11 +77,11 @@ TEST_CASE("clusterfuzz_issue 21589")
     SECTION("test 6")
     {
         json_decoder<json> visitor;
-        for (size_t i = 0; i < 238; ++i)
+        for (size_t i = 0; i < 4000; ++i)
         {
             visitor.begin_array();
         }
-        for (size_t i = 0; i < 238; ++i)
+        for (size_t i = 0; i < 4000; ++i)
         {
             visitor.end_array();
         }
