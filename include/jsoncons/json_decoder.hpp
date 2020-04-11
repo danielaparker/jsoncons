@@ -223,14 +223,14 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(key_type(), json_array_arg, tag, array_allocator_);
+        item_stack_.emplace_back(std::forward<key_type>(name_), json_array_arg, tag, array_allocator_);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
 
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
-        std::cout << "visit_end_array " << item_stack_.size() << "\n";
+        //std::cout << "visit_end_array " << item_stack_.size() << "\n";
 
         //std::cout << "structure_stack\n";
         //for (auto& info : structure_stack_)
@@ -246,7 +246,7 @@ private:
         auto& container = item_stack_[container_index].value_;
 
         const size_t size = item_stack_.size() - (container_index + 1);
-        std::cout << "size on item stack: " << size << "\n";
+        //std::cout << "size on item stack: " << size << "\n";
 
         if (size > 0)
         {
