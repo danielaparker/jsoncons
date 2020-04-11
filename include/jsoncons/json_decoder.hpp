@@ -58,10 +58,10 @@ private:
     struct structure_info
     {
         structure_type type_;
-        std::size_t offset_;
+        std::size_t container_index_;
 
         structure_info(structure_type type, std::size_t offset)
-            : type_(type), offset_(offset)
+            : type_(type), container_index_(offset)
         {
         }
 
@@ -194,7 +194,7 @@ private:
     {
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);
-        const size_t structure_index = structure_stack_.back().offset_;
+        const size_t structure_index = structure_stack_.back().container_index_;
         JSONCONS_ASSERT(item_stack_.size() > structure_index);
         const size_t count = item_stack_.size() - (structure_index + 1);
         auto first = item_stack_.begin() + (structure_index+1);
@@ -223,28 +223,43 @@ private:
             item_stack_.clear();
             is_valid_ = false;
         }
-        item_stack_.emplace_back(std::forward<key_type>(name_), json_array_arg, tag, array_allocator_);
+        item_stack_.emplace_back(key_type(), json_array_arg, tag, array_allocator_);
         structure_stack_.emplace_back(structure_type::array_t, item_stack_.size()-1);
         return true;
     }
 
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
-        JSONCONS_ASSERT(structure_stack_.size() > 0);
-        JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
-        const size_t structure_index = structure_stack_.back().offset_;
-        JSONCONS_ASSERT(item_stack_.size() > structure_index);
-        const size_t count = item_stack_.size() - (structure_index + 1);
-        auto first = item_stack_.begin() + (structure_index+1);
-        auto last = first + count;
-        auto& j = item_stack_[structure_index].value_;
-        j.reserve(count);
-        while (first != last)
+        std::cout << "visit_end_array " << item_stack_.size() << "\n";
+
+        //std::cout << "structure_stack\n";
+        //for (auto& info : structure_stack_)
         {
-            j.push_back(std::move(first->value_));
-            ++first;
+            //std::cout << "type: " << (int)info.type_ << ", offset " << info.container_index_ << "\n";
         }
-        item_stack_.erase(item_stack_.begin()+structure_index+1, item_stack_.end());
+
+        JSONCONS_ASSERT(structure_stack_.size() > 1);
+        JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
+        const size_t container_index = structure_stack_.back().container_index_;
+        JSONCONS_ASSERT(item_stack_.size() > container_index);
+
+        auto& container = item_stack_[container_index].value_;
+
+        const size_t size = item_stack_.size() - (container_index + 1);
+        std::cout << "size on item stack: " << size << "\n";
+
+        if (size > 0)
+        {
+            container.reserve(size);
+            auto first = item_stack_.begin() + (container_index+1);
+            auto last = first + size;
+            for (auto it = first; it != last; ++it)
+            {
+                container.push_back(std::move(it->value_));
+            }
+            item_stack_.erase(first, item_stack_.end());
+        }
+
         structure_stack_.pop_back();
         if (structure_stack_.back().type_ == structure_type::root_t)
         {

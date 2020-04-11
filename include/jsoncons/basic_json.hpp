@@ -3780,24 +3780,27 @@ public:
 
     void reserve(std::size_t n)
     {
-        switch (var_.storage())
+        if (n > 0)
         {
-        case storage_kind::array_value:
-            array_value().reserve(n);
+            switch (var_.storage())
+            {
+            case storage_kind::array_value:
+                array_value().reserve(n);
+                break;
+            case storage_kind::empty_object_value:
+            {
+                create_object_implicitly();
+                object_value().reserve(n);
+            }
             break;
-        case storage_kind::empty_object_value:
-        {
-            create_object_implicitly();
-            object_value().reserve(n);
-        }
-        break;
-        case storage_kind::object_value:
-        {
-            object_value().reserve(n);
-        }
-            break;
-        default:
-            break;
+            case storage_kind::object_value:
+            {
+                object_value().reserve(n);
+            }
+                break;
+            default:
+                break;
+            }
         }
     }
 
