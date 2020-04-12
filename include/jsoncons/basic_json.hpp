@@ -737,16 +737,30 @@ public:
                     switch (j.storage())
                     {
                         case storage_kind::array_value:
+                        {
+                            for (auto& item : j.array_range())
+                            {
+                                basic_json v;
+                                v.swap(item);
+                                if (v.is_object() || v.is_array())
+                                {
+                                    ptr_->push_back(std::move(v));
+                                }
+                            }
                             std::move(j.array_range().begin(), j.array_range().end(),
                                       std::back_inserter(*ptr_)); 
                             j.clear();                           
                             break;
+                        }
                         case storage_kind::object_value:
                             for (auto& kv : j.object_range())
                             {
                                 basic_json v;
                                 v.swap(kv.value());
-                                ptr_->push_back(std::move(v));
+                                if (v.is_object() || v.is_array())
+                                {
+                                    ptr_->push_back(std::move(v));
+                                }
                             }
                             j.clear();                           
                             break;
