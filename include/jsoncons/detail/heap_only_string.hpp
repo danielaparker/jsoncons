@@ -191,6 +191,7 @@ private:
 
         byte_allocator_type byte_alloc(alloc);
         byte_pointer ptr = byte_alloc.allocate(mem_size);
+        //byte_pointer ptr = std::allocator_traits<byte_allocator_type>::allocate(alloc, mem_size);
 
         char* storage = to_plain_pointer(ptr);
         string_type* ps = new(storage)heap_only_string<char_type,Allocator>(byte_alloc);

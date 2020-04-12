@@ -620,7 +620,7 @@ public:
             template <typename... Args>
             void create(byte_allocator_type alloc, Args&& ... args)
             {
-                ptr_ = alloc.allocate(1);
+                ptr_ = std::allocator_traits<byte_allocator_type>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
                     std::allocator_traits<byte_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
@@ -715,7 +715,7 @@ public:
             template <typename... Args>
             void create(array_allocator alloc, Args&& ... args)
             {
-                ptr_ = alloc.allocate(1);
+                ptr_ = std::allocator_traits<array_allocator>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
                     std::allocator_traits<array_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
@@ -844,7 +844,7 @@ public:
             template <typename... Args>
             void create(object_allocator alloc, Args&& ... args)
             {
-                ptr_ = alloc.allocate(1);
+                ptr_ = std::allocator_traits<object_allocator>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
                     std::allocator_traits<object_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
