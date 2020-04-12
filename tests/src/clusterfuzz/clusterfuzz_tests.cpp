@@ -2,6 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
+#include <nlohmann/json.hpp>
 #include <vector>
 #include <utility>
 #include <ctime>
@@ -74,7 +75,7 @@ TEST_CASE("clusterfuzz_issue 21589")
         }
         std::cout << pretty_print(visitor.get_result()) << "\n";
     }*/
-    SECTION("test 6")
+    /*SECTION("test 6")
     {
         json_decoder<json> visitor;
         for (size_t i = 0; i < 4000; ++i)
@@ -86,7 +87,7 @@ TEST_CASE("clusterfuzz_issue 21589")
             visitor.end_array();
         }
         //std::cout << pretty_print(visitor.get_result()) << "\n";
-    }
+    }*/
     SECTION("test 7")
     {
         json doc(json_array_arg);
@@ -98,5 +99,22 @@ TEST_CASE("clusterfuzz_issue 21589")
         }
         //std::cout << doc << "\n";
     }
+    /*SECTION("test 8")
+    {
+        nlohmann::json doc = nlohmann::json::array();
+        nlohmann::json* ref = &doc;
+        for (size_t j = 0; j < 575; ++j)
+        {
+            ref->push_back(nlohmann::json::array());
+            ref = &ref->at(0);
+        }
+        //std::cout << doc << "\n";
+    }*/
+    /*SECTION("test 8")
+    {
+        std::ifstream is("input/clusterfuzz/yyy.json");
+        nlohmann::json doc = nlohmann::json::parse(is);
+        std::cout << doc << "\n";
+    }*/
 }
 
