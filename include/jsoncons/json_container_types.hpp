@@ -108,6 +108,26 @@ namespace jsoncons {
         {
         }
 
+        reference back()
+        {
+            return elements_.back();
+        }
+
+        const_reference back() const
+        {
+            return elements_.back();
+        }
+
+        void pop_back()
+        {
+            elements_.pop_back();
+        }
+
+        bool empty() const
+        {
+            return elements_.empty();
+        }
+
         void swap(json_array<Json>& val) noexcept
         {
             elements_.swap(val.elements_);
