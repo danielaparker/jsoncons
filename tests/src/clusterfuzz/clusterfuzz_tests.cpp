@@ -2,7 +2,6 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <nlohmann/json.hpp>
 #include <vector>
 #include <utility>
 #include <ctime>
@@ -11,110 +10,14 @@
 
 using namespace jsoncons;
 
-TEST_CASE("clusterfuzz_issue 21589")
+TEST_CASE("clusterfuzz issues")
 {
-    std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
-#if 0
-    SECTION("test 1")
+    SECTION("issue 21589")
     {
-        try
-        {
-            json val = json::parse(is);
-        }
-        catch(const jsoncons::ser_error& e) 
-        {
-            std::cout << e.what();
-        }
+        std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
+
+        std::ifstream is(pathname);
+        REQUIRE_THROWS_WITH(json::parse(is), Catch::Matchers::Contains(json_error_category_impl().message((int)json_errc::expected_comma_or_right_bracket).c_str()));
     }
-#endif
-    /*SECTION("test 2")
-    {
-        std::ifstream is("input/clusterfuzz/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328");
-        default_json_visitor visitor;
-        json_reader reader(is, visitor);
-
-        std::error_code ec;
-        reader.read(ec);
-        //CHECK_FALSE(ec);
-        std::cout << ec.message() << "\n";
-    }*/
-    /* SECTION("test 3")
-    {
-        std::ifstream is("input/clusterfuzz/yyy.json");
-        REQUIRE(is);
-        json_decoder<json> visitor;
-
-        json_options options;
-        //options.max_nesting_depth(1310);
-        json_reader reader(is, visitor, options);
-
-        std::error_code ec;
-        reader.read(ec);
-    }*/
-    /* SECTION("test 4")
-    {
-        std::string s;
-        json_string_encoder encoder(s);
-        json_reader reader(is, encoder);
-
-        std::error_code ec;
-        reader.read(ec);
-        CHECK(ec); 
-        //std::cout << s << "\n";
-    }*/
-    /*SECTION("test 5")
-    {
-        json_decoder<json> visitor;
-        for (size_t i = 0; i < 238; ++i)
-        {
-            visitor.begin_array();
-        }
-        for (size_t i = 0; i < 238; ++i)
-        {
-            visitor.end_array();
-        }
-        std::cout << pretty_print(visitor.get_result()) << "\n";
-    }*/
-    /*SECTION("test 6")
-    {
-        json_decoder<json> visitor;
-        for (size_t i = 0; i < 4000; ++i)
-        {
-            visitor.begin_array();
-        }
-        for (size_t i = 0; i < 4000; ++i)
-        {
-            visitor.end_array();
-        }
-        //std::cout << pretty_print(visitor.get_result()) << "\n";
-    }*/
-    SECTION("test 7")
-    {
-        json doc(json_array_arg);
-        json* ref = &doc;
-        for (size_t j = 0; j < 300; ++j)
-        {
-            ref->emplace_back(json_array_arg);
-            ref = &ref->at(0);
-        }
-        //std::cout << doc << "\n";
-    }
-    /*SECTION("test 8")
-    {
-        nlohmann::json doc = nlohmann::json::array();
-        nlohmann::json* ref = &doc;
-        for (size_t j = 0; j < 575; ++j)
-        {
-            ref->push_back(nlohmann::json::array());
-            ref = &ref->at(0);
-        }
-        //std::cout << doc << "\n";
-    }*/
-    /*SECTION("test 8")
-    {
-        std::ifstream is("input/clusterfuzz/yyy.json");
-        nlohmann::json doc = nlohmann::json::parse(is);
-        std::cout << doc << "\n";
-    }*/
 }
 
