@@ -731,38 +731,36 @@ public:
             {
                 while (!ptr_->empty())
                 {
-                    basic_json j;
-                    j.swap(ptr_->back());
+                    basic_json current;
+                    current.swap(ptr_->back());
                     ptr_->pop_back();
-                    switch (j.storage())
+                    switch (current.storage())
                     {
                         case storage_kind::array_value:
                         {
-                            for (auto& item : j.array_range())
+                            for (auto& item : current.array_range())
                             {
-                                basic_json v;
-                                v.swap(item);
-                                if (v.is_object() || v.is_array())
+                                basic_json tmp;
+                                tmp.swap(item);
+                                if (tmp.is_object() || tmp.is_array())
                                 {
-                                    ptr_->push_back(std::move(v));
+                                    ptr_->push_back(std::move(tmp));
                                 }
                             }
-                            std::move(j.array_range().begin(), j.array_range().end(),
-                                      std::back_inserter(*ptr_)); 
-                            j.clear();                           
+                            current.clear();                           
                             break;
                         }
                         case storage_kind::object_value:
-                            for (auto& kv : j.object_range())
+                            for (auto& kv : current.object_range())
                             {
-                                basic_json v;
-                                v.swap(kv.value());
-                                if (v.is_object() || v.is_array())
+                                basic_json tmp;
+                                tmp.swap(kv.value());
+                                if (tmp.is_object() || tmp.is_array())
                                 {
-                                    ptr_->push_back(std::move(v));
+                                    ptr_->push_back(std::move(tmp));
                                 }
                             }
-                            j.clear();                           
+                            current.clear();                           
                             break;
                         default:
                             break;
