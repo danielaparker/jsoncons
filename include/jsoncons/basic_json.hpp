@@ -726,6 +726,38 @@ public:
                     JSONCONS_RETHROW;
                 }
             }
+
+            void destroy()
+            {
+                while (!ptr_->empty())
+                {
+                    basic_json j;
+                    j.swap(ptr_->back());
+                    ptr_->pop_back();
+                    switch (j.storage())
+                    {
+                        case storage_kind::array_value:
+                            std::move(j.array_range().begin(), j.array_range().end(),
+                                      std::back_inserter(*ptr_)); 
+                            j.clear();                           
+                            break;
+                        case storage_kind::object_value:
+                            for (auto& kv : j.object_range())
+                            {
+                                basic_json v;
+                                v.swap(kv.value());
+                                ptr_->push_back(std::move(v));
+                            }
+                            j.clear();                           
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                array_allocator alloc(ptr_->get_allocator());
+                std::allocator_traits<array_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                alloc.deallocate(ptr_,1);
+            }
         public:
             array_storage(const array& val, semantic_tag tag)
                 : ext_type_(from_storage_and_tag(storage_kind::array_value, tag))
@@ -761,9 +793,7 @@ public:
             {
                 if (ptr_ != nullptr)
                 {
-                    array_allocator alloc(ptr_->get_allocator());
-                    std::allocator_traits<array_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                    alloc.deallocate(ptr_,1);
+                    destroy();
                 }
             }
 
