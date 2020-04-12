@@ -627,7 +627,7 @@ public:
                 }
                 JSONCONS_CATCH(...)
                 {
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<byte_allocator_type>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
             }
@@ -666,7 +666,7 @@ public:
                 {
                     byte_allocator_type alloc(ptr_->get_allocator());
                     std::allocator_traits<byte_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<byte_allocator_type>::deallocate(alloc, ptr_,1);
                 }
             }
 
@@ -722,7 +722,7 @@ public:
                 }
                 JSONCONS_CATCH(...)
                 {
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<array_allocator>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
             }
@@ -738,11 +738,20 @@ public:
                     {
                         case storage_kind::array_value:
                         {
+                            std::size_t count = 0;
+                            for (const auto& item : current.array_range())
+                            {
+                                if ((item.is_object() || item.is_array()) && !item.empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            ptr_->reserve(ptr_->size()+count);
                             for (auto& item : current.array_range())
                             {
                                 basic_json tmp;
                                 tmp.swap(item);
-                                if (tmp.is_object() || tmp.is_array())
+                                if ((tmp.is_object() || tmp.is_array()) && !tmp.empty())
                                 {
                                     ptr_->push_back(std::move(tmp));
                                 }
@@ -751,24 +760,35 @@ public:
                             break;
                         }
                         case storage_kind::object_value:
+                        {
+                            std::size_t count = 0;
+                            for (const auto& kv : current.object_range())
+                            {
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            ptr_->reserve(ptr_->size()+count);
                             for (auto& kv : current.object_range())
                             {
                                 basic_json tmp;
                                 tmp.swap(kv.value());
-                                if (tmp.is_object() || tmp.is_array())
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
                                 {
                                     ptr_->push_back(std::move(tmp));
                                 }
                             }
                             current.clear();                           
                             break;
+                        }
                         default:
                             break;
                     }
                 }
                 array_allocator alloc(ptr_->get_allocator());
                 std::allocator_traits<array_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                alloc.deallocate(ptr_,1);
+                std::allocator_traits<array_allocator>::deallocate(alloc, ptr_,1);
             }
         public:
             array_storage(const array& val, semantic_tag tag)
@@ -851,7 +871,7 @@ public:
                 }
                 JSONCONS_CATCH(...)
                 {
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
             }
@@ -891,9 +911,7 @@ public:
             {
                 if (ptr_ != nullptr)
                 {
-                    object_allocator alloc(ptr_->get_allocator());
-                    std::allocator_traits<object_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                    alloc.deallocate(ptr_,1);
+                    destroy();
                 }
             }
 
@@ -915,6 +933,92 @@ public:
             allocator_type get_allocator() const
             {
                 return ptr_->get_allocator();
+            }
+        private:
+
+            void destroy()
+            {
+                std::size_t initial_size = 0;
+                for (const auto& kv : *ptr_)
+                {
+                    if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                    {
+                        ++initial_size;
+                    }
+                }
+
+                json_array<basic_json> stack(initial_size, get_allocator());
+
+                for (auto& kv : *ptr_)
+                {
+                    basic_json tmp;
+                    tmp.swap(kv.value());
+                    if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                    {
+                        stack.push_back(std::move(tmp));
+                    }
+                }
+
+                while (!stack.empty())
+                {
+                    basic_json current;
+                    current.swap(stack.back());
+                    stack.pop_back();
+                    switch (current.storage())
+                    {
+                        case storage_kind::array_value:
+                        {
+                            std::size_t count = 0;
+                            for (const auto& item : current.array_range())
+                            {
+                                if ((item.is_object() || item.is_array()) && !item.empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            stack.reserve(stack.size()+count);
+                            for (auto& item : current.array_range())
+                            {
+                                basic_json tmp;
+                                tmp.swap(item);
+                                if ((tmp.is_object() || tmp.is_array()) && !tmp.empty())
+                                {
+                                    stack.push_back(std::move(tmp));
+                                }
+                            }
+                            current.clear();                           
+                            break;
+                        }
+                        case storage_kind::object_value:
+                        {
+                            std::size_t count = 0;
+                            for (const auto& kv : current.object_range())
+                            {
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            stack.reserve(stack.size()+count);
+                            for (auto& kv : current.object_range())
+                            {
+                                basic_json tmp;
+                                tmp.swap(kv.value());
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                {
+                                    stack.push_back(std::move(tmp));
+                                }
+                            }
+                            current.clear();                           
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+                object_allocator alloc(ptr_->get_allocator());
+                std::allocator_traits<object_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
             }
         };
 
