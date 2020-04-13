@@ -34,7 +34,7 @@ Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
 
-    virtual ~basic_cbor_encoder()
+    virtual ~basic_cbor_encoder() noexcept
 
 
 #### Inherited from [jsoncons::json_visitor](../basic_json_visitor.md)

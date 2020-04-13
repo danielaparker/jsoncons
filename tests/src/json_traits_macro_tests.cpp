@@ -338,7 +338,7 @@ namespace json_type_traits_macro_tests
             : firstName_(firstName), lastName_(lastName)
         {
         }
-        virtual ~Employee() = default;
+        virtual ~Employee() noexcept = default;
 
         virtual double calculatePay() const = 0;
 

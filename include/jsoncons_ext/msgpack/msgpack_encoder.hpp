@@ -84,15 +84,9 @@ public:
     {
     }
 
-    ~basic_msgpack_encoder()
+    ~basic_msgpack_encoder() noexcept
     {
-        JSONCONS_TRY
-        {
-            sink_.flush();
-        }
-        JSONCONS_CATCH(...)
-        {
-        }
+        sink_.flush();
     }
 
 private:

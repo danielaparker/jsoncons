@@ -339,7 +339,7 @@ public:
         initialize( v );
     }
 
-    ~basic_bignum()
+    ~basic_bignum() noexcept
     {
         if ( dynamic_ )
         {

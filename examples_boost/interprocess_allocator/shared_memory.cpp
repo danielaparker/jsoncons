@@ -30,8 +30,8 @@ int f1(int argc, char *argv[])
       //Remove shared memory on construction and destruction
       struct shm_remove
       {
-         shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
-         ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+         shm_remove() noexcept { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+         ~shm_remove() noexcept{ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
       } remover;
 
       //Construct managed shared memory

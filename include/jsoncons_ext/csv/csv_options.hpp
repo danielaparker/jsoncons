@@ -321,7 +321,7 @@ protected:
     basic_csv_options_common(const basic_csv_options_common&) = default;
     basic_csv_options_common& operator=(const basic_csv_options_common&) = default;
 
-    virtual ~basic_csv_options_common() = default;
+    virtual ~basic_csv_options_common() noexcept = default;
 public:
 
     char_type field_delimiter() const 

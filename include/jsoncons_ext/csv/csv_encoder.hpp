@@ -123,7 +123,7 @@ public:
         jsoncons::csv::detail::parse_column_names(options.column_names(), strings_buffer_);
     }
 
-    ~basic_csv_encoder()
+    ~basic_csv_encoder() noexcept
     {
         JSONCONS_TRY
         {

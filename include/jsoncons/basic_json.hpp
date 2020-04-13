@@ -576,7 +576,7 @@ public:
             {
             }
 
-            ~long_string_storage()
+            ~long_string_storage() noexcept
             {
             }
 
@@ -660,7 +660,7 @@ public:
                 create(byte_allocator_type(a), *(val.ptr_), a);
             }
 
-            ~byte_string_storage()
+            ~byte_string_storage() noexcept
             {
                 if (ptr_ != nullptr)
                 {
@@ -821,7 +821,7 @@ public:
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
-            ~array_storage()
+            ~array_storage() noexcept
             {
                 if (ptr_ != nullptr)
                 {
@@ -907,7 +907,7 @@ public:
                 create(object_allocator(a), *(val.ptr_), a);
             }
 
-            ~object_storage()
+            ~object_storage() noexcept
             {
                 if (ptr_ != nullptr)
                 {
@@ -1150,7 +1150,7 @@ public:
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
         }
 
-        ~variant()
+        ~variant() noexcept
         {
             Destroy_();
         }
@@ -3433,7 +3433,7 @@ public:
     {
     }
 
-    ~basic_json()
+    ~basic_json() noexcept
     {
     }
 

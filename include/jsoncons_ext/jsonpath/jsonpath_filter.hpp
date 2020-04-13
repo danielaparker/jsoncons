@@ -1058,7 +1058,7 @@ public:
     using char_type = typename Json::char_type;
     using string_type = std::basic_string<char_type>;
 
-    virtual ~term() {}
+    virtual ~term() noexcept {}
 
     term() = default;
     term(const term&) = default;
@@ -1291,7 +1291,7 @@ public:
         construct(std::forward<token>(other));
     }
 
-    ~token()
+    ~token() noexcept
     {
         destroy();
     }

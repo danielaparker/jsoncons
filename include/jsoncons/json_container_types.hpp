@@ -104,7 +104,7 @@ namespace jsoncons {
               elements_(init,value_allocator_type(alloc))
         {
         }
-        ~json_array()
+        ~json_array() noexcept
         {
         }
 

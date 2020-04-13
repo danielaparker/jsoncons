@@ -81,7 +81,7 @@ public:
         std::swap(reader_,other.reader_);
     }
 
-    ~staj_array_iterator()
+    ~staj_array_iterator() noexcept
     {
     }
 
@@ -232,7 +232,7 @@ public:
     {
     }
 
-    ~staj_object_iterator()
+    ~staj_object_iterator() noexcept
     {
     }
 

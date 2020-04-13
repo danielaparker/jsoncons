@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
       struct shm_remove
       {
          shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
-         ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+         ~shm_remove() noexcept { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
       } remover;
 
       //Construct managed shared memory

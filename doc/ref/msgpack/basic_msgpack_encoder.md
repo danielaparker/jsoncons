@@ -35,7 +35,7 @@ Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
 
-    virtual ~basic_msgpack_encoder()
+    virtual ~basic_msgpack_encoder() noexcept
 
 
 #### Inherited from [jsoncons::basic_json_visitor](basic_json_visitor.md)

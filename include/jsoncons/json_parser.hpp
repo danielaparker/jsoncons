@@ -223,7 +223,7 @@ public:
         return input_ptr_ == input_end_;
     }
 
-    ~basic_json_parser()
+    ~basic_json_parser() noexcept
     {
     }
 

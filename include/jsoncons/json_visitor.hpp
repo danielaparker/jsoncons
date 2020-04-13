@@ -33,7 +33,7 @@ namespace jsoncons {
 
         basic_json_visitor() = default;
 
-        virtual ~basic_json_visitor() {}
+        virtual ~basic_json_visitor() noexcept = default;
 
         void flush()
         {

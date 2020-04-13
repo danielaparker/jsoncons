@@ -118,7 +118,7 @@ public:
         }
     }
 
-    ~basic_cbor_encoder()
+    ~basic_cbor_encoder() noexcept
     {
         JSONCONS_TRY
         {
