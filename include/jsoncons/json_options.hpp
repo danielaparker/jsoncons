@@ -40,14 +40,17 @@ enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
 enum class spaces_option : uint8_t {no_spaces=0,space_after,space_before,space_before_and_after};
 
+template <class CharT>
+class basic_json_options;
 
 template <class CharT>
 class basic_json_options_common
 {
+    friend class basic_json_options<CharT>;
 public:
     using char_type = CharT;
     using string_type = std::basic_string<CharT>;
-protected:
+private:
 #if !defined(JSONCONS_NO_DEPRECATED)
     bool can_read_nan_replacement_;
     bool can_read_pos_inf_replacement_;
@@ -74,6 +77,7 @@ protected:
     string_type inf_to_str_;
     string_type neginf_to_str_;
 
+protected:
     basic_json_options_common()
        :
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -308,17 +312,18 @@ public:
 template <class CharT>
 class basic_json_decode_options : public virtual basic_json_options_common<CharT>
 {
+    friend class basic_json_options<CharT>;
     using super_type = basic_json_options_common<CharT>;
 public:
     using typename super_type::char_type;
     using typename super_type::string_type;
-protected:
+private:
     bool lossless_number_:1;
-    int max_nesting_depth_;
+    int max_depth_;
 public:
     basic_json_decode_options()
         : lossless_number_(false),
-          max_nesting_depth_((std::numeric_limits<int>::max)())
+          max_depth_((std::numeric_limits<int>::max)())
     {
     }
 
@@ -327,7 +332,7 @@ public:
     basic_json_decode_options(basic_json_decode_options&& other)
         : super_type(std::forward<basic_json_decode_options>(other)),
                      lossless_number_(other.lossless_number_),
-                     max_nesting_depth_(other.max_nesting_depth_)
+                     max_depth_(other.max_depth_)
     {
     }
 
@@ -338,21 +343,30 @@ public:
         return lossless_number_;
     }
 
-    int max_nesting_depth() const 
+    int max_depth() const 
     {
-        return max_nesting_depth_;
+        return max_depth_;
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use lossless_number()")
     bool dec_to_str() const 
     {
         return lossless_number_;
     }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use max_depth()")
+    int max_nesting_depth() const 
+    {
+        return max_depth_;
+    }
+#endif
 };
 
 template <class CharT>
 class basic_json_encode_options : public virtual basic_json_options_common<CharT>
 {
+    friend class basic_json_options<CharT>;
     using super_type = basic_json_options_common<CharT>;
 public:
     using typename super_type::char_type;
@@ -360,7 +374,7 @@ public:
 
     static constexpr uint8_t indent_size_default = 4;
     static constexpr size_t line_length_limit_default = 120;
-protected:
+private:
     bool escape_all_non_ascii_:1;
     bool escape_solidus_:1;
     bool pad_inside_object_braces_:1;
@@ -536,7 +550,7 @@ public:
     using basic_json_decode_options<CharT>::neginf_to_num;
 
     using basic_json_decode_options<CharT>::lossless_number;
-    using basic_json_decode_options<CharT>::max_nesting_depth;
+    using basic_json_decode_options<CharT>::max_depth;
 
     using basic_json_encode_options<CharT>::byte_string_format;
     using basic_json_encode_options<CharT>::bigint_format;
@@ -718,9 +732,9 @@ public:
         return *this;
     }
 
-    basic_json_options& max_nesting_depth(int value)
+    basic_json_options& max_depth(int value)
     {
-        this->max_nesting_depth_ = value;
+        this->max_depth_ = value;
         return *this;
     }
 
@@ -765,6 +779,13 @@ public:
     basic_json_options& floating_point_format(float_chars_format value)
     {
         this->float_format_ = value;
+        return *this;
+    }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use max_depth")
+    basic_json_options& max_nesting_depth(int value)
+    {
+        this->max_depth_ = value;
         return *this;
     }
 

@@ -15,9 +15,36 @@
 
 namespace jsoncons { namespace cbor {
 
-class cbor_encode_options
+class cbor_options;
+
+class cbor_options_common
 {
+    friend class cbor_options;
+
+    int max_depth_;
 protected:
+    virtual ~cbor_options_common() = default;
+
+    cbor_options_common()
+        : max_depth_(1000)
+    {
+    }
+
+    cbor_options_common(const cbor_options_common&) = default;
+    cbor_options_common& operator=(const cbor_options_common&) = default;
+    cbor_options_common(cbor_options_common&&) = default;
+    cbor_options_common& operator=(cbor_options_common&&) = default;
+public:
+    int max_depth() const 
+    {
+        return max_depth_;
+    }
+};
+
+class cbor_encode_options : public virtual cbor_options_common
+{
+    friend class cbor_options;
+
     bool use_stringref_;
     bool enable_typed_arrays_;
 public:

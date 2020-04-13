@@ -21,7 +21,7 @@ nan_to_num| |Sets a number replacement for `NaN` when writing JSON
 inf_to_num| |Sets a number replacement for `Infinity` when writing JSON
 neginf_to_num| |Sets a number replacement for `Negative Infinity` when writing JSON
 lossless_number|If `true`, parse numbers with exponents and fractional parts as strings with semantic tagging `semantic_tag::bigdec`. Defaults to `false`.|
-max_nesting_depth|Maximum nesting depth allowed when parsing JSON|
+max_depth|Maximum nesting depth allowed when parsing JSON|
 indent_size| |The indent size, the default is 4
 spaces_around_colon| |Indicates [space option](spaces_option.md) for name separator (`:`). Default is space after.
 spaces_around_comma| |Indicates [space option](spaces_option.md) for array value and object name/value pair separators (`,`). Default is space after.
@@ -77,7 +77,7 @@ Move constructor.
 
 #### Modifiers
 
-    void max_nesting_depth(int depth)
+    void max_depth(int depth)
 The maximum nesting depth allowed when parsing JSON. By default `jsoncons` can read a `JSON` text of arbitrarily large depth.
 
     basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 
