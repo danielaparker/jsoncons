@@ -41,6 +41,15 @@ public:
     }
 };
 
+class cbor_decode_options : public virtual cbor_options_common
+{
+    friend class cbor_options;
+public:
+    cbor_decode_options()
+    {
+    }
+};
+
 class cbor_encode_options : public virtual cbor_options_common
 {
     friend class cbor_options;
@@ -65,11 +74,18 @@ public:
     }
 };
 
-class cbor_options final : public cbor_encode_options
+class cbor_options final : public cbor_decode_options, public cbor_encode_options
 {
 public:
+    using cbor_options_common::max_depth;
     using cbor_encode_options::pack_strings;
     using cbor_encode_options::enable_typed_arrays;
+
+    cbor_options& max_depth(int value)
+    {
+        this->max_depth_ = value;
+        return *this;
+    }
 
     cbor_options& pack_strings(bool value)
     {

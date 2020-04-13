@@ -76,6 +76,7 @@ private:
     string_type nan_to_str_;
     string_type inf_to_str_;
     string_type neginf_to_str_;
+    int max_depth_;
 
 protected:
     basic_json_options_common()
@@ -93,7 +94,8 @@ protected:
         enable_neginf_to_str_(false),
         enable_str_to_nan_(false),
         enable_str_to_inf_(false),
-        enable_str_to_neginf_(false)
+        enable_str_to_neginf_(false),
+        max_depth_(1000)
     {}
 
     virtual ~basic_json_options_common() = default;
@@ -272,6 +274,11 @@ public:
         }
     }
 
+    int max_depth() const 
+    {
+        return max_depth_;
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use enable_nan_to_num() or enable_nan_to_str()")
         bool can_read_nan_replacement() const { return can_read_nan_replacement_; }
@@ -287,7 +294,6 @@ public:
     bool can_write_pos_inf_replacement() const { return !pos_inf_replacement_.empty(); }
 
     bool can_write_neg_inf_replacement() const { return !neg_inf_replacement_.empty(); }
-
 
     JSONCONS_DEPRECATED_MSG("Instead, use nan_to_num() or nan_to_str()")
         const string_type& nan_replacement() const
@@ -306,6 +312,12 @@ public:
     {
         return neg_inf_replacement_;
     }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use max_depth()")
+    int max_nesting_depth() const 
+    {
+        return max_depth_;
+    }
 #endif
 };
 
@@ -319,11 +331,9 @@ public:
     using typename super_type::string_type;
 private:
     bool lossless_number_:1;
-    int max_depth_;
 public:
     basic_json_decode_options()
-        : lossless_number_(false),
-          max_depth_((std::numeric_limits<int>::max)())
+        : lossless_number_(false)
     {
     }
 
@@ -331,8 +341,7 @@ public:
 
     basic_json_decode_options(basic_json_decode_options&& other)
         : super_type(std::forward<basic_json_decode_options>(other)),
-                     lossless_number_(other.lossless_number_),
-                     max_depth_(other.max_depth_)
+                     lossless_number_(other.lossless_number_)
     {
     }
 
@@ -343,22 +352,11 @@ public:
         return lossless_number_;
     }
 
-    int max_depth() const 
-    {
-        return max_depth_;
-    }
-
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use lossless_number()")
     bool dec_to_str() const 
     {
         return lossless_number_;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use max_depth()")
-    int max_nesting_depth() const 
-    {
-        return max_depth_;
     }
 #endif
 };
@@ -539,6 +537,8 @@ public:
     using char_type = CharT;
     using string_type = std::basic_string<CharT>;
 
+    using basic_json_options_common<CharT>::max_depth;
+
     using basic_json_decode_options<CharT>::enable_str_to_nan;
     using basic_json_decode_options<CharT>::enable_str_to_inf;
     using basic_json_decode_options<CharT>::enable_str_to_neginf;
@@ -550,7 +550,6 @@ public:
     using basic_json_decode_options<CharT>::neginf_to_num;
 
     using basic_json_decode_options<CharT>::lossless_number;
-    using basic_json_decode_options<CharT>::max_depth;
 
     using basic_json_encode_options<CharT>::byte_string_format;
     using basic_json_encode_options<CharT>::bigint_format;
@@ -729,12 +728,6 @@ public:
     basic_json_options& lossless_number(bool value) 
     {
         this->lossless_number_ = value;
-        return *this;
-    }
-
-    basic_json_options& max_depth(int value)
-    {
-        this->max_depth_ = value;
         return *this;
     }
 
