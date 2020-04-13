@@ -90,15 +90,9 @@ public:
     {
     }
 
-    ~basic_bson_encoder()
+    ~basic_bson_encoder() noexcept
     {
-        JSONCONS_TRY
-        {
-            sink_.flush();
-        }
-        JSONCONS_CATCH(...)
-        {
-        }
+        sink_.flush();
     }
 
 private:

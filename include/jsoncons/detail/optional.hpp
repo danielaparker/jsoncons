@@ -152,7 +152,7 @@ namespace detail
         {
         }
 
-        ~optional()
+        ~optional() noexcept
         {
             destroy();
         }

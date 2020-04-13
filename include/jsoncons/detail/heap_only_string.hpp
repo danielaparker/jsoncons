@@ -49,7 +49,7 @@ protected:
     {
     }
 
-    ~heap_only_string_base() {}
+    ~heap_only_string_base() noexcept = default;
 };
 
 template <class CharT,class Allocator>
@@ -73,7 +73,7 @@ class heap_only_string : public heap_only_string_base<Allocator>
 public:
     using char_type = CharT;
 
-    ~heap_only_string() {}
+    ~heap_only_string() noexcept = default; 
 
     const char_type* c_str() const { return to_plain_pointer(p_); }
     const char_type* data() const { return to_plain_pointer(p_); }
@@ -147,7 +147,7 @@ public:
         ptr_ = create(val.data(),val.length(),a);
     }
 
-    ~heap_only_string_wrapper()
+    ~heap_only_string_wrapper() noexcept
     {
         if (ptr_ != nullptr)
         {

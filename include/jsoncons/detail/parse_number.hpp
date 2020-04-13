@@ -952,7 +952,7 @@ public:
     {
         locale_ = _create_locale(LC_NUMERIC, "C");
     }
-    ~string_to_double()
+    ~string_to_double() noexcept
     {
         _free_locale(locale_);
     }
@@ -1004,7 +1004,7 @@ public:
     {
         locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
     }
-    ~string_to_double()
+    ~string_to_double() noexcept
     {
         freelocale(locale_);
     }

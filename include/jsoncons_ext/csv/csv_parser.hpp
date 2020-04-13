@@ -620,7 +620,7 @@ public:
         level_ = 0;
     }
 
-    ~basic_csv_parser()
+    ~basic_csv_parser() noexcept
     {
     }
 

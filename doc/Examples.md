@@ -1484,7 +1484,7 @@ public:
         : firstName_(firstName), lastName_(lastName)
     {
     }
-    virtual ~Employee() = default;
+    virtual ~Employee() noexcept = default;
 
     virtual double calculatePay() const = 0;
 
@@ -1662,7 +1662,7 @@ namespace ns {
 class Foo
 {
 public:
-    virtual ~Foo() = default;
+    virtual ~Foo() noexcept = default;
 };
 
 class Bar : public Foo

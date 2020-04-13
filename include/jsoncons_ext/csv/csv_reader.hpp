@@ -144,9 +144,7 @@ public:
         parser_.update(sv.data()+offset,sv.size()-offset);
     }
 
-    ~basic_csv_reader()
-    {
-    }
+    ~basic_csv_reader() noexcept = default;
 
     void read()
     {

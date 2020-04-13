@@ -13,7 +13,7 @@ namespace json_type_traits_macros_examples_ns {
     class Foo
     {
     public:
-        virtual ~Foo() = default;
+        virtual ~Foo() noexcept = default;
     };
 
     class Bar : public Foo
@@ -98,7 +98,7 @@ namespace json_type_traits_macros_examples_ns {
             : firstName_(firstName), lastName_(lastName)
         {
         }
-        virtual ~Employee() = default;
+        virtual ~Employee() noexcept = default;
 
         virtual double calculatePay() const = 0;
 

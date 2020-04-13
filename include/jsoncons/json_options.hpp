@@ -98,7 +98,7 @@ protected:
         max_depth_(1000)
     {}
 
-    virtual ~basic_json_options_common() = default;
+    virtual ~basic_json_options_common() noexcept = default;
 
     basic_json_options_common(const basic_json_options_common&) = default;
     basic_json_options_common& operator=(const basic_json_options_common&) = default;

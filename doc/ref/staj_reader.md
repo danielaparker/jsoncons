@@ -15,7 +15,7 @@ interface. When `next()` is called, copies of data previously accessed may be in
 
 #### Destructor
 
-    virtual ~basic_staj_reader() = default;
+    virtual ~basic_staj_reader() noexcept = default;
 
 #### Member functions
 

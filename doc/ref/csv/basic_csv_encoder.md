@@ -43,7 +43,7 @@ and uses the specified [csv options](basic_csv_options.md).
 
 #### Destructor
 
-    virtual ~basic_csv_encoder()
+    virtual ~basic_csv_encoder() noexcept
 
 #### Inherited from [basic_json_visitor](../basic_json_visitor.md)
 

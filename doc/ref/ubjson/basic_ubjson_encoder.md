@@ -34,7 +34,7 @@ Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
 
-    virtual ~basic_ubjson_encoder()
+    virtual ~basic_ubjson_encoder() noexcept 
 
 
 #### Inherited from [jsoncons::basic_json_visitor](basic_json_visitor.md)

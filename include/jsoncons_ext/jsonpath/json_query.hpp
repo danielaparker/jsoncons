@@ -242,9 +242,7 @@ class jsonpath_evaluator : public ser_context
     class selector_base
     {
     public:
-        virtual ~selector_base()
-        {
-        }
+        virtual ~selector_base() noexcept = default;
         virtual void select(jsonpath_resources<Json>& resources,
                             const string_type& path, reference val, node_set& nodes) = 0;
 

@@ -1326,7 +1326,7 @@ template<class CharT>
 class basic_staj_reader
 {
 public:
-    virtual ~basic_staj_reader() = default;
+    virtual ~basic_staj_reader() noexcept = default;
 
     virtual bool done() const = 0;
 

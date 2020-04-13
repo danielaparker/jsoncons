@@ -57,7 +57,7 @@ namespace detail {
         {
         }
 
-        ~operation_unwinder()
+        ~operation_unwinder() noexcept
         {
             std::error_code ec;
             //std::cout << "state: " << std::boolalpha << (state == state_type::commit) << ", stack size: " << stack.size() << std::endl;

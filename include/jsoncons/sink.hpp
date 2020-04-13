@@ -54,7 +54,7 @@ public:
     : os_(std::addressof(os)), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ~stream_sink()
+    ~stream_sink() noexcept
     {
         os_->write(begin_buffer_, buffer_length());
         os_->flush();
@@ -144,7 +144,7 @@ public:
           p_(begin_buffer_)
     {
     }
-    ~binary_stream_sink()
+    ~binary_stream_sink() noexcept
     {
         os_->write((char*)begin_buffer_, buffer_length());
         os_->flush();

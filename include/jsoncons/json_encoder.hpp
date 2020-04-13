@@ -375,7 +375,7 @@ public:
         }
     }
 
-    ~basic_json_encoder()
+    ~basic_json_encoder() noexcept
     {
         JSONCONS_TRY
         {
@@ -1074,7 +1074,7 @@ public:
     {
     }
 
-    ~basic_json_compressed_encoder()
+    ~basic_json_compressed_encoder() noexcept
     {
         JSONCONS_TRY
         {

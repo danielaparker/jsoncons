@@ -20,7 +20,7 @@ namespace jsoncons {
     class json_exception
     {
     public:
-        virtual ~json_exception() = default;
+        virtual ~json_exception() noexcept = default;
         virtual const char* what() const noexcept = 0;
     };
 
