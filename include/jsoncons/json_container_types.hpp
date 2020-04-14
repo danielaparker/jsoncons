@@ -1217,9 +1217,9 @@ namespace jsoncons {
                         case storage_kind::array_value:
                         {
                             std::size_t count = 0;
-                            for (const auto& item : current.object_range())
+                            for (const auto& item : current.array_range())
                             {
-                                if ((item.value().is_object() || item.value().is_array()) && !item.value().empty())
+                                if ((item.is_object() || item.is_array()) && !item.empty())
                                 {
                                     ++count;
                                 }
@@ -1414,7 +1414,7 @@ namespace jsoncons {
             members_.reserve(init.size());
             for (auto& item : init)
             {
-                insert_or_assign(item.value().first, item.value().second);
+                insert_or_assign(item.first, item.second);
             }
         }
 
@@ -1954,9 +1954,9 @@ namespace jsoncons {
                         case storage_kind::array_value:
                         {
                             std::size_t count = 0;
-                            for (const auto& item : current.object_range())
+                            for (const auto& item : current.array_range())
                             {
-                                if ((item.value().is_object() || item.value().is_array()) && !item.value().empty())
+                                if ((item.is_object() || item.is_array()) && !item.empty())
                                 {
                                     ++count;
                                 }
