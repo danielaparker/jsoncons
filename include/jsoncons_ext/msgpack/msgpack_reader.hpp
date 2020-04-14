@@ -29,9 +29,21 @@ class basic_msgpack_reader : public ser_context
 public:
     template <class Source>
     basic_msgpack_reader(Source&& source, 
-                         json_visitor& visitor,
-                         const Allocator alloc=Allocator())
-       : parser_(std::forward<Source>(source), alloc),
+                      json_visitor& visitor, 
+                      const Allocator alloc)
+       : basic_msgpack_reader(std::forward<Source>(source),
+                           visitor,
+                           msgpack_decode_options(),
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_msgpack_reader(Source&& source, 
+                      json_visitor& visitor, 
+                      const msgpack_decode_options& options = msgpack_decode_options(),
+                      const Allocator alloc=Allocator())
+       : parser_(std::forward<Source>(source), options, alloc),
          visitor_(visitor)
     {
     }

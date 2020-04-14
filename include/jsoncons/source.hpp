@@ -83,9 +83,7 @@ namespace jsoncons {
             std::swap(position_,other.position_);
         }
 
-        ~stream_source()
-        {
-        }
+        ~stream_source() noexcept = default;
 
         stream_source& operator=(stream_source&& other) noexcept
         {

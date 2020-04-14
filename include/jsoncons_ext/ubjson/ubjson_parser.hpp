@@ -16,6 +16,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
+#include <jsoncons_ext/ubjson/ubjson_options.hpp>
 
 namespace jsoncons { namespace ubjson {
 
@@ -37,17 +38,18 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class TempAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_ubjson_parser : public ser_context
 {
     using char_type = char;
     using char_traits_type = std::char_traits<char>;
-    using temp_allocator_type = TempAllocator;
+    using temp_allocator_type = Allocator;
     using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;                  
     using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
     Src source_;
+    ubjson_decode_options options_;
     int nesting_depth_;
     bool more_;
     bool done_;
@@ -55,8 +57,9 @@ class basic_ubjson_parser : public ser_context
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
 public:
     template <class Source>
-    basic_ubjson_parser(Source&& source,
-                        const TempAllocator alloc=TempAllocator())
+        basic_ubjson_parser(Source&& source,
+                          const ubjson_decode_options& options = ubjson_decode_options(),
+                          const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)), 
          nesting_depth_(0),
          more_(true), 

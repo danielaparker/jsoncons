@@ -137,7 +137,7 @@ private:
     static constexpr size_t initial_string_buffer_capacity_ = 1024;
     static constexpr int default_initial_stack_capacity_ = 100;
 
-    const basic_json_decode_options<CharT> options_;
+    basic_json_decode_options<CharT> options_;
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int initial_stack_capacity_;
@@ -169,12 +169,14 @@ public:
     {
     }
 
-    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, const TempAllocator& alloc = TempAllocator())
+    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const TempAllocator& alloc = TempAllocator())
         : basic_json_parser(basic_json_decode_options<CharT>(), err_handler, alloc)
     {
     }
 
-    basic_json_parser(const basic_json_decode_options<CharT>& options, const TempAllocator& alloc = TempAllocator())
+    basic_json_parser(const basic_json_decode_options<CharT>& options, 
+                      const TempAllocator& alloc = TempAllocator())
         : basic_json_parser(options, default_json_parsing(), alloc)
     {
     }

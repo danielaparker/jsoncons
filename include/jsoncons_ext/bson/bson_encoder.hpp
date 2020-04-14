@@ -19,6 +19,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -74,6 +75,7 @@ private:
     };
 
     sink_type sink_;
+    const bson_encode_options options_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -86,6 +88,15 @@ public:
     explicit basic_bson_encoder(Sink&& sink, 
                                 const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
+         alloc_(alloc)
+    {
+    }
+
+    explicit basic_bson_encoder(Sink&& sink, 
+                                const bson_encode_options& options, 
+                                const Allocator& alloc = Allocator())
+       : sink_(std::forward<Sink>(sink)),
+         options_(options),
          alloc_(alloc)
     {
     }

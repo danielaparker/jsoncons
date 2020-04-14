@@ -22,19 +22,23 @@ namespace ubjson {
 
     template<class T>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(const T& j, std::vector<uint8_t>& v)
+    encode_ubjson(const T& j, 
+                  std::vector<uint8_t>& v, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
         using char_type = typename T::char_type;
-        ubjson_bytes_encoder encoder(v);
+        ubjson_bytes_encoder encoder(v, options);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
     template<class T>
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(const T& val, std::vector<uint8_t>& v)
+    encode_ubjson(const T& val, 
+                  std::vector<uint8_t>& v, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
-        ubjson_bytes_encoder encoder(v);
+        ubjson_bytes_encoder encoder(v, options);
         std::error_code ec;
         ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
@@ -45,19 +49,23 @@ namespace ubjson {
 
     template<class T>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(const T& j, std::ostream& os)
+    encode_ubjson(const T& j, 
+                  std::ostream& os, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
         using char_type = typename T::char_type;
-        ubjson_stream_encoder encoder(os);
+        ubjson_stream_encoder encoder(os, options);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
     template<class T>
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(const T& val, std::ostream& os)
+    encode_ubjson(const T& val, 
+                  std::ostream& os, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
-        ubjson_stream_encoder encoder(os);
+        ubjson_stream_encoder encoder(os, options);
         std::error_code ec;
         ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
@@ -70,19 +78,23 @@ namespace ubjson {
 
     template<class T,class TempAllocator>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& j, std::vector<uint8_t>& v)
+    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& j, 
+                  std::vector<uint8_t>& v, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
         using char_type = typename T::char_type;
-        basic_ubjson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v,temp_alloc);
+        basic_ubjson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v, options, temp_alloc);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
     template<class T,class TempAllocator>
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& val, std::vector<uint8_t>& v)
+    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& val, 
+                  std::vector<uint8_t>& v, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
-        basic_ubjson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v,temp_alloc);
+        basic_ubjson_encoder<jsoncons::bytes_sink,TempAllocator> encoder(v, options, temp_alloc);
         std::error_code ec;
         ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
@@ -93,19 +105,25 @@ namespace ubjson {
 
     template<class T,class TempAllocator>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& j, std::ostream& os)
+    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                  const T& j, 
+                  std::ostream& os, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
         using char_type = typename T::char_type;
-        basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os,temp_alloc);
+        basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os, options, temp_alloc);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
 
     template<class T,class TempAllocator>
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& val, std::ostream& os)
+    encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+                  const T& val, 
+                  std::ostream& os, 
+                  const ubjson_encode_options& options = ubjson_encode_options())
     {
-        basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os,temp_alloc);
+        basic_ubjson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os, options, temp_alloc);
         std::error_code ec;
         ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)

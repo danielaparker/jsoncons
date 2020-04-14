@@ -20,6 +20,7 @@
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
+#include <jsoncons_ext/cbor/cbor_options.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -101,6 +102,8 @@ class basic_cbor_parser : public ser_context
 
     allocator_type alloc_;
     Src source_;
+    cbor_decode_options options_;
+
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
@@ -150,9 +153,11 @@ class basic_cbor_parser : public ser_context
 public:
     template <class Source>
     basic_cbor_parser(Source&& source,
-                      const Allocator alloc=Allocator())
+                      const cbor_decode_options& options = cbor_decode_options(),
+                      const Allocator alloc = Allocator())
        : alloc_(alloc),
          source_(std::forward<Source>(source)),
+         options_(options),
          more_(true), 
          done_(false),
          text_buffer_(alloc),

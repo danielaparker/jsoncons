@@ -12,7 +12,7 @@
 #include <cwchar>
 #include <jsoncons/json_exception.hpp>
 
-namespace jsoncons { namespace msgpack {
+namespace jsoncons { namespace ubjson {
 
 class ubjson_options;
 

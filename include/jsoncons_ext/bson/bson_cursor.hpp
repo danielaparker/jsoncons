@@ -48,21 +48,31 @@ public:
     template <class Source>
     basic_bson_cursor(Source&& source,
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc),
-         eof_(false)
+       : basic_bson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           bson_decode_options(),
+                           alloc)
     {
-        if (!done())
-        {
-            next();
-        }
+    }
+
+    template <class Source>
+    basic_bson_cursor(Source&& source,
+                      const bson_decode_options& options,
+                      const Allocator& alloc = Allocator())
+       : basic_bson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           options,
+                           alloc)
+    {
     }
 
     template <class Source>
     basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc), 
-         event_handler_(filter),
+       : parser_(std::forward<Source>(source), options, alloc), 
+         event_handler_(filter), 
          eof_(false)
     {
         if (!done())

@@ -17,6 +17,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -49,6 +50,7 @@ class basic_bson_parser : public ser_context
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
     Src source_;
+    bson_decode_options options_;
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
@@ -56,8 +58,10 @@ class basic_bson_parser : public ser_context
 public:
     template <class Source>
     basic_bson_parser(Source&& source,
-                      const Allocator alloc=Allocator())
+                      const bson_decode_options& options = bson_decode_options(),
+                      const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)), 
+         options_(options),
          more_(true), 
          done_(false),
          text_buffer_(alloc),

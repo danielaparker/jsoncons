@@ -23,20 +23,22 @@ namespace msgpack {
 
     template<class T>
     typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-    decode_msgpack(const std::vector<uint8_t>& v)
+    decode_msgpack(const std::vector<uint8_t>& v, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
         jsoncons::json_decoder<T> decoder;
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor);
+        basic_msgpack_reader<jsoncons::bytes_source> reader(v, adaptor, options);
         reader.read();
         return decoder.get_result();
     }
 
     template<class T>
     typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-    decode_msgpack(const std::vector<uint8_t>& v)
+    decode_msgpack(const std::vector<uint8_t>& v, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
-        basic_msgpack_cursor<bytes_source> cursor(v);
+        basic_msgpack_cursor<bytes_source> cursor(v, options);
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
@@ -50,20 +52,22 @@ namespace msgpack {
 
     template<class T>
     typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-    decode_msgpack(std::istream& is)
+    decode_msgpack(std::istream& is, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
         jsoncons::json_decoder<T> decoder;
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        msgpack_stream_reader reader(is, adaptor);
+        msgpack_stream_reader reader(is, adaptor, options);
         reader.read();
         return decoder.get_result();
     }
 
     template<class T>
     typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-    decode_msgpack(std::istream& is)
+    decode_msgpack(std::istream& is, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
-        basic_msgpack_cursor<binary_stream_source> cursor(is);
+        basic_msgpack_cursor<binary_stream_source> cursor(is, options);
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
@@ -80,11 +84,12 @@ namespace msgpack {
     template<class T,class TempAllocator>
     typename std::enable_if<is_basic_json_class<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                   const std::vector<uint8_t>& v)
+                   const std::vector<uint8_t>& v, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_msgpack_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, temp_alloc);
+        basic_msgpack_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, temp_alloc);
         reader.read();
         return decoder.get_result();
     }
@@ -92,9 +97,10 @@ namespace msgpack {
     template<class T,class TempAllocator>
     typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                   const std::vector<uint8_t>& v)
+                   const std::vector<uint8_t>& v, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
-        basic_msgpack_cursor<bytes_source,TempAllocator> cursor(v, temp_alloc);
+        basic_msgpack_cursor<bytes_source,TempAllocator> cursor(v, options, temp_alloc);
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
@@ -109,11 +115,12 @@ namespace msgpack {
     template<class T,class TempAllocator>
     typename std::enable_if<is_basic_json_class<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                   std::istream& is)
+                   std::istream& is, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_msgpack_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, temp_alloc);
+        basic_msgpack_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, temp_alloc);
         reader.read();
         return decoder.get_result();
     }
@@ -121,9 +128,10 @@ namespace msgpack {
     template<class T,class TempAllocator>
     typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                   std::istream& is)
+                   std::istream& is, 
+                   const msgpack_decode_options& options = msgpack_decode_options())
     {
-        basic_msgpack_cursor<binary_stream_source,TempAllocator> cursor(is, temp_alloc);
+        basic_msgpack_cursor<binary_stream_source,TempAllocator> cursor(is, options, temp_alloc);
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;

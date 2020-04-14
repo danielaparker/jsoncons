@@ -19,6 +19,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
+#include <jsoncons_ext/ubjson/ubjson_options.hpp>
 
 namespace jsoncons { namespace ubjson {
 
@@ -69,6 +70,7 @@ private:
     };
 
     Sink sink_;
+    const ubjson_encode_options options_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -84,7 +86,16 @@ public:
     {
     }
 
-    ~basic_ubjson_encoder()
+    explicit basic_ubjson_encoder(Sink&& sink, 
+                                const ubjson_encode_options& options, 
+                                const Allocator& alloc = Allocator())
+       : sink_(std::forward<Sink>(sink)),
+         options_(options),
+         alloc_(alloc)
+    {
+    }
+
+    ~basic_ubjson_encoder() noexcept
     {
         JSONCONS_TRY
         {

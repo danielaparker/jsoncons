@@ -19,6 +19,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
+#include <jsoncons_ext/msgpack/msgpack_options.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -69,6 +70,7 @@ private:
     };
 
     Sink sink_;
+    const msgpack_encode_options options_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
@@ -80,6 +82,15 @@ public:
     explicit basic_msgpack_encoder(Sink&& sink, 
                                    const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)), 
+         alloc_(alloc)
+    {
+    }
+
+    explicit basic_msgpack_encoder(Sink&& sink, 
+                                const msgpack_encode_options& options, 
+                                const Allocator& alloc = Allocator())
+       : sink_(std::forward<Sink>(sink)),
+         options_(options),
          alloc_(alloc)
     {
     }

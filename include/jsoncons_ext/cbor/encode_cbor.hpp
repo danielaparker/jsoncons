@@ -24,14 +24,10 @@ namespace cbor {
     // to bytes 
 
     template<class T>
-    void encode_cbor(const T& j, std::vector<uint8_t>& v)
-    {
-        encode_cbor(j,v,cbor_encode_options());
-    }
-
-    template<class T>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-    encode_cbor(const T& j, std::vector<uint8_t>& v, const cbor_encode_options& options)
+    encode_cbor(const T& j, 
+                std::vector<uint8_t>& v, 
+                const cbor_encode_options& options = cbor_encode_options())
     {
         using char_type = typename T::char_type;
         cbor_bytes_encoder encoder(v, options);
@@ -41,7 +37,8 @@ namespace cbor {
 
     template<class T>
     typename std::enable_if<!is_basic_json_class<T>::value, void>::type
-    encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options)
+    encode_cbor(const T& val, std::vector<uint8_t>& v, 
+                const cbor_encode_options& options = cbor_encode_options())
     {
         std::error_code ec;
         encode_cbor(val, v, options, ec);
@@ -53,7 +50,10 @@ namespace cbor {
 
     template<class T>
     typename std::enable_if<!is_basic_json_class<T>::value, void>::type
-    encode_cbor(const T& val, std::vector<uint8_t>& v, const cbor_encode_options& options, std::error_code& ec)
+    encode_cbor(const T& val, 
+                std::vector<uint8_t>& v, 
+                const cbor_encode_options& options, 
+                std::error_code& ec)
     {
         cbor_bytes_encoder encoder(v, options);
         ser_traits<T,char>::serialize(val, encoder, json(), ec);
@@ -62,14 +62,10 @@ namespace cbor {
     // stream
 
     template<class T>
-    void encode_cbor(const T& j, std::ostream& os)
-    {
-        encode_cbor(j,os,cbor_encode_options());
-    }
-
-    template<class T>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
-    encode_cbor(const T& j, std::ostream& os, const cbor_encode_options& options)
+    encode_cbor(const T& j, 
+                std::ostream& os, 
+                const cbor_encode_options& options = cbor_encode_options())
     {
         using char_type = typename T::char_type;
         cbor_stream_encoder encoder(os, options);
@@ -79,7 +75,9 @@ namespace cbor {
 
     template<class T>
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
-    encode_cbor(const T& val, std::ostream& os, const cbor_encode_options& options)
+    encode_cbor(const T& val, 
+                std::ostream& os, 
+                const cbor_encode_options& options = cbor_encode_options())
     {
         std::error_code ec;
         encode_cbor(val, os, options, ec);
@@ -105,22 +103,14 @@ namespace cbor {
     // to bytes 
 
     template<class T,class TempAllocator>
-    void encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                     const T& j, 
-                     std::vector<uint8_t>& v)
-    {
-        encode_cbor(temp_allocator_arg, temp_alloc, j,v,cbor_encode_options());
-    }
-
-    template<class T,class TempAllocator>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
                 std::vector<uint8_t>& v, 
-                const cbor_encode_options& options)
+                const cbor_encode_options& options = cbor_encode_options())
     {
         using char_type = typename T::char_type;
-        cbor_bytes_encoder encoder(v, options);
+        basic_cbor_encoder<bytes_sink,TempAllocator> encoder(v, options, temp_alloc);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
@@ -130,7 +120,7 @@ namespace cbor {
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::vector<uint8_t>& v, 
-                const cbor_encode_options& options)
+                const cbor_encode_options& options = cbor_encode_options())
     {
         std::error_code ec;
         encode_cbor(temp_allocator_arg, temp_alloc, val, v, options, ec);
@@ -148,26 +138,21 @@ namespace cbor {
                 const cbor_encode_options& options, 
                 std::error_code& ec)
     {
-        cbor_bytes_encoder encoder(v, options);
+        basic_cbor_encoder<bytes_sink,TempAllocator> encoder(v, options, temp_alloc);
         ser_traits<T,char>::serialize(val, encoder, json(), ec);
     }
 
     // stream
 
     template<class T,class TempAllocator>
-    void encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                     const T& j, std::ostream& os)
-    {
-        encode_cbor(temp_allocator_arg, temp_alloc, j,os,cbor_encode_options());
-    }
-
-    template<class T,class TempAllocator>
     typename std::enable_if<is_basic_json_class<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                const T& j, std::ostream& os, const cbor_encode_options& options)
+                const T& j, 
+                std::ostream& os, 
+                const cbor_encode_options& options = cbor_encode_options())
     {
         using char_type = typename T::char_type;
-        cbor_stream_encoder encoder(os, options);
+        basic_cbor_encoder<binary_stream_sink,TempAllocator> encoder(os, options, temp_alloc);
         auto adaptor = make_json_visitor_adaptor<basic_json_visitor<char_type>>(encoder);
         j.dump(adaptor);
     }
@@ -175,7 +160,9 @@ namespace cbor {
     template<class T,class TempAllocator>
     typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                const T& val, std::ostream& os, const cbor_encode_options& options)
+                const T& val, 
+                std::ostream& os, 
+                const cbor_encode_options& options = cbor_encode_options())
     {
         std::error_code ec;
         encode_cbor(temp_allocator_arg, temp_alloc, val, os, options, ec);
@@ -193,7 +180,7 @@ namespace cbor {
                 const cbor_encode_options& options, 
                 std::error_code& ec)
     {
-        cbor_stream_encoder encoder(os, options);
+        basic_cbor_encoder<binary_stream_sink,TempAllocator> encoder(os, options, temp_alloc);
         ser_traits<T,char>::serialize(val, encoder, json(), ec);
     }
 

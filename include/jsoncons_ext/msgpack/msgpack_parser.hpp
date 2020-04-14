@@ -17,6 +17,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
+#include <jsoncons_ext/msgpack/msgpack_options.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -37,17 +38,18 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class TempAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_msgpack_parser : public ser_context
 {
     using char_type = char;
     using char_traits_type = std::char_traits<char>;
-    using temp_allocator_type = TempAllocator;
+    using temp_allocator_type = Allocator;
     using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;                  
     using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
     Src source_;
+    msgpack_decode_options options_;
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> buffer_;
@@ -55,7 +57,8 @@ class basic_msgpack_parser : public ser_context
 public:
     template <class Source>
     basic_msgpack_parser(Source&& source,
-                         const TempAllocator alloc=TempAllocator())
+                         const msgpack_decode_options& options = msgpack_decode_options(),
+                         const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)),
          more_(true), 
          done_(false),

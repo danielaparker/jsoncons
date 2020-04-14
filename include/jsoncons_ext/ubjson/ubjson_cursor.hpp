@@ -47,22 +47,32 @@ public:
 
     template <class Source>
     basic_ubjson_cursor(Source&& source,
-                        const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc),
-         eof_(false)
+                      const Allocator& alloc = Allocator())
+       : basic_ubjson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           ubjson_decode_options(),
+                           alloc)
     {
-        if (!done())
-        {
-            next();
-        }
     }
 
     template <class Source>
     basic_ubjson_cursor(Source&& source,
-                        std::function<bool(const staj_event&, const ser_context&)> filter,
-                        const Allocator& alloc = Allocator())
-       : event_handler_(filter),
-         parser_(std::forward<Source>(source), alloc), 
+                      const ubjson_decode_options& options,
+                      const Allocator& alloc = Allocator())
+       : basic_ubjson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           options,
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_ubjson_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const ubjson_decode_options& options = ubjson_decode_options(),
+                      const Allocator& alloc = Allocator())
+       : parser_(std::forward<Source>(source), options, alloc), 
+         event_handler_(filter), 
          eof_(false)
     {
         if (!done())
