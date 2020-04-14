@@ -547,7 +547,7 @@ namespace jsoncons {
     public:
         using allocator_type = typename Json::allocator_type;
         using key_type = KeyT;
-        using mapped_type = Json;
+        //using mapped_type = Json;
         using key_value_type = key_value<KeyT,Json>;
         using char_type = typename Json::char_type;
         using string_view_type = typename Json::string_view_type;
@@ -1210,7 +1210,7 @@ namespace jsoncons {
                 any_key.clear();
                 while (!members_.empty())
                 {
-                    mapped_type current = std::move(members_.back().value());
+                    Json current = std::move(members_.back().value());
                     members_.pop_back();
                     switch (current.storage())
                     {
@@ -1275,7 +1275,7 @@ namespace jsoncons {
         using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
         using key_type = KeyT;
-        using mapped_type = Json;
+        //using mapped_type = Json;
         using string_view_type = typename Json::string_view_type;
         using key_value_type = key_value<KeyT,Json>;
     private:
@@ -1947,7 +1947,7 @@ namespace jsoncons {
                 any_key.clear();
                 while (!members_.empty())
                 {
-                    mapped_type current = std::move(members_.back().value());
+                    Json current = std::move(members_.back().value());
                     members_.pop_back();
                     switch (current.storage())
                     {
