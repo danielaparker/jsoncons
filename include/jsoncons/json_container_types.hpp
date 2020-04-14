@@ -106,6 +106,7 @@ namespace jsoncons {
         }
         ~json_array() noexcept
         {
+            destroy();
         }
 
         reference back()
@@ -278,6 +279,64 @@ namespace jsoncons {
     private:
 
         json_array& operator=(const json_array<Json>&) = delete;
+
+        void destroy() noexcept
+        {
+            while (!elements_.empty())
+            {
+                value_type current = std::move(elements_.back());
+                elements_.pop_back();
+                switch (current.storage())
+                {
+                    case storage_kind::array_value:
+                    {
+                        std::size_t count = 0;
+                        for (const auto& item : current.array_range())
+                        {
+                            if ((item.is_object() || item.is_array()) && !item.empty())
+                            {
+                                ++count;
+                            }
+                        }
+                        elements_.reserve(elements_.size()+count);
+                        for (auto& item : current.array_range())
+                        {
+                            if ((item.is_object() || item.is_array()) && !item.empty())
+                            {
+                                elements_.push_back(std::move(item));
+                            }
+                        }
+                        current.clear();                           
+                        break;
+                    }
+                    case storage_kind::object_value:
+                    {
+                        std::size_t count = 0;
+                        for (const auto& kv : current.object_range())
+                        {
+                            if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                            {
+                                ++count;
+                            }
+                        }
+                        elements_.reserve(elements_.size()+count);
+                        for (auto& kv : current.object_range())
+                        {
+                            value_type tmp;
+                            tmp.swap(kv.value());
+                            if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                            {
+                                elements_.push_back(std::move(tmp));
+                            }
+                        }
+                        current.clear();                           
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
     };
 
     struct sorted_unique_range_tag
@@ -488,6 +547,7 @@ namespace jsoncons {
     public:
         using allocator_type = typename Json::allocator_type;
         using key_type = KeyT;
+        using mapped_type = Json;
         using key_value_type = key_value<KeyT,Json>;
         using char_type = typename Json::char_type;
         using string_view_type = typename Json::string_view_type;
@@ -581,6 +641,11 @@ namespace jsoncons {
             {
                 insert_or_assign(item.first, item.second);
             }
+        }
+
+        ~json_object() noexcept
+        {
+            destroy();
         }
 
         void swap(json_object& val) noexcept
@@ -1136,6 +1201,67 @@ namespace jsoncons {
             return members_ < rhs.members_;
         }
     private:
+
+        void destroy() noexcept
+        {
+            if (!members_.empty())
+            {
+                key_type any_key = members_.back().key();
+                while (!members_.empty())
+                {
+                    mapped_type current = std::move(members_.back().value());
+                    members_.pop_back();
+                    switch (current.storage())
+                    {
+                        case storage_kind::array_value:
+                        {
+                            std::size_t count = 0;
+                            for (const auto& item : current.object_range())
+                            {
+                                if ((item.value().is_object() || item.value().is_array()) && !item.value().empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            members_.reserve(members_.size()+count);
+                            for (auto& item : current.array_range())
+                            {
+                                if ((item.is_object() || item.is_array()) && !item.empty())
+                                {
+                                    members_.emplace_back(any_key, std::move(item));
+                                }
+                            }
+                            current.clear();                           
+                            break;
+                        }
+                        case storage_kind::object_value:
+                        {
+                            std::size_t count = 0;
+                            for (const auto& kv : current.object_range())
+                            {
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            members_.reserve(members_.size()+count);
+                            for (auto& kv : current.object_range())
+                            {
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                {
+                                    members_.push_back(std::move(kv));
+                                }
+                            }
+                            current.clear();                           
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
         json_object& operator=(const json_object&) = delete;
     };
 
@@ -1148,6 +1274,7 @@ namespace jsoncons {
         using allocator_type = typename Json::allocator_type;
         using char_type = typename Json::char_type;
         using key_type = KeyT;
+        using mapped_type = Json;
         using string_view_type = typename Json::string_view_type;
         using key_value_type = key_value<KeyT,Json>;
     private:
@@ -1286,8 +1413,13 @@ namespace jsoncons {
             members_.reserve(init.size());
             for (auto& item : init)
             {
-                insert_or_assign(item.first, item.second);
+                insert_or_assign(item.value().first, item.value().second);
             }
+        }
+
+        ~json_object() noexcept
+        {
+            destroy();
         }
 
         void swap(json_object& val) noexcept
@@ -1805,6 +1937,66 @@ namespace jsoncons {
             return members_ < rhs.members_;
         }
     private:
+
+        void destroy() noexcept
+        {
+            if (!members_.empty())
+            {
+                key_type any_key = members_.back().key();
+                while (!members_.empty())
+                {
+                    mapped_type current = std::move(members_.back().value());
+                    members_.pop_back();
+                    switch (current.storage())
+                    {
+                        case storage_kind::array_value:
+                        {
+                            std::size_t count = 0;
+                            for (const auto& item : current.object_range())
+                            {
+                                if ((item.value().is_object() || item.value().is_array()) && !item.value().empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            members_.reserve(members_.size()+count);
+                            for (auto& item : current.array_range())
+                            {
+                                if ((item.is_object() || item.is_array()) && !item.empty())
+                                {
+                                    members_.emplace_back(any_key, std::move(item));
+                                }
+                            }
+                            current.clear();                           
+                            break;
+                        }
+                        case storage_kind::object_value:
+                        {
+                            std::size_t count = 0;
+                            for (const auto& kv : current.object_range())
+                            {
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                {
+                                    ++count;
+                                }
+                            }
+                            members_.reserve(members_.size()+count);
+                            for (auto& kv : current.object_range())
+                            {
+                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                {
+                                    members_.push_back(std::move(kv));
+                                }
+                            }
+                            current.clear();                           
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
 
         std::pair<std::size_t,bool> insert_index_entry(const string_view_type& key, std::size_t pos)
         {
