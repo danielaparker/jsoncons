@@ -36,9 +36,9 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     static constexpr size_t default_max_buffer_length = 16384;
 
-    basic_staj_visitor<CharT> event_handler_;
-    basic_json_parser<CharT,Allocator> parser_;
     source_type source_;
+    basic_json_parser<CharT,Allocator> parser_;
+    basic_staj_visitor<CharT> event_handler_;
     std::vector<CharT,char_allocator_type> buffer_;
     std::size_t buffer_length_;
     bool eof_;
@@ -72,9 +72,9 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : event_handler_(filter),
+       : source_(source),
          parser_(options,err_handler,alloc),
-         source_(source),
+         event_handler_(filter),
          buffer_(alloc),
          buffer_length_(default_max_buffer_length),
          eof_(false),
@@ -94,8 +94,8 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : event_handler_(filter),
-         parser_(options, err_handler, alloc),
+       : parser_(options, err_handler, alloc),
+         event_handler_(filter),
          buffer_(alloc),
          buffer_length_(0),
          eof_(false),
@@ -200,9 +200,9 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec,
                       typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : event_handler_(filter),
+       : source_(source),
          parser_(options,err_handler,alloc),
-         source_(source),
+         event_handler_(filter),
          eof_(false),
          buffer_(alloc),
          buffer_length_(default_max_buffer_length),
@@ -223,8 +223,8 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec,
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
-       : event_handler_(filter),
-         parser_(options, err_handler, alloc),
+       : parser_(options, err_handler, alloc),
+         event_handler_(filter),
          eof_(false),
          buffer_(alloc),
          buffer_length_(0),

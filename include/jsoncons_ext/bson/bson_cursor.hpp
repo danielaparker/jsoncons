@@ -33,9 +33,8 @@ public:
     using char_type = char;
     using allocator_type = Allocator;
 private:
-    basic_staj_visitor<char_type> event_handler_;
-
     basic_bson_parser<Src,Allocator> parser_;
+    basic_staj_visitor<char_type> event_handler_;
     bool eof_;
 
     // Noncopyable and nonmoveable

@@ -33,9 +33,8 @@ public:
     using char_type = char;
     using allocator_type = Allocator;
 private:
-    basic_staj_visitor<char_type> event_handler_;
-
     basic_msgpack_parser<Src,Allocator> parser_;
+    basic_staj_visitor<char_type> event_handler_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -105,8 +104,8 @@ public:
                          Source&& source,
                          std::function<bool(const staj_event&, const ser_context&)> filter,
                          std::error_code& ec)
-       : event_handler_(filter),
-         parser_(std::forward<Source>(source), alloc), 
+       : parser_(std::forward<Source>(source), alloc), 
+         event_handler_(filter),
          eof_(false)
     {
         if (!done())
