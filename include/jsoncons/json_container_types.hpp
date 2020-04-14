@@ -1207,6 +1207,7 @@ namespace jsoncons {
             if (!members_.empty())
             {
                 key_type any_key = members_.back().key();
+                any_key.clear();
                 while (!members_.empty())
                 {
                     mapped_type current = std::move(members_.back().value());
@@ -1943,6 +1944,7 @@ namespace jsoncons {
             if (!members_.empty())
             {
                 key_type any_key = members_.back().key();
+                any_key.clear();
                 while (!members_.empty())
                 {
                     mapped_type current = std::move(members_.back().value());
