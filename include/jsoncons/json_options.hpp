@@ -761,6 +761,12 @@ public:
         return *this;
     }
 
+    basic_json_options& max_depth(int value)
+    {
+        this->max_depth_ = value;
+        return *this;
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use bigint_format(bigint_chars_format)")
     basic_json_options&  big_integer_format(bigint_chars_format value) {this->bigint_format_ = value; return *this;}

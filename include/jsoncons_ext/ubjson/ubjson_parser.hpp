@@ -61,6 +61,7 @@ public:
                           const ubjson_decode_options& options = ubjson_decode_options(),
                           const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)), 
+         options_(options),
          nesting_depth_(0),
          more_(true), 
          done_(false),

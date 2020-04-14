@@ -60,6 +60,7 @@ public:
                          const msgpack_decode_options& options = msgpack_decode_options(),
                          const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)),
+         options_(options),
          more_(true), 
          done_(false),
          buffer_(alloc),
