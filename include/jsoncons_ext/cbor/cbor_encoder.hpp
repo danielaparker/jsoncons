@@ -139,16 +139,26 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
         sink_.push_back(0xbf);
         return true;
     }
 
-    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::object, length));
 
         if (length <= 0x17)
@@ -191,6 +201,8 @@ private:
     bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         if (stack_.back().is_indefinite_length())
         {
             sink_.push_back(0xff);
@@ -215,15 +227,25 @@ private:
         return true;
     }
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
         sink_.push_back(0x9f);
         return true;
     }
 
-    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::array, length));
         if (length <= 0x17)
         {
@@ -264,6 +286,7 @@ private:
     bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
 
         if (stack_.back().is_indefinite_length())
         {

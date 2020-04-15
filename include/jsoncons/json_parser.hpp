@@ -334,7 +334,7 @@ public:
 
     void begin_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (++nesting_depth_ > options_.max_depth())
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
         {
             more_ = err_handler_(json_errc::max_depth_exceeded, *this);
             if (!more_)
@@ -350,7 +350,7 @@ public:
 
     void end_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (nesting_depth_ < 1)
+        if (JSONCONS_UNLIKELY(nesting_depth_ < 1))
         {
             err_handler_(json_errc::unexpected_right_brace, *this);
             ec = json_errc::unexpected_right_brace;

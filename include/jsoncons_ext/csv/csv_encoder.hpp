@@ -185,6 +185,7 @@ private:
     bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:

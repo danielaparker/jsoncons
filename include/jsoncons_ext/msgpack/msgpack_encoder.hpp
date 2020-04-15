@@ -115,8 +115,13 @@ private:
         return false;
     }
 
-    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(msgpack_container_type::object, length));
 
         if (length <= 15)
@@ -148,6 +153,7 @@ private:
     bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
 
         if (stack_.back().count() < stack_.back().length())
         {
@@ -171,8 +177,13 @@ private:
         return false;
     }
 
-    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(msgpack_container_type::array, length));
         if (length <= 15)
         {
@@ -197,6 +208,8 @@ private:
     bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
+        --nesting_depth_;
 
         if (stack_.back().count() < stack_.back().length())
         {

@@ -117,8 +117,13 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         if (buffer_.size() > 0)
         {
             before_value(jsoncons::bson::detail::bson_format::document_cd);
@@ -132,6 +137,7 @@ private:
     bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
 
         buffer_.push_back(0x00);
 
@@ -149,8 +155,13 @@ private:
         return true;
     }
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return false;
+        } 
         if (buffer_.size() > 0)
         {
             before_value(jsoncons::bson::detail::bson_format::array_cd);
@@ -163,6 +174,7 @@ private:
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
 
         buffer_.push_back(0x00);
 
