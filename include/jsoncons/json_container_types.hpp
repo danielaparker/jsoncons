@@ -292,7 +292,7 @@ namespace jsoncons {
                     {
                         for (auto& item : current.array_range())
                         {
-                            if ((item.is_object() || item.is_array()) && !item.empty())
+                            if (item.size() > 0) // non-empty object or array
                             {
                                 elements_.push_back(std::move(item));
                             }
@@ -306,7 +306,7 @@ namespace jsoncons {
                         {
                             value_type tmp;
                             tmp.swap(kv.value());
-                            if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                            if (kv.value().size() > 0) // non-empty object or array
                             {
                                 elements_.push_back(std::move(tmp));
                             }
@@ -1200,7 +1200,7 @@ namespace jsoncons {
                         {
                             for (auto& item : current.array_range())
                             {
-                                if ((item.is_object() || item.is_array()) && !item.empty())
+                                if (item.size() > 0) // non-empty object or array
                                 {
                                     members_.emplace_back(any_key, std::move(item));
                                 }
@@ -1212,7 +1212,7 @@ namespace jsoncons {
                         {
                             for (auto& kv : current.object_range())
                             {
-                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                if (kv.value().size() > 0) // non-empty object or array
                                 {
                                     members_.push_back(std::move(kv));
                                 }
@@ -1919,7 +1919,7 @@ namespace jsoncons {
                         {
                             for (auto& item : current.array_range())
                             {
-                                if ((item.is_object() || item.is_array()) && !item.empty())
+                                if (item.size() > 0) // non-empty object or array
                                 {
                                     members_.emplace_back(any_key, std::move(item));
                                 }
@@ -1931,7 +1931,7 @@ namespace jsoncons {
                         {
                             for (auto& kv : current.object_range())
                             {
-                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
+                                if (kv.value().size() > 0) // non-empty object or array
                                 {
                                     members_.push_back(std::move(kv));
                                 }
