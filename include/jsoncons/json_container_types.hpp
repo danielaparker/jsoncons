@@ -290,15 +290,6 @@ namespace jsoncons {
                 {
                     case storage_kind::array_value:
                     {
-                        std::size_t count = 0;
-                        for (const auto& item : current.array_range())
-                        {
-                            if ((item.is_object() || item.is_array()) && !item.empty())
-                            {
-                                ++count;
-                            }
-                        }
-                        elements_.reserve(elements_.size()+count);
                         for (auto& item : current.array_range())
                         {
                             if ((item.is_object() || item.is_array()) && !item.empty())
@@ -311,15 +302,6 @@ namespace jsoncons {
                     }
                     case storage_kind::object_value:
                     {
-                        std::size_t count = 0;
-                        for (const auto& kv : current.object_range())
-                        {
-                            if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
-                            {
-                                ++count;
-                            }
-                        }
-                        elements_.reserve(elements_.size()+count);
                         for (auto& kv : current.object_range())
                         {
                             value_type tmp;
@@ -1216,15 +1198,6 @@ namespace jsoncons {
                     {
                         case storage_kind::array_value:
                         {
-                            std::size_t count = 0;
-                            for (const auto& item : current.array_range())
-                            {
-                                if ((item.is_object() || item.is_array()) && !item.empty())
-                                {
-                                    ++count;
-                                }
-                            }
-                            members_.reserve(members_.size()+count);
                             for (auto& item : current.array_range())
                             {
                                 if ((item.is_object() || item.is_array()) && !item.empty())
@@ -1237,15 +1210,6 @@ namespace jsoncons {
                         }
                         case storage_kind::object_value:
                         {
-                            std::size_t count = 0;
-                            for (const auto& kv : current.object_range())
-                            {
-                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
-                                {
-                                    ++count;
-                                }
-                            }
-                            members_.reserve(members_.size()+count);
                             for (auto& kv : current.object_range())
                             {
                                 if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
@@ -1953,15 +1917,6 @@ namespace jsoncons {
                     {
                         case storage_kind::array_value:
                         {
-                            std::size_t count = 0;
-                            for (const auto& item : current.array_range())
-                            {
-                                if ((item.is_object() || item.is_array()) && !item.empty())
-                                {
-                                    ++count;
-                                }
-                            }
-                            members_.reserve(members_.size()+count);
                             for (auto& item : current.array_range())
                             {
                                 if ((item.is_object() || item.is_array()) && !item.empty())
@@ -1974,15 +1929,6 @@ namespace jsoncons {
                         }
                         case storage_kind::object_value:
                         {
-                            std::size_t count = 0;
-                            for (const auto& kv : current.object_range())
-                            {
-                                if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
-                                {
-                                    ++count;
-                                }
-                            }
-                            members_.reserve(members_.size()+count);
                             for (auto& kv : current.object_range())
                             {
                                 if ((kv.value().is_object() || kv.value().is_array()) && !kv.value().empty())
