@@ -323,10 +323,10 @@ public:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            more_ = err_handler_(json_errc::max_depth_exceeded, *this);
+            more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
             {
-                ec = json_errc::max_depth_exceeded;
+                ec = json_errc::max_nesting_depth_exceeded;
                 return;
             }
         } 
@@ -379,10 +379,10 @@ public:
     {
         if (++nesting_depth_ > options_.max_nesting_depth())
         {
-            more_ = err_handler_(json_errc::max_depth_exceeded, *this);
+            more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
             {
-                ec = json_errc::max_depth_exceeded;
+                ec = json_errc::max_nesting_depth_exceeded;
                 return;
             }
         }

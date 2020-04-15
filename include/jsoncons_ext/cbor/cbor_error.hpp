@@ -24,7 +24,8 @@ enum class cbor_errc
     too_many_items,
     too_few_items,
     number_too_large,
-    stringref_too_large
+    stringref_too_large,
+    max_nesting_depth_exceeded
 };
 
 class cbor_error_category_impl
@@ -57,6 +58,8 @@ public:
                 return "Number exceeds implementation limits";
             case cbor_errc::stringref_too_large:
                 return "stringref exceeds stringref map size";
+            case cbor_errc::max_nesting_depth_exceeded:
+                return "Data item nesting exceeds limit set in cbor_options";
             default:
                 return "Unknown CBOR parser error";
         }

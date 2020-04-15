@@ -24,7 +24,8 @@ enum class ubjson_errc
     invalid_utf8_text_string,
     too_many_items,
     too_few_items,
-    number_too_large
+    number_too_large,
+    max_nesting_depth_exceeded
 };
 
 class ubjson_error_category_impl
@@ -57,6 +58,8 @@ public:
                 return "Too few items were added to a UBJSON object or array of known length";
             case ubjson_errc::number_too_large:
                 return "Number exceeds implementation limits";
+            case ubjson_errc::max_nesting_depth_exceeded:
+                return "Data item nesting exceeds limit set in ubjson_options";
             default:
                 return "Unknown UBJSON parser error";
         }

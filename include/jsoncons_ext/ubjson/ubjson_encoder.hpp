@@ -119,7 +119,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = ubjson_errc::max_nesting_depth_exceeded;
             return false;
         } 
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_object));
@@ -132,7 +132,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = ubjson_errc::max_nesting_depth_exceeded;
             return false;
         } 
         stack_.push_back(stack_item(ubjson_container_type::object, length));
@@ -174,7 +174,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = ubjson_errc::max_nesting_depth_exceeded;
             return false;
         } 
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_array));
@@ -187,7 +187,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = ubjson_errc::max_nesting_depth_exceeded;
             return false;
         } 
         stack_.push_back(stack_item(ubjson_container_type::array, length));

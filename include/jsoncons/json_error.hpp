@@ -19,7 +19,7 @@ namespace jsoncons {
         source_error,
         invalid_json_text,
         extra_character,
-        max_depth_exceeded,
+        max_nesting_depth_exceeded,
         single_quote,
         illegal_character_in_string,
         extra_comma,
@@ -66,8 +66,8 @@ namespace jsoncons {
                     return "Invalid JSON text";
                 case json_errc::extra_character:
                     return "Unexpected non-whitespace character after JSON text";
-                case json_errc::max_depth_exceeded:
-                    return "Maximum JSON depth exceeded";
+                case json_errc::max_nesting_depth_exceeded:
+                    return "Data item nesting exceeds limit set in json_options";
                 case json_errc::single_quote:
                     return "JSON strings cannot be quoted with single quotes";
                 case json_errc::illegal_character_in_string:

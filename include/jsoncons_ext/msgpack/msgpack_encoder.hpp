@@ -119,7 +119,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = msgpack_errc::max_nesting_depth_exceeded;
             return false;
         } 
         stack_.push_back(stack_item(msgpack_container_type::object, length));
@@ -181,7 +181,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = msgpack_errc::max_nesting_depth_exceeded;
             return false;
         } 
         stack_.push_back(stack_item(msgpack_container_type::array, length));

@@ -399,7 +399,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = json_errc::max_nesting_depth_exceeded;
             return false;
         } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
@@ -490,7 +490,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = json_errc::max_nesting_depth_exceeded;
             return false;
         } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
@@ -1114,7 +1114,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = json_errc::max_nesting_depth_exceeded;
             return false;
         } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
@@ -1147,7 +1147,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = json_errc::max_nesting_depth_exceeded;
             return false;
         } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)

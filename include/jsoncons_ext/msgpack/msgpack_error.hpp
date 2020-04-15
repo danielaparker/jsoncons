@@ -21,7 +21,8 @@ enum class msgpack_errc
     array_length_required,
     object_length_required,
     too_many_items,
-    too_few_items
+    too_few_items,
+    max_nesting_depth_exceeded
 };
 
 class msgpack_error_category_impl
@@ -50,6 +51,8 @@ public:
                 return "Too many items were added to a MessagePack object or array";
             case msgpack_errc::too_few_items:
                 return "Too few items were added to a MessagePack object or array";
+            case msgpack_errc::max_nesting_depth_exceeded:
+                return "Data item nesting exceeds limit set in msgpack_options";
             default:
                 return "Unknown MessagePack parser error";
         }

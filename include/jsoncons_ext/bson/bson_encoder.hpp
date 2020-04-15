@@ -121,7 +121,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = bson_errc::max_nesting_depth_exceeded;
             return false;
         } 
         if (buffer_.size() > 0)
@@ -159,7 +159,7 @@ private:
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = json_errc::max_depth_exceeded;
+            ec = bson_errc::max_nesting_depth_exceeded;
             return false;
         } 
         if (buffer_.size() > 0)
