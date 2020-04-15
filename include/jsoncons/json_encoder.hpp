@@ -302,6 +302,7 @@ private:
     std::basic_string<CharT> close_object_brace_str_;
     std::basic_string<CharT> open_array_bracket_str_;
     std::basic_string<CharT> close_array_bracket_str_;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_json_encoder(const basic_json_encoder&) = delete;
@@ -321,7 +322,8 @@ public:
          fp_(options.float_format(), options.precision()),
          stack_(alloc),
          indent_amount_(0), 
-         column_(0)
+         column_(0),
+         nesting_depth_(0)
     {
         switch (options.spaces_around_colon())
         {
@@ -1051,8 +1053,8 @@ private:
     Sink sink_;
     const basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
-
     std::vector<encoding_context,encoding_context_allocator_type> stack_;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
@@ -1070,7 +1072,8 @@ public:
        : sink_(std::forward<Sink>(sink)),
          options_(options),
          fp_(options.float_format(), options.precision()),
-         stack_(alloc)         
+         stack_(alloc),
+         nesting_depth_(0)          
     {
     }
 

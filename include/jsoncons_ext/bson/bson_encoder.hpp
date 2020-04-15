@@ -80,6 +80,7 @@ private:
 
     std::vector<stack_item> stack_;
     std::vector<uint8_t> buffer_;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_bson_encoder(const basic_bson_encoder&) = delete;
@@ -87,8 +88,9 @@ private:
 public:
     explicit basic_bson_encoder(Sink&& sink, 
                                 const Allocator& alloc = Allocator())
-       : sink_(std::forward<Sink>(sink)),
-         alloc_(alloc)
+       : basic_bson_encoder(std::forward<Sink>(sink),
+                            bson_encode_options(),
+                            alloc)
     {
     }
 
@@ -97,7 +99,8 @@ public:
                                 const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
          options_(options),
-         alloc_(alloc)
+         alloc_(alloc), 
+         nesting_depth_(0)
     {
     }
 

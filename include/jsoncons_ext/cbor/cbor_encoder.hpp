@@ -90,6 +90,7 @@ private:
     std::map<string_type,size_t,std::less<string_type>,string_size_allocator_type> stringref_map_;
     std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
@@ -106,11 +107,12 @@ public:
        : sink_(std::forward<Sink>(sink)), 
          options_(options), 
          alloc_(alloc),
-         stack_(alloc)
+         stack_(alloc),
 #if !defined(JSONCONS_NO_MAP_TAKING_ALLOCATOR) 
-         , stringref_map_(alloc),
-         bytestringref_map_(alloc)
-#endif
+         stringref_map_(alloc),
+         bytestringref_map_(alloc),
+#endif 
+         nesting_depth_(0)        
     {
         if (options.pack_strings())
         {

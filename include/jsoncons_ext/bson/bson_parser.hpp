@@ -55,6 +55,7 @@ class basic_bson_parser : public ser_context
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
+    int nesting_depth_;
 public:
     template <class Source>
     basic_bson_parser(Source&& source,
@@ -65,7 +66,9 @@ public:
          more_(true), 
          done_(false),
          text_buffer_(alloc),
-         state_stack_(alloc)
+         state_stack_(alloc),
+         nesting_depth_(0)
+
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }

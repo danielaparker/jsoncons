@@ -74,6 +74,7 @@ private:
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_ubjson_encoder(const basic_ubjson_encoder&) = delete;
@@ -81,17 +82,17 @@ private:
 public:
     basic_ubjson_encoder(Sink&& sink, 
                          const Allocator& alloc = Allocator())
-       : sink_(std::forward<Sink>(sink)), 
-         alloc_(alloc)
+       : basic_ubjson_encoder(std::forward<Sink>(sink), ubjson_encode_options(), alloc)
     {
     }
 
     explicit basic_ubjson_encoder(Sink&& sink, 
-                                const ubjson_encode_options& options, 
-                                const Allocator& alloc = Allocator())
+                                  const ubjson_encode_options& options, 
+                                  const Allocator& alloc = Allocator())
        : sink_(std::forward<Sink>(sink)),
          options_(options),
-         alloc_(alloc)
+         alloc_(alloc),
+         nesting_depth_(0)
     {
     }
 

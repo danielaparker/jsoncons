@@ -114,6 +114,7 @@ class basic_cbor_parser : public ser_context
     std::vector<std::size_t> shape_;
     std::size_t index_;
     std::vector<stringref_map,stringref_map_allocator_type> stringref_map_stack_;
+    int nesting_depth_;
 
     struct read_byte_string_from_buffer
     {
@@ -166,7 +167,8 @@ public:
          state_stack_(alloc),
          typed_array_(alloc),
          index_(0),
-         stringref_map_stack_(alloc)
+         stringref_map_stack_(alloc),
+         nesting_depth_(0)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
