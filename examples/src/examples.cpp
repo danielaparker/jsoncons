@@ -305,7 +305,7 @@ void max_nesting_path_example()
     try
     {
         json_options options;
-        options.max_depth(20);
+        options.max_nesting_depth(20);
         json::parse(s, options);
     }
     catch (const ser_error& e)

@@ -21,12 +21,12 @@ class cbor_options_common
 {
     friend class cbor_options;
 
-    int max_depth_;
+    int max_nesting_depth_;
 protected:
     virtual ~cbor_options_common() = default;
 
     cbor_options_common()
-        : max_depth_(1000)
+        : max_nesting_depth_(1024)
     {
     }
 
@@ -35,9 +35,9 @@ protected:
     cbor_options_common(cbor_options_common&&) = default;
     cbor_options_common& operator=(cbor_options_common&&) = default;
 public:
-    int max_depth() const 
+    int max_nesting_depth() const 
     {
-        return max_depth_;
+        return max_nesting_depth_;
     }
 };
 
@@ -77,13 +77,13 @@ public:
 class cbor_options final : public cbor_decode_options, public cbor_encode_options
 {
 public:
-    using cbor_options_common::max_depth;
+    using cbor_options_common::max_nesting_depth;
     using cbor_encode_options::pack_strings;
     using cbor_encode_options::enable_typed_arrays;
 
-    cbor_options& max_depth(int value)
+    cbor_options& max_nesting_depth(int value)
     {
-        this->max_depth_ = value;
+        this->max_nesting_depth_ = value;
         return *this;
     }
 

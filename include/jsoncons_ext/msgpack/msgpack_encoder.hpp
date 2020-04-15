@@ -117,7 +117,7 @@ private:
 
     bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = json_errc::max_depth_exceeded;
             return false;
@@ -179,7 +179,7 @@ private:
 
     bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = json_errc::max_depth_exceeded;
             return false;

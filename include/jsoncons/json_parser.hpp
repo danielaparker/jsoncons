@@ -229,19 +229,6 @@ public:
     {
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_depth()")
-    int max_depth() const
-    {
-        return options_.max_depth();
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_depth(int)")
-    void max_depth(int value)
-    {
-        options_.max_depth() = value;
-    }
-#endif
     json_parse_state parent() const
     {
         JSONCONS_ASSERT(state_stack_.size() >= 1);
@@ -334,7 +321,7 @@ public:
 
     void begin_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             more_ = err_handler_(json_errc::max_depth_exceeded, *this);
             if (!more_)
@@ -390,7 +377,7 @@ public:
 
     void begin_array(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (++nesting_depth_ > options_.max_depth())
+        if (++nesting_depth_ > options_.max_nesting_depth())
         {
             more_ = err_handler_(json_errc::max_depth_exceeded, *this);
             if (!more_)

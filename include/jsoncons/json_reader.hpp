@@ -315,16 +315,16 @@ public:
         buffer_.reserve(buffer_length_);
     }
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use max_depth() on options")
-    int max_depth() const
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth() on options")
+    int max_nesting_depth() const
     {
-        return parser_.max_depth();
+        return parser_.max_nesting_depth();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use max_depth(int) on options")
-    void max_depth(int depth)
+    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(int) on options")
+    void max_nesting_depth(int depth)
     {
-        parser_.max_depth(depth);
+        parser_.max_nesting_depth(depth);
     }
 #endif
     void read_next()
@@ -475,17 +475,6 @@ public:
     {
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
-    }
-    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth()")
-    std::size_t max_nesting_depth() const
-    {
-        return parser_.max_depth();
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use max_depth(int)")
-    void max_nesting_depth(std::size_t depth)
-    {
-        parser_.max_depth(depth);
     }
 #endif
 

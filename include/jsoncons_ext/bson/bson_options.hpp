@@ -21,12 +21,12 @@ class bson_options_common
 {
     friend class bson_options;
 
-    int max_depth_;
+    int max_nesting_depth_;
 protected:
     virtual ~bson_options_common() = default;
 
     bson_options_common()
-        : max_depth_(1000)
+        : max_nesting_depth_(1024)
     {
     }
 
@@ -35,9 +35,9 @@ protected:
     bson_options_common(bson_options_common&&) = default;
     bson_options_common& operator=(bson_options_common&&) = default;
 public:
-    int max_depth() const 
+    int max_nesting_depth() const 
     {
-        return max_depth_;
+        return max_nesting_depth_;
     }
 };
 
@@ -62,11 +62,11 @@ public:
 class bson_options final : public bson_decode_options, public bson_encode_options
 {
 public:
-    using bson_options_common::max_depth;
+    using bson_options_common::max_nesting_depth;
 
-    bson_options& max_depth(int value)
+    bson_options& max_nesting_depth(int value)
     {
-        this->max_depth_ = value;
+        this->max_nesting_depth_ = value;
         return *this;
     }
 };

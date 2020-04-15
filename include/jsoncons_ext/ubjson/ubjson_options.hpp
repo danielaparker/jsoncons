@@ -20,12 +20,12 @@ class ubjson_options_common
 {
     friend class ubjson_options;
 
-    int max_depth_;
+    int max_nesting_depth_;
 protected:
     virtual ~ubjson_options_common() = default;
 
     ubjson_options_common()
-        : max_depth_(1000)
+        : max_nesting_depth_(1024)
     {
     }
 
@@ -34,9 +34,9 @@ protected:
     ubjson_options_common(ubjson_options_common&&) = default;
     ubjson_options_common& operator=(ubjson_options_common&&) = default;
 public:
-    int max_depth() const 
+    int max_nesting_depth() const 
     {
-        return max_depth_;
+        return max_nesting_depth_;
     }
 };
 
@@ -61,11 +61,11 @@ public:
 class ubjson_options final : public ubjson_decode_options, public ubjson_encode_options
 {
 public:
-    using ubjson_options_common::max_depth;
+    using ubjson_options_common::max_nesting_depth;
 
-    ubjson_options& max_depth(int value)
+    ubjson_options& max_nesting_depth(int value)
     {
-        this->max_depth_ = value;
+        this->max_nesting_depth_ = value;
         return *this;
     }
 };

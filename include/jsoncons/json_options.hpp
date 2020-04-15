@@ -76,7 +76,7 @@ private:
     string_type nan_to_str_;
     string_type inf_to_str_;
     string_type neginf_to_str_;
-    int max_depth_;
+    int max_nesting_depth_;
 
 protected:
     basic_json_options_common()
@@ -95,7 +95,7 @@ protected:
         enable_str_to_nan_(false),
         enable_str_to_inf_(false),
         enable_str_to_neginf_(false),
-        max_depth_(1000)
+        max_nesting_depth_(1024)
     {}
 
     virtual ~basic_json_options_common() noexcept = default;
@@ -274,9 +274,9 @@ public:
         }
     }
 
-    int max_depth() const 
+    int max_nesting_depth() const 
     {
-        return max_depth_;
+        return max_nesting_depth_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -311,12 +311,6 @@ public:
         const string_type& neg_inf_replacement() const
     {
         return neg_inf_replacement_;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use max_depth()")
-    int max_nesting_depth() const 
-    {
-        return max_depth_;
     }
 #endif
 };
@@ -537,7 +531,7 @@ public:
     using char_type = CharT;
     using string_type = std::basic_string<CharT>;
 
-    using basic_json_options_common<CharT>::max_depth;
+    using basic_json_options_common<CharT>::max_nesting_depth;
 
     using basic_json_decode_options<CharT>::enable_str_to_nan;
     using basic_json_decode_options<CharT>::enable_str_to_inf;
@@ -761,9 +755,9 @@ public:
         return *this;
     }
 
-    basic_json_options& max_depth(int value)
+    basic_json_options& max_nesting_depth(int value)
     {
-        this->max_depth_ = value;
+        this->max_nesting_depth_ = value;
         return *this;
     }
 
@@ -778,13 +772,6 @@ public:
     basic_json_options& floating_point_format(float_chars_format value)
     {
         this->float_format_ = value;
-        return *this;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use max_depth")
-    basic_json_options& max_nesting_depth(int value)
-    {
-        this->max_depth_ = value;
         return *this;
     }
 

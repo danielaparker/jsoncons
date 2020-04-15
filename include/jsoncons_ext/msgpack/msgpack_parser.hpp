@@ -705,7 +705,7 @@ private:
 
     void begin_array(json_visitor& visitor, uint8_t type, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = json_errc::max_depth_exceeded;
             return;
@@ -758,7 +758,7 @@ private:
 
     void begin_object(json_visitor& visitor, uint8_t type, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = json_errc::max_depth_exceeded;
             return;

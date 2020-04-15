@@ -20,12 +20,12 @@ class msgpack_options_common
 {
     friend class msgpack_options;
 
-    int max_depth_;
+    int max_nesting_depth_;
 protected:
     virtual ~msgpack_options_common() = default;
 
     msgpack_options_common()
-        : max_depth_(1000)
+        : max_nesting_depth_(1024)
     {
     }
 
@@ -34,9 +34,9 @@ protected:
     msgpack_options_common(msgpack_options_common&&) = default;
     msgpack_options_common& operator=(msgpack_options_common&&) = default;
 public:
-    int max_depth() const 
+    int max_nesting_depth() const 
     {
-        return max_depth_;
+        return max_nesting_depth_;
     }
 };
 
@@ -61,11 +61,11 @@ public:
 class msgpack_options final : public msgpack_decode_options, public msgpack_encode_options
 {
 public:
-    using msgpack_options_common::max_depth;
+    using msgpack_options_common::max_nesting_depth;
 
-    msgpack_options& max_depth(int value)
+    msgpack_options& max_nesting_depth(int value)
     {
-        this->max_depth_ = value;
+        this->max_nesting_depth_ = value;
         return *this;
     }
 };
