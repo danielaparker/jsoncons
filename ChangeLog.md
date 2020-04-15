@@ -7,6 +7,14 @@ Defects fixed:
 
 - Fixed issue #220
 
+Enhancements:
+
+- Added classes bson_options, msgpack_options, and ubjson_options
+
+- Until this release, only JSON parsing supported the max_nesting_depth option. Since this release,
+JSON, BSON, CBOR, MessagePack and UBJSON all support the max_nesting_depth option for both
+parsing and serializing. The default is 1024.
+
 v0.150.0
 --------
 
