@@ -16,7 +16,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_reader.hpp>
-#include <jsoncons/conversion_error.hpp>
+#include <jsoncons/convert_error.hpp>
 
 namespace jsoncons {
 
@@ -104,38 +104,38 @@ namespace jsoncons {
             using value_type = std::pair<T1, T2>;
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             reader.next(ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
 
             T1 v1 = deser_traits<T1,CharT>::deserialize(reader, decoder, ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             reader.next(ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             T2 v2 = deser_traits<T2, CharT>::deserialize(reader, decoder, ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             reader.next(ec);
             if (ec || reader.current().event_type() != staj_event_type::end_array)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             return std::make_pair(v1, v2);
@@ -161,7 +161,7 @@ namespace jsoncons {
 
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return v;
             }
             reader.next(ec);
@@ -183,7 +183,7 @@ namespace jsoncons {
         using value_type = typename T::value_type;
 
         typed_array_visitor(T& v)
-            : default_json_visitor(false,conversion_errc::json_not_vector), v_(v), level_(0)
+            : default_json_visitor(false,convert_errc::json_not_vector), v_(v), level_(0)
         {
         }
     private:
@@ -193,7 +193,7 @@ namespace jsoncons {
         {      
             if (++level_ != 1)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return false;
             }
             return true;
@@ -206,7 +206,7 @@ namespace jsoncons {
         {
             if (++level_ != 1)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return false;
             }
             v_.reserve(size);
@@ -218,7 +218,7 @@ namespace jsoncons {
         {
             if (level_ != 1)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return false;
             }
             return false;
@@ -299,7 +299,7 @@ namespace jsoncons {
 
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return v;
             }
 
@@ -325,7 +325,7 @@ namespace jsoncons {
             v.fill(T{});
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
             }
             reader.next(ec);
             for (std::size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
@@ -358,7 +358,7 @@ namespace jsoncons {
             T val;
             if (reader.current().event_type() != staj_event_type::begin_object)
             {
-                ec = conversion_errc::json_not_map;
+                ec = convert_errc::json_not_map;
                 return val;
             }
             reader.next(ec);
@@ -398,7 +398,7 @@ namespace jsoncons {
             T val;
             if (reader.current().event_type() != staj_event_type::begin_object)
             {
-                ec = conversion_errc::json_not_map;
+                ec = convert_errc::json_not_map;
                 return val;
             }
             reader.next(ec);
