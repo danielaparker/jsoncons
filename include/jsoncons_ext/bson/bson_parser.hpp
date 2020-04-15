@@ -182,6 +182,11 @@ private:
 
     void begin_document(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {
@@ -197,12 +202,18 @@ private:
 
     void end_document(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
         more_ = visitor.end_object(*this);
         state_stack_.pop_back();
     }
 
     void begin_array(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {
@@ -218,6 +229,8 @@ private:
 
     void end_array(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
+
         more_ = visitor.end_array(*this);
         state_stack_.pop_back();
     }

@@ -242,7 +242,7 @@ public:
                     }
                     else
                     {
-                        produce_end_array(visitor, ec);
+                        end_array(visitor, ec);
                     }
                     break;
                 }
@@ -257,7 +257,7 @@ public:
                             return;
                         case 0xff:
                             source_.ignore(1);
-                            produce_end_array(visitor, ec);
+                            end_array(visitor, ec);
                             if (ec)
                             {
                                 return;
@@ -287,7 +287,7 @@ public:
                     }
                     else
                     {
-                        produce_end_map(visitor, ec);
+                        end_object(visitor, ec);
                     }
                     break;
                 }
@@ -312,7 +312,7 @@ public:
                             return;
                         case 0xff:
                             source_.ignore(1);
-                            produce_end_map(visitor, ec);
+                            end_object(visitor, ec);
                             if (ec)
                             {
                                 return;
@@ -577,20 +577,20 @@ private:
                             produce_begin_multi_dim(visitor, semantic_tag::multi_dim_column_major, ec);
                             break;
                         default:
-                            produce_begin_array(visitor, info, ec);
+                            begin_array(visitor, info, ec);
                             break;
                     }
                     other_tags_[item_tag] = false;
                 }
                 else
                 {
-                    produce_begin_array(visitor, info, ec);
+                    begin_array(visitor, info, ec);
                 }
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::map:
             {
-                produce_begin_map(visitor, info, ec);
+                begin_object(visitor, info, ec);
                 break;
             }
             default:
@@ -599,8 +599,13 @@ private:
         other_tags_[item_tag] = false;
     }
 
-    void produce_begin_array(json_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_array(json_visitor& visitor, uint8_t info, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         semantic_tag tag = semantic_tag::none;
         bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
@@ -632,8 +637,10 @@ private:
         }
     }
 
-    void produce_end_array(json_visitor& visitor, std::error_code&)
+    void end_array(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
+
         more_ = visitor.end_array(*this);
         if (state_stack_.back().pop_stringref_map_stack)
         {
@@ -642,8 +649,13 @@ private:
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_object(json_visitor& visitor, uint8_t info, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         bool pop_stringref_map_stack = false;
         if (other_tags_[stringref_namespace_tag])
         {
@@ -674,8 +686,9 @@ private:
         }
     }
 
-    void produce_end_map(json_visitor& visitor, std::error_code&)
+    void end_object(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
         more_ = visitor.end_object(*this);
         if (state_stack_.back().pop_stringref_map_stack)
         {

@@ -123,7 +123,7 @@ public:
                     }
                     else
                     {
-                        produce_end_array(visitor, ec);
+                        end_array(visitor, ec);
                     }
                     break;
                 }
@@ -140,7 +140,7 @@ public:
                     }
                     else
                     {
-                        produce_end_array(visitor, ec);
+                        end_array(visitor, ec);
                     }
                     break;
                 }
@@ -155,7 +155,7 @@ public:
                             return;
                         case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
                             source_.ignore(1);
-                            produce_end_array(visitor, ec);
+                            end_array(visitor, ec);
                             if (ec)
                             {
                                 return;
@@ -185,7 +185,7 @@ public:
                     }
                     else
                     {
-                        produce_end_map(visitor, ec);
+                        end_object(visitor, ec);
                     }
                     break;
                 }
@@ -213,7 +213,7 @@ public:
                     }
                     else
                     {
-                        produce_end_map(visitor, ec);
+                        end_object(visitor, ec);
                     }
                     break;
                 }
@@ -238,7 +238,7 @@ public:
                             return;
                         case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
                             source_.ignore(1);
-                            produce_end_map(visitor, ec);
+                            end_object(visitor, ec);
                             if (ec)
                             {
                                 return;
@@ -492,12 +492,12 @@ private:
             }
             case jsoncons::ubjson::detail::ubjson_format::start_array_marker: 
             {
-                produce_begin_array(visitor,ec);
+                begin_array(visitor,ec);
                 break;
             }
             case jsoncons::ubjson::detail::ubjson_format::start_object_marker: 
             {
-                produce_begin_map(visitor, ec);
+                begin_object(visitor, ec);
                 break;
             }
             default:
@@ -508,8 +508,13 @@ private:
         }
     }
 
-    void produce_begin_array(json_visitor& visitor, std::error_code& ec)
+    void begin_array(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
             source_.ignore(1);
@@ -546,14 +551,21 @@ private:
         }
     }
 
-    void produce_end_array(json_visitor& visitor, std::error_code&)
+    void end_array(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
+
         more_ = visitor.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_visitor& visitor, std::error_code& ec)
+    void begin_object(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
             source_.ignore(1);
@@ -593,8 +605,9 @@ private:
         }
     }
 
-    void produce_end_map(json_visitor& visitor, std::error_code&)
+    void end_object(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
         more_ = visitor.end_object(*this);
         state_stack_.pop_back();
     }

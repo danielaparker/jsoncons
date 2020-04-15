@@ -124,7 +124,7 @@ public:
                     }
                     else
                     {
-                        produce_end_array(visitor, ec);
+                        end_array(visitor, ec);
                     }
                     break;
                 }
@@ -142,7 +142,7 @@ public:
                     }
                     else
                     {
-                        produce_end_map(visitor, ec);
+                        end_object(visitor, ec);
                     }
                     break;
                 }
@@ -200,11 +200,11 @@ private:
             }
             else if (type <= 0x8f) 
             {
-                produce_begin_map(visitor,type,ec); // fixmap
+                begin_object(visitor,type,ec); // fixmap
             }
             else if (type <= 0x9f) 
             {
-                produce_begin_array(visitor,type,ec); // fixarray
+                begin_array(visitor,type,ec); // fixarray
             }
             else 
             {
@@ -568,14 +568,14 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
                 case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
                 {
-                    produce_begin_array(visitor,type,ec);
+                    begin_array(visitor,type,ec);
                     break;
                 }
 
                 case jsoncons::msgpack::detail::msgpack_format::map16_cd : 
                 case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
                 {
-                    produce_begin_map(visitor, type, ec);
+                    begin_object(visitor, type, ec);
                     break;
                 }
 
@@ -703,8 +703,13 @@ private:
         }
     }
 
-    void produce_begin_array(json_visitor& visitor, uint8_t type, std::error_code& ec)
+    void begin_array(json_visitor& visitor, uint8_t type, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         std::size_t len = 0;
         switch (type)
         {
@@ -743,14 +748,21 @@ private:
         more_ = visitor.begin_array(len, semantic_tag::none, *this, ec);
     }
 
-    void produce_end_array(json_visitor& visitor, std::error_code&)
+    void end_array(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
+
         more_ = visitor.end_array(*this);
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_visitor& visitor, uint8_t type, std::error_code& ec)
+    void begin_object(json_visitor& visitor, uint8_t type, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_depth()))
+        {
+            ec = json_errc::max_depth_exceeded;
+            return;
+        } 
         std::size_t len = 0;
         switch (type)
         {
@@ -789,8 +801,9 @@ private:
         more_ = visitor.begin_object(len, semantic_tag::none, *this, ec);
     }
 
-    void produce_end_map(json_visitor& visitor, std::error_code&)
+    void end_object(json_visitor& visitor, std::error_code&)
     {
+        --nesting_depth_;
         more_ = visitor.end_object(*this);
         state_stack_.pop_back();
     }
