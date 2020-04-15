@@ -24,11 +24,13 @@ T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (4)
 ```
 
-(1) Reads a CSV string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 
-or if T supports [json_type_traits](../json_type_traits.md).
+(1) Reads a CSV string value into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
+Type T must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
 
-(2) Reads a CSV input stream into a type T if T is an instantiation of [basic_json](../basic_json.md) 
-or if T supports [json_type_traits](../json_type_traits.md).
+(2) Reads a CSV input stream into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
+Type T must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
 
 #### Return value
 

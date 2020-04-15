@@ -232,7 +232,7 @@ std::string s = "[[[[[[[[[[[[[[[[[[[[[\"Too deep\"]]]]]]]]]]]]]]]]]]]]]";
 try
 {
     json_options options;
-    options.max_depth(20);
+    options.max_nesting_depth(20);
     json j = json::parse(s, options);
 }
 catch (const ser_error& e)
