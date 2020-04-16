@@ -64,13 +64,13 @@ void encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                  basic_json_visitor<CharT>& encoder); // (10)
 ```
 
-(1) Encode `val` to string with the specified line indenting.
+(1) Encode `val` to string using the specified (or defaulted) [line_indent](indenting.md).
 
-(2) Encode `val` to string with the specified options and line indenting.
+(2) Encode `val` to string using the specified (or defaulted) [options](basic_json_options.md) and [line_indent](indenting.md).
 
-(3) Encode `val` to output stream with the specified line indenting.
+(3) Encode `val` to output stream with the specified (or defaulted) [line_indent](indenting.md).
 
-(4) Encode `val` to output stream with the specified options and line indenting.
+(4) Encode `val` to output stream using the specified (or defaulted) [options](basic_json_options.md) and [line_indent](indenting.md).
 
 (5) Convert `val` to json events and stream through encoder.
 
