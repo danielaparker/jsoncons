@@ -26,10 +26,10 @@ TEST_CASE("clusterfuzz issues")
     {
         std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5740910806827008.fuzz";
 
-        std::ifstream is(pathname);
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         cbor::cbor_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
-        REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is, options), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::invalid_utf8_text_string).c_str()));
+        options.max_nesting_depth(10000);
+        REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
     }
 
 }
