@@ -4,6 +4,8 @@
 #include <jsoncons_ext/cbor/cbor_options.hpp>
 ```
 
+![cbor_options](./diagrams/cbor_options.png)
+
 <br>
 
 Specifies options for reading and writing CBOR.

@@ -4,6 +4,8 @@
 #include <jsoncons_ext/ubjson/ubjson_options.hpp>
 ```
 
+![ubjson_options](./diagrams/ubjson_options.png)
+
 <br>
 
 Specifies options for reading and writing CBOR.
