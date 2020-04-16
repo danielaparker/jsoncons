@@ -2,10 +2,12 @@
 
 ```c++
 #include <jsoncons_ext/cbor/cbor_options.hpp>
+
+class cbor_options;
 ```
 
+<br>
 ![cbor_options](./diagrams/cbor_options.png)
-
 <br>
 
 Specifies options for reading and writing CBOR.

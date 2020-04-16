@@ -8,7 +8,9 @@ template<
 > class basic_json_options;
 ```
 
+<br>
 ![basic_json_options](./diagrams/basic_json_options.png)
+<br>
 
 Specifies options for reading and writing JSON text. 
 

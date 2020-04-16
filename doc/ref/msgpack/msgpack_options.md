@@ -2,10 +2,12 @@
 
 ```c++
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
+
+class msgpack_options;
 ```
 
+<br>
 ![msgpack_options](./diagrams/msgpack_options.png)
-
 <br>
 
 Specifies options for reading and writing CBOR.

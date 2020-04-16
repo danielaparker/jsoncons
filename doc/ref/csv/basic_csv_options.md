@@ -8,7 +8,9 @@ template<
 > class basic_csv_options;
 ```
 
+<br>
 ![basic_csv_options](./diagrams/basic_csv_options.png)
+<br>
 
 Specifies options for reading and writing CSV data. 
 

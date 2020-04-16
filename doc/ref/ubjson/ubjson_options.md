@@ -2,10 +2,12 @@
 
 ```c++
 #include <jsoncons_ext/ubjson/ubjson_options.hpp>
+
+class ubjson_options;
 ```
 
+<br>
 ![ubjson_options](./diagrams/ubjson_options.png)
-
 <br>
 
 Specifies options for reading and writing CBOR.
