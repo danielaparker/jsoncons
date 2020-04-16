@@ -281,13 +281,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use enable_nan_to_num() or enable_nan_to_str()")
-        bool can_read_nan_replacement() const { return can_read_nan_replacement_; }
+    bool can_read_nan_replacement() const { return can_read_nan_replacement_; }
 
     JSONCONS_DEPRECATED_MSG("Instead, use enable_inf_to_num() or enable_inf_to_str()")
-        bool can_read_pos_inf_replacement() const { return can_read_pos_inf_replacement_; }
+    bool can_read_pos_inf_replacement() const { return can_read_pos_inf_replacement_; }
 
     JSONCONS_DEPRECATED_MSG("Instead, use enable_neginf_to_num() or enable_neginf_to_str()")
-        bool can_read_neg_inf_replacement() const { return can_read_neg_inf_replacement_; }
+    bool can_read_neg_inf_replacement() const { return can_read_neg_inf_replacement_; }
 
     bool can_write_nan_replacement() const { return !nan_replacement_.empty(); }
 
@@ -296,19 +296,19 @@ public:
     bool can_write_neg_inf_replacement() const { return !neg_inf_replacement_.empty(); }
 
     JSONCONS_DEPRECATED_MSG("Instead, use nan_to_num() or nan_to_str()")
-        const string_type& nan_replacement() const
+    const string_type& nan_replacement() const
     {
         return nan_replacement_;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num() or inf_to_str()")
-        const string_type& pos_inf_replacement() const
+    const string_type& pos_inf_replacement() const
     {
         return pos_inf_replacement_;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use neginf_to_num() or neginf_to_str()")
-        const string_type& neg_inf_replacement() const
+    const string_type& neg_inf_replacement() const
     {
         return neg_inf_replacement_;
     }

@@ -71,7 +71,7 @@ jsoncons strings tagged with `semantic_tag::base64url` and `semantic_tag::base64
 Tags 256 and 25 are automatically decoded when detected. They are encoded when CBOR option `pack_strings` is set to true.
 
 64-87 [Tags for Typed Arrays](https://tools.ietf.org/html/rfc8746)  
-Tags 64-82 (excepting float128 big endian) and 84-86 (excepting float128 little endian) are automatically decoded when detected. They may be encoded when CBOR option `enable_typed_arrays` is set to true.
+Tags 64-82 (excepting float128 big endian) and 84-86 (excepting float128 little endian) are automatically decoded when detected. They may be encoded when CBOR option `use_typed_arrays` is set to true.
 
 #### Mappings between CBOR and jsoncons data items
 
@@ -383,7 +383,7 @@ int main()
         x[i] = static_cast<float>(i);
     }
     cbor::cbor_options options;
-    options.enable_typed_arrays(true);
+    options.use_typed_arrays(true);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(x, buf, options);

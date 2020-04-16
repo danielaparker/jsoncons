@@ -40,7 +40,7 @@ will encode strings the usual CBOR way.
 This option does not affect decode - jsoncons will always decode
 string references if present.
 
-    cbor_options& enable_typed_arrays(bool value)
+    cbor_options& use_typed_arrays(bool value)
 
 This option does not affect decode - jsoncons will always decode
 typed arrays if present.

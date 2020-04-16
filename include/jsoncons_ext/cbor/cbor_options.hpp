@@ -55,11 +55,11 @@ class cbor_encode_options : public virtual cbor_options_common
     friend class cbor_options;
 
     bool use_stringref_;
-    bool enable_typed_arrays_;
+    bool use_typed_arrays_;
 public:
     cbor_encode_options()
         : use_stringref_(false),
-          enable_typed_arrays_(false)
+          use_typed_arrays_(false)
     {
     }
 
@@ -68,9 +68,9 @@ public:
         return use_stringref_;
     }
 
-    bool enable_typed_arrays() const 
+    bool use_typed_arrays() const 
     {
-        return enable_typed_arrays_;
+        return use_typed_arrays_;
     }
 };
 
@@ -79,7 +79,7 @@ class cbor_options final : public cbor_decode_options, public cbor_encode_option
 public:
     using cbor_options_common::max_nesting_depth;
     using cbor_encode_options::pack_strings;
-    using cbor_encode_options::enable_typed_arrays;
+    using cbor_encode_options::use_typed_arrays;
 
     cbor_options& max_nesting_depth(int value)
     {
@@ -93,11 +93,20 @@ public:
         return *this;
     }
 
-    cbor_options& enable_typed_arrays(bool value)
+    cbor_options& use_typed_arrays(bool value)
     {
-        this->enable_typed_arrays_ = value;
+        this->use_typed_arrays_ = value;
         return *this;
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use use_typed_arrays(bool)")
+    cbor_options& enable_typed_arrays(bool value)
+    {
+        this->use_typed_arrays_ = value;
+        return *this;
+    }
+#endif
 };
 
 }}

@@ -287,7 +287,7 @@ int main()
 
     std::vector<uint8_t> output2;
     cbor::cbor_options options;
-    options.enable_typed_arrays(true);
+    options.use_typed_arrays(true);
     cbor::encode_cbor(v, output2, options);
 
     // output2 contains a float64, native endian, Typed Array 

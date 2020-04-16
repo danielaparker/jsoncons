@@ -7,6 +7,14 @@ Defects fixed:
 
 - Fixed issue #220
 
+Changes:
+
+- The cbor_option name `enable_typed_arrays` has been deprecated and
+renamed to `use_typed_arrays`. 
+
+- `jsonpointer::unflatten_method::try_array` has been renamed to
+`jsonpointer::unflatten_method::preserve_arrays`.
+
 Enhancements:
 
 - Added classes bson_options, msgpack_options, and ubjson_options

@@ -122,7 +122,7 @@ TEST_CASE("cbor typed array tests")
         auto u = cbor::decode_cbor<std::vector<uint8_t>>(input);
         std::vector<uint8_t> v;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
         CHECK((v == input));
     }
@@ -147,7 +147,7 @@ TEST_CASE("cbor typed array tests")
         auto u = cbor::decode_cbor<std::vector<uint16_t>>(input);
         std::vector<uint8_t> v;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
         check_native(std::integral_constant<bool,jsoncons::endian::native == jsoncons::endian::big>(),
                      input, v);
@@ -174,7 +174,7 @@ TEST_CASE("cbor typed array tests")
         auto u = cbor::decode_cbor<std::vector<uint32_t>>(input);
         std::vector<uint8_t> v;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, v);
@@ -202,7 +202,7 @@ TEST_CASE("cbor typed array tests")
         auto u = cbor::decode_cbor<std::vector<uint64_t>>(input);
         std::vector<uint8_t> v;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, v, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, v);
@@ -270,7 +270,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -309,7 +309,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -341,7 +341,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -367,7 +367,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -411,7 +411,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
@@ -450,7 +450,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
@@ -482,7 +482,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
@@ -526,7 +526,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -564,7 +564,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -597,7 +597,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -646,7 +646,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
@@ -670,7 +670,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(),
             input, buf);
@@ -741,7 +741,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);
@@ -770,7 +770,7 @@ TEST_CASE("cbor typed array tests")
 
         std::vector<uint8_t> buf;
         cbor::cbor_options options;
-        options.enable_typed_arrays(true);
+        options.use_typed_arrays(true);
         cbor::encode_cbor(u, buf, options);
         check_native(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::little>(),
             input, buf);

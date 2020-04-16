@@ -304,7 +304,7 @@ int main()
 
     std::vector<uint8_t> buffer;
     cbor::cbor_options options;
-    options.enable_typed_arrays(true);
+    options.use_typed_arrays(true);
     cbor::encode_cbor(v, buffer, options);
 
     std::cout << "(1)\n";
