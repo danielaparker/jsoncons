@@ -7,7 +7,9 @@ class bson_options;
 ```
 
 <br>
+
 ![bson_options](./diagrams/bson_options.png)
+
 <br>
 
 Specifies options for reading and writing CBOR.
