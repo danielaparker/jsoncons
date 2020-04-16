@@ -10,8 +10,6 @@ class bson_options;
 
 ![bson_options](./diagrams/bson_options.png)
 
-<br>
-
 Specifies options for reading and writing CBOR.
 
 #### Constructors
