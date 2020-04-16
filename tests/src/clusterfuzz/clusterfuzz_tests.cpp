@@ -19,7 +19,7 @@ TEST_CASE("clusterfuzz issues")
         json_options options;
         options.max_nesting_depth(std::numeric_limits<int>::max());
 
-        std::ifstream is(pathname);
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         REQUIRE_THROWS_WITH(json::parse(is, options), Catch::Matchers::Contains(json_error_category_impl().message((int)json_errc::expected_comma_or_right_bracket).c_str()));
     }
     SECTION("issue 21709")
@@ -29,7 +29,19 @@ TEST_CASE("clusterfuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         cbor::cbor_options options;
         options.max_nesting_depth(10000);
-        REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
+        REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is,options), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
+    }
+    SECTION("issue 21710")
+    {
+        std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        cbor::cbor_options options;
+        options.max_nesting_depth(10000);
+
+        REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is,options), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
     }
 
 }
