@@ -497,7 +497,7 @@ private:
                     int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
-                    if (source_reader<Src>::read(source_,v,len) != len)
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -522,7 +522,7 @@ private:
                     int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
-                    if (source_reader<Src>::read(source_,v,len) != len)
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -547,7 +547,7 @@ private:
                     int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
 
                     std::vector<uint8_t> v;
-                    if (source_reader<Src>::read(source_,v,len) != len)
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
