@@ -282,9 +282,11 @@ private:
                 }
                 const uint8_t* endp;
                 auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(buf),&endp);
+                JSONCONS_ASSERT(len > 0);
 
                 std::vector<char> s;
-                if (source_reader<Src>::read(source_,s,len-1) != len-1)
+                std::size_t size = static_cast<std::size_t>(len-1);
+                if (source_reader<Src>::read(source_,s,size) != size)
                 {
                     ec = bson_errc::unexpected_eof;
                     return;
