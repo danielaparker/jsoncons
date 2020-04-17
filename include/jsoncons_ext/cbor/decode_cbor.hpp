@@ -23,7 +23,7 @@ namespace jsoncons {
 namespace cbor {
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_cbor(const std::vector<uint8_t>& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -35,7 +35,7 @@ namespace cbor {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_cbor(const std::vector<uint8_t>& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -52,7 +52,7 @@ namespace cbor {
     }
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_cbor(std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -64,7 +64,7 @@ namespace cbor {
     }
      
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_cbor(std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -83,7 +83,7 @@ namespace cbor {
     // With leading allocator parameter
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const std::vector<uint8_t>& v, 
                 const cbor_decode_options& options = cbor_decode_options())
@@ -96,7 +96,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const std::vector<uint8_t>& v, 
                 const cbor_decode_options& options = cbor_decode_options())
@@ -114,7 +114,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())
@@ -127,7 +127,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 std::istream& is, 
                 const cbor_decode_options& options = cbor_decode_options())

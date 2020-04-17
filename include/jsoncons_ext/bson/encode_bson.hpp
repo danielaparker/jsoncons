@@ -21,7 +21,7 @@ namespace jsoncons {
 namespace bson {
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_bson(const T& j, 
                 std::vector<uint8_t>& v, 
                 const bson_encode_options& options = bson_encode_options())
@@ -33,7 +33,7 @@ namespace bson {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_bson(const T& val, 
                 std::vector<uint8_t>& v, 
                 const bson_encode_options& options = bson_encode_options())
@@ -48,7 +48,7 @@ namespace bson {
     }
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_bson(const T& j, 
                 std::ostream& os, 
                 const bson_encode_options& options = bson_encode_options())
@@ -60,7 +60,7 @@ namespace bson {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_bson(const T& val, 
                 std::ostream& os, 
                 const bson_encode_options& options = bson_encode_options())
@@ -77,7 +77,7 @@ namespace bson {
     // with temp_allocator_rag
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
                 std::vector<uint8_t>& v, 
@@ -90,7 +90,7 @@ namespace bson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::vector<uint8_t>& v, 
@@ -106,7 +106,7 @@ namespace bson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
                 std::ostream& os, 
@@ -119,7 +119,7 @@ namespace bson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::ostream& os, 

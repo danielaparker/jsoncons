@@ -5635,8 +5635,16 @@ jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
     return jsoncons::wojson::parse(jsoncons::wojson::string_view_type(s, n));
 }
 
-}
+} // inline namespace literals
 
-}
+template <class T>
+struct is_basic_json : std::false_type
+{};
+
+template <class CharT, class ImplementationPolicy, class Allocator>
+struct is_basic_json<basic_json<CharT,ImplementationPolicy,Allocator>> : std::true_type
+{};
+
+} // namespace jsoncons
 
 #endif

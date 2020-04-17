@@ -24,7 +24,7 @@ namespace cbor {
     // to bytes 
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_cbor(const T& j, 
                 std::vector<uint8_t>& v, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -36,7 +36,7 @@ namespace cbor {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value, void>::type
+    typename std::enable_if<!is_basic_json<T>::value, void>::type
     encode_cbor(const T& val, std::vector<uint8_t>& v, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
@@ -49,7 +49,7 @@ namespace cbor {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value, void>::type
+    typename std::enable_if<!is_basic_json<T>::value, void>::type
     encode_cbor(const T& val, 
                 std::vector<uint8_t>& v, 
                 const cbor_encode_options& options, 
@@ -62,7 +62,7 @@ namespace cbor {
     // stream
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_cbor(const T& j, 
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -74,7 +74,7 @@ namespace cbor {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_cbor(const T& val, 
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
@@ -88,7 +88,7 @@ namespace cbor {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_cbor(const T& val, 
                 std::ostream& os, 
                 const cbor_encode_options& options, 
@@ -103,7 +103,7 @@ namespace cbor {
     // to bytes 
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
                 std::vector<uint8_t>& v, 
@@ -116,7 +116,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value, void>::type
+    typename std::enable_if<!is_basic_json<T>::value, void>::type
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::vector<uint8_t>& v, 
@@ -131,7 +131,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value, void>::type
+    typename std::enable_if<!is_basic_json<T>::value, void>::type
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::vector<uint8_t>& v, 
@@ -145,7 +145,7 @@ namespace cbor {
     // stream
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& j, 
                 std::ostream& os, 
@@ -158,7 +158,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::ostream& os, 
@@ -173,7 +173,7 @@ namespace cbor {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val, 
                 std::ostream& os, 

@@ -22,7 +22,7 @@ namespace jsoncons {
 namespace msgpack {
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_msgpack(const std::vector<uint8_t>& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
@@ -34,7 +34,7 @@ namespace msgpack {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_msgpack(const std::vector<uint8_t>& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
@@ -51,7 +51,7 @@ namespace msgpack {
     }
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_msgpack(std::istream& is, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
@@ -63,7 +63,7 @@ namespace msgpack {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_msgpack(std::istream& is, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
@@ -82,7 +82,7 @@ namespace msgpack {
     // With leading allocator parameter
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                    const std::vector<uint8_t>& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
@@ -95,7 +95,7 @@ namespace msgpack {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                    const std::vector<uint8_t>& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
@@ -113,7 +113,7 @@ namespace msgpack {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                    std::istream& is, 
                    const msgpack_decode_options& options = msgpack_decode_options())
@@ -126,7 +126,7 @@ namespace msgpack {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                    std::istream& is, 
                    const msgpack_decode_options& options = msgpack_decode_options())

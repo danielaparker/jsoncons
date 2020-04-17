@@ -21,7 +21,7 @@ namespace jsoncons {
 namespace ubjson {
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_ubjson(const T& j, 
                   std::vector<uint8_t>& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -33,7 +33,7 @@ namespace ubjson {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_ubjson(const T& val, 
                   std::vector<uint8_t>& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -48,7 +48,7 @@ namespace ubjson {
     }
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_ubjson(const T& j, 
                   std::ostream& os, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -60,7 +60,7 @@ namespace ubjson {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_ubjson(const T& val, 
                   std::ostream& os, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -77,7 +77,7 @@ namespace ubjson {
     // with temp_allocator_arg_t
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& j, 
                   std::vector<uint8_t>& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -89,7 +89,7 @@ namespace ubjson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,const T& val, 
                   std::vector<uint8_t>& v, 
                   const ubjson_encode_options& options = ubjson_encode_options())
@@ -104,7 +104,7 @@ namespace ubjson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<is_basic_json<T>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   const T& j, 
                   std::ostream& os, 
@@ -117,7 +117,7 @@ namespace ubjson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,void>::type 
+    typename std::enable_if<!is_basic_json<T>::value,void>::type 
     encode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   const T& val, 
                   std::ostream& os, 

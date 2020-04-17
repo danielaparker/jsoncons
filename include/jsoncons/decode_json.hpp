@@ -20,7 +20,7 @@ namespace jsoncons {
     // decode_json
 
     template <class T, class CharT>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<is_basic_json<T>::value,T>::type
     decode_json(const std::basic_string<CharT>& s,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
@@ -31,7 +31,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<!is_basic_json<T>::value,T>::type
     decode_json(const std::basic_string<CharT>& s,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
@@ -47,7 +47,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<is_basic_json<T>::value,T>::type
     decode_json(std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
@@ -58,7 +58,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<!is_basic_json<T>::value,T>::type
     decode_json(std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
     {
@@ -77,7 +77,7 @@ namespace jsoncons {
     // With leading allocator parameter
 
     template <class T,class CharT,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<is_basic_json<T>::value,T>::type
     decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const std::basic_string<CharT>& s,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
@@ -90,7 +90,7 @@ namespace jsoncons {
     }
 
     template <class T,class CharT,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<!is_basic_json<T>::value,T>::type
     decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const std::basic_string<CharT>& s,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
@@ -108,7 +108,7 @@ namespace jsoncons {
     }
 
     template <class T,class CharT,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<is_basic_json<T>::value,T>::type
     decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())
@@ -121,7 +121,7 @@ namespace jsoncons {
     }
 
     template <class T,class CharT,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type
+    typename std::enable_if<!is_basic_json<T>::value,T>::type
     decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 std::basic_istream<CharT>& is,
                 const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>())

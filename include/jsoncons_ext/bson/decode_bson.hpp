@@ -21,7 +21,7 @@ namespace jsoncons {
 namespace bson {
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_bson(const std::vector<uint8_t>& v, 
                 const bson_decode_options& options = bson_decode_options())
     {
@@ -33,7 +33,7 @@ namespace bson {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_bson(const std::vector<uint8_t>& v, 
                 const bson_decode_options& options = bson_decode_options())
     {
@@ -50,7 +50,7 @@ namespace bson {
     }
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_bson(std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
     {
@@ -62,7 +62,7 @@ namespace bson {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_bson(std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
     {
@@ -81,7 +81,7 @@ namespace bson {
     // With leading allocator parameter
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const std::vector<uint8_t>& v, 
                 const bson_decode_options& options = bson_decode_options())
@@ -94,7 +94,7 @@ namespace bson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const std::vector<uint8_t>& v, 
                 const bson_decode_options& options = bson_decode_options())
@@ -112,7 +112,7 @@ namespace bson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
@@ -125,7 +125,7 @@ namespace bson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 std::istream& is, 
                 const bson_decode_options& options = bson_decode_options())
