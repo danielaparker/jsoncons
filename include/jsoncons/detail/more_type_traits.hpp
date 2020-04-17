@@ -28,13 +28,13 @@ struct static_max;
 template <std::size_t arg>
 struct static_max<arg>
 {
-    static constexpr size_t value = arg;
+    static constexpr std::size_t value = arg;
 };
 
 template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
 struct static_max<arg1,arg2,argn ...>
 {
-    static constexpr size_t value = arg1 >= arg2 ? 
+    static constexpr std::size_t value = arg1 >= arg2 ? 
         static_max<arg1,argn...>::value :
         static_max<arg2,argn...>::value; 
 };

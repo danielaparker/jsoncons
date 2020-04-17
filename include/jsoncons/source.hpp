@@ -740,8 +740,8 @@ namespace jsoncons {
     template <class Source>
     struct source_reader
     {
-        static constexpr size_t max_buffer_length = 16384;
         using value_type = typename Source::value_type;
+        static const std::size_t max_buffer_length = 16384;
 
         template <class ValueT,class Allocator>
         static
