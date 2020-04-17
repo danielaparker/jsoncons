@@ -283,9 +283,8 @@ private:
                 const uint8_t* endp;
                 auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(buf),&endp);
 
-                std::basic_string<char> s;
-                s.reserve(len - 1);
-                if ((int32_t)source_.read(std::back_inserter(s), len-1) != len-1)
+                std::vector<char> s;
+                if (source_reader<Src>::read(source_,s,len-1) != len-1)
                 {
                     ec = bson_errc::unexpected_eof;
                     return;
@@ -298,7 +297,7 @@ private:
                     ec = bson_errc::invalid_utf8_text_string;
                     return;
                 }
-                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 

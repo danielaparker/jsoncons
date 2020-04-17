@@ -836,9 +836,7 @@ private:
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
         auto func = [&s](Src& source, std::size_t length, std::error_code& ec) -> bool
         {
-            s.reserve(s.size()+length);
-            source.read(std::back_inserter(s), length);
-            if (source.eof())
+            if (source_reader<Src>::read(source, s, length) != length)
             {
                 ec = cbor_errc::unexpected_eof;
                 return false;
