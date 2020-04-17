@@ -528,6 +528,10 @@ private:
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
+                if (ec)
+                {
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::strongly_typed_array,length,item_type);
                 more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
             }
@@ -541,6 +545,10 @@ private:
         {
             source_.ignore(1);
             std::size_t length = get_length(ec);
+            if (ec)
+            {
+                return;
+            }
             state_stack_.emplace_back(parse_mode::array,length);
             more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
         }
@@ -579,6 +587,10 @@ private:
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
+                if (ec)
+                {
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::strongly_typed_map_key,length,item_type);
                 more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
             }
@@ -594,6 +606,10 @@ private:
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
+                if (ec)
+                {
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::map_key,length);
                 more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
             }
@@ -645,7 +661,7 @@ private:
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
                     return length;
                 }
                 break;
@@ -678,7 +694,7 @@ private:
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
                     return length;
                 }
                 break;
@@ -700,7 +716,7 @@ private:
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
                     return length;
                 }
                 break;
@@ -727,7 +743,7 @@ private:
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
                     return length;
                 }
                 break;
