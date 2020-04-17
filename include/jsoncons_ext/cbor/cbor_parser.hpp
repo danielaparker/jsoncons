@@ -15,7 +15,6 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/staj_reader.hpp> // typed_array
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
