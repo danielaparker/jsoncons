@@ -212,8 +212,8 @@ private:
                 const size_t len = type & 0x1f;
 
                 buffer_.clear();
-                source_.read(std::back_inserter(buffer_), len);
-                if (source_.eof())
+
+                if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
                 {
                     ec = msgpack_errc::unexpected_eof;
                     return;
@@ -406,10 +406,14 @@ private:
                     }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -435,10 +439,14 @@ private:
                     }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -465,10 +473,14 @@ private:
                     }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -495,11 +507,14 @@ private:
                     }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(std::back_inserter(v), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -522,11 +537,14 @@ private:
                     }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(std::back_inserter(v), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -549,11 +567,14 @@ private:
                     }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(std::back_inserter(v), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -633,10 +654,14 @@ private:
                     }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -663,10 +688,14 @@ private:
                     }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -687,10 +716,14 @@ private:
                     }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        return;
+                    }
 
                     buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
@@ -710,7 +743,7 @@ private:
             ec = msgpack_errc::max_nesting_depth_exceeded;
             return;
         } 
-        std::size_t len = 0;
+        std::size_t length = 0;
         switch (type)
         {
             case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
@@ -723,7 +756,13 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break;
             }
             case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
@@ -736,16 +775,22 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break;
             }
             default:
                 JSONCONS_ASSERT(type > 0x8f && type <= 0x9f) // fixarray
-                len = type & 0x0f;
+                length = type & 0x0f;
                 break;
         }
-        state_stack_.emplace_back(parse_mode::array,len);
-        more_ = visitor.begin_array(len, semantic_tag::none, *this, ec);
+        state_stack_.emplace_back(parse_mode::array,length);
+        more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
     }
 
     void end_array(json_visitor& visitor, std::error_code&)
@@ -763,7 +808,7 @@ private:
             ec = msgpack_errc::max_nesting_depth_exceeded;
             return;
         } 
-        std::size_t len = 0;
+        std::size_t length = 0;
         switch (type)
         {
             case jsoncons::msgpack::detail::msgpack_format::map16_cd:
@@ -776,7 +821,13 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break; 
             }
             case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
@@ -789,16 +840,22 @@ private:
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break;
             }
             default:
                 JSONCONS_ASSERT (type > 0x7f && type <= 0x8f) // fixmap
-                len = type & 0x0f;
+                length = type & 0x0f;
                 break;
         }
-        state_stack_.emplace_back(parse_mode::map_key,len);
-        more_ = visitor.begin_object(len, semantic_tag::none, *this, ec);
+        state_stack_.emplace_back(parse_mode::map_key,length);
+        more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
     }
 
     void end_object(json_visitor& visitor, std::error_code&)

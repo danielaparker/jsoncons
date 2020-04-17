@@ -282,10 +282,15 @@ private:
                 }
                 const uint8_t* endp;
                 auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(buf),&endp);
+                if (len < 1)
+                {
+                    ec = bson_errc::string_length_is_non_positive;
+                    return;
+                }
 
-                std::basic_string<char> s;
-                s.reserve(len - 1);
-                if ((int32_t)source_.read(std::back_inserter(s), len-1) != len-1)
+                std::vector<char> s;
+                std::size_t size = static_cast<std::size_t>(len-1);
+                if (source_reader<Src>::read(source_,s,size) != size)
                 {
                     ec = bson_errc::unexpected_eof;
                     return;
@@ -298,7 +303,7 @@ private:
                     ec = bson_errc::invalid_utf8_text_string;
                     return;
                 }
-                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
@@ -393,9 +398,13 @@ private:
                 }
                 const uint8_t* endp;
                 const auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
-
-                std::vector<uint8_t> v(len, 0);
-                if (source_.read(v.data(), v.size()) != v.size())
+                if (len < 0)
+                {
+                    ec = bson_errc::length_is_negative;
+                    return;
+                }
+                std::vector<uint8_t> v;
+                if (source_reader<Src>::read(source_, v, len) != static_cast<std::size_t>(len))
                 {
                     ec = bson_errc::unexpected_eof;
                     return;
