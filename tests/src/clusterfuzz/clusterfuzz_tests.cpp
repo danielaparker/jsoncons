@@ -44,5 +44,19 @@ TEST_CASE("clusterfuzz issues")
         REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is,options), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
     }
 
+    SECTION("issue 21710b")
+    {
+        std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        cbor::cbor_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        default_json_visitor visitor;
+        cbor::cbor_stream_reader reader(is,visitor,options);
+    }
+
 }
 
