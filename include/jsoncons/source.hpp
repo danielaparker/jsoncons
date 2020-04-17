@@ -741,7 +741,7 @@ namespace jsoncons {
     struct source_reader
     {
         using value_type = typename Source::value_type;
-        static const std::size_t max_buffer_length = 16384;
+        static constexpr std::size_t max_buffer_length = 16384;
 
         template <class ValueT,class Allocator>
         static
@@ -781,6 +781,8 @@ namespace jsoncons {
             return length - unread;
         }
     };
+    template <class Source>
+    constexpr std::size_t source_reader<Source>::max_buffer_length = 16384;
 
     #if !defined(JSONCONS_NO_DEPRECATED)
     using bin_stream_source = binary_stream_source;
