@@ -61,8 +61,6 @@ struct mapped_string
     mapped_string& operator=(mapped_string&&) = default;
 };
 
-using stringref_map = std::vector<mapped_string>;
-
 struct parse_state 
 {
     parse_mode mode; 
@@ -89,6 +87,7 @@ class basic_cbor_parser : public ser_context
     using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
     using tag_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t>;                 
     using parse_state_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<parse_state>;                         
+    using stringref_map = std::vector<mapped_string>;
     using stringref_map_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<stringref_map>;                           
 
     using string_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
@@ -478,6 +477,10 @@ private:
             case jsoncons::cbor::detail::cbor_major_type::text_string:
             {
                 text_buffer_ = get_text_string(ec);
+                if (ec)
+                {
+                    return;
+                }
                 auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                 if (result.ec != unicons::conv_errc())
                 {

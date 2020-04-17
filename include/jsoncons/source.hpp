@@ -743,29 +743,10 @@ namespace jsoncons {
         using value_type = typename Source::value_type;
         static constexpr std::size_t max_buffer_length = 16384;
 
-        template <class ValueT,class Allocator>
+        template <class Container>
         static
-        typename std::enable_if<std::is_convertible<value_type,ValueT>::value, std::size_t>::type
-        read(Source& source, std::vector<ValueT,Allocator>& v, std::size_t length)
-        {
-            std::size_t unread = length;
-
-            std::size_t n = (std::min)(max_buffer_length, unread);
-            while (n > 0 && !source.eof())
-            {
-                v.reserve(v.size()+n);
-                std::size_t actual = source.read(std::back_inserter(v), n);
-                unread -= actual;
-                n = (std::min)(max_buffer_length, unread);
-            }
-
-            return length - unread;
-        }
-
-        template <class CharT,class Allocator>
-        static
-        typename std::enable_if<std::is_convertible<value_type,CharT>::value, std::size_t>::type
-        read(Source& source, std::basic_string<CharT,std::char_traits<CharT>,Allocator>& v, std::size_t length)
+        typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value, std::size_t>::type
+        read(Source& source, Container& v, std::size_t length)
         {
             std::size_t unread = length;
 
