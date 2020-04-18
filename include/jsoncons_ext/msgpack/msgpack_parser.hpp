@@ -52,7 +52,7 @@ class basic_msgpack_parser : public ser_context
     msgpack_decode_options options_;
     bool more_;
     bool done_;
-    std::basic_string<char,std::char_traits<char>,char_allocator_type> buffer_;
+    std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
 
@@ -65,7 +65,7 @@ public:
          options_(options),
          more_(true), 
          done_(false),
-         buffer_(alloc),
+         text_buffer_(alloc),
          state_stack_(alloc),
          nesting_depth_(0)
     {
@@ -211,21 +211,21 @@ private:
                 // fixstr
                 const size_t len = type & 0x1f;
 
-                buffer_.clear();
+                text_buffer_.clear();
 
-                if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
+                if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                 {
                     ec = msgpack_errc::unexpected_eof;
                     return;
                 }
 
-                auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = msgpack_errc::invalid_utf8_text_string;
                     return;
                 }
-                more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
             }
         }
         else if (type >= 0xe0) 
@@ -412,19 +412,19 @@ private:
                         return;
                     }
 
-                    buffer_.clear();
-                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                    auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -445,20 +445,20 @@ private:
                         return;
                     }
 
-                    buffer_.clear();
-                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                    auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -479,20 +479,20 @@ private:
                         return;
                     }
 
-                    buffer_.clear();
-                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                    auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -624,19 +624,19 @@ private:
                 // fixstr
             const size_t len = type & 0x1f;
 
-            buffer_.clear();
-            if (source_reader<Src>::read(source_, buffer_, len) != len)
+            text_buffer_.clear();
+            if (source_reader<Src>::read(source_, text_buffer_, len) != len)
             {
                 ec = msgpack_errc::unexpected_eof;
                 return;
             }
-            auto result = unicons::validate(buffer_.begin(),buffer_.end());
+            auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
             if (result.ec != unicons::conv_errc())
             {
                 ec = msgpack_errc::invalid_utf8_text_string;
                 return;
             }
-            more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
         }
         else
         {
@@ -659,20 +659,20 @@ private:
                         return;
                     }
 
-                    buffer_.clear();
-                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                    auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                     break;
                 }
 
@@ -693,14 +693,14 @@ private:
                         return;
                     }
 
-                    buffer_.clear();
-                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                     break;
                 }
 
@@ -721,14 +721,14 @@ private:
                         return;
                     }
 
-                    buffer_.clear();
-                    if (source_reader<Src>::read(source_,buffer_,len) != static_cast<std::size_t>(len))
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         return;
                     }
 
-                    more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
+                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
                     break;
                 }
             }
