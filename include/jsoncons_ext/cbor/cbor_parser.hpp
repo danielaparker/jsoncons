@@ -897,15 +897,13 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                auto func = [&v](Src& source, std::size_t length, std::error_code& ec) -> bool
+                auto func = [&v,&more](Src& source, std::size_t length, std::error_code& ec) -> bool
                 {
-                    size_t offset = v.size();
-                    v.resize(v.size()+length);
-                    source.read(v.data()+offset, length);
-                    if (source.eof())
+                    if (source_reader<Src>::read(source, v, length) != length)
                     {
                         ec = cbor_errc::unexpected_eof;
-                        return false;
+                        more = false;
+                        return more;
                     }
                     return true;
                 };
@@ -920,9 +918,7 @@ private:
                     more = false;
                     return more;
                 }
-                v.resize(length);
-                source_.read(v.data(), length);
-                if (source_.eof())
+                if (source_reader<Src>::read(source_, v, length) != length)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more = false;
