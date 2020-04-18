@@ -94,8 +94,8 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         reader.read(ec);
-        //REQUIRE_NO_THROW(reader.read(ec));
-        //CHECK_FALSE(ec);
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK_FALSE(ec);
 
         //std::cout << visitor.get_result() << "\n";
     }
