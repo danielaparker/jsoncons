@@ -391,7 +391,7 @@ namespace detail {
             if (j.is_array())
             {
                 T result;
-                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::container_has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
                     result.push_back(item.template as<value_type>());
@@ -412,7 +412,7 @@ namespace detail {
             if (j.is_array())
             {
                 T result;
-                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::container_has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
                     result.push_back(item.template as<value_type>());

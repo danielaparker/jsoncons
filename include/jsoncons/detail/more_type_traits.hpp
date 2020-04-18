@@ -283,17 +283,30 @@ namespace detail {
 
     #endif
 
-    // has_reserve
+    // container_has_reserve
+    template<typename, typename T>
+    struct container_has_reserve_ {
+    };
 
-    template<class T, class Enable=void>
-    struct has_reserve : std::false_type{};
+    template<typename Container, typename Ret, typename... Args>
+    struct container_has_reserve_<Container, Ret(Args...)> {
+    private:
+        template<class U>
+        static constexpr auto Test(U*)
+        -> typename
+            std::is_same<
+                decltype( std::declval<U>().reserve( std::declval<Args>()... ) ),
+                Ret    
+            >::type; 
+
+        template<class U>
+        static constexpr std::false_type Test(...);
+    public:
+        static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
+    };
 
     template<class C>
-    struct has_reserve
-    <
-        C, 
-        typename std::enable_if<!std::is_void<decltype(std::declval<C>().reserve(0))>::value>::type
-    > : std::true_type{};
+    using container_has_reserve = container_has_reserve_<C,void(typename C::size_type)>;
 
     // is_c_array
 
