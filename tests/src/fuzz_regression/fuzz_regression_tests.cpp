@@ -3,6 +3,8 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
+#include <jsoncons_ext/ubjson/ubjson.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
 #include <vector>
 #include <utility>
 #include <ctime>
@@ -11,11 +13,11 @@
 
 using namespace jsoncons;
 
-TEST_CASE("clusterfuzz issues")
+TEST_CASE("oss-fuzz issues")
 {
     SECTION("issue 21589")
     {
-        std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
         json_options options;
         options.max_nesting_depth(std::numeric_limits<int>::max());
 
@@ -24,7 +26,7 @@ TEST_CASE("clusterfuzz issues")
     }
     SECTION("issue 21709")
     {
-        std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5740910806827008.fuzz";
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5740910806827008.fuzz";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         cbor::cbor_options options;
@@ -33,7 +35,7 @@ TEST_CASE("clusterfuzz issues")
     }
     SECTION("issue 21710")
     {
-        std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -46,7 +48,7 @@ TEST_CASE("clusterfuzz issues")
 
     SECTION("issue 21710b")
     {
-        std::string pathname = "input/clusterfuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -56,6 +58,33 @@ TEST_CASE("clusterfuzz issues")
 
         default_json_visitor visitor;
         cbor::cbor_stream_reader reader(is,visitor,options);
+    }
+    SECTION("issue 21697")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5737197673381888";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+
+        ubjson::ubjson_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+        ubjson::ubjson_stream_reader reader(is,visitor,options);
+    }
+    SECTION("issue 21663")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv-5762751990595584";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+
+        csv::csv_options options;
+        options.assume_header(true);
+        options.mapping(csv::mapping_kind::n_rows);
+        csv::csv_reader reader(is,visitor,options);
     }
 
 }
