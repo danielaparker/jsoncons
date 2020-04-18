@@ -625,8 +625,7 @@ private:
             const size_t len = type & 0x1f;
 
             buffer_.clear();
-            source_.read(std::back_inserter(buffer_), len);
-            if (source_.eof())
+            if (source_reader<Src>::read(source_, buffer_, len) != len)
             {
                 ec = msgpack_errc::unexpected_eof;
                 return;

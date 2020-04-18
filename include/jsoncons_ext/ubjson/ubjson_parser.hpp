@@ -176,7 +176,7 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        read_name(visitor, ec);
+                        read_key(visitor, ec);
                         if (ec)
                         {
                             return;
@@ -204,7 +204,7 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        read_name(visitor, ec);
+                        read_key(visitor, ec);
                         if (ec)
                         {
                             return;
@@ -236,7 +236,7 @@ public:
                             ec = ubjson_errc::unexpected_eof;
                             more_ = false;
                             return;
-                        case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
+                        case jsoncons::ubjson::detail::ubjson_format::end_object_marker:
                             source_.ignore(1);
                             end_object(visitor, ec);
                             if (ec)
@@ -245,7 +245,7 @@ public:
                             }
                             break;
                         default:
-                            read_name(visitor, ec);
+                            read_key(visitor, ec);
                             if (ec)
                             {
                                 return;
@@ -451,8 +451,7 @@ private:
                     return;
                 }
                 text_buffer_.clear();
-                source_.read(std::back_inserter(text_buffer_), length);
-                if (source_.eof())
+                if (source_reader<Src>::read(source_,text_buffer_,length) != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     return;
@@ -474,8 +473,7 @@ private:
                     return;
                 }
                 text_buffer_.clear();
-                source_.read(std::back_inserter(text_buffer_), length);
-                if (source_.eof())
+                if (source_reader<Src>::read(source_,text_buffer_,length) != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     return;
@@ -757,20 +755,21 @@ private:
         return length;
     }
 
-    void read_name(json_visitor& visitor, std::error_code& ec)
+    void read_key(json_visitor& visitor, std::error_code& ec)
     {
         std::size_t length = get_length(ec);
         if (ec)
         {
+            ec = ubjson_errc::key_expected;
             return;
         }
         text_buffer_.clear();
-        source_.read(std::back_inserter(text_buffer_), length);
-        if (source_.eof())
+        if (source_reader<Src>::read(source_,text_buffer_,length) != length)
         {
             ec = ubjson_errc::unexpected_eof;
             return;
         }
+
         auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
         if (result.ec != unicons::conv_errc())
         {

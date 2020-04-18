@@ -25,7 +25,8 @@ enum class ubjson_errc
     too_many_items,
     too_few_items,
     number_too_large,
-    max_nesting_depth_exceeded
+    max_nesting_depth_exceeded,
+    key_expected
 };
 
 class ubjson_error_category_impl
@@ -60,6 +61,9 @@ public:
                 return "Number exceeds implementation limits";
             case ubjson_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit set in ubjson_options";
+            case ubjson_errc::key_expected:
+                return "Text string key in a map expected";
+                break;
             default:
                 return "Unknown UBJSON parser error";
         }

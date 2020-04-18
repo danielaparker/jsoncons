@@ -58,6 +58,7 @@ TEST_CASE("oss-fuzz issues")
 
         default_json_visitor visitor;
         cbor::cbor_stream_reader reader(is,visitor,options);
+        reader.read();
     }
     SECTION("issue 21697")
     {
@@ -68,9 +69,10 @@ TEST_CASE("oss-fuzz issues")
 
         json_decoder<json> visitor;
 
-        ubjson::ubjson_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
-        ubjson::ubjson_stream_reader reader(is,visitor,options);
+        ubjson::ubjson_stream_reader reader(is,visitor);
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(ec == ubjson::ubjson_errc::key_expected);
     }
     SECTION("issue 21663")
     {
@@ -85,6 +87,9 @@ TEST_CASE("oss-fuzz issues")
         options.assume_header(true);
         options.mapping(csv::mapping_kind::n_rows);
         csv::csv_reader reader(is,visitor,options);
+        reader.read();
+
+        //std::cout << visitor.get_result() << "\n";
     }
 
 }
