@@ -23,7 +23,8 @@ enum class msgpack_errc
     too_many_items,
     too_few_items,
     max_nesting_depth_exceeded,
-    length_is_negative
+    length_is_negative,
+    unknown_type
 };
 
 class msgpack_error_category_impl
@@ -56,6 +57,8 @@ public:
                 return "Data item nesting exceeds limit set in options";
             case msgpack_errc::length_is_negative:
                 return "Request for the length of an array, map or string returned a negative result";
+            case msgpack_errc::unknown_type:
+                return "An unknown type was found in the stream";
             default:
                 return "Unknown MessagePack parser error";
         }

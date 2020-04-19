@@ -415,6 +415,11 @@ private:
                                            *this);
                 break;
             }
+            default:
+            {
+                ec = bson_errc::unknown_type;
+                return;
+            }
         }
 
     }

@@ -20,7 +20,8 @@ enum class bson_errc
     invalid_utf8_text_string,
     max_nesting_depth_exceeded,
     string_length_is_non_positive,
-    length_is_negative
+    length_is_negative,
+    unknown_type
 };
 
 class bson_error_category_impl
@@ -47,6 +48,8 @@ public:
                 return "Request for the length of a string returned a non-positive result";
             case bson_errc::length_is_negative:
                 return "Request for the length of a binary returned a negative result";
+            case bson_errc::unknown_type:
+                return "An unknown type was found in the stream";
             default:
                 return "Unknown BSON parser error";
         }
