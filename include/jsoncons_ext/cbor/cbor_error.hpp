@@ -25,7 +25,8 @@ enum class cbor_errc
     too_few_items,
     number_too_large,
     stringref_too_large,
-    max_nesting_depth_exceeded
+    max_nesting_depth_exceeded,
+    unknown_type
 };
 
 class cbor_error_category_impl
@@ -60,6 +61,8 @@ public:
                 return "stringref exceeds stringref map size";
             case cbor_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit set in cbor_options";
+            case cbor_errc::unknown_type:
+                return "An unknown type was found in the stream";
             default:
                 return "Unknown CBOR parser error";
         }

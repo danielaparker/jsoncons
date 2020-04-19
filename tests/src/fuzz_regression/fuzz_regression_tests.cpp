@@ -61,7 +61,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK_FALSE(ec);
+        CHECK(ec.value() == (int)cbor::cbor_errc::unknown_type);
     }
     SECTION("issue 21697")
     {
@@ -124,6 +124,25 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
+    }
+
+    SECTION("issue 21631")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5639265590706176";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        default_json_visitor visitor;
+
+        cbor::cbor_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == cbor::cbor_errc::unknown_type);
     }
 }
 
