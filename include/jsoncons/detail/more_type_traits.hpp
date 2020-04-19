@@ -283,13 +283,13 @@ namespace detail {
 
     #endif
 
-    // container_has_reserve
+    // is_reservable_container
     template<typename, typename T>
-    struct container_has_reserve_ {
+    struct has_reserve {
     };
 
     template<typename Container, typename Ret, typename... Args>
-    struct container_has_reserve_<Container, Ret(Args...)> {
+    struct has_reserve<Container, Ret(Args...)> {
     private:
         template<class U>
         static constexpr auto Test(U*)
@@ -305,8 +305,30 @@ namespace detail {
         static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
     };
 
-    template<class C>
-    using container_has_reserve = container_has_reserve_<C,void(typename C::size_type)>;
+    template<class Container>
+    using is_reservable_container = has_reserve<Container,void(typename Container::size_type)>;
+
+    // is_reservable_container
+    template<typename, typename T>
+    struct has_data {
+    };
+
+    template<typename Container, typename Ret, typename... Args>
+    struct has_data<Container, Ret(Args...)> {
+    private:
+        template<class U>
+        static constexpr auto Test(U*)
+        -> typename
+            std::is_same<
+                decltype( std::declval<U>().data( std::declval<Args>()... ) ),
+                Ret    
+            >::type; 
+
+        template<class U>
+        static constexpr std::false_type Test(...);
+    public:
+        static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
+    };
 
     // is_c_array
 

@@ -42,7 +42,7 @@ public:
             case bson_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
             case bson_errc::max_nesting_depth_exceeded:
-                return "Data item nesting exceeds limit set in bson_options";
+                return "Data item nesting exceeds limit set in options";
             case bson_errc::string_length_is_non_positive:
                 return "Request for the length of a string returned a non-positive result";
             case bson_errc::length_is_negative:

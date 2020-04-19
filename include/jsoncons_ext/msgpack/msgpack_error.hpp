@@ -53,7 +53,7 @@ public:
             case msgpack_errc::too_few_items:
                 return "Too few items were added to a MessagePack object or array";
             case msgpack_errc::max_nesting_depth_exceeded:
-                return "Data item nesting exceeds limit set in msgpack_options";
+                return "Data item nesting exceeds limit set in options";
             case msgpack_errc::length_is_negative:
                 return "Request for the length of an array, map or string returned a negative result";
             default:
