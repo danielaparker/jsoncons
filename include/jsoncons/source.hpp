@@ -702,7 +702,7 @@ namespace jsoncons {
                 while (actual < n)
                 {
                     int c = source.get();
-                    if (c == typename Source::traits_type::eof())
+                    if (c == Source::traits_type::eof())
                     {
                         break;
                     }
