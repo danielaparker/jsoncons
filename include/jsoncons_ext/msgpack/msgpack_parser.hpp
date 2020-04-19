@@ -521,8 +521,9 @@ private:
                     }
 
                     more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag::none, 
-                                               *this);
+                                                      semantic_tag::none, 
+                                                      *this,
+                                                      ec);
                     break;
                 }
 
@@ -551,8 +552,9 @@ private:
                     }
 
                     more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag::none, 
-                                               *this);
+                                                      semantic_tag::none, 
+                                                      *this,
+                                                      ec);
                     break;
                 }
 
@@ -581,8 +583,9 @@ private:
                     }
 
                     more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag::none, 
-                                               *this);
+                                                      semantic_tag::none, 
+                                                      *this,
+                                                      ec);
                     break;
                 }
 
@@ -636,7 +639,7 @@ private:
                 ec = msgpack_errc::invalid_utf8_text_string;
                 return;
             }
-            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
         }
         else
         {
@@ -672,7 +675,7 @@ private:
                         ec = msgpack_errc::invalid_utf8_text_string;
                         return;
                     }
-                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
                     break;
                 }
 
@@ -700,7 +703,7 @@ private:
                         return;
                     }
 
-                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
                     break;
                 }
 
@@ -728,7 +731,7 @@ private:
                         return;
                     }
 
-                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+                    more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
                     break;
                 }
             }
@@ -799,11 +802,11 @@ private:
         more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
     }
 
-    void end_array(json_visitor& visitor, std::error_code&)
+    void end_array(json_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
-        more_ = visitor.end_array(*this);
+        more_ = visitor.end_array(*this, ec);
         state_stack_.pop_back();
     }
 
@@ -864,10 +867,10 @@ private:
         more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
     }
 
-    void end_object(json_visitor& visitor, std::error_code&)
+    void end_object(json_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
-        more_ = visitor.end_object(*this);
+        more_ = visitor.end_object(*this, ec);
         state_stack_.pop_back();
     }
 };
