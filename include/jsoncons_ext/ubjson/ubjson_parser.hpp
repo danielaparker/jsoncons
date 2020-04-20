@@ -530,6 +530,11 @@ private:
                 {
                     return;
                 }
+                if (length > options_.max_items())
+                {
+                    ec = ubjson_errc::max_items_exceeded;
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::strongly_typed_array,length,item_type);
                 more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
             }
@@ -545,6 +550,11 @@ private:
             std::size_t length = get_length(ec);
             if (ec)
             {
+                return;
+            }
+            if (length > options_.max_items())
+            {
+                ec = ubjson_errc::max_items_exceeded;
                 return;
             }
             state_stack_.emplace_back(parse_mode::array,length);
@@ -589,6 +599,11 @@ private:
                 {
                     return;
                 }
+                if (length > options_.max_items())
+                {
+                    ec = ubjson_errc::max_items_exceeded;
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::strongly_typed_map_key,length,item_type);
                 more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
             }
@@ -606,6 +621,11 @@ private:
                 std::size_t length = get_length(ec);
                 if (ec)
                 {
+                    return;
+                }
+                if (length > options_.max_items())
+                {
+                    ec = ubjson_errc::max_items_exceeded;
                     return;
                 }
                 state_stack_.emplace_back(parse_mode::map_key,length);

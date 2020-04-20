@@ -43,9 +43,16 @@ public:
 class ubjson_decode_options : public virtual ubjson_options_common
 {
     friend class ubjson_options;
+    std::size_t max_items_;
 public:
-    ubjson_decode_options()
+    ubjson_decode_options() :
+         max_items_(1 << 24)
     {
+    }
+
+    std::size_t max_items() const
+    {
+        return max_items_;
     }
 };
 
@@ -66,6 +73,12 @@ public:
     ubjson_options& max_nesting_depth(int value)
     {
         this->max_nesting_depth_ = value;
+        return *this;
+    }
+
+    ubjson_options& max_items(std::size_t value)
+    {
+        this->max_items_ = value;
         return *this;
     }
 };
