@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
@@ -143,6 +143,21 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == cbor::cbor_errc::unknown_type);
+    }
+
+    SECTION("issue 21667")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5738905124208640";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        default_json_visitor visitor;
+
+        ubjson::ubjson_stream_reader reader(is,visitor);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == ubjson::ubjson_errc::max_items_exceeded);
     }
 }
 

@@ -162,6 +162,11 @@ public:
                             }
                             break;
                         default:
+                            if (++state_stack_.back().index > options_.max_items())
+                            {
+                                ec = ubjson_errc::max_items_exceeded;
+                                return;
+                            }
                             read_type_and_value(visitor, ec);
                             if (ec)
                             {
@@ -245,6 +250,11 @@ public:
                             }
                             break;
                         default:
+                            if (++state_stack_.back().index > options_.max_items())
+                            {
+                                ec = ubjson_errc::max_items_exceeded;
+                                return;
+                            }
                             read_key(visitor, ec);
                             if (ec)
                             {
