@@ -60,7 +60,7 @@ public:
             case cbor_errc::stringref_too_large:
                 return "stringref exceeds stringref map size";
             case cbor_errc::max_nesting_depth_exceeded:
-                return "Data item nesting exceeds limit set in options";
+                return "Data item nesting exceeds limit in options";
             case cbor_errc::unknown_type:
                 return "An unknown type was found in the stream";
             default:

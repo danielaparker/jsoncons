@@ -61,11 +61,11 @@ public:
             case ubjson_errc::number_too_large:
                 return "Number exceeds implementation limits";
             case ubjson_errc::max_nesting_depth_exceeded:
-                return "Data item nesting exceeds limit";
+                return "Data item nesting exceeds limit in options";
             case ubjson_errc::key_expected:
                 return "Text string key in a map expected";
             case ubjson_errc::max_items_exceeded:
-                return "Number of items added to UBJSON object or array exceeds limit";
+                return "Number of items in UBJSON object or array exceeds limit in options";
             default:
                 return "Unknown UBJSON parser error";
         }
