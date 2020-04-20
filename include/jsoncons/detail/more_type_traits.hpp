@@ -271,13 +271,13 @@ namespace detail {
     >::type> 
         : std::true_type {};
 
-    // has_data
+    // has_data_exact
     template<typename, typename T>
-    struct has_data {
+    struct has_data_exact {
     };
 
     template<typename Container, typename Ret, typename... Args>
-    struct has_data<Container, Ret(Args...)> {
+    struct has_data_exact<Container, Ret(Args...)> {
     private:
         template<class U>
         static constexpr auto Test(U*)
@@ -316,13 +316,13 @@ namespace detail {
         >::type>>: std::true_type
     {};
 
-    // has_reserve
+    // has_reserve_exact
     template<typename, typename T>
-    struct has_reserve {
+    struct has_reserve_exact {
     };
 
     template<typename Container, typename Ret, typename... Args>
-    struct has_reserve<Container, Ret(Args...)> {
+    struct has_reserve_exact<Container, Ret(Args...)> {
     private:
         template<class U>
         static constexpr auto Test(U*)
@@ -343,7 +343,7 @@ namespace detail {
     template<class Container>
     struct is_reservable_container
     {
-        static constexpr bool value = has_reserve<Container,void(typename Container::size_type)>::value;
+        static constexpr bool value = has_reserve_exact<Container,void(typename Container::size_type)>::value;
     };
 
     // is_c_array
