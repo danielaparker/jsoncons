@@ -39,15 +39,20 @@ using std::span;
 }
 #endif
 
-#if !defined(JSONCONS_HAS_STD_OPTIONAL)
-#include <jsoncons/detail/optional.hpp>
-namespace jsoncons {
-using jsoncons::detail::optional;
-}
+#if defined(JSONCONS_HAS_STD_OPTIONAL)
+    #include <optional>
+    namespace jsoncons {
+    using std::optional;
+    }
+#elif defined(JSONCONS_HAS_BOOST_OPTIONAL)
+    #include <<boost/optional.hpp>>
+    namespace jsoncons {
+    using boost::optional;
+    }
 #else 
-#include <optional>
-namespace jsoncons {
-using std::optional;
+    #include <jsoncons/detail/optional.hpp>
+    namespace jsoncons {
+    using jsoncons::detail::optional;
 }
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
