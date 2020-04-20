@@ -366,7 +366,7 @@ private:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                auto result = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
+                auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
                 if (!result)
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
@@ -400,7 +400,7 @@ private:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                auto result = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
+                auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
                 if (!result)
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));

@@ -580,7 +580,7 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            auto sink = jsoncons::detail::integer_from_json<int64_t>(exponent.data(), exponent.length());
+            auto sink = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
             if (!sink)
             {
                 ec = sink.error_code();
@@ -591,7 +591,7 @@ private:
         more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
-        auto sink = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
+        auto sink = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
         if (sink)
         {
             more = visit_int64(sink.value(), semantic_tag::none, context, ec);

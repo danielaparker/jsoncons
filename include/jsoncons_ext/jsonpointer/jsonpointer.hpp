@@ -433,7 +433,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -486,7 +486,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -548,7 +548,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -603,7 +603,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -677,7 +677,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer.data(), buffer.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
