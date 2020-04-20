@@ -123,7 +123,8 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec.value() == (int)cbor::cbor_errc::unexpected_eof);
+        CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch
+               ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
     }
 
     SECTION("issue 21631")
@@ -142,7 +143,8 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == cbor::cbor_errc::unknown_type);
+        CHECK((ec == cbor::cbor_errc::unknown_type || // x64 arch
+               ec == cbor::cbor_errc::number_too_large)); // x86 arch
     }
 
     SECTION("issue 21667")
@@ -157,7 +159,8 @@ TEST_CASE("oss-fuzz issues")
         ubjson::ubjson_stream_reader reader(is,visitor);
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == ubjson::ubjson_errc::max_items_exceeded);
+        CHECK((ec == ubjson::ubjson_errc::max_items_exceeded || // x64 arch
+               ec == ubjson::ubjson_errc::number_too_large)); // x86 arch
     }
 }
 
