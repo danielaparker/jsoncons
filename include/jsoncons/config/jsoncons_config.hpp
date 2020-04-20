@@ -7,6 +7,7 @@
 #ifndef JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 #define JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
+#include <type_traits>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/binary_config.hpp>
 

@@ -20,6 +20,15 @@
 
 namespace jsoncons
 {
+
+#ifndef JSONCONS_HAS_VOID_T
+// follows https://en.cppreference.com/w/cpp/types/void_t
+template<typename... Ts> struct make_void { typedef void type;};
+template<typename... Ts> using void_t = typename make_void<Ts...>::type;
+#else
+using void_t = std::void_t; 
+#endif
+
 // static_max
 
 template <std::size_t arg1, std::size_t ... argn>
@@ -262,28 +271,52 @@ namespace detail {
     >::type> 
         : std::true_type {};
 
-    // has_size_and_data
+    // has_data
+    template<typename, typename T>
+    struct has_data {
+    };
 
+    template<typename Container, typename Ret, typename... Args>
+    struct has_data<Container, Ret(Args...)> {
+    private:
+        template<class U>
+        static constexpr auto Test(U*)
+        -> typename
+            std::is_same<
+                decltype( std::declval<U>().data( std::declval<Args>()... ) ),
+                Ret    
+            >::type; 
 
-    // has_size_and_data
-    #if !(defined(_MSC_VER) && _MSC_VER <= 1900)
-    template<class T, class Enable=void>
-    struct has_data_and_size : std::false_type{};
+        template<class U>
+        static constexpr std::false_type Test(...);
+    public:
+        static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
+    };
 
-    template<class C>
-    struct has_data_and_size
-    <
-        C, 
-        typename std::enable_if<!std::is_void<decltype(std::declval<C>().size())>::value &&
-                                !std::is_void<decltype(std::declval<C>().data())>::value>::type
-    > : std::true_type{};
-    #else
-    template<class T, class Enable=void>
-    struct has_data_and_size : std::true_type{};
+    // is_contiguous_container
 
-    #endif
+    // follows boost https://github.com/boostorg/beast/blob/develop/include/boost/beast/core/detail/type_traits.hpp
+    template<class Container, class ElementType, class = void>
+    struct is_contiguous_container: std::false_type {};
 
-    // is_reservable_container
+    template<class Container, class ElementType>
+    struct is_contiguous_container<Container, ElementType, jsoncons::void_t<
+        decltype(
+            std::declval<std::size_t&>() = std::declval<const Container&>().size(),
+            std::declval<ElementType*&>() = std::declval<Container&>().data()),
+        typename std::enable_if<
+            std::is_same<
+                typename std::remove_cv<ElementType>::type,
+                typename std::remove_cv<
+                    typename std::remove_pointer<
+                        decltype(std::declval<Container&>().data())
+                    >::type
+                >::type
+            >::value
+        >::type>>: std::true_type
+    {};
+
+    // has_reserve
     template<typename, typename T>
     struct has_reserve {
     };
@@ -305,29 +338,12 @@ namespace detail {
         static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
     };
 
-    template<class Container>
-    using is_reservable_container = has_reserve<Container,void(typename Container::size_type)>;
-
     // is_reservable_container
-    template<typename, typename T>
-    struct has_data {
-    };
 
-    template<typename Container, typename Ret, typename... Args>
-    struct has_data<Container, Ret(Args...)> {
-    private:
-        template<class U>
-        static constexpr auto Test(U*)
-        -> typename
-            std::is_same<
-                decltype( std::declval<U>().data( std::declval<Args>()... ) ),
-                Ret    
-            >::type; 
-
-        template<class U>
-        static constexpr std::false_type Test(...);
-    public:
-        static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
+    template<class Container>
+    struct is_reservable_container
+    {
+        static constexpr bool value = has_reserve<Container,void(typename Container::size_type)>::value;
     };
 
     // is_c_array
