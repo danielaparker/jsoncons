@@ -4,6 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <vector>
 #include <utility>
@@ -161,6 +162,66 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK((ec == ubjson::ubjson_errc::max_items_exceeded || // x64 arch
                ec == ubjson::ubjson_errc::number_too_large)); // x86 arch
+    }
+
+    SECTION("issue 21813")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_msgpack-5727715157344256";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+
+        msgpack::msgpack_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        msgpack::msgpack_stream_reader reader(is,visitor,options);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
+    }
+
+/*
+    SECTION("issue 21805")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5687592176844800";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        default_json_visitor visitor;
+
+        cbor::cbor_options options;
+        options.max_nesting_depth(500);
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        reader.read(ec);
+        std::cout << ec.message() << "\n";
+        //REQUIRE_NOTHROW(reader.read(ec));
+        //CHECK((ec == cbor::cbor_errc::unknown_type || // x64 arch
+        //       ec == cbor::cbor_errc::number_too_large)); // x86 arch
+    }
+*/
+
+    SECTION("issue 21801")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_msgpack-5651190114418688";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+
+        msgpack::msgpack_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        msgpack::msgpack_stream_reader reader(is,visitor);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
     }
 }
 

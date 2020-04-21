@@ -189,7 +189,11 @@ private:
         }   
 
         uint8_t type{};
-        source_.get(type);
+        if (source_.get(type) == 0)
+        {
+            ec = msgpack_errc::unexpected_eof;
+            return;
+        }
 
         if (type <= 0xbf)
         {
@@ -285,7 +289,12 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::uint8_cd: 
                 {
                     uint8_t val{};
-                    source_.get(val);
+                    if (source_.get(val) == 0)
+                    {
+                        more_ = false;
+                        ec = msgpack_errc::unexpected_eof;
+                        return;
+                    }
                     more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -605,7 +614,8 @@ private:
 
                 default:
                 {
-                    //error
+                    ec = msgpack_errc::unknown_type;
+                    return;
                 }
             }
         }
@@ -614,8 +624,7 @@ private:
     void parse_name(json_visitor& visitor, std::error_code& ec)
     {
         uint8_t type{};
-        source_.get(type);
-        if (source_.eof())
+        if (source_.get(type) == 0)
         {
             ec = msgpack_errc::unexpected_eof;
             return;

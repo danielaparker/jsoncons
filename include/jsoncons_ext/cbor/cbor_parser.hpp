@@ -209,6 +209,7 @@ public:
     {
         while (!done_ && more_)
         {
+            //size_t pos = source_.position();
             switch (state_stack_.back().mode)
             {
                 case parse_mode::multi_dim:
@@ -1044,8 +1045,7 @@ private:
             case 0x18: // Unsigned integer (one-byte uint8_t follows)
             {
                 uint8_t c{};
-                source_.get(c);
-                if (source_.eof())
+                if (source_.get(c) == 0)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
@@ -1110,8 +1110,7 @@ private:
                     case 0x18: // Negative integer (one-byte uint8_t follows)
                         {
                             uint8_t c{};
-                            source_.get(c);
-                            if (source_.eof())
+                            if (source_.get(c) == 0)
                             {
                                 ec = cbor_errc::unexpected_eof;
                                 more_ = false;

@@ -296,7 +296,11 @@ private:
                     return;
                 }
                 uint8_t c{};
-                source_.get(c); // discard 0
+                if (source_.get(c) == 0) // discard 0
+                {
+                    ec = bson_errc::unexpected_eof;
+                    return;
+                }
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
                 {
