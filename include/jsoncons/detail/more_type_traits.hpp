@@ -21,57 +21,128 @@
 namespace jsoncons
 {
 
-#ifndef JSONCONS_HAS_VOID_T
-// follows https://en.cppreference.com/w/cpp/types/void_t
-template<typename... Ts> struct make_void { typedef void type;};
-template<typename... Ts> using void_t = typename make_void<Ts...>::type;
-#else
-using void_t = std::void_t; 
-#endif
+    #ifndef JSONCONS_HAS_VOID_T
+    // follows https://en.cppreference.com/w/cpp/types/void_t
+    template<typename... Ts> struct make_void { typedef void type;};
+    template<typename... Ts> using void_t = typename make_void<Ts...>::type;
+    #else
+    using void_t = std::void_t; 
+    #endif
 
-// static_max
+    // detector
 
-template <std::size_t arg1, std::size_t ... argn>
-struct static_max;
+    // primary template handles all types not supporting the archetypal Op
+    template< 
+        class Default, 
+        class, // always void; supplied externally
+        template<class...> class Op, 
+        class... Args
+    >
+    struct detector
+    {
+        constexpr static auto value = false;
+        using type = Default;
+    };
 
-template <std::size_t arg>
-struct static_max<arg>
-{
-    static constexpr size_t value = arg;
-};
+    // specialization recognizes and handles only types supporting Op
+    template< 
+        class Default, 
+        template<class...> class Op, 
+        class... Args
+    >
+    struct detector<Default, void_t<Op<Args...>>, Op, Args...>
+    {
+        constexpr static auto value = true;
+        using type = Op<Args...>;
+    };
 
-template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
-struct static_max<arg1,arg2,argn ...>
-{
-    static constexpr size_t value = arg1 >= arg2 ? 
-        static_max<arg1,argn...>::value :
-        static_max<arg2,argn...>::value; 
-};
+    // is_detected, is_detected_v, is_detected_t
 
-inline
-char to_hex_character(uint8_t c)
-{
-    return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
-}
+    template< template<class...> class Op, class... Args >
+    using
+    is_detected = detector<void, void, Op, Args...>;
 
-inline
-bool is_control_character(uint32_t c)
-{
-    return c <= 0x1F || c == 0x7f;
-}
+    template< template<class...> class Op, class... Args >
+    constexpr bool
+    is_detected_v = is_detected<Op, Args...>::value;
 
-inline
-bool is_non_ascii_codepoint(uint32_t cp)
-{
-    return cp >= 0x80;
-}
+    template< template<class...> class Op, class... Args >
+    using
+    is_detected_t = typename is_detected<Op, Args...>::type;
 
-template <typename T>
-struct is_stateless
- : public std::integral_constant<bool,  
-      (std::is_default_constructible<T>::value &&
-      std::is_empty<T>::value)>
-{};
+    // detected_or, detected_or_t
+
+    template< class Default, template<class...> class Op, class... Args >
+    using
+    detected_or = detector<Default, void, Op, Args...>;
+
+    template< class Default, template<class...> class Op, class... Args >
+    using
+    detected_or_t = typename detected_or<Default, Op, Args...>::type;
+
+    // is_detected_exact, is_detected_exact_v
+
+   template< class Expected, template<class...> class Op, class... Args >
+   using
+   is_detected_exact = std::is_same< Expected, is_detected_t<Op, Args...> >;
+
+   template< class Expected, template<class...> class Op, class... Args >
+   constexpr bool
+   is_detected_exact_v = is_detected_exact< Expected, Op, Args...>::value;
+
+    // is_detected_convertible, is_detected_convertible_v
+
+    template< class To, template<class...> class Op, class... Args >
+    using
+    is_detected_convertible = std::is_convertible< is_detected_t<Op, Args...>, To >;
+
+    template< class To, template<class...> class Op, class... Args >
+    constexpr bool
+    is_detected_convertible_v = is_detected_convertible<To, Op, Args...>::value;
+
+    // static_max
+
+    template <std::size_t arg1, std::size_t ... argn>
+    struct static_max;
+
+    template <std::size_t arg>
+    struct static_max<arg>
+    {
+        static constexpr size_t value = arg;
+    };
+
+    template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
+    struct static_max<arg1,arg2,argn ...>
+    {
+        static constexpr size_t value = arg1 >= arg2 ? 
+            static_max<arg1,argn...>::value :
+            static_max<arg2,argn...>::value; 
+    };
+
+    inline
+    char to_hex_character(uint8_t c)
+    {
+        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
+    }
+
+    inline
+    bool is_control_character(uint32_t c)
+    {
+        return c <= 0x1F || c == 0x7f;
+    }
+
+    inline
+    bool is_non_ascii_codepoint(uint32_t cp)
+    {
+        return cp >= 0x80;
+    }
+
+    template <typename T>
+    struct is_stateless
+     : public std::integral_constant<bool,  
+          (std::is_default_constructible<T>::value &&
+          std::is_empty<T>::value)>
+    {};
 
 // type traits extensions
 
@@ -316,35 +387,18 @@ namespace detail {
         >::type>>: std::true_type
     {};
 
-    // has_reserve_exact
-    template<typename, typename T>
-    struct has_reserve_exact {
-    };
-
-    template<typename Container, typename Ret, typename... Args>
-    struct has_reserve_exact<Container, Ret(Args...)> {
-    private:
-        template<class U>
-        static constexpr auto Test(U*)
-        -> typename
-            std::is_same<
-                decltype( std::declval<U>().reserve( std::declval<Args>()... ) ),
-                Ret    
-            >::type; 
-
-        template<class U>
-        static constexpr std::false_type Test(...);
-    public:
-        static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
-    };
-
-    // is_reservable_container
+    // has_reserve, has_reserve_v
+    template<class Container>
+    using
+    container_reserve_t = decltype(std::declval<Container>().reserve(typename Container::size_type()));
 
     template<class Container>
-    struct is_reservable_container
-    {
-        static constexpr bool value = has_reserve_exact<Container,void(typename Container::size_type)>::value;
-    };
+    using
+    has_reserve = is_detected<container_reserve_t, Container>;
+
+    template<class Container>
+    constexpr bool
+    has_reserve_v = is_detected_v<container_reserve_t, Container>;
 
     // is_c_array
 

@@ -687,7 +687,7 @@ namespace jsoncons {
         template <class Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                jsoncons::detail::is_reservable_container<Container>::value &&
+                                jsoncons::detail::has_reserve_v<Container> &&
                                 !jsoncons::detail::has_data_exact<Container,value_type*()>::value 
             , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
