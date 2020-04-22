@@ -1,7 +1,9 @@
-#include <jsoncons/json_parser.hpp>
 #include <jsoncons/json.hpp>
+#include <jsoncons_ext/csv/csv.hpp>
+#include <jsoncons_ext/csv/csv_reader.hpp>
 
 using namespace jsoncons;
+using namespace jsoncons::csv;
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
@@ -9,8 +11,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 	std::istringstream is(s);
 
 	std::string s2;
-	json_string_encoder visitor(s2);
-	json_reader reader(is, visitor);
+	csv_string_encoder visitor(s2);
+	csv_reader reader(is, visitor);
 	std::error_code ec;
 	reader.read(ec);
 
