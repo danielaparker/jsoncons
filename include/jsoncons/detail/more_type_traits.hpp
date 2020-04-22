@@ -387,18 +387,27 @@ namespace detail {
         >::type>>: std::true_type
     {};
 
-    // has_reserve, has_reserve_v
+    // has_reserve_v
     template<class Container>
     using
     container_reserve_t = decltype(std::declval<Container>().reserve(typename Container::size_type()));
 
     template<class Container>
+    constexpr bool
+    has_reserve_v = is_detected_v<container_reserve_t, Container>;
+
+    // has_data_v, has_data_exact_v
+    template<class Container>
     using
-    has_reserve = is_detected<container_reserve_t, Container>;
+    container_data_t = decltype(std::declval<Container>().data());
 
     template<class Container>
     constexpr bool
-    has_reserve_v = is_detected_v<container_reserve_t, Container>;
+    has_data_v = is_detected_v<container_data_t, Container>;
+
+    template<class Ret, class Container>
+    constexpr bool
+    has_data_exact_v = is_detected_exact_v<Ret, container_data_t, Container>;
 
     // is_c_array
 
