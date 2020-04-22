@@ -342,51 +342,6 @@ namespace detail {
     >::type> 
         : std::true_type {};
 
-    // has_data_exact
-    template<typename, typename T>
-    struct has_data_exact {
-    };
-
-    template<typename Container, typename Ret, typename... Args>
-    struct has_data_exact<Container, Ret(Args...)> {
-    private:
-        template<class U>
-        static constexpr auto Test(U*)
-        -> typename
-            std::is_same<
-                decltype( std::declval<U>().data( std::declval<Args>()... ) ),
-                Ret    
-            >::type; 
-
-        template<class U>
-        static constexpr std::false_type Test(...);
-    public:
-        static constexpr bool value = std::is_same<decltype(Test<Container>((Container*)0)),std::true_type>::value;
-    };
-
-    // is_contiguous_container
-
-    // follows boost https://github.com/boostorg/beast/blob/develop/include/boost/beast/core/detail/type_traits.hpp
-    template<class Container, class ElementType, class = void>
-    struct is_contiguous_container: std::false_type {};
-
-    template<class Container, class ElementType>
-    struct is_contiguous_container<Container, ElementType, jsoncons::void_t<
-        decltype(
-            std::declval<std::size_t&>() = std::declval<const Container&>().size(),
-            std::declval<ElementType*&>() = std::declval<Container&>().data()),
-        typename std::enable_if<
-            std::is_same<
-                typename std::remove_cv<ElementType>::type,
-                typename std::remove_cv<
-                    typename std::remove_pointer<
-                        decltype(std::declval<Container&>().data())
-                    >::type
-                >::type
-            >::value
-        >::type>>: std::true_type
-    {};
-
     // has_reserve_v
     template<class Container>
     using
@@ -408,6 +363,21 @@ namespace detail {
     template<class Ret, class Container>
     constexpr bool
     has_data_exact_v = is_detected_exact_v<Ret, container_data_t, Container>;
+
+    // has_size_v
+    template<class Container>
+    using
+    container_size_t = decltype(std::declval<Container>().size());
+
+    template<class Container>
+    constexpr bool
+    has_size_v = is_detected_v<container_size_t, Container>;
+
+    // has_data_and_size
+
+    template<class Container>
+    constexpr bool
+    has_data_and_size_v = has_data_v<Container> && has_size_v<Container>;
 
     // is_c_array
 
