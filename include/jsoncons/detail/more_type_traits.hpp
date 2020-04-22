@@ -76,25 +76,17 @@ namespace jsoncons
     using
     detected_or_t = typename detected_or<Default, Op, Args...>::type;
 
-    // is_detected_exact, is_detected_exact_v
+    // is_detected_exact
 
    template< class Expected, template<class...> class Op, class... Args >
    using
    is_detected_exact = std::is_same< Expected, is_detected_t<Op, Args...> >;
 
-   template< class Expected, template<class...> class Op, class... Args >
-   constexpr bool
-   is_detected_exact_v = is_detected_exact< Expected, Op, Args...>::value;
-
-    // is_detected_convertible, is_detected_convertible_v
+    // is_detected_convertible
 
     template< class To, template<class...> class Op, class... Args >
     using
     is_detected_convertible = std::is_convertible< is_detected_t<Op, Args...>, To >;
-
-    template< class To, template<class...> class Op, class... Args >
-    constexpr bool
-    is_detected_convertible_v = is_detected_convertible<To, Op, Args...>::value;
 
     // static_max
 
