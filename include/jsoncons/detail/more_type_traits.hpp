@@ -56,15 +56,11 @@ namespace jsoncons
         using type = Op<Args...>;
     };
 
-    // is_detected, is_detected_v, is_detected_t
+    // is_detected, is_detected_t
 
     template< template<class...> class Op, class... Args >
     using
     is_detected = detector<void, void, Op, Args...>;
-
-    template< template<class...> class Op, class... Args >
-    constexpr bool
-    is_detected_v = is_detected<Op, Args...>::value;
 
     template< template<class...> class Op, class... Args >
     using
@@ -342,42 +338,44 @@ namespace detail {
     >::type> 
         : std::true_type {};
 
-    // has_reserve_v
+    // has_reserve
     template<class Container>
     using
     container_reserve_t = decltype(std::declval<Container>().reserve(typename Container::size_type()));
 
     template<class Container>
-    constexpr bool
-    has_reserve_v = is_detected_v<container_reserve_t, Container>;
+    using
+    has_reserve = is_detected<container_reserve_t, Container>;
 
-    // has_data_v, has_data_exact_v
+    // has_data, has_data_exact
     template<class Container>
     using
     container_data_t = decltype(std::declval<Container>().data());
 
     template<class Container>
-    constexpr bool
-    has_data_v = is_detected_v<container_data_t, Container>;
+    using
+    has_data = is_detected<container_data_t, Container>;
 
     template<class Ret, class Container>
-    constexpr bool
-    has_data_exact_v = is_detected_exact_v<Ret, container_data_t, Container>;
+    using
+    has_data_exact = is_detected_exact<Ret, container_data_t, Container>;
 
-    // has_size_v
+    // has_size
     template<class Container>
     using
     container_size_t = decltype(std::declval<Container>().size());
 
     template<class Container>
-    constexpr bool
-    has_size_v = is_detected_v<container_size_t, Container>;
+    using
+    has_size = is_detected<container_size_t, Container>;
 
     // has_data_and_size
 
     template<class Container>
-    constexpr bool
-    has_data_and_size_v = has_data_v<Container> && has_size_v<Container>;
+    struct has_data_and_size
+    {
+        static constexpr bool value = has_data<Container>::value && has_size<Container>::value;
+    };
 
     // is_c_array
 
