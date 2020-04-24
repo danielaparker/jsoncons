@@ -234,7 +234,10 @@ namespace detail {
     // is_string
 
     template <class T>
-    using container_pos_t = decltype(T::npos);
+    using container_npos_t = decltype(T::npos);
+
+    template <class T>
+    using container_allocator_type_t = typename T::allocator_type;
 
     template <class T, class Enable=void>
     struct is_string : std::false_type {};
@@ -243,8 +246,8 @@ namespace detail {
     struct is_string<T, 
                      typename std::enable_if<is_character<typename T::value_type>::value &&
                                              has_char_traits_member_type<T>::value && 
-                                             is_detected<container_pos_t,T>::value &&
-                                             !std::is_void<typename T::allocator_type>::value
+                                             is_detected<container_npos_t,T>::value &&
+                                             is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
 
     // is_string_view
@@ -256,8 +259,8 @@ namespace detail {
     struct is_string_view<T, 
                           typename std::enable_if<is_character<typename T::value_type>::value &&
                                                   has_char_traits_member_type<T>::value && 
-                                                  is_detected<container_pos_t,T>::value &&
-                                                  !is_string<T>::value
+                                                  is_detected<container_npos_t,T>::value &&
+                                                  !is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
 
     // is_integer_like
@@ -293,12 +296,24 @@ namespace detail {
 
     // is_map_like
 
+    template <class T>
+    using container_mapped_type_t = typename T::mapped_type;
+
+    template <class T>
+    using container_key_type_t = typename T::key_type;
+
+    template <class T>
+    using container_value_type_t = typename std::iterator_traits<typename T::iterator>::value_type;
+
     template <class T, class Enable=void>
     struct is_map_like : std::false_type {};
 
     template <class T>
     struct is_map_like<T, 
-                       typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type> 
+                       typename std::enable_if<is_detected<container_mapped_type_t,T>::value &&
+                                               is_detected<container_key_type_t,T>::value &&
+                                               is_detected<container_value_type_t,T>::value 
+        >::type> 
         : std::true_type {};
 
     // is_std_array
@@ -315,8 +330,7 @@ namespace detail {
 
     template <class T>
     struct is_vector_like<T, 
-                          typename std::enable_if<!std::is_void<typename T::value_type>::value &&
-                                                  !std::is_void<typename std::iterator_traits<typename T::iterator>::value_type>::value &&
+                          typename std::enable_if<is_detected<container_value_type_t,T>::value &&
                                                   !is_std_array<T>::value && 
                                                   !has_char_traits_member_type<T>::value && 
                                                   !is_map_like<T>::value 
