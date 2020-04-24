@@ -88,7 +88,7 @@ namespace detail {
     template<class Json, class T>
     struct is_compatible_array_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        jsoncons::detail::is_vector_like<T>::value && 
+        jsoncons::detail::is_list_like<T>::value && 
         !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
@@ -565,9 +565,11 @@ namespace detail {
         }
     };
 
+    // map like
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_map_like<T>::value &&
                                                     jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
                                                     is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
@@ -621,6 +623,7 @@ namespace detail {
     template <class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_map_like<T>::value &&
                                                     std::is_integral<typename T::key_type>::value &&
                                                     is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
@@ -679,6 +682,8 @@ namespace detail {
             return j;
         }
     };
+
+    // std::array
 
     template<class Json, class E, size_t N>
     struct json_type_traits<Json, std::array<E, N>>
