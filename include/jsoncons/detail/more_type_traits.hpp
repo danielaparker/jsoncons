@@ -233,6 +233,9 @@ namespace detail {
 
     // is_string
 
+    template <class T>
+    using container_pos_t = decltype(T::npos);
+
     template <class T, class Enable=void>
     struct is_string : std::false_type {};
 
@@ -240,7 +243,7 @@ namespace detail {
     struct is_string<T, 
                      typename std::enable_if<is_character<typename T::value_type>::value &&
                                              has_char_traits_member_type<T>::value && 
-                                             !std::is_void<decltype(T::npos)>::value && 
+                                             is_detected<container_pos_t,T>::value &&
                                              !std::is_void<typename T::allocator_type>::value
     >::type> : std::true_type {};
 
@@ -253,7 +256,8 @@ namespace detail {
     struct is_string_view<T, 
                           typename std::enable_if<is_character<typename T::value_type>::value &&
                                                   has_char_traits_member_type<T>::value && 
-                                                  !std::is_void<decltype(T::npos)>::value && !is_string<T>::value
+                                                  is_detected<container_pos_t,T>::value &&
+                                                  !is_string<T>::value
     >::type> : std::true_type {};
 
     // is_integer_like
