@@ -88,7 +88,7 @@ namespace detail {
     template<class Json, class T>
     struct is_compatible_array_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        jsoncons::detail::is_dynamic_array<T>::value && 
+        jsoncons::detail::is_list_like<T>::value && 
         !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 

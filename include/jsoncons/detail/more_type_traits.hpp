@@ -338,13 +338,13 @@ namespace detail {
     template<class E, std::size_t N>
     struct is_std_array<std::array<E, N>> : std::true_type {};
 
-    // is_dynamic_array
+    // is_list_like
 
     template <class T, class Enable=void>
-    struct is_dynamic_array : std::false_type {};
+    struct is_list_like : std::false_type {};
 
     template <class T>
-    struct is_dynamic_array<T, 
+    struct is_list_like<T, 
                           typename std::enable_if<is_detected<container_value_type_t,T>::value &&
                                                   !is_std_array<T>::value && 
                                                   !is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
@@ -368,6 +368,12 @@ namespace detail {
     template<class Container>
     using
     has_reserve = is_detected<container_reserve_t, Container>;
+
+    // has_push_back
+
+    template<class Container>
+    using
+    has_push_back = is_detected<container_push_back_t, Container>;
 
     // has_data, has_data_exact
 
@@ -411,7 +417,7 @@ namespace detail {
     struct is_typed_array
     <
         T, 
-        typename std::enable_if<jsoncons::detail::is_dynamic_array<T>::value && 
+        typename std::enable_if<jsoncons::detail::is_list_like<T>::value && 
                                 (std::is_same<typename T::value_type,uint8_t>::value ||  
                                  std::is_same<typename T::value_type,uint16_t>::value ||
                                  std::is_same<typename T::value_type,uint32_t>::value ||

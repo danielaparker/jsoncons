@@ -146,7 +146,8 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_dynamic_array<T>::value &&
+                 jsoncons::detail::is_list_like<T>::value &&
+                 jsoncons::detail::has_push_back<T>::value &&
                  !jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
@@ -284,7 +285,7 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_dynamic_array<T>::value &&
+                 jsoncons::detail::is_list_like<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
