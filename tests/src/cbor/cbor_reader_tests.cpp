@@ -24,8 +24,8 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         std::error_code ec;
 
         jsoncons::json_decoder<json> decoder;
-        cbor_bytes_reader parser(v, decoder);
-        parser.read(ec);
+        cbor_bytes_reader reader(v, decoder);
+        reader.read(ec);
 
         json result = decoder.get_result();
 

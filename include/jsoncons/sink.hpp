@@ -41,7 +41,6 @@ private:
     // Noncopyable
     stream_sink(const stream_sink&) = delete;
     stream_sink& operator=(const stream_sink&) = delete;
-    stream_sink& operator=(stream_sink&&) = delete;
 
 public:
     stream_sink(stream_sink&&) = default;
@@ -59,6 +58,9 @@ public:
         os_->write(begin_buffer_, buffer_length());
         os_->flush();
     }
+
+    // Movable
+    stream_sink& operator=(stream_sink&&) = default;
 
     void flush()
     {
@@ -123,7 +125,6 @@ private:
     // Noncopyable
     binary_stream_sink(const binary_stream_sink&) = delete;
     binary_stream_sink& operator=(const binary_stream_sink&) = delete;
-    binary_stream_sink& operator=(binary_stream_sink&&) = delete;
 
 public:
     binary_stream_sink(binary_stream_sink&&) = default;
@@ -149,6 +150,8 @@ public:
         os_->write((char*)begin_buffer_, buffer_length());
         os_->flush();
     }
+
+    binary_stream_sink& operator=(binary_stream_sink&&) = default;
 
     void flush()
     {
@@ -207,7 +210,6 @@ private:
     // Noncopyable
     string_sink(const string_sink&) = delete;
     string_sink& operator=(const string_sink&) = delete;
-    string_sink& operator=(string_sink&& val) = delete;
 public:
     string_sink(string_sink&& val)
         : s_(nullptr)
@@ -219,6 +221,8 @@ public:
         : s_(std::addressof(s))
     {
     }
+
+    string_sink& operator=(string_sink&& val) = default;
 
     void flush()
     {
@@ -248,7 +252,6 @@ private:
     // Noncopyable
     bytes_sink(const bytes_sink&) = delete;
     bytes_sink& operator=(const bytes_sink&) = delete;
-    bytes_sink& operator=(bytes_sink&&) = delete;
 public:
     bytes_sink(bytes_sink&&) = default;
 
@@ -256,6 +259,8 @@ public:
         : s_(s)
     {
     }
+
+    bytes_sink& operator=(bytes_sink&&) = default;
 
     void flush()
     {

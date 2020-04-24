@@ -380,6 +380,9 @@ public:
         }
 #endif
     }
+    write_double(const write_double&) = default;
+
+    write_double& operator=(const write_double&) = default;
 
     template<class Result>
     std::size_t operator()(double val, Result& result)

@@ -987,10 +987,9 @@ public:
         }
         return val;
     }
-private:
-    // noncopyable and nonmoveable
-    string_to_double(const string_to_double&) = delete;
-    string_to_double& operator=(const string_to_double&) = delete;
+
+    string_to_double(const string_to_double&) = default;
+    string_to_double& operator=(const string_to_double&) = default;
 };
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
@@ -1040,10 +1039,8 @@ public:
         return val;
     }
 
-private:
-    // noncopyable and nonmoveable
-    string_to_double(const string_to_double& fr) = delete;
-    string_to_double& operator=(const string_to_double& fr) = delete;
+    string_to_double(const string_to_double&) = default;
+    string_to_double& operator=(const string_to_double&) = default;
 };
 
 #else
@@ -1099,10 +1096,8 @@ public:
         return val;
     }
 
-private:
-    // noncopyable and nonmoveable
-    string_to_double(const string_to_double& fr) = delete;
-    string_to_double& operator=(const string_to_double& fr) = delete;
+    string_to_double(const string_to_double&) = default;
+    string_to_double& operator=(const string_to_double&) = default;
 };
 #endif
 

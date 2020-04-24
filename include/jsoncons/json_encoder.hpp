@@ -221,6 +221,9 @@ private:
         {
         }
 
+        encoding_context(const encoding_context&) = default;
+        encoding_context& operator=(const encoding_context&) = default;
+
         void set_position(std::size_t pos)
         {
             data_pos_ = pos;
@@ -290,7 +293,7 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
-    const basic_json_encode_options<CharT> options_;
+    basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
 
     std::vector<encoding_context,encoding_context_allocator_type> stack_;
@@ -1065,12 +1068,12 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
-    const basic_json_encode_options<CharT> options_;
+    basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
     std::vector<encoding_context,encoding_context_allocator_type> stack_;
     int nesting_depth_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
@@ -1090,6 +1093,9 @@ public:
          nesting_depth_(0)          
     {
     }
+
+    basic_json_compressed_encoder(basic_json_compressed_encoder&&) = default;
+    basic_json_compressed_encoder& operator=(basic_json_compressed_encoder&&) = default;
 
     ~basic_json_compressed_encoder() noexcept
     {

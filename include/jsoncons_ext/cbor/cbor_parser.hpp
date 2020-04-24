@@ -15,12 +15,11 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/staj_reader.hpp> // typed_array
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/cbor/cbor_encoder.hpp>
 #include <jsoncons_ext/cbor/cbor_error.hpp>
 #include <jsoncons_ext/cbor/cbor_detail.hpp>
 #include <jsoncons_ext/cbor/cbor_options.hpp>
+#include <jsoncons_ext/cbor/cbor_visitor.hpp>
 
 namespace jsoncons { namespace cbor {
 
@@ -205,7 +204,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_visitor& visitor, std::error_code& ec)
+    void parse(cbor_visitor& visitor, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -278,12 +277,12 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        read_name(visitor, ec);
+                        state_stack_.back().mode = parse_mode::map_value;
+                        read_item(visitor, ec);
                         if (ec)
                         {
                             return;
                         }
-                        state_stack_.back().mode = parse_mode::map_value;
                     }
                     else
                     {
@@ -319,7 +318,7 @@ public:
                             }
                             break;
                         default:
-                            read_name(visitor, ec);
+                            read_item(visitor, ec);
                             if (ec)
                             {
                                 return;
@@ -362,7 +361,7 @@ public:
         }
     }
 private:
-    void read_item(json_visitor& visitor, std::error_code& ec)
+    void read_item(cbor_visitor& visitor, std::error_code& ec)
     {
         read_tags(ec);
         if (ec)
@@ -614,7 +613,7 @@ private:
         other_tags_[item_tag] = false;
     }
 
-    void begin_array(json_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_array(cbor_visitor& visitor, uint8_t info, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -652,7 +651,7 @@ private:
         }
     }
 
-    void end_array(json_visitor& visitor, std::error_code& ec)
+    void end_array(cbor_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
@@ -664,7 +663,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_object(json_visitor& visitor, uint8_t info, std::error_code& ec)
+    void begin_object(cbor_visitor& visitor, uint8_t info, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -701,7 +700,7 @@ private:
         }
     }
 
-    void end_object(json_visitor& visitor, std::error_code& ec)
+    void end_object(cbor_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
         more_ = visitor.end_object(*this, ec);
@@ -710,134 +709,6 @@ private:
             stringref_map_stack_.pop_back();
         }
         state_stack_.pop_back();
-    }
-
-    void read_name(json_visitor& visitor, std::error_code& ec)
-    {
-        read_tags(ec);
-        if (ec)
-        {
-            return;
-        }
-        jsoncons::cbor::detail::cbor_major_type major_type;
-        int c = source_.peek();
-        switch (c)
-        {
-            case Src::traits_type::eof():
-                ec = cbor_errc::unexpected_eof;
-                more_ = false;
-                return;
-            default:
-                major_type = get_major_type((uint8_t)c);
-                break;
-        }
-        switch (major_type)
-        {
-            case jsoncons::cbor::detail::cbor_major_type::text_string:
-            {
-                text_buffer_.clear();
-                read_text_string(text_buffer_, ec);
-                if (ec)
-                {
-                    return;
-                }
-                auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
-                if (result.ec != unicons::conv_errc())
-                {
-                    ec = cbor_errc::invalid_utf8_text_string;
-                    more_ = false;
-                    return;
-                }
-                more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
-                break;
-            }
-            case jsoncons::cbor::detail::cbor_major_type::byte_string:
-            {
-                more_ = read_byte_string(bytes_buffer_, ec);
-                if (!more_)
-                {
-                    return;
-                }
-                text_buffer_.clear();
-                encode_base64url(bytes_buffer_.begin(),bytes_buffer_.end(),text_buffer_);
-                more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
-                break;
-            }
-            case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
-            {
-                if (!stringref_map_stack_.empty() && other_tags_[stringref_tag])
-                {
-                    other_tags_[stringref_tag] = false;
-                    uint64_t ref = get_uint64_value(ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                    if (ref >= stringref_map_stack_.back().size())
-                    {
-                        ec = cbor_errc::stringref_too_large;
-                        more_ = false;
-                        return;
-                    }
-
-                    stringref_map::size_type index = (stringref_map::size_type)ref;
-                    if (index != ref)
-                    {
-                        ec = cbor_errc::number_too_large;
-                        more_ = false;
-                        return;
-                    }
-                    auto& val = stringref_map_stack_.back().at(index);
-                    switch (val.type)
-                    {
-                        case jsoncons::cbor::detail::cbor_major_type::text_string:
-                        {
-                            more_ = visitor.key(basic_string_view<char>(val.s.data(),val.s.length()), *this, ec);
-                            break;
-                        }
-                        case jsoncons::cbor::detail::cbor_major_type::byte_string:
-                        {
-                            text_buffer_.clear();
-                            encode_base64url(val.bytes.begin(),val.bytes.end(),text_buffer_);
-                            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
-                            break;
-                        }
-                        default:
-                            JSONCONS_UNREACHABLE();
-                            break;
-                    }
-                    //other_tags_[item_tag] = false;
-                    break;
-                }
-            }
-                JSONCONS_FALLTHROUGH;
-            default:
-            {
-                text_buffer_.clear();
-                json_string_encoder encoder(text_buffer_);
-                basic_cbor_parser<Src> reader(std::move(source_));
-
-                reader.parse(encoder, ec);
-                if (ec)
-                {
-                    more_ = false;
-                    return;
-                }
-                source_ = std::move(reader.source_);
-                auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
-                if (result.ec != unicons::conv_errc())
-                {
-                    ec = cbor_errc::invalid_utf8_text_string;
-                    more_ = false;
-                    return;
-                }
-                more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
-                if (!more_)
-                {
-                    return;
-                }
-            }
-        }
     }
 
     void read_text_string(string_type& s, std::error_code& ec)
@@ -1602,7 +1473,7 @@ private:
         }
     }
 
-    void handle_string(json_visitor& visitor, const basic_string_view<char>& v, std::error_code& ec)
+    void handle_string(cbor_visitor& visitor, const basic_string_view<char>& v, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])
@@ -1643,7 +1514,7 @@ private:
     }
 
     template <typename Read>
-    void write_byte_string(Read read, json_visitor& visitor, std::error_code& ec)
+    void write_byte_string(Read read, cbor_visitor& visitor, std::error_code& ec)
     {
         if (other_tags_[item_tag])
         {
@@ -2015,7 +1886,7 @@ private:
         }
     }
 
-    void produce_begin_multi_dim(json_visitor& visitor, 
+    void produce_begin_multi_dim(cbor_visitor& visitor, 
                                  semantic_tag tag,
                                  std::error_code& ec)
     {
@@ -2040,7 +1911,7 @@ private:
         more_ = visitor.begin_multi_dim(shape_, tag, *this, ec);
     }
 
-    void produce_end_multi_dim(json_visitor& visitor, std::error_code& ec)
+    void produce_end_multi_dim(cbor_visitor& visitor, std::error_code& ec)
     {
         more_ = visitor.end_multi_dim(*this, ec);
         state_stack_.pop_back();
