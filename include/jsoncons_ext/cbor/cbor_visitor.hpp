@@ -873,25 +873,47 @@ namespace cbor {
         }
     };
 
-    enum class level_state {odd_value=1, odd_key, even_key, even_value};
-
     template <class CharT>
     class basic_cbor_visitor_adaptor : public basic_cbor_visitor<CharT>
     {
         JSONCONS_STRING_LITERAL(null_literal,'n','u','l','l')
         JSONCONS_STRING_LITERAL(true_literal,'t','r','u','e')
         JSONCONS_STRING_LITERAL(false_literal,'f','a','l','s','e')
+
+        enum class level_state {value=1, key};
+
+        struct level
+        {
+            level_state state;
+            bool is_object;
+            bool is_key;
+
+            level(level_state state, bool is_object)
+                : state(state), is_object(is_object), is_key(is_object)
+            {
+            }
+
+            void toggle_is_odd()
+            {
+                if (is_object)
+                {
+                    is_key = !is_key;
+                }
+            }
+        };
+
     public:
         using typename basic_cbor_visitor<CharT>::char_type;
         using typename basic_cbor_visitor<CharT>::string_view_type;
     private:
+
         using string_type = std::basic_string<CharT>;
         using key_encoder_type = basic_json_compressed_encoder<CharT,string_sink<string_type>>;
         basic_json_visitor<char_type>& destination_;
         string_type key_;
         string_type key_buffer_;
         key_encoder_type key_encoder_;
-        std::vector<level_state> level_stack_;
+        std::vector<level> level_stack_;
 
         // noncopyable and nonmoveable
         basic_cbor_visitor_adaptor(const basic_cbor_visitor_adaptor&) = delete;
@@ -900,7 +922,7 @@ namespace cbor {
         basic_cbor_visitor_adaptor(basic_json_visitor<char_type>& visitor)
             : destination_(visitor), key_encoder_(key_buffer_)
         {
-            level_stack_.push_back(level_state());
+            level_stack_.emplace_back(level_state(),false); // root
         }
 
         basic_json_visitor<char_type>& destination()
@@ -916,66 +938,98 @@ namespace cbor {
 
         bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            switch (level_stack_.back())
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
-                    case level_state::odd_value:
-                        level_stack_.push_back(level_state::odd_key);
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        level_stack_.emplace_back(level_state::key, true);
                         return key_encoder_.begin_object(tag, context, ec);
-                    case level_state::even_value:
-                        level_stack_.back() = level_state::odd_value;
-                        return destination_.begin_object(tag, context, ec);
-                    case level_state::odd_key:
-                        level_stack_.push_back(level_state::even_key);
-                        return key_encoder_.begin_object(tag, context, ec);
-                    case level_state::even_key:
-                        level_stack_.back() = level_state::odd_key;
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::key, true);
                         return key_encoder_.begin_object(tag, context, ec);
                     default:
-                        level_stack_.push_back(level_state::odd_value);
+                        //level_stack_.emplace_back(level_state::value, true);
+                        level_stack_.back() = level(level_state::value,true);
                         return destination_.begin_object(tag, context, ec);
+                }
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        //level_stack_.emplace_back(level_state::value, true);
+                        return destination_.begin_object(tag, context, ec);
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::key, true);
+                        return key_encoder_.begin_object(tag, context, ec);
+                    default:
+                        //level_stack_.emplace_back(level_state::value, true);
+                        level_stack_.back() = level(level_state::value,true);
+                        return destination_.begin_object(tag, context, ec);
+                }
             }
         }
 
         bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            switch (level_stack_.back())
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
-                case level_state::odd_value:
-                    level_stack_.push_back(level_state::odd_key);
-                    return key_encoder_.begin_object(length, tag, context, ec);
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.begin_object(length, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.push_back(level_state::even_key);
-                    return key_encoder_.begin_object(length, tag, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.begin_object(length, tag, context, ec);
-                default:
-                    level_stack_.push_back(level_state::odd_value);
-                    return destination_.begin_object(length, tag, context, ec);
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        level_stack_.emplace_back(level_state::key, true);
+                        return key_encoder_.begin_object(length, tag, context, ec);
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::key, true);
+                        return key_encoder_.begin_object(length, tag, context, ec);
+                    default:
+                        //level_stack_.emplace_back(level_state::value, true);
+                        level_stack_.back() = level(level_state::value,true);
+                        return destination_.begin_object(length, tag, context, ec);
+                }
             }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        //level_stack_.emplace_back(level_state::value, true);
+                        return destination_.begin_object(length, tag, context, ec);
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::key, true);
+                        return key_encoder_.begin_object(length, tag, context, ec);
+                    default:
+                        //level_stack_.emplace_back(level_state::value, true);
+                        level_stack_.back() = level(level_state::value,true);
+                        return destination_.begin_object(length, tag, context, ec);
+                }
+            }
+
         }
 
         bool visit_end_object(const ser_context& context, std::error_code& ec) override
         {
-            switch (level_stack_.back())
+            switch (level_stack_.back().state)
             {
-                case level_state::odd_value:
-                case level_state::even_value:
-                    level_stack_.pop_back();
+                case level_state::value:
+                    //level_stack_.pop_back();
                     return destination_.end_object(context, ec);
-                case level_state::odd_key:
-                case level_state::even_key:
+                case level_state::key:
                 {
                     bool ret = key_encoder_.end_object(context, ec);
                     level_stack_.pop_back();
-                    if (level_stack_.back() == level_state::odd_value)
+                    if (level_stack_.back().state == level_state::value)
                     {
                         ret = destination_.key(key_buffer_,context, ec);
                         key_buffer_.clear();
-                        level_stack_.back() = level_state::even_value;
                     }
                     return ret;
                 }
@@ -986,20 +1040,104 @@ namespace cbor {
 
         bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            level_stack_.push_back(level_state());
-            return destination_.begin_array(tag, context, ec);
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        //level_stack_.emplace_back(level_state::key, false);
+                        return key_encoder_.begin_array(tag, context, ec);
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::key, false);
+                        return key_encoder_.begin_array(tag, context, ec);
+                    default:
+                        //level_stack_.emplace_back(level_state::value, false);
+                        level_stack_.back() = level(level_state::value, false);
+                        return destination_.begin_array(tag, context, ec);
+                }
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        //level_stack_.back().state = level_state::value;
+                        return destination_.begin_array(tag, context, ec);
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::value, false);
+                        return key_encoder_.begin_array(tag, context, ec);
+                    default:
+                        //level_stack_.emplace_back(level_state::value, false);
+                        level_stack_.back() = level(level_state::value, false);
+                        return destination_.begin_array(tag, context, ec);
+                }
+            }
         }
 
         bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            level_stack_.push_back(level_state());
-            return destination_.begin_array(length, tag, context, ec);
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        //level_stack_.emplace_back(level_state::key, false);
+                        return key_encoder_.begin_array(length, tag, context, ec);
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::key, false);
+                        return key_encoder_.begin_array(length, tag, context, ec);
+                    default:
+                        //level_stack_.emplace_back(level_state::value, false);
+                        level_stack_.back() = level(level_state::value, false);
+                        return destination_.begin_array(length, tag, context, ec);
+                }
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        //level_stack_.emplace_back(level_state::value, false);
+                        return destination_.begin_array(length, tag, context, ec);
+                    case level_state::key:
+                        level_stack_.emplace_back(level_state::value, false);
+                        return key_encoder_.begin_array(length, tag, context, ec);
+                    default:
+                        //level_stack_.emplace_back(level_state::value, false);
+                        level_stack_.back() = level(level_state::value, false);
+                        return destination_.begin_array(length, tag, context, ec);
+                }
+            }
+
         }
 
         bool visit_end_array(const ser_context& context, std::error_code& ec) override
         {
-            level_stack_.pop_back();
-            return destination_.end_array(context, ec);
+            switch (level_stack_.back().state)
+            {
+                case level_state::value:
+                    //level_stack_.pop_back();
+                    return destination_.end_array(context, ec);
+                case level_state::key:
+                {
+                    bool ret = key_encoder_.end_array(context, ec);
+                    level_stack_.pop_back();
+                    if (level_stack_.back().state == level_state::value)
+                    {
+                        ret = destination_.key(key_buffer_,context, ec);
+                        key_buffer_.clear();
+                    }
+                    return ret;
+                }
+                default:
+                    return destination_.end_array(context, ec);
+            }
         }
 
         bool visit_string(const string_view_type& value,
@@ -1007,22 +1145,29 @@ namespace cbor {
                              const ser_context& context,
                              std::error_code& ec) override
         {
-            switch (level_stack_.back())
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+            if (is_key)
             {
-                case level_state::odd_value:
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(value, context, ec);
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.string_value(value, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(value, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.string_value(value, tag, context, ec);
-                default:
-                    return destination_.string_value(value, tag, context, ec);
+                switch (level_stack_.back().state)
+                {
+                    case level_state::value:
+                        return destination_.key(value, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(value, context, ec);
+                    default:
+                        return destination_.string_value(value, tag, context, ec);
+                }
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.string_value(value, tag, context, ec);
+                    default:
+                        return destination_.string_value(value, tag, context, ec);
+                }
             }
         }
 
@@ -1031,7 +1176,10 @@ namespace cbor {
                                   const ser_context& context,
                                   std::error_code& ec) override
         {
-            if (level_stack_.back() == level_state::odd_value || level_stack_.back() == level_state::odd_key)
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
                 key_.clear();
                 switch (tag)
@@ -1046,196 +1194,214 @@ namespace cbor {
                         encode_base64url(value.begin(), value.end(),key_);
                         break;
                 }
-            }
-            switch (level_stack_.back())
-            {
-                case level_state::odd_value:
+                switch (level_stack_.back().state)
                 {
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(key_, context, ec);
+                    case level_state::value:
+                        return destination_.key(key_, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(key_, context, ec);
+                    default:
+                        return destination_.byte_string_value(value, tag, context, ec);
                 }
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.byte_string_value(value, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(key_, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.byte_string_value(value, tag, context, ec);
-                default:
-                    return destination_.byte_string_value(value, tag, context, ec);
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.byte_string_value(value, tag, context, ec);
+                    default:
+                        return destination_.byte_string_value(value, tag, context, ec);
+                }
             }
         }
 
         bool visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            if (level_stack_.back() == level_state::odd_value || level_stack_.back() == level_state::odd_key)
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
                 key_.clear();
                 auto res = jsoncons::detail::write_integer(value,key_);
-            }
-            switch (level_stack_.back())
-            {
-                case level_state::odd_value:
+                switch (level_stack_.back().state)
                 {
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(key_, context, ec);
+                    case level_state::value:
+                        return destination_.key(key_, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(key_, context, ec);
+                    default:
+                        return destination_.uint64_value(value, tag, context, ec);
                 }
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.uint64_value(value, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(key_, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.uint64_value(value, tag, context, ec);
-                default:
-                    return destination_.uint64_value(value, tag, context, ec);
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.uint64_value(value, tag, context, ec);
+                    default:
+                        return destination_.uint64_value(value, tag, context, ec);
+                }
             }
         }
 
         bool visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            if (level_stack_.back() == level_state::odd_value || level_stack_.back() == level_state::odd_key)
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
                 key_.clear();
                 jsoncons::detail::write_integer(value,key_);
-            }
-            switch (level_stack_.back())
-            {
-                case level_state::odd_value:
+                switch (level_stack_.back().state)
                 {
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(key_, context, ec);
+                    case level_state::value:
+                        return destination_.key(key_, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(key_, context, ec);
+                    default:
+                        return destination_.int64_value(value, tag, context, ec);
                 }
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.int64_value(value, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(key_, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.int64_value(value, tag, context, ec);
-                default:
-                    return destination_.int64_value(value, tag, context, ec);
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.int64_value(value, tag, context, ec);
+                    default:
+                        return destination_.int64_value(value, tag, context, ec);
+                }
             }
         }
 
         bool visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            if (level_stack_.back() == level_state::odd_value || level_stack_.back() == level_state::odd_key)
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
                 key_.clear();
                 jsoncons::string_sink<string_type> sink(key_);
                 jsoncons::detail::write_double f{float_chars_format::general,0};
                 double x = jsoncons::detail::decode_half(value);
                 f(x, sink);
-            }
-            switch (level_stack_.back())
-            {
-                case level_state::odd_value:
+                switch (level_stack_.back().state)
                 {
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(key_, context, ec);
+                    case level_state::value:
+                        return destination_.key(key_, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(key_, context, ec);
+                    default:
+                        return destination_.half_value(value, tag, context, ec);
                 }
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.half_value(value, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(key_, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.half_value(value, tag, context, ec);
-                default:
-                    return destination_.half_value(value, tag, context, ec);
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.half_value(value, tag, context, ec);
+                    default:
+                        return destination_.half_value(value, tag, context, ec);
+                }
             }
         }
 
         bool visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            if (level_stack_.back() == level_state::odd_value || level_stack_.back() == level_state::odd_key)
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
                 key_.clear();
                 string_sink<string_type> sink(key_);
                 jsoncons::detail::write_double f{float_chars_format::general,0};
                 f(value, sink);
-            }
-            switch (level_stack_.back())
-            {
-                case level_state::odd_value:
+                switch (level_stack_.back().state)
                 {
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(key_, context, ec);
+                    case level_state::value:
+                        return destination_.key(key_, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(key_, context, ec);
+                    default:
+                        return destination_.double_value(value, tag, context, ec);
                 }
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.double_value(value, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(key_, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.double_value(value, tag, context, ec);
-                default:
-                    return destination_.double_value(value, tag, context, ec);
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.double_value(value, tag, context, ec);
+                    default:
+                        return destination_.double_value(value, tag, context, ec);
+                }
             }
         }
 
         bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            if (level_stack_.back() == level_state::odd_value || level_stack_.back() == level_state::odd_key)
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
                 key_ = value ? string_type(true_literal<CharT>()) : string_type(false_literal<CharT>());
-            }
-            switch (level_stack_.back())
-            {
-                case level_state::odd_value:
+                switch (level_stack_.back().state)
                 {
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(key_, context, ec);
+                    case level_state::value:
+                        return destination_.key(key_, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(key_, context, ec);
+                    default:
+                        return destination_.bool_value(value, tag, context, ec);
                 }
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.bool_value(value, tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(key_, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.bool_value(value, tag, context, ec);
-                default:
-                    return destination_.bool_value(value, tag, context, ec);
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.bool_value(value, tag, context, ec);
+                    default:
+                        return destination_.bool_value(value, tag, context, ec);
+                }
             }
         }
 
         bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            if (level_stack_.back() == level_state::odd_value || level_stack_.back() == level_state::odd_key)
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key)
             {
                 key_ = string_type(null_literal<CharT>());
-            }
-            switch (level_stack_.back())
-            {
-                case level_state::odd_value:
+                switch (level_stack_.back().state)
                 {
-                    level_stack_.back() = level_state::even_value;
-                    return destination_.key(key_, context, ec);
+                    case level_state::value:
+                        return destination_.key(key_, context, ec);
+                    case level_state::key:
+                        return key_encoder_.key(key_, context, ec);
+                    default:
+                        return destination_.null_value(tag, context, ec);
                 }
-                case level_state::even_value:
-                    level_stack_.back() = level_state::odd_value;
-                    return destination_.null_value(tag, context, ec);
-                case level_state::odd_key:
-                    level_stack_.back() = level_state::even_key;
-                    return key_encoder_.key(key_, context, ec);
-                case level_state::even_key:
-                    level_stack_.back() = level_state::odd_key;
-                    return key_encoder_.null_value(tag, context, ec);
-                default:
-                    return destination_.null_value(tag, context, ec);
+            }
+            else
+            {
+                switch (level_stack_.back().state)
+                {
+                    case level_state::key:
+                        return key_encoder_.null_value(tag, context, ec);
+                    default:
+                        return destination_.null_value(tag, context, ec);
+                }
             }
         }
     };
