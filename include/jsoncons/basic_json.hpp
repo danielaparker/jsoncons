@@ -2900,6 +2900,10 @@ public:
 #endif
     };
 
+    template <class T>
+    using
+    json_proxy_t = typename T::jsoncons_json_parent_type;
+
     // is_proxy
     template<class T, class Enable = void>
     struct is_proxy : std::false_type {};
@@ -2907,7 +2911,7 @@ public:
     // is_proxy
     template<class T>
     struct is_proxy<T,
-        typename std::enable_if<!std::is_void<typename T::jsoncons_json_parent_type>::value>::type
+        typename std::enable_if<jsoncons::is_detected<json_proxy_t,T>::value>::type
     > : std::true_type {};
 
     using proxy_type = proxy<basic_json>;
