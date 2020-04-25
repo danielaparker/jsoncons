@@ -432,15 +432,15 @@ namespace detail {
 
     // is_compatible_element
 
-    template<class C, class E, class Enable=void>
+    template<class Container, class Element, class Enable=void>
     struct is_compatible_element : std::false_type {};
 
-    template<class C, class E>
+    template<class Container, class Element>
     struct is_compatible_element
     <
-        C, E, 
-        typename std::enable_if<!std::is_void<decltype(std::declval<C>().data())>::value>::type>
-            : std::is_convertible< typename std::remove_pointer<decltype(std::declval<C>().data() )>::type(*)[], E(*)[]>
+        Container, Element, 
+        typename std::enable_if<has_data<Container>::value>::type>
+            : std::is_convertible< typename std::remove_pointer<decltype(std::declval<Container>().data() )>::type(*)[], Element(*)[]>
     {};
 
 } // detail
