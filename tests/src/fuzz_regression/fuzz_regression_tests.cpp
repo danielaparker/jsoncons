@@ -182,7 +182,7 @@ TEST_CASE("oss-fuzz issues")
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
     }
 
-/*
+
     SECTION("issue 21805")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5687592176844800";
@@ -204,7 +204,7 @@ TEST_CASE("oss-fuzz issues")
         //CHECK((ec == cbor::cbor_errc::unknown_type || // x64 arch
         //       ec == cbor::cbor_errc::number_too_large)); // x86 arch
     }
-*/
+
 
     SECTION("issue 21801")
     {

@@ -957,6 +957,16 @@ public:
         _free_locale(locale_);
     }
 
+    string_to_double(const string_to_double&)
+    {
+        locale_ = _create_locale(LC_NUMERIC, "C");
+    }
+
+    string_to_double& operator=(const string_to_double&) 
+    {
+        return *this;
+    }
+
     char get_decimal_point() const
     {
         return '.';
@@ -987,9 +997,6 @@ public:
         }
         return val;
     }
-
-    string_to_double(const string_to_double&) = default;
-    string_to_double& operator=(const string_to_double&) = default;
 };
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
@@ -1006,6 +1013,16 @@ public:
     ~string_to_double() noexcept
     {
         freelocale(locale_);
+    }
+
+    string_to_double(const string_to_double&)
+    {
+        locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+    }
+
+    string_to_double& operator=(const string_to_double&) 
+    {
+        return *this;
     }
 
     char get_decimal_point() const
@@ -1038,9 +1055,6 @@ public:
         }
         return val;
     }
-
-    string_to_double(const string_to_double&) = default;
-    string_to_double& operator=(const string_to_double&) = default;
 };
 
 #else
@@ -1064,6 +1078,9 @@ public:
         }
         buffer_.reserve(100);
     }
+
+    string_to_double(const string_to_double&) = default;
+    string_to_double& operator=(const string_to_double&) = default;
 
     char get_decimal_point() const
     {
@@ -1095,9 +1112,6 @@ public:
         }
         return val;
     }
-
-    string_to_double(const string_to_double&) = default;
-    string_to_double& operator=(const string_to_double&) = default;
 };
 #endif
 

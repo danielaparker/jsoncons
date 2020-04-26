@@ -35,6 +35,7 @@ public:
 private:
     basic_cbor_parser<Src,Allocator> parser_;
     basic_staj_visitor<char_type> event_handler_;
+    cbor_visitor_adaptor event_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -72,6 +73,7 @@ public:
                       const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), options, alloc), 
          event_handler_(filter), 
+         event_handler_adaptor_(event_handler_),
          eof_(false)
     {
         if (!done())
@@ -105,6 +107,7 @@ public:
                       std::error_code& ec)
        : parser_(std::forward<Source>(source), alloc), 
          event_handler_(filter),
+         event_handler_adaptor_(event_handler_),
          eof_(false)
     {
         if (!done())
@@ -174,7 +177,7 @@ public:
             parser_.restart();
             while (!parser_.stopped())
             {
-                parser_.parse(event_handler_, ec);
+                parser_.parse(event_handler_adaptor_, ec);
                 if (ec) return;
             }
         }
@@ -182,10 +185,11 @@ public:
 
     void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
+        cbor_visitor_adaptor adaptor(visitor);
         parser_.restart();
         while (!parser_.stopped())
         {
-            parser_.parse(visitor, ec);
+            parser_.parse(adaptor, ec);
             if (ec) return;
         }
     }

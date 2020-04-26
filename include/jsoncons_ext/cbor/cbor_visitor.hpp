@@ -14,8 +14,12 @@ namespace jsoncons {
 namespace cbor {
 
     template <class CharT>
+    class basic_cbor_visitor_adaptor;
+
+    template <class CharT>
     class basic_cbor_visitor 
     {
+        friend class basic_cbor_visitor_adaptor<CharT>;
     public:
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
@@ -880,6 +884,13 @@ namespace cbor {
         JSONCONS_STRING_LITERAL(true_literal,'t','r','u','e')
         JSONCONS_STRING_LITERAL(false_literal,'f','a','l','s','e')
 
+    public:
+        using typename basic_cbor_visitor<CharT>::char_type;
+        using typename basic_cbor_visitor<CharT>::string_view_type;
+    private:
+
+        using string_type = std::basic_string<CharT>;
+
         enum class level_state {value=1, key};
 
         struct level
@@ -893,6 +904,9 @@ namespace cbor {
             {
             }
 
+            level(level&&) = default;
+            level& operator=(level&&) = default;
+
             void toggle_is_odd()
             {
                 if (is_object)
@@ -902,17 +916,9 @@ namespace cbor {
             }
         };
 
-    public:
-        using typename basic_cbor_visitor<CharT>::char_type;
-        using typename basic_cbor_visitor<CharT>::string_view_type;
-    private:
-
-        using string_type = std::basic_string<CharT>;
-        using key_encoder_type = basic_json_compressed_encoder<CharT,string_sink<string_type>>;
         basic_json_visitor<char_type>& destination_;
         string_type key_;
         string_type key_buffer_;
-        key_encoder_type key_encoder_;
         std::vector<level> level_stack_;
 
         // noncopyable and nonmoveable
@@ -920,7 +926,7 @@ namespace cbor {
         basic_cbor_visitor_adaptor& operator=(const basic_cbor_visitor_adaptor&) = delete;
     public:
         basic_cbor_visitor_adaptor(basic_json_visitor<char_type>& visitor)
-            : destination_(visitor), key_encoder_(key_buffer_)
+            : destination_(visitor)
         {
             level_stack_.emplace_back(level_state(),false); // root
         }
@@ -947,14 +953,14 @@ namespace cbor {
                 {
                     case level_state::value:
                         level_stack_.emplace_back(level_state::key, true);
-                        return key_encoder_.begin_object(tag, context, ec);
+                        key_buffer_.push_back('{');
+                        return true;
                     case level_state::key:
                         level_stack_.emplace_back(level_state::key, true);
-                        return key_encoder_.begin_object(tag, context, ec);
+                        key_buffer_.push_back('{');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, true);
-                        level_stack_.back() = level(level_state::value,true);
-                        return destination_.begin_object(tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -962,17 +968,18 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
-                        //level_stack_.emplace_back(level_state::value, true);
+                        level_stack_.emplace_back(level_state::value, true);
                         return destination_.begin_object(tag, context, ec);
                     case level_state::key:
                         level_stack_.emplace_back(level_state::key, true);
-                        return key_encoder_.begin_object(tag, context, ec);
+                        key_buffer_.push_back('{');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, true);
                         level_stack_.back() = level(level_state::value,true);
                         return destination_.begin_object(tag, context, ec);
                 }
             }
+
         }
 
         bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -986,14 +993,14 @@ namespace cbor {
                 {
                     case level_state::value:
                         level_stack_.emplace_back(level_state::key, true);
-                        return key_encoder_.begin_object(length, tag, context, ec);
+                        key_buffer_.push_back('{');
+                        return true;
                     case level_state::key:
                         level_stack_.emplace_back(level_state::key, true);
-                        return key_encoder_.begin_object(length, tag, context, ec);
+                        key_buffer_.push_back('{');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, true);
-                        level_stack_.back() = level(level_state::value,true);
-                        return destination_.begin_object(length, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1001,13 +1008,13 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
-                        //level_stack_.emplace_back(level_state::value, true);
+                        level_stack_.emplace_back(level_state::value, true);
                         return destination_.begin_object(length, tag, context, ec);
                     case level_state::key:
                         level_stack_.emplace_back(level_state::key, true);
-                        return key_encoder_.begin_object(length, tag, context, ec);
+                        key_buffer_.push_back('{');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, true);
                         level_stack_.back() = level(level_state::value,true);
                         return destination_.begin_object(length, tag, context, ec);
                 }
@@ -1020,16 +1027,21 @@ namespace cbor {
             switch (level_stack_.back().state)
             {
                 case level_state::value:
-                    //level_stack_.pop_back();
+                    level_stack_.pop_back();
                     return destination_.end_object(context, ec);
                 case level_state::key:
                 {
-                    bool ret = key_encoder_.end_object(context, ec);
+                    key_buffer_.push_back('}');
                     level_stack_.pop_back();
+
+                    bool ret = true;
                     if (level_stack_.back().state == level_state::value)
                     {
                         ret = destination_.key(key_buffer_,context, ec);
-                        key_buffer_.clear();
+                    }
+                    else
+                    {
+                        key_buffer_.push_back(':');
                     }
                     return ret;
                 }
@@ -1048,15 +1060,15 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
-                        //level_stack_.emplace_back(level_state::key, false);
-                        return key_encoder_.begin_array(tag, context, ec);
+                        level_stack_.emplace_back(level_state::key, false);
+                        key_buffer_.push_back('[');
+                        return true;
                     case level_state::key:
                         level_stack_.emplace_back(level_state::key, false);
-                        return key_encoder_.begin_array(tag, context, ec);
+                        key_buffer_.push_back('[');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, false);
-                        level_stack_.back() = level(level_state::value, false);
-                        return destination_.begin_array(tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1064,13 +1076,13 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
-                        //level_stack_.back().state = level_state::value;
+                        level_stack_.emplace_back(level_state::value, false);
                         return destination_.begin_array(tag, context, ec);
                     case level_state::key:
                         level_stack_.emplace_back(level_state::value, false);
-                        return key_encoder_.begin_array(tag, context, ec);
+                        key_buffer_.push_back('[');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, false);
                         level_stack_.back() = level(level_state::value, false);
                         return destination_.begin_array(tag, context, ec);
                 }
@@ -1087,15 +1099,15 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
-                        //level_stack_.emplace_back(level_state::key, false);
-                        return key_encoder_.begin_array(length, tag, context, ec);
+                        level_stack_.emplace_back(level_state::key, false);
+                        key_buffer_.push_back('[');
+                        return true;
                     case level_state::key:
                         level_stack_.emplace_back(level_state::key, false);
-                        return key_encoder_.begin_array(length, tag, context, ec);
+                        key_buffer_.push_back('[');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, false);
-                        level_stack_.back() = level(level_state::value, false);
-                        return destination_.begin_array(length, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1103,18 +1115,17 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
-                        //level_stack_.emplace_back(level_state::value, false);
+                        level_stack_.emplace_back(level_state::value, false);
                         return destination_.begin_array(length, tag, context, ec);
                     case level_state::key:
                         level_stack_.emplace_back(level_state::value, false);
-                        return key_encoder_.begin_array(length, tag, context, ec);
+                        key_buffer_.push_back('[');
+                        return true;
                     default:
-                        //level_stack_.emplace_back(level_state::value, false);
                         level_stack_.back() = level(level_state::value, false);
                         return destination_.begin_array(length, tag, context, ec);
                 }
             }
-
         }
 
         bool visit_end_array(const ser_context& context, std::error_code& ec) override
@@ -1122,16 +1133,20 @@ namespace cbor {
             switch (level_stack_.back().state)
             {
                 case level_state::value:
-                    //level_stack_.pop_back();
+                    level_stack_.pop_back();
                     return destination_.end_array(context, ec);
                 case level_state::key:
                 {
-                    bool ret = key_encoder_.end_array(context, ec);
+                    key_buffer_.push_back(']');
                     level_stack_.pop_back();
+                    bool ret = true;
                     if (level_stack_.back().state == level_state::value)
                     {
                         ret = destination_.key(key_buffer_,context, ec);
-                        key_buffer_.clear();
+                    }
+                    else
+                    {
+                        key_buffer_.push_back(':');
                     }
                     return ret;
                 }
@@ -1154,9 +1169,13 @@ namespace cbor {
                     case level_state::value:
                         return destination_.key(value, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(value, context, ec);
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), value.begin(), value.end());
+                        key_buffer_.push_back('\"');
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.string_value(value, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1164,7 +1183,10 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.string_value(value, tag, context, ec);
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), value.begin(), value.end());
+                        key_buffer_.push_back('\"');
+                        return true;
                     default:
                         return destination_.string_value(value, tag, context, ec);
                 }
@@ -1179,7 +1201,7 @@ namespace cbor {
             bool is_key = level_stack_.back().is_key;
             level_stack_.back().toggle_is_odd();
 
-            if (is_key)
+            if (is_key || level_stack_.back().state == level_state::key)
             {
                 key_.clear();
                 switch (tag)
@@ -1194,14 +1216,22 @@ namespace cbor {
                         encode_base64url(value.begin(), value.end(),key_);
                         break;
                 }
+            }
+
+            if (is_key)
+            {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
                         return destination_.key(key_, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(key_, context, ec);
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back('\"');
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.byte_string_value(value, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1209,7 +1239,10 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.byte_string_value(value, tag, context, ec);
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back('\"');
+                        return true;
                     default:
                         return destination_.byte_string_value(value, tag, context, ec);
                 }
@@ -1221,18 +1254,24 @@ namespace cbor {
             bool is_key = level_stack_.back().is_key;
             level_stack_.back().toggle_is_odd();
 
-            if (is_key)
+            if (is_key || level_stack_.back().state == level_state::key)
             {
                 key_.clear();
-                auto res = jsoncons::detail::write_integer(value,key_);
+                jsoncons::detail::write_integer(value,key_);
+            }
+
+            if (is_key)
+            {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
                         return destination_.key(key_, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(key_, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.uint64_value(value, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1240,7 +1279,8 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.uint64_value(value, tag, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        return true;
                     default:
                         return destination_.uint64_value(value, tag, context, ec);
                 }
@@ -1252,18 +1292,24 @@ namespace cbor {
             bool is_key = level_stack_.back().is_key;
             level_stack_.back().toggle_is_odd();
 
-            if (is_key)
+            if (is_key || level_stack_.back().state == level_state::key)
             {
                 key_.clear();
                 jsoncons::detail::write_integer(value,key_);
+            }
+
+            if (is_key)
+            {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
                         return destination_.key(key_, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(key_, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.int64_value(value, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1271,7 +1317,8 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.int64_value(value, tag, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        return true;
                     default:
                         return destination_.int64_value(value, tag, context, ec);
                 }
@@ -1283,21 +1330,27 @@ namespace cbor {
             bool is_key = level_stack_.back().is_key;
             level_stack_.back().toggle_is_odd();
 
-            if (is_key)
+            if (is_key || level_stack_.back().state == level_state::key)
             {
                 key_.clear();
                 jsoncons::string_sink<string_type> sink(key_);
                 jsoncons::detail::write_double f{float_chars_format::general,0};
                 double x = jsoncons::detail::decode_half(value);
                 f(x, sink);
+            }
+
+            if (is_key)
+            {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
                         return destination_.key(key_, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(key_, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.half_value(value, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1305,7 +1358,8 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.half_value(value, tag, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        return true;
                     default:
                         return destination_.half_value(value, tag, context, ec);
                 }
@@ -1317,20 +1371,26 @@ namespace cbor {
             bool is_key = level_stack_.back().is_key;
             level_stack_.back().toggle_is_odd();
 
-            if (is_key)
+            if (is_key || level_stack_.back().state == level_state::key)
             {
                 key_.clear();
                 string_sink<string_type> sink(key_);
                 jsoncons::detail::write_double f{float_chars_format::general,0};
                 f(value, sink);
+            }
+
+            if (is_key)
+            {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
                         return destination_.key(key_, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(key_, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.double_value(value, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1338,7 +1398,8 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.double_value(value, tag, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        return true;
                     default:
                         return destination_.double_value(value, tag, context, ec);
                 }
@@ -1350,17 +1411,23 @@ namespace cbor {
             bool is_key = level_stack_.back().is_key;
             level_stack_.back().toggle_is_odd();
 
-            if (is_key)
+            if (is_key || level_stack_.back().state == level_state::key)
             {
                 key_ = value ? string_type(true_literal<CharT>()) : string_type(false_literal<CharT>());
+            }
+
+            if (is_key)
+            {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
                         return destination_.key(key_, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(key_, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.bool_value(value, tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1368,7 +1435,8 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.bool_value(value, tag, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        return true;
                     default:
                         return destination_.bool_value(value, tag, context, ec);
                 }
@@ -1380,17 +1448,23 @@ namespace cbor {
             bool is_key = level_stack_.back().is_key;
             level_stack_.back().toggle_is_odd();
 
-            if (is_key)
+            if (is_key || level_stack_.back().state == level_state::key)
             {
                 key_ = string_type(null_literal<CharT>());
+            }
+
+            if (is_key)
+            {
                 switch (level_stack_.back().state)
                 {
                     case level_state::value:
                         return destination_.key(key_, context, ec);
                     case level_state::key:
-                        return key_encoder_.key(key_, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back(':');
+                        return true;
                     default:
-                        return destination_.null_value(tag, context, ec);
+                        JSONCONS_UNREACHABLE();
                 }
             }
             else
@@ -1398,10 +1472,210 @@ namespace cbor {
                 switch (level_stack_.back().state)
                 {
                     case level_state::key:
-                        return key_encoder_.null_value(tag, context, ec);
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        return true;
                     default:
                         return destination_.null_value(tag, context, ec);
                 }
+            }
+        }
+
+        bool visit_typed_array(const span<const uint8_t>& s, 
+                               semantic_tag tag,
+                               const ser_context& context, 
+                               std::error_code& ec) override 
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const uint16_t>& s, 
+                                    semantic_tag tag, 
+                                    const ser_context& context, 
+                                    std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const uint32_t>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override 
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const uint64_t>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override 
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const int8_t>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const int16_t>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const int32_t>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const int64_t>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(half_arg_t, 
+                               const span<const uint16_t>& s, 
+                               semantic_tag tag, 
+                               const ser_context& context, 
+                               std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(half_arg, s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const float>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
+            }
+        }
+
+        bool visit_typed_array(const span<const double>& s, 
+                                    semantic_tag tag,
+                                    const ser_context& context, 
+                                    std::error_code& ec) override  
+        {
+            bool is_key = level_stack_.back().is_key;
+            level_stack_.back().toggle_is_odd();
+
+            if (is_key || level_stack_.back().state == level_state::key)
+            {
+                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+            }
+            else
+            {
+                return destination_.typed_array(s, tag, context, ec);
             }
         }
     };
