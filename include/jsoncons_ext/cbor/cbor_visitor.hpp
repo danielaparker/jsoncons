@@ -880,10 +880,6 @@ namespace cbor {
     template <class CharT>
     class basic_cbor_visitor_adaptor : public basic_cbor_visitor<CharT>
     {
-        JSONCONS_STRING_LITERAL(null_literal,'n','u','l','l')
-        JSONCONS_STRING_LITERAL(true_literal,'t','r','u','e')
-        JSONCONS_STRING_LITERAL(false_literal,'f','a','l','s','e')
-
     public:
         using typename basic_cbor_visitor<CharT>::char_type;
         using typename basic_cbor_visitor<CharT>::string_view_type;
@@ -920,6 +916,10 @@ namespace cbor {
         string_type key_;
         string_type key_buffer_;
         std::vector<level> level_stack_;
+
+        const string_type null_k = {'n','u','l','l'};
+        const string_type true_k = { 't','r','u','e' };
+        const string_type false_k = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
         basic_cbor_visitor_adaptor(const basic_cbor_visitor_adaptor&) = delete;
@@ -1413,7 +1413,7 @@ namespace cbor {
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                key_ = value ? string_type(true_literal<CharT>()) : string_type(false_literal<CharT>());
+                key_ = value ? true_k : false_k;
             }
 
             if (is_key)
@@ -1450,7 +1450,7 @@ namespace cbor {
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                key_ = string_type(null_literal<CharT>());
+                key_ = null_k;
             }
 
             if (is_key)
