@@ -4,35 +4,34 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CBOR_CBOR_VISITOR_HPP
-#define JSONCONS_CBOR_CBOR_VISITOR_HPP
+#ifndef JSONCONS_EVEN_ODD_VISITOR_HPP
+#define JSONCONS_EVEN_ODD_VISITOR_HPP
 
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_encoder.hpp>
 
 namespace jsoncons { 
-namespace cbor {
 
     template <class CharT>
-    class basic_cbor_visitor_adaptor;
+    class basic_even_odd_to_json_visitor;
 
     template <class CharT>
-    class basic_cbor_visitor 
+    class basic_even_odd_visitor 
     {
-        friend class basic_cbor_visitor_adaptor<CharT>;
+        friend class basic_even_odd_to_json_visitor<CharT>;
     public:
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
 
         using string_view_type = basic_string_view<char_type,char_traits_type>;
 
-        basic_cbor_visitor(basic_cbor_visitor&&) = default;
+        basic_even_odd_visitor(basic_even_odd_visitor&&) = default;
 
-        basic_cbor_visitor& operator=(basic_cbor_visitor&&) = default;
+        basic_even_odd_visitor& operator=(basic_even_odd_visitor&&) = default;
 
-        basic_cbor_visitor() = default;
+        basic_even_odd_visitor() = default;
 
-        virtual ~basic_cbor_visitor() noexcept = default;
+        virtual ~basic_even_odd_visitor() noexcept = default;
 
         void flush()
         {
@@ -878,11 +877,11 @@ namespace cbor {
     };
 
     template <class CharT>
-    class basic_cbor_visitor_adaptor : public basic_cbor_visitor<CharT>
+    class basic_even_odd_to_json_visitor : public basic_even_odd_visitor<CharT>
     {
     public:
-        using typename basic_cbor_visitor<CharT>::char_type;
-        using typename basic_cbor_visitor<CharT>::string_view_type;
+        using typename basic_even_odd_visitor<CharT>::char_type;
+        using typename basic_even_odd_visitor<CharT>::string_view_type;
     private:
 
         using string_type = std::basic_string<CharT>;
@@ -903,7 +902,7 @@ namespace cbor {
             level(level&&) = default;
             level& operator=(level&&) = default;
 
-            void toggle_is_odd()
+            void toggle_is_key()
             {
                 if (is_object)
                 {
@@ -922,10 +921,10 @@ namespace cbor {
         const string_type false_k = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
-        basic_cbor_visitor_adaptor(const basic_cbor_visitor_adaptor&) = delete;
-        basic_cbor_visitor_adaptor& operator=(const basic_cbor_visitor_adaptor&) = delete;
+        basic_even_odd_to_json_visitor(const basic_even_odd_to_json_visitor&) = delete;
+        basic_even_odd_to_json_visitor& operator=(const basic_even_odd_to_json_visitor&) = delete;
     public:
-        basic_cbor_visitor_adaptor(basic_json_visitor<char_type>& visitor)
+        basic_even_odd_to_json_visitor(basic_json_visitor<char_type>& visitor)
             : destination_(visitor)
         {
             level_stack_.emplace_back(level_state(),false); // root
@@ -945,7 +944,7 @@ namespace cbor {
         bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key)
             {
@@ -985,7 +984,7 @@ namespace cbor {
         bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key)
             {
@@ -1053,7 +1052,7 @@ namespace cbor {
         bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key)
             {
@@ -1092,7 +1091,7 @@ namespace cbor {
         bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key)
             {
@@ -1161,7 +1160,7 @@ namespace cbor {
                              std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
             if (is_key)
             {
                 switch (level_stack_.back().state)
@@ -1199,7 +1198,7 @@ namespace cbor {
                                   std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
@@ -1252,7 +1251,7 @@ namespace cbor {
         bool visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
@@ -1290,7 +1289,7 @@ namespace cbor {
         bool visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
@@ -1328,7 +1327,7 @@ namespace cbor {
         bool visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
@@ -1369,7 +1368,7 @@ namespace cbor {
         bool visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
@@ -1409,7 +1408,7 @@ namespace cbor {
         bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
@@ -1446,7 +1445,7 @@ namespace cbor {
         bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
@@ -1486,11 +1485,11 @@ namespace cbor {
                                std::error_code& ec) override 
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1504,11 +1503,11 @@ namespace cbor {
                                     std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1522,11 +1521,11 @@ namespace cbor {
                                     std::error_code& ec) override 
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1540,11 +1539,11 @@ namespace cbor {
                                     std::error_code& ec) override 
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1558,11 +1557,11 @@ namespace cbor {
                                     std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1576,11 +1575,11 @@ namespace cbor {
                                     std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1594,11 +1593,11 @@ namespace cbor {
                                     std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1612,11 +1611,11 @@ namespace cbor {
                                     std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1631,11 +1630,11 @@ namespace cbor {
                                std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
             }
             else
             {
@@ -1649,11 +1648,11 @@ namespace cbor {
                                     std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1667,11 +1666,11 @@ namespace cbor {
                                     std::error_code& ec) override  
         {
             bool is_key = level_stack_.back().is_key;
-            level_stack_.back().toggle_is_odd();
+            level_stack_.back().toggle_is_key();
 
             if (is_key || level_stack_.back().state == level_state::key)
             {
-                return basic_cbor_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1680,11 +1679,10 @@ namespace cbor {
         }
     };
 
-    using cbor_visitor = basic_cbor_visitor<char>;
-    using cbor_visitor_adaptor = basic_cbor_visitor_adaptor<char>;
+    using even_odd_visitor = basic_even_odd_visitor<char>;
+    using even_odd_to_json_visitor = basic_even_odd_to_json_visitor<char>;
 
 
-} // namespace cbor 
 } // namespace jsoncons
 
 #endif

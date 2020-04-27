@@ -18,6 +18,7 @@
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
+#include <jsoncons/even_odd_visitor.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -105,7 +106,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_visitor& visitor, std::error_code& ec)
+    void parse(even_odd_visitor& visitor, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -116,7 +117,7 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        parse_item(visitor, ec);
+                        read_item(visitor, ec);
                         if (ec)
                         {
                             return;
@@ -133,12 +134,12 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        parse_name(visitor, ec);
+                        state_stack_.back().mode = parse_mode::map_value;
+                        read_item(visitor, ec);
                         if (ec)
                         {
                             return;
                         }
-                        state_stack_.back().mode = parse_mode::map_value;
                     }
                     else
                     {
@@ -149,7 +150,7 @@ public:
                 case parse_mode::map_value:
                 {
                     state_stack_.back().mode = parse_mode::map_key;
-                    parse_item(visitor, ec);
+                    read_item(visitor, ec);
                     if (ec)
                     {
                         return;
@@ -159,7 +160,7 @@ public:
                 case parse_mode::root:
                 {
                     state_stack_.back().mode = parse_mode::before_done;
-                    parse_item(visitor, ec);
+                    read_item(visitor, ec);
                     if (ec)
                     {
                         return;
@@ -180,7 +181,7 @@ public:
     }
 private:
 
-    void parse_item(json_visitor& visitor, std::error_code& ec)
+    void read_item(even_odd_visitor& visitor, std::error_code& ec)
     {
         if (source_.is_error())
         {
@@ -620,7 +621,7 @@ private:
             }
         }
     }
-
+/*
     void parse_name(json_visitor& visitor, std::error_code& ec)
     {
         uint8_t type{};
@@ -746,8 +747,8 @@ private:
             }
         }
     }
-
-    void begin_array(json_visitor& visitor, uint8_t type, std::error_code& ec)
+*/
+    void begin_array(even_odd_visitor& visitor, uint8_t type, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -811,7 +812,7 @@ private:
         more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
     }
 
-    void end_array(json_visitor& visitor, std::error_code& ec)
+    void end_array(even_odd_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
 
@@ -819,7 +820,7 @@ private:
         state_stack_.pop_back();
     }
 
-    void begin_object(json_visitor& visitor, uint8_t type, std::error_code& ec)
+    void begin_object(even_odd_visitor& visitor, uint8_t type, std::error_code& ec)
     {
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
@@ -876,7 +877,7 @@ private:
         more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
     }
 
-    void end_object(json_visitor& visitor, std::error_code& ec)
+    void end_object(even_odd_visitor& visitor, std::error_code& ec)
     {
         --nesting_depth_;
         more_ = visitor.end_object(*this, ec);

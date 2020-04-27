@@ -52,7 +52,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
     JSONCONS_ARRAY_OF_CHAR(CharT,end_array_name,'e','n','d','_','a','r','r','a','y')
     JSONCONS_ARRAY_OF_CHAR(CharT,begin_object_name,'b','e','g','i','n','_','o','b','j','e','c','t')
     JSONCONS_ARRAY_OF_CHAR(CharT,end_object_name,'e','n','d','_','o','b','j','e','c','t')
-    JSONCONS_ARRAY_OF_CHAR(CharT,name_name,'n','a','m','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,name_key,'k','e','y')
     JSONCONS_ARRAY_OF_CHAR(CharT,string_value_name,'s','t','r','i','n','g','_','v','a','l','u','e')
     JSONCONS_ARRAY_OF_CHAR(CharT,byte_string_value_name,'b','y','t','e','_','s','t','r','i','n','g','_','v','a','l','u','e')
     JSONCONS_ARRAY_OF_CHAR(CharT,null_value_name,'n','u','l','l','_','v','a','l','u','e')
@@ -86,7 +86,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
         }
         case staj_event_type::key:
         {
-            os << name_name;
+            os << name_key;
             break;
         }
         case staj_event_type::string_value:

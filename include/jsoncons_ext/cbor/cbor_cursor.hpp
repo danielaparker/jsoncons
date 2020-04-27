@@ -35,7 +35,7 @@ public:
 private:
     basic_cbor_parser<Src,Allocator> parser_;
     basic_staj_visitor<char_type> event_handler_;
-    cbor_visitor_adaptor event_handler_adaptor_;
+    even_odd_to_json_visitor event_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -185,7 +185,7 @@ public:
 
     void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        cbor_visitor_adaptor adaptor(visitor);
+        even_odd_to_json_visitor adaptor(visitor);
         parser_.restart();
         while (!parser_.stopped())
         {

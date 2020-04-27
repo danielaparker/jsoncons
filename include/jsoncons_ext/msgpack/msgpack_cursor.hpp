@@ -35,6 +35,7 @@ public:
 private:
     basic_msgpack_parser<Src,Allocator> parser_;
     basic_staj_visitor<char_type> event_handler_;
+    even_odd_to_json_visitor event_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -72,6 +73,7 @@ public:
                       const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), options, alloc), 
          event_handler_(filter), 
+         event_handler_adaptor_(event_handler_),
          eof_(false)
     {
         if (!done())
@@ -106,6 +108,7 @@ public:
                          std::error_code& ec)
        : parser_(std::forward<Source>(source), alloc), 
          event_handler_(filter),
+         event_handler_adaptor_(event_handler_),
          eof_(false)
     {
         if (!done())
@@ -161,15 +164,28 @@ public:
 
     void read_next(std::error_code& ec)
     {
-        read_next(event_handler_, ec);
+        if (event_handler_.in_available())
+        {
+            event_handler_.send_available(ec);
+        }
+        else
+        {
+            parser_.restart();
+            while (!parser_.stopped())
+            {
+                parser_.parse(event_handler_adaptor_, ec);
+                if (ec) return;
+            }
+        }
     }
 
     void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
+        even_odd_to_json_visitor adaptor(visitor);
         parser_.restart();
         while (!parser_.stopped())
         {
-            parser_.parse(visitor, ec);
+            parser_.parse(adaptor, ec);
             if (ec) return;
         }
     }

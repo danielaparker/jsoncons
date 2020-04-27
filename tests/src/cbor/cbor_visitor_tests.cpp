@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
-#include <jsoncons_ext/cbor/cbor_visitor.hpp>
+#include <jsoncons/even_odd_visitor.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -97,7 +97,7 @@ class my_json_visitor : public default_json_visitor
 };
 
 #if 0
-TEST_CASE("cbor_visitor indefinite length map")
+TEST_CASE("even_odd_visitor indefinite length map")
 {
     std::vector<uint8_t> input = {0xbf,               // Start indefinite-length map
                                   0x63,               // First key, UTF-8 string length 3
@@ -111,7 +111,7 @@ TEST_CASE("cbor_visitor indefinite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -121,7 +121,7 @@ TEST_CASE("cbor_visitor indefinite length map")
     }
 }
 
-TEST_CASE("cbor_visitor definite length map")
+TEST_CASE("even_odd_visitor definite length map")
 {
     std::vector<uint8_t> input = {0xa2,               // Start definite-length map
                                   0x63,               // First key, UTF-8 string length 3
@@ -134,7 +134,7 @@ TEST_CASE("cbor_visitor definite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -144,7 +144,7 @@ TEST_CASE("cbor_visitor definite length map")
     }
 }
 
-TEST_CASE("cbor_visitor definite length map with definite length map key")
+TEST_CASE("even_odd_visitor definite length map with definite length map key")
 {
     std::vector<uint8_t> input = {0xa2,               // Start definite-length map
                                   0xa1,               // First key, map
@@ -157,7 +157,7 @@ TEST_CASE("cbor_visitor definite length map with definite length map key")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -167,7 +167,7 @@ TEST_CASE("cbor_visitor definite length map with definite length map key")
     }
 }
 
-TEST_CASE("cbor_visitor definite length map with definite length array key")
+TEST_CASE("even_odd_visitor definite length map with definite length array key")
 {
     std::vector<uint8_t> input = {0xa2,               // Start definite-length map
                                   0x82,               // First key, array length 2
@@ -180,7 +180,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -193,7 +193,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key")
 #endif
 #if 0
 
-TEST_CASE("cbor_visitor definite length map with definite length array key with object")
+TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
 {
     std::vector<uint8_t> input = {0xa2,               // Start definite-length map
                                   0x82,               // First key, array length 2
@@ -208,7 +208,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -218,7 +218,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     }
 }
 
-TEST_CASE("cbor_visitor definite length map with definite length array key with object")
+TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
 {
     std::vector<uint8_t> input = {0x82,               // Start definite-length array
                                   0x81,               // Array length 2
@@ -229,7 +229,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -240,7 +240,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
 }
 #endif
 #if 0
-TEST_CASE("cbor_visitor definite length map with definite length array key with object")
+TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
 {
     std::vector<uint8_t> input = {0xa1,               // Start definite-length map
                                   0x81,               // First key, array length 1
@@ -252,7 +252,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -262,7 +262,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     }
 }
 
-TEST_CASE("cbor_visitor definite length map with definite length array key with object")
+TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
 {
     std::vector<uint8_t> input = {0xa1,               // Start definite-length map
                                   0xa1,               // First key, map length 1
@@ -275,7 +275,7 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -285,14 +285,14 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     }
 }
 
-TEST_CASE("cbor_visitor definite length map with definite length array key with array")
+TEST_CASE("even_odd_visitor definite length map with definite length array key with array")
 {
     std::vector<uint8_t> input = {0xa1,0x62,'o','c',0x81,'\0'}; 
 
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -302,14 +302,14 @@ TEST_CASE("cbor_visitor definite length map with definite length array key with 
     }
 }
 
-TEST_CASE("cbor_visitor indefinite length map")
+TEST_CASE("even_odd_visitor indefinite length map")
 {
     std::vector<uint8_t> input = {0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff}; 
 
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -318,14 +318,14 @@ TEST_CASE("cbor_visitor indefinite length map")
         std::cout << "\n";
     }
 }
-TEST_CASE("cbor_visitor definite length map")
+TEST_CASE("even_odd_visitor definite length map")
 {
     std::vector<uint8_t> input = {0xa1,0x64,'N','a','m','e',0xa0}; 
 
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -335,7 +335,7 @@ TEST_CASE("cbor_visitor definite length map")
     }
 }
 #endif
-TEST_CASE("cbor_visitor definite length map")
+TEST_CASE("even_odd_visitor definite length map")
 {
     const std::vector<uint8_t> input = {
         0xd8, // Tag
@@ -350,7 +350,7 @@ TEST_CASE("cbor_visitor definite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::cbor_visitor_adaptor visitor{destination};
+        cbor::even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 

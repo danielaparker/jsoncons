@@ -25,7 +25,7 @@ template <class Src,class Allocator=std::allocator<char>>
 class basic_msgpack_reader : public ser_context
 {
     basic_msgpack_parser<Src,Allocator> parser_;
-    json_visitor& visitor_;
+    even_odd_to_json_visitor visitor_;
 public:
     template <class Source>
     basic_msgpack_reader(Source&& source, 
