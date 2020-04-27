@@ -96,257 +96,51 @@ class my_json_visitor : public default_json_visitor
     }
 };
 
-#if 0
-TEST_CASE("even_odd_visitor indefinite length map")
+TEST_CASE("even_odd_visitor cbor 1")
 {
-    std::vector<uint8_t> input = {0xbf,               // Start indefinite-length map
-                                  0x63,               // First key, UTF-8 string length 3
-                                      0x46,0x75,0x6e,     // "Fun"
-                                  0xf5,                 // First value, true
-                                  0x63,              // Second key, UTF-8 string length 3
-                                      0x41,0x6d,0x74, // "Amt"
-                                  0x21,                 // -2
-                                      0xff};            // "break"
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-TEST_CASE("even_odd_visitor definite length map")
-{
-    std::vector<uint8_t> input = {0xa2,               // Start definite-length map
-                                  0x63,               // First key, UTF-8 string length 3
-                                      0x46,0x75,0x6e,     // "Fun"
-                                  0xf5,                 // First value, true
-                                  0x63,              // Second key, UTF-8 string length 3
-                                      0x41,0x6d,0x74, // "Amt"
-                                  0x21};                 // -2
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-TEST_CASE("even_odd_visitor definite length map with definite length map key")
-{
-    std::vector<uint8_t> input = {0xa2,               // Start definite-length map
-                                  0xa1,               // First key, map
-                                      0x62,'o','c','\0', // {\"oc\": 0}
-                                  0xf5,                 // First value, true
-                                  0x63,              // Second key, UTF-8 string length 3
-                                      0x41,0x6d,0x74, // "Amt"
-                                  0x21};                 // -2
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-TEST_CASE("even_odd_visitor definite length map with definite length array key")
-{
-    std::vector<uint8_t> input = {0xa2,               // Start definite-length map
-                                  0x82,               // First key, array length 2
-                                      '\0','\0',      // [0,0]         
-                                  0xf5,               // First value, true
-                                  0x63,               // Second key, UTF-8 string length 3
-                                      0x41,0x6d,0x74, // "Amt"
-                                  0x21};              // -2
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-#endif
-#if 0
-
-TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
-{
-    std::vector<uint8_t> input = {0xa2,               // Start definite-length map
-                                  0x82,               // First key, array length 2
-                                      0xa1,               // First key, map
-                                        0x62,'o','c','\0',
-                                        '\0',      // [{\"oc\": 0},0]         
-                                  0xf5,               // First value, true
-                                  0x63,               // Second key, UTF-8 string length 3
-                                      0x41,0x6d,0x74, // "Amt"
-                                  0x21};              // -2
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
-{
-    std::vector<uint8_t> input = {0x82,               // Start definite-length array
-                                  0x81,               // Array length 2
-                                      0x82,               // Array length 2
-                                        0x62,'o','c','\0',
-                                  0xf5};              // -2
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-#endif
-#if 0
-TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
-{
-    std::vector<uint8_t> input = {0xa1,               // Start definite-length map
-                                  0x81,               // First key, array length 1
-                                      0xa1,               // First key, map
-                                        0x62,'o','c','\0',
-                                  0xf5               // First value, true
-                                  }; 
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-TEST_CASE("even_odd_visitor definite length map with definite length array key with object")
-{
-    std::vector<uint8_t> input = {0xa1,               // Start definite-length map
-                                  0xa1,               // First key, map length 1
-                                      0xa1,               // First key, map
-                                        0x62,'o','c','\0',
-                                        '\0',
-                                  0xf5               // First value, true
-                                  }; 
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-TEST_CASE("even_odd_visitor definite length map with definite length array key with array")
-{
-    std::vector<uint8_t> input = {0xa1,0x62,'o','c',0x81,'\0'}; 
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-
-TEST_CASE("even_odd_visitor indefinite length map")
-{
-    std::vector<uint8_t> input = {0xbf,0x64,'N','a','m','e',0xbf,0xff,0xff}; 
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-TEST_CASE("even_odd_visitor definite length map")
-{
-    std::vector<uint8_t> input = {0xa1,0x64,'N','a','m','e',0xa0}; 
-
-    SECTION("test 1")
-    {
-        my_json_visitor destination;
-        even_odd_to_json_visitor visitor{destination};
-
-        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
-
-        std::error_code ec;
-        parser.parse(visitor, ec);
-        std::cout << "\n";
-    }
-}
-#endif
-TEST_CASE("even_odd_visitor definite length map")
-{
-    const std::vector<uint8_t> input = {
-        0xd8, // Tag
-            0x50, // Tag 80, float16, big endian, Typed Array
-        0x48, // Byte string value of length 8
-            0x00,0x01,
-            0x03,0xff,
-            0x04,0x00,
-            0x7b,0xff
+    std::vector<uint8_t> input = {0xa2,
+                                      0xa1, // object (1), key
+                                          0x62,'o','c', // string, key
+                                          0x81,0, // array(1), value
+                                      0x61, 'a', // string(1), value
+                                      0xa0, // object(0), key
+                                      0 // value
     };
 
+    json expected = json::parse(R"(
+        {"{\"oc\":[0]}":"a","{}":0}
+    )");
+
+    SECTION("test 1")
+    {
+        json_decoder<json> destination;
+        even_odd_to_json_visitor visitor{destination};
+
+        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+
+        std::error_code ec;
+        parser.parse(visitor, ec);
+        CHECK(destination.get_result() == expected);
+    }
+}
+
+TEST_CASE("even_odd_visitor cbor 2")
+{
+    std::vector<uint8_t> input = {0xa2,
+                                      0xa2, // object (2), key
+                                          0x62,'a','a', // string, key
+                                          0x81,0, // array(1), value
+                                          0x62,'b','b', // string, key
+                                          0x81,0, // array(1), value
+                                      0x61, 'a', // string(1), value
+                                      0xa0, // object(0), key
+                                      0 // value
+    };
+
+    json expected = json::parse(R"(
+        {"{\"oc\":[0]}":"a","{}":0}
+    )");
+
     SECTION("test 1")
     {
         my_json_visitor destination;
@@ -356,9 +150,9 @@ TEST_CASE("even_odd_visitor definite length map")
 
         std::error_code ec;
         parser.parse(visitor, ec);
-        std::cout << "\n";
+        //std::cout << destination.get_result() << "\n";
+        //CHECK(destination.get_result() == expected);
     }
 }
-
 
 

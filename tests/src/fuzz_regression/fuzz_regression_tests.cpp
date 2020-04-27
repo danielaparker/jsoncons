@@ -14,6 +14,89 @@
 
 using namespace jsoncons;
 
+namespace {
+
+    class my_json_visitor : public default_json_visitor
+    {
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object\n"; 
+            return true;
+        }
+
+        bool visit_end_object(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_object\n"; 
+            return true;
+        }
+        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_array\n"; 
+            return true;
+        }
+
+        bool visit_end_array(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_array\n"; 
+            return true;
+        }
+
+        bool visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_key " << s << "\n"; 
+            return true;
+        }
+        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_string " << s << "\n"; 
+            return true;
+        }
+        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_int64 " << val << "\n"; 
+            return true;
+        }
+        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_uint64 " << val << "\n"; 
+            return true;
+        }
+        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_bool " << val << "\n"; 
+            return true;
+        }
+
+        bool visit_typed_array(const span<const uint16_t>& s, 
+                                    semantic_tag tag, 
+                                    const ser_context&, 
+                                    std::error_code&) override  
+        {
+            std::cout << "visit_typed_array uint16_t " << tag << "\n"; 
+            for (auto val : s)
+            {
+                std::cout << val << "\n";
+            }
+            std::cout << "\n";
+            return true;
+        }
+
+        bool visit_typed_array(half_arg_t, const span<const uint16_t>& s,
+            semantic_tag tag,
+            const ser_context&,
+            std::error_code&) override
+        {
+            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "\n";
+            for (auto val : s)
+            {
+                std::cout << val << "\n";
+            }
+            std::cout << "\n";
+            return true;
+        }
+    };
+} // namespace
+
 TEST_CASE("oss-fuzz issues")
 {
     SECTION("issue 21589")
@@ -205,7 +288,6 @@ TEST_CASE("oss-fuzz issues")
         //       ec == cbor::cbor_errc::number_too_large)); // x86 arch
     }
 
-
     SECTION("issue 21801")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_msgpack-5651190114418688";
@@ -216,7 +298,7 @@ TEST_CASE("oss-fuzz issues")
         json_decoder<json> visitor;
 
         msgpack::msgpack_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        //options.max_nesting_depth(std::numeric_limits<int>::max());
 
         msgpack::msgpack_stream_reader reader(is,visitor);
         std::error_code ec;
