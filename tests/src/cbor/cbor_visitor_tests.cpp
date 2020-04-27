@@ -111,7 +111,7 @@ TEST_CASE("even_odd_visitor indefinite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -134,7 +134,7 @@ TEST_CASE("even_odd_visitor definite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -157,7 +157,7 @@ TEST_CASE("even_odd_visitor definite length map with definite length map key")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -180,7 +180,7 @@ TEST_CASE("even_odd_visitor definite length map with definite length array key")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -208,7 +208,7 @@ TEST_CASE("even_odd_visitor definite length map with definite length array key w
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -229,7 +229,7 @@ TEST_CASE("even_odd_visitor definite length map with definite length array key w
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -252,7 +252,7 @@ TEST_CASE("even_odd_visitor definite length map with definite length array key w
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -275,7 +275,7 @@ TEST_CASE("even_odd_visitor definite length map with definite length array key w
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -292,7 +292,7 @@ TEST_CASE("even_odd_visitor definite length map with definite length array key w
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -309,7 +309,7 @@ TEST_CASE("even_odd_visitor indefinite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -325,7 +325,7 @@ TEST_CASE("even_odd_visitor definite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -350,7 +350,7 @@ TEST_CASE("even_odd_visitor definite length map")
     SECTION("test 1")
     {
         my_json_visitor destination;
-        cbor::even_odd_to_json_visitor visitor{destination};
+        even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
