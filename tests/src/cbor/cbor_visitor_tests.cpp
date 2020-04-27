@@ -131,19 +131,19 @@ TEST_CASE("even_odd_visitor cbor 2")
                                           0x62,'a','a', // string, key
                                           0x81,0, // array(1), value
                                           0x62,'b','b', // string, key
-                                          0x81,0, // array(1), value
+                                          0x81,1, // array(1), value
                                       0x61, 'a', // string(1), value
                                       0xa0, // object(0), key
                                       0 // value
     };
 
     json expected = json::parse(R"(
-        {"{\"oc\":[0]}":"a","{}":0}
+        {"{\"aa\":[0],\"bb\":[1]}":"a","{}":0}
     )");
 
     SECTION("test 1")
     {
-        my_json_visitor destination;
+        json_decoder<json> destination;
         even_odd_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
@@ -151,7 +151,100 @@ TEST_CASE("even_odd_visitor cbor 2")
         std::error_code ec;
         parser.parse(visitor, ec);
         //std::cout << destination.get_result() << "\n";
-        //CHECK(destination.get_result() == expected);
+        CHECK(destination.get_result() == expected);
+    }
+}
+
+TEST_CASE("even_odd_visitor cbor 3")
+{
+    std::vector<uint8_t> input = {0xa2,
+                                      0xa2, // object (2), key
+                                          0x62,'a','a', // string, key
+                                          0x81,0, // array(1), value
+                                          0xa0, // string, key
+                                          0x81,1, // array(1), value
+                                      0x61, 'a', // string(1), value
+                                      0xa0, // object(0), key
+                                      0 // value
+    };
+
+    json expected = json::parse(R"(
+        {"{\"aa\":[0],{}:[1]}":"a","{}":0}
+    )");
+
+    SECTION("test 1")
+    {
+        json_decoder<json> destination;
+        even_odd_to_json_visitor visitor{destination};
+
+        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+
+        std::error_code ec;
+        parser.parse(visitor, ec);
+        //std::cout << destination.get_result() << "\n";
+        CHECK(destination.get_result() == expected);
+    }
+}
+
+TEST_CASE("even_odd_visitor cbor 4")
+{
+    std::vector<uint8_t> input = {0xa2,
+                                      0xa2, // object (2), key
+                                          0x62,'a','a', // string, key
+                                          0x81,0, // array(1), value
+                                          0x80, // array, key
+                                          0x81,1, // array(1), value
+                                      0x61, 'a', // string(1), value
+                                      0xa0, // object(0), key
+                                      0 // value
+    };
+
+    json expected = json::parse(R"(
+        {"{\"aa\":[0],[]:[1]}":"a","{}":0}
+    )");
+
+    SECTION("test 1")
+    {
+        json_decoder<json> destination;
+        even_odd_to_json_visitor visitor{destination};
+
+        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+
+        std::error_code ec;
+        parser.parse(visitor, ec);
+        //std::cout << destination.get_result() << "\n";
+        CHECK(destination.get_result() == expected);
+    }
+}
+
+TEST_CASE("even_odd_visitor cbor 5")
+{
+    std::vector<uint8_t> input = {0xa2,
+                                      0x84, // array(4), key
+                                         0,
+                                         1,
+                                         2,
+                                         3,
+                                      0x61, 'a', // string(1), value
+                                      0x80, // array(0), key
+                                      0 // value
+    };
+
+    json expected = json::parse(R"(
+        {"[0,1,2,3]":"a","[]":0}
+    )");
+
+    SECTION("test 1")
+    {
+        json_decoder<json> destination;
+        even_odd_to_json_visitor visitor{destination};
+
+        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+
+        std::error_code ec;
+        parser.parse(visitor, ec);
+        //std::cout << destination.get_result() << "\n";
+        CHECK(destination.get_result() == expected);
     }
 }
 
