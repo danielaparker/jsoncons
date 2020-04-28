@@ -1194,42 +1194,14 @@ namespace jsoncons {
         {
             if (!members_.empty())
             {
-                key_type any_key = members_.back().key();
-                any_key.clear();
-                while (!members_.empty())
+                json_array<Json> temp(get_allocator());
+
+                for (auto&& kv : members_)
                 {
-                    Json current = std::move(members_.back().value());
-                    members_.pop_back();
-                    switch (current.storage())
+                    if (kv.value().size() > 0)
                     {
-                        case storage_kind::array_value:
-                        {
-                            for (auto&& item : current.array_range())
-                            {
-                                if (item.size() > 0) // non-empty object or array
-                                {
-                                    members_.emplace_back(any_key, std::move(item));
-                                    assert(item.size() == 0);
-                                }
-                            }
-                            current.clear();                           
-                            break;
-                        }
-                        case storage_kind::object_value:
-                        {
-                            for (auto&& kv : current.object_range())
-                            {
-                                if (kv.value().size() > 0) // non-empty object or array
-                                {
-                                    members_.push_back(std::move(kv));
-                                    assert(kv.value().size() == 0);
-                                }
-                            }
-                            current.clear();                           
-                            break;
-                        }
-                        default:
-                            break;
+                        temp.emplace_back(std::move(kv.value()));
+                        assert(kv.value().size() == 0);
                     }
                 }
             }
@@ -1915,42 +1887,14 @@ namespace jsoncons {
         {
             if (!members_.empty())
             {
-                key_type any_key = members_.back().key();
-                any_key.clear();
-                while (!members_.empty())
+                json_array<Json> temp(get_allocator());
+
+                for (auto&& kv : members_)
                 {
-                    Json current = std::move(members_.back().value());
-                    members_.pop_back();
-                    switch (current.storage())
+                    if (kv.value().size() > 0)
                     {
-                        case storage_kind::array_value:
-                        {
-                            for (auto&& item : current.array_range())
-                            {
-                                if (item.size() > 0) // non-empty object or array
-                                {
-                                    members_.emplace_back(any_key, std::move(item));
-                                    assert(item.size() == 0);
-                                }
-                            }
-                            current.clear();                           
-                            break;
-                        }
-                        case storage_kind::object_value:
-                        {
-                            for (auto&& kv : current.object_range())
-                            {
-                                if (kv.value().size() > 0) // non-empty object or array
-                                {
-                                    members_.push_back(std::move(kv));
-                                    assert(kv.value().size() == 0);
-                                }
-                            }
-                            current.clear();                           
-                            break;
-                        }
-                        default:
-                            break;
+                        temp.emplace_back(std::move(kv.value()));
+                        assert(kv.value().size() == 0);
                     }
                 }
             }
