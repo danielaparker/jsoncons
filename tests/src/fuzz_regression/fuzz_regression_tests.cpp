@@ -344,8 +344,8 @@ TEST_CASE("oss-fuzz issues")
             cbor::cbor_stream_reader reader(is, encoder);
 
             std::error_code ec;
-            reader.read(ec);
-            std::cout << ec.message() << "\n";
+            REQUIRE_NOTHROW(reader.read(ec));
+            CHECK(ec == cbor::cbor_errc::illegal_chunked_string);
         }
         catch (const std::exception& e)
         {
