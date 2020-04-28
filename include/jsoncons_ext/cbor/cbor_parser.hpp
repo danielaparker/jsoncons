@@ -737,7 +737,7 @@ private:
             }
             return true;
         };
-        iterate_string_chunks( func, ec);
+        iterate_string_chunks(func, major_type, ec);
         if (!stringref_map_stack_.empty() && 
             info != jsoncons::cbor::detail::additional_info::indefinite_length &&
             s.length() >= jsoncons::cbor::detail::min_length_for_stringref(stringref_map_stack_.back().size()))
@@ -796,7 +796,7 @@ private:
                     }
                     return true;
                 };
-                iterate_string_chunks( func, ec);
+                iterate_string_chunks(func, major_type, ec);
                 break;
             }
             default:
@@ -825,7 +825,7 @@ private:
     }
 
     template <class Function>
-    void iterate_string_chunks(Function& func, std::error_code& ec)
+    void iterate_string_chunks(Function& func, jsoncons::cbor::detail::cbor_major_type type, std::error_code& ec)
     {
         int c = source_.peek();
         if (c == Src::traits_type::eof())
@@ -836,7 +836,11 @@ private:
         }
 
         jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
-        JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string || major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
+        if (major_type != type)
+        {
+            ec = cbor_errc::illegal_chunked_string;
+            return;
+        }
         uint8_t info = get_additional_information_value((uint8_t)c);
 
         switch (info)
@@ -858,7 +862,7 @@ private:
                             done = true;
                             break;
                         default:
-                            iterate_string_chunks( func, ec);
+                            iterate_string_chunks( func, major_type, ec);
                             if (ec)
                             {
                                 return;

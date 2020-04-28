@@ -5,6 +5,7 @@
 #include <jsoncons_ext/cbor/cbor.hpp>
 #include <jsoncons_ext/ubjson/ubjson.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <vector>
 #include <utility>
@@ -24,14 +25,20 @@ namespace {
             return true;
         }
 
+        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object " << length << "\n"; 
+            return true;
+        }
+
         bool visit_end_object(const ser_context&, std::error_code&) override
         {
             std::cout << "visit_end_object\n"; 
             return true;
         }
-        bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_array\n"; 
+            std::cout << "visit_begin_array " << length << "\n"; 
             return true;
         }
 
@@ -96,6 +103,7 @@ namespace {
         }
     };
 } // namespace
+
 
 TEST_CASE("oss-fuzz issues")
 {
@@ -302,6 +310,47 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
+    }
+
+    /*SECTION("issue 21865")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_bson-5637264110780416";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+        //my_json_visitor visitor;
+
+        bson::bson_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        bson::bson_stream_reader reader(is,visitor,options);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == bson::bson_errc::unexpected_eof);
+    }*/
+    SECTION("issue 21902")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5665976638242816";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        try
+        {
+            std::vector<uint8_t> buf;
+            cbor::cbor_bytes_encoder encoder(buf);
+            cbor::cbor_stream_reader reader(is, encoder);
+
+            std::error_code ec;
+            reader.read(ec);
+            std::cout << ec.message() << "\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
     }
 }
 

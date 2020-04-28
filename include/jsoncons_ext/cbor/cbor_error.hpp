@@ -26,7 +26,8 @@ enum class cbor_errc
     number_too_large,
     stringref_too_large,
     max_nesting_depth_exceeded,
-    unknown_type
+    unknown_type,
+    illegal_chunked_string
 };
 
 class cbor_error_category_impl
@@ -63,6 +64,8 @@ public:
                 return "Data item nesting exceeds limit in options";
             case cbor_errc::unknown_type:
                 return "An unknown type was found in the stream";
+            case cbor_errc::illegal_chunked_string:
+                return "An illegal type was found while parsing an indefinite length string";
             default:
                 return "Unknown CBOR parser error";
         }
