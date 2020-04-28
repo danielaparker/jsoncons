@@ -6,7 +6,7 @@
 #endif
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
-#include <jsoncons/even_odd_visitor.hpp>
+#include <jsoncons/json_visitor2.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -96,7 +96,7 @@ class my_json_visitor : public default_json_visitor
     }
 };
 
-TEST_CASE("even_odd_visitor cbor 1")
+TEST_CASE("json_visitor2 cbor 1")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa1, // object (1), key
@@ -114,7 +114,7 @@ TEST_CASE("even_odd_visitor cbor 1")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        even_odd_to_json_visitor visitor{destination};
+        json_visitor2_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -124,7 +124,7 @@ TEST_CASE("even_odd_visitor cbor 1")
     }
 }
 
-TEST_CASE("even_odd_visitor cbor 2")
+TEST_CASE("json_visitor2 cbor 2")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa2, // object (2), key
@@ -144,7 +144,7 @@ TEST_CASE("even_odd_visitor cbor 2")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        even_odd_to_json_visitor visitor{destination};
+        json_visitor2_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -155,7 +155,7 @@ TEST_CASE("even_odd_visitor cbor 2")
     }
 }
 
-TEST_CASE("even_odd_visitor cbor 3")
+TEST_CASE("json_visitor2 cbor 3")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa2, // object (2), key
@@ -175,7 +175,7 @@ TEST_CASE("even_odd_visitor cbor 3")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        even_odd_to_json_visitor visitor{destination};
+        json_visitor2_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -186,7 +186,7 @@ TEST_CASE("even_odd_visitor cbor 3")
     }
 }
 
-TEST_CASE("even_odd_visitor cbor 4")
+TEST_CASE("json_visitor2 cbor 4")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0xa2, // object (2), key
@@ -206,7 +206,7 @@ TEST_CASE("even_odd_visitor cbor 4")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        even_odd_to_json_visitor visitor{destination};
+        json_visitor2_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -217,7 +217,7 @@ TEST_CASE("even_odd_visitor cbor 4")
     }
 }
 
-TEST_CASE("even_odd_visitor cbor 5")
+TEST_CASE("json_visitor2 cbor 5")
 {
     std::vector<uint8_t> input = {0xa2,
                                       0x84, // array(4), key
@@ -237,7 +237,7 @@ TEST_CASE("even_odd_visitor cbor 5")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        even_odd_to_json_visitor visitor{destination};
+        json_visitor2_to_json_visitor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 

@@ -25,7 +25,7 @@ template <class Src,class Allocator=std::allocator<char>>
 class basic_cbor_reader : public ser_context
 {
     basic_cbor_parser<Src,Allocator> parser_;
-    even_odd_to_json_visitor visitor_;
+    json_visitor2_to_json_visitor visitor_;
 public:
     template <class Source>
     basic_cbor_reader(Source&& source, 

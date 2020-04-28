@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_EVEN_ODD_VISITOR_HPP
-#define JSONCONS_EVEN_ODD_VISITOR_HPP
+#ifndef JSONCONS_JSON_VISITOR2_HPP
+#define JSONCONS_JSON_VISITOR2_HPP
 
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_encoder.hpp>
@@ -13,25 +13,25 @@
 namespace jsoncons { 
 
     template <class CharT>
-    class basic_even_odd_to_json_visitor;
+    class basic_json_visitor2_to_json_visitor;
 
     template <class CharT>
-    class basic_even_odd_visitor 
+    class basic_json_visitor2 
     {
-        friend class basic_even_odd_to_json_visitor<CharT>;
+        friend class basic_json_visitor2_to_json_visitor<CharT>;
     public:
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
 
         using string_view_type = basic_string_view<char_type,char_traits_type>;
 
-        basic_even_odd_visitor(basic_even_odd_visitor&&) = default;
+        basic_json_visitor2(basic_json_visitor2&&) = default;
 
-        basic_even_odd_visitor& operator=(basic_even_odd_visitor&&) = default;
+        basic_json_visitor2& operator=(basic_json_visitor2&&) = default;
 
-        basic_even_odd_visitor() = default;
+        basic_json_visitor2() = default;
 
-        virtual ~basic_even_odd_visitor() noexcept = default;
+        virtual ~basic_json_visitor2() noexcept = default;
 
         void flush()
         {
@@ -877,11 +877,11 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    class basic_even_odd_to_json_visitor : public basic_even_odd_visitor<CharT>
+    class basic_json_visitor2_to_json_visitor : public basic_json_visitor2<CharT>
     {
     public:
-        using typename basic_even_odd_visitor<CharT>::char_type;
-        using typename basic_even_odd_visitor<CharT>::string_view_type;
+        using typename basic_json_visitor2<CharT>::char_type;
+        using typename basic_json_visitor2<CharT>::string_view_type;
     private:
 
         using string_type = std::basic_string<CharT>;
@@ -945,10 +945,10 @@ namespace jsoncons {
         const string_type false_k = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
-        basic_even_odd_to_json_visitor(const basic_even_odd_to_json_visitor&) = delete;
-        basic_even_odd_to_json_visitor& operator=(const basic_even_odd_to_json_visitor&) = delete;
+        basic_json_visitor2_to_json_visitor(const basic_json_visitor2_to_json_visitor&) = delete;
+        basic_json_visitor2_to_json_visitor& operator=(const basic_json_visitor2_to_json_visitor&) = delete;
     public:
-        basic_even_odd_to_json_visitor(basic_json_visitor<char_type>& visitor)
+        basic_json_visitor2_to_json_visitor(basic_json_visitor<char_type>& visitor)
             : destination_(visitor)
         {
             level_stack_.emplace_back(level_state::final,false); // root
@@ -1570,7 +1570,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1588,7 +1588,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1606,7 +1606,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1624,7 +1624,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1642,7 +1642,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1660,7 +1660,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1678,7 +1678,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1696,7 +1696,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1715,7 +1715,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
             }
             else
             {
@@ -1733,7 +1733,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1751,7 +1751,7 @@ namespace jsoncons {
 
             if (is_key || level_stack_.back().target() == level_state::key)
             {
-                return basic_even_odd_visitor<CharT>::visit_typed_array(s,tag,context,ec);
+                return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
             else
             {
@@ -1760,8 +1760,8 @@ namespace jsoncons {
         }
     };
 
-    using even_odd_visitor = basic_even_odd_visitor<char>;
-    using even_odd_to_json_visitor = basic_even_odd_to_json_visitor<char>;
+    using json_visitor2 = basic_json_visitor2<char>;
+    using json_visitor2_to_json_visitor = basic_json_visitor2_to_json_visitor<char>;
 
 
 } // namespace jsoncons
