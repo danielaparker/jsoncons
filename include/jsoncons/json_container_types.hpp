@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <deque>
 #include <exception>
 #include <cstring>
 #include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
@@ -18,6 +17,7 @@
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
 #include <utility> // std::move
+#include <cassert> // assert
 #include <type_traits> // std::enable_if
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/allocator_holder.hpp>
@@ -290,11 +290,12 @@ namespace jsoncons {
                 {
                     case storage_kind::array_value:
                     {
-                        for (auto& item : current.array_range())
+                        for (auto&& item : current.array_range())
                         {
                             if (item.size() > 0) // non-empty object or array
                             {
                                 elements_.push_back(std::move(item));
+                                assert(item.size() == 0);
                             }
                         }
                         current.clear();                           
@@ -302,13 +303,12 @@ namespace jsoncons {
                     }
                     case storage_kind::object_value:
                     {
-                        for (auto& kv : current.object_range())
+                        for (auto&& kv : current.object_range())
                         {
-                            value_type tmp;
-                            tmp.swap(kv.value());
                             if (kv.value().size() > 0) // non-empty object or array
                             {
-                                elements_.push_back(std::move(tmp));
+                                elements_.push_back(std::move(kv.value()));
+                                assert(kv.value().size() == 0);
                             }
                         }
                         current.clear();                           
@@ -357,10 +357,16 @@ namespace jsoncons {
         {
         }
 
-        template <class T>
-        key_value(key_type&& name, T&& val)
-            : key_(std::forward<key_type>(name)), 
-              value_(std::forward<T>(val))
+        //template <class T>
+        //key_value(key_type&& name, T&& val)
+        //    : key_(std::forward<key_type>(name)), 
+        //      value_(std::forward<T>(val))
+        //{
+        //}
+
+        template <typename... Args>
+        key_value(const key_type& name,  Args&& ... args)
+            : key_(name), value_(std::forward<Args>(args)...)
         {
         }
 
@@ -1198,11 +1204,12 @@ namespace jsoncons {
                     {
                         case storage_kind::array_value:
                         {
-                            for (auto& item : current.array_range())
+                            for (auto&& item : current.array_range())
                             {
                                 if (item.size() > 0) // non-empty object or array
                                 {
                                     members_.emplace_back(any_key, std::move(item));
+                                    assert(item.size() == 0);
                                 }
                             }
                             current.clear();                           
@@ -1210,11 +1217,12 @@ namespace jsoncons {
                         }
                         case storage_kind::object_value:
                         {
-                            for (auto& kv : current.object_range())
+                            for (auto&& kv : current.object_range())
                             {
                                 if (kv.value().size() > 0) // non-empty object or array
                                 {
                                     members_.push_back(std::move(kv));
+                                    assert(kv.value().size() == 0);
                                 }
                             }
                             current.clear();                           
@@ -1917,11 +1925,12 @@ namespace jsoncons {
                     {
                         case storage_kind::array_value:
                         {
-                            for (auto& item : current.array_range())
+                            for (auto&& item : current.array_range())
                             {
                                 if (item.size() > 0) // non-empty object or array
                                 {
                                     members_.emplace_back(any_key, std::move(item));
+                                    assert(item.size() == 0);
                                 }
                             }
                             current.clear();                           
@@ -1929,11 +1938,12 @@ namespace jsoncons {
                         }
                         case storage_kind::object_value:
                         {
-                            for (auto& kv : current.object_range())
+                            for (auto&& kv : current.object_range())
                             {
                                 if (kv.value().size() > 0) // non-empty object or array
                                 {
                                     members_.push_back(std::move(kv));
+                                    assert(kv.value().size() == 0);
                                 }
                             }
                             current.clear();                           
