@@ -330,6 +330,7 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == bson::bson_errc::unexpected_eof);
     }
+    // Resolution: change assert to illegal_chunked_string error code
     SECTION("issue 21902")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5665976638242816";
