@@ -445,6 +445,14 @@ namespace detail {
             : std::is_convertible< typename std::remove_pointer<decltype(std::declval<Container>().data() )>::type(*)[], Element(*)[]>
     {};
 
+    template<typename T>
+    using
+    construct_from_string_t = decltype(T(std::string{}));
+
+
+    template<class T>
+    using
+    is_constructible_from_string = is_detected<construct_from_string_t,T>;
 } // detail
 } // jsoncons
 
