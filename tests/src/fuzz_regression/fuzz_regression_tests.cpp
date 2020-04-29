@@ -107,6 +107,14 @@ namespace {
 
 TEST_CASE("oss-fuzz issues")
 {
+    // Fuzz target: fuzz_parse
+    // Issue: Stack-overflow
+    // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
+    //            destructor after reaching a certain nesting depth,
+    //            approximately 270 with visual studio on windows.
+    // Resolution: 
+    // - Implement destructors for json_array and json_object that flatten std::vector elements
+    // - max_nesting_depth option for all parsers and encoders (default 1024)
     SECTION("issue 21589")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
@@ -116,6 +124,124 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         REQUIRE_THROWS_WITH(json::parse(is, options), Catch::Matchers::Contains(json_error_category_impl().message((int)json_errc::expected_comma_or_right_bracket).c_str()));
     }
+
+    // Fuzz target: fuzz_cbo
+    // Issue: Abrt in __cxxabiv1::failed_throw
+    // Diagnosis: Huge length field in binary data formats
+    // Resolution: Read from source in chunks, to avoid bad_alloc, and fail with unexpected_eof
+    SECTION("issue 21619")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5171679883165696";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        cbor::cbor_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        json_decoder<json> visitor;
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch
+               ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
+    }
+
+    // Fuzz target: fuzz_cbor
+    // Issue: Timeout in fuzz_cbor
+    SECTION("issue 21631")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5639265590706176";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        default_json_visitor visitor;
+
+        cbor::cbor_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK((ec == cbor::cbor_errc::unknown_type || // x64 arch
+               ec == cbor::cbor_errc::number_too_large)); // x86 arch
+    }
+
+    // Fuzz target: fuzz_csv
+    // Issue: Integer-overflow
+    SECTION("issue 21663")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv-5762751990595584";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+
+        csv::csv_options options;
+        options.assume_header(true);
+        options.mapping(csv::mapping_kind::n_rows);
+        csv::csv_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        reader.read(ec);
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK_FALSE(ec);
+
+        //std::cout << visitor.get_result() << "" << std::endl;
+    }
+
+    SECTION("issue 21663b")
+    {
+        std::string s = "-6.6E6";
+        auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.size());
+        CHECK_FALSE(result);
+    }
+
+    // Fuzz target: fuzz_ubjson
+    // Issue: Out-of-memory
+    // Diagnosis:  Issue with huge length for a strongly typed array of no-op, null, false, or true,
+    // e.g. [[][$][T][#][I][9223372036854775807]
+    // Resolution: limit number of items to max_items set in options
+    SECTION("issue 21667")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5738905124208640";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        default_json_visitor visitor;
+
+        ubjson::ubjson_stream_reader reader(is,visitor);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK((ec == ubjson::ubjson_errc::max_items_exceeded || // x64 arch
+               ec == ubjson::ubjson_errc::number_too_large)); // x86 arch
+    }
+
+    // Fuzz target: fuzz_ubjson
+    // Issue: Timeout 
+    SECTION("issue 21697")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5737197673381888";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+
+        ubjson::ubjson_stream_reader reader(is,visitor);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == ubjson::ubjson_errc::key_expected);
+    }
+
+    // Fuzz target: fuzz_cbor
+    // Issue: Stack overflow
     SECTION("issue 21709")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5740910806827008.fuzz";
@@ -125,6 +251,9 @@ TEST_CASE("oss-fuzz issues")
         options.max_nesting_depth(10000);
         REQUIRE_THROWS_WITH(cbor::decode_cbor<json>(is,options), Catch::Matchers::Contains(cbor::cbor_error_category_impl().message((int)cbor::cbor_errc::max_nesting_depth_exceeded).c_str()));
     }
+
+    // Fuzz target: fuzz_cbor
+    // Issue: Stack overflow
     SECTION("issue 21710")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
@@ -155,109 +284,12 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec.value() == (int)cbor::cbor_errc::unknown_type);
     }
-    SECTION("issue 21697")
+
+    // Fuzz target: fuzz_msgpack
+    // Issue: Out of memory
+    SECTION("issue 21801")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5737197673381888";
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        CHECK(is);
-
-        json_decoder<json> visitor;
-
-        ubjson::ubjson_stream_reader reader(is,visitor);
-        std::error_code ec;
-        REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == ubjson::ubjson_errc::key_expected);
-    }
-
-    SECTION("issue 21663")
-    {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv-5762751990595584";
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        CHECK(is);
-
-        json_decoder<json> visitor;
-
-        csv::csv_options options;
-        options.assume_header(true);
-        options.mapping(csv::mapping_kind::n_rows);
-        csv::csv_reader reader(is,visitor,options);
-
-        std::error_code ec;
-        reader.read(ec);
-        REQUIRE_NOTHROW(reader.read(ec));
-        CHECK_FALSE(ec);
-
-        //std::cout << visitor.get_result() << "" << std::endl;
-    }
-
-    SECTION("issue 21663b")
-    {
-        std::string s = "-6.6E6";
-        auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.size());
-        CHECK_FALSE(result);
-    }
-
-    SECTION("issue 21619")
-    {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5171679883165696";
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        CHECK(is);
-
-        cbor::cbor_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
-
-        json_decoder<json> visitor;
-
-        cbor::cbor_stream_reader reader(is,visitor,options);
-
-        std::error_code ec;
-        REQUIRE_NOTHROW(reader.read(ec));
-        CHECK((ec.value() == (int)cbor::cbor_errc::unexpected_eof ||  // x64 arch
-               ec.value() == (int)cbor::cbor_errc::number_too_large)); // x86 arch  
-    }
-
-    SECTION("issue 21631")
-    {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5639265590706176";
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        CHECK(is);
-
-        default_json_visitor visitor;
-
-        cbor::cbor_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
-
-        cbor::cbor_stream_reader reader(is,visitor,options);
-
-        std::error_code ec;
-        REQUIRE_NOTHROW(reader.read(ec));
-        CHECK((ec == cbor::cbor_errc::unknown_type || // x64 arch
-               ec == cbor::cbor_errc::number_too_large)); // x86 arch
-    }
-
-    SECTION("issue 21667")
-    {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5738905124208640";
-
-        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        CHECK(is);
-
-        default_json_visitor visitor;
-
-        ubjson::ubjson_stream_reader reader(is,visitor);
-        std::error_code ec;
-        REQUIRE_NOTHROW(reader.read(ec));
-        CHECK((ec == ubjson::ubjson_errc::max_items_exceeded || // x64 arch
-               ec == ubjson::ubjson_errc::number_too_large)); // x86 arch
-    }
-
-    SECTION("issue 21813")
-    {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_msgpack-5727715157344256";
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_msgpack-5651190114418688";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -265,15 +297,16 @@ TEST_CASE("oss-fuzz issues")
         json_decoder<json> visitor;
 
         msgpack::msgpack_options options;
-        options.max_nesting_depth(std::numeric_limits<int>::max());
+        //options.max_nesting_depth(std::numeric_limits<int>::max());
 
-        msgpack::msgpack_stream_reader reader(is,visitor,options);
+        msgpack::msgpack_stream_reader reader(is,visitor);
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
     }
 
-
+    // Fuzz target: fuzz_cbor
+    // Issue: Stack overflow
     SECTION("issue 21805")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5687592176844800";
@@ -294,9 +327,11 @@ TEST_CASE("oss-fuzz issues")
         CHECK((ec == cbor::cbor_errc::max_nesting_depth_exceeded)); 
     }
 
-    SECTION("issue 21801")
+    // Fuzz target: fuzz_msgpack
+    // Issue: Timeout
+    SECTION("issue 21813")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_msgpack-5651190114418688";
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_msgpack-5727715157344256";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -304,14 +339,16 @@ TEST_CASE("oss-fuzz issues")
         json_decoder<json> visitor;
 
         msgpack::msgpack_options options;
-        //options.max_nesting_depth(std::numeric_limits<int>::max());
+        options.max_nesting_depth(std::numeric_limits<int>::max());
 
-        msgpack::msgpack_stream_reader reader(is,visitor);
+        msgpack::msgpack_stream_reader reader(is,visitor,options);
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
     }
 
+    // Fuzz target: fuzz_ubjson
+    // Issue: Timeout
     SECTION("issue 21865")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_bson-5637264110780416";
@@ -330,6 +367,9 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == bson::bson_errc::unexpected_eof);
     }
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: failed_throw
     // Resolution: change assert to illegal_chunked_string error code
     SECTION("issue 21902")
     {
@@ -354,6 +394,8 @@ TEST_CASE("oss-fuzz issues")
         }
     }
 
+    // Fuzz target: fuzz_csv_encoder
+    // Issue: Failed throw
     // Resolution: check if csv_parser is still in start state when no more input
     SECTION("issue 21912")
     {
