@@ -312,7 +312,7 @@ TEST_CASE("oss-fuzz issues")
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
     }
 
-    /*SECTION("issue 21865")
+    SECTION("issue 21865")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_bson-5637264110780416";
 
@@ -329,7 +329,7 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == bson::bson_errc::unexpected_eof);
-    }*/
+    }
     SECTION("issue 21902")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5665976638242816";
