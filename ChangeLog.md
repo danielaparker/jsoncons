@@ -1,11 +1,23 @@
 master
 ------
 
-Defects fixed:
+Bug fixes:
 
-- Fixed jsonpath issue [Filter expression with regular expressions](https://cburgmer.github.io/json-path-comparison/results/filter_expression_with_regular_expression.html)
+- Fixed eternal loop in csv parser [\#220](https://github.com/danielaparker/jsoncons/issues/220)
 
-- Fixed issue #220
+- Fixed JSONPath issue with filter expressions containing regular expressions [\#233](https://github.com/danielaparker/jsoncons/issues/233)
+
+- Fixed OSS-Fuzz failed throw issue in CSV parser [\#232](https://github.com/danielaparker/jsoncons/issues/232)
+
+- Fixed OSS-Fuzz integer-overflow issue in CSV parser [\#231](https://github.com/danielaparker/jsoncons/issues/231)
+
+- Fixed OSS-Fuzz timeout issues [\#230](https://github.com/danielaparker/jsoncons/issues/230)
+
+- Fixed UBJSON issue parsing arrays with end markers [\#229](https://github.com/danielaparker/jsoncons/issues/229)
+
+- Fixed OSS-Fuzz memory allocation issues [\#228](https://github.com/danielaparker/jsoncons/issues/228)
+
+- Fixed OSS-Fuzz stack overflow issues [\#225](https://github.com/danielaparker/jsoncons/issues/225)
 
 Changes:
 
@@ -19,9 +31,11 @@ Enhancements:
 
 - Added classes bson_options, msgpack_options, and ubjson_options
 
-- Until this release, only JSON parsing supported the max_nesting_depth option. Since this release,
-JSON, BSON, CBOR, MessagePack and UBJSON all support the max_nesting_depth option for both
+- Until this release, only JSON parsing supported a `max_nesting_depth` option. Since this release,
+JSON, BSON, CBOR, MessagePack and UBJSON all support a `max_nesting_depth` option for both
 parsing and serializing. The default is 1024.
+
+- UBJSON supports a `max_items` option for parsing and serializing. The default is 16,777,216.
 
 v0.150.0
 --------
