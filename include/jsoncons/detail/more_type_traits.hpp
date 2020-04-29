@@ -29,6 +29,8 @@ namespace jsoncons
     using void_t = std::void_t; 
     #endif
 
+    // follows http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4436.pdf
+
     // detector
 
     // primary template handles all types not supporting the archetypal Op

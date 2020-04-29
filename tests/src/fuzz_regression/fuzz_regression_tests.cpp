@@ -17,60 +17,60 @@ using namespace jsoncons;
 
 namespace {
 
-    class my_json_visitor : public default_json_visitor
+    class diagnostics_visitor : public default_json_visitor
     {
         bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_object\n"; 
+            std::cout << "visit_begin_object" << std::endl; 
             return true;
         }
 
         bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_object " << length << "\n"; 
+            std::cout << "visit_begin_object " << length << std::endl; 
             return true;
         }
 
         bool visit_end_object(const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_end_object\n"; 
+            std::cout << "visit_end_object" << std::endl; 
             return true;
         }
         bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_begin_array " << length << "\n"; 
+            std::cout << "visit_begin_array " << length << std::endl; 
             return true;
         }
 
         bool visit_end_array(const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_end_array\n"; 
+            std::cout << "visit_end_array" << std::endl; 
             return true;
         }
 
         bool visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_key " << s << "\n"; 
+            std::cout << "visit_key " << s << std::endl; 
             return true;
         }
         bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_string " << s << "\n"; 
+            std::cout << "visit_string " << s << std::endl; 
             return true;
         }
         bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_int64 " << val << "\n"; 
+            std::cout << "visit_int64 " << val << std::endl; 
             return true;
         }
         bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_uint64 " << val << "\n"; 
+            std::cout << "visit_uint64 " << val << std::endl; 
             return true;
         }
         bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
         {
-            std::cout << "visit_bool " << val << "\n"; 
+            std::cout << "visit_bool " << val << std::endl; 
             return true;
         }
 
@@ -79,12 +79,12 @@ namespace {
                                     const ser_context&, 
                                     std::error_code&) override  
         {
-            std::cout << "visit_typed_array uint16_t " << tag << "\n"; 
+            std::cout << "visit_typed_array uint16_t " << tag << std::endl; 
             for (auto val : s)
             {
-                std::cout << val << "\n";
+                std::cout << val << "" << std::endl;
             }
-            std::cout << "\n";
+            std::cout << "" << std::endl;
             return true;
         }
 
@@ -93,12 +93,12 @@ namespace {
             const ser_context&,
             std::error_code&) override
         {
-            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "\n";
+            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << std::endl;
             for (auto val : s)
             {
-                std::cout << val << "\n";
+                std::cout << val << "" << std::endl;
             }
-            std::cout << "\n";
+            std::cout << "" << std::endl;
             return true;
         }
     };
@@ -189,7 +189,7 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK_FALSE(ec);
 
-        //std::cout << visitor.get_result() << "\n";
+        //std::cout << visitor.get_result() << "" << std::endl;
     }
 
     SECTION("issue 21663b")
@@ -289,7 +289,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         //reader.read(ec);
-        //std::cout << ec.message() << "\n";
+        //std::cout << ec.message() << "" << std::endl;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK((ec == cbor::cbor_errc::max_nesting_depth_exceeded)); 
     }
@@ -320,7 +320,7 @@ TEST_CASE("oss-fuzz issues")
         CHECK(is);
 
         json_decoder<json> visitor;
-        //my_json_visitor visitor;
+        //diagnostics_visitor visitor;
 
         bson::bson_options options;
         options.max_nesting_depth(std::numeric_limits<int>::max());
@@ -349,8 +349,29 @@ TEST_CASE("oss-fuzz issues")
         }
         catch (const std::exception& e)
         {
-            std::cout << e.what() << "\n";
+            std::cout << e.what() << "" << std::endl;
         }
+    }
+
+    // Resolution: check if csv_parser is still in start state when no more input
+    SECTION("issue 21912")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv_encoder-5202115606872064.fuzz";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::string s2;
+        csv::csv_string_encoder visitor(s2);
+
+        csv::csv_reader reader(is, visitor);
+        std::error_code ec;
+        reader.read(ec);
+
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK((ec == csv::csv_errc::source_error));
+
+        //std::cout << visitor.get_result() << "" << std::endl;
     }
 }
 

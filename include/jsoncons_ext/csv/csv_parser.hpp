@@ -683,6 +683,9 @@ public:
         {
             switch (state_)
             {
+                case csv_parse_state::start:
+                    ec = csv_errc::source_error;
+                    return;
                 case csv_parse_state::before_unquoted_field:
                 case csv_parse_state::before_last_unquoted_field:
                     end_unquoted_string_value(ec);
