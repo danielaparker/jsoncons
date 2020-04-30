@@ -779,7 +779,7 @@ namespace jsoncons {
             }
         };
 
-        basic_json_visitor<char_type>& destination_;
+        basic_json_visitor<char_type>* destination_;
         string_type key_;
         string_type key_buffer_;
         std::vector<level> level_stack_;
@@ -793,20 +793,25 @@ namespace jsoncons {
         basic_json_visitor2_to_json_visitor& operator=(const basic_json_visitor2_to_json_visitor&) = delete;
     public:
         basic_json_visitor2_to_json_visitor(basic_json_visitor<char_type>& visitor)
-            : destination_(visitor)
+            : destination_(std::addressof(visitor))
         {
             level_stack_.emplace_back(output_t::destination,container_t::root); // root
         }
 
         basic_json_visitor<char_type>& destination()
         {
-            return destination_;
+            return *destination_;
+        }
+
+        void destination(basic_json_visitor<char_type>& dest)
+        {
+            destination_ = std::addressof(dest);
         }
 
     private:
         void visit_flush() override
         {
-            destination_.flush();
+            destination_->flush();
         }
 
         bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -827,7 +832,7 @@ namespace jsoncons {
                         return true;
                     default:
                         level_stack_.emplace_back(output_t::destination, container_t::object);
-                        return destination_.begin_object(tag, context, ec);
+                        return destination_->begin_object(tag, context, ec);
                 }
             }
         }
@@ -858,7 +863,7 @@ namespace jsoncons {
                         return true;
                     default:
                         level_stack_.emplace_back(output_t::destination, container_t::object);
-                        return destination_.begin_object(length, tag, context, ec);
+                        return destination_->begin_object(length, tag, context, ec);
                 }
             }
         }
@@ -870,11 +875,12 @@ namespace jsoncons {
             {
                 case output_t::key_buffer:
                     key_buffer_.push_back('}');
+                    JSONCONS_ASSERT(level_stack_.size() > 1);
                     level_stack_.pop_back();
                     
                     if (level_stack_.back().write_to() == output_t::destination)
                     {
-                        ret = destination_.key(key_buffer_,context, ec);
+                        ret = destination_->key(key_buffer_,context, ec);
                         key_buffer_.clear();
                     }
                     else if (level_stack_.back().is_key())
@@ -884,12 +890,10 @@ namespace jsoncons {
                     level_stack_.back().advance();
                     break;
                 default:
-                    if (level_stack_.size() > 1)
-                    {
-                        level_stack_.pop_back();
-                        level_stack_.back().advance();
-                    }
-                    ret = destination_.end_object(context, ec);
+                    JSONCONS_ASSERT(level_stack_.size() > 1);
+                    level_stack_.pop_back();
+                    level_stack_.back().advance();
+                    ret = destination_->end_object(context, ec);
                     break;
             }
             return ret;
@@ -921,7 +925,7 @@ namespace jsoncons {
                         return true;
                     default:
                         level_stack_.emplace_back(output_t::destination, container_t::array);
-                        return destination_.begin_array(tag, context, ec);
+                        return destination_->begin_array(tag, context, ec);
                 }
             }
         }
@@ -952,7 +956,7 @@ namespace jsoncons {
                         return true;
                     default:
                         level_stack_.emplace_back(output_t::destination, container_t::array);
-                        return destination_.begin_array(length, tag, context, ec);
+                        return destination_->begin_array(length, tag, context, ec);
                 }
             }
         }
@@ -964,10 +968,11 @@ namespace jsoncons {
             {
                 case output_t::key_buffer:
                     key_buffer_.push_back(']');
+                    JSONCONS_ASSERT(level_stack_.size() > 1);
                     level_stack_.pop_back();
                     if (level_stack_.back().write_to() == output_t::destination)
                     {
-                        ret = destination_.key(key_buffer_, context, ec);
+                        ret = destination_->key(key_buffer_, context, ec);
                         key_buffer_.clear();
                     }
                     else if (level_stack_.back().is_key())
@@ -977,12 +982,10 @@ namespace jsoncons {
                     level_stack_.back().advance();
                     break;
                 default:
-                    if (level_stack_.size() > 1)
-                    {
-                        level_stack_.pop_back();
-                        level_stack_.back().advance();
-                    }
-                    ret = destination_.end_array(context, ec);
+                    JSONCONS_ASSERT(level_stack_.size() > 1);
+                    level_stack_.pop_back();
+                    level_stack_.back().advance();
+                    ret = destination_->end_array(context, ec);
                     break;
             }
             return ret;
@@ -1011,7 +1014,7 @@ namespace jsoncons {
                         ret = true;
                         break;
                     default:
-                        ret = destination_.key(value, context, ec);
+                        ret = destination_->key(value, context, ec);
                         break;
                 }
             }
@@ -1030,7 +1033,7 @@ namespace jsoncons {
                         ret = true;
                         break;
                     default:
-                        ret = destination_.string_value(value, tag, context, ec);
+                        ret = destination_->string_value(value, tag, context, ec);
                         break;
                 }
             }
@@ -1079,7 +1082,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.key(key_, context, ec);
+                        ret = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1098,7 +1101,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.byte_string_value(value, tag, context, ec);
+                        ret = destination_->byte_string_value(value, tag, context, ec);
                         break;
                 }
             }
@@ -1131,7 +1134,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.key(key_, context, ec);
+                        ret = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1148,7 +1151,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.uint64_value(value, tag, context, ec);
+                        ret = destination_->uint64_value(value, tag, context, ec);
                         break;
                 }
             }
@@ -1181,7 +1184,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.key(key_, context, ec);
+                        ret = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1198,7 +1201,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.int64_value(value, tag, context, ec);
+                        ret = destination_->int64_value(value, tag, context, ec);
                         break;
                 }
             }
@@ -1234,7 +1237,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.key(key_, context, ec);
+                        ret = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1251,7 +1254,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.half_value(value, tag, context, ec);
+                        ret = destination_->half_value(value, tag, context, ec);
                         break;
                 }
             }
@@ -1286,7 +1289,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.key(key_, context, ec);
+                        ret = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1303,7 +1306,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.double_value(value, tag, context, ec);
+                        ret = destination_->double_value(value, tag, context, ec);
                         break;
                 }
             }
@@ -1335,7 +1338,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.key(key_, context, ec);
+                        ret = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1352,7 +1355,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.bool_value(value, tag, context, ec);
+                        ret = destination_->bool_value(value, tag, context, ec);
                         break;
                 }
             }
@@ -1384,7 +1387,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.key(key_, context, ec);
+                        ret = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1401,7 +1404,7 @@ namespace jsoncons {
                         ret = true; 
                         break;
                     default:
-                        ret = destination_.null_value(tag, context, ec);
+                        ret = destination_->null_value(tag, context, ec);
                         break;
                 }
             }
@@ -1424,7 +1427,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1442,7 +1445,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1460,7 +1463,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1478,7 +1481,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1496,7 +1499,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1514,7 +1517,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1532,7 +1535,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1550,7 +1553,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1569,7 +1572,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(half_arg, s, tag, context, ec);
+                return destination_->typed_array(half_arg, s, tag, context, ec);
             }
         }
 
@@ -1587,7 +1590,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
 
@@ -1605,7 +1608,7 @@ namespace jsoncons {
             }
             else
             {
-                return destination_.typed_array(s, tag, context, ec);
+                return destination_->typed_array(s, tag, context, ec);
             }
         }
     };

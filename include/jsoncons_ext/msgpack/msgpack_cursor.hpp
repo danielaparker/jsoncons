@@ -181,11 +181,28 @@ public:
 
     void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        json_visitor2_to_json_visitor adaptor(visitor);
+        struct resource_wrapper
+        {
+            json_visitor2_to_json_visitor& adaptor;
+            basic_json_visitor<char_type>& original;
+
+            resource_wrapper(json_visitor2_to_json_visitor& adaptor,
+                             basic_json_visitor<char_type>& visitor)
+                : adaptor(adaptor), original(adaptor.destination())
+            {
+                adaptor.destination(visitor);
+            }
+
+            ~resource_wrapper()
+            {
+                adaptor.destination(original);
+            }
+        } wrapper(event_handler_adaptor_, visitor);
+
         parser_.restart();
         while (!parser_.stopped())
         {
-            parser_.parse(adaptor, ec);
+            parser_.parse(event_handler_adaptor_, ec);
             if (ec) return;
         }
     }
