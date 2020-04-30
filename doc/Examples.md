@@ -21,10 +21,10 @@
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-[Specialize json_type_traits explicitly](#G1)  
 [Serialize with the C++ member names of the class](#G2)  
 [Serialize with provided names using the `_NAME_` macros](#G3)  
 [Mapping to C++ data structures with and without defaults allowed](#G4)  
+[Specialize json_type_traits explicitly](#G1)  
 [Serialize non-mandatory std::optional values using the convenience macros](#G5)  
 [An example with std::shared_ptr and std::unique_ptr](#G6)  
 [Serialize a templated class with the `_TPL_` macros](#G7)  
@@ -499,132 +499,6 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 <div id="G0"/>
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
-
-<div id="G1"/>
-
-#### Specialize json_type_traits explicitly
-
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
-Decode and encode work for all C++ classes that have 
-[json_type_traits](ref/json_type_traits.md) 
-defined. The standard library containers are already supported, 
-and your own types will be supported too if you specialize `json_type_traits`
-in the `jsoncons` namespace. 
-
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
-
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        using allocator_type = typename Json::allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
-} // namespace jsoncons
-```
-
-To save typing and enhance readability, the jsoncons library defines macros, 
-so you could also write
-
-```c++
-JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
-```
-
-which expands to the code above.
-
-```c++
-using namespace jsoncons; // for convenience
-
-int main()
-{
-    const std::string s = R"(
-    [
-        {
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
-        },
-        {
-            "author" : "Charles Bukowski",
-            "title" : "Pulp",
-            "price" : 22.48
-        }
-    ]
-    )";
-
-    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
-
-    std::cout << "(1)\n";
-    for (const auto& item : book_list)
-    {
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-
-    std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
-    std::cout << "\n\n";
-}
-```
-Output:
-```
-(1)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Pulp, 22.48
-
-(2)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 22.48,
-        "title": "Pulp"
-    }
-]
-```
 
 <div id="G2"/>
 
@@ -1108,6 +982,132 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 instead. This will cause an exception to be thrown with the message
 ```
 Key 'ssn' not found
+```
+
+<div id="G1"/>
+
+#### Specialize json_type_traits explicitly
+
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](ref/json_type_traits.md) 
+defined. The standard library containers are already supported, 
+and your own types will be supported too if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
+
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
+
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
+        }
+        static ns::book as(const Json& j)
+        {
+            ns::book val;
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
+            return val;
+        }
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
+        {
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
+            return j;
+        }
+    };
+} // namespace jsoncons
+```
+
+To save typing and enhance readability, the jsoncons library defines macros, 
+so you could also write
+
+```c++
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
+```
+
+which expands to the code above.
+
+```c++
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
+
+    std::cout << "(1)\n";
+    for (const auto& item : book_list)
+    {
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
+    }
+
+    std::cout << "\n(2)\n";
+    encode_json(book_list, std::cout, indenting::indent);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
+
+(2)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 22.48,
+        "title": "Pulp"
+    }
+]
 ```
 
 <div id="G5"/>
