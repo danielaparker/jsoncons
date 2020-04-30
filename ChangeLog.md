@@ -24,8 +24,7 @@ Changes:
 - The cbor_option name `enable_typed_arrays` has been deprecated and
 renamed to `use_typed_arrays`. 
 
-- `jsonpointer::unflatten_method::try_array` has been renamed to
-`jsonpointer::unflatten_method::preserve_arrays`.
+- `jsonpointer::unflatten_method` has been deprecated and replaced with `jsonpointer::unflatten_options`.
 
 Enhancements:
 
