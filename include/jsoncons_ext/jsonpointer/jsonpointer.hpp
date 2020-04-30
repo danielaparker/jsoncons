@@ -987,7 +987,7 @@ enum class pointer_state
 
     // unflatten
 
-    enum class unflatten_method {preserve_arrays,object};
+    enum class unflatten_options {none,object = 1};
 
     template<class Json>
     Json safe_unflatten (Json& value)
@@ -1102,7 +1102,7 @@ enum class pointer_state
     }
 
     template<class Json>
-    Json unflatten_to_object(const Json& value, unflatten_method method = unflatten_method::preserve_arrays)
+    Json unflatten_to_object(const Json& value, unflatten_options method = unflatten_options::none)
     {
         using char_type = typename Json::char_type;
 
@@ -1132,13 +1132,13 @@ enum class pointer_state
             }
         }
 
-        return method == unflatten_method::preserve_arrays ? safe_unflatten (result) : result;
+        return method == unflatten_options::none ? safe_unflatten (result) : result;
     }
 
     template<class Json>
-    Json unflatten(const Json& value, unflatten_method method = unflatten_method::preserve_arrays)
+    Json unflatten(const Json& value, unflatten_options method = unflatten_options::none)
     {
-        if (method == unflatten_method::preserve_arrays)
+        if (method == unflatten_options::none)
         {
             jsoncons::optional<Json> j = try_unflatten_array(value);
             return j ? *j : unflatten_to_object(value,method);

@@ -58,7 +58,7 @@
 
 ### Flatten and unflatten
 
-[Flatten a json object with number'ish keys to JSON Pointer/value pairs](#H1)  
+[Flatten a json object with numberlike keys to JSON Pointer/value pairs](#H1)  
 [Flatten a json object to JSONPath/value pairs](#H2)  
 
 ### Search and Replace
@@ -2417,7 +2417,7 @@ Output:
  
 <div id="H1"/> 
 
-#### Flatten a json object with number'ish keys JSON Pointer/value pairs
+#### Flatten a json object with numberlike keys JSON Pointer/value pairs
 
 ```c++
 #include <iostream>
@@ -2452,7 +2452,7 @@ int main()
     std::cout << "(2)\n" << pretty_print(unflattened1) << "\n";
 
     json unflattened2 = jsonpointer::unflatten(flattened,
-        jsonpointer::unflatten_method::object);
+        jsonpointer::unflatten_options::object);
     std::cout << "(3)\n" << pretty_print(unflattened2) << "\n";
 }
 ```
