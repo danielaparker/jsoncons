@@ -553,24 +553,24 @@ void working_with_cbor4()
 void run_cbor_examples()
 {
     std::cout << "\ncbor examples\n\n";
-    cbor_examples::encode_byte_string_with_encoding_hint();
-    cbor_examples::encode_cbor_byte_string();
-    cbor_examples::encode_to_cbor_buffer();
-    cbor_examples::encode_to_cbor_stream();
-    cbor_examples::cbor_reputon_example();
-    cbor_examples::query_cbor();
-    cbor_examples::encode_cbor_with_packed_strings();
+    //cbor_examples::encode_byte_string_with_encoding_hint();
+    //cbor_examples::encode_cbor_byte_string();
+    //cbor_examples::encode_to_cbor_buffer();
+    //cbor_examples::encode_to_cbor_stream();
+    //cbor_examples::cbor_reputon_example();
+    //cbor_examples::query_cbor();
+    //cbor_examples::encode_cbor_with_packed_strings();
 
-    cbor_examples::decode_cbor_with_packed_strings();
+    //cbor_examples::decode_cbor_with_packed_strings();
 
-    cbor_examples::decode_cbor_byte_string();
-    cbor_examples::decode_byte_string_with_encoding_hint();
+    //cbor_examples::decode_cbor_byte_string();
+    //cbor_examples::decode_byte_string_with_encoding_hint();
 
-    cbor_examples::working_with_cbor3();
+    //cbor_examples::working_with_cbor3();
     std::cout << "\n";
-    cbor_examples::working_with_cbor4();
+    //cbor_examples::working_with_cbor4();
     std::cout << "\n";
-    cbor_examples::working_with_cbor1();
+    //cbor_examples::working_with_cbor1();
     std::cout << std::endl;
     cbor_examples::working_with_cbor2();
     std::cout << "\n";

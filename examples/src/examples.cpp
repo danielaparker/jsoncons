@@ -360,7 +360,7 @@ int main()
 
         std::cout << "jsoncons version: " << version() << std::endl;
 
-        object_range_based_for_loop();
+/*        object_range_based_for_loop();
 
         basics_examples();
         basics_wexamples();
@@ -404,10 +404,12 @@ int main()
         serialization_examples();
 
         json_cursor_examples();
-
+ 
         run_ubjson_examples();
+*/
 
         run_cbor_examples();
+/*
 
         type_extensibility_examples();
 
@@ -438,6 +440,7 @@ int main()
         jsonpath_examples();
 
         jsonpointer_examples();
+*/
     }
     catch (const std::exception& e)
     {

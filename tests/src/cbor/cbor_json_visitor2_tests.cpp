@@ -7,6 +7,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons/json_visitor2.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -248,4 +249,58 @@ TEST_CASE("json_visitor2 cbor 5")
     }
 }
 
+TEST_CASE("json_visitor2 cbor 6")
+{
+    const std::vector<uint8_t> input = {
+        0x9f, // Start indefinte length array
+          0x83, // Array of length 3
+            0x63, // String value of length 3
+              0x66,0x6f,0x6f, // "foo" 
+            0x44, // Byte string value of length 4
+              0x50,0x75,0x73,0x73, // 'P''u''s''s'
+            0xc5, // Tag 5 (bigfloat)
+              0x82, // Array of length 2
+                0x20, // -1
+                0x03, // 3   
+          0x83, // Another array of length 3
+            0x63, // String value of length 3
+              0x62,0x61,0x72, // "bar"
+            0xd6, // Expected conversion to base64
+            0x44, // Byte string value of length 4
+              0x50,0x75,0x73,0x73, // 'P''u''s''s'
+            0xc4, // Tag 4 (decimal fraction)
+              0x82, // Array of length 2
+                0x38, // Negative integer of length 1
+                  0x1c, // -29
+                0xc2, // Tag 2 (positive bignum)
+                  0x4d, // Byte string value of length 13
+                    0x01,0x8e,0xe9,0x0f,0xf6,0xc3,0x73,0xe0,0xee,0x4e,0x3f,0x0a,0xd2,
+        0xff // "break"
+    };
+
+    SECTION("test 1")
+    {
+        json_decoder<json> destination;
+        json_visitor2_to_json_visitor visitor{destination};
+
+        cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
+
+        std::error_code ec;
+        parser.parse(visitor, ec);
+        //std::cout << destination.get_result() << "\n";
+    }
+
+    SECTION("test 2")
+    {
+        auto j1 = cbor::decode_cbor<json>(input);
+
+        auto val = cbor::decode_cbor<std::vector<std::tuple<std::string,jsoncons::byte_string,std::string>>>(input);
+
+        // Serialize back to CBOR
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(val, buffer);
+        json j2 = cbor::decode_cbor<json>(buffer);
+        CHECK(j2 == j1);
+    }
+}
 

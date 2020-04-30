@@ -149,6 +149,7 @@ public:
     void reset()
     {
         is_valid_ = false;
+        item_stack_.clear();
         structure_stack_.clear();
         structure_stack_.emplace_back(structure_type::root_t, 0);
     }

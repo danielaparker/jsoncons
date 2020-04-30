@@ -729,19 +729,20 @@ namespace jsoncons {
 
         using string_type = std::basic_string<CharT>;
 
-        enum class level_state {final, key};
+        enum class container_t {root, array, object};
+        enum class output_t {destination, key_buffer};
 
         struct level
         {
         private:
-            level_state state_;
-            bool is_object_;
+            output_t state_;
+            container_t type_;
             int even_odd_;
             std::size_t count_;
         public:
 
-            level(level_state state, bool is_object)
-                : state_(state), is_object_(is_object), even_odd_(is_object? 0 : 1), count_(0)
+            level(output_t state, container_t type)
+                : state_(state), type_(type), even_odd_(type == container_t::object ? 0 : 1), count_(0)
             {
             }
 
@@ -751,7 +752,7 @@ namespace jsoncons {
                 {
                     ++count_;
                 }
-                if (is_object_)
+                if (is_object())
                 {
                     even_odd_ = !even_odd_;
                 }
@@ -764,10 +765,10 @@ namespace jsoncons {
 
             bool is_object() const
             {
-                return is_object_;
+                return type_ == container_t::object;
             }
 
-            level_state target() const
+            output_t write_to() const
             {
                 return state_;
             }
@@ -794,7 +795,7 @@ namespace jsoncons {
         basic_json_visitor2_to_json_visitor(basic_json_visitor<char_type>& visitor)
             : destination_(visitor)
         {
-            level_stack_.emplace_back(level_state::final,false); // root
+            level_stack_.emplace_back(output_t::destination,container_t::root); // root
         }
 
         basic_json_visitor<char_type>& destination()
@@ -812,20 +813,20 @@ namespace jsoncons {
         {
             if (level_stack_.back().is_key())
             {
-                level_stack_.emplace_back(level_state::key, true);
+                level_stack_.emplace_back(output_t::key_buffer, container_t::object);
                 key_buffer_.push_back('{');
                 return true;
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
-                        level_stack_.emplace_back(level_state::key, true);
+                    case output_t::key_buffer:
+                        level_stack_.emplace_back(output_t::key_buffer, container_t::object);
                         key_buffer_.push_back('{');
                         return true;
                     default:
-                        level_stack_.emplace_back(level_state::final, true);
+                        level_stack_.emplace_back(output_t::destination, container_t::object);
                         return destination_.begin_object(tag, context, ec);
                 }
             }
@@ -839,24 +840,24 @@ namespace jsoncons {
                 {
                     key_buffer_.push_back(',');
                 }
-                level_stack_.emplace_back(level_state::key, true);
+                level_stack_.emplace_back(output_t::key_buffer, container_t::object);
                 key_buffer_.push_back('{');
                 return true;
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && !key_buffer_.empty())
                         {
                             key_buffer_.push_back(',');
                         }
-                        level_stack_.emplace_back(level_state::key, true);
+                        level_stack_.emplace_back(output_t::key_buffer, container_t::object);
                         key_buffer_.push_back('{');
                         return true;
                     default:
-                        level_stack_.emplace_back(level_state::final, true);
+                        level_stack_.emplace_back(output_t::destination, container_t::object);
                         return destination_.begin_object(length, tag, context, ec);
                 }
             }
@@ -865,13 +866,13 @@ namespace jsoncons {
         bool visit_end_object(const ser_context& context, std::error_code& ec) override
         {
             bool ret = true;
-            switch (level_stack_.back().target())
+            switch (level_stack_.back().write_to())
             {
-                case level_state::key:
+                case output_t::key_buffer:
                     key_buffer_.push_back('}');
                     level_stack_.pop_back();
                     
-                    if (level_stack_.back().target() == level_state::final)
+                    if (level_stack_.back().write_to() == output_t::destination)
                     {
                         ret = destination_.key(key_buffer_,context, ec);
                         key_buffer_.clear();
@@ -883,9 +884,12 @@ namespace jsoncons {
                     level_stack_.back().advance();
                     break;
                 default:
-                    level_stack_.pop_back();
+                    if (level_stack_.size() > 1)
+                    {
+                        level_stack_.pop_back();
+                        level_stack_.back().advance();
+                    }
                     ret = destination_.end_object(context, ec);
-                    level_stack_.back().advance();
                     break;
             }
             return ret;
@@ -899,24 +903,24 @@ namespace jsoncons {
                 {
                     key_buffer_.push_back(',');
                 }
-                level_stack_.emplace_back(level_state::key, false);
+                level_stack_.emplace_back(output_t::key_buffer, container_t::array);
                 key_buffer_.push_back('[');
                 return true;
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().is_object() && !key_buffer_.empty())
                         {
                             key_buffer_.push_back(',');
                         }
-                        level_stack_.emplace_back(level_state::key, false);
+                        level_stack_.emplace_back(output_t::key_buffer, container_t::array);
                         key_buffer_.push_back('[');
                         return true;
                     default:
-                        level_stack_.emplace_back(level_state::final, false);
+                        level_stack_.emplace_back(output_t::destination, container_t::array);
                         return destination_.begin_array(tag, context, ec);
                 }
             }
@@ -930,24 +934,24 @@ namespace jsoncons {
                 {
                     key_buffer_.push_back(',');
                 }
-                level_stack_.emplace_back(level_state::key, false);
+                level_stack_.emplace_back(output_t::key_buffer, container_t::array);
                 key_buffer_.push_back('[');
                 return true;
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && !key_buffer_.empty())
                         {
                             key_buffer_.push_back(',');
                         }
-                        level_stack_.emplace_back(level_state::key, false);
+                        level_stack_.emplace_back(output_t::key_buffer, container_t::array);
                         key_buffer_.push_back('[');
                         return true;
                     default:
-                        level_stack_.emplace_back(level_state::final, false);
+                        level_stack_.emplace_back(output_t::destination, container_t::array);
                         return destination_.begin_array(length, tag, context, ec);
                 }
             }
@@ -956,12 +960,12 @@ namespace jsoncons {
         bool visit_end_array(const ser_context& context, std::error_code& ec) override
         {
             bool ret = true;
-            switch (level_stack_.back().target())
+            switch (level_stack_.back().write_to())
             {
-                case level_state::key:
+                case output_t::key_buffer:
                     key_buffer_.push_back(']');
                     level_stack_.pop_back();
-                    if (level_stack_.back().target() == level_state::final)
+                    if (level_stack_.back().write_to() == output_t::destination)
                     {
                         ret = destination_.key(key_buffer_, context, ec);
                         key_buffer_.clear();
@@ -973,9 +977,12 @@ namespace jsoncons {
                     level_stack_.back().advance();
                     break;
                 default:
-                    level_stack_.pop_back();
+                    if (level_stack_.size() > 1)
+                    {
+                        level_stack_.pop_back();
+                        level_stack_.back().advance();
+                    }
                     ret = destination_.end_array(context, ec);
-                    level_stack_.back().advance();
                     break;
             }
             return ret;
@@ -990,9 +997,9 @@ namespace jsoncons {
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1010,9 +1017,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1039,7 +1046,7 @@ namespace jsoncons {
         {
             bool ret = true;
 
-            if (level_stack_.back().is_key() || level_stack_.back().target() == level_state::key)
+            if (level_stack_.back().is_key() || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 key_.clear();
                 switch (tag)
@@ -1058,9 +1065,9 @@ namespace jsoncons {
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1078,9 +1085,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1104,7 +1111,7 @@ namespace jsoncons {
         {
             bool ret = true;
 
-            if (level_stack_.back().is_key() || level_stack_.back().target() == level_state::key)
+            if (level_stack_.back().is_key() || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 key_.clear();
                 jsoncons::detail::write_integer(value,key_);
@@ -1112,9 +1119,9 @@ namespace jsoncons {
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1130,9 +1137,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1154,7 +1161,7 @@ namespace jsoncons {
         {
             bool ret = true;
 
-            if (level_stack_.back().is_key() || level_stack_.back().target() == level_state::key)
+            if (level_stack_.back().is_key() || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 key_.clear();
                 jsoncons::detail::write_integer(value,key_);
@@ -1162,9 +1169,9 @@ namespace jsoncons {
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1180,9 +1187,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1204,7 +1211,7 @@ namespace jsoncons {
         {
             bool ret = true;
 
-            if (level_stack_.back().is_key() || level_stack_.back().target() == level_state::key)
+            if (level_stack_.back().is_key() || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 key_.clear();
                 jsoncons::string_sink<string_type> sink(key_);
@@ -1215,9 +1222,9 @@ namespace jsoncons {
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1233,9 +1240,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1257,7 +1264,7 @@ namespace jsoncons {
         {
             bool ret = true;
 
-            if (level_stack_.back().is_key() || level_stack_.back().target() == level_state::key)
+            if (level_stack_.back().is_key() || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 key_.clear();
                 string_sink<string_type> sink(key_);
@@ -1267,9 +1274,9 @@ namespace jsoncons {
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1285,9 +1292,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1309,16 +1316,16 @@ namespace jsoncons {
         {
             bool ret = true;
 
-            if (level_stack_.back().is_key() || level_stack_.back().target() == level_state::key)
+            if (level_stack_.back().is_key() || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 key_ = value ? true_k : false_k;
             }
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1334,9 +1341,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1358,16 +1365,16 @@ namespace jsoncons {
         {
             bool ret = true;
 
-            if (level_stack_.back().is_key() || level_stack_.back().target() == level_state::key)
+            if (level_stack_.back().is_key() || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 key_ = null_k;
             }
 
             if (level_stack_.back().is_key())
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1383,9 +1390,9 @@ namespace jsoncons {
             }
             else
             {
-                switch (level_stack_.back().target())
+                switch (level_stack_.back().write_to())
                 {
-                    case level_state::key:
+                    case output_t::key_buffer:
                         if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
                         {
                             key_buffer_.push_back(',');
@@ -1411,7 +1418,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1429,7 +1436,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1447,7 +1454,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1465,7 +1472,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1483,7 +1490,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1501,7 +1508,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1519,7 +1526,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1537,7 +1544,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1556,7 +1563,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(half_arg,s,tag,context,ec);
             }
@@ -1574,7 +1581,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
@@ -1592,7 +1599,7 @@ namespace jsoncons {
             bool is_key = level_stack_.back().is_key();
             level_stack_.back().advance();
 
-            if (is_key || level_stack_.back().target() == level_state::key)
+            if (is_key || level_stack_.back().write_to() == output_t::key_buffer)
             {
                 return basic_json_visitor2<CharT>::visit_typed_array(s,tag,context,ec);
             }
