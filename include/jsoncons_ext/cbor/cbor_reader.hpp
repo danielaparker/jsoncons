@@ -24,8 +24,10 @@ namespace jsoncons { namespace cbor {
 template <class Src,class Allocator=std::allocator<char>>
 class basic_cbor_reader : public ser_context
 {
+    using char_type = char;
+
     basic_cbor_parser<Src,Allocator> parser_;
-    json_visitor2_to_json_visitor adaptor_;
+    basic_json_visitor2_to_json_visitor<char_type,Allocator> adaptor_;
     json_visitor2& visitor_;
 public:
     template <class Source>
@@ -45,7 +47,7 @@ public:
                       const cbor_decode_options& options = cbor_decode_options(),
                       const Allocator alloc=Allocator())
        : parser_(std::forward<Source>(source), options, alloc),
-         adaptor_(visitor), visitor_(adaptor_)
+         adaptor_(visitor, alloc), visitor_(adaptor_)
     {
     }
     template <class Source>

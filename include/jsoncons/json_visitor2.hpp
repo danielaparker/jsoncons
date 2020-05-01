@@ -12,13 +12,14 @@
 
 namespace jsoncons { 
 
-    template <class CharT>
+    template <class CharT, class Allocator = std::allocator<char>>
     class basic_json_visitor2_to_json_visitor;
 
     template <class CharT>
     class basic_json_visitor2 
     {
-        friend class basic_json_visitor2_to_json_visitor<CharT>;
+        template <class Ch, class Allocator>
+        friend class basic_json_visitor2_to_json_visitor;
     public:
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
@@ -719,7 +720,7 @@ namespace jsoncons {
         }
     };
 
- template <class CharT>
+ template <class CharT, class Allocator>
     class basic_json_visitor2_to_json_visitor : public basic_json_visitor2<CharT>
     {
     public:
@@ -793,13 +794,14 @@ namespace jsoncons {
         basic_json_visitor2_to_json_visitor(const basic_json_visitor2_to_json_visitor&) = delete;
         basic_json_visitor2_to_json_visitor& operator=(const basic_json_visitor2_to_json_visitor&) = delete;
     public:
-        basic_json_visitor2_to_json_visitor()
+        explicit basic_json_visitor2_to_json_visitor(const Allocator& alloc = Allocator())
             : destination_(std::addressof(default_visitor_))
         {
             level_stack_.emplace_back(output_t::destination,container_t::root); // root
         }
 
-        basic_json_visitor2_to_json_visitor(basic_json_visitor<char_type>& visitor)
+        explicit basic_json_visitor2_to_json_visitor(basic_json_visitor<char_type>& visitor, 
+                                                     const Allocator& = Allocator())
             : destination_(std::addressof(visitor))
         {
             level_stack_.emplace_back(output_t::destination,container_t::root); // root

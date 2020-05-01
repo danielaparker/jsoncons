@@ -35,7 +35,7 @@ public:
 private:
     basic_msgpack_parser<Src,Allocator> parser_;
     basic_staj_visitor<char_type> event_handler_;
-    json_visitor2_to_json_visitor event_handler_adaptor_;
+    basic_json_visitor2_to_json_visitor<char_type,Allocator> event_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -73,7 +73,7 @@ public:
                       const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), options, alloc), 
          event_handler_(filter), 
-         event_handler_adaptor_(event_handler_),
+         event_handler_adaptor_(event_handler_, alloc),
          eof_(false)
     {
         if (!done())
@@ -108,7 +108,7 @@ public:
                          std::error_code& ec)
        : parser_(std::forward<Source>(source), alloc), 
          event_handler_(filter),
-         event_handler_adaptor_(event_handler_),
+         event_handler_adaptor_(event_handler_, alloc),
          eof_(false)
     {
         if (!done())
@@ -183,10 +183,10 @@ public:
     {
         struct resource_wrapper
         {
-            json_visitor2_to_json_visitor& adaptor;
+            basic_json_visitor2_to_json_visitor<char_type,Allocator>& adaptor;
             basic_json_visitor<char_type>& original;
 
-            resource_wrapper(json_visitor2_to_json_visitor& adaptor,
+            resource_wrapper(basic_json_visitor2_to_json_visitor<char_type,Allocator>& adaptor,
                              basic_json_visitor<char_type>& visitor)
                 : adaptor(adaptor), original(adaptor.destination())
             {

@@ -24,8 +24,11 @@ namespace jsoncons { namespace msgpack {
 template <class Src,class Allocator=std::allocator<char>>
 class basic_msgpack_reader : public ser_context
 {
+    using char_type = char;
+
     basic_msgpack_parser<Src,Allocator> parser_;
-    json_visitor2_to_json_visitor visitor_;
+    basic_json_visitor2_to_json_visitor<char_type,Allocator> adaptor_;
+    json_visitor2& visitor_;
 public:
     template <class Source>
     basic_msgpack_reader(Source&& source, 
@@ -41,6 +44,26 @@ public:
     template <class Source>
     basic_msgpack_reader(Source&& source, 
                       json_visitor& visitor, 
+                      const msgpack_decode_options& options = msgpack_decode_options(),
+                      const Allocator alloc=Allocator())
+       : parser_(std::forward<Source>(source), options, alloc),
+         adaptor_(visitor, alloc), visitor_(adaptor_)
+    {
+    }
+    template <class Source>
+    basic_msgpack_reader(Source&& source, 
+                      json_visitor2& visitor, 
+                      const Allocator alloc)
+       : basic_msgpack_reader(std::forward<Source>(source),
+                           visitor,
+                           msgpack_decode_options(),
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_msgpack_reader(Source&& source, 
+                      json_visitor2& visitor, 
                       const msgpack_decode_options& options = msgpack_decode_options(),
                       const Allocator alloc=Allocator())
        : parser_(std::forward<Source>(source), options, alloc),
