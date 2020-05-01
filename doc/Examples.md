@@ -58,7 +58,7 @@
 
 ### Flatten and unflatten
 
-[Flatten a json object with numberlike keys to JSON Pointer/value pairs](#H1)  
+[Flatten a json object with numberish keys to JSON Pointer/value pairs](#H1)  
 [Flatten a json object to JSONPath/value pairs](#H2)  
 
 ### Search and Replace
@@ -576,7 +576,7 @@ namespace ns {
         double price() const{return price_;}
     };
 
-    // Class with gettors and setters
+    // #4 Class with gettors and setters
     class Book4
     {
         BookCategory category_;
@@ -2464,7 +2464,7 @@ Output:
  
 <div id="H1"/> 
 
-#### Flatten a json object with numberlike keys JSON Pointer/value pairs
+#### Flatten a json object with numberish keys to JSON Pointer/value pairs
 
 ```c++
 #include <iostream>
