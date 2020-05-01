@@ -2464,7 +2464,7 @@ Output:
  
 <div id="H1"/> 
 
-#### Flatten a json object with numberlike keys JSON Pointer/value pairs
+#### Flatten a json object with numberlike keys to JSON Pointer/value pairs
 
 ```c++
 #include <iostream>
