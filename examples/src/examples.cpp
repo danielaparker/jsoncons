@@ -360,7 +360,7 @@ int main()
 
         std::cout << "jsoncons version: " << version() << std::endl;
 
-/*        object_range_based_for_loop();
+        object_range_based_for_loop();
 
         basics_examples();
         basics_wexamples();
@@ -406,10 +406,8 @@ int main()
         json_cursor_examples();
  
         run_ubjson_examples();
-*/
 
         run_cbor_examples();
-/*
 
         type_extensibility_examples();
 
@@ -425,13 +423,9 @@ int main()
 
         json_accessor_examples();
 
-        json_traits_macros_named_examples();
-
         json_accessor_examples();
 
         run_cbor_typed_array_examples();
-
-        json_traits_macros_examples();
 
         jsonpatch_examples();
 
@@ -440,7 +434,10 @@ int main()
         jsonpath_examples();
 
         jsonpointer_examples();
-*/
+
+        json_traits_macros_examples();
+
+        json_traits_macros_named_examples();
     }
     catch (const std::exception& e)
     {

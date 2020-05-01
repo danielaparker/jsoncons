@@ -66,11 +66,6 @@ namespace json_type_traits_named_macro_tests
         {
         }
 
-        book2a(const book2a&) = default;
-        book2a(book2a&&) = default;
-        book2a& operator=(const book2a&) = default;
-        book2a& operator=(book2a&&) = default;
-
         const std::string& author() const
         {
             return author_;
@@ -104,11 +99,6 @@ namespace json_type_traits_named_macro_tests
               publisher_(publisher)
         {
         }
-
-        book2b(const book2b&) = default;
-        book2b(book2b&&) = default;
-        book2b& operator=(const book2b&) = default;
-        book2b& operator=(book2b&&) = default;
 
         const std::string& author() const
         {
@@ -153,11 +143,6 @@ namespace json_type_traits_named_macro_tests
             : author_(author), title_(title), price_(price)
         {
         }
-
-        book3a(const book3a&) = default;
-        book3a(book3a&&) = default;
-        book3a& operator=(const book3a&) = default;
-        book3a& operator=(book3a&&) = default;
 
         const std::string& get_author() const
         {
@@ -209,11 +194,6 @@ namespace json_type_traits_named_macro_tests
             : author_(author), title_(title), price_(price), isbn_(isbn)
         {
         }
-
-        book3b(const book3b&) = default;
-        book3b(book3b&&) = default;
-        book3b& operator=(const book3b&) = default;
-        book3b& operator=(book3b&&) = default;
 
         const std::string& get_author() const
         {
@@ -273,11 +253,6 @@ namespace json_type_traits_named_macro_tests
             : author_(author), title_(title), price_(price)
         {
         }
-
-        book5(const book5&) = default;
-        book5(book5&&) = default;
-        book5& operator=(const book5&) = default;
-        book5& operator=(book5&&) = default;
 
         const std::string& get_author() const
         {

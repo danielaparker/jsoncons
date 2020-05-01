@@ -8,7 +8,8 @@
 #include <iomanip>
 #include <jsoncons/json.hpp>
 
-namespace json_type_traits_macros_examples_ns {
+namespace { 
+namespace ns {
 
     class Foo
     {
@@ -29,6 +30,17 @@ namespace json_type_traits_macros_examples_ns {
     };
 
     enum class BookCategory {fiction,biography};
+
+    inline
+    std::ostream& operator<<(std::ostream& os, const BookCategory& category)
+    {
+        switch (category)
+        {
+            case BookCategory::fiction: os << "fiction, "; break;
+            case BookCategory::biography: os << "biography, "; break;
+        }
+        return os;
+    }
 
     // #1 Class with public member data and default constructor   
     struct Book1
@@ -75,11 +87,6 @@ namespace json_type_traits_macros_examples_ns {
         {
         }
 
-        Book3(const Book3&) = default;
-        Book3(Book3&&) = default;
-        Book3& operator=(const Book3&) = default;
-        Book3& operator=(Book3&&) = default;
-
         BookCategory category() const {return category_;}
 
         const std::string& author() const{return author_;}
@@ -87,6 +94,68 @@ namespace json_type_traits_macros_examples_ns {
         const std::string& title() const{return title_;}
 
         double price() const{return price_;}
+    };
+
+    // Class with gettors and setters
+    class Book4
+    {
+        BookCategory category_;
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        Book4()
+            : price_(0)
+        {
+        }
+
+        Book4(BookCategory category,
+              const std::string& author,
+              const std::string& title,
+              double price)
+            : category_(category), author_(author), title_(title), price_(price)
+        {
+        }
+
+        BookCategory get_category() const
+        {
+            return category_;
+        }
+
+        void set_category(BookCategory value)
+        {
+            category_ = value;
+        }
+
+        const std::string& get_author() const
+        {
+            return author_;
+        }
+
+        void set_author(const std::string& value)
+        {
+            author_ = value;
+        }
+
+        const std::string& get_title() const
+        {
+            return title_;
+        }
+
+        void set_title(const std::string& value)
+        {
+            title_ = value;
+        }
+
+        double get_price() const
+        {
+            return price_;
+        }
+
+        void set_price(double value)
+        {
+            price_ = value;
+        }
     };
 
     class Employee
@@ -117,10 +186,6 @@ namespace json_type_traits_macros_examples_ns {
               wage_(wage), hours_(hours)
         {
         }
-        HourlyEmployee(const HourlyEmployee&) = default;
-        HourlyEmployee(HourlyEmployee&&) = default;
-        HourlyEmployee& operator=(const HourlyEmployee&) = default;
-        HourlyEmployee& operator=(HourlyEmployee&&) = default;
 
         double wage() const {return wage_;}
 
@@ -144,10 +209,6 @@ namespace json_type_traits_macros_examples_ns {
               baseSalary_(baseSalary), commission_(commission), sales_(sales)
         {
         }
-        CommissionedEmployee(const CommissionedEmployee&) = default;
-        CommissionedEmployee(CommissionedEmployee&&) = default;
-        CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
-        CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
 
         double baseSalary() const
         {
@@ -211,9 +272,8 @@ namespace json_type_traits_macros_examples_ns {
 
 #endif
 
-} // json_type_traits_macros_examples_ns
-
-namespace ns = json_type_traits_macros_examples_ns;
+} // namespace ns
+} // namespace 
 
 // Declare the traits at global scope
 JSONCONS_ENUM_TRAITS(ns::BookCategory,fiction,biography)
@@ -221,6 +281,7 @@ JSONCONS_ENUM_TRAITS(ns::BookCategory,fiction,biography)
 JSONCONS_ALL_MEMBER_TRAITS(ns::Book1,category,author,title,price)
 JSONCONS_ALL_MEMBER_TRAITS(ns::Book2,category,author,title,price)
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::Book3,category,author,title,price)
+JSONCONS_ALL_GETTER_SETTER_TRAITS(ns::Book4,get_,set_,category,author,title,price)
 
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
@@ -332,12 +393,8 @@ namespace {
         auto books1 = decode_json<std::vector<ns::Book1>>(input);
         for (const auto& item : books1)
         {
-            switch(item.category)
-            {
-                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-                case ns::BookCategory::biography: std::cout << "biography, "; break;
-            }
-            std::cout << item.author << ", " 
+            std::cout << item.category << ", "
+                      << item.author << ", " 
                       << item.title << ", " 
                       << item.price << "\n";
         }
@@ -349,12 +406,8 @@ namespace {
         auto books2 = decode_json<std::vector<ns::Book2>>(input);
         for (const auto& item : books2)
         {
-            switch(item.get_category())
-            {
-                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-                case ns::BookCategory::biography: std::cout << "biography, "; break;
-            }
-            std::cout << item.get_author() << ", " 
+            std::cout << item.get_category() << ", "
+                      << item.get_author() << ", " 
                       << item.get_title() << ", " 
                       << item.get_price() << "\n";
         }
@@ -366,17 +419,26 @@ namespace {
         auto books3 = decode_json<std::vector<ns::Book3>>(input);
         for (const auto& item : books3)
         {
-            switch(item.category())
-            {
-                case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-                case ns::BookCategory::biography: std::cout << "biography, "; break;
-            }
-            std::cout << item.author() << ", " 
+            std::cout << item.category() << ", "
+                      << item.author() << ", " 
                       << item.title() << ", " 
                       << item.price() << "\n";
         }
         std::cout << "\n";
         encode_json(books3, std::cout, indenting::indent);
+        std::cout << "\n\n";
+
+        std::cout << "(4)\n\n";
+        auto books4 = decode_json<std::vector<ns::Book4>>(input);
+        for (const auto& item : books4)
+        {
+            std::cout << item.get_category() << ", "
+                      << item.get_author() << ", " 
+                      << item.get_title() << ", " 
+                      << item.get_price() << "\n";
+        }
+        std::cout << "\n";
+        encode_json(books4, std::cout, indenting::indent);
         std::cout << "\n\n";
     }
 
