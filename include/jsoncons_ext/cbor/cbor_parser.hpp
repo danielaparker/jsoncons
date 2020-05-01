@@ -318,12 +318,13 @@ public:
                             }
                             break;
                         default:
+                            state_stack_.back().mode = parse_mode::indefinite_map_value;
                             read_item(visitor, ec);
                             if (ec)
                             {
                                 return;
                             }
-                            state_stack_.back().mode = parse_mode::indefinite_map_value;
+                            //state_stack_.back().mode = parse_mode::indefinite_map_value;
                             break;
                     }
                     break;

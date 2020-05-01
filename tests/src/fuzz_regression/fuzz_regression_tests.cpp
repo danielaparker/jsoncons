@@ -197,7 +197,6 @@ namespace {
 
 TEST_CASE("oss-fuzz issues")
 {
-#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -507,10 +506,9 @@ TEST_CASE("oss-fuzz issues")
 
         //std::cout << visitor.get_result() << "" << std::endl;
     }
-#endif
+
     // Fuzz target: fuzz_cbor
     // Issue: failed_throw
-    // Notes: visit_key {,{}:{null:null,null:null,null:null,0:}}
     SECTION("issue 21948")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5743359164678144";
@@ -518,22 +516,14 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
 
-        //diagnostics_visitor visitor0;
-        //json_decoder<json> visitor1;
-        //json_tee_visitor visitor(visitor0, visitor1);
-
-        diagnostics_visitor2 visitor;
-
-        //json_decoder<json> visitor;
+        json_decoder<json> visitor;
         cbor::cbor_options options;
 
         cbor::cbor_stream_reader reader(is,visitor,options);
 
         std::error_code ec;
-        reader.read(ec);
-        std::cout << ec.message() << "" << std::endl;
-        //REQUIRE_NOTHROW(reader.read(ec));
-        //CHECK((ec == cbor::cbor_errc::max_nesting_depth_exceeded)); 
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK((ec == cbor::cbor_errc::unknown_type)); 
     }
 }
 

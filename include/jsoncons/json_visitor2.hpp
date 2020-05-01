@@ -825,6 +825,10 @@ namespace jsoncons {
         {
             if (level_stack_.back().is_key())
             {
+                if (level_stack_.back().write_to() == output_t::key_buffer && level_stack_.back().count() > 0)
+                {
+                    key_buffer_.push_back(',');
+                }
                 level_stack_.emplace_back(output_t::key_buffer, container_t::object);
                 key_buffer_.push_back('{');
                 return true;
@@ -848,7 +852,7 @@ namespace jsoncons {
         {
             if (level_stack_.back().is_key())
             {
-                if (level_stack_.back().is_object() && level_stack_.back().count() > 0)
+                if (level_stack_.back().write_to() == output_t::key_buffer && level_stack_.back().count() > 0)
                 {
                     key_buffer_.push_back(',');
                 }
@@ -910,7 +914,7 @@ namespace jsoncons {
         {
             if (level_stack_.back().is_key())
             {
-                if (level_stack_.back().is_object() && level_stack_.back().count() > 0)
+                if (level_stack_.back().write_to() == output_t::key_buffer && level_stack_.back().count() > 0)
                 {
                     key_buffer_.push_back(',');
                 }
@@ -941,7 +945,7 @@ namespace jsoncons {
         {
             if (level_stack_.back().is_key())
             {
-                if (level_stack_.back().is_object() && level_stack_.back().count() > 0)
+                if (level_stack_.back().write_to() == output_t::key_buffer && level_stack_.back().count() > 0)
                 {
                     key_buffer_.push_back(',');
                 }
