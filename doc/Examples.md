@@ -58,7 +58,7 @@
 
 ### Flatten and unflatten
 
-[Flatten a json object with numberlike keys to JSON Pointer/value pairs](#H1)  
+[Flatten a json object with numberish keys to JSON Pointer/value pairs](#H1)  
 [Flatten a json object to JSONPath/value pairs](#H2)  
 
 ### Search and Replace
@@ -2464,7 +2464,7 @@ Output:
  
 <div id="H1"/> 
 
-#### Flatten a json object with numberlike keys to JSON Pointer/value pairs
+#### Flatten a json object with numberish keys to JSON Pointer/value pairs
 
 ```c++
 #include <iostream>
