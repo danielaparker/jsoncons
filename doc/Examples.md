@@ -1530,88 +1530,80 @@ using namespace jsoncons;
 
 namespace ns {
 
-class Employee
-{
-    std::string firstName_;
-    std::string lastName_;
-public:
-    Employee(const std::string& firstName, const std::string& lastName)
-        : firstName_(firstName), lastName_(lastName)
+    class Employee
     {
-    }
-    virtual ~Employee() noexcept = default;
+        std::string firstName_;
+        std::string lastName_;
+    public:
+        Employee(const std::string& firstName, const std::string& lastName)
+            : firstName_(firstName), lastName_(lastName)
+        {
+        }
+        virtual ~Employee() noexcept = default;
 
-    virtual double calculatePay() const = 0;
+        virtual double calculatePay() const = 0;
 
-    const std::string& firstName() const {return firstName_;}
-    const std::string& lastName() const {return lastName_;}
-};
+        const std::string& firstName() const {return firstName_;}
+        const std::string& lastName() const {return lastName_;}
+    };
 
-class HourlyEmployee : public Employee
-{
-    double wage_;
-    unsigned hours_;
-public:
-    HourlyEmployee(const std::string& firstName, const std::string& lastName, 
-                   double wage, unsigned hours)
-        : Employee(firstName, lastName), 
-          wage_(wage), hours_(hours)
+    class HourlyEmployee : public Employee
     {
-    }
-    HourlyEmployee(const HourlyEmployee&) = default;
-    HourlyEmployee(HourlyEmployee&&) = default;
-    HourlyEmployee& operator=(const HourlyEmployee&) = default;
-    HourlyEmployee& operator=(HourlyEmployee&&) = default;
+        double wage_;
+        unsigned hours_;
+    public:
+        HourlyEmployee(const std::string& firstName, const std::string& lastName, 
+                       double wage, unsigned hours)
+            : Employee(firstName, lastName), 
+              wage_(wage), hours_(hours)
+        {
+        }
 
-    double wage() const {return wage_;}
+        double wage() const {return wage_;}
 
-    unsigned hours() const {return hours_;}
+        unsigned hours() const {return hours_;}
 
-    double calculatePay() const override
+        double calculatePay() const override
+        {
+            return wage_*hours_;
+        }
+    };
+
+    class CommissionedEmployee : public Employee
     {
-        return wage_*hours_;
-    }
-};
+        double baseSalary_;
+        double commission_;
+        unsigned sales_;
+    public:
+        CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
+                             double baseSalary, double commission, unsigned sales)
+            : Employee(firstName, lastName), 
+              baseSalary_(baseSalary), commission_(commission), sales_(sales)
+        {
+        }
 
-class CommissionedEmployee : public Employee
-{
-    double baseSalary_;
-    double commission_;
-    unsigned sales_;
-public:
-    CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
-                         double baseSalary, double commission, unsigned sales)
-        : Employee(firstName, lastName), 
-          baseSalary_(baseSalary), commission_(commission), sales_(sales)
-    {
-    }
-    CommissionedEmployee(const CommissionedEmployee&) = default;
-    CommissionedEmployee(CommissionedEmployee&&) = default;
-    CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
-    CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
+        double baseSalary() const
+        {
+            return baseSalary_;
+        }
 
-    double baseSalary() const
-    {
-        return baseSalary_;
-    }
+        double commission() const
+        {
+            return commission_;
+        }
 
-    double commission() const
-    {
-        return commission_;
-    }
+        unsigned sales() const
+        {
+            return sales_;
+        }
 
-    unsigned sales() const
-    {
-        return sales_;
-    }
+        double calculatePay() const override
+        {
+            return baseSalary_ + commission_*sales_;
+        }
+    };
 
-    double calculatePay() const override
-    {
-        return baseSalary_ + commission_*sales_;
-    }
-};
-
-} // ns
+} // namespace ns
 
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
