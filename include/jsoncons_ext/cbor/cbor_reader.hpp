@@ -25,7 +25,8 @@ template <class Src,class Allocator=std::allocator<char>>
 class basic_cbor_reader : public ser_context
 {
     basic_cbor_parser<Src,Allocator> parser_;
-    json_visitor2_to_json_visitor visitor_;
+    json_visitor2_to_json_visitor adaptor_;
+    json_visitor2& visitor_;
 public:
     template <class Source>
     basic_cbor_reader(Source&& source, 
@@ -41,6 +42,26 @@ public:
     template <class Source>
     basic_cbor_reader(Source&& source, 
                       json_visitor& visitor, 
+                      const cbor_decode_options& options = cbor_decode_options(),
+                      const Allocator alloc=Allocator())
+       : parser_(std::forward<Source>(source), options, alloc),
+         adaptor_(visitor), visitor_(adaptor_)
+    {
+    }
+    template <class Source>
+    basic_cbor_reader(Source&& source, 
+                      json_visitor2& visitor, 
+                      const Allocator alloc)
+       : basic_cbor_reader(std::forward<Source>(source),
+                           visitor,
+                           cbor_decode_options(),
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_cbor_reader(Source&& source, 
+                      json_visitor2& visitor, 
                       const cbor_decode_options& options = cbor_decode_options(),
                       const Allocator alloc=Allocator())
        : parser_(std::forward<Source>(source), options, alloc),

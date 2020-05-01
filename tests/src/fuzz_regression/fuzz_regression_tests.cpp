@@ -73,6 +73,97 @@ namespace {
             std::cout << "visit_bool " << val << std::endl; 
             return true;
         }
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_null " << std::endl; 
+            return true;
+        }
+
+        bool visit_typed_array(const span<const uint16_t>& s, 
+                                    semantic_tag tag, 
+                                    const ser_context&, 
+                                    std::error_code&) override  
+        {
+            std::cout << "visit_typed_array uint16_t " << tag << std::endl; 
+            for (auto val : s)
+            {
+                std::cout << val << "" << std::endl;
+            }
+            std::cout << "" << std::endl;
+            return true;
+        }
+
+        bool visit_typed_array(half_arg_t, const span<const uint16_t>& s,
+            semantic_tag tag,
+            const ser_context&,
+            std::error_code&) override
+        {
+            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << std::endl;
+            for (auto val : s)
+            {
+                std::cout << val << "" << std::endl;
+            }
+            std::cout << "" << std::endl;
+            return true;
+        }
+    };
+
+    class diagnostics_visitor2 : public default_json_visitor2
+    {
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object" << std::endl; 
+            return true;
+        }
+
+        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object " << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_object(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_object" << std::endl; 
+            return true;
+        }
+        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_array " << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_array(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_array" << std::endl; 
+            return true;
+        }
+
+        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_string " << s << std::endl; 
+            return true;
+        }
+        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_int64 " << val << std::endl; 
+            return true;
+        }
+        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_uint64 " << val << std::endl; 
+            return true;
+        }
+        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_bool " << val << std::endl; 
+            return true;
+        }
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_null " << std::endl; 
+            return true;
+        }
 
         bool visit_typed_array(const span<const uint16_t>& s, 
                                     semantic_tag tag, 
@@ -103,7 +194,6 @@ namespace {
         }
     };
 } // namespace
-
 
 TEST_CASE("oss-fuzz issues")
 {
@@ -415,6 +505,25 @@ TEST_CASE("oss-fuzz issues")
         CHECK((ec == csv::csv_errc::source_error));
 
         //std::cout << visitor.get_result() << "" << std::endl;
+    }
+
+    // Fuzz target: fuzz_cbor
+    // Issue: failed_throw
+    SECTION("issue 21948")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5743359164678144";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        json_decoder<json> visitor;
+        cbor::cbor_options options;
+
+        cbor::cbor_stream_reader reader(is,visitor,options);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK((ec == cbor::cbor_errc::unknown_type)); 
     }
 }
 
