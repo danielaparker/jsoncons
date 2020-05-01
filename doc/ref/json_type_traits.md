@@ -842,10 +842,6 @@ public:
           wage_(wage), hours_(hours)
     {
     }
-    HourlyEmployee(const HourlyEmployee&) = default;
-    HourlyEmployee(HourlyEmployee&&) = default;
-    HourlyEmployee& operator=(const HourlyEmployee&) = default;
-    HourlyEmployee& operator=(HourlyEmployee&&) = default;
 
     double wage() const {return wage_;}
 
@@ -869,10 +865,6 @@ public:
           baseSalary_(baseSalary), commission_(commission), sales_(sales)
     {
     }
-    CommissionedEmployee(const CommissionedEmployee&) = default;
-    CommissionedEmployee(CommissionedEmployee&&) = default;
-    CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
-    CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
 
     double baseSalary() const
     {
