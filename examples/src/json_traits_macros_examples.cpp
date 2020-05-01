@@ -96,7 +96,7 @@ namespace ns {
         double price() const{return price_;}
     };
 
-    // Class with gettors and setters
+    // #4 Class with gettors and setters
     class Book4
     {
         BookCategory category_;
