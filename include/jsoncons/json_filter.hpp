@@ -253,7 +253,6 @@ private:
     {
         return destination_.end_multi_dim(context, ec);
     }
-
 };
 
 template <class CharT>
