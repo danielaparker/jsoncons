@@ -278,7 +278,6 @@ TEST_CASE("oss-fuzz issues")
         csv::csv_reader reader(is,visitor,options);
 
         std::error_code ec;
-        reader.read(ec);
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK_FALSE(ec);
 
@@ -499,7 +498,6 @@ TEST_CASE("oss-fuzz issues")
 
         csv::csv_reader reader(is, visitor);
         std::error_code ec;
-        reader.read(ec);
 
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK((ec == csv::csv_errc::source_error));
@@ -524,6 +522,30 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK((ec == cbor::cbor_errc::unknown_type)); 
+    }
+
+    // Fuzz target: fuzz_csv_encoder
+    // Issue: Failed throw
+    // Resolution: 
+    SECTION("issue 21990")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv_encoder-5682837304115200.fuzz";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::string s2;
+        csv::csv_string_encoder visitor(s2);
+
+        csv::csv_reader reader(is, visitor);
+        std::error_code ec;
+        reader.read(ec);
+        std::cout << ec.message() << "\n";
+
+        //REQUIRE_NOTHROW(reader.read(ec));
+        //CHECK((ec == csv::csv_errc::source_error));
+
+        //std::cout << visitor.get_result() << "" << std::endl;
     }
 }
 

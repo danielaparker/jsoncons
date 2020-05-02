@@ -943,27 +943,28 @@ base16_to_integer(const CharT* s, std::size_t length)
 
 #if defined(JSONCONS_HAS_MSC__STRTOD_L)
 
-class string_to_double
+class to_double_t
 {
 private:
     _locale_t locale_;
 public:
-    string_to_double()
+    to_double_t()
     {
         locale_ = _create_locale(LC_NUMERIC, "C");
     }
-    ~string_to_double() noexcept
+    ~to_double_t() noexcept
     {
         _free_locale(locale_);
     }
 
-    string_to_double(const string_to_double&)
+    to_double_t(const to_double_t&)
     {
         locale_ = _create_locale(LC_NUMERIC, "C");
     }
 
-    string_to_double& operator=(const string_to_double&) 
+    to_double_t& operator=(const to_double_t&) 
     {
+        // Don't assign locale
         return *this;
     }
 
@@ -1001,26 +1002,26 @@ public:
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
 
-class string_to_double
+class to_double_t
 {
 private:
     locale_t locale_;
 public:
-    string_to_double()
+    to_double_t()
     {
         locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
     }
-    ~string_to_double() noexcept
+    ~to_double_t() noexcept
     {
         freelocale(locale_);
     }
 
-    string_to_double(const string_to_double&)
+    to_double_t(const to_double_t&)
     {
         locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
     }
 
-    string_to_double& operator=(const string_to_double&) 
+    to_double_t& operator=(const to_double_t&) 
     {
         return *this;
     }
@@ -1058,13 +1059,13 @@ public:
 };
 
 #else
-class string_to_double
+class to_double_t
 {
 private:
     std::vector<char> buffer_;
     char decimal_point_;
 public:
-    string_to_double()
+    to_double_t()
         : buffer_()
     {
         struct lconv * lc = localeconv();
@@ -1079,8 +1080,8 @@ public:
         buffer_.reserve(100);
     }
 
-    string_to_double(const string_to_double&) = default;
-    string_to_double& operator=(const string_to_double&) = default;
+    to_double_t(const to_double_t&) = default;
+    to_double_t& operator=(const to_double_t&) = default;
 
     char get_decimal_point() const
     {

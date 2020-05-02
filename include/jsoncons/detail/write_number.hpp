@@ -195,7 +195,7 @@ bool dtoa_scientific(double val, char decimal_point, Result& result)
         return true;
     }
 
-    jsoncons::detail::string_to_double to_double_;
+    jsoncons::detail::to_double_t to_double_;
 
     char buffer[100];
     int precision = std::numeric_limits<double>::digits10;
@@ -228,7 +228,7 @@ bool dtoa_general(double val, char decimal_point, Result& result, std::false_typ
         return true;
     }
 
-    jsoncons::detail::string_to_double to_double_;
+    jsoncons::detail::to_double_t to_double_;
 
     char buffer[100];
     int precision = std::numeric_limits<double>::digits10;
@@ -295,7 +295,7 @@ bool dtoa_fixed(double val, char decimal_point, Result& result, std::false_type)
         return true;
     }
 
-    jsoncons::detail::string_to_double to_double_;
+    jsoncons::detail::to_double_t to_double_;
 
     char buffer[100];
     int precision = std::numeric_limits<double>::digits10;
@@ -364,7 +364,7 @@ bool dtoa_general(double v, char decimal_point, Result& result)
 class write_double
 {
 private:
-    string_to_double to_double_;
+    to_double_t to_double_;
     float_chars_format float_format_;
     int precision_;
     char decimal_point_;

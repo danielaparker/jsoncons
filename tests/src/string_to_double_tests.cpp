@@ -36,7 +36,7 @@ TEST_CASE("test_string_to_double")
 
 TEST_CASE("test_exponent")
 {
-    jsoncons::detail::string_to_double reader;
+    jsoncons::detail::to_double_t reader;
     const char* begin = "1.15507e-173";
     char* endptr = nullptr;
     const double value1 = 1.15507e-173;

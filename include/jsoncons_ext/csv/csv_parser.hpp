@@ -520,7 +520,7 @@ private:
     std::size_t column_index_;
     std::size_t level_;
     std::size_t offset_;
-    jsoncons::detail::string_to_double to_double_; 
+    jsoncons::detail::to_double_t to_double_; 
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
@@ -1905,10 +1905,6 @@ private:
                         ++precision;
                         buffer.push_back(*p);
                         state = numeric_check_state::integer;
-                        break;
-                    case 'e':case 'E':
-                        buffer.push_back(*p);
-                        state = numeric_check_state::exp1;
                         break;
                     default:
                         state = numeric_check_state::done;
