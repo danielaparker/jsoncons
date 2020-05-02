@@ -508,7 +508,7 @@ namespace {
         std::cout << "(2)\n" << pretty_print(unflattened1) << "\n";
 
         json unflattened2 = jsonpointer::unflatten(flattened,
-            jsonpointer::unflatten_options::object);
+            jsonpointer::unflatten_options::assume_object);
         std::cout << "(3)\n" << pretty_print(unflattened2) << "\n";
     }
 } // namespace

@@ -12,5 +12,5 @@ An integer appearing in a path could be an array index or it could be an object 
 Value      |Definition
 -----------|-----------
 none|Default is to attempt to preserve arrays
-object|Assume an integer appearing in a path is an object key
+assume_object|Assume an integer appearing in a path is an object key
 
