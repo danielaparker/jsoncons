@@ -926,7 +926,9 @@ bar,UHVzcw==,273.15
 
 ## Supported compilers
 
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+jsoncons requires a C++11 compiler. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
+Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/google/oss-fuzz), with coverage for all parsers and encoders.
 
 | Compiler                | Version                   |Architecture | Operating System  | Notes |
 |-------------------------|---------------------------|-------------|-------------------|-------|
@@ -939,10 +941,6 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 |                         | 4.9.2                     | i386        | Debian 8          |       |
 | clang                   | 3.8 and above             | x64         | Ubuntu            |       |
 | clang xcode             | 6.4 and above             | x64         | OSX               |       |
-
-[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
-
-jsoncons is now integrated with [Google OSS-fuzz](https://github.com/google/oss-fuzz), with coverage for all parsers and encoders.
 
 ## Building the test suite and examples with CMake
 

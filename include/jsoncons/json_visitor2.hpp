@@ -727,8 +727,9 @@ namespace jsoncons {
         using typename basic_json_visitor2<CharT>::char_type;
         using typename basic_json_visitor2<CharT>::string_view_type;
     private:
+        using char_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<char_type>;
 
-        using string_type = std::basic_string<CharT>;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
 
         enum class container_t {root, array, object};
         enum class output_t {destination, key_buffer};
@@ -779,30 +780,33 @@ namespace jsoncons {
                 return count_;
             }
         };
+        using level_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<level>;
 
         basic_json_visitor<char_type>* destination_;
         string_type key_;
         string_type key_buffer_;
-        std::vector<level> level_stack_;
+        std::vector<level,level_allocator_type> level_stack_;
         basic_default_json_visitor<char_type> default_visitor_;
 
-        const string_type null_k = {'n','u','l','l'};
-        const string_type true_k = { 't','r','u','e' };
-        const string_type false_k = { 'f', 'a', 'l', 's', 'e' };
+        const std::basic_string<char> null_k = {'n','u','l','l'};
+        const std::basic_string<char> true_k = { 't','r','u','e' };
+        const std::basic_string<char> false_k = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
         basic_json_visitor2_to_json_visitor(const basic_json_visitor2_to_json_visitor&) = delete;
         basic_json_visitor2_to_json_visitor& operator=(const basic_json_visitor2_to_json_visitor&) = delete;
     public:
         explicit basic_json_visitor2_to_json_visitor(const Allocator& alloc = Allocator())
-            : destination_(std::addressof(default_visitor_))
+            : destination_(std::addressof(default_visitor_)), 
+              key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
             level_stack_.emplace_back(output_t::destination,container_t::root); // root
         }
 
         explicit basic_json_visitor2_to_json_visitor(basic_json_visitor<char_type>& visitor, 
-                                                     const Allocator& = Allocator())
-            : destination_(std::addressof(visitor))
+                                                     const Allocator& alloc = Allocator())
+            : destination_(std::addressof(visitor)), 
+              key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
             level_stack_.emplace_back(output_t::destination,container_t::root); // root
         }
