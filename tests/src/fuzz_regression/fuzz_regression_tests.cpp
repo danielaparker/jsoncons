@@ -455,7 +455,7 @@ TEST_CASE("oss-fuzz issues")
         bson::bson_stream_reader reader(is,visitor,options);
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == bson::bson_errc::unexpected_eof);
+        CHECK(ec == bson::bson_errc::unknown_type);
     }
 
     // Fuzz target: fuzz_cbor_encoder
