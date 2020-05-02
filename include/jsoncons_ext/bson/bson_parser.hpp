@@ -111,6 +111,7 @@ public:
         if (source_.is_error())
         {
             ec = bson_errc::source_error;
+            more_ = false;
             return;
         }
         
@@ -128,6 +129,7 @@ public:
                     if (source_.get(t) == 0)
                     {
                         ec = bson_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     if (t != 0x00)
@@ -148,6 +150,7 @@ public:
                     if (source_.get(t) == 0)
                     {
                         ec = bson_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     if (t != 0x00)
@@ -185,12 +188,14 @@ private:
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
+            more_ = false;
             return;
         } 
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
+            more_ = false;
             return;
         }
         const uint8_t* endp;
@@ -212,12 +217,14 @@ private:
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
+            more_ = false;
             return;
         } 
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
+            more_ = false;
             return;
         }
         const uint8_t* endp;
@@ -249,6 +256,7 @@ private:
             if (result.ec != unicons::conv_errc())
             {
                 ec = bson_errc::invalid_utf8_text_string;
+                more_ = false;
                 return;
             }
             more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
@@ -265,6 +273,7 @@ private:
                 if (source_.read(buf, sizeof(double)) != sizeof(double))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -278,6 +287,7 @@ private:
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -285,6 +295,7 @@ private:
                 if (len < 1)
                 {
                     ec = bson_errc::string_length_is_non_positive;
+                    more_ = false;
                     return;
                 }
 
@@ -293,18 +304,21 @@ private:
                 if (source_reader<Src>::read(source_,s,size) != size)
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 uint8_t c{};
                 if (source_.get(c) == 0) // discard 0
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = bson_errc::invalid_utf8_text_string;
+                    more_ = false;
                     return;
                 }
                 more_ = visitor.string_value(basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
@@ -332,6 +346,7 @@ private:
                 if (source_.get(val) == 0)
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 more_ = visitor.bool_value(val != 0, semantic_tag::none, *this, ec);
@@ -343,6 +358,7 @@ private:
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -357,6 +373,7 @@ private:
                 if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -371,6 +388,7 @@ private:
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -385,6 +403,7 @@ private:
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -398,6 +417,7 @@ private:
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -405,12 +425,14 @@ private:
                 if (len < 0)
                 {
                     ec = bson_errc::length_is_negative;
+                    more_ = false;
                     return;
                 }
                 std::vector<uint8_t> v;
                 if (source_reader<Src>::read(source_, v, len) != static_cast<std::size_t>(len))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
 
@@ -423,6 +445,7 @@ private:
             default:
             {
                 ec = bson_errc::unknown_type;
+                more_ = false;
                 return;
             }
         }

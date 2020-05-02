@@ -186,6 +186,7 @@ private:
         if (source_.is_error())
         {
             ec = msgpack_errc::source_error;
+            more_ = false;
             return;
         }   
 
@@ -193,6 +194,7 @@ private:
         if (source_.get(type) == 0)
         {
             ec = msgpack_errc::unexpected_eof;
+            more_ = false;
             return;
         }
 
@@ -221,6 +223,7 @@ private:
                 if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
 
@@ -228,6 +231,7 @@ private:
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = msgpack_errc::invalid_utf8_text_string;
+                    more_ = false;
                     return;
                 }
                 more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
@@ -264,6 +268,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -279,6 +284,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -292,8 +298,8 @@ private:
                     uint8_t val{};
                     if (source_.get(val) == 0)
                     {
-                        more_ = false;
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
@@ -307,6 +313,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -322,6 +329,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -337,6 +345,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -352,6 +361,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -367,6 +377,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -382,6 +393,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -397,6 +409,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -412,6 +425,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -419,6 +433,7 @@ private:
                     if (len < 0)
                     {
                         ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
@@ -426,12 +441,14 @@ private:
                     if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
+                        more_ = false;
                         return;
                     }
                     more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
@@ -445,6 +462,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -452,6 +470,7 @@ private:
                     if (len < 0)
                     {
                         ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
@@ -459,6 +478,7 @@ private:
                     if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
@@ -466,6 +486,7 @@ private:
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
+                        more_ = false;
                         return;
                     }
                     more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
@@ -479,6 +500,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -486,6 +508,7 @@ private:
                     if (len < 0)
                     {
                         ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
@@ -493,6 +516,7 @@ private:
                     if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
@@ -500,6 +524,7 @@ private:
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
+                        more_ = false;
                         return;
                     }
                     more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
@@ -513,6 +538,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -520,6 +546,7 @@ private:
                     if (len < 0)
                     {
                         ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
@@ -527,6 +554,7 @@ private:
                     if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
@@ -544,6 +572,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -551,6 +580,7 @@ private:
                     if (len < 0)
                     {
                         ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
@@ -558,6 +588,7 @@ private:
                     if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
@@ -575,6 +606,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -582,6 +614,7 @@ private:
                     if (len < 0)
                     {
                         ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
@@ -589,6 +622,7 @@ private:
                     if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
@@ -616,6 +650,7 @@ private:
                 default:
                 {
                     ec = msgpack_errc::unknown_type;
+                    more_ = false;
                     return;
                 }
             }
@@ -627,6 +662,7 @@ private:
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = msgpack_errc::max_nesting_depth_exceeded;
+            more_ = false;
             return;
         } 
         std::size_t length = 0;
@@ -639,6 +675,7 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -646,6 +683,7 @@ private:
                 if (len < 0)
                 {
                     ec = msgpack_errc::length_is_negative;
+                    more_ = false;
                     return;
                 }
                 length = static_cast<std::size_t>(len);
@@ -658,6 +696,7 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -665,6 +704,7 @@ private:
                 if (len < 0)
                 {
                     ec = msgpack_errc::length_is_negative;
+                    more_ = false;
                     return;
                 }
                 length = static_cast<std::size_t>(len);
@@ -679,6 +719,7 @@ private:
                 else
                 {
                     ec = msgpack_errc::unknown_type;
+                    more_ = false;
                     return;
                 }
         }
@@ -699,6 +740,7 @@ private:
         if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
             ec = msgpack_errc::max_nesting_depth_exceeded;
+            more_ = false;
             return;
         } 
         std::size_t length = 0;
@@ -711,6 +753,7 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -718,6 +761,7 @@ private:
                 if (len < 0)
                 {
                     ec = msgpack_errc::length_is_negative;
+                    more_ = false;
                     return;
                 }
                 length = static_cast<std::size_t>(len);
@@ -730,6 +774,7 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -737,6 +782,7 @@ private:
                 if (len < 0)
                 {
                     ec = msgpack_errc::length_is_negative;
+                    more_ = false;
                     return;
                 }
                 length = static_cast<std::size_t>(len);
