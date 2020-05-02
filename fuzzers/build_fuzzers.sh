@@ -27,6 +27,9 @@ oss_fuzz_compile_all()
     $CXX ./fuzzers/fuzz_json_parser_max.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_json_parser_max
     $CXX ./fuzzers/fuzz_msgpack_parser_max.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_msgpack_parser_max
     $CXX ./fuzzers/fuzz_ubjson_parser_max.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_ubjson_parser_max
+
+    # Fuzzers that target the cursors
+    $CXX ./fuzzers/fuzz_json_cursor.cpp -I./include -I./third_party $CXXFLAGS $LIB_FUZZING_ENGINE -o $OUT/fuzz_json_cursor
 }
 
 if [[ -z "${OUT}" ]]; then
