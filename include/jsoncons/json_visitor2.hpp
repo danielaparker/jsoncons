@@ -1757,10 +1757,124 @@ namespace jsoncons {
         }
     };
 
+    // basic_json_visitor_to_visitor2_adaptor
+
+    template <class CharT>
+    class basic_json_visitor_to_visitor2_adaptor : public basic_json_visitor<CharT>
+    {
+    public:
+        using typename basic_json_visitor<CharT>::char_type;
+        using typename basic_json_visitor<CharT>::string_view_type;
+    private:
+        basic_json_visitor2<char_type>& destination_;
+
+        // noncopyable and nonmoveable
+        basic_json_visitor_to_visitor2_adaptor(const basic_json_visitor_to_visitor2_adaptor&) = delete;
+        basic_json_visitor_to_visitor2_adaptor& operator=(const basic_json_visitor_to_visitor2_adaptor&) = delete;
+    public:
+        basic_json_visitor_to_visitor2_adaptor(basic_json_visitor2<char_type>& visitor)
+            : destination_(visitor)
+        {
+        }
+
+        basic_json_visitor2<char_type>& destination()
+        {
+            return destination_;
+        }
+
+    private:
+        void visit_flush() override
+        {
+            destination_.flush();
+        }
+
+        bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.begin_object(tag, context, ec);
+        }
+
+        bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.begin_object(length, tag, context, ec);
+        }
+
+        bool visit_end_object(const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.end_object(context, ec);
+        }
+
+        bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.begin_array(tag, context, ec);
+        }
+
+        bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.begin_array(length, tag, context, ec);
+        }
+
+        bool visit_end_array(const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.end_array(context, ec);
+        }
+
+        bool visit_key(const string_view_type& name,
+                       const ser_context& context,
+                       std::error_code& ec) override
+        {
+            return destination_.visit_string(name, context, ec);
+        }
+
+        bool visit_string(const string_view_type& value,
+                          semantic_tag tag,
+                          const ser_context& context,
+                          std::error_code& ec) override
+        {
+            return destination_.string_value(value, tag, context, ec);
+        }
+
+        bool visit_byte_string(const byte_string_view& b, 
+                               semantic_tag tag,
+                               const ser_context& context,
+                               std::error_code& ec) override
+        {
+            return destination_.byte_string_value(b, tag, context, ec);
+        }
+
+        bool visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.uint64_value(value, tag, context, ec);
+        }
+
+        bool visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.int64_value(value, tag, context, ec);
+        }
+
+        bool visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.half_value(value, tag, context, ec);
+        }
+
+        bool visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.double_value(value, tag, context, ec);
+        }
+
+        bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.bool_value(value, tag, context, ec);
+        }
+
+        bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
+        {
+            return destination_.null_value(tag, context, ec);
+        }
+    };
+
     using json_visitor2 = basic_json_visitor2<char>;
     using default_json_visitor2 = basic_default_json_visitor2<char>;
     using json_visitor2_to_visitor_adaptor = basic_json_visitor2_to_visitor_adaptor<char>;
-
 
 } // namespace jsoncons
 

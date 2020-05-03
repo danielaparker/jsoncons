@@ -24,7 +24,7 @@ namespace jsoncons {
 // utf8_other_json_input_adapter
 
 template <class CharT>
-class json_utf8_other_visitor_adapter : public json_visitor
+class json_utf8_to_other_visitor_adaptor : public json_visitor
 {
 public:
     using json_visitor::string_view_type;
@@ -34,16 +34,16 @@ private:
     //std::function<bool(json_errc,const ser_context&)> err_handler_;
 
     // noncopyable and nonmoveable
-    json_utf8_other_visitor_adapter<CharT>(const json_utf8_other_visitor_adapter<CharT>&) = delete;
-    json_utf8_other_visitor_adapter<CharT>& operator=(const json_utf8_other_visitor_adapter<CharT>&) = delete;
+    json_utf8_to_other_visitor_adaptor<CharT>(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
+    json_utf8_to_other_visitor_adaptor<CharT>& operator=(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
 
 public:
-    json_utf8_other_visitor_adapter()
+    json_utf8_to_other_visitor_adaptor()
         : other_visitor_(default_visitor_)
     {
     }
 
-    json_utf8_other_visitor_adapter(basic_json_visitor<CharT>& other_visitor/*,
+    json_utf8_to_other_visitor_adaptor(basic_json_visitor<CharT>& other_visitor/*,
                                           std::function<bool(json_errc,const ser_context&)> err_handler*/)
         : other_visitor_(other_visitor)/*,
           err_handler_(err_handler)*/
