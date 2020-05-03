@@ -18,7 +18,7 @@ enum class cbor_errc
     success = 0,
     unexpected_eof,
     source_error,
-    invalid_bigdec,
+    invalid_decimal_fraction,
     invalid_bigfloat,
     invalid_utf8_text_string,
     too_many_items,
@@ -46,8 +46,8 @@ public:
                 return "Unexpected end of file";
             case cbor_errc::source_error:
                 return "Source error";
-            case cbor_errc::invalid_bigdec:
-                return "Invalid decimal";
+            case cbor_errc::invalid_decimal_fraction:
+                return "Invalid decimal fraction";
             case cbor_errc::invalid_bigfloat:
                 return "Invalid bigfloat";
             case cbor_errc::invalid_utf8_text_string:

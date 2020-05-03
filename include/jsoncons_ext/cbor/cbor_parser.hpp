@@ -569,7 +569,7 @@ private:
                     {
                         case 0x04:
                             text_buffer_.clear();
-                            read_array_as_decimal_string(text_buffer_, ec);
+                            read_decimal_fraction(text_buffer_, ec);
                             if (ec)
                             {
                                 return;
@@ -578,7 +578,7 @@ private:
                             break;
                         case 0x05:
                             text_buffer_.clear();
-                            read_array_as_hexfloat_string(text_buffer_, ec);
+                            read_bigfloat(text_buffer_, ec);
                             if (ec)
                             {
                                 return;
@@ -642,7 +642,7 @@ private:
             default: // definite length
             {
                 std::size_t len = get_size(ec);
-                if (ec)
+                if (!more_)
                 {
                     return;
                 }
@@ -692,7 +692,7 @@ private:
             default: // definite_length
             {
                 std::size_t len = get_size(ec);
-                if (ec)
+                if (!more_)
                 {
                     return;
                 }
@@ -752,7 +752,7 @@ private:
     std::size_t get_size(std::error_code& ec)
     {
         uint64_t u = get_uint64_value(ec);
-        if (ec)
+        if (!more_)
         {
             return 0;
         }
@@ -880,7 +880,7 @@ private:
             default: // definite length
             {
                 std::size_t length = get_size(ec);
-                if (ec)
+                if (!more_)
                 {
                     return;
                 }
@@ -1118,22 +1118,21 @@ private:
         return val;
     }
 
-    void read_array_as_decimal_string(string_type& result, std::error_code& ec)
+    void read_decimal_fraction(string_type& result, std::error_code& ec)
     {
-        string_type s;
-
-        int c;
-        if ((c=source_.get()) == Src::traits_type::eof())
+        std::size_t size = get_size(ec);
+        if (!more_)
         {
-            ec = cbor_errc::unexpected_eof;
+            return;
+        }
+        if (size != 2)
+        {
+            ec = cbor_errc::invalid_decimal_fraction;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
-        uint8_t info = get_additional_information_value((uint8_t)c);
-        JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
-        JSONCONS_ASSERT(info == 2);
 
+        int c;
         if ((c=source_.peek()) == Src::traits_type::eof())
         {
             ec = cbor_errc::unexpected_eof;
@@ -1163,12 +1162,13 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_bigdec;
+                ec = cbor_errc::invalid_decimal_fraction;
                 more_ = false;
                 return;
             }
         }
 
+        string_type s;
         switch (get_major_type((uint8_t)source_.peek()))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
@@ -1231,7 +1231,7 @@ private:
             }
             default:
             {
-                ec = cbor_errc::invalid_bigdec;
+                ec = cbor_errc::invalid_decimal_fraction;
                 more_ = false;
                 return;
             }
@@ -1251,20 +1251,21 @@ private:
         }
     }
 
-    void read_array_as_hexfloat_string(string_type& s, std::error_code& ec)
+    void read_bigfloat(string_type& s, std::error_code& ec)
     {
-        int c;
-        if ((c=source_.get()) == Src::traits_type::eof())
+        std::size_t size = get_size(ec);
+        if (!more_)
         {
-            ec = cbor_errc::unexpected_eof;
+            return;
+        }
+        if (size != 2)
+        {
+            ec = cbor_errc::invalid_bigfloat;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
-        uint8_t info = get_additional_information_value((uint8_t)c);
-        JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
-        JSONCONS_ASSERT(info == 2);
 
+        int c;
         if ((c=source_.peek()) == Src::traits_type::eof())
         {
             ec = cbor_errc::unexpected_eof;
@@ -1947,7 +1948,7 @@ private:
                         default:
                         {
                             std::size_t dim = get_size(ec);
-                            if (ec)
+                            if (!more_)
                             {
                                 return;
                             }
@@ -1961,14 +1962,14 @@ private:
             default:
             {
                 std::size_t size = get_size(ec);
-                if (ec)
+                if (!more_)
                 {
                     return;
                 }
                 for (std::size_t i = 0; more_ && i < size; ++i)
                 {
                     std::size_t dim = get_size(ec);
-                    if (ec)
+                    if (!more_)
                     {
                         return;
                     }

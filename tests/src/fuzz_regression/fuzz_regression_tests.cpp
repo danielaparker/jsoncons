@@ -526,7 +526,7 @@ TEST_CASE("oss-fuzz issues")
 
     // Fuzz target: fuzz_csv_encoder
     // Issue: Failed throw
-    // Resolution: 
+    // Resolution: Fixed check for floating point values
     SECTION("issue 21990")
     {
         std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv_encoder-5682837304115200.fuzz";
@@ -539,13 +539,28 @@ TEST_CASE("oss-fuzz issues")
 
         csv::csv_reader reader(is, visitor);
         std::error_code ec;
-        reader.read(ec);
-        std::cout << ec.message() << "\n";
 
-        //REQUIRE_NOTHROW(reader.read(ec));
-        //CHECK((ec == csv::csv_errc::source_error));
+        REQUIRE_NOTHROW(reader.read(ec));
+    }
 
-        //std::cout << visitor.get_result() << "" << std::endl;
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: failed_throw
+    // Resolution: Replaced assert that array containing decimal fraction
+    //             has size 2 with error code invalid_decimal_fraction
+    SECTION("issue  22000")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5685492533428224";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == cbor::cbor_errc::invalid_decimal_fraction);
     }
 }
 
