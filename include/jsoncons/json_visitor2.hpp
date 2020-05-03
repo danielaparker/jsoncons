@@ -13,13 +13,13 @@
 namespace jsoncons { 
 
     template <class CharT, class Allocator = std::allocator<char>>
-    class basic_json_visitor2_to_json_visitor;
+    class basic_json_visitor2_to_visitor_adaptor;
 
     template <class CharT>
     class basic_json_visitor2 
     {
         template <class Ch, class Allocator>
-        friend class basic_json_visitor2_to_json_visitor;
+        friend class basic_json_visitor2_to_visitor_adaptor;
     public:
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
@@ -721,7 +721,7 @@ namespace jsoncons {
     };
 
  template <class CharT, class Allocator>
-    class basic_json_visitor2_to_json_visitor : public basic_json_visitor2<CharT>
+    class basic_json_visitor2_to_visitor_adaptor : public basic_json_visitor2<CharT>
     {
     public:
         using typename basic_json_visitor2<CharT>::char_type;
@@ -793,17 +793,17 @@ namespace jsoncons {
         const std::basic_string<char> false_k = { 'f', 'a', 'l', 's', 'e' };
 
         // noncopyable and nonmoveable
-        basic_json_visitor2_to_json_visitor(const basic_json_visitor2_to_json_visitor&) = delete;
-        basic_json_visitor2_to_json_visitor& operator=(const basic_json_visitor2_to_json_visitor&) = delete;
+        basic_json_visitor2_to_visitor_adaptor(const basic_json_visitor2_to_visitor_adaptor&) = delete;
+        basic_json_visitor2_to_visitor_adaptor& operator=(const basic_json_visitor2_to_visitor_adaptor&) = delete;
     public:
-        explicit basic_json_visitor2_to_json_visitor(const Allocator& alloc = Allocator())
+        explicit basic_json_visitor2_to_visitor_adaptor(const Allocator& alloc = Allocator())
             : destination_(std::addressof(default_visitor_)), 
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
             level_stack_.emplace_back(output_t::destination,container_t::root); // root
         }
 
-        explicit basic_json_visitor2_to_json_visitor(basic_json_visitor<char_type>& visitor, 
+        explicit basic_json_visitor2_to_visitor_adaptor(basic_json_visitor<char_type>& visitor, 
                                                      const Allocator& alloc = Allocator())
             : destination_(std::addressof(visitor)), 
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
@@ -1759,7 +1759,7 @@ namespace jsoncons {
 
     using json_visitor2 = basic_json_visitor2<char>;
     using default_json_visitor2 = basic_default_json_visitor2<char>;
-    using json_visitor2_to_json_visitor = basic_json_visitor2_to_json_visitor<char>;
+    using json_visitor2_to_visitor_adaptor = basic_json_visitor2_to_visitor_adaptor<char>;
 
 
 } // namespace jsoncons

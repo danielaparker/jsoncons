@@ -27,7 +27,7 @@ class basic_cbor_reader : public ser_context
     using char_type = char;
 
     basic_cbor_parser<Src,Allocator> parser_;
-    basic_json_visitor2_to_json_visitor<char_type,Allocator> adaptor_;
+    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> adaptor_;
     json_visitor2& visitor_;
 public:
     template <class Source>

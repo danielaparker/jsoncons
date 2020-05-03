@@ -35,7 +35,7 @@ public:
 private:
     basic_msgpack_parser<Src,Allocator> parser_;
     basic_staj_visitor<char_type> event_handler_;
-    basic_json_visitor2_to_json_visitor<char_type,Allocator> event_handler_adaptor_;
+    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> event_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -183,10 +183,10 @@ public:
     {
         struct resource_wrapper
         {
-            basic_json_visitor2_to_json_visitor<char_type,Allocator>& adaptor;
+            basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor;
             basic_json_visitor<char_type>& original;
 
-            resource_wrapper(basic_json_visitor2_to_json_visitor<char_type,Allocator>& adaptor,
+            resource_wrapper(basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor,
                              basic_json_visitor<char_type>& visitor)
                 : adaptor(adaptor), original(adaptor.destination())
             {

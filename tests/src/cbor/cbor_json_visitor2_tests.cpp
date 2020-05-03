@@ -115,7 +115,7 @@ TEST_CASE("json_visitor2 cbor 1")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        json_visitor2_to_json_visitor visitor{destination};
+        json_visitor2_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -145,7 +145,7 @@ TEST_CASE("json_visitor2 cbor 2")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        json_visitor2_to_json_visitor visitor{destination};
+        json_visitor2_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -176,7 +176,7 @@ TEST_CASE("json_visitor2 cbor 3")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        json_visitor2_to_json_visitor visitor{destination};
+        json_visitor2_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -207,7 +207,7 @@ TEST_CASE("json_visitor2 cbor 4")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        json_visitor2_to_json_visitor visitor{destination};
+        json_visitor2_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -238,7 +238,7 @@ TEST_CASE("json_visitor2 cbor 5")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        json_visitor2_to_json_visitor visitor{destination};
+        json_visitor2_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
@@ -281,7 +281,7 @@ TEST_CASE("json_visitor2 cbor 6")
     SECTION("test 1")
     {
         json_decoder<json> destination;
-        json_visitor2_to_json_visitor visitor{destination};
+        json_visitor2_to_visitor_adaptor visitor{destination};
 
         cbor::basic_cbor_parser<bytes_source> parser{ bytes_source(input) };
 
