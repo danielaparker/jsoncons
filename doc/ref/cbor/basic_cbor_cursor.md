@@ -138,40 +138,40 @@ int main()
         switch (event.event_type())
         {
             case staj_event_type::begin_array:
-                std::cout << "begin_array\n";
+                std::cout << event.event_type() << "\n";
                 break;
             case staj_event_type::end_array:
-                std::cout << "end_array\n";
+                std::cout << event.event_type() << "\n";
                 break;
             case staj_event_type::begin_object:
-                std::cout << "begin_object\n";
+                std::cout << event.event_type() << "\n";
                 break;
             case staj_event_type::end_object:
-                std::cout << "end_object\n";
+                std::cout << event.event_type() << "\n";
                 break;
             case staj_event_type::key:
                 // Or std::string_view, if supported
-                std::cout << "name: " << event.get<jsoncons::string_view>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
             case staj_event_type::string_value:
                 // Or std::string_view, if supported
-                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
             case staj_event_type::null_value:
-                std::cout << "null_value: " << "\n";
+                std::cout << event.event_type() << ": " << "\n";
                 break;
             case staj_event_type::bool_value:
-                std::cout << "bool_value: " << std::boolalpha << event.get<bool>() << "\n";
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
                 break;
             case staj_event_type::int64_value:
-                std::cout << "int64_value: " << event.get<int64_t>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
                 break;
             case staj_event_type::uint64_value:
-                std::cout << "uint64_value: " << event.get<uint64_t>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
                 break;
             case staj_event_type::half_value:
             case staj_event_type::double_value:
-                std::cout << "double_value: " << event.get<double>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<double>() << "\n";
                 break;
             default:
                 std::cout << "Unhandled event type\n";
@@ -184,31 +184,31 @@ Output:
 ```
 begin_array
 begin_object
-name: author
+key: author
 string_value: Haruki Murakami
-name: title
+key: title
 string_value: Hard-Boiled Wonderland and the End of the World
-name: isbn
+key: isbn
 string_value: 0679743464
-name: publisher
+key: publisher
 string_value: Vintage
-name: date
+key: date
 string_value: 1993-03-02
-name: price
+key: price
 double_value: 19
 end_object
 begin_object
-name: author
+key: author
 string_value: Graham Greene
-name: title
+key: title
 string_value: The Comedians
-name: isbn
+key: isbn
 string_value: 0099478374
-name: publisher
+key: publisher
 string_value: Vintage Classics
-name: date
+key: date
 string_value: 2005-09-21
-name: price
+key: price
 double_value: 16
 end_object
 end_array

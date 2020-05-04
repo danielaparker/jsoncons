@@ -19,6 +19,8 @@ Bug fixes:
 
 - Fixed OSS-Fuzz stack overflow issues [\#225](https://github.com/danielaparker/jsoncons/issues/225)
 
+- OSS-Fuzz failed throw issue in CBOR parser [\#235](https://github.com/danielaparker/jsoncons/issues/235)
+
 Changes:
 
 - The cbor_option name `enable_typed_arrays` has been deprecated and

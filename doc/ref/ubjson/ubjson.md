@@ -12,6 +12,8 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [basic_ubjson_encoder](basic_ubjson_encoder.md)
 
+[ubjson_options](ubjson_options.md)
+
 #### Mappings between UBJSON and jsoncons data items
 
 UBJSON data item           | jsoncons data item|jsoncons tag  

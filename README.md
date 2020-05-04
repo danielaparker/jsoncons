@@ -365,20 +365,20 @@ Output:
 ```
 Marilyn C
 begin_object
-name: application
+key: application
 string_value: hiking
-name: reputons
+key: reputons
 begin_array
 begin_object
-name: rater
+key: rater
 string_value: HikingAsylum
-name: assertion
+key: assertion
 string_value: advanced
-name: rated
+key: rated
 string_value: Marilyn C
-name: rating
+key: rating
 double_value: 0.9
-name: confidence
+key: confidence
 double_value: 0.99
 end_object
 end_array
@@ -417,7 +417,7 @@ int main()
         {
             case staj_event_type::string_value:
                 // Or std::string_view, if supported
-                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
             default:
                 std::cout << "Unhandled event type\n";

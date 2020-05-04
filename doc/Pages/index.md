@@ -314,20 +314,20 @@ Output:
 ```
 Marilyn C
 begin_object
-name: application
+key: application
 string_value: hiking
-name: reputons
+key: reputons
 begin_array
 begin_object
-name: rater
+key: rater
 string_value: HikingAsylum
-name: assertion
+key: assertion
 string_value: advanced
-name: rated
+key: rated
 string_value: Marilyn C
-name: rating
+key: rating
 double_value: 0.9
-name: confidence
+key: confidence
 double_value: 0.99
 end_object
 end_array

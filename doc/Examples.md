@@ -386,31 +386,31 @@ Output:
 ```
 begin_array
 begin_object
-name: author
+key: author
 string_value: Haruki Murakami
-name: title
+key: title
 string_value: Hard-Boiled Wonderland and the End of the World
-name: isbn
+key: isbn
 string_value: 0679743464
-name: publisher
+key: publisher
 string_value: Vintage
-name: date
+key: date
 string_value: 1993-03-02
-name: price
+key: price
 double_value: 19
 end_object
 begin_object
-name: author
+key: author
 string_value: Graham Greene
-name: title
+key: title
 string_value: The Comedians
-name: isbn
+key: isbn
 string_value: 0099478374
-name: publisher
+key: publisher
 string_value: Vintage Classics
-name: date
+key: date
 string_value: 2005-09-21
-name: price
+key: price
 double_value: 16
 end_object
 end_array
