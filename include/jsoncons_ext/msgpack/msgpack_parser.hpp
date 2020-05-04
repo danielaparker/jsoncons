@@ -714,7 +714,6 @@ private:
                 if(type > 0x8f && type <= 0x9f) // fixarray
                 {
                     length = type & 0x0f;
-                    break;
                 }
                 else
                 {
@@ -722,6 +721,7 @@ private:
                     more_ = false;
                     return;
                 }
+                break;
         }
         state_stack_.emplace_back(parse_mode::array,length);
         more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
@@ -789,8 +789,16 @@ private:
                 break;
             }
             default:
-                JSONCONS_ASSERT (type > 0x7f && type <= 0x8f) // fixmap
-                length = type & 0x0f;
+                if (type > 0x7f && type <= 0x8f) // fixmap
+                {
+                    length = type & 0x0f;
+                }
+                else
+                {
+                    ec = msgpack_errc::unknown_type;
+                    more_ = false;
+                    return;
+                }
                 break;
         }
         state_stack_.emplace_back(parse_mode::map_key,length);
