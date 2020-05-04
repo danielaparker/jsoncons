@@ -208,7 +208,6 @@ public:
     {
         while (!done_ && more_)
         {
-            //size_t pos = source_.position();
             switch (state_stack_.back().mode)
             {
                 case parse_mode::multi_dim:
@@ -217,10 +216,6 @@ public:
                     {
                         ++state_stack_.back().index;
                         read_item(visitor, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
                     }
                     else
                     {
@@ -234,10 +229,6 @@ public:
                     {
                         ++state_stack_.back().index;
                         read_item(visitor, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
                     }
                     else
                     {
@@ -257,17 +248,9 @@ public:
                         case 0xff:
                             source_.ignore(1);
                             end_array(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
                             break;
                         default:
                             read_item(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
                             break;
                     }
                     break;
@@ -279,10 +262,6 @@ public:
                         ++state_stack_.back().index;
                         state_stack_.back().mode = parse_mode::map_value;
                         read_item(visitor, ec);
-                        if (ec)
-                        {
-                            return;
-                        }
                     }
                     else
                     {
@@ -294,10 +273,6 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::map_key;
                     read_item(visitor, ec);
-                    if (ec)
-                    {
-                        return;
-                    }
                     break;
                 }
                 case parse_mode::indefinite_map_key:
@@ -312,19 +287,10 @@ public:
                         case 0xff:
                             source_.ignore(1);
                             end_object(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
                             break;
                         default:
                             state_stack_.back().mode = parse_mode::indefinite_map_value;
                             read_item(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            //state_stack_.back().mode = parse_mode::indefinite_map_value;
                             break;
                     }
                     break;
@@ -333,20 +299,12 @@ public:
                 {
                     state_stack_.back().mode = parse_mode::indefinite_map_key;
                     read_item(visitor, ec);
-                    if (ec)
-                    {
-                        return;
-                    }
                     break;
                 }
                 case parse_mode::root:
                 {
                     state_stack_.back().mode = parse_mode::before_done;
                     read_item(visitor, ec);
-                    if (ec)
-                    {
-                        return;
-                    }
                     break;
                 }
                 case parse_mode::before_done:
@@ -365,7 +323,7 @@ private:
     void read_item(json_visitor2& visitor, std::error_code& ec)
     {
         read_tags(ec);
-        if (ec)
+        if (!more_)
         {
             return;
         }
@@ -1418,7 +1376,7 @@ private:
         while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
             uint64_t val = get_uint64_value(ec);
-            if (ec)
+            if (!more_)
             {
                 return;
             }
