@@ -338,7 +338,7 @@ private:
         auto sink = unicons::validate(sv.begin(), sv.end());
         if (sink.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
+            JSONCONS_THROW(ser_error(cbor_errc::invalid_utf8_text_string));
         }
 
         if (options_.pack_strings() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))

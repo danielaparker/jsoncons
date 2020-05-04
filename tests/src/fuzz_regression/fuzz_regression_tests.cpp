@@ -562,5 +562,25 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == cbor::cbor_errc::invalid_decimal_fraction);
     }
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: failed_throw
+    // Resolution: prettify_string with decimal fractions failed with exponents >= 1000
+
+    SECTION("issue 22018")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5673305546948608";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == cbor::cbor_errc::illegal_chunked_string);
+    }
 }
 

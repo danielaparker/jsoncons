@@ -1207,6 +1207,12 @@ private:
                 jsoncons::detail::prettify_string(s.c_str(), s.size(), (int)exponent, -4, 17, result);
             }
         }
+        else
+        {
+            ec = cbor_errc::invalid_decimal_fraction;
+            more_ = false;
+            return;
+        }
     }
 
     void read_bigfloat(string_type& s, std::error_code& ec)
