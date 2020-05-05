@@ -582,5 +582,44 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == cbor::cbor_errc::illegal_chunked_string);
     }
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: Stack-overflow
+    // Resolution: 
+
+    SECTION("issue 22023")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5681910597812224";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == cbor::cbor_errc::unexpected_eof);
+    }
+
+    // Fuzz target: fuzz_msgpack_encoder
+    // Issue: Timeout
+    SECTION("issue 22024")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_msgpack_encoder-5677646685143040";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::vector<uint8_t> buf;
+        msgpack::msgpack_bytes_encoder visitor(buf);
+
+        msgpack::msgpack_stream_reader reader(is,visitor);
+        std::error_code ec;
+
+        REQUIRE_NOTHROW(reader.read(ec));
+        CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
+    }
 }
 

@@ -887,7 +887,7 @@ namespace jsoncons {
 
         bool visit_end_object(const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
             switch (level_stack_.back().target())
             {
                 case target_t::buffer:
@@ -897,7 +897,7 @@ namespace jsoncons {
                     
                     if (level_stack_.back().target() == target_t::destination)
                     {
-                        ret = destination_->key(key_buffer_,context, ec);
+                        retval = destination_->key(key_buffer_,context, ec);
                         key_buffer_.clear();
                     }
                     else if (level_stack_.back().is_key())
@@ -910,10 +910,10 @@ namespace jsoncons {
                     JSONCONS_ASSERT(level_stack_.size() > 1);
                     level_stack_.pop_back();
                     level_stack_.back().advance();
-                    ret = destination_->end_object(context, ec);
+                    retval = destination_->end_object(context, ec);
                     break;
             }
-            return ret;
+            return retval;
         }
 
         bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -980,7 +980,7 @@ namespace jsoncons {
 
         bool visit_end_array(const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
             switch (level_stack_.back().target())
             {
                 case target_t::buffer:
@@ -989,7 +989,7 @@ namespace jsoncons {
                     level_stack_.pop_back();
                     if (level_stack_.back().target() == target_t::destination)
                     {
-                        ret = destination_->key(key_buffer_, context, ec);
+                        retval = destination_->key(key_buffer_, context, ec);
                         key_buffer_.clear();
                     }
                     else if (level_stack_.back().is_key())
@@ -1002,10 +1002,10 @@ namespace jsoncons {
                     JSONCONS_ASSERT(level_stack_.size() > 1);
                     level_stack_.pop_back();
                     level_stack_.back().advance();
-                    ret = destination_->end_array(context, ec);
+                    retval = destination_->end_array(context, ec);
                     break;
             }
-            return ret;
+            return retval;
         }
 
         bool visit_string(const string_view_type& value,
@@ -1013,7 +1013,7 @@ namespace jsoncons {
                              const ser_context& context,
                              std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key())
             {
@@ -1028,10 +1028,10 @@ namespace jsoncons {
                         key_buffer_.insert(key_buffer_.end(), value.begin(), value.end());
                         key_buffer_.push_back('\"');
                         key_buffer_.push_back(':');
-                        ret = true;
+                        retval = true;
                         break;
                     default:
-                        ret = destination_->key(value, context, ec);
+                        retval = destination_->key(value, context, ec);
                         break;
                 }
             }
@@ -1047,16 +1047,16 @@ namespace jsoncons {
                         key_buffer_.push_back('\"');
                         key_buffer_.insert(key_buffer_.end(), value.begin(), value.end());
                         key_buffer_.push_back('\"');
-                        ret = true;
+                        retval = true;
                         break;
                     default:
-                        ret = destination_->string_value(value, tag, context, ec);
+                        retval = destination_->string_value(value, tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_byte_string(const byte_string_view& value, 
@@ -1064,7 +1064,7 @@ namespace jsoncons {
                                   const ser_context& context,
                                   std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
@@ -1096,10 +1096,10 @@ namespace jsoncons {
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back('\"');
                         key_buffer_.push_back(':');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->key(key_, context, ec);
+                        retval = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1115,21 +1115,21 @@ namespace jsoncons {
                         key_buffer_.push_back('\"');
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back('\"');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->byte_string_value(value, tag, context, ec);
+                        retval = destination_->byte_string_value(value, tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
@@ -1148,10 +1148,10 @@ namespace jsoncons {
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back(':');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->key(key_, context, ec);
+                        retval = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1165,21 +1165,21 @@ namespace jsoncons {
                             key_buffer_.push_back(',');
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->uint64_value(value, tag, context, ec);
+                        retval = destination_->uint64_value(value, tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
@@ -1198,10 +1198,10 @@ namespace jsoncons {
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back(':');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->key(key_, context, ec);
+                        retval = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1215,21 +1215,21 @@ namespace jsoncons {
                             key_buffer_.push_back(',');
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->int64_value(value, tag, context, ec);
+                        retval = destination_->int64_value(value, tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
@@ -1251,10 +1251,10 @@ namespace jsoncons {
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back(':');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->key(key_, context, ec);
+                        retval = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1268,21 +1268,21 @@ namespace jsoncons {
                             key_buffer_.push_back(',');
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->half_value(value, tag, context, ec);
+                        retval = destination_->half_value(value, tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
@@ -1303,10 +1303,10 @@ namespace jsoncons {
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back(':');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->key(key_, context, ec);
+                        retval = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1320,21 +1320,21 @@ namespace jsoncons {
                             key_buffer_.push_back(',');
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->double_value(value, tag, context, ec);
+                        retval = destination_->double_value(value, tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
@@ -1352,10 +1352,10 @@ namespace jsoncons {
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back(':');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->key(key_, context, ec);
+                        retval = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1369,21 +1369,21 @@ namespace jsoncons {
                             key_buffer_.push_back(',');
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->bool_value(value, tag, context, ec);
+                        retval = destination_->bool_value(value, tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
-            bool ret = true;
+            bool retval = true;
 
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
@@ -1401,10 +1401,10 @@ namespace jsoncons {
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
                         key_buffer_.push_back(':');
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->key(key_, context, ec);
+                        retval = destination_->key(key_, context, ec);
                         break;
                 }
             }
@@ -1418,16 +1418,16 @@ namespace jsoncons {
                             key_buffer_.push_back(',');
                         }
                         key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
-                        ret = true; 
+                        retval = true; 
                         break;
                     default:
-                        ret = destination_->null_value(tag, context, ec);
+                        retval = destination_->null_value(tag, context, ec);
                         break;
                 }
             }
 
             level_stack_.back().advance();
-            return ret;
+            return retval;
         }
 
         bool visit_typed_array(const span<const uint8_t>& s, 

@@ -788,68 +788,66 @@ private:
     template <class Function>
     void iterate_string_chunks(Function& func, jsoncons::cbor::detail::cbor_major_type type, std::error_code& ec)
     {
-        int c = source_.peek();
-        if (c == Src::traits_type::eof())
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return;
-        }
+        int nesting_level = 0;
 
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
-        if (major_type != type)
+        bool done = false;
+        while (!done)
         {
-            ec = cbor_errc::illegal_chunked_string;
-            more_ = false;
-            return;
-        }
-        uint8_t info = get_additional_information_value((uint8_t)c);
-
-        switch (info)
-        {
-            case jsoncons::cbor::detail::additional_info::indefinite_length:
+            int c = source_.peek();
+            if (c == Src::traits_type::eof())
             {
-                source_.ignore(1);
-                bool done = false;
-                while (!done)
+                ec = cbor_errc::unexpected_eof;
+                more_ = false;
+                return;
+            }
+            if (nesting_level > 0 && c == 0xff)
+            {
+                --nesting_level;
+                if (nesting_level == 0)
                 {
-                    int test = source_.peek();
-                    switch (test)
+                    done = true;
+                }
+                source_.ignore(1);
+                continue;
+            }
+
+            jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
+            if (major_type != type)
+            {
+                ec = cbor_errc::illegal_chunked_string;
+                more_ = false;
+                return;
+            }
+            uint8_t info = get_additional_information_value((uint8_t)c);
+
+            switch (info)
+            {
+                case jsoncons::cbor::detail::additional_info::indefinite_length:
+                {
+                    ++nesting_level;
+                    source_.ignore(1);
+                    break;
+                }
+                default: // definite length
+                {
+                    std::size_t length = get_size(ec);
+                    if (!more_)
                     {
-                        case Src::traits_type::eof():
-                            ec = cbor_errc::unexpected_eof;
-                            more_ = false;
-                            return;
-                        case 0xff:
-                            done = true;
-                            break;
-                        default:
-                            iterate_string_chunks( func, major_type, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            break;
+                        return;
                     }
+                    more_ = func(source_, length, ec);
+                    if (!more_)
+                    {
+                        return;
+                    }
+                    if (nesting_level == 0)
+                    {
+                        done = true;
+                    }
+                    break;
                 }
-                source_.ignore(1);
-                break;
             }
-            default: // definite length
-            {
-                std::size_t length = get_size(ec);
-                if (!more_)
-                {
-                    return;
-                }
-                more_ = func(source_, length, ec);
-                if (!more_)
-                {
-                    return;
-                }
-                break;
-            }
-        }
+        } 
     }
 
     uint64_t get_uint64_value(std::error_code& ec)
