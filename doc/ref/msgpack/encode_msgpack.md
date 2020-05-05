@@ -6,16 +6,22 @@ Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.htm
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
 template<class T>
-void encode_msgpack(const T& jval, std::vector<uint8_t>& v); // (1)
+void encode_msgpack(const T& jval, 
+                    std::vector<uint8_t>& v,
+                    const msgpack_decode_options& options = msgpack_decode_options()); // (1)
 
 template<class T>
-void encode_msgpack(const T& jval, std::ostream& os); // (2)
+void encode_msgpack(const T& jval, 
+                    std::ostream& os,
+                    const msgpack_decode_options& options = msgpack_decode_options()); // (2)
 ```
 
-(1) Writes a value of type T into a bytes buffer in the MessagePack data format. Type T must be an instantiation of [basic_json](../basic_json.md) 
+(1) Writes a value of type T into a bytes buffer in the MessagePack data format, using the specified (or defaulted) [options](msgpack_options.md). 
+Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
-(2) Writes a value of type T into a binary stream in the MessagePack data format. Type T must be an instantiation of [basic_json](../basic_json.md) 
+(2) Writes a value of type T into a binary stream in the MessagePack data format, using the specified (or defaulted) [options](msgpack_options.md). 
+Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
 ### See also

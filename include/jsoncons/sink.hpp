@@ -26,8 +26,8 @@ template <class CharT>
 class stream_sink
 {
 public:
-    typedef CharT value_type;
-    typedef std::basic_ostream<CharT> output_type;
+    using value_type = CharT;
+    using output_type = std::basic_ostream<CharT>;
 
 private:
     static constexpr size_t default_buffer_length = 16384;
@@ -41,7 +41,6 @@ private:
     // Noncopyable
     stream_sink(const stream_sink&) = delete;
     stream_sink& operator=(const stream_sink&) = delete;
-    stream_sink& operator=(stream_sink&&) = delete;
 
 public:
     stream_sink(stream_sink&&) = default;
@@ -54,11 +53,14 @@ public:
     : os_(std::addressof(os)), buffer_(buflen), begin_buffer_(buffer_.data()), end_buffer_(begin_buffer_+buffer_.size()), p_(begin_buffer_)
     {
     }
-    ~stream_sink()
+    ~stream_sink() noexcept
     {
         os_->write(begin_buffer_, buffer_length());
         os_->flush();
     }
+
+    // Movable
+    stream_sink& operator=(stream_sink&&) = default;
 
     void flush()
     {
@@ -110,7 +112,7 @@ class binary_stream_sink
 {
 public:
     typedef uint8_t value_type;
-    typedef std::basic_ostream<char> output_type;
+    using output_type = std::basic_ostream<char>;
 private:
     static constexpr size_t default_buffer_length = 16384;
 
@@ -123,7 +125,6 @@ private:
     // Noncopyable
     binary_stream_sink(const binary_stream_sink&) = delete;
     binary_stream_sink& operator=(const binary_stream_sink&) = delete;
-    binary_stream_sink& operator=(binary_stream_sink&&) = delete;
 
 public:
     binary_stream_sink(binary_stream_sink&&) = default;
@@ -144,11 +145,13 @@ public:
           p_(begin_buffer_)
     {
     }
-    ~binary_stream_sink()
+    ~binary_stream_sink() noexcept
     {
         os_->write((char*)begin_buffer_, buffer_length());
         os_->flush();
     }
+
+    binary_stream_sink& operator=(binary_stream_sink&&) = default;
 
     void flush()
     {
@@ -199,15 +202,14 @@ template <class StringT>
 class string_sink 
 {
 public:
-    typedef typename StringT::value_type value_type;
-    typedef StringT output_type;
+    using value_type = typename StringT::value_type;
+    using output_type = StringT;
 private:
     output_type* s_;
 
     // Noncopyable
     string_sink(const string_sink&) = delete;
     string_sink& operator=(const string_sink&) = delete;
-    string_sink& operator=(string_sink&& val) = delete;
 public:
     string_sink(string_sink&& val)
         : s_(nullptr)
@@ -219,6 +221,8 @@ public:
         : s_(std::addressof(s))
     {
     }
+
+    string_sink& operator=(string_sink&& val) = default;
 
     void flush()
     {
@@ -248,7 +252,6 @@ private:
     // Noncopyable
     bytes_sink(const bytes_sink&) = delete;
     bytes_sink& operator=(const bytes_sink&) = delete;
-    bytes_sink& operator=(bytes_sink&&) = delete;
 public:
     bytes_sink(bytes_sink&&) = default;
 
@@ -256,6 +259,8 @@ public:
         : s_(s)
     {
     }
+
+    bytes_sink& operator=(bytes_sink&&) = default;
 
     void flush()
     {

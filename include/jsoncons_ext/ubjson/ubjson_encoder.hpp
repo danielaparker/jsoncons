@@ -19,6 +19,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
+#include <jsoncons_ext/ubjson/ubjson_options.hpp>
 
 namespace jsoncons { namespace ubjson {
 
@@ -30,9 +31,9 @@ class basic_ubjson_encoder final : public basic_json_visitor<char>
 
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
-    typedef Allocator allocator_type;
+    using allocator_type = Allocator;
     using typename basic_json_visitor<char>::string_view_type;
-    typedef Sink sink_type;
+    using sink_type = Sink;
 
 private:
     struct stack_item
@@ -69,9 +70,11 @@ private:
     };
 
     Sink sink_;
+    const ubjson_encode_options options_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_ubjson_encoder(const basic_ubjson_encoder&) = delete;
@@ -79,12 +82,21 @@ private:
 public:
     basic_ubjson_encoder(Sink&& sink, 
                          const Allocator& alloc = Allocator())
-       : sink_(std::forward<Sink>(sink)), 
-         alloc_(alloc)
+       : basic_ubjson_encoder(std::forward<Sink>(sink), ubjson_encode_options(), alloc)
     {
     }
 
-    ~basic_ubjson_encoder()
+    explicit basic_ubjson_encoder(Sink&& sink, 
+                                  const ubjson_encode_options& options, 
+                                  const Allocator& alloc = Allocator())
+       : sink_(std::forward<Sink>(sink)),
+         options_(options),
+         alloc_(alloc),
+         nesting_depth_(0)
+    {
+    }
+
+    ~basic_ubjson_encoder() noexcept
     {
         JSONCONS_TRY
         {
@@ -103,16 +115,26 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = ubjson_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_object));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_object_marker);
 
         return true;
     }
 
-    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = ubjson_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(ubjson_container_type::object, length));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_object_marker);
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::count_marker);
@@ -124,6 +146,8 @@ private:
     bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         if (stack_.back().is_indefinite_length())
         {
             sink_.push_back(jsoncons::ubjson::detail::ubjson_format::end_object_marker);
@@ -146,16 +170,26 @@ private:
         return true;
     }
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = ubjson_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(ubjson_container_type::indefinite_length_array));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
 
         return true;
     }
 
-    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = ubjson_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(ubjson_container_type::array, length));
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::count_marker);
@@ -167,6 +201,8 @@ private:
     bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         if (stack_.back().is_indefinite_length())
         {
             sink_.push_back(jsoncons::ubjson::detail::ubjson_format::end_array_marker);
@@ -434,8 +470,8 @@ private:
     }
 };
 
-typedef basic_ubjson_encoder<jsoncons::binary_stream_sink> ubjson_stream_encoder;
-typedef basic_ubjson_encoder<jsoncons::bytes_sink> ubjson_bytes_encoder;
+using ubjson_stream_encoder = basic_ubjson_encoder<jsoncons::binary_stream_sink>;
+using ubjson_bytes_encoder = basic_ubjson_encoder<jsoncons::bytes_sink>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Sink=jsoncons::binary_stream_sink>

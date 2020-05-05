@@ -254,27 +254,27 @@ Output:
 ```
 begin_array
 begin_object
-name: index_id
+key: index_id
 string_value: EUR_LIBOR_06M
-name: observation_date
+key: observation_date
 string_value: 2015-10-23
-name: rate
+key: rate
 double_value: 0.0000214
 end_object
 begin_object
-name: index_id
+key: index_id
 string_value: EUR_LIBOR_06M
-name: observation_date
+key: observation_date
 string_value: 2015-10-26
-name: rate
+key: rate
 double_value: 0.0000143
 end_object
 begin_object
-name: index_id
+key: index_id
 string_value: EUR_LIBOR_06M
-name: observation_date
+key: observation_date
 string_value: 2015-10-27
-name: rate
+key: rate
 double_value: 0.0000001
 end_object
 end_array
@@ -325,7 +325,7 @@ Or into strongly typed records:
 
 int main()
 {
-    typedef std::tuple<std::string,std::string,double> record_type;
+    using record_type = std::tuple<std::string,std::string,double>;
 
     csv::csv_options options;
     options.assume_header(true);

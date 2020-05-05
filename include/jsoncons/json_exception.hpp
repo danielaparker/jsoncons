@@ -20,18 +20,26 @@ namespace jsoncons {
     class json_exception
     {
     public:
-        virtual ~json_exception() = default;
+        virtual ~json_exception() noexcept = default;
         virtual const char* what() const noexcept = 0;
     };
 
     // json_runtime_error
 
+    template <class Base, class Enable = void>
+    class json_runtime_error
+    {
+    };
+
     template <class Base>
-    class json_runtime_error : public Base, public virtual json_exception
+    class json_runtime_error<Base,
+                             typename std::enable_if<std::is_convertible<Base*,std::exception*>::value &&
+                                                     jsoncons::detail::is_constructible_from_string<Base>::value>::type> 
+        : public Base, public virtual json_exception
     {
     public:
         json_runtime_error(const std::string& s) noexcept
-            : Base(""), message_(s)
+            : Base(s)
         {
         }
         ~json_runtime_error() noexcept
@@ -39,10 +47,8 @@ namespace jsoncons {
         }
         const char* what() const noexcept override
         {
-            return message_.c_str();
+            return Base::what();
         }
-    private:
-        std::string message_;
     };
 
     class key_not_found : public std::out_of_range, public virtual json_exception
@@ -172,13 +178,28 @@ JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_error;
 #define JSONCONS_STR2(x)  #x
 #define JSONCONS_STR(x)  JSONCONS_STR2(x)
 
+
+    class assertion_error : public std::runtime_error, public virtual json_exception
+    {
+    public:
+        assertion_error(const std::string& s) noexcept
+            : std::runtime_error(s)
+        {
+        }
+        const char* what() const noexcept override
+        {
+            return std::runtime_error::what();
+        }
+    };
+
+
 #ifdef _DEBUG
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-    JSONCONS_THROW(jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at " __FILE__ ":" \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
             JSONCONS_STR(__LINE__))); }
 #else
 #define JSONCONS_ASSERT(x) if (!(x)) { \
-    JSONCONS_THROW(jsoncons::json_runtime_error<std::runtime_error>("assertion '" #x "' failed at  <> :" \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at  <> :" \
             JSONCONS_STR( 0 ))); }
 #endif // _DEBUG
 

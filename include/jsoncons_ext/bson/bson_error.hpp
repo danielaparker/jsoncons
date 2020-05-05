@@ -17,7 +17,11 @@ enum class bson_errc
     success = 0,
     unexpected_eof = 1,
     source_error,
-    invalid_utf8_text_string
+    invalid_utf8_text_string,
+    max_nesting_depth_exceeded,
+    string_length_is_non_positive,
+    length_is_negative,
+    unknown_type
 };
 
 class bson_error_category_impl
@@ -38,7 +42,15 @@ public:
                 return "Source error";
             case bson_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
-           default:
+            case bson_errc::max_nesting_depth_exceeded:
+                return "Data item nesting exceeds limit in options";
+            case bson_errc::string_length_is_non_positive:
+                return "Request for the length of a string returned a non-positive result";
+            case bson_errc::length_is_negative:
+                return "Request for the length of a binary returned a negative result";
+            case bson_errc::unknown_type:
+                return "An unknown type was found in the stream";
+            default:
                 return "Unknown BSON parser error";
         }
     }

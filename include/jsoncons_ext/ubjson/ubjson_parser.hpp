@@ -16,6 +16,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/ubjson/ubjson_detail.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
+#include <jsoncons_ext/ubjson/ubjson_options.hpp>
 
 namespace jsoncons { namespace ubjson {
 
@@ -37,32 +38,35 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class TempAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_ubjson_parser : public ser_context
 {
-    typedef char char_type;
-    typedef std::char_traits<char> char_traits_type;
-    typedef TempAllocator temp_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    using char_type = char;
+    using char_traits_type = std::char_traits<char>;
+    using temp_allocator_type = Allocator;
+    using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;                  
+    using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
     Src source_;
-    int nesting_depth_;
+    ubjson_decode_options options_;
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
+    int nesting_depth_;
 public:
     template <class Source>
-    basic_ubjson_parser(Source&& source,
-                        const TempAllocator alloc=TempAllocator())
+        basic_ubjson_parser(Source&& source,
+                          const ubjson_decode_options& options = ubjson_decode_options(),
+                          const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)), 
-         nesting_depth_(0),
+         options_(options),
          more_(true), 
          done_(false),
          text_buffer_(alloc),
-         state_stack_(alloc)
+         state_stack_(alloc),
+         nesting_depth_(0)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
@@ -119,7 +123,7 @@ public:
                     }
                     else
                     {
-                        produce_end_array(visitor, ec);
+                        end_array(visitor, ec);
                     }
                     break;
                 }
@@ -136,7 +140,7 @@ public:
                     }
                     else
                     {
-                        produce_end_array(visitor, ec);
+                        end_array(visitor, ec);
                     }
                     break;
                 }
@@ -151,13 +155,19 @@ public:
                             return;
                         case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
                             source_.ignore(1);
-                            produce_end_array(visitor, ec);
+                            end_array(visitor, ec);
                             if (ec)
                             {
                                 return;
                             }
                             break;
                         default:
+                            if (++state_stack_.back().index > options_.max_items())
+                            {
+                                ec = ubjson_errc::max_items_exceeded;
+                                more_ = false;
+                                return;
+                            }
                             read_type_and_value(visitor, ec);
                             if (ec)
                             {
@@ -172,7 +182,7 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        read_name(visitor, ec);
+                        read_key(visitor, ec);
                         if (ec)
                         {
                             return;
@@ -181,7 +191,7 @@ public:
                     }
                     else
                     {
-                        produce_end_map(visitor, ec);
+                        end_object(visitor, ec);
                     }
                     break;
                 }
@@ -200,7 +210,7 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        read_name(visitor, ec);
+                        read_key(visitor, ec);
                         if (ec)
                         {
                             return;
@@ -209,7 +219,7 @@ public:
                     }
                     else
                     {
-                        produce_end_map(visitor, ec);
+                        end_object(visitor, ec);
                     }
                     break;
                 }
@@ -232,16 +242,22 @@ public:
                             ec = ubjson_errc::unexpected_eof;
                             more_ = false;
                             return;
-                        case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
+                        case jsoncons::ubjson::detail::ubjson_format::end_object_marker:
                             source_.ignore(1);
-                            produce_end_map(visitor, ec);
+                            end_object(visitor, ec);
                             if (ec)
                             {
                                 return;
                             }
                             break;
                         default:
-                            read_name(visitor, ec);
+                            if (++state_stack_.back().index > options_.max_items())
+                            {
+                                ec = ubjson_errc::max_items_exceeded;
+                                more_ = false;
+                                return;
+                            }
+                            read_key(visitor, ec);
                             if (ec)
                             {
                                 return;
@@ -289,6 +305,7 @@ private:
         if (source_.is_error())
         {
             ec = ubjson_errc::source_error;
+            more_ = false;
             return;
         }   
 
@@ -296,6 +313,7 @@ private:
         if (source_.get(type) == 0)
         {
             ec = ubjson_errc::unexpected_eof;
+            more_ = false;
             return;
         }
         read_value(visitor, type, ec);
@@ -331,6 +349,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -344,6 +363,7 @@ private:
                 if (source_.get(val) == 0)
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
@@ -356,6 +376,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -370,6 +391,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -384,6 +406,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -398,6 +421,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -412,6 +436,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -426,6 +451,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -434,6 +460,7 @@ private:
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = ubjson_errc::invalid_utf8_text_string;
+                    more_ = false;
                     return;
                 }
                 more_ = visitor.string_value(basic_string_view<char>(&c,1), semantic_tag::none, *this, ec);
@@ -447,16 +474,17 @@ private:
                     return;
                 }
                 text_buffer_.clear();
-                source_.read(std::back_inserter(text_buffer_), length);
-                if (source_.eof())
+                if (source_reader<Src>::read(source_,text_buffer_,length) != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = ubjson_errc::invalid_utf8_text_string;
+                    more_ = false;
                     return;
                 }
                 more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
@@ -470,42 +498,49 @@ private:
                     return;
                 }
                 text_buffer_.clear();
-                source_.read(std::back_inserter(text_buffer_), length);
-                if (source_.eof())
+                if (source_reader<Src>::read(source_,text_buffer_,length) != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 if (jsoncons::detail::is_base10(text_buffer_.data(),text_buffer_.length()))
                 {
-                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigint, *this);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigint, *this, ec);
                 }
                 else
                 {
-                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigdec, *this);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::bigdec, *this, ec);
                 }
                 break;
             }
             case jsoncons::ubjson::detail::ubjson_format::start_array_marker: 
             {
-                produce_begin_array(visitor,ec);
+                begin_array(visitor,ec);
                 break;
             }
             case jsoncons::ubjson::detail::ubjson_format::start_object_marker: 
             {
-                produce_begin_map(visitor, ec);
+                begin_object(visitor, ec);
                 break;
             }
             default:
             {
                 ec = ubjson_errc::unknown_type;
+                more_ = false;
                 return;
             }
         }
     }
 
-    void produce_begin_array(json_visitor& visitor, std::error_code& ec)
+    void begin_array(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = ubjson_errc::max_nesting_depth_exceeded;
+            more_ = false;
+            return;
+        } 
         if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
             source_.ignore(1);
@@ -513,18 +548,30 @@ private:
             if (source_.get(item_type) == 0)
             {
                 ec = ubjson_errc::unexpected_eof;
+                more_ = false;
                 return;
             }
             if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
+                if (ec)
+                {
+                    return;
+                }
+                if (length > options_.max_items())
+                {
+                    ec = ubjson_errc::max_items_exceeded;
+                    more_ = false;
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::strongly_typed_array,length,item_type);
                 more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
             }
             else
             {
                 ec = ubjson_errc::count_required_after_type;
+                more_ = false;
                 return;
             }
         }
@@ -532,6 +579,16 @@ private:
         {
             source_.ignore(1);
             std::size_t length = get_length(ec);
+            if (ec)
+            {
+                return;
+            }
+            if (length > options_.max_items())
+            {
+                ec = ubjson_errc::max_items_exceeded;
+                more_ = false;
+                return;
+            }
             state_stack_.emplace_back(parse_mode::array,length);
             more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
         }
@@ -542,14 +599,22 @@ private:
         }
     }
 
-    void produce_end_array(json_visitor& visitor, std::error_code&)
+    void end_array(json_visitor& visitor, std::error_code& ec)
     {
-        more_ = visitor.end_array(*this);
+        --nesting_depth_;
+
+        more_ = visitor.end_array(*this, ec);
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_visitor& visitor, std::error_code& ec)
+    void begin_object(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = ubjson_errc::max_nesting_depth_exceeded;
+            more_ = false;
+            return;
+        } 
         if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
             source_.ignore(1);
@@ -557,18 +622,30 @@ private:
             if (source_.get(item_type) == 0)
             {
                 ec = ubjson_errc::unexpected_eof;
+                more_ = false;
                 return;
             }
             if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
+                if (ec)
+                {
+                    return;
+                }
+                if (length > options_.max_items())
+                {
+                    ec = ubjson_errc::max_items_exceeded;
+                    more_ = false;
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::strongly_typed_map_key,length,item_type);
                 more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
             }
             else
             {
                 ec = ubjson_errc::count_required_after_type;
+                more_ = false;
                 return;
             }
         }
@@ -578,6 +655,16 @@ private:
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
+                if (ec)
+                {
+                    return;
+                }
+                if (length > options_.max_items())
+                {
+                    ec = ubjson_errc::max_items_exceeded;
+                    more_ = false;
+                    return;
+                }
                 state_stack_.emplace_back(parse_mode::map_key,length);
                 more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
             }
@@ -589,9 +676,10 @@ private:
         }
     }
 
-    void produce_end_map(json_visitor& visitor, std::error_code&)
+    void end_object(json_visitor& visitor, std::error_code& ec)
     {
-        more_ = visitor.end_object(*this);
+        --nesting_depth_;
+        more_ = visitor.end_object(*this, ec);
         state_stack_.pop_back();
     }
 
@@ -601,12 +689,14 @@ private:
         if (JSONCONS_UNLIKELY(source_.eof()))
         {
             ec = ubjson_errc::unexpected_eof;
+            more_ = false;
             return length;
         }
         uint8_t type{};
         if (source_.get(type) == 0)
         {
             ec = ubjson_errc::unexpected_eof;
+            more_ = false;
             return length;
         }
         switch (type)
@@ -618,6 +708,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return length;
                 }
                 const uint8_t* endp;
@@ -628,7 +719,8 @@ private:
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
+                    more_ = false;
                     return length;
                 }
                 break;
@@ -639,6 +731,7 @@ private:
                 if (source_.get(val) == 0)
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return length;
                 }
                 length = val;
@@ -651,6 +744,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return length;
                 }
                 const uint8_t* endp;
@@ -661,7 +755,8 @@ private:
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
+                    more_ = false;
                     return length;
                 }
                 break;
@@ -673,6 +768,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return length;
                 }
                 const uint8_t* endp;
@@ -683,7 +779,8 @@ private:
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
+                    more_ = false;
                     return length;
                 }
                 break;
@@ -695,6 +792,7 @@ private:
                 if (source_.eof())
                 {
                     ec = ubjson_errc::unexpected_eof;
+                    more_ = false;
                     return length;
                 }
                 const uint8_t* endp;
@@ -705,12 +803,14 @@ private:
                     if (length != (uint64_t)val)
                     {
                         ec = ubjson_errc::number_too_large;
+                        more_ = false;
                         return length;
                     }
                 }
                 else
                 {
-                    ec = ubjson_errc::length_cannot_be_negative;
+                    ec = ubjson_errc::length_is_negative;
+                    more_ = false;
                     return length;
                 }
                 break;
@@ -718,33 +818,38 @@ private:
             default:
             {
                 ec = ubjson_errc::length_must_be_integer;
+                more_ = false;
                 return length;
             }
         }
         return length;
     }
 
-    void read_name(json_visitor& visitor, std::error_code& ec)
+    void read_key(json_visitor& visitor, std::error_code& ec)
     {
         std::size_t length = get_length(ec);
         if (ec)
         {
+            ec = ubjson_errc::key_expected;
+            more_ = false;
             return;
         }
         text_buffer_.clear();
-        source_.read(std::back_inserter(text_buffer_), length);
-        if (source_.eof())
+        if (source_reader<Src>::read(source_,text_buffer_,length) != length)
         {
             ec = ubjson_errc::unexpected_eof;
+            more_ = false;
             return;
         }
+
         auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
         if (result.ec != unicons::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
+            more_ = false;
             return;
         }
-        more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+        more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
     }
 };
 

@@ -52,7 +52,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
     JSONCONS_ARRAY_OF_CHAR(CharT,end_array_name,'e','n','d','_','a','r','r','a','y')
     JSONCONS_ARRAY_OF_CHAR(CharT,begin_object_name,'b','e','g','i','n','_','o','b','j','e','c','t')
     JSONCONS_ARRAY_OF_CHAR(CharT,end_object_name,'e','n','d','_','o','b','j','e','c','t')
-    JSONCONS_ARRAY_OF_CHAR(CharT,name_name,'n','a','m','e')
+    JSONCONS_ARRAY_OF_CHAR(CharT,key_name,'k','e','y')
     JSONCONS_ARRAY_OF_CHAR(CharT,string_value_name,'s','t','r','i','n','g','_','v','a','l','u','e')
     JSONCONS_ARRAY_OF_CHAR(CharT,byte_string_value_name,'b','y','t','e','_','s','t','r','i','n','g','_','v','a','l','u','e')
     JSONCONS_ARRAY_OF_CHAR(CharT,null_value_name,'n','u','l','l','_','v','a','l','u','e')
@@ -86,7 +86,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
         }
         case staj_event_type::key:
         {
-            os << name_name;
+            os << key_name;
             break;
         }
         case staj_event_type::string_value:
@@ -154,7 +154,7 @@ class basic_staj_event
     } value_;
     std::size_t length_;
 public:
-    typedef basic_string_view<CharT> string_view_type;
+    using string_view_type = basic_string_view<CharT>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), length_(0)
@@ -366,7 +366,7 @@ private:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                auto result = jsoncons::detail::integer_from_json<int64_t>(value_.string_data_, length_);
+                auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
                 if (!result)
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
@@ -400,7 +400,7 @@ private:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                auto result = jsoncons::detail::integer_from_json<uint64_t>(value_.string_data_, length_);
+                auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
                 if (!result)
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
@@ -433,7 +433,7 @@ private:
             case staj_event_type::key:
             case staj_event_type::string_value:
             {
-                jsoncons::detail::string_to_double f;
+                jsoncons::detail::to_double_t f;
                 return f(value_.string_data_, length_);
             }
             case staj_event_type::double_value:
@@ -1326,7 +1326,7 @@ template<class CharT>
 class basic_staj_reader
 {
 public:
-    virtual ~basic_staj_reader() = default;
+    virtual ~basic_staj_reader() noexcept = default;
 
     virtual bool done() const = 0;
 
@@ -1344,11 +1344,11 @@ public:
     virtual const ser_context& context() const = 0;
 };
 
-typedef basic_staj_event<char> staj_event;
-typedef basic_staj_event<wchar_t> wstaj_event;
+using staj_event = basic_staj_event<char>;
+using wstaj_event = basic_staj_event<wchar_t>;
 
-typedef basic_staj_reader<char> staj_reader;
-typedef basic_staj_reader<wchar_t> wstaj_reader;
+using staj_reader = basic_staj_reader<char>;
+using wstaj_reader = basic_staj_reader<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 

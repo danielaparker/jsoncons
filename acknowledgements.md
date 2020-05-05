@@ -83,3 +83,5 @@ and [Rodrigo Broggi](https://github.com/rbroggi) for providing feedback and help
 convenience macros.
 
 - [dvzubarev](https://github.com/dvzubarev) for contributing suggestions for improving the `ser_traits` implementation.
+
+- [David Korczynski](https://github.com/DavidKorczynski) for integrating jsoncons into OSS-fuzz and contributing fuzzers 

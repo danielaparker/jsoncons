@@ -943,18 +943,29 @@ base16_to_integer(const CharT* s, std::size_t length)
 
 #if defined(JSONCONS_HAS_MSC__STRTOD_L)
 
-class string_to_double
+class to_double_t
 {
 private:
     _locale_t locale_;
 public:
-    string_to_double()
+    to_double_t()
     {
         locale_ = _create_locale(LC_NUMERIC, "C");
     }
-    ~string_to_double()
+    ~to_double_t() noexcept
     {
         _free_locale(locale_);
+    }
+
+    to_double_t(const to_double_t&)
+    {
+        locale_ = _create_locale(LC_NUMERIC, "C");
+    }
+
+    to_double_t& operator=(const to_double_t&) 
+    {
+        // Don't assign locale
+        return *this;
     }
 
     char get_decimal_point() const
@@ -987,26 +998,32 @@ public:
         }
         return val;
     }
-private:
-    // noncopyable and nonmoveable
-    string_to_double(const string_to_double&) = delete;
-    string_to_double& operator=(const string_to_double&) = delete;
 };
 
 #elif defined(JSONCONS_HAS_STRTOLD_L)
 
-class string_to_double
+class to_double_t
 {
 private:
     locale_t locale_;
 public:
-    string_to_double()
+    to_double_t()
     {
         locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
     }
-    ~string_to_double()
+    ~to_double_t() noexcept
     {
         freelocale(locale_);
+    }
+
+    to_double_t(const to_double_t&)
+    {
+        locale_ = newlocale(LC_ALL_MASK, "C", (locale_t) 0);
+    }
+
+    to_double_t& operator=(const to_double_t&) 
+    {
+        return *this;
     }
 
     char get_decimal_point() const
@@ -1039,21 +1056,16 @@ public:
         }
         return val;
     }
-
-private:
-    // noncopyable and nonmoveable
-    string_to_double(const string_to_double& fr) = delete;
-    string_to_double& operator=(const string_to_double& fr) = delete;
 };
 
 #else
-class string_to_double
+class to_double_t
 {
 private:
     std::vector<char> buffer_;
     char decimal_point_;
 public:
-    string_to_double()
+    to_double_t()
         : buffer_()
     {
         struct lconv * lc = localeconv();
@@ -1067,6 +1079,9 @@ public:
         }
         buffer_.reserve(100);
     }
+
+    to_double_t(const to_double_t&) = default;
+    to_double_t& operator=(const to_double_t&) = default;
 
     char get_decimal_point() const
     {
@@ -1098,11 +1113,6 @@ public:
         }
         return val;
     }
-
-private:
-    // noncopyable and nonmoveable
-    string_to_double(const string_to_double& fr) = delete;
-    string_to_double& operator=(const string_to_double& fr) = delete;
 };
 #endif
 

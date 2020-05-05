@@ -7,6 +7,7 @@
 #ifndef JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 #define JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
+#include <type_traits>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/config/binary_config.hpp>
 
@@ -38,15 +39,20 @@ using std::span;
 }
 #endif
 
-#if !defined(JSONCONS_HAS_STD_OPTIONAL)
-#include <jsoncons/detail/optional.hpp>
-namespace jsoncons {
-using jsoncons::detail::optional;
-}
+#if defined(JSONCONS_HAS_STD_OPTIONAL)
+    #include <optional>
+    namespace jsoncons {
+    using std::optional;
+    }
+#elif defined(JSONCONS_HAS_BOOST_OPTIONAL)
+    #include <<boost/optional.hpp>>
+    namespace jsoncons {
+    using boost::optional;
+    }
 #else 
-#include <optional>
-namespace jsoncons {
-using std::optional;
+    #include <jsoncons/detail/optional.hpp>
+    namespace jsoncons {
+    using jsoncons::detail::optional;
 }
 #endif // !defined(JSONCONS_HAS_STD_OPTIONAL)
 
@@ -75,7 +81,7 @@ namespace jsoncons {
     template<class T> 
     struct unique_if 
     {
-        typedef std::unique_ptr<T> value_is_not_array;
+        using value_is_not_array = std::unique_ptr<T>;
     };
 
     template<class T> 
@@ -86,7 +92,7 @@ namespace jsoncons {
 
     template<class T, size_t N> 
     struct unique_if<T[N]> {
-        typedef void value_is_array_of_known_bound;
+        using value_is_array_of_known_bound = void;
     };
 
     template<class T, class... Args>
@@ -100,7 +106,7 @@ namespace jsoncons {
     typename unique_if<T>::value_is_array_of_unknown_bound
     make_unique(size_t n) 
     {
-        typedef typename std::remove_extent<T>::type U;
+        using U = typename std::remove_extent<T>::type;
         return std::unique_ptr<T>(new U[n]());
     }
 
@@ -248,9 +254,9 @@ namespace detail {
 
 #define JSONCONS_STRING_LITERAL(name, ...) \
    template <class CharT> \
-   basic_string_view<CharT> name() {\
+   jsoncons::basic_string_view<CharT> name() {\
        static constexpr CharT s[] = { __VA_ARGS__};\
-       return basic_string_view<CharT>(s, sizeof(s) / sizeof(CharT));\
+       return jsoncons::basic_string_view<CharT>(s, sizeof(s) / sizeof(CharT));\
    }
 
 #define JSONCONS_ARRAY_OF_CHAR(CharT, name, ...) \

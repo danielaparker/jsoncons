@@ -20,49 +20,119 @@
 
 namespace jsoncons
 {
-// static_max
 
-template <std::size_t arg1, std::size_t ... argn>
-struct static_max;
+    #ifndef JSONCONS_HAS_VOID_T
+    // follows https://en.cppreference.com/w/cpp/types/void_t
+    template<typename... Ts> struct make_void { typedef void type;};
+    template<typename... Ts> using void_t = typename make_void<Ts...>::type;
+    #else
+    using void_t = std::void_t; 
+    #endif
 
-template <std::size_t arg>
-struct static_max<arg>
-{
-    static constexpr size_t value = arg;
-};
+    // follows http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4436.pdf
 
-template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
-struct static_max<arg1,arg2,argn ...>
-{
-    static constexpr size_t value = arg1 >= arg2 ? 
-        static_max<arg1,argn...>::value :
-        static_max<arg2,argn...>::value; 
-};
+    // detector
 
-inline
-char to_hex_character(uint8_t c)
-{
-    return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
-}
+    // primary template handles all types not supporting the archetypal Op
+    template< 
+        class Default, 
+        class, // always void; supplied externally
+        template<class...> class Op, 
+        class... Args
+    >
+    struct detector
+    {
+        constexpr static auto value = false;
+        using type = Default;
+    };
 
-inline
-bool is_control_character(uint32_t c)
-{
-    return c <= 0x1F || c == 0x7f;
-}
+    // specialization recognizes and handles only types supporting Op
+    template< 
+        class Default, 
+        template<class...> class Op, 
+        class... Args
+    >
+    struct detector<Default, void_t<Op<Args...>>, Op, Args...>
+    {
+        constexpr static auto value = true;
+        using type = Op<Args...>;
+    };
 
-inline
-bool is_non_ascii_codepoint(uint32_t cp)
-{
-    return cp >= 0x80;
-}
+    // is_detected, is_detected_t
 
-template <typename T>
-struct is_stateless
- : public std::integral_constant<bool,  
-      (std::is_default_constructible<T>::value &&
-      std::is_empty<T>::value)>
-{};
+    template< template<class...> class Op, class... Args >
+    using
+    is_detected = detector<void, void, Op, Args...>;
+
+    template< template<class...> class Op, class... Args >
+    using
+    is_detected_t = typename is_detected<Op, Args...>::type;
+
+    // detected_or, detected_or_t
+
+    template< class Default, template<class...> class Op, class... Args >
+    using
+    detected_or = detector<Default, void, Op, Args...>;
+
+    template< class Default, template<class...> class Op, class... Args >
+    using
+    detected_or_t = typename detected_or<Default, Op, Args...>::type;
+
+    // is_detected_exact
+
+   template< class Expected, template<class...> class Op, class... Args >
+   using
+   is_detected_exact = std::is_same< Expected, is_detected_t<Op, Args...> >;
+
+    // is_detected_convertible
+
+    template< class To, template<class...> class Op, class... Args >
+    using
+    is_detected_convertible = std::is_convertible< is_detected_t<Op, Args...>, To >;
+
+    // static_max
+
+    template <std::size_t arg1, std::size_t ... argn>
+    struct static_max;
+
+    template <std::size_t arg>
+    struct static_max<arg>
+    {
+        static constexpr size_t value = arg;
+    };
+
+    template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
+    struct static_max<arg1,arg2,argn ...>
+    {
+        static constexpr size_t value = arg1 >= arg2 ? 
+            static_max<arg1,argn...>::value :
+            static_max<arg2,argn...>::value; 
+    };
+
+    inline
+    char to_hex_character(uint8_t c)
+    {
+        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
+    }
+
+    inline
+    bool is_control_character(uint32_t c)
+    {
+        return c <= 0x1F || c == 0x7f;
+    }
+
+    inline
+    bool is_non_ascii_codepoint(uint32_t cp)
+    {
+        return cp >= 0x80;
+    }
+
+    template <typename T>
+    struct is_stateless
+     : public std::integral_constant<bool,  
+          (std::is_default_constructible<T>::value &&
+          std::is_empty<T>::value)>
+    {};
 
 // type traits extensions
 
@@ -93,8 +163,6 @@ namespace detail {
                                    std::is_floating_point<T>::value
     >::type> : std::true_type {};
 
-    // has_char_traits_member_type
-
     // is_character
 
     template <class T, class Enable=void>
@@ -104,16 +172,6 @@ namespace detail {
     struct is_character<T, 
            typename std::enable_if<std::is_same<T,char>::value ||
                                    std::is_same<T,wchar_t>::value
-    >::type> : std::true_type {};
-
-    // has_char_traits_member_type
-
-    template <class T, class Enable=void>
-    struct has_char_traits_member_type : std::false_type {};
-
-    template <class T>
-    struct has_char_traits_member_type<T, 
-                                       typename std::enable_if<std::is_same<typename T::traits_type::char_type, typename T::value_type>::value
     >::type> : std::true_type {};
 
     // is_int
@@ -163,31 +221,6 @@ namespace detail {
                                                       std::is_same<T,double>::value
     >::type> : std::true_type {};
 
-    // is_string
-
-    template <class T, class Enable=void>
-    struct is_string : std::false_type {};
-
-    template <class T>
-    struct is_string<T, 
-                     typename std::enable_if<is_character<typename T::value_type>::value &&
-                                             has_char_traits_member_type<T>::value && 
-                                             !std::is_void<decltype(T::npos)>::value && 
-                                             !std::is_void<typename T::allocator_type>::value
-    >::type> : std::true_type {};
-
-    // is_string_view
-
-    template <class T, class Enable=void>
-    struct is_string_view : std::false_type {};
-
-    template <class T>
-    struct is_string_view<T, 
-                          typename std::enable_if<is_character<typename T::value_type>::value &&
-                                                  has_char_traits_member_type<T>::value && 
-                                                  !std::is_void<decltype(T::npos)>::value && !is_string<T>::value
-    >::type> : std::true_type {};
-
     // is_integer_like
 
     template <class T, class Enable=void>
@@ -219,6 +252,74 @@ namespace detail {
     struct is_floating_point_like<T, 
                                   typename std::enable_if<std::is_floating_point<T>::value>::type> : std::true_type {};
 
+    // Containers
+
+    template <class Container>
+    using 
+    container_npos_t = decltype(Container::npos);
+
+    template <class Container>
+    using 
+    container_allocator_type_t = typename Container::allocator_type;
+
+    template <class Container>
+    using 
+    container_mapped_type_t = typename Container::mapped_type;
+
+    template <class Container>
+    using 
+    container_key_type_t = typename Container::key_type;
+
+    template <class Container>
+    using 
+    container_value_type_t = typename std::iterator_traits<typename Container::iterator>::value_type;
+
+    template <class Container>
+    using 
+    container_char_traits_t = typename Container::traits_type::char_type;
+
+    template<class Container>
+    using
+    container_push_back_t = decltype(std::declval<Container>().push_back(typename Container::value_type()));
+
+    template<class Container>
+    using
+    container_reserve_t = decltype(std::declval<Container>().reserve(typename Container::size_type()));
+
+    template<class Container>
+    using
+    container_data_t = decltype(std::declval<Container>().data());
+
+    template<class Container>
+    using
+    container_size_t = decltype(std::declval<Container>().size());
+
+    // is_string
+
+    template <class T, class Enable=void>
+    struct is_string : std::false_type {};
+
+    template <class T>
+    struct is_string<T, 
+                     typename std::enable_if<is_character<typename T::value_type>::value &&
+                                             is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
+                                             is_detected<container_npos_t,T>::value &&
+                                             is_detected<container_allocator_type_t,T>::value
+    >::type> : std::true_type {};
+
+    // is_string_view
+
+    template <class T, class Enable=void>
+    struct is_string_view : std::false_type {};
+
+    template <class T>
+    struct is_string_view<T, 
+                          typename std::enable_if<is_character<typename T::value_type>::value &&
+                                                  is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
+                                                  is_detected<container_npos_t,T>::value &&
+                                                  !is_detected<container_allocator_type_t,T>::value
+    >::type> : std::true_type {};
+
     // is_map_like
 
     template <class T, class Enable=void>
@@ -226,7 +327,10 @@ namespace detail {
 
     template <class T>
     struct is_map_like<T, 
-                       typename std::enable_if<!std::is_void<typename T::mapped_type>::value>::type> 
+                       typename std::enable_if<is_detected<container_mapped_type_t,T>::value &&
+                                               is_detected<container_key_type_t,T>::value &&
+                                               is_detected<container_value_type_t,T>::value 
+        >::type> 
         : std::true_type {};
 
     // is_std_array
@@ -236,17 +340,16 @@ namespace detail {
     template<class E, std::size_t N>
     struct is_std_array<std::array<E, N>> : std::true_type {};
 
-    // is_vector_like
+    // is_list_like
 
     template <class T, class Enable=void>
-    struct is_vector_like : std::false_type {};
+    struct is_list_like : std::false_type {};
 
     template <class T>
-    struct is_vector_like<T, 
-                          typename std::enable_if<!std::is_void<typename T::value_type>::value &&
-                                                  !std::is_void<typename std::iterator_traits<typename T::iterator>::value_type>::value &&
+    struct is_list_like<T, 
+                          typename std::enable_if<is_detected<container_value_type_t,T>::value &&
                                                   !is_std_array<T>::value && 
-                                                  !has_char_traits_member_type<T>::value && 
+                                                  !is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
                                                   !is_map_like<T>::value 
     >::type> 
         : std::true_type {};
@@ -262,38 +365,41 @@ namespace detail {
     >::type> 
         : std::true_type {};
 
-    // has_size_and_data
-
-
-    // has_size_and_data
-    #if !(defined(_MSC_VER) && _MSC_VER <= 1900)
-    template<class T, class Enable=void>
-    struct has_data_and_size : std::false_type{};
-
-    template<class C>
-    struct has_data_and_size
-    <
-        C, 
-        typename std::enable_if<!std::is_void<decltype(std::declval<C>().size())>::value &&
-                                !std::is_void<decltype(std::declval<C>().data())>::value>::type
-    > : std::true_type{};
-    #else
-    template<class T, class Enable=void>
-    struct has_data_and_size : std::true_type{};
-
-    #endif
-
     // has_reserve
 
-    template<class T, class Enable=void>
-    struct has_reserve : std::false_type{};
+    template<class Container>
+    using
+    has_reserve = is_detected<container_reserve_t, Container>;
 
-    template<class C>
-    struct has_reserve
-    <
-        C, 
-        typename std::enable_if<!std::is_void<decltype(std::declval<C>().reserve(0))>::value>::type
-    > : std::true_type{};
+    // has_push_back
+
+    template<class Container>
+    using
+    has_push_back = is_detected<container_push_back_t, Container>;
+
+    // has_data, has_data_exact
+
+    template<class Container>
+    using
+    has_data = is_detected<container_data_t, Container>;
+
+    template<class Ret, class Container>
+    using
+    has_data_exact = is_detected_exact<Ret, container_data_t, Container>;
+
+    // has_size
+
+    template<class Container>
+    using
+    has_size = is_detected<container_size_t, Container>;
+
+    // has_data_and_size
+
+    template<class Container>
+    struct has_data_and_size
+    {
+        static constexpr bool value = has_data<Container>::value && has_size<Container>::value;
+    };
 
     // is_c_array
 
@@ -306,19 +412,6 @@ namespace detail {
     template<class T, std::size_t N>
     struct is_c_array<T[N]> : std::true_type {};
 
-    // is_compatible_element
-
-    template<class C, class E, class Enable=void>
-    struct is_compatible_element : std::false_type {};
-
-    template<class C, class E>
-    struct is_compatible_element
-    <
-        C, E, 
-        typename std::enable_if<!std::is_void<decltype(std::declval<C>().data())>::value>::type>
-            : std::is_convertible< typename std::remove_pointer<decltype(std::declval<C>().data() )>::type(*)[], E(*)[]>
-    {};
-
     template<class C, class Enable=void>
     struct is_typed_array : std::false_type {};
 
@@ -326,7 +419,7 @@ namespace detail {
     struct is_typed_array
     <
         T, 
-        typename std::enable_if<jsoncons::detail::is_vector_like<T>::value && 
+        typename std::enable_if<jsoncons::detail::is_list_like<T>::value && 
                                 (std::is_same<typename T::value_type,uint8_t>::value ||  
                                  std::is_same<typename T::value_type,uint16_t>::value ||
                                  std::is_same<typename T::value_type,uint32_t>::value ||
@@ -339,6 +432,27 @@ namespace detail {
                                  std::is_same<typename T::value_type,double_t>::value)>::type
     > : std::true_type{};
 
+    // is_compatible_element
+
+    template<class Container, class Element, class Enable=void>
+    struct is_compatible_element : std::false_type {};
+
+    template<class Container, class Element>
+    struct is_compatible_element
+    <
+        Container, Element, 
+        typename std::enable_if<has_data<Container>::value>::type>
+            : std::is_convertible< typename std::remove_pointer<decltype(std::declval<Container>().data() )>::type(*)[], Element(*)[]>
+    {};
+
+    template<typename T>
+    using
+    construct_from_string_t = decltype(T(std::string{}));
+
+
+    template<class T>
+    using
+    is_constructible_from_string = is_detected<construct_from_string_t,T>;
 } // detail
 } // jsoncons
 

@@ -17,6 +17,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
+#include <jsoncons_ext/bson/bson_options.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -41,27 +42,33 @@ struct parse_state
 template <class Src,class Allocator=std::allocator<char>>
 class basic_bson_parser : public ser_context
 {
-    typedef char char_type;
-    typedef std::char_traits<char> char_traits_type;
-    typedef Allocator temp_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    using char_type = char;
+    using char_traits_type = std::char_traits<char>;
+    using temp_allocator_type = Allocator;
+    using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;                  
+    using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
     Src source_;
+    bson_decode_options options_;
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
+    int nesting_depth_;
 public:
     template <class Source>
     basic_bson_parser(Source&& source,
-                      const Allocator alloc=Allocator())
+                      const bson_decode_options& options = bson_decode_options(),
+                      const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)), 
+         options_(options),
          more_(true), 
          done_(false),
          text_buffer_(alloc),
-         state_stack_(alloc)
+         state_stack_(alloc),
+         nesting_depth_(0)
+
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
@@ -104,6 +111,7 @@ public:
         if (source_.is_error())
         {
             ec = bson_errc::source_error;
+            more_ = false;
             return;
         }
         
@@ -121,6 +129,7 @@ public:
                     if (source_.get(t) == 0)
                     {
                         ec = bson_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     if (t != 0x00)
@@ -141,6 +150,7 @@ public:
                     if (source_.get(t) == 0)
                     {
                         ec = bson_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     if (t != 0x00)
@@ -175,10 +185,17 @@ private:
 
     void begin_document(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = bson_errc::max_nesting_depth_exceeded;
+            more_ = false;
+            return;
+        } 
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
+            more_ = false;
             return;
         }
         const uint8_t* endp;
@@ -188,18 +205,26 @@ private:
         state_stack_.emplace_back(parse_mode::document,length);
     }
 
-    void end_document(json_visitor& visitor, std::error_code&)
+    void end_document(json_visitor& visitor, std::error_code& ec)
     {
-        more_ = visitor.end_object(*this);
+        --nesting_depth_;
+        more_ = visitor.end_object(*this,ec);
         state_stack_.pop_back();
     }
 
     void begin_array(json_visitor& visitor, std::error_code& ec)
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = bson_errc::max_nesting_depth_exceeded;
+            more_ = false;
+            return;
+        } 
         uint8_t buf[sizeof(int32_t)]; 
         if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
+            more_ = false;
             return;
         }
         const uint8_t* endp;
@@ -209,9 +234,11 @@ private:
         state_stack_.emplace_back(parse_mode::array,0);
     }
 
-    void end_array(json_visitor& visitor, std::error_code&)
+    void end_array(json_visitor& visitor, std::error_code& ec)
     {
-        more_ = visitor.end_array(*this);
+        --nesting_depth_;
+
+        more_ = visitor.end_array(*this, ec);
         state_stack_.pop_back();
     }
 
@@ -229,9 +256,10 @@ private:
             if (result.ec != unicons::conv_errc())
             {
                 ec = bson_errc::invalid_utf8_text_string;
+                more_ = false;
                 return;
             }
-            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this);
+            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
         }
     }
 
@@ -245,6 +273,7 @@ private:
                 if (source_.read(buf, sizeof(double)) != sizeof(double))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -258,27 +287,41 @@ private:
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
                 auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(buf),&endp);
+                if (len < 1)
+                {
+                    ec = bson_errc::string_length_is_non_positive;
+                    more_ = false;
+                    return;
+                }
 
-                std::basic_string<char> s;
-                s.reserve(len - 1);
-                if ((int32_t)source_.read(std::back_inserter(s), len-1) != len-1)
+                std::vector<char> s;
+                std::size_t size = static_cast<std::size_t>(len-1);
+                if (source_reader<Src>::read(source_,s,size) != size)
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 uint8_t c{};
-                source_.get(c); // discard 0
+                if (source_.get(c) == 0) // discard 0
+                {
+                    ec = bson_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
                 auto result = unicons::validate(s.begin(),s.end());
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = bson_errc::invalid_utf8_text_string;
+                    more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.length()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
@@ -303,6 +346,7 @@ private:
                 if (source_.get(val) == 0)
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 more_ = visitor.bool_value(val != 0, semantic_tag::none, *this, ec);
@@ -314,6 +358,7 @@ private:
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -328,11 +373,12 @@ private:
                 if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
-                more_ = visitor.uint64_value(val, semantic_tag::timestamp, *this);
+                more_ = visitor.uint64_value(val, semantic_tag::timestamp, *this, ec);
                 break;
             }
 
@@ -342,6 +388,7 @@ private:
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
@@ -356,11 +403,12 @@ private:
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
                 auto val = jsoncons::detail::little_to_native<int64_t>(buf, buf+sizeof(int64_t),&endp);
-                more_ = visitor.int64_value(val, semantic_tag::timestamp, *this);
+                more_ = visitor.int64_value(val, semantic_tag::timestamp, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::binary_cd: 
@@ -369,22 +417,36 @@ private:
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
                 const auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
-
-                std::vector<uint8_t> v(len, 0);
-                if (source_.read(v.data(), v.size()) != v.size())
+                if (len < 0)
+                {
+                    ec = bson_errc::length_is_negative;
+                    more_ = false;
+                    return;
+                }
+                std::vector<uint8_t> v;
+                if (source_reader<Src>::read(source_, v, len) != static_cast<std::size_t>(len))
                 {
                     ec = bson_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
 
                 more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                           semantic_tag::none, 
-                                           *this);
+                                                  semantic_tag::none, 
+                                                  *this,
+                                                  ec);
                 break;
+            }
+            default:
+            {
+                ec = bson_errc::unknown_type;
+                more_ = false;
+                return;
             }
         }
 

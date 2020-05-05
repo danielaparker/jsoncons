@@ -38,10 +38,10 @@ namespace detail
         using const_pointer = const T*;
         using reference = T&;
         using const_reference = const T&;
-        typedef pointer iterator;
-        typedef const_pointer const_iterator;
-        typedef std::reverse_iterator<iterator> reverse_iterator;
-        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+        using iterator = pointer;
+        using const_iterator = const_pointer;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     private:
         pointer data_;
         size_type size_;

@@ -35,8 +35,8 @@ template <class Allocator>
 class basic_bignum_base
 {
 public:
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t> basic_type_allocator_type;
+    using allocator_type = Allocator;
+    using basic_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t>;
 
 private:
     basic_type_allocator_type alloc_;
@@ -339,7 +339,7 @@ public:
         initialize( v );
     }
 
-    ~basic_bignum()
+    ~basic_bignum() noexcept
     {
         if ( dynamic_ )
         {
@@ -1613,7 +1613,7 @@ private:
     }
 };
 
-typedef basic_bignum<std::allocator<uint8_t>> bignum;
+using bignum = basic_bignum<std::allocator<uint8_t>>;
 
 }
 

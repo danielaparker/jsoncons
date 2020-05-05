@@ -129,7 +129,7 @@ TEST_CASE("order preserving insert")
 {
     json_object<std::string, ojson> o;
 
-    typedef std::pair<ojson::key_type,ojson> item_type;
+    using item_type = std::pair<ojson::key_type,ojson>;
     std::vector<item_type> items;
     items.emplace_back("b", 1);
     items.emplace_back("a", 2);

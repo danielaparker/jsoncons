@@ -12,6 +12,8 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [basic_bson_encoder](basic_bson_encoder.md)
 
+[bson_options](bson_options.md)
+
 #### Mappings between BSON and jsoncons data items
 
 BSON data item  | jsoncons data item  |jsoncons tag

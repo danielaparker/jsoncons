@@ -29,12 +29,13 @@ template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator
 class basic_cbor_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
-    typedef Src source_type;
-    typedef char char_type;
-    typedef Allocator allocator_type;
+    using source_type = Src;
+    using char_type = char;
+    using allocator_type = Allocator;
 private:
     basic_cbor_parser<Src,Allocator> parser_;
     basic_staj_visitor<char_type> event_handler_;
+    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> event_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -42,26 +43,37 @@ private:
     basic_cbor_cursor& operator=(const basic_cbor_cursor&) = delete;
 
 public:
-    typedef string_view string_view_type;
+    using string_view_type = string_view;
 
     template <class Source>
     basic_cbor_cursor(Source&& source,
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc), 
-         eof_(false)
+       : basic_cbor_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           cbor_decode_options(),
+                           alloc)
     {
-        if (!done())
-        {
-            next();
-        }
+    }
+
+    template <class Source>
+    basic_cbor_cursor(Source&& source,
+                      const cbor_decode_options& options,
+                      const Allocator& alloc = Allocator())
+       : basic_cbor_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           options,
+                           alloc)
+    {
     }
 
     template <class Source>
     basic_cbor_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const cbor_decode_options& options = cbor_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc), 
+       : parser_(std::forward<Source>(source), options, alloc), 
          event_handler_(filter), 
+         event_handler_adaptor_(event_handler_, alloc),
          eof_(false)
     {
         if (!done())
@@ -95,6 +107,7 @@ public:
                       std::error_code& ec)
        : parser_(std::forward<Source>(source), alloc), 
          event_handler_(filter),
+         event_handler_adaptor_(event_handler_, alloc),
          eof_(false)
     {
         if (!done())
@@ -164,7 +177,7 @@ public:
             parser_.restart();
             while (!parser_.stopped())
             {
-                parser_.parse(event_handler_, ec);
+                parser_.parse(event_handler_adaptor_, ec);
                 if (ec) return;
             }
         }
@@ -172,13 +185,35 @@ public:
 
     void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
+        struct resource_wrapper
+        {
+            basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor;
+            basic_json_visitor<char_type>& original;
+
+            resource_wrapper(basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor,
+                             basic_json_visitor<char_type>& visitor)
+                : adaptor(adaptor), original(adaptor.destination())
+            {
+                adaptor.destination(visitor);
+            }
+
+            ~resource_wrapper()
+            {
+                adaptor.destination(original);
+            }
+        } wrapper(event_handler_adaptor_, visitor);
+
         parser_.restart();
         while (!parser_.stopped())
         {
-            parser_.parse(visitor, ec);
-            if (ec) return;
+            parser_.parse(event_handler_adaptor_, ec);
+            if (ec)
+            {
+                return;
+            }
         }
     }
+
     const ser_context& context() const override
     {
         return *this;
@@ -220,8 +255,8 @@ private:
     }
 };
 
-typedef basic_cbor_cursor<jsoncons::binary_stream_source> cbor_stream_cursor;
-typedef basic_cbor_cursor<jsoncons::bytes_source> cbor_bytes_cursor;
+using cbor_stream_cursor = basic_cbor_cursor<jsoncons::binary_stream_source>;
+using cbor_bytes_cursor = basic_cbor_cursor<jsoncons::bytes_source>;
 
 } // namespace cbor
 } // namespace jsoncons

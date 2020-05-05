@@ -195,11 +195,11 @@ class basic_json_encoder final : public basic_json_visitor<CharT>
         return k;
     }
 public:
-    typedef Allocator allocator_type;
-    typedef CharT char_type;
+    using allocator_type = Allocator;
+    using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
-    typedef Sink sink_type;
-    typedef typename basic_json_encode_options<CharT>::string_type string_type;
+    using sink_type = Sink;
+    using string_type = typename basic_json_encode_options<CharT>::string_type;
 
 private:
     enum class container_type {object, array};
@@ -220,6 +220,9 @@ private:
              begin_pos_(begin_pos), data_pos_(data_pos)
         {
         }
+
+        encoding_context(const encoding_context&) = default;
+        encoding_context& operator=(const encoding_context&) = default;
 
         void set_position(std::size_t pos)
         {
@@ -290,7 +293,7 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
-    const basic_json_encode_options<CharT> options_;
+    basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
 
     std::vector<encoding_context,encoding_context_allocator_type> stack_;
@@ -302,6 +305,7 @@ private:
     std::basic_string<CharT> close_object_brace_str_;
     std::basic_string<CharT> open_array_bracket_str_;
     std::basic_string<CharT> close_array_bracket_str_;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_json_encoder(const basic_json_encoder&) = delete;
@@ -321,7 +325,8 @@ public:
          fp_(options.float_format(), options.precision()),
          stack_(alloc),
          indent_amount_(0), 
-         column_(0)
+         column_(0),
+         nesting_depth_(0)
     {
         switch (options.spaces_around_colon())
         {
@@ -375,7 +380,7 @@ public:
         }
     }
 
-    ~basic_json_encoder()
+    ~basic_json_encoder() noexcept
     {
         JSONCONS_TRY
         {
@@ -393,8 +398,13 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = json_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
             sink_.append(comma_str_.data(),comma_str_.length());
@@ -464,6 +474,8 @@ private:
     bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         unindent();
         if (stack_.back().new_line_after())
         {
@@ -477,8 +489,13 @@ private:
         return true;
     }
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = json_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
             sink_.append(comma_str_.data(),comma_str_.length());
@@ -549,6 +566,8 @@ private:
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         unindent();
         if (stack_.back().new_line_after())
         {
@@ -1012,11 +1031,11 @@ class basic_json_compressed_encoder final : public basic_json_visitor<CharT>
         return k;
     }
 public:
-    typedef Allocator allocator_type;
-    typedef CharT char_type;
+    using allocator_type = Allocator;
+    using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
-    typedef Sink sink_type;
-    typedef typename basic_json_encode_options<CharT>::string_type string_type;
+    using sink_type = Sink;
+    using string_type = typename basic_json_encode_options<CharT>::string_type;
 
 private:
     enum class container_type {object, array};
@@ -1049,12 +1068,12 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<encoding_context> encoding_context_allocator_type;
 
     Sink sink_;
-    const basic_json_encode_options<CharT> options_;
+    basic_json_encode_options<CharT> options_;
     jsoncons::detail::write_double fp_;
-
     std::vector<encoding_context,encoding_context_allocator_type> stack_;
+    int nesting_depth_;
 
-    // Noncopyable and nonmoveable
+    // Noncopyable
     basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
     basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
 public:
@@ -1070,11 +1089,15 @@ public:
        : sink_(std::forward<Sink>(sink)),
          options_(options),
          fp_(options.float_format(), options.precision()),
-         stack_(alloc)         
+         stack_(alloc),
+         nesting_depth_(0)          
     {
     }
 
-    ~basic_json_compressed_encoder()
+    basic_json_compressed_encoder(basic_json_compressed_encoder&&) = default;
+    basic_json_compressed_encoder& operator=(basic_json_compressed_encoder&&) = default;
+
+    ~basic_json_compressed_encoder() noexcept
     {
         JSONCONS_TRY
         {
@@ -1093,8 +1116,13 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = json_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
             sink_.push_back(',');
@@ -1108,6 +1136,8 @@ private:
     bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         stack_.pop_back();
         sink_.push_back('}');
 
@@ -1119,8 +1149,13 @@ private:
     }
 
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = json_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         if (!stack_.empty() && stack_.back().is_array() && stack_.back().count() > 0)
         {
             sink_.push_back(',');
@@ -1133,6 +1168,8 @@ private:
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         stack_.pop_back();
         sink_.push_back(']');
         if (!stack_.empty())
@@ -1445,15 +1482,15 @@ private:
     }
 };
 
-typedef basic_json_encoder<char,jsoncons::stream_sink<char>> json_stream_encoder;
-typedef basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_stream_encoder;
-typedef basic_json_compressed_encoder<char,jsoncons::stream_sink<char>> json_compressed_stream_encoder;
-typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_compressed_stream_encoder;
+using json_stream_encoder = basic_json_encoder<char,jsoncons::stream_sink<char>>;
+using wjson_stream_encoder = basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>;
+using json_compressed_stream_encoder = basic_json_compressed_encoder<char,jsoncons::stream_sink<char>>;
+using wjson_compressed_stream_encoder = basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>;
 
-typedef basic_json_encoder<char,jsoncons::string_sink<std::string>> json_string_encoder;
-typedef basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_string_encoder;
-typedef basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>> json_compressed_string_encoder;
-typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_compressed_string_encoder;
+using json_string_encoder = basic_json_encoder<char,jsoncons::string_sink<std::string>>;
+using wjson_string_encoder = basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
+using json_compressed_string_encoder = basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>>;
+using wjson_compressed_string_encoder = basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT,class Sink=jsoncons::stream_sink<CharT>>

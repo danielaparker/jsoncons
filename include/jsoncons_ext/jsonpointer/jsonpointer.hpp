@@ -36,9 +36,9 @@ enum class pointer_state
     template <class InputIt>
     class json_ptr_iterator
     {
-        typedef typename std::iterator_traits<InputIt>::value_type char_type;
-        typedef std::basic_string<char_type> string_type;
-        typedef InputIt base_iterator;
+        using char_type = typename std::iterator_traits<InputIt>::value_type;
+        using string_type = std::basic_string<char_type>;
+        using base_iterator = InputIt;
 
         base_iterator path_ptr_;
         base_iterator end_input_;
@@ -49,11 +49,11 @@ enum class pointer_state
         std::size_t column_;
         std::basic_string<char_type> buffer_;
     public:
-        typedef string_type value_type;
-        typedef std::ptrdiff_t difference_type;
-        typedef value_type* pointer;
-        typedef const value_type& reference;
-        typedef std::input_iterator_tag iterator_category;
+        using value_type = string_type;
+        using difference_type = std::ptrdiff_t;
+        using pointer = value_type*;
+        using reference = const value_type&;
+        using iterator_category = std::input_iterator_tag;
 
         json_ptr_iterator(base_iterator first, base_iterator last)
             : json_ptr_iterator(first, last, first)
@@ -207,11 +207,11 @@ enum class pointer_state
         std::basic_string<CharT> path_;
     public:
         // Member types
-        typedef CharT char_type;
-        typedef std::basic_string<char_type> string_type;
-        typedef jsoncons::basic_string_view<char_type> string_view_type;
-        typedef json_ptr_iterator<typename string_type::const_iterator> const_iterator;
-        typedef const_iterator iterator;
+        using char_type = CharT;
+        using string_type = std::basic_string<char_type>;
+        using string_view_type = jsoncons::basic_string_view<char_type>;
+        using const_iterator = json_ptr_iterator<typename string_type::const_iterator>;
+        using iterator = const_iterator;
 
         // Constructors
         basic_json_ptr()
@@ -319,8 +319,8 @@ enum class pointer_state
         }
     };
 
-    typedef basic_json_ptr<char> json_ptr;
-    typedef basic_json_ptr<wchar_t> wjson_ptr;
+    using json_ptr = basic_json_ptr<char>;
+    using wjson_ptr = basic_json_ptr<wchar_t>;
 
     #if !defined(JSONCONS_NO_DEPRECATED)
     template<class CharT>
@@ -358,10 +358,10 @@ enum class pointer_state
     template<class J,class JReference>
     class jsonpointer_evaluator : public ser_context
     {
-        typedef typename handle_type<J,JReference>::type type;
-        typedef typename J::char_type char_type;
-        typedef typename std::basic_string<char_type> string_type;
-        typedef typename J::string_view_type string_view_type;
+        using type = typename handle_type<J,JReference>::type;
+        using char_type = typename J::char_type;
+        using string_type = typename std::basic_string<char_type>;
+        using string_view_type = typename J::string_view_type;
         using reference = JReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
 
@@ -433,7 +433,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -486,7 +486,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -548,7 +548,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -603,7 +603,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -677,7 +677,7 @@ enum class pointer_state
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::integer_from_json<std::size_t>(buffer.data(), buffer.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -987,7 +987,11 @@ enum class pointer_state
 
     // unflatten
 
-    enum class unflatten_method {try_array,object};
+    enum class unflatten_options {none,assume_object = 1
+    #if !defined(JSONCONS_NO_DEPRECATED)
+,object = assume_object
+#endif
+};
 
     template<class Json>
     Json safe_unflatten (Json& value)
@@ -1102,7 +1106,7 @@ enum class pointer_state
     }
 
     template<class Json>
-    Json unflatten_to_object(const Json& value, unflatten_method method = unflatten_method::try_array)
+    Json unflatten_to_object(const Json& value, unflatten_options options = unflatten_options::none)
     {
         using char_type = typename Json::char_type;
 
@@ -1132,20 +1136,20 @@ enum class pointer_state
             }
         }
 
-        return method == unflatten_method::try_array ? safe_unflatten (result) : result;
+        return options == unflatten_options::none ? safe_unflatten (result) : result;
     }
 
     template<class Json>
-    Json unflatten(const Json& value, unflatten_method method = unflatten_method::try_array)
+    Json unflatten(const Json& value, unflatten_options options = unflatten_options::none)
     {
-        if (method == unflatten_method::try_array)
+        if (options == unflatten_options::none)
         {
             jsoncons::optional<Json> j = try_unflatten_array(value);
-            return j ? *j : unflatten_to_object(value,method);
+            return j ? *j : unflatten_to_object(value,options);
         }
         else
         {
-            return unflatten_to_object(value,method);
+            return unflatten_to_object(value,options);
         }
     }
 

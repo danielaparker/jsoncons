@@ -43,13 +43,13 @@ namespace
         template<typename U>
         struct rebind
         {
-            typedef MyAlloc<U> other;
+            using other = MyAlloc<U>;
         };
-        typedef T* pointer;
-        typedef const T* const_pointer;
-        typedef T& reference;
-        typedef const T& const_reference;
-        typedef std::ptrdiff_t difference_type;
+        using pointer = T*;
+        using const_pointer = const T*;
+        using reference = T&;
+        using const_reference = const T&;
+        using difference_type = std::ptrdiff_t;
     };
     //template <class U>
     //using MyAlloc = std::allocator<U>;
@@ -226,7 +226,7 @@ TEST_CASE("convert vector of vector test, temp_allocator")
 #if !(defined(__GNUC__) && __GNUC__ <= 5)
 TEST_CASE("convert_tuple_test")
 {
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+    using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
 
     employee_collection input = 
     { 
@@ -251,7 +251,7 @@ TEST_CASE("convert_tuple_test")
 
 TEST_CASE("convert_tuple_test, temp_allocator")
 {
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+    using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
 
     employee_collection employees = 
     { 

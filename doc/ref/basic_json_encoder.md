@@ -52,7 +52,7 @@ and uses the specified [json options](basic_json_options.md).
 
 #### Destructor
 
-    virtual ~basic_json_encoder()
+    virtual ~basic_json_encoder() noexcept
 
 #### Inherited from [basic_json_visitor](../basic_json_visitor.md)
 

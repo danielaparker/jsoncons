@@ -24,7 +24,7 @@ namespace jsoncons {
 // utf8_other_json_input_adapter
 
 template <class CharT>
-class json_utf8_other_visitor_adapter : public json_visitor
+class json_utf8_to_other_visitor_adaptor : public json_visitor
 {
 public:
     using json_visitor::string_view_type;
@@ -34,16 +34,16 @@ private:
     //std::function<bool(json_errc,const ser_context&)> err_handler_;
 
     // noncopyable and nonmoveable
-    json_utf8_other_visitor_adapter<CharT>(const json_utf8_other_visitor_adapter<CharT>&) = delete;
-    json_utf8_other_visitor_adapter<CharT>& operator=(const json_utf8_other_visitor_adapter<CharT>&) = delete;
+    json_utf8_to_other_visitor_adaptor<CharT>(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
+    json_utf8_to_other_visitor_adaptor<CharT>& operator=(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
 
 public:
-    json_utf8_other_visitor_adapter()
+    json_utf8_to_other_visitor_adaptor()
         : other_visitor_(default_visitor_)
     {
     }
 
-    json_utf8_other_visitor_adapter(basic_json_visitor<CharT>& other_visitor/*,
+    json_utf8_to_other_visitor_adaptor(basic_json_visitor<CharT>& other_visitor/*,
                                           std::function<bool(json_errc,const ser_context&)> err_handler*/)
         : other_visitor_(other_visitor)/*,
           err_handler_(err_handler)*/
@@ -151,10 +151,10 @@ template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=st
 class basic_json_reader 
 {
 public:
-    typedef CharT char_type;
-    typedef Src source_type;
-    typedef basic_string_view<CharT> string_view_type;
-    typedef Allocator temp_allocator_type;
+    using char_type = CharT;
+    using source_type = Src;
+    using string_view_type = basic_string_view<CharT>;
+    using temp_allocator_type = Allocator;
 private:
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
@@ -476,17 +476,6 @@ public:
         buffer_length_ = length;
         buffer_.reserve(buffer_length_);
     }
-    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth()")
-    std::size_t max_depth() const
-    {
-        return parser_.max_nesting_depth();
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth(int)")
-    void max_depth(std::size_t depth)
-    {
-        parser_.max_nesting_depth(depth);
-    }
 #endif
 
 private:
@@ -520,8 +509,8 @@ private:
     }
 };
 
-typedef basic_json_reader<char> json_reader;
-typedef basic_json_reader<wchar_t> wjson_reader;
+using json_reader = basic_json_reader<char>;
+using wjson_reader = basic_json_reader<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use json_reader") typedef json_reader json_string_reader;

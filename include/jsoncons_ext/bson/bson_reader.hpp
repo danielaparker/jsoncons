@@ -29,9 +29,21 @@ class basic_bson_reader : public ser_context
 public:
     template <class Source>
     basic_bson_reader(Source&& source, 
-                      json_visitor& visitor,
+                      json_visitor& visitor, 
+                      const Allocator alloc)
+       : basic_bson_reader(std::forward<Source>(source),
+                           visitor,
+                           bson_decode_options(),
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_bson_reader(Source&& source, 
+                      json_visitor& visitor, 
+                      const bson_decode_options& options = bson_decode_options(),
                       const Allocator alloc=Allocator())
-       : parser_(std::forward<Source>(source), alloc),
+       : parser_(std::forward<Source>(source), options, alloc),
          visitor_(visitor)
     {
     }
@@ -67,8 +79,8 @@ public:
     }
 };
 
-typedef basic_bson_reader<jsoncons::binary_stream_source> bson_stream_reader;
-typedef basic_bson_reader<jsoncons::bytes_source> bson_bytes_reader;
+using bson_stream_reader = basic_bson_reader<jsoncons::binary_stream_source>;
+using bson_bytes_reader = basic_bson_reader<jsoncons::bytes_source>;
 
 #if !defined(JSONCONS_NO_DEPRECATED) 
 JSONCONS_DEPRECATED_MSG("Instead, use bson_stream_reader") typedef bson_stream_reader bson_reader;

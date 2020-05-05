@@ -223,7 +223,7 @@ struct sorted_policy
     template <class CharT, class CharTraits, class Allocator>
     using key_storage = std::basic_string<CharT, CharTraits,Allocator>;
 
-    typedef default_json_parsing parse_error_handler_type;
+    using parse_error_handler_type = default_json_parsing;
 };
 
 struct preserve_order_policy : public sorted_policy
@@ -253,48 +253,46 @@ public:
     }
 };
 
-enum class storage_kind : uint8_t 
-{
-    null_value = 0x00,
-    bool_value = 0x01,
-    int64_value = 0x02,
-    uint64_value = 0x03,
-    half_value = 0x04,
-    double_value = 0x05,
-    short_string_value = 0x06,
-    long_string_value = 0x07,
-    byte_string_value = 0x08,
-    array_value = 0x09,
-    empty_object_value = 0x0a,
-    object_value = 0x0b
-};
+template <class T>
+using
+json_proxy_t = typename T::jsoncons_json_parent_type;
+
+// is_proxy
+template<class T, class Enable = void>
+struct is_proxy : std::false_type {};
+
+// is_proxy
+template<class T>
+struct is_proxy<T,
+    typename std::enable_if<jsoncons::is_detected<json_proxy_t,T>::value>::type
+> : std::true_type {};
 
 template <class CharT, class ImplementationPolicy, class Allocator>
 class basic_json
 {
 public:
 
-    typedef Allocator allocator_type; 
+    using allocator_type = Allocator; 
 
-    typedef ImplementationPolicy implementation_policy;
+    using implementation_policy = ImplementationPolicy;
 
-    typedef typename ImplementationPolicy::parse_error_handler_type parse_error_handler_type;
+    using parse_error_handler_type = typename ImplementationPolicy::parse_error_handler_type;
 
-    typedef CharT char_type;
-    typedef std::char_traits<char_type> char_traits_type;
-    typedef jsoncons::basic_string_view<char_type,char_traits_type> string_view_type;
+    using char_type = CharT;
+    using char_traits_type = std::char_traits<char_type>;
+    using string_view_type = jsoncons::basic_string_view<char_type,char_traits_type>;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
+    using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
 
-    typedef std::basic_string<char_type,char_traits_type,char_allocator_type> key_type;
+    using key_type = std::basic_string<char_type,char_traits_type,char_allocator_type>;
 
 
-    typedef basic_json& reference;
-    typedef const basic_json& const_reference;
-    typedef basic_json* pointer;
-    typedef const basic_json* const_pointer;
+    using reference = basic_json&;
+    using const_reference = const basic_json&;
+    using pointer = basic_json*;
+    using const_pointer = const basic_json*;
 
-    typedef key_value<key_type,basic_json> key_value_type;
+    using key_value_type = key_value<key_type,basic_json>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("no replacement") typedef basic_json value_type;
@@ -303,19 +301,19 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
 #endif
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
     using byte_string_storage_type = typename implementation_policy::template sequence_container_type<uint8_t, byte_allocator_type>;
 
-    typedef json_array<basic_json> array;
+    using array = json_array<basic_json>;
 
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
+    using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
 
-    typedef json_object<key_type,basic_json> object;
+    using object = json_object<key_type,basic_json>;
 
-    typedef jsoncons::detail::random_access_iterator_wrapper<typename object::iterator> object_iterator;
-    typedef jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator> const_object_iterator;
-    typedef typename array::iterator array_iterator;
-    typedef typename array::const_iterator const_array_iterator;
+    using object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::iterator>;              
+    using const_object_iterator = jsoncons::detail::random_access_iterator_wrapper<typename object::const_iterator>;                    
+    using array_iterator = typename array::iterator;
+    using const_array_iterator = typename array::const_iterator;
 
     struct variant
     {
@@ -576,7 +574,7 @@ public:
             {
             }
 
-            ~long_string_storage()
+            ~long_string_storage() noexcept
             {
             }
 
@@ -612,22 +610,22 @@ public:
         public:
             uint8_t ext_type_;
         private:
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type> byte_allocator_type;
-            typedef typename std::allocator_traits<byte_allocator_type>::pointer pointer;
+            using byte_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type>;                  
+            using pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
 
             pointer ptr_;
 
             template <typename... Args>
             void create(byte_allocator_type alloc, Args&& ... args)
             {
-                ptr_ = alloc.allocate(1);
+                ptr_ = std::allocator_traits<byte_allocator_type>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
                     std::allocator_traits<byte_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<byte_allocator_type>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
             }
@@ -660,13 +658,13 @@ public:
                 create(byte_allocator_type(a), *(val.ptr_), a);
             }
 
-            ~byte_string_storage()
+            ~byte_string_storage() noexcept
             {
                 if (ptr_ != nullptr)
                 {
                     byte_allocator_type alloc(ptr_->get_allocator());
                     std::allocator_traits<byte_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<byte_allocator_type>::deallocate(alloc, ptr_,1);
                 }
             }
 
@@ -707,24 +705,31 @@ public:
         public:
             uint8_t ext_type_;
         private:
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<array> array_allocator;
-            typedef typename std::allocator_traits<array_allocator>::pointer pointer;
+            using array_allocator = typename std::allocator_traits<Allocator>:: template rebind_alloc<array>;
+            using pointer = typename std::allocator_traits<array_allocator>::pointer;
 
             pointer ptr_;
 
             template <typename... Args>
             void create(array_allocator alloc, Args&& ... args)
             {
-                ptr_ = alloc.allocate(1);
+                ptr_ = std::allocator_traits<array_allocator>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
                     std::allocator_traits<array_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<array_allocator>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
+            }
+
+            void destroy() noexcept
+            {
+                array_allocator alloc(ptr_->get_allocator());
+                std::allocator_traits<array_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                std::allocator_traits<array_allocator>::deallocate(alloc, ptr_,1);
             }
         public:
             array_storage(const array& val, semantic_tag tag)
@@ -757,13 +762,11 @@ public:
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
-            ~array_storage()
+            ~array_storage() noexcept
             {
                 if (ptr_ != nullptr)
                 {
-                    array_allocator alloc(ptr_->get_allocator());
-                    std::allocator_traits<array_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                    alloc.deallocate(ptr_,1);
+                    destroy();
                 }
             }
 
@@ -794,22 +797,22 @@ public:
         public:
             uint8_t ext_type_;
         private:
-            typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<object> object_allocator;
-            typedef typename std::allocator_traits<object_allocator>::pointer pointer;
+            using object_allocator = typename std::allocator_traits<Allocator>:: template rebind_alloc<object>;
+            using pointer = typename std::allocator_traits<object_allocator>::pointer;
 
             pointer ptr_;
 
             template <typename... Args>
             void create(object_allocator alloc, Args&& ... args)
             {
-                ptr_ = alloc.allocate(1);
+                ptr_ = std::allocator_traits<object_allocator>::allocate(alloc, 1);
                 JSONCONS_TRY
                 {
                     std::allocator_traits<object_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
                 }
                 JSONCONS_CATCH(...)
                 {
-                    alloc.deallocate(ptr_,1);
+                    std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
                     JSONCONS_RETHROW;
                 }
             }
@@ -845,13 +848,11 @@ public:
                 create(object_allocator(a), *(val.ptr_), a);
             }
 
-            ~object_storage()
+            ~object_storage() noexcept
             {
                 if (ptr_ != nullptr)
                 {
-                    object_allocator alloc(ptr_->get_allocator());
-                    std::allocator_traits<object_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                    alloc.deallocate(ptr_,1);
+                    destroy();
                 }
             }
 
@@ -873,6 +874,14 @@ public:
             allocator_type get_allocator() const
             {
                 return ptr_->get_allocator();
+            }
+        private:
+
+            void destroy() noexcept
+            {
+                object_allocator alloc(ptr_->get_allocator());
+                std::allocator_traits<object_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+                std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
             }
         };
 
@@ -1004,7 +1013,7 @@ public:
                      typename std::allocator_traits<Allocator>::propagate_on_container_move_assignment());
         }
 
-        ~variant()
+        ~variant() noexcept
         {
             Destroy_();
         }
@@ -1883,8 +1892,8 @@ public:
             return evaluate().at(index);
         }
     public:
-        typedef ParentT jsoncons_json_parent_type;
-        typedef proxy<typename ParentT::proxy_type> proxy_type;
+        using jsoncons_json_parent_type = ParentT;
+        using proxy_type = proxy<typename ParentT::proxy_type>;
 
         operator basic_json&()
         {
@@ -2905,17 +2914,7 @@ public:
 #endif
     };
 
-    // is_proxy
-    template<class T, class Enable = void>
-    struct is_proxy : std::false_type {};
-
-    // is_proxy
-    template<class T>
-    struct is_proxy<T,
-        typename std::enable_if<!std::is_void<typename T::jsoncons_json_parent_type>::value>::type
-    > : std::true_type {};
-
-    typedef proxy<basic_json> proxy_type;
+    using proxy_type = proxy<basic_json>;
 
     static basic_json parse(std::basic_istream<char_type>& is)
     {
@@ -3287,7 +3286,7 @@ public:
     {
     }
 
-    ~basic_json()
+    ~basic_json() noexcept
     {
     }
 
@@ -3466,7 +3465,7 @@ public:
               indenting line_indent,
               std::error_code& ec) const
     {
-        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
         if (line_indent == indenting::indent)
         {
             basic_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
@@ -3484,7 +3483,7 @@ public:
               indenting line_indent,
               std::error_code& ec) const
     {
-        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
         if (line_indent == indenting::indent)
         {
             basic_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
@@ -3544,7 +3543,7 @@ public:
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> to_string(const char_allocator_type& alloc=SAllocator()) const noexcept
     {
-        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
         string_type s(alloc);
         basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
         dump(encoder);
@@ -3555,7 +3554,7 @@ public:
     std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options,
                                                                           const SAllocator& alloc=SAllocator()) const
     {
-        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
         string_type s(alloc);
         basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
         dump(encoder);
@@ -3780,24 +3779,27 @@ public:
 
     void reserve(std::size_t n)
     {
-        switch (var_.storage())
+        if (n > 0)
         {
-        case storage_kind::array_value:
-            array_value().reserve(n);
+            switch (var_.storage())
+            {
+            case storage_kind::array_value:
+                array_value().reserve(n);
+                break;
+            case storage_kind::empty_object_value:
+            {
+                create_object_implicitly();
+                object_value().reserve(n);
+            }
             break;
-        case storage_kind::empty_object_value:
-        {
-            create_object_implicitly();
-            object_value().reserve(n);
-        }
-        break;
-        case storage_kind::object_value:
-        {
-            object_value().reserve(n);
-        }
-            break;
-        default:
-            break;
+            case storage_kind::object_value:
+            {
+                object_value().reserve(n);
+            }
+                break;
+            default:
+                break;
+            }
         }
     }
 
@@ -3967,7 +3969,7 @@ public:
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
             {
-                jsoncons::detail::string_to_double to_double;
+                jsoncons::detail::to_double_t to_double;
                 // to_double() throws std::invalid_argument if conversion fails
                 return to_double(as_cstring(), as_string_view().length());
             }
@@ -4009,7 +4011,7 @@ public:
     template <class SAllocator=std::allocator<char_type>>
     std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
     {
-        typedef std::basic_string<char_type,char_traits_type,SAllocator> string_type;
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
@@ -5598,10 +5600,10 @@ void swap(typename Json::key_value_type& a, typename Json::key_value_type& b) no
     a.swap(b);
 }
 
-typedef basic_json<char,sorted_policy,std::allocator<char>> json;
-typedef basic_json<wchar_t,sorted_policy,std::allocator<char>> wjson;
-typedef basic_json<char, preserve_order_policy, std::allocator<char>> ojson;
-typedef basic_json<wchar_t, preserve_order_policy, std::allocator<char>> wojson;
+using json = basic_json<char,sorted_policy,std::allocator<char>>;
+using wjson = basic_json<wchar_t,sorted_policy,std::allocator<char>>;
+using ojson = basic_json<char, preserve_order_policy, std::allocator<char>>;
+using wojson = basic_json<wchar_t, preserve_order_policy, std::allocator<char>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use wojson") typedef basic_json<wchar_t, preserve_order_policy, std::allocator<wchar_t>> owjson;
@@ -5637,8 +5639,16 @@ jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
     return jsoncons::wojson::parse(jsoncons::wojson::string_view_type(s, n));
 }
 
-}
+} // inline namespace literals
 
-}
+template <class T>
+struct is_basic_json : std::false_type
+{};
+
+template <class CharT, class ImplementationPolicy, class Allocator>
+struct is_basic_json<basic_json<CharT,ImplementationPolicy,Allocator>> : std::true_type
+{};
+
+} // namespace jsoncons
 
 #endif

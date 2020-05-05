@@ -109,8 +109,8 @@ struct strict_json_parsing
 };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use default_json_parsing") typedef default_json_parsing strict_parse_error_handler;
-JSONCONS_DEPRECATED_MSG("Instead, use strict_json_parsing") typedef strict_json_parsing default_parse_error_handler;
+JSONCONS_DEPRECATED_MSG("Instead, use default_json_parsing") typedef default_json_parsing default_parse_error_handler;
+JSONCONS_DEPRECATED_MSG("Instead, use strict_json_parsing") typedef strict_json_parsing strict_parse_error_handler;
 #endif
 
 template <class CharT, class TempAllocator = std::allocator<char>>
@@ -118,7 +118,7 @@ class basic_json_parser : public ser_context
 {
 public:
     using char_type = CharT;
-    typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
+    using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
 private:
     struct string_maps_to_double
     {
@@ -130,14 +130,14 @@ private:
         }
     };
 
-    typedef TempAllocator temp_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_parse_state> parse_state_allocator_type;
+    using temp_allocator_type = TempAllocator;
+    using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
+    using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_parse_state>;
 
     static constexpr size_t initial_string_buffer_capacity_ = 1024;
     static constexpr int default_initial_stack_capacity_ = 100;
 
-    const basic_json_decode_options<CharT> options_;
+    basic_json_decode_options<CharT> options_;
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int initial_stack_capacity_;
@@ -154,7 +154,7 @@ private:
     bool done_;
 
     std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
-    jsoncons::detail::string_to_double to_double_;
+    jsoncons::detail::to_double_t to_double_;
 
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<string_view_type,double>> string_double_map_;
@@ -169,12 +169,14 @@ public:
     {
     }
 
-    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, const TempAllocator& alloc = TempAllocator())
+    basic_json_parser(std::function<bool(json_errc,const ser_context&)> err_handler, 
+                      const TempAllocator& alloc = TempAllocator())
         : basic_json_parser(basic_json_decode_options<CharT>(), err_handler, alloc)
     {
     }
 
-    basic_json_parser(const basic_json_decode_options<CharT>& options, const TempAllocator& alloc = TempAllocator())
+    basic_json_parser(const basic_json_decode_options<CharT>& options, 
+                      const TempAllocator& alloc = TempAllocator())
         : basic_json_parser(options, default_json_parsing(), alloc)
     {
     }
@@ -223,23 +225,10 @@ public:
         return input_ptr_ == input_end_;
     }
 
-    ~basic_json_parser()
+    ~basic_json_parser() noexcept
     {
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_nesting_depth()")
-    int max_nesting_depth() const
-    {
-        return options_.max_nesting_depth();
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use basic_json_decode_options<CharT>::max_nesting_depth(int)")
-    void max_nesting_depth(int value)
-    {
-        options_.max_nesting_depth() = value;
-    }
-#endif
     json_parse_state parent() const
     {
         JSONCONS_ASSERT(state_stack_.size() >= 1);
@@ -332,12 +321,12 @@ public:
 
     void begin_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (++nesting_depth_ > options_.max_nesting_depth())
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            more_ = err_handler_(json_errc::max_depth_exceeded, *this);
+            more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
             {
-                ec = json_errc::max_depth_exceeded;
+                ec = json_errc::max_nesting_depth_exceeded;
                 return;
             }
         } 
@@ -348,7 +337,7 @@ public:
 
     void end_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (nesting_depth_ < 1)
+        if (JSONCONS_UNLIKELY(nesting_depth_ < 1))
         {
             err_handler_(json_errc::unexpected_right_brace, *this);
             ec = json_errc::unexpected_right_brace;
@@ -390,10 +379,10 @@ public:
     {
         if (++nesting_depth_ > options_.max_nesting_depth())
         {
-            more_ = err_handler_(json_errc::max_depth_exceeded, *this);
+            more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
             {
-                ec = json_errc::max_depth_exceeded;
+                ec = json_errc::max_nesting_depth_exceeded;
                 return;
             }
         }
@@ -2830,8 +2819,8 @@ private:
     }
 };
 
-typedef basic_json_parser<char> json_parser;
-typedef basic_json_parser<wchar_t> wjson_parser;
+using json_parser = basic_json_parser<char>;
+using wjson_parser = basic_json_parser<wchar_t>;
 
 }
 

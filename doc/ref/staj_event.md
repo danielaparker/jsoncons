@@ -3,7 +3,7 @@
 ```c++
 #include <jsoncons/staj_reader.hpp>
 
-typedef basic_staj_event<char> staj_event;
+using staj_event = basic_staj_event<char>;
 ```
 
 A JSON-like data event.
@@ -14,11 +14,12 @@ A JSON-like data event.
 | end_object        |                        | |
 | begin_array       |                        | |
 | end_array         |                        | |
-| name              | "foo"                  | `get<std::string>()`, `get<jsoncons::string_view>`, `get<std::string_view>()` |
+| key               | "foo"                  | `get<std::string>()`, `get<jsoncons::string_view>`, `get<std::string_view>()` |
 | string_value      | "1000"                 | `get<std::string>()`, `get<jsoncons::string_view>`, `get<std::string_view>()`, `get<int>()`, `get<unsigned>()` |
 | byte_string_value | 0x660x6F0x6F           | `get<std::string>()`, `get<jsoncons::byte_string>()` |
 | int64_value       | -1000                  | `get<std::string>()`, `get<int>()`, `get<long>`, `get<int64_t>()` |
 | uint64_value      | 1000                   | `get<std::string>()`, `get<int>()`, `get<unsigned>()`, `get<int64_t>()`, `get<uint64_t>()` |
+| half_value        | 1.5 (as double)        | `get<uint16_t>()`, `get<double>()` |
 | double_value      | 125.72                 | `get<std::string>()`, `get<double>()` |
 | bool_value        | true                   | `get<std::string>()`, `get<bool>()` |
 | null_value        |                        | `get<std::string>()` |

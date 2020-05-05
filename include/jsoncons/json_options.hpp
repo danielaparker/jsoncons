@@ -40,14 +40,17 @@ enum class byte_string_chars_format : uint8_t {none=0,base16,base64,base64url};
 
 enum class spaces_option : uint8_t {no_spaces=0,space_after,space_before,space_before_and_after};
 
+template <class CharT>
+class basic_json_options;
 
 template <class CharT>
 class basic_json_options_common
 {
+    friend class basic_json_options<CharT>;
 public:
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
-protected:
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
+private:
 #if !defined(JSONCONS_NO_DEPRECATED)
     bool can_read_nan_replacement_;
     bool can_read_pos_inf_replacement_;
@@ -73,7 +76,9 @@ protected:
     string_type nan_to_str_;
     string_type inf_to_str_;
     string_type neginf_to_str_;
+    int max_nesting_depth_;
 
+protected:
     basic_json_options_common()
        :
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -89,10 +94,11 @@ protected:
         enable_neginf_to_str_(false),
         enable_str_to_nan_(false),
         enable_str_to_inf_(false),
-        enable_str_to_neginf_(false)
+        enable_str_to_neginf_(false),
+        max_nesting_depth_(1024)
     {}
 
-    virtual ~basic_json_options_common() = default;
+    virtual ~basic_json_options_common() noexcept = default;
 
     basic_json_options_common(const basic_json_options_common&) = default;
     basic_json_options_common& operator=(const basic_json_options_common&) = default;
@@ -268,15 +274,20 @@ public:
         }
     }
 
+    int max_nesting_depth() const 
+    {
+        return max_nesting_depth_;
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use enable_nan_to_num() or enable_nan_to_str()")
-        bool can_read_nan_replacement() const { return can_read_nan_replacement_; }
+    bool can_read_nan_replacement() const { return can_read_nan_replacement_; }
 
     JSONCONS_DEPRECATED_MSG("Instead, use enable_inf_to_num() or enable_inf_to_str()")
-        bool can_read_pos_inf_replacement() const { return can_read_pos_inf_replacement_; }
+    bool can_read_pos_inf_replacement() const { return can_read_pos_inf_replacement_; }
 
     JSONCONS_DEPRECATED_MSG("Instead, use enable_neginf_to_num() or enable_neginf_to_str()")
-        bool can_read_neg_inf_replacement() const { return can_read_neg_inf_replacement_; }
+    bool can_read_neg_inf_replacement() const { return can_read_neg_inf_replacement_; }
 
     bool can_write_nan_replacement() const { return !nan_replacement_.empty(); }
 
@@ -284,21 +295,20 @@ public:
 
     bool can_write_neg_inf_replacement() const { return !neg_inf_replacement_.empty(); }
 
-
     JSONCONS_DEPRECATED_MSG("Instead, use nan_to_num() or nan_to_str()")
-        const string_type& nan_replacement() const
+    const string_type& nan_replacement() const
     {
         return nan_replacement_;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use inf_to_num() or inf_to_str()")
-        const string_type& pos_inf_replacement() const
+    const string_type& pos_inf_replacement() const
     {
         return pos_inf_replacement_;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use neginf_to_num() or neginf_to_str()")
-        const string_type& neg_inf_replacement() const
+    const string_type& neg_inf_replacement() const
     {
         return neg_inf_replacement_;
     }
@@ -308,17 +318,16 @@ public:
 template <class CharT>
 class basic_json_decode_options : public virtual basic_json_options_common<CharT>
 {
+    friend class basic_json_options<CharT>;
     using super_type = basic_json_options_common<CharT>;
 public:
     using typename super_type::char_type;
     using typename super_type::string_type;
-protected:
+private:
     bool lossless_number_:1;
-    int max_nesting_depth_;
 public:
     basic_json_decode_options()
-        : lossless_number_(false),
-          max_nesting_depth_((std::numeric_limits<int>::max)())
+        : lossless_number_(false)
     {
     }
 
@@ -326,8 +335,7 @@ public:
 
     basic_json_decode_options(basic_json_decode_options&& other)
         : super_type(std::forward<basic_json_decode_options>(other)),
-                     lossless_number_(other.lossless_number_),
-                     max_nesting_depth_(other.max_nesting_depth_)
+                     lossless_number_(other.lossless_number_)
     {
     }
 
@@ -338,21 +346,19 @@ public:
         return lossless_number_;
     }
 
-    int max_nesting_depth() const 
-    {
-        return max_nesting_depth_;
-    }
-
+#if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use lossless_number()")
     bool dec_to_str() const 
     {
         return lossless_number_;
     }
+#endif
 };
 
 template <class CharT>
 class basic_json_encode_options : public virtual basic_json_options_common<CharT>
 {
+    friend class basic_json_options<CharT>;
     using super_type = basic_json_options_common<CharT>;
 public:
     using typename super_type::char_type;
@@ -360,7 +366,7 @@ public:
 
     static constexpr uint8_t indent_size_default = 4;
     static constexpr size_t line_length_limit_default = 120;
-protected:
+private:
     bool escape_all_non_ascii_:1;
     bool escape_solidus_:1;
     bool pad_inside_object_braces_:1;
@@ -522,8 +528,10 @@ class basic_json_options final: public basic_json_decode_options<CharT>,
                                 public basic_json_encode_options<CharT>
 {
 public:
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
+
+    using basic_json_options_common<CharT>::max_nesting_depth;
 
     using basic_json_decode_options<CharT>::enable_str_to_nan;
     using basic_json_decode_options<CharT>::enable_str_to_inf;
@@ -536,7 +544,6 @@ public:
     using basic_json_decode_options<CharT>::neginf_to_num;
 
     using basic_json_decode_options<CharT>::lossless_number;
-    using basic_json_decode_options<CharT>::max_nesting_depth;
 
     using basic_json_encode_options<CharT>::byte_string_format;
     using basic_json_encode_options<CharT>::bigint_format;
@@ -718,12 +725,6 @@ public:
         return *this;
     }
 
-    basic_json_options& max_nesting_depth(int value)
-    {
-        this->max_nesting_depth_ = value;
-        return *this;
-    }
-
     basic_json_options& line_length_limit(std::size_t value)
     {
         this->line_length_limit_ = value;
@@ -751,6 +752,12 @@ public:
     basic_json_options& escape_solidus(bool value)
     {
         this->escape_solidus_ = value;
+        return *this;
+    }
+
+    basic_json_options& max_nesting_depth(int value)
+    {
+        this->max_nesting_depth_ = value;
         return *this;
     }
 
@@ -839,8 +846,8 @@ private:
     }
 };
 
-typedef basic_json_options<char> json_options;
-typedef basic_json_options<wchar_t> wjson_options;
+using json_options = basic_json_options<char>;
+using wjson_options = basic_json_options<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("json_options") typedef json_options output_format;

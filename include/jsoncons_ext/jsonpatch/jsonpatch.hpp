@@ -37,9 +37,9 @@ namespace detail {
     template <class Json>
     struct operation_unwinder
     {
-        typedef typename Json::char_type char_type;
-        typedef std::basic_string<char_type> string_type;
-        typedef typename Json::string_view_type string_view_type;
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+        using string_view_type = typename Json::string_view_type;
 
         struct entry
         {
@@ -57,7 +57,7 @@ namespace detail {
         {
         }
 
-        ~operation_unwinder()
+        ~operation_unwinder() noexcept
         {
             std::error_code ec;
             //std::cout << "state: " << std::boolalpha << (state == state_type::commit) << ", stack size: " << stack.size() << std::endl;
@@ -100,7 +100,7 @@ namespace detail {
     template <class Json>
     Json from_diff(const Json& source, const Json& target, const typename Json::string_view_type& path)
     {
-        typedef typename Json::char_type char_type;
+        using char_type = typename Json::char_type;
 
         Json result = typename Json::array();
 
@@ -199,9 +199,9 @@ namespace detail {
 template <class Json>
 void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
 {
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
-    typedef typename Json::string_view_type string_view_type;
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
+    using string_view_type = typename Json::string_view_type;
 
    jsoncons::jsonpatch::detail::operation_unwinder<Json> unwinder(target);
 

@@ -9,7 +9,6 @@
 
 #include <string>
 #include <vector>
-#include <deque>
 #include <exception>
 #include <cstring>
 #include <algorithm> // std::sort, std::stable_sort, std::lower_bound, std::unique
@@ -18,6 +17,7 @@
 #include <iterator> // std::iterator_traits
 #include <memory> // std::allocator
 #include <utility> // std::move
+#include <cassert> // assert
 #include <type_traits> // std::enable_if
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/allocator_holder.hpp>
@@ -30,18 +30,18 @@ namespace jsoncons {
     class json_array : public allocator_holder<typename Json::allocator_type>
     {
     public:
-        typedef typename Json::allocator_type allocator_type;
-        typedef Json value_type;
+        using allocator_type = typename Json::allocator_type;
+        using value_type = Json;
     private:
-        typedef typename Json::implementation_policy implementation_policy;
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type> value_allocator_type;
+        using implementation_policy = typename Json::implementation_policy;
+        using value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<value_type>;                   
         using value_container_type = typename implementation_policy::template sequence_container_type<value_type,value_allocator_type>;
         value_container_type elements_;
     public:
-        typedef typename value_container_type::iterator iterator;
-        typedef typename value_container_type::const_iterator const_iterator;
-        typedef typename std::iterator_traits<iterator>::reference reference;
-        typedef typename std::iterator_traits<const_iterator>::reference const_reference;
+        using iterator = typename value_container_type::iterator;
+        using const_iterator = typename value_container_type::const_iterator;
+        using reference = typename std::iterator_traits<iterator>::reference;
+        using const_reference = typename std::iterator_traits<const_iterator>::reference;
 
         using allocator_holder<allocator_type>::get_allocator;
 
@@ -104,8 +104,29 @@ namespace jsoncons {
               elements_(init,value_allocator_type(alloc))
         {
         }
-        ~json_array()
+        ~json_array() noexcept
         {
+            destroy();
+        }
+
+        reference back()
+        {
+            return elements_.back();
+        }
+
+        const_reference back() const
+        {
+            return elements_.back();
+        }
+
+        void pop_back()
+        {
+            elements_.pop_back();
+        }
+
+        bool empty() const
+        {
+            return elements_.empty();
         }
 
         void swap(json_array<Json>& val) noexcept
@@ -258,6 +279,46 @@ namespace jsoncons {
     private:
 
         json_array& operator=(const json_array<Json>&) = delete;
+
+        void destroy() noexcept
+        {
+            while (!elements_.empty())
+            {
+                value_type current = std::move(elements_.back());
+                elements_.pop_back();
+                switch (current.storage())
+                {
+                    case storage_kind::array_value:
+                    {
+                        for (auto&& item : current.array_range())
+                        {
+                            if (item.size() > 0) // non-empty object or array
+                            {
+                                elements_.push_back(std::move(item));
+                                assert(item.size() == 0);
+                            }
+                        }
+                        current.clear();                           
+                        break;
+                    }
+                    case storage_kind::object_value:
+                    {
+                        for (auto&& kv : current.object_range())
+                        {
+                            if (kv.value().size() > 0) // non-empty object or array
+                            {
+                                elements_.push_back(std::move(kv.value()));
+                                assert(kv.value().size() == 0);
+                            }
+                        }
+                        current.clear();                           
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
     };
 
     struct sorted_unique_range_tag
@@ -273,10 +334,10 @@ namespace jsoncons {
     class key_value
     {
     public:
-        typedef KeyT key_type;
-        typedef ValueT value_type;
-        typedef typename ValueT::allocator_type allocator_type;
-        typedef typename value_type::string_view_type string_view_type;
+        using key_type = KeyT;
+        using value_type = ValueT;
+        using allocator_type = typename ValueT::allocator_type;
+        using string_view_type = typename value_type::string_view_type;
     private:
         key_type key_;
         value_type value_;
@@ -296,10 +357,16 @@ namespace jsoncons {
         {
         }
 
-        template <class T>
-        key_value(key_type&& name, T&& val)
-            : key_(std::forward<key_type>(name)), 
-              value_(std::forward<T>(val))
+        //template <class T>
+        //key_value(key_type&& name, T&& val)
+        //    : key_(std::forward<key_type>(name)), 
+        //      value_(std::forward<T>(val))
+        //{
+        //}
+
+        template <typename... Args>
+        key_value(const key_type& name,  Args&& ... args)
+            : key_(name), value_(std::forward<Args>(args)...)
         {
         }
 
@@ -421,7 +488,7 @@ namespace jsoncons {
     template <class KeyT, class ValueT>
     struct get_key_value
     {
-        typedef key_value<KeyT,ValueT> key_value_type;
+        using key_value_type = key_value<KeyT,ValueT>;
 
         template <class T1,class T2>
         key_value_type operator()(const std::pair<T1,T2>& p)
@@ -466,20 +533,21 @@ namespace jsoncons {
         public allocator_holder<typename Json::allocator_type>
     {
     public:
-        typedef typename Json::allocator_type allocator_type;
-        typedef KeyT key_type;
-        typedef key_value<KeyT,Json> key_value_type;
-        typedef typename Json::char_type char_type;
-        typedef typename Json::string_view_type string_view_type;
+        using allocator_type = typename Json::allocator_type;
+        using key_type = KeyT;
+        //using mapped_type = Json;
+        using key_value_type = key_value<KeyT,Json>;
+        using char_type = typename Json::char_type;
+        using string_view_type = typename Json::string_view_type;
     private:
-        typedef typename Json::implementation_policy implementation_policy;
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
+        using implementation_policy = typename Json::implementation_policy;
+        using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
         using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
 
         key_value_container_type members_;
     public:
-        typedef typename key_value_container_type::iterator iterator;
-        typedef typename key_value_container_type::const_iterator const_iterator;
+        using iterator = typename key_value_container_type::iterator;
+        using const_iterator = typename key_value_container_type::const_iterator;
 
         using allocator_holder<allocator_type>::get_allocator;
 
@@ -561,6 +629,11 @@ namespace jsoncons {
             {
                 insert_or_assign(item.first, item.second);
             }
+        }
+
+        ~json_object() noexcept
+        {
+            destroy();
         }
 
         void swap(json_object& val) noexcept
@@ -1116,6 +1189,24 @@ namespace jsoncons {
             return members_ < rhs.members_;
         }
     private:
+
+        void destroy() noexcept
+        {
+            if (!members_.empty())
+            {
+                json_array<Json> temp(get_allocator());
+
+                for (auto&& kv : members_)
+                {
+                    if (kv.value().size() > 0)
+                    {
+                        temp.emplace_back(std::move(kv.value()));
+                        assert(kv.value().size() == 0);
+                    }
+                }
+            }
+        }
+
         json_object& operator=(const json_object&) = delete;
     };
 
@@ -1125,14 +1216,15 @@ namespace jsoncons {
         public allocator_holder<typename Json::allocator_type>
     {
     public:
-        typedef typename Json::allocator_type allocator_type;
-        typedef typename Json::char_type char_type;
-        typedef KeyT key_type;
-        typedef typename Json::string_view_type string_view_type;
-        typedef key_value<KeyT,Json> key_value_type;
+        using allocator_type = typename Json::allocator_type;
+        using char_type = typename Json::char_type;
+        using key_type = KeyT;
+        //using mapped_type = Json;
+        using string_view_type = typename Json::string_view_type;
+        using key_value_type = key_value<KeyT,Json>;
     private:
-        typedef typename Json::implementation_policy implementation_policy;
-        typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type> key_value_allocator_type;
+        using implementation_policy = typename Json::implementation_policy;
+        using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
         using key_value_container_type = typename implementation_policy::template sequence_container_type<key_value_type,key_value_allocator_type>;
         typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::size_t> index_allocator_type;
         using index_container_type = typename implementation_policy::template sequence_container_type<std::size_t,index_allocator_type>;
@@ -1140,8 +1232,8 @@ namespace jsoncons {
         key_value_container_type members_;
         index_container_type index_;
     public:
-        typedef typename key_value_container_type::iterator iterator;
-        typedef typename key_value_container_type::const_iterator const_iterator;
+        using iterator = typename key_value_container_type::iterator;
+        using const_iterator = typename key_value_container_type::const_iterator;
 
         using allocator_holder<allocator_type>::get_allocator;
 
@@ -1268,6 +1360,11 @@ namespace jsoncons {
             {
                 insert_or_assign(item.first, item.second);
             }
+        }
+
+        ~json_object() noexcept
+        {
+            destroy();
         }
 
         void swap(json_object& val) noexcept
@@ -1785,6 +1882,23 @@ namespace jsoncons {
             return members_ < rhs.members_;
         }
     private:
+
+        void destroy() noexcept
+        {
+            if (!members_.empty())
+            {
+                json_array<Json> temp(get_allocator());
+
+                for (auto&& kv : members_)
+                {
+                    if (kv.value().size() > 0)
+                    {
+                        temp.emplace_back(std::move(kv.value()));
+                        assert(kv.value().size() == 0);
+                    }
+                }
+            }
+        }
 
         std::pair<std::size_t,bool> insert_index_entry(const string_view_type& key, std::size_t pos)
         {

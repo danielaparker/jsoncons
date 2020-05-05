@@ -21,10 +21,10 @@
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-[Specialize json_type_traits explicitly](#G1)  
 [Serialize with the C++ member names of the class](#G2)  
 [Serialize with provided names using the `_NAME_` macros](#G3)  
 [Mapping to C++ data structures with and without defaults allowed](#G4)  
+[Specialize json_type_traits explicitly](#G1)  
 [Serialize non-mandatory std::optional values using the convenience macros](#G5)  
 [An example with std::shared_ptr and std::unique_ptr](#G6)  
 [Serialize a templated class with the `_TPL_` macros](#G7)  
@@ -58,7 +58,7 @@
 
 ### Flatten and unflatten
 
-[Flatten a json object with number'ish keys to JSON Pointer/value pairs](#H1)  
+[Flatten a json object with numberish keys to JSON Pointer/value pairs](#H1)  
 [Flatten a json object to JSONPath/value pairs](#H2)  
 
 ### Search and Replace
@@ -386,31 +386,31 @@ Output:
 ```
 begin_array
 begin_object
-name: author
+key: author
 string_value: Haruki Murakami
-name: title
+key: title
 string_value: Hard-Boiled Wonderland and the End of the World
-name: isbn
+key: isbn
 string_value: 0679743464
-name: publisher
+key: publisher
 string_value: Vintage
-name: date
+key: date
 string_value: 1993-03-02
-name: price
+key: price
 double_value: 19
 end_object
 begin_object
-name: author
+key: author
 string_value: Graham Greene
-name: title
+key: title
 string_value: The Comedians
-name: isbn
+key: isbn
 string_value: 0099478374
-name: publisher
+key: publisher
 string_value: Vintage Classics
-name: date
+key: date
 string_value: 2005-09-21
-name: price
+key: price
 double_value: 16
 end_object
 end_array
@@ -426,7 +426,7 @@ end_array
 // working memory used by json_decoder, and my_alloc(3) to allocate
 // working memory used by basic_json_reader. 
 
-typedef basic_json<char,sorted_policy,my_alloc> my_json;
+using my_json = basic_json<char,sorted_policy,my_alloc>;
 
 std::ifstream is("book_catalog.json");
 json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
@@ -500,132 +500,6 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
-<div id="G1"/>
-
-#### Specialize json_type_traits explicitly
-
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
-Decode and encode work for all C++ classes that have 
-[json_type_traits](ref/json_type_traits.md) 
-defined. The standard library containers are already supported, 
-and your own types will be supported too if you specialize `json_type_traits`
-in the `jsoncons` namespace. 
-
-
-```c++
-#include <iostream>
-#include <jsoncons/json.hpp>
-#include <vector>
-#include <string>
-
-namespace ns {
-    struct book
-    {
-        std::string author;
-        std::string title;
-        double price;
-    };
-} // namespace ns
-
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        typedef typename Json::allocator_type allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type allocator=allocator_type())
-        {
-            Json j(allocator);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
-} // namespace jsoncons
-```
-
-To save typing and enhance readability, the jsoncons library defines macros, 
-so you could also write
-
-```c++
-JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
-```
-
-which expands to the code above.
-
-```c++
-using namespace jsoncons; // for convenience
-
-int main()
-{
-    const std::string s = R"(
-    [
-        {
-            "author" : "Haruki Murakami",
-            "title" : "Kafka on the Shore",
-            "price" : 25.17
-        },
-        {
-            "author" : "Charles Bukowski",
-            "title" : "Pulp",
-            "price" : 22.48
-        }
-    ]
-    )";
-
-    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
-
-    std::cout << "(1)\n";
-    for (const auto& item : book_list)
-    {
-        std::cout << item.author << ", " 
-                  << item.title << ", " 
-                  << item.price << "\n";
-    }
-
-    std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
-    std::cout << "\n\n";
-}
-```
-Output:
-```
-(1)
-Haruki Murakami, Kafka on the Shore, 25.17
-Charles Bukowski, Pulp, 22.48
-
-(2)
-[
-    {
-        "author": "Haruki Murakami",
-        "price": 25.17,
-        "title": "Kafka on the Shore"
-    },
-    {
-        "author": "Charles Bukowski",
-        "price": 22.48,
-        "title": "Pulp"
-    }
-]
-```
-
 <div id="G2"/>
 
 #### Serialize with the C++ member names of the class
@@ -635,66 +509,134 @@ Charles Bukowski, Pulp, 22.48
 
 namespace ns {
 
-enum class BookCategory {fiction,biography};
+    enum class BookCategory {fiction,biography};
 
-// #1 Class with public member data and default constructor   
-struct Book1
-{
-    BookCategory category;
-    std::string author;
-    std::string title;
-    double price;
-};
-
-// #2 Class with private member data and default constructor   
-class Book2
-{
-    BookCategory category;
-    std::string author;
-    std::string title;
-    double price;
-    Book2() = default;
-
-    JSONCONS_TYPE_TRAITS_FRIEND
-public:
-    BookCategory get_category() const {return category;}
-
-    const std::string& get_author() const {return author;}
-
-    const std::string& get_title() const{return title;}
-
-    double get_price() const{return price;}
-};
-
-// #3 Class with getters and initializing constructor
-class Book3
-{
-    BookCategory category_;
-    std::string author_;
-    std::string title_;
-    double price_;
-public:
-    Book3(BookCategory category,
-          const std::string& author,
-          const std::string& title,
-          double price)
-        : category_(category), author_(author), title_(title), price_(price)
+    inline
+    std::ostream& operator<<(std::ostream& os, const BookCategory& category)
     {
+        switch (category)
+        {
+            case BookCategory::fiction: os << "fiction, "; break;
+            case BookCategory::biography: os << "biography, "; break;
+        }
+        return os;
     }
 
-    Book3(const Book3&) = default;
-    Book3(Book3&&) = default;
-    Book3& operator=(const Book3&) = default;
-    Book3& operator=(Book3&&) = default;
+    // #1 Class with public member data and default constructor   
+    struct Book1
+    {
+        BookCategory category;
+        std::string author;
+        std::string title;
+        double price;
+    };
 
-    BookCategory category() const {return category_;}
+    // #2 Class with private member data and default constructor   
+    class Book2
+    {
+        BookCategory category;
+        std::string author;
+        std::string title;
+        double price;
+        Book2() = default;
 
-    const std::string& author() const{return author_;}
+        JSONCONS_TYPE_TRAITS_FRIEND
+    public:
+        BookCategory get_category() const {return category;}
 
-    const std::string& title() const{return title_;}
+        const std::string& get_author() const {return author;}
 
-    double price() const{return price_;}
-};
+        const std::string& get_title() const{return title;}
+
+        double get_price() const{return price;}
+    };
+
+    // #3 Class with getters and initializing constructor
+    class Book3
+    {
+        BookCategory category_;
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        Book3(BookCategory category,
+              const std::string& author,
+              const std::string& title,
+              double price)
+            : category_(category), author_(author), title_(title), price_(price)
+        {
+        }
+
+        BookCategory category() const {return category_;}
+
+        const std::string& author() const{return author_;}
+
+        const std::string& title() const{return title_;}
+
+        double price() const{return price_;}
+    };
+
+    // #4 Class with gettors and setters
+    class Book4
+    {
+        BookCategory category_;
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        Book4()
+            : price_(0)
+        {
+        }
+
+        Book4(BookCategory category,
+              const std::string& author,
+              const std::string& title,
+              double price)
+            : category_(category), author_(author), title_(title), price_(price)
+        {
+        }
+
+        BookCategory get_category() const
+        {
+            return category_;
+        }
+
+        void set_category(BookCategory value)
+        {
+            category_ = value;
+        }
+
+        const std::string& get_author() const
+        {
+            return author_;
+        }
+
+        void set_author(const std::string& value)
+        {
+            author_ = value;
+        }
+
+        const std::string& get_title() const
+        {
+            return title_;
+        }
+
+        void set_title(const std::string& value)
+        {
+            title_ = value;
+        }
+
+        double get_price() const
+        {
+            return price_;
+        }
+
+        void set_price(double value)
+        {
+            price_ = value;
+        }
+    };
 
 } // namespace ns
 
@@ -704,6 +646,7 @@ JSONCONS_ENUM_TRAITS(ns::BookCategory,fiction,biography)
 JSONCONS_ALL_MEMBER_TRAITS(ns::Book1,category,author,title,price)
 JSONCONS_ALL_MEMBER_TRAITS(ns::Book2,category,author,title,price)
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::Book3,category,author,title,price)
+JSONCONS_ALL_GETTER_SETTER_TRAITS(ns::Book4,get_,set_,category,author,title,price)
 
 using namespace jsoncons; // for convenience
 
@@ -730,12 +673,8 @@ int main()
     auto books1 = decode_json<std::vector<ns::Book1>>(input);
     for (const auto& item : books1)
     {
-        switch(item.category)
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.author << ", " 
+        std::cout << item.category << ", "
+                  << item.author << ", " 
                   << item.title << ", " 
                   << item.price << "\n";
     }
@@ -747,12 +686,8 @@ int main()
     auto books2 = decode_json<std::vector<ns::Book2>>(input);
     for (const auto& item : books2)
     {
-        switch(item.get_category())
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.get_author() << ", " 
+        std::cout << item.get_category() << ", "
+                  << item.get_author() << ", " 
                   << item.get_title() << ", " 
                   << item.get_price() << "\n";
     }
@@ -764,17 +699,26 @@ int main()
     auto books3 = decode_json<std::vector<ns::Book3>>(input);
     for (const auto& item : books3)
     {
-        switch(item.category())
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.author() << ", " 
+        std::cout << item.category() << ", "
+                  << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
     std::cout << "\n";
     encode_json(books3, std::cout, indenting::indent);
+    std::cout << "\n\n";
+
+    std::cout << "(4)\n\n";
+    auto books4 = decode_json<std::vector<ns::Book4>>(input);
+    for (const auto& item : books4)
+    {
+        std::cout << item.get_category() << ", "
+                  << item.get_author() << ", " 
+                  << item.get_title() << ", " 
+                  << item.get_price() << "\n";
+    }
+    std::cout << "\n";
+    encode_json(books4, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
@@ -812,93 +756,94 @@ The output for (2), (3) and (4) is the same.
 
 namespace ns {
 
-enum class BookCategory {fiction,biography};
+    enum class BookCategory {fiction,biography};
 
-// #1 Class with public member data and default constructor   
-struct Book1
-{
-    BookCategory category;
-    std::string author;
-    std::string title;
-    double price;
-};
-
-// #2 Class with private member data and default constructor   
-class Book2
-{
-    BookCategory category_;
-    std::string author_;
-    std::string title_;
-    double price_;
-    Book2() = default;
-
-    JSONCONS_TYPE_TRAITS_FRIEND
-public:
-    BookCategory category() const {return category_;}
-
-    const std::string& author() const {return author_;}
-
-    const std::string& title() const{return title_;}
-
-    double price() const{return price_;}
-};
-
-// #3 Class with getters and initializing constructor
-class Book3
-{
-    BookCategory category_;
-    std::string author_;
-    std::string title_;
-    double price_;
-public:
-    Book3(BookCategory category,
-          const std::string& author,
-          const std::string& title,
-          double price)
-        : category_(category), author_(author), title_(title), price_(price)
+    inline
+    std::ostream& operator<<(std::ostream& os, const BookCategory& category)
     {
+        switch (category)
+        {
+            case BookCategory::fiction: os << "fiction, "; break;
+            case BookCategory::biography: os << "biography, "; break;
+        }
+        return os;
     }
 
-    Book3(const Book3&) = default;
-    Book3(Book3&&) = default;
-    Book3& operator=(const Book3&) = default;
-    Book3& operator=(Book3&&) = default;
+    // #1 Class with public member data and default constructor   
+    struct Book1
+    {
+        BookCategory category;
+        std::string author;
+        std::string title;
+        double price;
+    };
 
-    BookCategory category() const {return category_;}
+    // #2 Class with private member data and default constructor   
+    class Book2
+    {
+        BookCategory category_;
+        std::string author_;
+        std::string title_;
+        double price_;
+        Book2() = default;
 
-    const std::string& author() const{return author_;}
+        JSONCONS_TYPE_TRAITS_FRIEND
+    public:
+        BookCategory category() const {return category_;}
 
-    const std::string& title() const{return title_;}
+        const std::string& author() const {return author_;}
 
-    double price() const{return price_;}
-};
+        const std::string& title() const{return title_;}
 
-// #4 Class with getters, setters and default constructor
-class Book4
-{
-    BookCategory category_;
-    std::string author_;
-    std::string title_;
-    double price_;
-public:
-    Book4() = default;
-    Book4(const Book4&) = default;
-    Book4(Book4&&) = default;
-    Book4& operator=(const Book4&) = default;
-    Book4& operator=(Book4&&) = default;
+        double price() const{return price_;}
+    };
 
-    BookCategory getCategory() const {return category_;}
-    void setCategory(const BookCategory& value) {category_ = value;}
+    // #3 Class with getters and initializing constructor
+    class Book3
+    {
+        BookCategory category_;
+        std::string author_;
+        std::string title_;
+        double price_;
+    public:
+        Book3(BookCategory category,
+              const std::string& author,
+              const std::string& title,
+              double price)
+            : category_(category), author_(author), title_(title), price_(price)
+        {
+        }
 
-    const std::string& getAuthor() const {return author_;}
-    void setAuthor(const std::string& value) {author_ = value;}
+        BookCategory category() const {return category_;}
 
-    const std::string& getTitle() const {return title_;}
-    void setTitle(const std::string& value) {title_ = value;}
+        const std::string& author() const{return author_;}
 
-    double getPrice() const {return price_;}
-    void setPrice(double value) {price_ = value;}
-};
+        const std::string& title() const{return title_;}
+
+        double price() const{return price_;}
+    };
+
+    // #4 Class with getters, setters and default constructor
+    class Book4
+    {
+        BookCategory category_;
+        std::string author_;
+        std::string title_;
+        double price_;
+
+    public:
+        BookCategory getCategory() const {return category_;}
+        void setCategory(const BookCategory& value) {category_ = value;}
+
+        const std::string& getAuthor() const {return author_;}
+        void setAuthor(const std::string& value) {author_ = value;}
+
+        const std::string& getTitle() const {return title_;}
+        void setTitle(const std::string& value) {title_ = value;}
+
+        double getPrice() const {return price_;}
+        void setPrice(double value) {price_ = value;}
+    };
 
 } // namespace ns
 
@@ -941,12 +886,8 @@ int main()
     auto books1 = decode_json<std::vector<ns::Book1>>(input);
     for (const auto& item : books1)
     {
-        switch(item.category)
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.author << ", " 
+        std::cout << item.category << ", "
+                  << item.author << ", " 
                   << item.title << ", " 
                   << item.price << "\n";
     }
@@ -958,12 +899,8 @@ int main()
     auto books2 = decode_json<std::vector<ns::Book2>>(input);
     for (const auto& item : books2)
     {
-        switch(item.category())
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.author() << ", " 
+        std::cout << item.category() << ", "
+                  << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
@@ -975,12 +912,8 @@ int main()
     auto books3 = decode_json<std::vector<ns::Book3>>(input);
     for (const auto& item : books3)
     {
-        switch(item.category)
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.author() << ", " 
+        std::cout << item.category() << ", "
+                  << item.author() << ", " 
                   << item.title() << ", " 
                   << item.price() << "\n";
     }
@@ -992,12 +925,8 @@ int main()
     auto books4 = decode_json<std::vector<ns::Book4>>(input);
     for (const auto& item : books4)
     {
-        switch(item.getCategory())
-        {
-            case ns::BookCategory::fiction: std::cout << "fiction, "; break;
-            case ns::BookCategory::biography: std::cout << "biography, "; break;
-        }
-        std::cout << item.getAuthor() << ", " 
+        std::cout << item.getCategory() << ", "
+                  << item.getAuthor() << ", " 
                   << item.getTitle() << ", " 
                   << item.getPrice() << "\n";
     }
@@ -1108,6 +1037,132 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 instead. This will cause an exception to be thrown with the message
 ```
 Key 'ssn' not found
+```
+
+<div id="G1"/>
+
+#### Specialize json_type_traits explicitly
+
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
+and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+Decode and encode work for all C++ classes that have 
+[json_type_traits](ref/json_type_traits.md) 
+defined. The standard library containers are already supported, 
+and your own types will be supported too if you specialize `json_type_traits`
+in the `jsoncons` namespace. 
+
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+
+namespace ns {
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+} // namespace ns
+
+namespace jsoncons {
+
+    template<class Json>
+    struct json_type_traits<Json, ns::book>
+    {
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_object() && j.contains("author") && 
+                   j.contains("title") && j.contains("price");
+        }
+        static ns::book as(const Json& j)
+        {
+            ns::book val;
+            val.author = j.at("author").template as<std::string>();
+            val.title = j.at("title").template as<std::string>();
+            val.price = j.at("price").template as<double>();
+            return val;
+        }
+        static Json to_json(const ns::book& val, 
+                            allocator_type allocator=allocator_type())
+        {
+            Json j(allocator);
+            j.try_emplace("author", val.author);
+            j.try_emplace("title", val.title);
+            j.try_emplace("price", val.price);
+            return j;
+        }
+    };
+} // namespace jsoncons
+```
+
+To save typing and enhance readability, the jsoncons library defines macros, 
+so you could also write
+
+```c++
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
+```
+
+which expands to the code above.
+
+```c++
+using namespace jsoncons; // for convenience
+
+int main()
+{
+    const std::string s = R"(
+    [
+        {
+            "author" : "Haruki Murakami",
+            "title" : "Kafka on the Shore",
+            "price" : 25.17
+        },
+        {
+            "author" : "Charles Bukowski",
+            "title" : "Pulp",
+            "price" : 22.48
+        }
+    ]
+    )";
+
+    std::vector<ns::book> book_list = decode_json<std::vector<ns::book>>(s);
+
+    std::cout << "(1)\n";
+    for (const auto& item : book_list)
+    {
+        std::cout << item.author << ", " 
+                  << item.title << ", " 
+                  << item.price << "\n";
+    }
+
+    std::cout << "\n(2)\n";
+    encode_json(book_list, std::cout, indenting::indent);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1)
+Haruki Murakami, Kafka on the Shore, 25.17
+Charles Bukowski, Pulp, 22.48
+
+(2)
+[
+    {
+        "author": "Haruki Murakami",
+        "price": 25.17,
+        "title": "Kafka on the Shore"
+    },
+    {
+        "author": "Charles Bukowski",
+        "price": 22.48,
+        "title": "Pulp"
+    }
+]
 ```
 
 <div id="G5"/>
@@ -1325,7 +1380,7 @@ using namespace jsoncons; // for convenience
 
 int main()
 {
-    typedef ns::TemplatedStruct<int,std::wstring> value_type;
+    using value_type = ns::TemplatedStruct<int,std::wstring>;
 
     value_type val{1, L"sss"};
 
@@ -1475,88 +1530,80 @@ using namespace jsoncons;
 
 namespace ns {
 
-class Employee
-{
-    std::string firstName_;
-    std::string lastName_;
-public:
-    Employee(const std::string& firstName, const std::string& lastName)
-        : firstName_(firstName), lastName_(lastName)
+    class Employee
     {
-    }
-    virtual ~Employee() = default;
+        std::string firstName_;
+        std::string lastName_;
+    public:
+        Employee(const std::string& firstName, const std::string& lastName)
+            : firstName_(firstName), lastName_(lastName)
+        {
+        }
+        virtual ~Employee() noexcept = default;
 
-    virtual double calculatePay() const = 0;
+        virtual double calculatePay() const = 0;
 
-    const std::string& firstName() const {return firstName_;}
-    const std::string& lastName() const {return lastName_;}
-};
+        const std::string& firstName() const {return firstName_;}
+        const std::string& lastName() const {return lastName_;}
+    };
 
-class HourlyEmployee : public Employee
-{
-    double wage_;
-    unsigned hours_;
-public:
-    HourlyEmployee(const std::string& firstName, const std::string& lastName, 
-                   double wage, unsigned hours)
-        : Employee(firstName, lastName), 
-          wage_(wage), hours_(hours)
+    class HourlyEmployee : public Employee
     {
-    }
-    HourlyEmployee(const HourlyEmployee&) = default;
-    HourlyEmployee(HourlyEmployee&&) = default;
-    HourlyEmployee& operator=(const HourlyEmployee&) = default;
-    HourlyEmployee& operator=(HourlyEmployee&&) = default;
+        double wage_;
+        unsigned hours_;
+    public:
+        HourlyEmployee(const std::string& firstName, const std::string& lastName, 
+                       double wage, unsigned hours)
+            : Employee(firstName, lastName), 
+              wage_(wage), hours_(hours)
+        {
+        }
 
-    double wage() const {return wage_;}
+        double wage() const {return wage_;}
 
-    unsigned hours() const {return hours_;}
+        unsigned hours() const {return hours_;}
 
-    double calculatePay() const override
+        double calculatePay() const override
+        {
+            return wage_*hours_;
+        }
+    };
+
+    class CommissionedEmployee : public Employee
     {
-        return wage_*hours_;
-    }
-};
+        double baseSalary_;
+        double commission_;
+        unsigned sales_;
+    public:
+        CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
+                             double baseSalary, double commission, unsigned sales)
+            : Employee(firstName, lastName), 
+              baseSalary_(baseSalary), commission_(commission), sales_(sales)
+        {
+        }
 
-class CommissionedEmployee : public Employee
-{
-    double baseSalary_;
-    double commission_;
-    unsigned sales_;
-public:
-    CommissionedEmployee(const std::string& firstName, const std::string& lastName, 
-                         double baseSalary, double commission, unsigned sales)
-        : Employee(firstName, lastName), 
-          baseSalary_(baseSalary), commission_(commission), sales_(sales)
-    {
-    }
-    CommissionedEmployee(const CommissionedEmployee&) = default;
-    CommissionedEmployee(CommissionedEmployee&&) = default;
-    CommissionedEmployee& operator=(const CommissionedEmployee&) = default;
-    CommissionedEmployee& operator=(CommissionedEmployee&&) = default;
+        double baseSalary() const
+        {
+            return baseSalary_;
+        }
 
-    double baseSalary() const
-    {
-        return baseSalary_;
-    }
+        double commission() const
+        {
+            return commission_;
+        }
 
-    double commission() const
-    {
-        return commission_;
-    }
+        unsigned sales() const
+        {
+            return sales_;
+        }
 
-    unsigned sales() const
-    {
-        return sales_;
-    }
+        double calculatePay() const override
+        {
+            return baseSalary_ + commission_*sales_;
+        }
+    };
 
-    double calculatePay() const override
-    {
-        return baseSalary_ + commission_*sales_;
-    }
-};
-
-} // ns
+} // namespace ns
 
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::HourlyEmployee, 3, firstName, lastName, wage, hours)
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::CommissionedEmployee, 4, firstName, lastName, baseSalary, commission, sales)
@@ -1662,7 +1709,7 @@ namespace ns {
 class Foo
 {
 public:
-    virtual ~Foo() = default;
+    virtual ~Foo() noexcept = default;
 };
 
 class Bar : public Foo
@@ -1733,7 +1780,7 @@ namespace jsoncons
     template <class Json, class Backend>
     struct json_type_traits<Json,boost::multiprecision::number<Backend>>
     {
-        typedef boost::multiprecision::number<Backend> multiprecision_type;
+        using multiprecision_type = boost::multiprecision::number<Backend>;
 
         static bool is(const Json& val) noexcept
         {
@@ -2417,7 +2464,7 @@ Output:
  
 <div id="H1"/> 
 
-#### Flatten a json object with number'ish keys JSON Pointer/value pairs
+#### Flatten a json object with numberish keys to JSON Pointer/value pairs
 
 ```c++
 #include <iostream>
@@ -2452,7 +2499,7 @@ int main()
     std::cout << "(2)\n" << pretty_print(unflattened1) << "\n";
 
     json unflattened2 = jsonpointer::unflatten(flattened,
-        jsonpointer::unflatten_method::object);
+        jsonpointer::unflatten_options::assume_object);
     std::cout << "(3)\n" << pretty_print(unflattened2) << "\n";
 }
 ```

@@ -17,6 +17,8 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
+#include <jsoncons_ext/msgpack/msgpack_options.hpp>
+#include <jsoncons/json_visitor2.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -37,30 +39,36 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class TempAllocator=std::allocator<char>>
+template <class Src,class Allocator=std::allocator<char>>
 class basic_msgpack_parser : public ser_context
 {
-    typedef char char_type;
-    typedef std::char_traits<char> char_traits_type;
-    typedef TempAllocator temp_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state> parse_state_allocator_type;
+    using char_type = char;
+    using char_traits_type = std::char_traits<char>;
+    using temp_allocator_type = Allocator;
+    using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;                  
+    using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
     Src source_;
+    msgpack_decode_options options_;
     bool more_;
     bool done_;
-    std::basic_string<char,std::char_traits<char>,char_allocator_type> buffer_;
+    std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
+    int nesting_depth_;
+
 public:
     template <class Source>
     basic_msgpack_parser(Source&& source,
-                         const TempAllocator alloc=TempAllocator())
+                         const msgpack_decode_options& options = msgpack_decode_options(),
+                         const Allocator alloc = Allocator())
        : source_(std::forward<Source>(source)),
+         options_(options),
          more_(true), 
          done_(false),
-         buffer_(alloc),
-         state_stack_(alloc)
+         text_buffer_(alloc),
+         state_stack_(alloc),
+         nesting_depth_(0)
     {
         state_stack_.emplace_back(parse_mode::root,0);
     }
@@ -98,7 +106,7 @@ public:
         return source_.position();
     }
 
-    void parse(json_visitor& visitor, std::error_code& ec)
+    void parse(json_visitor2& visitor, std::error_code& ec)
     {
         while (!done_ && more_)
         {
@@ -109,7 +117,7 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        parse_item(visitor, ec);
+                        read_item(visitor, ec);
                         if (ec)
                         {
                             return;
@@ -117,7 +125,7 @@ public:
                     }
                     else
                     {
-                        produce_end_array(visitor, ec);
+                        end_array(visitor, ec);
                     }
                     break;
                 }
@@ -126,23 +134,23 @@ public:
                     if (state_stack_.back().index < state_stack_.back().length)
                     {
                         ++state_stack_.back().index;
-                        parse_name(visitor, ec);
+                        state_stack_.back().mode = parse_mode::map_value;
+                        read_item(visitor, ec);
                         if (ec)
                         {
                             return;
                         }
-                        state_stack_.back().mode = parse_mode::map_value;
                     }
                     else
                     {
-                        produce_end_map(visitor, ec);
+                        end_object(visitor, ec);
                     }
                     break;
                 }
                 case parse_mode::map_value:
                 {
                     state_stack_.back().mode = parse_mode::map_key;
-                    parse_item(visitor, ec);
+                    read_item(visitor, ec);
                     if (ec)
                     {
                         return;
@@ -152,7 +160,7 @@ public:
                 case parse_mode::root:
                 {
                     state_stack_.back().mode = parse_mode::before_done;
-                    parse_item(visitor, ec);
+                    read_item(visitor, ec);
                     if (ec)
                     {
                         return;
@@ -173,16 +181,22 @@ public:
     }
 private:
 
-    void parse_item(json_visitor& visitor, std::error_code& ec)
+    void read_item(json_visitor2& visitor, std::error_code& ec)
     {
         if (source_.is_error())
         {
             ec = msgpack_errc::source_error;
+            more_ = false;
             return;
         }   
 
         uint8_t type{};
-        source_.get(type);
+        if (source_.get(type) == 0)
+        {
+            ec = msgpack_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
 
         if (type <= 0xbf)
         {
@@ -193,32 +207,34 @@ private:
             }
             else if (type <= 0x8f) 
             {
-                produce_begin_map(visitor,type,ec); // fixmap
+                begin_object(visitor,type,ec); // fixmap
             }
             else if (type <= 0x9f) 
             {
-                produce_begin_array(visitor,type,ec); // fixarray
+                begin_array(visitor,type,ec); // fixarray
             }
             else 
             {
                 // fixstr
                 const size_t len = type & 0x1f;
 
-                buffer_.clear();
-                source_.read(std::back_inserter(buffer_), len);
-                if (source_.eof())
+                text_buffer_.clear();
+
+                if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
 
-                auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                 if (result.ec != unicons::conv_errc())
                 {
                     ec = msgpack_errc::invalid_utf8_text_string;
+                    more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
             }
         }
         else if (type >= 0xe0) 
@@ -252,6 +268,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -267,6 +284,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -278,7 +296,12 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::uint8_cd: 
                 {
                     uint8_t val{};
-                    source_.get(val);
+                    if (source_.get(val) == 0)
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
                     more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -290,6 +313,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -305,6 +329,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -320,6 +345,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -335,6 +361,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -350,6 +377,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -365,6 +393,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -380,6 +409,7 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
@@ -395,25 +425,33 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
-
-                    buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (len < 0)
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
+
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
+                        more_ = false;
                         return;
                     }
-                    more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -424,26 +462,34 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (len < 0)
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+
+                    auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
+                        more_ = false;
                         return;
                     }
-                    more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -454,26 +500,34 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
+                    if (len < 0)
                     {
-                        ec = msgpack_errc::unexpected_eof;
+                        ec = msgpack_errc::length_is_negative;
+                        more_ = false;
                         return;
                     }
 
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
+                    text_buffer_.clear();
+                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+
+                    auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
                     if (result.ec != unicons::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;
+                        more_ = false;
                         return;
                     }
-                    more_ = visitor.string_value(basic_string_view<char>(buffer_.data(),buffer_.length()), semantic_tag::none, *this, ec);
+                    more_ = visitor.string_value(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                     break;
                 }
 
@@ -484,23 +538,30 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
                     int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        more_ = false;
+                        return;
+                    }
 
                     std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(std::back_inserter(v), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
                     more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag::none, 
-                                               *this);
+                                                      semantic_tag::none, 
+                                                      *this,
+                                                      ec);
                     break;
                 }
 
@@ -511,23 +572,30 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
                     int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        more_ = false;
+                        return;
+                    }
 
                     std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(std::back_inserter(v), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
                     more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag::none, 
-                                               *this);
+                                                      semantic_tag::none, 
+                                                      *this,
+                                                      ec);
                     break;
                 }
 
@@ -538,167 +606,66 @@ private:
                     if (source_.eof())
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
                     const uint8_t* endp;
                     int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                    if (len < 0)
+                    {
+                        ec = msgpack_errc::length_is_negative;
+                        more_ = false;
+                        return;
+                    }
 
                     std::vector<uint8_t> v;
-                    v.reserve(len);
-                    source_.read(std::back_inserter(v), len);
-                    if (source_.eof())
+                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
                         return;
                     }
 
                     more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                               semantic_tag::none, 
-                                               *this);
+                                                      semantic_tag::none, 
+                                                      *this,
+                                                      ec);
                     break;
                 }
 
                 case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
                 case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
                 {
-                    produce_begin_array(visitor,type,ec);
+                    begin_array(visitor,type,ec);
                     break;
                 }
 
                 case jsoncons::msgpack::detail::msgpack_format::map16_cd : 
                 case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
                 {
-                    produce_begin_map(visitor, type, ec);
+                    begin_object(visitor, type, ec);
                     break;
                 }
 
                 default:
                 {
-                    //error
+                    ec = msgpack_errc::unknown_type;
+                    more_ = false;
+                    return;
                 }
             }
         }
     }
 
-    void parse_name(json_visitor& visitor, std::error_code& ec)
+    void begin_array(json_visitor2& visitor, uint8_t type, std::error_code& ec)
     {
-        uint8_t type{};
-        source_.get(type);
-        if (source_.eof())
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
         {
-            ec = msgpack_errc::unexpected_eof;
+            ec = msgpack_errc::max_nesting_depth_exceeded;
+            more_ = false;
             return;
-        }
-
-        //const uint8_t* pos = input_ptr_++;
-        if (type >= 0xa0 && type <= 0xbf)
-        {
-                // fixstr
-            const size_t len = type & 0x1f;
-
-            buffer_.clear();
-            source_.read(std::back_inserter(buffer_), len);
-            if (source_.eof())
-            {
-                ec = msgpack_errc::unexpected_eof;
-                return;
-            }
-            auto result = unicons::validate(buffer_.begin(),buffer_.end());
-            if (result.ec != unicons::conv_errc())
-            {
-                ec = msgpack_errc::invalid_utf8_text_string;
-                return;
-            }
-            more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
-        }
-        else
-        {
-            switch (type)
-            {
-                case jsoncons::msgpack::detail::msgpack_format::str8_cd: 
-                {
-                    uint8_t buf[sizeof(int8_t)];
-                    source_.read(buf, sizeof(int8_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
-
-                    buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-
-                    auto result = unicons::validate(buffer_.begin(),buffer_.end());
-                    if (result.ec != unicons::conv_errc())
-                    {
-                        ec = msgpack_errc::invalid_utf8_text_string;
-                        return;
-                    }
-                    more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
-                    break;
-                }
-
-                case jsoncons::msgpack::detail::msgpack_format::str16_cd: 
-                {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(buf, sizeof(int16_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
-
-                    buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-
-                    more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
-                    break;
-                }
-
-                case jsoncons::msgpack::detail::msgpack_format::str32_cd: 
-                {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(buf, sizeof(int32_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
-
-                    buffer_.clear();
-                    source_.read(std::back_inserter(buffer_), len);
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        return;
-                    }
-
-                    more_ = visitor.key(basic_string_view<char>(buffer_.data(),buffer_.length()), *this);
-                    break;
-                }
-            }
-        }
-    }
-
-    void produce_begin_array(json_visitor& visitor, uint8_t type, std::error_code& ec)
-    {
-        std::size_t len = 0;
+        } 
+        std::size_t length = 0;
         switch (type)
         {
             case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
@@ -708,10 +675,18 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    more_ = false;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break;
             }
             case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
@@ -721,30 +696,54 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    more_ = false;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break;
             }
             default:
-                JSONCONS_ASSERT(type > 0x8f && type <= 0x9f) // fixarray
-                len = type & 0x0f;
+                if(type > 0x8f && type <= 0x9f) // fixarray
+                {
+                    length = type & 0x0f;
+                }
+                else
+                {
+                    ec = msgpack_errc::unknown_type;
+                    more_ = false;
+                    return;
+                }
                 break;
         }
-        state_stack_.emplace_back(parse_mode::array,len);
-        more_ = visitor.begin_array(len, semantic_tag::none, *this, ec);
+        state_stack_.emplace_back(parse_mode::array,length);
+        more_ = visitor.begin_array(length, semantic_tag::none, *this, ec);
     }
 
-    void produce_end_array(json_visitor& visitor, std::error_code&)
+    void end_array(json_visitor2& visitor, std::error_code& ec)
     {
-        more_ = visitor.end_array(*this);
+        --nesting_depth_;
+
+        more_ = visitor.end_array(*this, ec);
         state_stack_.pop_back();
     }
 
-    void produce_begin_map(json_visitor& visitor, uint8_t type, std::error_code& ec)
+    void begin_object(json_visitor2& visitor, uint8_t type, std::error_code& ec)
     {
-        std::size_t len = 0;
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = msgpack_errc::max_nesting_depth_exceeded;
+            more_ = false;
+            return;
+        } 
+        std::size_t length = 0;
         switch (type)
         {
             case jsoncons::msgpack::detail::msgpack_format::map16_cd:
@@ -754,10 +753,18 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    more_ = false;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break; 
             }
             case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
@@ -767,24 +774,41 @@ private:
                 if (source_.eof())
                 {
                     ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
                     return;
                 }
                 const uint8_t* endp;
-                len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    more_ = false;
+                    return;
+                }
+                length = static_cast<std::size_t>(len);
                 break;
             }
             default:
-                JSONCONS_ASSERT (type > 0x7f && type <= 0x8f) // fixmap
-                len = type & 0x0f;
+                if (type > 0x7f && type <= 0x8f) // fixmap
+                {
+                    length = type & 0x0f;
+                }
+                else
+                {
+                    ec = msgpack_errc::unknown_type;
+                    more_ = false;
+                    return;
+                }
                 break;
         }
-        state_stack_.emplace_back(parse_mode::map_key,len);
-        more_ = visitor.begin_object(len, semantic_tag::none, *this, ec);
+        state_stack_.emplace_back(parse_mode::map_key,length);
+        more_ = visitor.begin_object(length, semantic_tag::none, *this, ec);
     }
 
-    void produce_end_map(json_visitor& visitor, std::error_code&)
+    void end_object(json_visitor2& visitor, std::error_code& ec)
     {
-        more_ = visitor.end_object(*this);
+        --nesting_depth_;
+        more_ = visitor.end_object(*this, ec);
         state_stack_.pop_back();
     }
 };

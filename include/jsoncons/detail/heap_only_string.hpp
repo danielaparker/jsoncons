@@ -49,7 +49,7 @@ protected:
     {
     }
 
-    ~heap_only_string_base() {}
+    ~heap_only_string_base() noexcept = default;
 };
 
 template <class CharT,class Allocator>
@@ -62,8 +62,8 @@ template <class CharT, class Allocator>
 class heap_only_string : public heap_only_string_base<Allocator>
 {
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<CharT> allocator_type;  
-    typedef std::allocator_traits<allocator_type> allocator_traits_type;
-    typedef typename allocator_traits_type::pointer pointer;
+    using allocator_traits_type = std::allocator_traits<allocator_type>;
+    using pointer = typename allocator_traits_type::pointer;
 
     friend class heap_only_string_factory<CharT, Allocator>;
     friend class heap_only_string_wrapper<CharT, Allocator>;
@@ -71,9 +71,9 @@ class heap_only_string : public heap_only_string_base<Allocator>
 	pointer p_;
 	size_t length_;
 public:
-    typedef CharT char_type;
+    using char_type = CharT;
 
-    ~heap_only_string() {}
+    ~heap_only_string() noexcept = default; 
 
     const char_type* c_str() const { return to_plain_pointer(p_); }
     const char_type* data() const { return to_plain_pointer(p_); }
@@ -107,14 +107,14 @@ private:
 template <class CharT,class Allocator>
 class heap_only_string_wrapper
 {
-    typedef CharT char_type;
+    using char_type = CharT;
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<char> byte_allocator_type;  
-    typedef typename std::allocator_traits<byte_allocator_type>::pointer byte_pointer;
+    using byte_pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
 
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<heap_only_string<CharT,Allocator>> string_allocator_type;  
-    typedef typename std::allocator_traits<string_allocator_type>::pointer string_pointer;
+    using string_pointer = typename std::allocator_traits<string_allocator_type>::pointer;
 
-    typedef heap_only_string<CharT,Allocator> string_type;
+    using string_type = heap_only_string<CharT,Allocator>;
 
     struct string_storage
     {
@@ -147,7 +147,7 @@ public:
         ptr_ = create(val.data(),val.length(),a);
     }
 
-    ~heap_only_string_wrapper()
+    ~heap_only_string_wrapper() noexcept
     {
         if (ptr_ != nullptr)
         {
@@ -191,6 +191,7 @@ private:
 
         byte_allocator_type byte_alloc(alloc);
         byte_pointer ptr = byte_alloc.allocate(mem_size);
+        //byte_pointer ptr = std::allocator_traits<byte_allocator_type>::allocate(alloc, mem_size);
 
         char* storage = to_plain_pointer(ptr);
         string_type* ps = new(storage)heap_only_string<char_type,Allocator>(byte_alloc);

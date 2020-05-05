@@ -353,7 +353,7 @@ TEST_CASE("test_fail18")
          err = e.code();
          //std::cout << in_file << " " << e.what() << std::endl;
     }
-    CHECK(err == jsoncons::json_errc::max_depth_exceeded);
+    CHECK(err == jsoncons::json_errc::max_nesting_depth_exceeded);
 }
 
 TEST_CASE("test_fail19")

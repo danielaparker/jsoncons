@@ -272,12 +272,16 @@ void parse_column_types(const std::basic_string<CharT>& types,
 } // detail
 
 template <class CharT>
+class basic_csv_options;
+
+template <class CharT>
 class basic_csv_options_common 
 {
+    friend class basic_csv_options<CharT>;
 public:
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
-protected:
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
+private:
     char_type field_delimiter_;
     char_type quote_char_;
     char_type quote_escape_char_;
@@ -301,6 +305,7 @@ protected:
     string_type neginf_to_str_;
     string_type column_names_;
 
+protected:
     basic_csv_options_common()
       : field_delimiter_(','),
         quote_char_('\"'),
@@ -321,7 +326,7 @@ protected:
     basic_csv_options_common(const basic_csv_options_common&) = default;
     basic_csv_options_common& operator=(const basic_csv_options_common&) = default;
 
-    virtual ~basic_csv_options_common() = default;
+    virtual ~basic_csv_options_common() noexcept = default;
 public:
 
     char_type field_delimiter() const 
@@ -484,11 +489,13 @@ public:
 template <class CharT>
 class basic_csv_decode_options : public virtual basic_csv_options_common<CharT>
 {
+    friend class basic_csv_options<CharT>;
     using super_type = basic_csv_options_common<CharT>;
 public:
     using typename super_type::char_type;
     using typename super_type::string_type;
-protected:
+
+private:
     bool assume_header_:1;
     bool ignore_empty_values_:1;
     bool ignore_empty_lines_:1;
@@ -617,7 +624,7 @@ public:
 
     mapping_kind mapping() const 
     {
-        return mapping_ != mapping_kind() ? mapping_ : (assume_header() || this->column_names_.size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
+        return mapping_ != mapping_kind() ? mapping_ : (assume_header() || this->column_names().size() > 0 ? mapping_kind::n_objects : mapping_kind::n_rows);
     }
 
     std::size_t max_lines() const 
@@ -639,11 +646,12 @@ public:
 template <class CharT>
 class basic_csv_encode_options : public virtual basic_csv_options_common<CharT>
 {
+    friend class basic_csv_options<CharT>;
     using super_type = basic_csv_options_common<CharT>;
 public:
     using typename super_type::char_type;
     using typename super_type::string_type;
-protected:
+private:
     quote_style_kind quote_style_;
     float_chars_format float_format_;
     int8_t precision_;
@@ -692,8 +700,8 @@ public:
 template <class CharT>
 class basic_csv_options final : public basic_csv_decode_options<CharT>, public basic_csv_encode_options<CharT>  
 {
-    typedef CharT char_type;
-    typedef std::basic_string<CharT> string_type;
+    using char_type = CharT;
+    using string_type = std::basic_string<CharT>;
 
 public:
     using basic_csv_decode_options<CharT>::enable_str_to_nan;
@@ -970,8 +978,8 @@ public:
 
 };
 
-typedef basic_csv_options<char> csv_options;
-typedef basic_csv_options<wchar_t> wcsv_options;
+using csv_options = basic_csv_options<char>;
+using wcsv_options = basic_csv_options<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use csv_options") typedef csv_options csv_parameters;

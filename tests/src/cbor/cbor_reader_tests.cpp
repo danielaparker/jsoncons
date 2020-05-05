@@ -24,8 +24,8 @@ void check_parse_cbor(const std::vector<uint8_t>& v, const json& expected)
         std::error_code ec;
 
         jsoncons::json_decoder<json> decoder;
-        cbor_bytes_reader parser(v, decoder);
-        parser.read(ec);
+        cbor_bytes_reader reader(v, decoder);
+        reader.read(ec);
 
         json result = decoder.get_result();
 
@@ -142,6 +142,8 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0x5f,0x41,'H',0x41,'e',0x40,0x41,'l',0x41,'l',0x41,'o',0xff}, json(byte_string({'H','e','l','l','o'})));
 
     // text strings with undefined length
+
+    check_parse_cbor({0x7f,0x7f,0x65,'H','e','l','l','o',0x7f,0x61,' ',0x60,0xff,0x65,'W','o','r','l','d',0xff,0xff},json("Hello World"));
 
     check_parse_cbor({0x7f,0xff}, json(""));
 

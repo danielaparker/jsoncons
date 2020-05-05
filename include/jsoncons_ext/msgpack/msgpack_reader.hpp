@@ -24,14 +24,49 @@ namespace jsoncons { namespace msgpack {
 template <class Src,class Allocator=std::allocator<char>>
 class basic_msgpack_reader : public ser_context
 {
+    using char_type = char;
+
     basic_msgpack_parser<Src,Allocator> parser_;
-    json_visitor& visitor_;
+    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> adaptor_;
+    json_visitor2& visitor_;
 public:
     template <class Source>
     basic_msgpack_reader(Source&& source, 
-                         json_visitor& visitor,
-                         const Allocator alloc=Allocator())
-       : parser_(std::forward<Source>(source), alloc),
+                      json_visitor& visitor, 
+                      const Allocator alloc)
+       : basic_msgpack_reader(std::forward<Source>(source),
+                           visitor,
+                           msgpack_decode_options(),
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_msgpack_reader(Source&& source, 
+                      json_visitor& visitor, 
+                      const msgpack_decode_options& options = msgpack_decode_options(),
+                      const Allocator alloc=Allocator())
+       : parser_(std::forward<Source>(source), options, alloc),
+         adaptor_(visitor, alloc), visitor_(adaptor_)
+    {
+    }
+    template <class Source>
+    basic_msgpack_reader(Source&& source, 
+                      json_visitor2& visitor, 
+                      const Allocator alloc)
+       : basic_msgpack_reader(std::forward<Source>(source),
+                           visitor,
+                           msgpack_decode_options(),
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_msgpack_reader(Source&& source, 
+                      json_visitor2& visitor, 
+                      const msgpack_decode_options& options = msgpack_decode_options(),
+                      const Allocator alloc=Allocator())
+       : parser_(std::forward<Source>(source), options, alloc),
          visitor_(visitor)
     {
     }
@@ -67,9 +102,9 @@ public:
     }
 };
 
-typedef basic_msgpack_reader<jsoncons::binary_stream_source> msgpack_stream_reader;
+using msgpack_stream_reader = basic_msgpack_reader<jsoncons::binary_stream_source>;
 
-typedef basic_msgpack_reader<jsoncons::bytes_source> msgpack_bytes_reader;
+using msgpack_bytes_reader = basic_msgpack_reader<jsoncons::bytes_source>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use msgpack_stream_reader") typedef msgpack_stream_reader msgpack_reader;

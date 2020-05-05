@@ -338,7 +338,7 @@ namespace json_type_traits_macro_tests
             : firstName_(firstName), lastName_(lastName)
         {
         }
-        virtual ~Employee() = default;
+        virtual ~Employee() noexcept = default;
 
         virtual double calculatePay() const = 0;
 
@@ -543,13 +543,13 @@ namespace
         template<typename U>
         struct rebind
         {
-            typedef MyAlloc<U> other;
+            using other = MyAlloc<U>;
         };
-        typedef T* pointer;
-        typedef const T* const_pointer;
-        typedef T& reference;
-        typedef const T& const_reference;
-        typedef std::ptrdiff_t difference_type;
+        using pointer = T*;
+        using const_pointer = const T*;
+        using reference = T&;
+        using const_reference = const T&;
+        using difference_type = std::ptrdiff_t;
     };
 } // namespace
 
@@ -805,7 +805,7 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
     }
     SECTION("TemplatedStruct<int,double>")
     {
-        typedef ns::TemplatedStruct<int,double> value_type;
+        using value_type = ns::TemplatedStruct<int,double>;
 
         value_type val;
         val.aT1 = 1;
@@ -823,7 +823,7 @@ TEST_CASE("JSONCONS_TPL_ALL_MEMBER_TRAITS tests")
     }
     SECTION("TemplatedStruct<int,wstring>")
     {
-        typedef ns::TemplatedStruct<int,std::wstring> value_type;
+        using value_type = ns::TemplatedStruct<int,std::wstring>;
 
         value_type val;
         val.aT1 = 1;

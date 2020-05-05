@@ -40,7 +40,7 @@ struct boost_sorted_policy : public sorted_policy
     using string_storage = boost::interprocess::basic_string<CharT, CharTraits, Allocator>;
 };
 
-typedef basic_json<char,boost_sorted_policy,shmem_allocator> my_json;
+using my_json = basic_json<char,boost_sorted_policy,shmem_allocator>;
 
 int main(int argc, char *argv[])
 {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
       struct shm_remove
       {
          shm_remove() { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
-         ~shm_remove(){ boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
+         ~shm_remove() noexcept { boost::interprocess::shared_memory_object::remove("MySharedMemory"); }
       } remover;
 
       //Construct managed shared memory

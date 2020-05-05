@@ -1475,7 +1475,7 @@ TEST_CASE("csv detect bom")
 
 TEST_CASE("test_encode_decode csv string")
 {
-    typedef std::vector<std::tuple<std::string,int>> cpp_type;
+    using cpp_type = std::vector<std::tuple<std::string,int>>;
     std::string s1 = "\"a\",1\n\"b\",2";
     csv::csv_options options;
     options.mapping(csv::mapping_kind::n_rows)
@@ -1530,7 +1530,7 @@ TEST_CASE("csv_reader constructors")
 
     SECTION("stateful allocator")
     {
-        typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
+        using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
 
         FreelistAllocator<char> my_allocator{1}; 
 
@@ -1549,3 +1549,35 @@ TEST_CASE("csv_reader constructors")
     }
 }
 #endif
+
+TEST_CASE("infinite loop")
+{
+    SECTION("Whitespace follows quoted field")
+    {
+        char data[4] = {'\"', '\"', ' ', '\n'};
+        int size = 4;
+        std::string input(data, size);
+        json_decoder<ojson> decoder;
+        csv::csv_options options;
+        options.assume_header(true);
+        options.mapping(csv::mapping_kind::n_rows);
+        csv::csv_reader reader(input, decoder, options);
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(!ec);
+    }
+    SECTION("Invalid character follows quoted field")
+    {
+        char data[4] = {'\"', '\"', '\x01', '\n'};
+        int size = 4;
+        std::string input(data, size);
+        json_decoder<ojson> decoder;
+        csv::csv_options options;
+        options.assume_header(true);
+        options.mapping(csv::mapping_kind::n_rows);
+        csv::csv_reader reader(input, decoder, options);
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(ec == csv::csv_errc::unexpected_char_between_fields);
+    }
+}

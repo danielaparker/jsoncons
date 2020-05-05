@@ -29,13 +29,12 @@ template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator
 class basic_ubjson_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
-    typedef Src source_type;
-    typedef char char_type;
-    typedef Allocator allocator_type;
+    using source_type = Src;
+    using char_type = char;
+    using allocator_type = Allocator;
 private:
-    basic_staj_visitor<char_type> event_handler_;
-
     basic_ubjson_parser<Src,Allocator> parser_;
+    basic_staj_visitor<char_type> event_handler_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -43,26 +42,36 @@ private:
     basic_ubjson_cursor& operator=(const basic_ubjson_cursor&) = delete;
 
 public:
-    typedef string_view string_view_type;
+    using string_view_type = string_view;
 
     template <class Source>
     basic_ubjson_cursor(Source&& source,
-                        const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc),
-         eof_(false)
+                      const Allocator& alloc = Allocator())
+       : basic_ubjson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           ubjson_decode_options(),
+                           alloc)
     {
-        if (!done())
-        {
-            next();
-        }
     }
 
     template <class Source>
     basic_ubjson_cursor(Source&& source,
-                        std::function<bool(const staj_event&, const ser_context&)> filter,
-                        const Allocator& alloc = Allocator())
-       : event_handler_(filter),
-         parser_(std::forward<Source>(source), alloc), 
+                      const ubjson_decode_options& options,
+                      const Allocator& alloc = Allocator())
+       : basic_ubjson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           options,
+                           alloc)
+    {
+    }
+
+    template <class Source>
+    basic_ubjson_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const ubjson_decode_options& options = ubjson_decode_options(),
+                      const Allocator& alloc = Allocator())
+       : parser_(std::forward<Source>(source), options, alloc), 
+         event_handler_(filter), 
          eof_(false)
     {
         if (!done())
@@ -94,8 +103,8 @@ public:
                         Source&& source,
                         std::function<bool(const staj_event&, const ser_context&)> filter,
                         std::error_code& ec)
-       : event_handler_(filter),
-         parser_(std::forward<Source>(source), alloc), 
+       : parser_(std::forward<Source>(source), alloc), 
+         event_handler_(filter),
          eof_(false)
     {
         if (!done())
@@ -205,8 +214,8 @@ private:
     }
 };
 
-typedef basic_ubjson_cursor<jsoncons::binary_stream_source> ubjson_stream_cursor;
-typedef basic_ubjson_cursor<jsoncons::bytes_source> ubjson_bytes_cursor;
+using ubjson_stream_cursor = basic_ubjson_cursor<jsoncons::binary_stream_source>;
+using ubjson_bytes_cursor = basic_ubjson_cursor<jsoncons::bytes_source>;
 
 } // namespace ubjson
 } // namespace jsoncons

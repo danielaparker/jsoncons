@@ -15,7 +15,7 @@ constant                            |Description
 `unexpected_eof`                    |Unexpected end of file
 `invalid_json_text`                    |Invalid JSON text
 `extra_character`          |Unexpected non-whitespace character after JSON text
-`max_depth_exceeded`         |Maximum JSON depth exceeded
+`json_nesting_too_deep`         |Maximum JSON depth exceeded
 `single_quote`        |JSON strings cannot be quoted with single quotes
 `illegal_character_in_string`        |Illegal character in string
 `extra_comma`        |Extra comma      

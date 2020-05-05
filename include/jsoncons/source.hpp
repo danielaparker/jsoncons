@@ -54,8 +54,8 @@ namespace jsoncons {
     class stream_source 
     {
     public:
-        typedef CharT value_type;
-        typedef std::char_traits<CharT> traits_type;
+        using value_type = CharT;
+        using traits_type = std::char_traits<CharT>;
     private:
         basic_null_istream<CharT> null_is_;
         std::basic_istream<CharT>* is_;
@@ -83,9 +83,7 @@ namespace jsoncons {
             std::swap(position_,other.position_);
         }
 
-        ~stream_source()
-        {
-        }
+        ~stream_source() noexcept = default;
 
         stream_source& operator=(stream_source&& other) noexcept
         {
@@ -216,36 +214,6 @@ namespace jsoncons {
                 return 0;
             }
         }
-
-        template <class OutputIt>
-        typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-        read(OutputIt p, std::size_t length)
-        {
-            std::size_t count = 0;
-            JSONCONS_TRY
-            {
-                for (count = 0; count < length; ++count)
-                {
-                    int c = sbuf_->sbumpc();
-                    if (c == traits_type::eof())
-                    {
-                        is_->clear(is_->rdstate() | std::ios::eofbit);
-                        return count;
-                    }
-                    else
-                    {
-                        ++position_;
-                    }
-                    *p++ = (value_type)c;
-                }
-                return count;
-            }
-            JSONCONS_CATCH(const std::exception&)     
-            {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return count;
-            }
-        }
     };
 
     // string_source
@@ -260,9 +228,9 @@ namespace jsoncons {
     class string_source 
     {
     public:
-        typedef CharT value_type;
-        typedef std::char_traits<CharT> traits_type;
-        typedef basic_string_view<value_type> string_view_type;
+        using value_type = CharT;
+        using traits_type = std::char_traits<CharT>;
+        using string_view_type = basic_string_view<value_type>;
     private:
         const value_type* data_;
         const value_type* input_ptr_;
@@ -388,27 +356,6 @@ namespace jsoncons {
             input_ptr_  += len;
             return len;
         }
-
-        template <class OutputIt>
-        typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-        read(OutputIt d_first, std::size_t count)
-        {
-            std::size_t len;
-            if ((std::size_t)(input_end_ - input_ptr_) < count)
-            {
-                len = input_end_ - input_ptr_;
-                eof_ = true;
-            }
-            else
-            {
-                len = count;
-            }
-            for (std::size_t i = 0; i < len; ++i)
-            {
-                *d_first++ = *input_ptr_++;
-            }
-            return len;
-        }
     };
 
     // binary sources
@@ -417,7 +364,7 @@ namespace jsoncons {
     {
     public:
         typedef uint8_t value_type;
-        typedef byte_traits traits_type;
+        using traits_type = byte_traits;
     private:
         basic_null_istream<char> null_is_;
         std::istream* is_;
@@ -560,32 +507,22 @@ namespace jsoncons {
             }
         }
 
-        template <class OutputIt>
-        std::size_t read(OutputIt p, std::size_t length)
+        std::size_t read(value_type* p, std::size_t length)
         {
-            std::size_t count = 0;
             JSONCONS_TRY
             {
-                for (count = 0; count < length; ++count)
+                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p), length); // never negative
+                if (static_cast<std::size_t>(count) < length)
                 {
-                    int c = sbuf_->sbumpc();
-                    if (c == traits_type::eof())
-                    {
-                        is_->clear(is_->rdstate() | std::ios::eofbit);
-                        return count;
-                    }
-                    else
-                    {
-                        ++position_;
-                    }
-                    *p++ = (value_type)c;
+                    is_->clear(is_->rdstate() | std::ios::eofbit);
                 }
-                return count;
+                position_ += length;
+                return static_cast<std::size_t>(count);
             }
             JSONCONS_CATCH(const std::exception&)     
             {
                 is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return count;
+                return 0;
             }
         }
     };
@@ -600,7 +537,7 @@ namespace jsoncons {
     {
     public:
         typedef uint8_t value_type;
-        typedef byte_traits traits_type;
+        using traits_type = byte_traits;
     private:
         const value_type* data_;
         const value_type* input_ptr_;
@@ -716,31 +653,74 @@ namespace jsoncons {
             input_ptr_  += len;
             return len;
         }
-
-        template <class OutputIt>
-        typename std::enable_if<!std::is_same<OutputIt,value_type*>::value,size_t>::type
-        read(OutputIt d_first, std::size_t count)
-        {
-            std::size_t len;
-            if ((std::size_t)(input_end_ - input_ptr_) < count)
-            {
-                len = input_end_ - input_ptr_;
-                eof_ = true;
-            }
-            else
-            {
-                len = count;
-            }
-            for (std::size_t i = 0; i < len; ++i)
-            {
-                *d_first++ = *input_ptr_++;
-            }
-            return len;
-        }
     };
 
+    template <class Source>
+    struct source_reader
+    {
+        using value_type = typename Source::value_type;
+        static constexpr std::size_t max_buffer_length = 16384;
+
+        template <class Container>
+        static
+        typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
+                                jsoncons::detail::has_reserve<Container>::value &&
+                                jsoncons::detail::has_data_exact<value_type*,Container>::value 
+            , std::size_t>::type
+        read(Source& source, Container& v, std::size_t length)
+        {
+            std::size_t unread = length;
+
+            std::size_t n = (std::min)(max_buffer_length, unread);
+            while (n > 0 && !source.eof())
+            {
+                std::size_t offset = v.size();
+                v.resize(v.size()+n);
+                std::size_t actual = source.read(v.data()+offset, n);
+                unread -= actual;
+                n = (std::min)(max_buffer_length, unread);
+            }
+
+            return length - unread;
+        }
+
+        template <class Container>
+        static
+        typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
+                                jsoncons::detail::has_reserve<Container>::value &&
+                                !jsoncons::detail::has_data_exact<value_type*, Container>::value 
+            , std::size_t>::type
+        read(Source& source, Container& v, std::size_t length)
+        {
+            std::size_t unread = length;
+
+            std::size_t n = (std::min)(max_buffer_length, unread);
+            while (n > 0 && !source.eof())
+            {
+                v.reserve(v.size()+n);
+                std::size_t actual = 0;
+                while (actual < n)
+                {
+                    int c = source.get();
+                    if (c == Source::traits_type::eof())
+                    {
+                        break;
+                    }
+                    v.push_back((value_type)c);
+                    ++actual;
+                }
+                unread -= actual;
+                n = (std::min)(max_buffer_length, unread);
+            }
+
+            return length - unread;
+        }
+    };
+    template <class Source>
+    constexpr std::size_t source_reader<Source>::max_buffer_length;
+
     #if !defined(JSONCONS_NO_DEPRECATED)
-    typedef binary_stream_source bin_stream_source;
+    using bin_stream_source = binary_stream_source;
     #endif
 
 } // namespace jsoncons

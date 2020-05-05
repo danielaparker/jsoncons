@@ -27,15 +27,15 @@ template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std
 class basic_csv_encoder final : public basic_json_visitor<CharT>
 {
 public:
-    typedef CharT char_type;
+    using char_type = CharT;
     using typename basic_json_visitor<CharT>::string_view_type;
-    typedef Sink sink_type;
+    using sink_type = Sink;
 
-    typedef Allocator allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type> string_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>> string_string_allocator_type;
+    using allocator_type = Allocator;
+    using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT>;
+    using string_type = std::basic_string<CharT, std::char_traits<CharT>, char_allocator_type>;
+    using string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<string_type>;
+    using string_string_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<std::pair<const string_type,string_type>>;
 
 private:
     static const std::array<CharT, 4>& null_k()
@@ -123,7 +123,7 @@ public:
         jsoncons::csv::detail::parse_column_names(options.column_names(), strings_buffer_);
     }
 
-    ~basic_csv_encoder()
+    ~basic_csv_encoder() noexcept
     {
         JSONCONS_TRY
         {
@@ -185,6 +185,7 @@ private:
     bool visit_end_object(const ser_context&, std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
         switch (stack_.back().item_kind_)
         {
             case stack_item_kind::object:
@@ -915,10 +916,10 @@ private:
     }
 };
 
-typedef basic_csv_encoder<char> csv_stream_encoder;
-typedef basic_csv_encoder<char,jsoncons::string_sink<std::string>> csv_string_encoder;
-typedef basic_csv_encoder<wchar_t> csv_wstream_encoder;
-typedef basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wcsv_string_encoder;
+using csv_stream_encoder = basic_csv_encoder<char>;
+using csv_string_encoder = basic_csv_encoder<char,jsoncons::string_sink<std::string>>;
+using csv_wstream_encoder = basic_csv_encoder<wchar_t>;
+using wcsv_string_encoder = basic_csv_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT, class Sink = jsoncons::stream_sink<CharT>, class Allocator = std::allocator<CharT>>

@@ -34,7 +34,7 @@ Constructs a new encoder that writes to the specified destination.
 
 #### Destructor
 
-    virtual ~basic_cbor_encoder()
+    virtual ~basic_cbor_encoder() noexcept
 
 
 #### Inherited from [jsoncons::json_visitor](../basic_json_visitor.md)
@@ -454,7 +454,7 @@ int main()
     std::vector<uint8_t> buffer;
 
     cbor::cbor_options options;
-    options.enable_typed_arrays(true);
+    options.use_typed_arrays(true);
     cbor::cbor_bytes_encoder encoder(buffer, options);
 
     std::vector<uint16_t> values = {0x3bff,0x3c00,0x3c01,0x3555};

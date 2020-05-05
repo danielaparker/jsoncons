@@ -807,8 +807,8 @@ Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
 template <class Json>
 struct jsonpath_resources
 {
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
 
     std::vector<std::unique_ptr<Json>> temp_json_values_;
 
@@ -933,9 +933,9 @@ private:
 template<class Json>
 struct PathConstructor
 {
-    typedef typename Json::char_type char_type;
-    typedef typename Json::string_view_type string_view_type;
-    typedef std::basic_string<char_type> string_type;
+    using char_type = typename Json::char_type;
+    using string_view_type = typename Json::string_view_type;
+    using string_type = std::basic_string<char_type>;
 
     string_type operator()(const string_type& path, std::size_t index) const
     {
@@ -963,9 +963,9 @@ struct PathConstructor
 template<class Json>
 struct VoidPathConstructor
 {
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
-    typedef typename Json::string_view_type string_view_type;
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
+    using string_view_type = typename Json::string_view_type;
 
     string_type operator()(const string_type&, std::size_t) const
     {
@@ -1055,10 +1055,10 @@ template <class Json>
 class term
 {
 public:
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
 
-    virtual ~term() {}
+    virtual ~term() noexcept {}
 
     term() = default;
     term(const term&) = default;
@@ -1145,8 +1145,8 @@ public:
 template <class Json>
 class regex_term final : public term<Json>
 {
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
     std::basic_regex<char_type> pattern_;
 public:
     regex_term(const string_type& pattern, std::regex::flag_type flags)
@@ -1168,15 +1168,15 @@ public:
 
     bool evaluate(const string_type& subject) const
     {
-        return std::regex_match(subject, pattern_);
+        return std::regex_search(subject, pattern_);
     }
 };
 
 template <class Json>
 class path_term final : public term<Json>
 {
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
 
     string_type path_;
     std::size_t line_;
@@ -1291,7 +1291,7 @@ public:
         construct(std::forward<token>(other));
     }
 
-    ~token()
+    ~token() noexcept
     {
         destroy();
     }
@@ -1636,9 +1636,9 @@ public:
 template <class Json>
 class jsonpath_filter_parser
 {
-    typedef typename Json::char_type char_type;
-    typedef std::basic_string<char_type> string_type;
-    typedef typename Json::string_view_type string_view_type;
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
+    using string_view_type = typename Json::string_view_type;
 
     std::vector<token<Json>> output_stack_;
     std::vector<token<Json>> operator_stack_;

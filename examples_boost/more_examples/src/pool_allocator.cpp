@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-typedef basic_json<char,sorted_policy,boost::pool_allocator<char>> my_json;
+using my_json = basic_json<char,sorted_policy,boost::pool_allocator<char>>;
 
 void pool_allocator_examples()
 {

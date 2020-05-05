@@ -22,17 +22,17 @@ template <class Json,class TempAllocator=std::allocator<char>>
 class json_decoder final : public basic_json_visitor<typename Json::char_type>
 {
 public:
-    typedef typename Json::char_type char_type;
+    using char_type = typename Json::char_type;
     using typename basic_json_visitor<char_type>::string_view_type;
 
-    typedef typename Json::key_value_type key_value_type;
-    typedef typename Json::key_type key_type;
-    typedef typename Json::array array;
-    typedef typename Json::object object;
-    typedef typename Json::allocator_type result_allocator_type;
-    typedef typename key_type::allocator_type json_string_allocator;
-    typedef typename array::allocator_type json_array_allocator;
-    typedef typename object::allocator_type json_object_allocator;
+    using key_value_type = typename Json::key_value_type;
+    using key_type = typename Json::key_type;
+    using array = typename Json::array;
+    using object = typename Json::object;
+    using result_allocator_type = typename Json::allocator_type;
+    using json_string_allocator = typename key_type::allocator_type;
+    using json_array_allocator = typename array::allocator_type;
+    using json_object_allocator = typename object::allocator_type;
     typedef typename std::allocator_traits<result_allocator_type>:: template rebind_alloc<uint8_t> json_byte_allocator_type;
 private:
     struct stack_item
@@ -58,16 +58,16 @@ private:
     struct structure_info
     {
         structure_type type_;
-        std::size_t offset_;
+        std::size_t container_index_;
 
         structure_info(structure_type type, std::size_t offset)
-            : type_(type), offset_(offset)
+            : type_(type), container_index_(offset)
         {
         }
 
     };
 
-    typedef TempAllocator temp_allocator_type;
+    using temp_allocator_type = TempAllocator;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<stack_item> stack_item_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<structure_info> structure_info_allocator_type;
  
@@ -149,6 +149,7 @@ public:
     void reset()
     {
         is_valid_ = false;
+        item_stack_.clear();
         structure_stack_.clear();
         structure_stack_.emplace_back(structure_type::root_t, 0);
     }
@@ -194,7 +195,7 @@ private:
     {
         JSONCONS_ASSERT(structure_stack_.size() > 0);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::object_t);
-        const size_t structure_index = structure_stack_.back().offset_;
+        const size_t structure_index = structure_stack_.back().container_index_;
         JSONCONS_ASSERT(item_stack_.size() > structure_index);
         const size_t count = item_stack_.size() - (structure_index + 1);
         auto first = item_stack_.begin() + (structure_index+1);
@@ -230,21 +231,36 @@ private:
 
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
-        JSONCONS_ASSERT(structure_stack_.size() > 0);
-        JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
-        const size_t structure_index = structure_stack_.back().offset_;
-        JSONCONS_ASSERT(item_stack_.size() > structure_index);
-        const size_t count = item_stack_.size() - (structure_index + 1);
-        auto first = item_stack_.begin() + (structure_index+1);
-        auto last = first + count;
-        auto& j = item_stack_[structure_index].value_;
-        j.reserve(count);
-        while (first != last)
+        //std::cout << "visit_end_array " << item_stack_.size() << "\n";
+
+        //std::cout << "structure_stack\n";
+        //for (auto& info : structure_stack_)
         {
-            j.push_back(std::move(first->value_));
-            ++first;
+            //std::cout << "type: " << (int)info.type_ << ", offset " << info.container_index_ << "\n";
         }
-        item_stack_.erase(item_stack_.begin()+structure_index+1, item_stack_.end());
+
+        JSONCONS_ASSERT(structure_stack_.size() > 1);
+        JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
+        const size_t container_index = structure_stack_.back().container_index_;
+        JSONCONS_ASSERT(item_stack_.size() > container_index);
+
+        auto& container = item_stack_[container_index].value_;
+
+        const size_t size = item_stack_.size() - (container_index + 1);
+        //std::cout << "size on item stack: " << size << "\n";
+
+        if (size > 0)
+        {
+            container.reserve(size);
+            auto first = item_stack_.begin() + (container_index+1);
+            auto last = first + size;
+            for (auto it = first; it != last; ++it)
+            {
+                container.push_back(std::move(it->value_));
+            }
+            item_stack_.erase(first, item_stack_.end());
+        }
+
         structure_stack_.pop_back();
         if (structure_stack_.back().type_ == structure_type::root_t)
         {

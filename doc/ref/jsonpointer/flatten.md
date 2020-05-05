@@ -7,7 +7,7 @@ template<class Json>
 Json flatten(const Json& value); // (1)
 
 template<class Json>
-Json unflatten(const Json& value, unflatten_method method = unflatten_method::try_array); // (2) (since v0.150.0)
+Json unflatten(const Json& value, unflatten_options options = unflatten_options::none); // (2) (since v0.150.0)
 ```
 
 (1) flattens a json object or array into a single depth object of JSON Pointer-value pairs.
@@ -16,7 +16,8 @@ The values are primitive (string, number, boolean, or null). Empty objects or ar
 
 (2) unflattens a json object of JSON Pointer-value pairs. There is no unique solution,
 an integer appearing in a path could be an array index or it could be an object key.
-[unflatten_method](unflatten_method.md) is used to specify how to unflatten.
+The default is to attempt to preserve arrays. [unflatten_options](unflatten_options.md) 
+provides additonal options.
 
 #### Return value
 
@@ -82,7 +83,7 @@ Output:
 }
 ```
 
-#### Flatten and unflatten a json object with number'ish keys
+#### Flatten and unflatten a json object with numberlike keys
 
 ```c++
 int main()
@@ -109,7 +110,7 @@ int main()
     std::cout << "(2)\n" << pretty_print(unflattened1) << "\n";
 
     json unflattened2 = jsonpointer::unflatten(flattened,
-        jsonpointer::unflatten_method::object);
+        jsonpointer::unflatten_options::assume_object);
     std::cout << "(3)\n" << pretty_print(unflattened2) << "\n";
 }
 ```

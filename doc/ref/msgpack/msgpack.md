@@ -13,6 +13,8 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 [basic_msgpack_encoder](basic_msgpack_encoder.md)
 
+[msgpack_options](msgpack_options.md)
+
 #### Mappings between MessagePack and jsoncons data items
 
 MessagePack data item                              | jsoncons data item|jsoncons tag  

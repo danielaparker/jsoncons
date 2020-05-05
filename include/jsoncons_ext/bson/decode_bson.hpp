@@ -21,21 +21,23 @@ namespace jsoncons {
 namespace bson {
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-    decode_bson(const std::vector<uint8_t>& v)
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    decode_bson(const std::vector<uint8_t>& v, 
+                const bson_decode_options& options = bson_decode_options())
     {
         jsoncons::json_decoder<T> decoder;
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_bson_reader<jsoncons::bytes_source> reader(v, adaptor);
+        basic_bson_reader<jsoncons::bytes_source> reader(v, adaptor, options);
         reader.read();
         return decoder.get_result();
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-    decode_bson(const std::vector<uint8_t>& v)
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    decode_bson(const std::vector<uint8_t>& v, 
+                const bson_decode_options& options = bson_decode_options())
     {
-        basic_bson_cursor<bytes_source> cursor(v);
+        basic_bson_cursor<bytes_source> cursor(v, options);
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
@@ -48,21 +50,23 @@ namespace bson {
     }
 
     template<class T>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
-    decode_bson(std::istream& is)
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    decode_bson(std::istream& is, 
+                const bson_decode_options& options = bson_decode_options())
     {
         jsoncons::json_decoder<T> decoder;
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        bson_stream_reader reader(is, adaptor);
+        bson_stream_reader reader(is, adaptor, options);
         reader.read();
         return decoder.get_result();
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
-    decode_bson(std::istream& is)
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    decode_bson(std::istream& is, 
+                const bson_decode_options& options = bson_decode_options())
     {
-        basic_bson_cursor<binary_stream_source> cursor(is);
+        basic_bson_cursor<binary_stream_source> cursor(is, options);
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
@@ -77,23 +81,25 @@ namespace bson {
     // With leading allocator parameter
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                const std::vector<uint8_t>& v)
+                const std::vector<uint8_t>& v, 
+                const bson_decode_options& options = bson_decode_options())
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_bson_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, temp_alloc);
+        basic_bson_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, temp_alloc);
         reader.read();
         return decoder.get_result();
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                const std::vector<uint8_t>& v)
+                const std::vector<uint8_t>& v, 
+                const bson_decode_options& options = bson_decode_options())
     {
-        basic_bson_cursor<bytes_source,TempAllocator> cursor(v, temp_alloc);
+        basic_bson_cursor<bytes_source,TempAllocator> cursor(v, options, temp_alloc);
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
@@ -106,23 +112,25 @@ namespace bson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                std::istream& is)
+                std::istream& is, 
+                const bson_decode_options& options = bson_decode_options())
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_bson_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, temp_alloc);
+        basic_bson_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, temp_alloc);
         reader.read();
         return decoder.get_result();
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json_class<T>::value,T>::type 
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
     decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                std::istream& is)
+                std::istream& is, 
+                const bson_decode_options& options = bson_decode_options())
     {
-        basic_bson_cursor<binary_stream_source,TempAllocator> cursor(is, temp_alloc);
+        basic_bson_cursor<binary_stream_source,TempAllocator> cursor(is, options, temp_alloc);
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;

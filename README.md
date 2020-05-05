@@ -64,10 +64,24 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [Reference](doc/Reference.md)
 - [Roadmap](Roadmap.md)
 
-A C++ Compiler with C++11 support is required.
+The library requires a C++ Compiler with C++11 support. In addition the library defines `jsoncons::endian`,
+`jsoncons::basic_string_view`, `jsoncons::optional`, and `jsoncons::span`, which will be typedefed to
+their standard library equivalents if detected. Otherwise they will be proxied with internal implementations.
 
 The library uses exceptions and in some cases `std::error_code`'s to report errors.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
+
+## Benchmarks
+
+[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
+
+- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
+
+- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
+
+- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
+
+[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
 
 ## Examples
 
@@ -351,20 +365,20 @@ Output:
 ```
 Marilyn C
 begin_object
-name: application
+key: application
 string_value: hiking
-name: reputons
+key: reputons
 begin_array
 begin_object
-name: rater
+key: rater
 string_value: HikingAsylum
-name: assertion
+key: assertion
 string_value: advanced
-name: rated
+key: rated
 string_value: Marilyn C
-name: rating
+key: rating
 double_value: 0.9
-name: confidence
+key: confidence
 double_value: 0.99
 end_object
 end_array
@@ -403,7 +417,7 @@ int main()
         {
             case staj_event_type::string_value:
                 // Or std::string_view, if supported
-                std::cout << "string_value: " << event.get<jsoncons::string_view>() << "\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
             default:
                 std::cout << "Unhandled event type\n";
@@ -910,21 +924,11 @@ foo,UHVzcw,-18446744073709551617
 bar,UHVzcw==,273.15
 ```
 
-## Benchmarks
-
-[json_benchmarks](https://github.com/danielaparker/json_benchmarks) provides some measurements about how `jsoncons` compares to other `json` libraries.
-
-- [JSONTestSuite and JSON_checker test suites](https://danielaparker.github.io/json_benchmarks/) 
-
-- [Performance benchmarks with text and integers](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance.md)
-
-- [Performance benchmarks with text and doubles](https://github.com/danielaparker/json_benchmarks/blob/master/report/performance_fp.md)
-
-[JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) shows how jsoncons JsonPath compares with other implementations
-
 ## Supported compilers
 
-jsoncons uses some features that are new to C++ 11, including [move semantics](http://thbecker.net/articles/rvalue_references/section_02.html) and the [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) concept. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+jsoncons requires a C++11 compiler. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
+Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/google/oss-fuzz), with coverage for all parsers and encoders.
 
 | Compiler                | Version                   |Architecture | Operating System  | Notes |
 |-------------------------|---------------------------|-------------|-------------------|-------|
@@ -937,8 +941,6 @@ jsoncons uses some features that are new to C++ 11, including [move semantics](h
 |                         | 4.9.2                     | i386        | Debian 8          |       |
 | clang                   | 3.8 and above             | x64         | Ubuntu            |       |
 | clang xcode             | 6.4 and above             | x64         | OSX               |       |
-
-[UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 
 ## Building the test suite and examples with CMake
 

@@ -35,7 +35,7 @@ void read_mulitple_json_objects()
 
 void read_with_stateful_allocator()
 {
-    typedef basic_json<char,sorted_policy,FreelistAllocator<char>> my_json;
+    using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
     std::string input = R"(
 [ 
   { 

@@ -8,22 +8,14 @@
 #define JSONCONS_JSON_TRAITS_MACROS_HPP
 
 #include <algorithm> // std::swap
-#include <array>
-#include <cstring>
-#include <exception>
-#include <functional>
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
-#include <jsoncons/bignum.hpp>
 #include <jsoncons/config/jsoncons_config.hpp> // JSONCONS_EXPAND, JSONCONS_QUOTE
 #include <jsoncons/detail/more_type_traits.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <limits> // std::numeric_limits
-#include <memory>
 #include <string>
 #include <type_traits> // std::enable_if
-#include <unordered_map> // std::unordered_map
 #include <utility>
-#include <valarray>
 #include <jsoncons/json_type_traits.hpp>
 
 namespace jsoncons
@@ -32,6 +24,42 @@ namespace jsoncons
     template <class ChT,class T>
     struct json_traits_macro_names
     {};
+
+    template <class Json>
+    struct json_traits_helper
+    {
+        using string_view_type = typename Json::string_view_type; 
+
+        template <class U> 
+        static void set_udt_member(const Json&, const string_view_type&, const U&) 
+        { 
+        } 
+        template <class U> 
+        static void set_udt_member(const Json& j, const string_view_type& key, U& val) 
+        { 
+            val = j.at(key).template as<U>(); 
+        } 
+        template <class U> 
+        static void set_optional_json_member(const string_view_type& key, const std::shared_ptr<U>& val, Json& j) 
+        { 
+            if (val) j.try_emplace(key, val); 
+        } 
+        template <class U> 
+        static void set_optional_json_member(const string_view_type& key, const std::unique_ptr<U>& val, Json& j) 
+        { 
+            if (val) j.try_emplace(key, val); 
+        } 
+        template <class U> 
+        static void set_optional_json_member(const string_view_type& key, const jsoncons::optional<U>& val, Json& j) 
+        { 
+            if (val) j.try_emplace(key, val); 
+        } 
+        template <class U> 
+        static void set_optional_json_member(const string_view_type& key, const U& val, Json& j) 
+        { 
+            j.try_emplace(key, val); 
+        } 
+    };
 }
 
 #if defined(_MSC_VER)
@@ -180,16 +208,22 @@ namespace jsoncons
 #define JSONCONS_IS_LAST(Prefix, P2, P3, Member, Count) if ((num_params-Count) < num_mandatory_params1 && !ajson.contains(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}))) return false;
 
 #define JSONCONS_AS(Prefix,P2,P3, Member, Count) JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count)
-#define JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count) if ((num_params-Count) < num_mandatory_params2 || ajson.contains(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}))) {set_member(std::is_const<decltype(aval.Member)>(),ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);}
+#define JSONCONS_AS_LAST(Prefix,P2,P3, Member, Count) \
+    if ((num_params-Count) < num_mandatory_params2 || ajson.contains(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}))) \
+        {json_traits_helper<Json>::set_udt_member(ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);}
 
 #define JSONCONS_ALL_AS(Prefix, P2,P3,Member, Count) JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count)
-#define JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count) set_member(std::is_const<decltype(aval.Member)>(),ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);
+#define JSONCONS_ALL_AS_LAST(Prefix,P2,P3, Member, Count) \
+    json_traits_helper<Json>::set_udt_member(ajson,json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}),aval.Member);
 
 #define JSONCONS_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
-#define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count) if ((num_params-Count) < num_mandatory_params2) {ajson.try_emplace(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member);} else {set_json_member(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member, ajson);}
+#define JSONCONS_TO_JSON_LAST(Prefix, P2, P3, Member, Count) if ((num_params-Count) < num_mandatory_params2) \
+    {ajson.try_emplace(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member);} \
+    else {json_traits_helper<Json>::set_optional_json_member(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member, ajson);}
 
 #define JSONCONS_ALL_TO_JSON(Prefix, P2, P3, Member, Count) JSONCONS_ALL_TO_JSON_LAST(Prefix, P2, P3, Member, Count)
-#define JSONCONS_ALL_TO_JSON_LAST(Prefix, P2, P3, Member, Count) ajson.try_emplace(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member);
+#define JSONCONS_ALL_TO_JSON_LAST(Prefix, P2, P3, Member, Count) \
+    ajson.try_emplace(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member);
 
 #define JSONCONS_MEMBER_TRAITS_BASE(AsT,ToJ,NumTemplateParams,ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons \
@@ -202,10 +236,10 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -226,36 +260,6 @@ namespace jsoncons \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(ToJ, ,,, __VA_ARGS__) \
             return ajson; \
-        } \
-    private: \
-        template <class U> \
-        static void set_member(std::true_type, const Json&, const string_view_type&, U&) \
-        { \
-        } \
-        template <class U> \
-        static void set_member(std::false_type, const Json& j, const string_view_type& name, U& val) \
-        { \
-            val = j.at(name).template as<U>(); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const U& val, Json& j) \
-        { \
-            j.try_emplace(name, val); \
         } \
     }; \
 } \
@@ -287,18 +291,20 @@ namespace jsoncons \
 
 #define JSONCONS_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 || JSONCONS_EXPAND(JSONCONS_NAME_AS_ Seq)
-#define JSONCONS_NAME_AS_(Member, Name) ajson.contains(Name)) {set_member(std::is_const<decltype(aval.Member)>(),ajson,Name,aval.Member);}
+#define JSONCONS_NAME_AS_(Member, Name) ajson.contains(Name)) \
+    {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
 
 #define JSONCONS_ALL_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAME_AS_ Seq)
 #define JSONCONS_ALL_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAME_AS_ Seq)
-#define JSONCONS_ALL_NAME_AS_(Member, Name) set_member(std::is_const<decltype(aval.Member)>(),ajson,Name,aval.Member);
+#define JSONCONS_ALL_NAME_AS_(Member, Name) \
+    json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);
 
 #define JSONCONS_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_NAME_TO_JSON_ Seq)
 #define JSONCONS_NAME_TO_JSON_(Member, Name) \
   {ajson.try_emplace(Name, aval.Member);} \
 else \
-  {set_json_member(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member, ajson);}
+  {json_traits_helper<Json>::set_optional_json_member(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member, ajson);}
 
 #define JSONCONS_ALL_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAME_TO_JSON_ Seq)
 #define JSONCONS_ALL_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_NAME_TO_JSON_ Seq)
@@ -310,10 +316,10 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -334,36 +340,6 @@ namespace jsoncons \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(ToJ,,,, __VA_ARGS__) \
             return ajson; \
-        } \
-    private: \
-        template <class U> \
-        static void set_member(std::true_type, const Json&, const string_view_type&, U&) \
-        { \
-        } \
-        template <class U> \
-        static void set_member(std::false_type, const Json& j, const string_view_type& name, U& val) \
-        { \
-            val = j.at(name).template as<U>(); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const U& val, Json& j) \
-        { \
-            j.try_emplace(name, val); \
         } \
     }; \
 } \
@@ -403,7 +379,7 @@ if ((num_params-Count) < num_mandatory_params2) { \
        ajson.try_emplace(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member() ); \
   } \
 else { \
-  set_json_member(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member(), ajson); \
+  json_traits_helper<Json>::set_optional_json_member(json_traits_macro_names<char_type,value_type>::Member##_str(char_type{}), aval.Member(), ajson); \
 }
 
 #define JSONCONS_CTOR_GETTER_TRAITS_BASE(NumTemplateParams, ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -417,10 +393,10 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -439,26 +415,6 @@ namespace jsoncons \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_TO_JSON, ,,, __VA_ARGS__) \
             return ajson; \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const U& val, Json& j) \
-        { \
-            j.try_emplace(name, val); \
         } \
     }; \
 } \
@@ -499,7 +455,7 @@ namespace jsoncons \
   ajson.try_emplace(Name, aval.Member() ); \
 } \
 else { \
-  set_json_member(Name, aval.Member(), ajson); \
+  json_traits_helper<Json>::set_optional_json_member(Name, aval.Member(), ajson); \
 }
 
 #define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
@@ -508,10 +464,10 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -530,26 +486,6 @@ namespace jsoncons \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_NAME_TO_JSON,,,, __VA_ARGS__) \
             return ajson; \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const U& val, Json& j) \
-        { \
-            j.try_emplace(name, val); \
         } \
     }; \
 } \
@@ -590,12 +526,12 @@ namespace jsoncons \
     struct json_type_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
-        typedef EnumType value_type; \
-        typedef typename Json::char_type char_type; \
-        typedef std::basic_string<char_type> string_type; \
-        typedef basic_string_view<char_type> string_view_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef std::pair<EnumType,string_type> mapped_type; \
+        using value_type = EnumType; \
+        using char_type = typename Json::char_type; \
+        using string_type = std::basic_string<char_type>; \
+        using string_view_type = basic_string_view<char_type>; \
+        using allocator_type = typename Json::allocator_type; \
+        using mapped_type = std::pair<EnumType,string_type>; \
         \
         static std::pair<const mapped_type*,const mapped_type*> get_values() \
         { \
@@ -694,12 +630,12 @@ namespace jsoncons \
     struct json_type_traits<Json, EnumType> \
     { \
         static_assert(std::is_enum<EnumType>::value, # EnumType " must be an enum"); \
-        typedef EnumType value_type; \
-        typedef typename Json::char_type char_type; \
-        typedef std::basic_string<char_type> string_type; \
-        typedef basic_string_view<char_type> string_view_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef std::pair<EnumType,string_type> mapped_type; \
+        using value_type = EnumType; \
+        using char_type = typename Json::char_type; \
+        using string_type = std::basic_string<char_type>; \
+        using string_view_type = basic_string_view<char_type>; \
+        using allocator_type = typename Json::allocator_type; \
+        using mapped_type = std::pair<EnumType,string_type>; \
         \
         static std::pair<const mapped_type*,const mapped_type*> get_values() \
         { \
@@ -797,7 +733,7 @@ namespace jsoncons \
 if ((num_params-Count) < num_mandatory_params2) \
   {ajson.try_emplace(json_traits_macro_names<char_type,value_type>::Property##_str(char_type{}), aval.Getter());} \
 else \
-  {set_json_member(json_traits_macro_names<char_type,value_type>::Property##_str(char_type{}), aval.Getter(), ajson);}
+  {json_traits_helper<Json>::set_optional_json_member(json_traits_macro_names<char_type,value_type>::Property##_str(char_type{}), aval.Getter(), ajson);}
 
 #define JSONCONS_ALL_GETTER_SETTER_TO_JSON(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
 #define JSONCONS_ALL_GETTER_SETTER_TO_JSON_LAST(Prefix, GetPrefix, SetPrefix, Property, Count) JSONCONS_ALL_GETTER_SETTER_TO_JSON_(Prefix, GetPrefix ## Property, SetPrefix ## Property, Property, Count) 
@@ -814,10 +750,10 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -838,26 +774,6 @@ namespace jsoncons \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(ToJ, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return ajson; \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const U& val, Json& j) \
-        { \
-            j.try_emplace(name, val); \
         } \
     }; \
 } \
@@ -904,7 +820,7 @@ namespace jsoncons \
 #define JSONCONS_ALL_GETTER_SETTER_NAME_TO_JSON_(Getter, Setter, Name) \
   ajson.try_emplace(Name, aval.Getter()); \
 else \
-  {set_json_member(Name, aval.Getter(), ajson);}
+  {json_traits_helper<Json>::set_optional_json_member(Name, aval.Getter(), ajson);}
  
 #define JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(AsT,ToJ, NumTemplateParams, ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons \
@@ -912,10 +828,10 @@ namespace jsoncons \
     template<typename Json JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_MORE_TPL_PARAM, NumTemplateParams)> \
     struct json_type_traits<Json, ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> \
     { \
-        typedef ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams) value_type; \
-        typedef typename Json::allocator_type allocator_type; \
-        typedef typename Json::char_type char_type; \
-        typedef typename Json::string_view_type string_view_type; \
+        using value_type = ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams); \
+        using allocator_type = typename Json::allocator_type; \
+        using char_type = typename Json::char_type; \
+        using string_view_type = typename Json::string_view_type; \
         constexpr static size_t num_params = JSONCONS_NARGS(__VA_ARGS__); \
         constexpr static size_t num_mandatory_params1 = NumMandatoryParams1; \
         constexpr static size_t num_mandatory_params2 = NumMandatoryParams2; \
@@ -936,26 +852,6 @@ namespace jsoncons \
             Json ajson(json_object_arg, semantic_tag::none, alloc); \
             JSONCONS_VARIADIC_REP_N(ToJ,,,, __VA_ARGS__) \
             return ajson; \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::shared_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const std::unique_ptr<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const jsoncons::optional<U>& val, Json& j) \
-        { \
-            if (val) j.try_emplace(name, val); \
-        } \
-        template <class U> \
-        static void set_json_member(const string_view_type& name, const U& val, Json& j) \
-        { \
-            j.try_emplace(name, val); \
         } \
     }; \
 } \

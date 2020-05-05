@@ -25,11 +25,13 @@ T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (4)
 ```
 
-(1) Reads a JSON string value into a type T if T is an instantiation of [basic_json](../basic_json.md) 
-or if T supports [json_type_traits](../json_type_traits.md).
+(1) Reads a JSON string value into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
+Type T must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
 
-(2) Reads a JSON input stream into a type T if T is an instantiation of [basic_json](../basic_json.md) 
-or if T supports [json_type_traits](../json_type_traits.md).
+(2) Reads a JSON input stream into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
+Type T must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
 
 Functions (1)-(2) perform encodings using the default json type `basic_json<CharT>`.
 Functions (3)-(4) are the same except `temp_alloc` is used to allocate temporary work areas.
@@ -46,7 +48,7 @@ Functions (3)-(4) are the same except `temp_alloc` is used to allocate temporary
 
 int main()
 {
-    typedef std::map<std::string,std::tuple<std::string,std::string,double>> employee_collection;
+    using employee_collection = std::map<std::string,std::tuple<std::string,std::string,double>>;
 
     std::string s = R"(
     {

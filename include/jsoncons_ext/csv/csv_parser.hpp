@@ -96,12 +96,12 @@ namespace detail {
     template <class CharT,class TempAllocator>
     class parse_event
     {
-        typedef TempAllocator temp_allocator_type;
-        typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
-        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
-        typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
-        typedef basic_byte_string<byte_allocator_type> byte_string_type;
+        using temp_allocator_type = TempAllocator;
+        using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
+        using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
+        using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
+        using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
+        using byte_string_type = basic_byte_string<byte_allocator_type>;
 
         staj_event_type event_type;
         string_type string_value;
@@ -211,17 +211,17 @@ namespace detail {
     class m_columns_filter : public basic_json_visitor<CharT>
     {
     public:
-        typedef typename basic_json_visitor<CharT>::string_view_type string_view_type;
-        typedef CharT char_type;
-        typedef TempAllocator temp_allocator_type;
+        using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
+        using char_type = CharT;
+        using temp_allocator_type = TempAllocator;
 
-        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-        typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+        using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
+        using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
 
-        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
-        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event<CharT,TempAllocator>> parse_event_allocator_type;
-        typedef std::vector<parse_event<CharT,TempAllocator>, parse_event_allocator_type> parse_event_vector_type;
-        typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event_vector_type> parse_event_vector_allocator_type;
+        using string_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type>;
+        using parse_event_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event<CharT,TempAllocator>>;
+        using parse_event_vector_type = std::vector<parse_event<CharT,TempAllocator>, parse_event_allocator_type>;
+        using parse_event_vector_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_event_vector_type>;
     private:
         TempAllocator alloc_;
         std::size_t name_index_;
@@ -485,8 +485,8 @@ template<class CharT,class TempAllocator=std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
 public:
-    typedef basic_string_view<CharT> string_view_type;
-    typedef CharT char_type;
+    using string_view_type = basic_string_view<CharT>;
+    using char_type = CharT;
 private:
     struct string_maps_to_double
     {
@@ -498,9 +498,9 @@ private:
         }
     };
 
-    typedef TempAllocator temp_allocator_type;
+    using temp_allocator_type = TempAllocator;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    typedef std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_type;
+    using string_type = std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type>;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<string_type> string_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_mode> csv_mode_allocator_type;
     typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<csv_type_info> csv_type_info_allocator_type;
@@ -520,7 +520,7 @@ private:
     std::size_t column_index_;
     std::size_t level_;
     std::size_t offset_;
-    jsoncons::detail::string_to_double to_double_; 
+    jsoncons::detail::to_double_t to_double_; 
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
@@ -620,7 +620,7 @@ public:
         level_ = 0;
     }
 
-    ~basic_csv_parser()
+    ~basic_csv_parser() noexcept
     {
     }
 
@@ -683,6 +683,10 @@ public:
         {
             switch (state_)
             {
+                case csv_parse_state::start:
+                    ec = csv_errc::source_error;
+                    more_ = false;
+                    return;
                 case csv_parse_state::before_unquoted_field:
                 case csv_parse_state::before_last_unquoted_field:
                     end_unquoted_string_value(ec);
@@ -982,6 +986,17 @@ public:
                                 }
                                 before_value(ec);
                                 state_ = csv_parse_state::before_quoted_subfield;
+                            }
+                            else if (curr_char == ' ' || curr_char == '\t')
+                            {
+                                ++column_;
+                                ++input_ptr_;
+                            }
+                            else
+                            {
+                                ec = csv_errc::unexpected_char_between_fields;
+                                more_ = false;
+                                return;
                             }
                             break;
                     }
@@ -1891,10 +1906,6 @@ private:
                         buffer.push_back(*p);
                         state = numeric_check_state::integer;
                         break;
-                    case 'e':case 'E':
-                        buffer.push_back(*p);
-                        state = numeric_check_state::exp1;
-                        break;
                     default:
                         state = numeric_check_state::done;
                         break;
@@ -1991,7 +2002,7 @@ private:
             {
                 if (is_negative)
                 {
-                    auto result = jsoncons::detail::integer_from_json<int64_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<int64_t>(buffer_.data(), buffer_.length());
                     if (result)
                     {
                         more_ = visitor_->int64_value(result.value(), semantic_tag::none, *this, ec);
@@ -2003,7 +2014,7 @@ private:
                 }
                 else
                 {
-                    auto result = jsoncons::detail::integer_from_json<uint64_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<uint64_t>(buffer_.data(), buffer_.length());
                     if (result)
                     {
                         more_ = visitor_->uint64_value(result.value(), semantic_tag::none, *this, ec);
@@ -2015,6 +2026,7 @@ private:
                     else
                     {
                         ec = result.error_code();
+                        more_ = false;
                         return;
                     }
                 }
@@ -2056,8 +2068,8 @@ private:
     }
 };
 
-typedef basic_csv_parser<char> csv_parser;
-typedef basic_csv_parser<wchar_t> wcsv_parser;
+using csv_parser = basic_csv_parser<char>;
+using wcsv_parser = basic_csv_parser<wchar_t>;
 
 }}
 

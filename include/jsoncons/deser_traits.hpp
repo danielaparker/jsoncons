@@ -16,7 +16,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_reader.hpp>
-#include <jsoncons/conversion_error.hpp>
+#include <jsoncons/convert_error.hpp>
 
 namespace jsoncons {
 
@@ -104,38 +104,38 @@ namespace jsoncons {
             using value_type = std::pair<T1, T2>;
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             reader.next(ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
 
             T1 v1 = deser_traits<T1,CharT>::deserialize(reader, decoder, ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             reader.next(ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             T2 v2 = deser_traits<T2, CharT>::deserialize(reader, decoder, ec);
             if (ec)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             reader.next(ec);
             if (ec || reader.current().event_type() != staj_event_type::end_array)
             {
-                ec = conversion_errc::json_not_pair;
+                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             return std::make_pair(v1, v2);
@@ -146,11 +146,12 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_vector_like<T>::value &&
+                 jsoncons::detail::is_list_like<T>::value &&
+                 jsoncons::detail::has_push_back<T>::value &&
                  !jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 
@@ -161,7 +162,7 @@ namespace jsoncons {
 
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return v;
             }
             reader.next(ec);
@@ -180,10 +181,10 @@ namespace jsoncons {
         T& v_;
         int level_;
     public:
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         typed_array_visitor(T& v)
-            : default_json_visitor(false,conversion_errc::json_not_vector), v_(v), level_(0)
+            : default_json_visitor(false,convert_errc::json_not_vector), v_(v), level_(0)
         {
         }
     private:
@@ -193,7 +194,7 @@ namespace jsoncons {
         {      
             if (++level_ != 1)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return false;
             }
             return true;
@@ -206,7 +207,7 @@ namespace jsoncons {
         {
             if (++level_ != 1)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return false;
             }
             v_.reserve(size);
@@ -218,7 +219,7 @@ namespace jsoncons {
         {
             if (level_ != 1)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return false;
             }
             return false;
@@ -284,11 +285,11 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_vector_like<T>::value &&
+                 jsoncons::detail::is_list_like<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 
@@ -299,7 +300,7 @@ namespace jsoncons {
 
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
                 return v;
             }
 
@@ -314,7 +315,7 @@ namespace jsoncons {
     template <class T, class CharT, std::size_t N>
     struct deser_traits<std::array<T,N>,CharT>
     {
-        typedef typename std::array<T,N>::value_type value_type;
+        using value_type = typename std::array<T,N>::value_type;
 
         template <class Json,class TempAllocator>
         static std::array<T, N> deserialize(basic_staj_reader<CharT>& reader, 
@@ -325,7 +326,7 @@ namespace jsoncons {
             v.fill(T{});
             if (reader.current().event_type() != staj_event_type::begin_array)
             {
-                ec = conversion_errc::json_not_vector;
+                ec = convert_errc::json_not_vector;
             }
             reader.next(ec);
             for (std::size_t i = 0; i < N && reader.current().event_type() != staj_event_type::end_array && !ec; ++i)
@@ -346,9 +347,9 @@ namespace jsoncons {
                                 jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 
@@ -358,7 +359,7 @@ namespace jsoncons {
             T val;
             if (reader.current().event_type() != staj_event_type::begin_object)
             {
-                ec = conversion_errc::json_not_map;
+                ec = convert_errc::json_not_map;
                 return val;
             }
             reader.next(ec);
@@ -386,9 +387,9 @@ namespace jsoncons {
                                 std::is_integral<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_reader<CharT>& reader, 
@@ -398,7 +399,7 @@ namespace jsoncons {
             T val;
             if (reader.current().event_type() != staj_event_type::begin_object)
             {
-                ec = conversion_errc::json_not_map;
+                ec = convert_errc::json_not_map;
                 return val;
             }
             reader.next(ec);

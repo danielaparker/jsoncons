@@ -94,13 +94,13 @@ public:
     template<typename U>
     struct rebind
     {
-        typedef FreelistAllocator<U> other;
+        using other = FreelistAllocator<U>;
     };
-    typedef T* pointer;
-    typedef const T* const_pointer;
-    typedef T& reference;
-    typedef const T& const_reference;
-    typedef std::ptrdiff_t difference_type;
+    using pointer = T*;
+    using const_pointer = const T*;
+    using reference = T&;
+    using const_reference = const T&;
+    using difference_type = std::ptrdiff_t;
 };
 
 template <typename T, typename U>

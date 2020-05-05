@@ -30,14 +30,14 @@ template <class Json, class JsonPointer>
 class function_table
 {
 public:
-    typedef typename Json::char_type char_type;
-    typedef typename Json::char_traits_type char_traits_type;
-    typedef std::basic_string<char_type,char_traits_type> string_type;
-    typedef typename Json::string_view_type string_view_type;
-    typedef JsonPointer pointer;
-    typedef std::vector<pointer> argument_type;
+    using char_type = typename Json::char_type;
+    using char_traits_type = typename Json::char_traits_type;
+    using string_type = std::basic_string<char_type,char_traits_type>;
+    using string_view_type = typename Json::string_view_type;
+    using pointer = JsonPointer;
+    using argument_type = std::vector<pointer>;
     typedef std::function<Json(const std::vector<argument_type>&, std::error_code&)> function_type;
-    typedef std::map<basic_string_view<char_type>,function_type> function_dictionary;
+    using function_dictionary = std::map<basic_string_view<char_type>,function_type>;
 private:
     const function_dictionary functions_ =
     {

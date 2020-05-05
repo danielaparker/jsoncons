@@ -33,14 +33,14 @@ class basic_cbor_encoder final : public basic_json_visitor<char>
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
 public:
-    typedef Allocator allocator_type;
-    typedef Sink sink_type;
+    using allocator_type = Allocator;
+    using sink_type = Sink;
     using typename super_type::char_type;
     using typename super_type::string_view_type;
 
 private:
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type> char_allocator_type;
-    typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t> byte_allocator_type;
+    using char_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<char_type>;
+    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
 
     using string_type = std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type>;
     using byte_string_type = basic_byte_string<byte_allocator_type>;
@@ -90,6 +90,7 @@ private:
     std::map<string_type,size_t,std::less<string_type>,string_size_allocator_type> stringref_map_;
     std::map<byte_string_type,size_t,std::less<byte_string_type>,byte_string_size_allocator_type> bytestringref_map_;
     std::size_t next_stringref_ = 0;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_cbor_encoder(const basic_cbor_encoder&) = delete;
@@ -106,11 +107,12 @@ public:
        : sink_(std::forward<Sink>(sink)), 
          options_(options), 
          alloc_(alloc),
-         stack_(alloc)
+         stack_(alloc),
 #if !defined(JSONCONS_NO_MAP_TAKING_ALLOCATOR) 
-         , stringref_map_(alloc),
-         bytestringref_map_(alloc)
-#endif
+         stringref_map_(alloc),
+         bytestringref_map_(alloc),
+#endif 
+         nesting_depth_(0)        
     {
         if (options.pack_strings())
         {
@@ -118,7 +120,7 @@ public:
         }
     }
 
-    ~basic_cbor_encoder()
+    ~basic_cbor_encoder() noexcept
     {
         JSONCONS_TRY
         {
@@ -137,16 +139,26 @@ private:
         sink_.flush();
     }
 
-    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = cbor_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
         
         sink_.push_back(0xbf);
         return true;
     }
 
-    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = cbor_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::object, length));
 
         if (length <= 0x17)
@@ -189,6 +201,8 @@ private:
     bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
+
         if (stack_.back().is_indefinite_length())
         {
             sink_.push_back(0xff);
@@ -213,15 +227,25 @@ private:
         return true;
     }
 
-    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = cbor_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
         sink_.push_back(0x9f);
         return true;
     }
 
-    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = cbor_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(cbor_container_type::array, length));
         if (length <= 0x17)
         {
@@ -262,6 +286,7 @@ private:
     bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
 
         if (stack_.back().is_indefinite_length())
         {
@@ -313,7 +338,7 @@ private:
         auto sink = unicons::validate(sv.begin(), sv.end());
         if (sink.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Illegal unicode"));
+            JSONCONS_THROW(ser_error(cbor_errc::invalid_utf8_text_string));
         }
 
         if (options_.pack_strings() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
@@ -465,7 +490,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_bigdec;
+                            ec = cbor_errc::invalid_decimal_fraction;
                             return false;
                         }
                     }
@@ -487,7 +512,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_bigdec;
+                            ec = cbor_errc::invalid_decimal_fraction;
                             return false;
                         }
                     }
@@ -510,7 +535,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_bigdec;
+                            ec = cbor_errc::invalid_decimal_fraction;
                             return false;
                         }
                     }
@@ -525,7 +550,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_bigdec;
+                            ec = cbor_errc::invalid_decimal_fraction;
                             return false;
                         }
                     }
@@ -541,7 +566,7 @@ private:
                             break;
                         default:
                         {
-                            ec = cbor_errc::invalid_bigdec;
+                            ec = cbor_errc::invalid_decimal_fraction;
                             return false;
                         }
                     }
@@ -555,7 +580,7 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            auto sink = jsoncons::detail::integer_from_json<int64_t>(exponent.data(), exponent.length());
+            auto sink = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
             if (!sink)
             {
                 ec = sink.error_code();
@@ -566,7 +591,7 @@ private:
         more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
-        auto sink = jsoncons::detail::integer_from_json<int64_t>(s.data(),s.length());
+        auto sink = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
         if (sink)
         {
             more = visit_int64(sink.value(), semantic_tag::none, context, ec);
@@ -1138,7 +1163,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             switch (tag)
             {
@@ -1172,7 +1197,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint16_t(), 
@@ -1202,7 +1227,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint32_t(), 
@@ -1232,7 +1257,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   uint64_t(), 
@@ -1262,7 +1287,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_tag(0x48);
             std::vector<uint8_t> v(data.size()*sizeof(int8_t));
@@ -1290,7 +1315,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int16_t(), 
@@ -1320,7 +1345,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int32_t(), 
@@ -1350,7 +1375,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   int64_t(), 
@@ -1380,7 +1405,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   half_arg, 
@@ -1410,7 +1435,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   float(), 
@@ -1440,7 +1465,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        if (options_.enable_typed_arrays())
+        if (options_.use_typed_arrays())
         {
             write_typed_array_tag(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>(), 
                                   double(), 
@@ -1635,8 +1660,8 @@ private:
     }
 };
 
-typedef basic_cbor_encoder<jsoncons::binary_stream_sink> cbor_stream_encoder;
-typedef basic_cbor_encoder<jsoncons::bytes_sink> cbor_bytes_encoder;
+using cbor_stream_encoder = basic_cbor_encoder<jsoncons::binary_stream_sink>;
+using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_bytes_serializer;

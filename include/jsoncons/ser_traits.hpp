@@ -17,7 +17,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
-#include <jsoncons/conversion_error.hpp>
+#include <jsoncons/convert_error.hpp>
 
 namespace jsoncons {
 
@@ -178,7 +178,63 @@ namespace jsoncons {
             ser_traits<T2,CharT>::serialize(val.second, encoder, context_j, ec);
             if (ec) return;
             encoder.end_array(ser_context(),ec);
+        }
+    };
+
+    // std::tuple
+
+    namespace detail
+    {
+        template<size_t Pos, size_t Size, class Json, class Tuple>
+        struct json_serialize_tuple_helper
+        {
+            using char_type = typename Json::char_type;
+            using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
+            using next = json_serialize_tuple_helper<Pos-1, Size, Json, Tuple>;
+
+            static void serialize(const Tuple& tuple,
+                                  basic_json_visitor<char_type>& encoder, 
+                                  const Json& context_j, 
+                                  std::error_code& ec)
+            {
+                ser_traits<element_type,char_type>::serialize(std::get<Size-Pos>(tuple), encoder, context_j, ec);
+                if (ec) return;
+                next::serialize(tuple, encoder, context_j, ec);
+            }
+        };
+
+        template<size_t Size, class Json, class Tuple>
+        struct json_serialize_tuple_helper<0, Size, Json, Tuple>
+        {
+            using char_type = typename Json::char_type;
+            static void serialize(const Tuple&,
+                                  basic_json_visitor<char_type>&, 
+                                  const Json&, 
+                                  std::error_code&)
+            {
+            }
+        };
+    } // namespace detail
+
+
+    template <class CharT, typename... E>
+    struct ser_traits<std::tuple<E...>, CharT>
+    {
+        using value_type = std::tuple<E...>;
+        static constexpr std::size_t size = sizeof...(E);
+
+        template <class Json>
+        static void serialize(const value_type& val, 
+                              basic_json_visitor<CharT>& encoder, 
+                              const Json& context_j, 
+                              std::error_code& ec)
+        {
+            using helper = jsoncons::detail::json_serialize_tuple_helper<size, size, Json, std::tuple<E...>>;
+            encoder.begin_array(semantic_tag::none,ser_context(),ec);
             if (ec) return;
+            helper::serialize(val, encoder, context_j, ec);
+            if (ec) return;
+            encoder.end_array(ser_context(),ec);
         }
     };
 
@@ -186,11 +242,11 @@ namespace jsoncons {
     template <class T, class CharT>
     struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_vector_like<T>::value &&
+                 jsoncons::detail::is_list_like<T>::value &&
                  !jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json>
         static void serialize(const T& val, 
@@ -212,11 +268,11 @@ namespace jsoncons {
     template <class T, class CharT>
     struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_vector_like<T>::value &&
+                 jsoncons::detail::is_list_like<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
-        typedef typename T::value_type value_type;
+        using value_type = typename T::value_type;
 
         template <class Json>
         static void serialize(const T& val, 
@@ -233,7 +289,7 @@ namespace jsoncons {
     template <class T, class CharT, std::size_t N>
     struct ser_traits<std::array<T,N>,CharT>
     {
-        typedef typename std::array<T,N>::value_type value_type;
+        using value_type = typename std::array<T,N>::value_type;
 
         template <class Json>
         static void serialize(const std::array<T, N>& val, 
@@ -261,9 +317,9 @@ namespace jsoncons {
                                 jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json>
         static void serialize(const T& val, 
@@ -291,9 +347,9 @@ namespace jsoncons {
                                 std::is_integral<typename T::key_type>::value
     >::type>
     {
-        typedef typename T::mapped_type mapped_type;
-        typedef typename T::value_type value_type;
-        typedef typename T::key_type key_type;
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
 
         template <class Json>
         static void serialize(const T& val, 

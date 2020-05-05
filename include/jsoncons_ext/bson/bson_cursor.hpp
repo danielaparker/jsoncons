@@ -29,13 +29,12 @@ template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator
 class basic_bson_cursor : public basic_staj_reader<char>, private virtual ser_context
 {
 public:
-    typedef Src source_type;
-    typedef char char_type;
-    typedef Allocator allocator_type;
+    using source_type = Src;
+    using char_type = char;
+    using allocator_type = Allocator;
 private:
-    basic_staj_visitor<char_type> event_handler_;
-
     basic_bson_parser<Src,Allocator> parser_;
+    basic_staj_visitor<char_type> event_handler_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -43,26 +42,36 @@ private:
     basic_bson_cursor& operator=(const basic_bson_cursor&) = delete;
 
 public:
-    typedef string_view string_view_type;
+    using string_view_type = string_view;
 
     template <class Source>
     basic_bson_cursor(Source&& source,
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc),
-         eof_(false)
+       : basic_bson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           bson_decode_options(),
+                           alloc)
     {
-        if (!done())
-        {
-            next();
-        }
+    }
+
+    template <class Source>
+    basic_bson_cursor(Source&& source,
+                      const bson_decode_options& options,
+                      const Allocator& alloc = Allocator())
+       : basic_bson_cursor(std::forward<Source>(source), 
+                           accept_all,
+                           options,
+                           alloc)
+    {
     }
 
     template <class Source>
     basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), alloc), 
-         event_handler_(filter),
+       : parser_(std::forward<Source>(source), options, alloc), 
+         event_handler_(filter), 
          eof_(false)
     {
         if (!done())
@@ -206,8 +215,8 @@ private:
     }
 };
 
-typedef basic_bson_cursor<jsoncons::binary_stream_source> bson_stream_cursor;
-typedef basic_bson_cursor<jsoncons::bytes_source> bson_bytes_cursor;
+using bson_stream_cursor = basic_bson_cursor<jsoncons::binary_stream_source>;
+using bson_bytes_cursor = basic_bson_cursor<jsoncons::bytes_source>;
 
 } // namespace bson
 } // namespace jsoncons

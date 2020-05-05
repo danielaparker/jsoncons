@@ -4,15 +4,15 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONVERSION_ERROR_HPP
-#define JSONCONS_CONVERSION_ERROR_HPP
+#ifndef JSONCONS_CONVERT_ERROR_HPP
+#define JSONCONS_CONVERT_ERROR_HPP
 
 #include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 
-    enum class conversion_errc
+    enum class convert_errc
     {
         success = 0,
         json_not_vector,
@@ -24,7 +24,7 @@ namespace jsoncons {
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::conversion_errc> : public true_type
+    struct is_error_code_enum<jsoncons::convert_errc> : public true_type
     {
     };
 }
@@ -32,7 +32,7 @@ namespace std {
 namespace jsoncons {
 
 namespace detail {
-    class conversion_error_category_impl
+    class convert_error_category_impl
        : public std::error_category
     {
     public:
@@ -42,15 +42,15 @@ namespace detail {
         }
         std::string message(int ev) const override
         {
-            switch (static_cast<conversion_errc>(ev))
+            switch (static_cast<convert_errc>(ev))
             {
-                case conversion_errc::json_not_vector:
+                case convert_errc::json_not_vector:
                     return "json cannot be converted to vector";
-                case conversion_errc::json_not_array:
+                case convert_errc::json_not_array:
                     return "json cannot be converted to array";
-                case conversion_errc::json_not_map:
+                case convert_errc::json_not_map:
                     return "json cannot be converted to map";
-                case conversion_errc::json_not_pair:
+                case convert_errc::json_not_pair:
                     return "json cannot be converted to std::pair";
                 default:
                     return "Unknown conversion error";
@@ -60,16 +60,16 @@ namespace detail {
 } // detail
 
 extern inline
-const std::error_category& conversion_error_category()
+const std::error_category& convert_error_category()
 {
-  static detail::conversion_error_category_impl instance;
+  static detail::convert_error_category_impl instance;
   return instance;
 }
 
 inline 
-std::error_code make_error_code(conversion_errc result)
+std::error_code make_error_code(convert_errc result)
 {
-    return std::error_code(static_cast<int>(result),conversion_error_category());
+    return std::error_code(static_cast<int>(result),convert_error_category());
 }
 
 }

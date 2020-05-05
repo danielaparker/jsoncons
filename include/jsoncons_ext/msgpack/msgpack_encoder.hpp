@@ -19,6 +19,7 @@
 #include <jsoncons/detail/parse_number.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
+#include <jsoncons_ext/msgpack/msgpack_options.hpp>
 
 namespace jsoncons { namespace msgpack {
 
@@ -29,10 +30,10 @@ class basic_msgpack_encoder final : public basic_json_visitor<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
 public:
-    typedef Allocator allocator_type;
-    typedef char char_type;
+    using allocator_type = Allocator;
+    using char_type = char;
     using typename basic_json_visitor<char>::string_view_type;
-    typedef Sink sink_type;
+    using sink_type = Sink;
 
 private:
     struct stack_item
@@ -69,9 +70,11 @@ private:
     };
 
     Sink sink_;
+    const msgpack_encode_options options_;
     allocator_type alloc_;
 
     std::vector<stack_item> stack_;
+    int nesting_depth_;
 
     // Noncopyable and nonmoveable
     basic_msgpack_encoder(const basic_msgpack_encoder&) = delete;
@@ -79,20 +82,23 @@ private:
 public:
     explicit basic_msgpack_encoder(Sink&& sink, 
                                    const Allocator& alloc = Allocator())
-       : sink_(std::forward<Sink>(sink)), 
-         alloc_(alloc)
+       : basic_msgpack_encoder(std::forward<Sink>(sink), msgpack_encode_options(), alloc)
     {
     }
 
-    ~basic_msgpack_encoder()
+    explicit basic_msgpack_encoder(Sink&& sink, 
+                                   const msgpack_encode_options& options, 
+                                   const Allocator& alloc = Allocator())
+       : sink_(std::forward<Sink>(sink)),
+         options_(options),
+         alloc_(alloc),
+         nesting_depth_(0)
     {
-        JSONCONS_TRY
-        {
-            sink_.flush();
-        }
-        JSONCONS_CATCH(...)
-        {
-        }
+    }
+
+    ~basic_msgpack_encoder() noexcept
+    {
+        sink_.flush();
     }
 
 private:
@@ -109,8 +115,13 @@ private:
         return false;
     }
 
-    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = msgpack_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(msgpack_container_type::object, length));
 
         if (length <= 15)
@@ -142,6 +153,7 @@ private:
     bool visit_end_object(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+        --nesting_depth_;
 
         if (stack_.back().count() < stack_.back().length())
         {
@@ -165,8 +177,13 @@ private:
         return false;
     }
 
-    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        {
+            ec = msgpack_errc::max_nesting_depth_exceeded;
+            return false;
+        } 
         stack_.push_back(stack_item(msgpack_container_type::array, length));
         if (length <= 15)
         {
@@ -191,6 +208,8 @@ private:
     bool visit_end_array(const ser_context&, std::error_code& ec) override
     {
         JSONCONS_ASSERT(!stack_.empty());
+
+        --nesting_depth_;
 
         if (stack_.back().count() < stack_.back().length())
         {
@@ -458,8 +477,8 @@ private:
     }
 };
 
-typedef basic_msgpack_encoder<jsoncons::binary_stream_sink> msgpack_stream_encoder;
-typedef basic_msgpack_encoder<jsoncons::bytes_sink> msgpack_bytes_encoder;
+using msgpack_stream_encoder = basic_msgpack_encoder<jsoncons::binary_stream_sink>;
+using msgpack_bytes_encoder = basic_msgpack_encoder<jsoncons::bytes_sink>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use msgpack_bytes_encoder") typedef msgpack_bytes_encoder msgpack_bytes_serializer;
