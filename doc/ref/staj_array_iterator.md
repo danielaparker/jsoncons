@@ -10,7 +10,7 @@ class staj_array_iterator
 ```
 
 A `staj_array_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
-accesses the individual stream events from a [staj_reader](staj_reader.md) and, provided that when it is constructed
+accesses the individual stream events from a [staj_cursor](staj_cursor.md) and, provided that when it is constructed
 the current stream event has type `staj_event_type::begin_array`, it retrieves the elements of the JSON array
 as items of type `T`. If when it is constructed the current stream event does not have type `staj_event_type::begin_array`,
 it becomes equal to the default-constructed iterator.
@@ -30,9 +30,9 @@ Member type                         |Definition
 
     staj_array_iterator() noexcept; // (1)
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader); // (2)
+    staj_array_iterator(basic_staj_cursor<char_type>& reader); // (2)
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader,
+    staj_array_iterator(basic_staj_cursor<char_type>& reader,
                         std::error_code& ec); // (3)
 
 (1) Constructs the end iterator
@@ -73,10 +73,10 @@ Range-based for loop support
 (2) Returns a default-constructed `stax_array_iterator`, which serves as an end iterator. The argument is ignored.
 
     template <class T, class CharT>
-    staj_array_iterator<Json, T> make_array_iterator(basic_staj_reader<CharT>& reader); // (1)
+    staj_array_iterator<Json, T> make_array_iterator(basic_staj_cursor<CharT>& reader); // (1)
 
     template <class T, class CharT>
-    staj_array_iterator<Json, T> make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec); // (1)
+    staj_array_iterator<Json, T> make_array_iterator(basic_staj_cursor<CharT>& reader, std::error_code& ec); // (1)
 
 (1) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
 

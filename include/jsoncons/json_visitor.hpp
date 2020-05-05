@@ -1326,6 +1326,87 @@ namespace jsoncons {
 
     };
 
+    template <class CharT>
+    class basic_json_diagnostics_visitor : public basic_default_json_visitor<CharT>
+    {
+        using supertype = basic_default_json_visitor<CharT>;
+        using string_view_type = typename supertype::string_view_type;
+
+        static constexpr CharT visit_begin_array_name[] = {'v','i','s','i','t','_','b','e','g','i','n','_','a','r','r','a','y', 0};
+        static constexpr CharT visit_end_array_name[] =  {'v','i','s','i','t','_','e','n','d','_','a','r','r','a','y', 0};
+        static constexpr CharT visit_begin_object_name[] =  {'v','i','s','i','t','_','b','e','g','i','n','_','o','b','j','e','c','t', 0};
+        static constexpr CharT visit_end_object_name[] =  {'v','i','s','i','t','_','e','n','d','_','o','b','j','e','c','t', 0};
+        static constexpr CharT visit_key_name[] =  {'v','i','s','i','t','_','k','e','y', 0};
+        static constexpr CharT visit_string_name[] =  {'v','i','s','i','t','_','s','t','r','i','n','g', 0};
+        static constexpr CharT visit_byte_string_name[] =  {'v','i','s','i','t','_','b','y','t','e','_','s','t','r','i','n','g', 0};
+        static constexpr CharT visit_null_name[] =  {'v','i','s','i','t','_','n','u','l','l', 0};
+        static constexpr CharT visit_bool_name[] =  {'v','i','s','i','t','_','b','o','o','l', 0};
+        static constexpr CharT visit_uint64_name[] =  {'v','i','s','i','t','_','u','i','n','t','6','4', 0};
+        static constexpr CharT visit_int64_name[] =  {'v','i','s','i','t','_','i','n','t','6','4', 0};
+        static constexpr CharT visit_half_name[] =  {'v','i','s','i','t','_','h','a','l','f', 0};
+        static constexpr CharT visit_double_name[] =  {'v','i','s','i','t','_','d','o','u','b','l','e', 0};
+
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_begin_object_name << std::endl; 
+            return true;
+        }
+
+        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_begin_object_name << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_object(const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_end_object_name << std::endl; 
+            return true;
+        }
+        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_begin_array_name << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_array(const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_end_array_name << std::endl; 
+            return true;
+        }
+
+        bool visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_key_name << s << std::endl; 
+            return true;
+        }
+        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_string_name << s << std::endl; 
+            return true;
+        }
+        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_int64_name << val << std::endl; 
+            return true;
+        }
+        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_uint64_name << val << std::endl; 
+            return true;
+        }
+        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_bool_name << val << std::endl; 
+            return true;
+        }
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_null_name << std::endl; 
+            return true;
+        }
+    };
+
     using json_visitor = basic_json_visitor<char>;
     using wjson_visitor = basic_json_visitor<wchar_t>;
 
@@ -1334,6 +1415,9 @@ namespace jsoncons {
 
     using default_json_visitor = basic_default_json_visitor<char>;
     using wdefault_json_visitor = basic_default_json_visitor<wchar_t>;
+
+    using json_diagnostics_visitor = basic_json_diagnostics_visitor<char>;
+    using wjson_diagnostics_visitor = basic_json_diagnostics_visitor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT>

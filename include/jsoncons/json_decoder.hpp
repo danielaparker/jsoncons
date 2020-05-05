@@ -231,14 +231,6 @@ private:
 
     bool visit_end_array(const ser_context&, std::error_code&) override
     {
-        //std::cout << "visit_end_array " << item_stack_.size() << "\n";
-
-        //std::cout << "structure_stack\n";
-        //for (auto& info : structure_stack_)
-        {
-            //std::cout << "type: " << (int)info.type_ << ", offset " << info.container_index_ << "\n";
-        }
-
         JSONCONS_ASSERT(structure_stack_.size() > 1);
         JSONCONS_ASSERT(structure_stack_.back().type_ == structure_type::array_t);
         const size_t container_index = structure_stack_.back().container_index_;

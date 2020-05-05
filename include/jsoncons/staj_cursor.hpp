@@ -498,7 +498,7 @@ private:
 
 // basic_staj_visitor
 
-enum class staj_reader_state
+enum class staj_cursor_state
 {
     typed_array = 1,
     multi_dim,
@@ -733,7 +733,7 @@ private:
     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter_;
     basic_staj_event<CharT> event_;
 
-    staj_reader_state state_;
+    staj_cursor_state state_;
     typed_array_view data_;
     span<const size_t> shape_;
     std::size_t index_;
@@ -757,18 +757,18 @@ public:
 
     bool in_available() const
     {
-        return state_ != staj_reader_state();
+        return state_ != staj_cursor_state();
     }
 
     void send_available(std::error_code& ec)
     {
         switch (state_)
         {
-            case staj_reader_state::typed_array:
+            case staj_cursor_state::typed_array:
                 advance_typed_array(ec);
                 break;
-            case staj_reader_state::multi_dim:
-            case staj_reader_state::shape:
+            case staj_cursor_state::multi_dim:
+            case staj_cursor_state::shape:
                 advance_multi_dim(ec);
                 break;
             default:
@@ -781,7 +781,7 @@ public:
         return data_.type() != typed_array_type();
     }
 
-    staj_reader_state state() const
+    staj_cursor_state state() const
     {
         return state_;
     }
@@ -857,7 +857,7 @@ public:
             else
             {
                 this->end_array();
-                state_ = staj_reader_state();
+                state_ = staj_cursor_state();
                 data_ = typed_array_view();
                 index_ = 0;
             }
@@ -868,10 +868,10 @@ public:
     {
         if (shape_.size() != 0)
         {
-            if (state_ == staj_reader_state::multi_dim)
+            if (state_ == staj_cursor_state::multi_dim)
             {
                 this->begin_array(shape_.size(), semantic_tag::none, ser_context(), ec);
-                state_ = staj_reader_state::shape;
+                state_ = staj_cursor_state::shape;
             }
             else if (index_ < shape_.size())
             {
@@ -880,7 +880,7 @@ public:
             }
             else
             {
-                state_ = staj_reader_state();
+                state_ = staj_cursor_state();
                 this->end_array(ser_context(), ec);
                 shape_ = span<const size_t>();
                 index_ = 0;
@@ -960,7 +960,7 @@ public:
                     else
                     {
                         more = visitor.end_array();
-                        state_ = staj_reader_state();
+                        state_ = staj_cursor_state();
                         data_ = typed_array_view();
                         index_ = 0;
                     }
@@ -1024,7 +1024,7 @@ public:
                         break;
                 }
 
-                state_ = staj_reader_state();
+                state_ = staj_cursor_state();
                 data_ = typed_array_view();
             }
         }
@@ -1139,7 +1139,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(v.data(), v.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1150,7 +1150,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1161,7 +1161,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1172,7 +1172,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1183,7 +1183,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1194,7 +1194,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1205,7 +1205,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1216,7 +1216,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1227,7 +1227,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1238,7 +1238,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1249,7 +1249,7 @@ private:
                         const ser_context& context,
                         std::error_code& ec) override
     {
-        state_ = staj_reader_state::typed_array;
+        state_ = staj_cursor_state::typed_array;
         data_ = typed_array_view(data.data(), data.size());
         index_ = 0;
         return this->begin_array(tag, context, ec);
@@ -1268,7 +1268,7 @@ private:
                             const ser_context& context, 
                             std::error_code& ec) override
     {
-        state_ = staj_reader_state::multi_dim;
+        state_ = staj_cursor_state::multi_dim;
         shape_ = shape;
         return this->begin_array(2, tag, context, ec);
     }
@@ -1321,21 +1321,21 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
     }
 }
 
-// basic_staj_reader
+// basic_staj_cursor
 
 template<class CharT>
-class basic_staj_reader
+class basic_staj_cursor
 {
 public:
-    virtual ~basic_staj_reader() noexcept = default;
+    virtual ~basic_staj_cursor() noexcept = default;
 
     virtual bool done() const = 0;
 
     virtual const basic_staj_event<CharT>& current() const = 0;
 
-    virtual void read(basic_json_visitor<CharT>& visitor) = 0;
+    virtual void read_to(basic_json_visitor<CharT>& visitor) = 0;
 
-    virtual void read(basic_json_visitor<CharT>& visitor,
+    virtual void read_to(basic_json_visitor<CharT>& visitor,
                       std::error_code& ec) = 0;
 
     virtual void next() = 0;
@@ -1348,8 +1348,8 @@ public:
 using staj_event = basic_staj_event<char>;
 using wstaj_event = basic_staj_event<wchar_t>;
 
-using staj_reader = basic_staj_reader<char>;
-using wstaj_reader = basic_staj_reader<wchar_t>;
+using staj_cursor = basic_staj_cursor<char>;
+using wstaj_cursor = basic_staj_cursor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
@@ -1359,13 +1359,16 @@ template<class CharT>
 using basic_stream_event = basic_staj_event<CharT>;
 
 template<class CharT>
-using basic_stream_reader = basic_staj_reader<CharT>;
+using basic_stream_reader = basic_staj_cursor<CharT>;
 
 JSONCONS_DEPRECATED_MSG("Instead, use staj_event") typedef basic_staj_event<char> stream_event;
 JSONCONS_DEPRECATED_MSG("Instead, use wstaj_event") typedef basic_staj_event<wchar_t> wstream_event;
 
-JSONCONS_DEPRECATED_MSG("Instead, use staj_reader") typedef basic_staj_reader<char> stream_reader;
-JSONCONS_DEPRECATED_MSG("Instead, use wstaj_reader") typedef basic_staj_reader<wchar_t> wstream_reader;
+JSONCONS_DEPRECATED_MSG("Instead, use staj_cursor") typedef basic_staj_cursor<char> stream_reader;
+JSONCONS_DEPRECATED_MSG("Instead, use wstaj_cursor") typedef basic_staj_cursor<wchar_t> wstream_reader;
+
+JSONCONS_DEPRECATED_MSG("Instead, use staj_cursor") typedef basic_staj_cursor<char> staj_reader;
+JSONCONS_DEPRECATED_MSG("Instead, use wstaj_cursor") typedef basic_staj_cursor<wchar_t> wstaj_reader;
 
 #endif
 

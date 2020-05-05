@@ -24,7 +24,7 @@ ubjson_bytes_cursor   |basic_ubjson_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces
 
-[staj_reader](staj_reader.md)
+[staj_cursor](staj_cursor.md)
 
 #### Constructors
 
@@ -72,12 +72,12 @@ Checks if there are no more events.
     const staj_event& current() const override;
 Returns the current [staj_event](staj_event.md).
 
-    void read(json_visitor& visitor) override
+    void read_to(json_visitor& visitor) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read(json_visitor& visitor, std::error_code& ec) override
+    void read_to(json_visitor& visitor, std::error_code& ec) override
 Feeds the current and succeeding [staj events](staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
@@ -94,7 +94,7 @@ Returns the current [context](ser_context.md)
 
 ### See also
 
-- [staj_reader](staj_reader.md) 
+- [staj_cursor](staj_cursor.md) 
 - [staj_array_iterator](staj_array_iterator.md) 
 - [staj_object_iterator](staj_object_iterator.md)
 

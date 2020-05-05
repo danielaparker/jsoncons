@@ -15,8 +15,8 @@
 
 using namespace jsoncons;
 
-namespace json_type_traits_macro_tests
-{
+namespace {
+namespace ns {
 
     template <typename T1, typename T2>
     struct TemplatedStruct
@@ -473,9 +473,10 @@ namespace json_type_traits_macro_tests
         std::unique_ptr<std::string> field11;
         jsoncons::optional<std::string> field12;
     };
-} // namespace json_type_traits_macro_tests
+
+} // namespace ns
+} // namespace 
  
-namespace ns = json_type_traits_macro_tests;
 
 JSONCONS_ENUM_TRAITS(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_ALL_MEMBER_TRAITS(ns::book1a,author,title,price)

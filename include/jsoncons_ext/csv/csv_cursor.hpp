@@ -20,13 +20,13 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons_ext/csv/csv_parser.hpp>
 #include <jsoncons_ext/csv/csv_cursor.hpp>
-#include <jsoncons/staj_reader.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/source.hpp>
 
 namespace jsoncons { namespace csv {
 
 template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
-class basic_csv_cursor : public basic_staj_reader<CharT>, private virtual ser_context
+class basic_csv_cursor : public basic_staj_cursor<CharT>, private virtual ser_context
 {
 public:
     using source_type = Src;
@@ -259,17 +259,17 @@ public:
         return event_handler_.event();
     }
 
-    void read(basic_json_visitor<CharT>& visitor) override
+    void read_to(basic_json_visitor<CharT>& visitor) override
     {
         std::error_code ec;
-        read(visitor, ec);
+        read_to(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read(basic_json_visitor<CharT>& visitor,
+    void read_to(basic_json_visitor<CharT>& visitor,
                 std::error_code& ec) override
     {
         if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
@@ -422,17 +422,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<CharT>&)")
-    void read_to(basic_json_visitor<CharT>& visitor) 
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&)")
+    void read(basic_json_visitor<CharT>& visitor) 
     {
-        read(visitor);
+        read_to(visitor);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<CharT>&, std::error_code&)")
-    void read_to(basic_json_visitor<CharT>& visitor,
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&, std::error_code&)")
+    void read(basic_json_visitor<CharT>& visitor,
                  std::error_code& ec) 
     {
-        read(visitor, ec);
+        read_to(visitor, ec);
     }
 #endif
 private:

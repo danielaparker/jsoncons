@@ -15,7 +15,7 @@
 #include <ios>
 #include <iterator> // std::input_iterator_tag
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_reader.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/basic_json.hpp>
 
 namespace jsoncons {
@@ -25,7 +25,7 @@ class staj_array_iterator
 {
     using char_type = typename Json::char_type;
 
-    basic_staj_reader<char_type>* reader_;
+    basic_staj_cursor<char_type>* reader_;
     optional<T> value_;
     json_decoder<Json> decoder_;
 public:
@@ -40,7 +40,7 @@ public:
     {
     }
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader)
+    staj_array_iterator(basic_staj_cursor<char_type>& reader)
         : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
@@ -53,7 +53,7 @@ public:
         }
     }
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader,
+    staj_array_iterator(basic_staj_cursor<char_type>& reader,
                         std::error_code& ec)
         : reader_(std::addressof(reader))
     {
@@ -182,7 +182,7 @@ public:
     using iterator_category = std::input_iterator_tag;
 
 private:
-    basic_staj_reader<char_type>* reader_;
+    basic_staj_cursor<char_type>* reader_;
     optional<value_type> key_value_;
     json_decoder<Json> decoder_;
 public:
@@ -192,7 +192,7 @@ public:
     {
     }
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader)
+    staj_object_iterator(basic_staj_cursor<char_type>& reader)
         : reader_(std::addressof(reader))
     {
         if (reader_->current().event_type() == staj_event_type::begin_object)
@@ -205,7 +205,7 @@ public:
         }
     }
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader, 
+    staj_object_iterator(basic_staj_cursor<char_type>& reader, 
                          std::error_code& ec)
         : reader_(std::addressof(reader))
     {
@@ -416,56 +416,56 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
 
 template <class T, class CharT>
 typename std::enable_if<is_basic_json<T>::value,staj_array_iterator<T,T>>::type
-make_array_iterator(basic_staj_reader<CharT>& reader)
+make_array_iterator(basic_staj_cursor<CharT>& reader)
 {
     return staj_array_iterator<T,T>(reader);
 }
 
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json<T>::value,staj_array_iterator<basic_json<CharT>,T>>::type
-make_array_iterator(basic_staj_reader<CharT>& reader)
+make_array_iterator(basic_staj_cursor<CharT>& reader)
 {
     return staj_array_iterator<basic_json<CharT>,T>(reader);
 }
 
 template <class T, class CharT>
 typename std::enable_if<is_basic_json<T>::value,staj_array_iterator<T,T>>::type
-make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+make_array_iterator(basic_staj_cursor<CharT>& reader, std::error_code& ec)
 {
     return staj_array_iterator<T,T>(reader, ec);
 }
 
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json<T>::value,staj_array_iterator<basic_json<CharT>,T>>::type
-make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+make_array_iterator(basic_staj_cursor<CharT>& reader, std::error_code& ec)
 {
     return staj_array_iterator<basic_json<CharT>,T>(reader, ec);
 }
 
 template <class T, class CharT>
 typename std::enable_if<is_basic_json<T>::value,staj_object_iterator<T,T>>::type
-make_object_iterator(basic_staj_reader<CharT>& reader)
+make_object_iterator(basic_staj_cursor<CharT>& reader)
 {
     return staj_object_iterator<T,T>(reader);
 }
 
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json<T>::value,staj_object_iterator<basic_json<CharT>,T>>::type
-make_object_iterator(basic_staj_reader<CharT>& reader)
+make_object_iterator(basic_staj_cursor<CharT>& reader)
 {
     return staj_object_iterator<basic_json<CharT>,T>(reader);
 }
 
 template <class T, class CharT>
 typename std::enable_if<is_basic_json<T>::value,staj_object_iterator<T,T>>::type
-make_object_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+make_object_iterator(basic_staj_cursor<CharT>& reader, std::error_code& ec)
 {
     return staj_object_iterator<T,T>(reader, ec);
 }
 
 template <class T, class CharT>
 typename std::enable_if<!is_basic_json<T>::value,staj_object_iterator<basic_json<CharT>,T>>::type
-make_object_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec)
+make_object_iterator(basic_staj_cursor<CharT>& reader, std::error_code& ec)
 {
     return staj_object_iterator<basic_json<CharT>,T>(reader, ec);
 }

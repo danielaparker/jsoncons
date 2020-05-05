@@ -1,7 +1,7 @@
 ### jsoncons::staj_event
 
 ```c++
-#include <jsoncons/staj_reader.hpp>
+#include <jsoncons/staj_cursor.hpp>
 
 using staj_event = basic_staj_event<char>;
 ```

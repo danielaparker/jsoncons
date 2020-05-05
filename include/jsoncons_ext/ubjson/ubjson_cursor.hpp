@@ -18,7 +18,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_reader.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/ubjson/ubjson_parser.hpp>
 
@@ -26,7 +26,7 @@ namespace jsoncons {
 namespace ubjson {
 
 template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
-class basic_ubjson_cursor : public basic_staj_reader<char>, private virtual ser_context
+class basic_ubjson_cursor : public basic_staj_cursor<char>, private virtual ser_context
 {
 public:
     using source_type = Src;
@@ -123,17 +123,17 @@ public:
         return event_handler_.event();
     }
 
-    void read(basic_json_visitor<char_type>& visitor) override
+    void read_to(basic_json_visitor<char_type>& visitor) override
     {
         std::error_code ec;
-        read(visitor, ec);
+        read_to(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read(basic_json_visitor<char_type>& visitor,
+    void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
         if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
@@ -194,17 +194,17 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&)")
-    void read_to(basic_json_visitor<char_type>& visitor)
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
+    void read(basic_json_visitor<char_type>& visitor)
     {
-        read(visitor);
+        read_to(visitor);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&, std::error_code&)")
-    void read_to(basic_json_visitor<char_type>& visitor,
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&, std::error_code&)")
+    void read(basic_json_visitor<char_type>& visitor,
                  std::error_code& ec) 
     {
-        read(visitor, ec);
+        read_to(visitor, ec);
     }
 #endif
 private:

@@ -289,7 +289,7 @@ void read_to_cbor_visitor()
     assert(cursor.is_typed_array());
 
     my_cbor_visitor visitor;
-    cursor.read(visitor);
+    cursor.read_to(visitor);
     std::cout << "(2)\n";
     for (auto item : visitor.v)
     {

@@ -90,7 +90,7 @@ TEST_CASE("cbor typed array cursor tests")
         CHECK(cursor.is_typed_array());
 
         my_cbor_visitor visitor;
-        cursor.read(visitor);
+        cursor.read_to(visitor);
         //for (auto item : visitor.v)
         //{
         //    std::cout << item << "\n";

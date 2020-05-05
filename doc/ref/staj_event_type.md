@@ -1,7 +1,7 @@
 ### jsoncons::staj_event_type
 
 ```c++
-#include <jsoncons/staj_reader.hpp>
+#include <jsoncons/staj_cursor.hpp>
 
 enum class staj_event_type
 {

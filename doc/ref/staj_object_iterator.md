@@ -9,7 +9,7 @@ template<
 ```
 
 A `staj_object_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
-accesses the individual stream events from a [staj_reader](staj_reader.md) and, provided that when it is constructed
+accesses the individual stream events from a [staj_cursor](staj_cursor.md) and, provided that when it is constructed
 the current stream event has type `begin_object`, it returns the elements
 of the JSON object as items of type `std::pair<string_type,T>`. If when it is constructed the current stream event
 does not have type `begin_object`, it becomes equal to the default-constructed iterator.
@@ -30,9 +30,9 @@ Member type                         |Definition
 
     staj_object_iterator() noexcept; // (1)
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader); // (2)
+    staj_object_iterator(basic_staj_cursor<char_type>& reader); // (2)
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader,
+    staj_object_iterator(basic_staj_cursor<char_type>& reader,
                          std::error_code& ec);  // (3)
 
 (1) Constructs the end iterator
