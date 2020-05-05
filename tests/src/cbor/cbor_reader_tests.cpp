@@ -143,6 +143,8 @@ TEST_CASE("test_cbor_parsing")
 
     // text strings with undefined length
 
+    check_parse_cbor({0x7f,0x7f,0x65,'H','e','l','l','o',0x7f,0x61,' ',0x60,0xff,0x65,'W','o','r','l','d',0xff,0xff},json("Hello World"));
+
     check_parse_cbor({0x7f,0xff}, json(""));
 
     check_parse_cbor({0x7f,0x60,0xff}, json(""));
