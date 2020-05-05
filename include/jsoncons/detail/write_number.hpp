@@ -24,26 +24,38 @@ namespace detail {
     // write_integer
 
     template<class Integer,class Result>
-    typename std::enable_if<std::is_integral<Integer>::value && std::is_signed<Integer>::value,std::size_t>::type
+    typename std::enable_if<std::is_integral<Integer>::value,std::size_t>::type
     write_integer(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
-        using unsigned_type = typename std::make_unsigned<Integer>::type;
 
         char_type buf[255];
-        unsigned_type u = (value < 0) ? static_cast<unsigned_type>(-value) : static_cast<unsigned_type>(value);
         char_type *p = buf;
         const char_type* last = buf+255;
 
-        do
+        bool is_negative = value < 0;
+
+        if (value < 0)
         {
-            *p++ = static_cast<char_type>(48 + u % 10);
+            do
+            {
+                *p++ = static_cast<char_type>(48 - (value % 10));
+            }
+            while ((value /= 10) && (p < last));
         }
-        while ((u /= 10) && (p < last));
+        else
+        {
+
+            do
+            {
+                *p++ = static_cast<char_type>(48 + value % 10);
+            }
+            while ((value /= 10) && (p < last));
+        }
         JSONCONS_ASSERT(p != last);
 
         std::size_t count = (p - buf);
-        if (value < 0)
+        if (is_negative)
         {
             result.push_back('-');
             ++count;
@@ -55,48 +67,42 @@ namespace detail {
 
         return count;
     }
+
+    // integer_to_hex_string
 
     template<class Integer,class Result>
-    typename std::enable_if<std::is_integral<Integer>::value && !std::is_signed<Integer>::value,std::size_t>::type
-    write_integer(Integer value, Result& result)
+    typename std::enable_if<std::is_integral<Integer>::value,std::size_t>::type
+    integer_to_hex_string(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
 
         char_type buf[255];
         char_type *p = buf;
         const char_type* last = buf+255;
-        do
+
+        bool is_negative = value < 0;
+
+        if (value < 0)
         {
-            *p++ = static_cast<char_type>(48 + value % 10);
+            do
+            {
+                *p++ = to_hex_character(0-(value % 16));
+            }
+            while ((value /= 16) && (p < last));
         }
-        while ((value /= 10) && (p < last));
+        else
+        {
+
+            do
+            {
+                *p++ = to_hex_character(value % 16);
+            }
+            while ((value /= 16) && (p < last));
+        }
         JSONCONS_ASSERT(p != last);
 
         std::size_t count = (p - buf);
-        while (--p >= buf)
-        {
-            result.push_back(*p);
-        }
-        return count;
-    }
-
-    template<class Result>
-    size_t integer_to_hex_string(int64_t value, Result& result)
-    {
-        using char_type = typename Result::value_type;
-
-        std::size_t count = 0;
-
-        char_type buf[255];
-        uint64_t u = (value < 0) ? static_cast<uint64_t>(-value) : static_cast<uint64_t>(value);
-        char_type *p = buf;
-        do
-        {
-            *p++ = to_hex_character(u % 16);
-        }
-        while (u /= 16);
-        count += (p - buf);
-        if (value < 0)
+        if (is_negative)
         {
             result.push_back('-');
             ++count;
@@ -106,36 +112,12 @@ namespace detail {
             result.push_back(*p);
         }
 
-        return count;
-    }
-
-    // write_integer
-
-    template<class Result>
-    size_t uinteger_to_hex_string(uint64_t value, Result& result)
-    {
-        using char_type = typename Result::value_type;
-
-        std::size_t count = 0;
-
-        char_type buf[255];
-        char_type *p = buf;
-        do
-        {
-            *p++ = to_hex_character(value % 16);
-        }
-        while (value /= 16);
-        count += (p - buf);
-        while (--p >= buf)
-        {
-            result.push_back(*p);
-        }
         return count;
     }
 
     // write_double
 
-    // fast_exponent
+    // fast exponent
     template <class Result>
     void fill_exponent(int K, Result& result)
     {

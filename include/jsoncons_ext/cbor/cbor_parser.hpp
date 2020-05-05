@@ -1274,7 +1274,7 @@ private:
                 }
                 s.push_back('0');
                 s.push_back('x');
-                jsoncons::detail::uinteger_to_hex_string(val, s);
+                jsoncons::detail::integer_to_hex_string(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1287,7 +1287,7 @@ private:
                 s.push_back('-');
                 s.push_back('0');
                 s.push_back('x');
-                jsoncons::detail::uinteger_to_hex_string(static_cast<uint64_t>(-val), s);
+                jsoncons::detail::integer_to_hex_string(static_cast<uint64_t>(-val), s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1344,12 +1344,12 @@ private:
         s.push_back('p');
         if (exponent >=0)
         {
-            jsoncons::detail::uinteger_to_hex_string(static_cast<uint64_t>(exponent), s);
+            jsoncons::detail::integer_to_hex_string(static_cast<uint64_t>(exponent), s);
         }
         else
         {
             s.push_back('-');
-            jsoncons::detail::uinteger_to_hex_string(static_cast<uint64_t>(-exponent), s);
+            jsoncons::detail::integer_to_hex_string(static_cast<uint64_t>(-exponent), s);
         }
     }
 
