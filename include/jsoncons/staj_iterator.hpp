@@ -374,7 +374,7 @@ void staj_object_iterator<Json,T>::next()
     if (!done())
     {
         JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
-        key_type key = reader_->current(). template get<key_type>();
+        key_type key = reader_->current().template as<key_type>();
         reader_->next();
         if (!done())
         {
@@ -401,7 +401,7 @@ void staj_object_iterator<Json,T>::next(std::error_code& ec)
     if (!done())
     {
         JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
-        auto key = reader_->current(). template get<key_type>();
+        auto key = reader_->current().template as<key_type>();
         reader_->next(ec);
         if (ec)
         {

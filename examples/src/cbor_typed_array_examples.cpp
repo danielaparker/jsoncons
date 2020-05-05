@@ -196,7 +196,7 @@ void cursor_example_multi_dim_row_major_typed_array()
                 break;
             case staj_event_type::uint64_value:
                 std::cout << event.event_type() 
-                          << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                          << ": " << event.as<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
                 std::cout << "Unhandled event type " << event.event_type() 
@@ -239,7 +239,7 @@ void cursor_example_multi_dim_column_major_classical_cbor_array()
                 break;
             case staj_event_type::uint64_value:
                 std::cout << event.event_type() 
-                          << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                          << ": " << event.as<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
                 std::cout << "Unhandled event type " << event.event_type() 

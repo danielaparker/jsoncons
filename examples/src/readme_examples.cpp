@@ -133,26 +133,26 @@ namespace readme
                     break;
                 case staj_event_type::key:
                     // Or std::string_view, if supported
-                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                    std::cout << event.event_type() << ": " << event.as<jsoncons::string_view>() << "\n";
                     break;
                 case staj_event_type::string_value:
                     // Or std::string_view, if supported
-                    std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                    std::cout << event.event_type() << ": " << event.as<jsoncons::string_view>() << "\n";
                     break;
                 case staj_event_type::null_value:
                     std::cout << event.event_type() << "\n";
                     break;
                 case staj_event_type::bool_value:
-                    std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
+                    std::cout << event.event_type() << ": " << std::boolalpha << event.as<bool>() << "\n";
                     break;
                 case staj_event_type::int64_value:
-                    std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
+                    std::cout << event.event_type() << ": " << event.as<int64_t>() << "\n";
                     break;
                 case staj_event_type::uint64_value:
-                    std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
+                    std::cout << event.event_type() << ": " << event.as<uint64_t>() << "\n";
                     break;
                 case staj_event_type::double_value:
-                    std::cout << event.event_type() << ": " << event.get<double>() << "\n";
+                    std::cout << event.event_type() << ": " << event.as<double>() << "\n";
                     break;
                 default:
                     std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
@@ -183,7 +183,7 @@ namespace readme
         {
             if (ev.event_type() == staj_event_type::key)
             {
-                name = ev.get<std::string>();
+                name = ev.as<std::string>();
                 return false;
             }
             else if (name == "rated")
@@ -205,7 +205,7 @@ namespace readme
             switch (event.event_type())
             {
                 case staj_event_type::string_value:
-                    std::cout << event.get<jsoncons::string_view>() << "\n";
+                    std::cout << event.as<jsoncons::string_view>() << "\n";
                     break;
                 default:
                     std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";

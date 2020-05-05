@@ -50,7 +50,7 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code&)
         {
-            T v = reader.current().template get<T>();
+            T v = reader.current().template as<T>();
             return v;
         }
     };
@@ -68,7 +68,7 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code&)
         {
-            T v = reader.current().template get<T>();
+            T v = reader.current().template as<T>();
             return v;
         }
     };
@@ -84,7 +84,7 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code&)
         {
-            auto val = reader.current().template get<std::basic_string<CharT>>();
+            auto val = reader.current().template as<std::basic_string<CharT>>();
             T s;
             unicons::convert(val.begin(), val.end(), std::back_inserter(s));
             return s;
@@ -371,7 +371,7 @@ namespace jsoncons {
                     ec = json_errc::expected_name;
                     return val;
                 }
-                auto key = reader.current(). template get<key_type>();
+                auto key = reader.current().template as<key_type>();
                 reader.next(ec);
                 val.emplace(std::move(key),deser_traits<mapped_type,CharT>::deserialize(reader, decoder, ec));
                 reader.next(ec);
@@ -411,7 +411,7 @@ namespace jsoncons {
                     ec = json_errc::expected_name;
                     return val;
                 }
-                auto s = reader.current().template get<basic_string_view<typename Json::char_type>>();
+                auto s = reader.current().template as<basic_string_view<typename Json::char_type>>();
                 auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 reader.next(ec);
                 val.emplace(key.value(),deser_traits<mapped_type,CharT>::deserialize(reader, decoder, ec));
