@@ -129,6 +129,12 @@ namespace jsoncons {
                 ec = convert_errc::json_not_pair;
                 return value_type();
             }
+            cursor.next(ec);
+            if (ec)
+            {
+                ec = convert_errc::json_not_pair;
+                return value_type();
+            }
             return std::make_pair(v1, v2);
         }
     };

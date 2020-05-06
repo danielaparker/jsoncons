@@ -1,0 +1,103 @@
+// Copyright 2020 Daniel Parker
+// Distributed under Boost license
+
+#include <jsoncons/json.hpp>
+#include <catch/catch.hpp>
+#include <sstream>
+#include <vector>
+#include <map>
+#include <utility>
+#include <ctime>
+#include <cstdint>
+
+using namespace jsoncons;
+
+TEST_CASE("deser_traits primitive")
+{
+    SECTION("is_primitive")
+    {
+        CHECK(jsoncons::detail::is_primitive<uint64_t>::value);
+    }
+    SECTION("uint64_t")
+    {
+        std::string input = R"(1000)";
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<uint64_t,char>::deserialize(cursor,decoder,ec);
+
+        CHECK(val == 1000);
+    }
+    SECTION("vector of uint64_t")
+    {
+        using test_type = std::vector<uint64_t>;
+
+        std::string input = R"([1000,1001,1002])";
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+
+        REQUIRE(val.size() == 3);
+        CHECK(val[0] == 1000);
+        CHECK(val[1] == 1001);
+        CHECK(val[2] == 1002);
+    }
+}
+
+TEST_CASE("deser_traits std::string")
+{
+    SECTION("is_string")
+    {
+        CHECK(jsoncons::detail::is_string<std::string>::value);
+    }
+    SECTION("string")
+    {
+        std::string input = R"("Hello World")";
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<std::string,char>::deserialize(cursor,decoder,ec);
+
+        CHECK((val == "Hello World"));
+    }
+}
+
+TEST_CASE("deser_traits std::pair")
+{
+    SECTION("std::pair<std::string,std::string>")
+    {
+        std::string input = R"(["first","second"])";
+        using test_type = std::pair<std::string,std::string>;
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+
+        CHECK((val == test_type("first","second")));
+    }
+    SECTION("vector of std::pair<std::string,std::string>")
+    {
+        std::string input = R"([["first","second"],["one","two"]])";
+        using test_type = std::vector<std::pair<std::string,std::string>>;
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+        REQUIRE_FALSE(ec);
+
+        REQUIRE(val.size() == 2);
+        CHECK((val[0] == test_type::value_type("first","second")));
+        CHECK((val[1] == test_type::value_type("one","two")));
+    }
+}

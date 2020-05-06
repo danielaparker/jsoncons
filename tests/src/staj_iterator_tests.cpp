@@ -16,7 +16,6 @@
 
 using namespace jsoncons;
 
-#if 0
 TEST_CASE("array_iterator test")
 {
     std::string s = R"(
@@ -59,7 +58,6 @@ TEST_CASE("array_iterator test")
     ++it;
     CHECK((it == end));
 }
-#endif
 
 TEST_CASE("object_iterator test")
 {
