@@ -24,8 +24,8 @@ TEST_CASE("json_cursor string_value test")
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
-    CHECK(cursor.current().as<std::string>() == std::string("Tom"));
-    CHECK((cursor.current().as<jsoncons::string_view>() == jsoncons::string_view("Tom")));
+    CHECK(cursor.current().get<std::string>() == std::string("Tom"));
+    CHECK((cursor.current().get<jsoncons::string_view>() == jsoncons::string_view("Tom")));
     cursor.next();
     CHECK(cursor.done());
 }
@@ -39,7 +39,7 @@ TEST_CASE("json_cursor string_value as<int> test")
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
-    CHECK(cursor.current().as<int>() == -100);
+    CHECK(cursor.current().get<int>() == -100);
     cursor.next();
     CHECK(cursor.done());
 }
@@ -53,8 +53,8 @@ TEST_CASE("json_cursor string_value as<unsigned> test")
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
-    CHECK(cursor.current().as<int>() == 100);
-    CHECK(cursor.current().as<unsigned>() == 100);
+    CHECK(cursor.current().get<int>() == 100);
+    CHECK(cursor.current().get<unsigned>() == 100);
     cursor.next();
     CHECK(cursor.done());
 }
@@ -94,7 +94,7 @@ TEST_CASE("json_cursor int64_value test")
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::int64_value);
-    CHECK(cursor.current().as<int>() == -100);
+    CHECK(cursor.current().get<int>() == -100);
     cursor.next();
     CHECK(cursor.done());
 }
@@ -108,8 +108,8 @@ TEST_CASE("json_cursor uint64_value test")
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::uint64_value);
-    CHECK(cursor.current().as<int>() == 100);
-    CHECK(cursor.current().as<unsigned>() == 100);
+    CHECK(cursor.current().get<int>() == 100);
+    CHECK(cursor.current().get<unsigned>() == 100);
     cursor.next();
     CHECK(cursor.done());
 }
@@ -123,8 +123,8 @@ TEST_CASE("json_cursor string_value as bignum test")
 
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
-    CHECK(s == cursor.current().as<std::string>());
-    bignum c = cursor.current().as<bignum>();
+    CHECK(s == cursor.current().get<std::string>());
+    bignum c = cursor.current().get<bignum>();
     CHECK(bool(bignum("-18446744073709551617") == c));
     cursor.next();
     CHECK(cursor.done());
@@ -140,7 +140,7 @@ TEST_CASE("json_cursor bigint value as bignum")
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
     CHECK(cursor.current().tag() == semantic_tag::bigint);
-    bignum c = cursor.current().as<bignum>();
+    bignum c = cursor.current().get<bignum>();
     CHECK(bool(bignum(s) == c));
     cursor.next();
     CHECK(cursor.done());
@@ -339,7 +339,7 @@ struct remove_mark_filter
     bool operator()(const staj_event& event, const ser_context&) 
     {
         if (event.event_type()  == staj_event_type::key &&
-            event.as<jsoncons::string_view>() == "mark")
+            event.get<jsoncons::string_view>() == "mark")
         {
             reject_next_ = true;
             return false;

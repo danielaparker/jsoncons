@@ -84,7 +84,7 @@ struct remove_mark_ubjson_filter
     bool operator()(const staj_event& event, const ser_context&) 
     {
         if (event.event_type()  == staj_event_type::key &&
-            event.as<jsoncons::string_view>() == "mark")
+            event.get<jsoncons::string_view>() == "mark")
         {
             reject_next_ = true;
             return false;

@@ -147,26 +147,26 @@ void working_with_ubjson_3()
                 break;
             case staj_event_type::key:
                 // Or std::string_view, if supported
-                std::cout << event.event_type() << ": " << event.as<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::string_value:
                 // Or std::string_view, if supported
-                std::cout << event.event_type() << ": " << event.as<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::null_value:
                 std::cout << event.event_type() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::bool_value:
-                std::cout << event.event_type() << ": " << std::boolalpha << event.as<bool>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::int64_value:
-                std::cout << event.event_type() << ": " << event.as<int64_t>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::uint64_value:
-                std::cout << event.event_type() << ": " << event.as<uint64_t>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << " " << "(" << event.tag() << ")\n";
                 break;
             case staj_event_type::double_value:
-                std::cout << event.event_type() << ": "  << event.as<double>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
                 std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";
@@ -179,7 +179,7 @@ void working_with_ubjson_4()
 {
     auto filter = [&](const staj_event& ev, const ser_context&) -> bool
     {
-        return (ev.event_type() == staj_event_type::double_value) && (ev.as<double>() < 30.0);  
+        return (ev.event_type() == staj_event_type::double_value) && (ev.get<double>() < 30.0);  
     };
 
     ubjson::ubjson_bytes_cursor cursor(data, filter);
@@ -189,7 +189,7 @@ void working_with_ubjson_4()
         switch (event.event_type())
         {
             case staj_event_type::double_value:
-                std::cout << event.event_type() << ": "  << event.as<double>() << " " << "(" << event.tag() << ")\n";
+                std::cout << event.event_type() << ": "  << event.get<double>() << " " << "(" << event.tag() << ")\n";
                 break;
             default:
                 std::cout << "Unhandled event type " << event.event_type() << " " << "(" << event.tag() << ")\n";

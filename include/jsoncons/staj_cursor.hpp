@@ -215,7 +215,7 @@ public:
 
     template<class T, class CharT_ = CharT>
     typename std::enable_if<jsoncons::detail::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        as() const
+        get() const
     {
         T s;
         switch (event_type_)
@@ -278,7 +278,7 @@ public:
 
     template<class T, class CharT_ = CharT>
     typename std::enable_if<jsoncons::detail::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        as() const
+        get() const
     {
         T s;
         switch (event_type_)
@@ -295,7 +295,7 @@ public:
 
     template<class T>
     typename std::enable_if<std::is_same<T, byte_string_view>::value, T>::type
-        as() const
+        get() const
     {
         T s;
         switch (event_type_)
@@ -311,45 +311,45 @@ public:
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_integer_like<T>::value, T>::type
-        as() const
+        get() const
     {
         return static_cast<T>(as_int64());
     }
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_uinteger_like<T>::value, T>::type
-        as() const
+        get() const
     {
         return static_cast<T>(as_uint64());
     }
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_floating_point_like<T>::value, T>::type
-        as() const
+        get() const
     {
         return static_cast<T>(as_double());
     }
 
     template<class T, class UserAllocator = std::allocator<uint8_t>>
     typename std::enable_if<std::is_same<T, basic_bignum<UserAllocator>>::value, T>::type
-        as() const
+        get() const
     {
         return as_bignum<UserAllocator>();
     }
 
     template<class T>
     typename std::enable_if<std::is_same<T, bool>::value, T>::type
-        as() const
+        get() const
     {
         return as_bool();
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     template<class T>
-    JSONCONS_DEPRECATED_MSG("Instead, use as<T>()")
-    T get() const
+    JSONCONS_DEPRECATED_MSG("Instead, use get<T>()")
+    T as() const
     {
-        return as<T>();
+        return get<T>();
     }
     semantic_tag get_semantic_tag() const noexcept { return tag_; }
 #endif
@@ -1301,21 +1301,21 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
         case staj_event_type::end_object:
             return visitor.end_object(context, ec);
         case staj_event_type::key:
-            return visitor.key(ev.template as<basic_string_view<CharT>>(), context);
+            return visitor.key(ev.template get<basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
-            return visitor.string_value(ev.template as<basic_string_view<CharT>>(), ev.tag(), context);
+            return visitor.string_value(ev.template get<basic_string_view<CharT>>(), ev.tag(), context);
         case staj_event_type::byte_string_value:
-            return visitor.byte_string_value(ev.template as<byte_string_view>(), ev.tag(), context);
+            return visitor.byte_string_value(ev.template get<byte_string_view>(), ev.tag(), context);
         case staj_event_type::null_value:
             return visitor.null_value(ev.tag(), context);
         case staj_event_type::bool_value:
-            return visitor.bool_value(ev.template as<bool>(), ev.tag(), context);
+            return visitor.bool_value(ev.template get<bool>(), ev.tag(), context);
         case staj_event_type::int64_value:
-            return visitor.int64_value(ev.template as<int64_t>(), ev.tag(), context);
+            return visitor.int64_value(ev.template get<int64_t>(), ev.tag(), context);
         case staj_event_type::uint64_value:
-            return visitor.uint64_value(ev.template as<uint64_t>(), ev.tag(), context);
+            return visitor.uint64_value(ev.template get<uint64_t>(), ev.tag(), context);
         case staj_event_type::double_value:
-            return visitor.double_value(ev.template as<double>(), ev.tag(), context);
+            return visitor.double_value(ev.template get<double>(), ev.tag(), context);
         default:
             return false;
     }

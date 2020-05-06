@@ -50,7 +50,7 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
-            T v = cursor.current().template as<T>();
+            T v = cursor.current().template get<T>();
             cursor.next(ec);
             return v;
         }
@@ -69,7 +69,7 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
-            T v = cursor.current().template as<T>();
+            T v = cursor.current().template get<T>();
             cursor.next(ec);
             return v;
         }
@@ -86,7 +86,7 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
-            auto val = cursor.current().template as<std::basic_string<CharT>>();
+            auto val = cursor.reader_->current().template get<std::basic_string<CharT>>();
             T s;
             unicons::convert(val.begin(), val.end(), std::back_inserter(s));
             cursor.next(ec);
@@ -360,7 +360,7 @@ namespace jsoncons {
                     ec = json_errc::expected_key;
                     return val;
                 }
-                auto key = cursor.current().template as<key_type>();
+                auto key = cursor.reader_->current().template get<key_type>();
                 cursor.next(ec);
                 if (ec) return val;
                 val.emplace(std::move(key),deser_traits<mapped_type,CharT>::deserialize(cursor, decoder, ec));
@@ -400,7 +400,7 @@ namespace jsoncons {
                     ec = json_errc::expected_key;
                     return val;
                 }
-                auto s = cursor.current().template as<basic_string_view<typename Json::char_type>>();
+                auto s = cursor.reader_->current().template get<basic_string_view<typename Json::char_type>>();
                 auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 cursor.next(ec);
                 if (ec) return val;
