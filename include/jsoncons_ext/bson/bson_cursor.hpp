@@ -137,11 +137,14 @@ public:
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
+        if (staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
         {
-            return;
+            read_next(visitor, ec);
         }
-        read_next(visitor, ec);
+        if (!done())
+        {
+            read_next(ec);
+        }
     }
 
     void next() override
@@ -176,10 +179,6 @@ public:
         {
             parser_.parse(visitor, ec);
             if (ec) return;
-        }
-        if (!done())
-        {
-            read_next(ec);
         }
     }
 

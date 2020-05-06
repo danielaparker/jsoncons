@@ -16,6 +16,7 @@
 
 using namespace jsoncons;
 
+#if 0
 TEST_CASE("array_iterator test")
 {
     std::string s = R"(
@@ -58,6 +59,7 @@ TEST_CASE("array_iterator test")
     ++it;
     CHECK((it == end));
 }
+#endif
 
 TEST_CASE("object_iterator test")
 {
@@ -70,24 +72,44 @@ TEST_CASE("object_iterator test")
         }
     )";
 
-    std::istringstream is(s);
-    json_cursor cursor(is);
-    auto it = make_object_iterator<json>(cursor);
-    auto end = jsoncons::end(it);
+    SECTION("test 1")
+    {
+        std::istringstream is(s);
+        json_cursor cursor(is);
 
-    const auto& p1 = *it;
-    CHECK(p1.second.as<int>() == 100);
-    ++it;
-    const auto& p2 = *it;
-    CHECK(p2.second.as<std::string>() == std::string("Tom"));
-    ++it;
-    const auto& p3 = *it;
-    CHECK(p3.second.as<std::string>() == std::string("Cochrane"));
-    ++it;
-    const auto& p4 = *it;
-    CHECK(p4.second.as<int>() == 55);
-    ++it;
-    CHECK((it == end));
+        REQUIRE_FALSE(cursor.done());
+        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
+        cursor.next();
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+        cursor.next();
+
+        json_decoder<json> decoder;
+        cursor.read_to(decoder);
+
+        CHECK(cursor.current().event_type() == staj_event_type::key);
+    }
+
+    SECTION("test 2")
+    {
+        std::istringstream is(s);
+        json_cursor cursor(is);
+        auto it = make_object_iterator<json>(cursor);
+        auto end = jsoncons::end(it);
+
+        const auto& p1 = *it;
+        CHECK(p1.second.as<int>() == 100);
+        ++it;
+        const auto& p2 = *it;
+        CHECK(p2.second.as<std::string>() == std::string("Tom"));
+        ++it;
+        const auto& p3 = *it;
+        CHECK(p3.second.as<std::string>() == std::string("Cochrane"));
+        ++it;
+        const auto& p4 = *it;
+        CHECK(p4.second.as<int>() == 55);
+        ++it;
+        CHECK((it == end));
+    }
 }
 
 

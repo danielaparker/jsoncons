@@ -1314,6 +1314,8 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
             return visitor.int64_value(ev.template get<int64_t>(), ev.tag(), context);
         case staj_event_type::uint64_value:
             return visitor.uint64_value(ev.template get<uint64_t>(), ev.tag(), context);
+        case staj_event_type::half_value:
+            return visitor.half_value(ev.template get<uint16_t>(), ev.tag(), context);
         case staj_event_type::double_value:
             return visitor.double_value(ev.template get<double>(), ev.tag(), context);
         default:

@@ -17,6 +17,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/basic_json.hpp>
+#include <jsoncons/deser_traits.hpp>
 
 namespace jsoncons {
 
@@ -60,12 +61,10 @@ namespace jsoncons {
         {
             if (reader_->current().event_type() == staj_event_type::begin_array)
             {
-                reader_->next(); // skip past array
+                reader_->next(ec); // skip past array
+                if (ec) {reader_ = nullptr;}
                 next(ec);
-                if (ec)
-                {
-                    reader_ = nullptr;
-                }
+                if (ec) {reader_ = nullptr;}
             }
             else
             {
@@ -121,10 +120,7 @@ namespace jsoncons {
         staj_array_iterator& increment(std::error_code& ec)
         {
             next(ec);
-            if (ec)
-            {
-                reader_ = nullptr;
-            }
+            if (ec) {reader_ = nullptr;}
             return *this;
         }
 
@@ -221,6 +217,7 @@ namespace jsoncons {
         {
             if (reader_->current().event_type() == staj_event_type::begin_object)
             {
+                reader_->next(); // advance past begin_object
                 next();
             }
             else
@@ -235,11 +232,10 @@ namespace jsoncons {
         {
             if (reader_->current().event_type() == staj_event_type::begin_object)
             {
+                reader_->next(ec); // advance past begin_object
+                if (ec) {reader_ = nullptr;}
                 next(ec);
-                if (ec)
-                {
-                    reader_ = nullptr;
-                }
+                if (ec) {reader_ = nullptr;}
             }
             else
             {
@@ -331,7 +327,7 @@ namespace jsoncons {
         {
             using char_type = typename Json::char_type;
 
-            reader_->next();
+            //reader_->next();
             if (!done())
             {
                 JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
@@ -353,11 +349,6 @@ namespace jsoncons {
         {
             using char_type = typename Json::char_type;
 
-            reader_->next(ec);
-            if (ec)
-            {
-                return;
-            }
             if (!done())
             {
                 JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);

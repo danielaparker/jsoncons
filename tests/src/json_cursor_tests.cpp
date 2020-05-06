@@ -21,13 +21,16 @@ TEST_CASE("json_cursor string_value test")
     std::istringstream is(s);
 
     json_cursor cursor(is);
-
     REQUIRE_FALSE(cursor.done());
-    CHECK(cursor.current().event_type() == staj_event_type::string_value);
-    CHECK(cursor.current().get<std::string>() == std::string("Tom"));
-    CHECK((cursor.current().get<jsoncons::string_view>() == jsoncons::string_view("Tom")));
-    cursor.next();
-    CHECK(cursor.done());
+
+    SECTION("test 1")
+    {
+        CHECK(cursor.current().event_type() == staj_event_type::string_value);
+        CHECK(cursor.current().get<std::string>() == std::string("Tom"));
+        CHECK((cursor.current().get<jsoncons::string_view>() == jsoncons::string_view("Tom")));
+        cursor.next();
+        CHECK(cursor.done());
+    }
 }
 
 TEST_CASE("json_cursor string_value as<int> test")
@@ -573,17 +576,5 @@ TEST_CASE("staj event as object")
         json j2 = decoder2.get_result();
         std::cout << pretty_print(j2) << "\n";
     }
-    /*SECTION("test 3")
-    {
-        json_cursor cursor(buffer);
-        REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == staj_event_type::begin_array);
-        cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
-
-        json_diagnostics_visitor visitor;
-        cursor.read_to(visitor);
-    }*/
 }
-
 

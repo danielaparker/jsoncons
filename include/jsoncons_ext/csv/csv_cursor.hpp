@@ -272,11 +272,14 @@ public:
     void read_to(basic_json_visitor<CharT>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
+        if (staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
         {
-            return;
+            read_next(visitor, ec);
         }
-        read_next(visitor, ec);
+        if (!done())
+        {
+            read_next(ec);
+        }
     }
 
     void next() override
@@ -324,54 +327,6 @@ public:
         else
         {
             parser_.update(buffer_.data(),buffer_.size());
-        }
-    }
-
-    void read_next(std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.finished())
-        {
-            if (parser_.source_exhausted())
-            {
-                if (!source_.eof())
-                {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
-                }
-            }
-            parser_.parse_some(cursor_visitor_, ec);
-            if (ec) return;
-        }
-    }
-
-    void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.finished())
-        {
-            if (parser_.source_exhausted())
-            {
-                if (!source_.eof())
-                {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
-                }
-            }
-            parser_.parse_some(visitor, ec);
-            if (ec) return;
-        }
-        if (!done())
-        {
-            read_next(ec);
         }
     }
 
@@ -457,6 +412,50 @@ public:
     }
 #endif
 private:
+
+    void read_next(std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.finished())
+        {
+            if (parser_.source_exhausted())
+            {
+                if (!source_.eof())
+                {
+                    read_buffer(ec);
+                    if (ec) return;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            parser_.parse_some(cursor_visitor_, ec);
+            if (ec) return;
+        }
+    }
+
+    void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.finished())
+        {
+            if (parser_.source_exhausted())
+            {
+                if (!source_.eof())
+                {
+                    read_buffer(ec);
+                    if (ec) return;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            parser_.parse_some(visitor, ec);
+            if (ec) return;
+        }
+    }
 };
 
 using csv_cursor = basic_csv_cursor<char>;

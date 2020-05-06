@@ -142,13 +142,16 @@ public:
     }
 
     void read_to(basic_json_visitor<char_type>& visitor,
-              std::error_code& ec) override
+                 std::error_code& ec) override
     {
-        if (!cursor_visitor_.dump(visitor, *this, ec))
+        if (cursor_visitor_.dump(visitor, *this, ec))
         {
-            return;
+            read_next(visitor, ec);
         }
-        read_next(visitor, ec);
+        if (!done())
+        {
+            read_next(ec);
+        }
     }
 
     void next() override
@@ -164,6 +167,46 @@ public:
     void next(std::error_code& ec) override
     {
         read_next(ec);
+    }
+
+    const ser_context& context() const override
+    {
+        return *this;
+    }
+
+    bool eof() const
+    {
+        return eof_;
+    }
+
+    std::size_t line() const override
+    {
+        return parser_.line();
+    }
+
+    std::size_t column() const override
+    {
+        return parser_.column();
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
+    void read(basic_json_visitor<char_type>& visitor)
+    {
+        read_to(visitor);
+    }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&, std::error_code&)")
+    void read(basic_json_visitor<char_type>& visitor,
+                 std::error_code& ec) 
+    {
+        read_to(visitor, ec);
+    }
+#endif
+private:
+    static bool accept_all(const basic_staj_event<char_type>&, const ser_context&) 
+    {
+        return true;
     }
 
     void read_next(std::error_code& ec)
@@ -214,50 +257,6 @@ public:
                 }
             }
         }
-        if (!done())
-        {
-            read_next(ec);
-        }
-    }
-
-    const ser_context& context() const override
-    {
-        return *this;
-    }
-
-    bool eof() const
-    {
-        return eof_;
-    }
-
-    std::size_t line() const override
-    {
-        return parser_.line();
-    }
-
-    std::size_t column() const override
-    {
-        return parser_.column();
-    }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
-    void read(basic_json_visitor<char_type>& visitor)
-    {
-        read_to(visitor);
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&, std::error_code&)")
-    void read(basic_json_visitor<char_type>& visitor,
-                 std::error_code& ec) 
-    {
-        read_to(visitor, ec);
-    }
-#endif
-private:
-    static bool accept_all(const basic_staj_event<char_type>&, const ser_context&) 
-    {
-        return true;
     }
 };
 

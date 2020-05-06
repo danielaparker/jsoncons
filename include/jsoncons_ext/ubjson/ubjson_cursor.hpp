@@ -136,11 +136,14 @@ public:
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
+        if (staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
         {
-            return;
+            read_next(visitor, ec);
         }
-        read_next(visitor, ec);
+        if (!done())
+        {
+            read_next(ec);
+        }
     }
 
     void next() override
@@ -156,30 +159,6 @@ public:
     void next(std::error_code& ec) override
     {
         read_next(ec);
-    }
-
-    void read_next(std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
-        {
-            parser_.parse(cursor_visitor_, ec);
-            if (ec) return;
-        }
-    }
-
-    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
-        {
-            parser_.parse(visitor, ec);
-            if (ec) return;
-        }
-        if (!done())
-        {
-            read_next(ec);
-        }
     }
 
     const ser_context& context() const override
@@ -220,6 +199,26 @@ private:
     static bool accept_all(const basic_staj_event<char_type>&, const ser_context&) 
     {
         return true;
+    }
+
+    void read_next(std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(cursor_visitor_, ec);
+            if (ec) return;
+        }
+    }
+
+    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(visitor, ec);
+            if (ec) return;
+        }
     }
 };
 
