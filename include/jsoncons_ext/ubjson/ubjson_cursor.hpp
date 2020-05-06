@@ -34,7 +34,7 @@ public:
     using allocator_type = Allocator;
 private:
     basic_ubjson_parser<Src,Allocator> parser_;
-    basic_staj_visitor<char_type> event_handler_;
+    basic_staj_visitor<char_type> cursor_visitor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -71,7 +71,7 @@ public:
                       const ubjson_decode_options& options = ubjson_decode_options(),
                       const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), options, alloc), 
-         event_handler_(filter), 
+         cursor_visitor_(filter), 
          eof_(false)
     {
         if (!done())
@@ -104,7 +104,7 @@ public:
                         std::function<bool(const staj_event&, const ser_context&)> filter,
                         std::error_code& ec)
        : parser_(std::forward<Source>(source), alloc), 
-         event_handler_(filter),
+         cursor_visitor_(filter),
          eof_(false)
     {
         if (!done())
@@ -120,7 +120,7 @@ public:
 
     const basic_staj_event<char_type>& current() const override
     {
-        return event_handler_.event();
+        return cursor_visitor_.event();
     }
 
     void read_to(basic_json_visitor<char_type>& visitor) override
@@ -136,7 +136,7 @@ public:
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
+        if (!staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
         {
             return;
         }
@@ -160,7 +160,12 @@ public:
 
     void read_next(std::error_code& ec)
     {
-        read_next(event_handler_, ec);
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(cursor_visitor_, ec);
+            if (ec) return;
+        }
     }
 
     void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
@@ -170,6 +175,10 @@ public:
         {
             parser_.parse(visitor, ec);
             if (ec) return;
+        }
+        if (!done())
+        {
+            read_next(ec);
         }
     }
 

@@ -1013,7 +1013,7 @@ public:
                             break;
                         case '[': 
                         case '.':
-                            ec = jsonpath_errc::expected_name;
+                            ec = jsonpath_errc::expected_key;
                             return;
                         default:
                             buffer.clear();
@@ -1080,7 +1080,7 @@ public:
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_name;
+                            ec = jsonpath_errc::expected_key;
                             return;
                     };
                     break;

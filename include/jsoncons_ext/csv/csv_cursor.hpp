@@ -39,7 +39,7 @@ private:
 
     source_type source_;
     basic_csv_parser<CharT,Allocator> parser_;
-    basic_staj_visitor<CharT> event_handler_;
+    basic_staj_visitor<CharT> cursor_visitor_;
     std::vector<CharT,char_allocator_type> buffer_;
     std::size_t buffer_length_;
     bool eof_;
@@ -76,7 +76,7 @@ public:
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
-         event_handler_(filter),
+         cursor_visitor_(filter),
          buffer_(alloc),
          buffer_length_(default_max_buffer_length),
          eof_(false),
@@ -97,7 +97,7 @@ public:
                      const Allocator& alloc = Allocator(),
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
-         event_handler_(filter),
+         cursor_visitor_(filter),
          buffer_(alloc),
          buffer_length_(0),
          eof_(false),
@@ -195,7 +195,7 @@ public:
                      typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
-         event_handler_(filter),
+         cursor_visitor_(filter),
          eof_(false),
          buffer_(alloc),
          buffer_length_(default_max_buffer_length),
@@ -217,7 +217,7 @@ public:
                      std::error_code& ec,
                      typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
-         event_handler_(filter),
+         cursor_visitor_(filter),
          eof_(false),
          buffer_(alloc),
          buffer_length_(0),
@@ -256,7 +256,7 @@ public:
 
     const basic_staj_event<CharT>& current() const override
     {
-        return event_handler_.event();
+        return cursor_visitor_.event();
     }
 
     void read_to(basic_json_visitor<CharT>& visitor) override
@@ -272,7 +272,7 @@ public:
     void read_to(basic_json_visitor<CharT>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
+        if (!staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
         {
             return;
         }
@@ -329,7 +329,24 @@ public:
 
     void read_next(std::error_code& ec)
     {
-        read_next(event_handler_, ec);
+        parser_.restart();
+        while (!parser_.finished())
+        {
+            if (parser_.source_exhausted())
+            {
+                if (!source_.eof())
+                {
+                    read_buffer(ec);
+                    if (ec) return;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            parser_.parse_some(cursor_visitor_, ec);
+            if (ec) return;
+        }
     }
 
     void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)
@@ -351,6 +368,10 @@ public:
             }
             parser_.parse_some(visitor, ec);
             if (ec) return;
+        }
+        if (!done())
+        {
+            read_next(ec);
         }
     }
 

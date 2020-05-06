@@ -202,7 +202,6 @@ TEST_CASE("convert vector of vector test")
         CHECK(item[3] == 4);
     }
 }
-
 TEST_CASE("convert vector of vector test, temp_allocator")
 {
     std::vector<double> u{1,2,3,4};
@@ -274,6 +273,7 @@ TEST_CASE("encode/decode map with integer key")
 
     std::string s;
     jsoncons::encode_json(m,s);
+    std::cout << s << "\n";
     auto result = jsoncons::decode_json<std::map<int,double>>(s);
 
     REQUIRE(result.size() == m.size());

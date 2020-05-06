@@ -56,7 +56,7 @@ TEST_CASE("test_fail3")
     {
         err = e.code();
     }
-    CHECK(err == jsoncons::json_errc::expected_name);
+    CHECK(err == jsoncons::json_errc::expected_key);
 }
 
 TEST_CASE("test_fail4")

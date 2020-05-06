@@ -1361,6 +1361,9 @@ using basic_stream_event = basic_staj_event<CharT>;
 template<class CharT>
 using basic_stream_reader = basic_staj_cursor<CharT>;
 
+template<class CharT>
+using basic_staj_reader = basic_staj_cursor<CharT>;
+
 JSONCONS_DEPRECATED_MSG("Instead, use staj_event") typedef basic_staj_event<char> stream_event;
 JSONCONS_DEPRECATED_MSG("Instead, use wstaj_event") typedef basic_staj_event<wchar_t> wstream_event;
 

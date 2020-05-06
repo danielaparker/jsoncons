@@ -145,14 +145,14 @@ TEST_CASE("test_read_expected_colon")
     test_json_reader_error("{\"name\" []}", jsoncons::json_errc::expected_colon);
 }
 
-TEST_CASE("test_read_expected_name")
+TEST_CASE("test_read_expected_key")
 {
-    test_json_reader_error("{10}", jsoncons::json_errc::expected_name);
-    test_json_reader_error("{true}", jsoncons::json_errc::expected_name);
-    test_json_reader_error("{false}", jsoncons::json_errc::expected_name);
-    test_json_reader_error("{null}", jsoncons::json_errc::expected_name);
-    test_json_reader_error("{{}}", jsoncons::json_errc::expected_name);
-    test_json_reader_error("{[]}", jsoncons::json_errc::expected_name);
+    test_json_reader_error("{10}", jsoncons::json_errc::expected_key);
+    test_json_reader_error("{true}", jsoncons::json_errc::expected_key);
+    test_json_reader_error("{false}", jsoncons::json_errc::expected_key);
+    test_json_reader_error("{null}", jsoncons::json_errc::expected_key);
+    test_json_reader_error("{{}}", jsoncons::json_errc::expected_key);
+    test_json_reader_error("{[]}", jsoncons::json_errc::expected_key);
 }
 
 TEST_CASE("test_read_expected_value")

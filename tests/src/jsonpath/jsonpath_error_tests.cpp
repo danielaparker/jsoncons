@@ -90,7 +90,7 @@ TEST_CASE("test_dot_dot_dot")
 {
 
     json root = json::parse(jsonpath_fixture::store_text());
-    test_error_code(root, "$.store...price", jsonpath::jsonpath_errc::expected_name,1,10);
+    test_error_code(root, "$.store...price", jsonpath::jsonpath_errc::expected_key,1,10);
 }
 
 TEST_CASE("test_dot_star_name")

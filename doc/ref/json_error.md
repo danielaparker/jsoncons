@@ -19,7 +19,7 @@ constant                            |Description
 `single_quote`        |JSON strings cannot be quoted with single quotes
 `illegal_character_in_string`        |Illegal character in string
 `extra_comma`        |Extra comma      
-`expected_name`                     |Expected object member name
+`expected_key`                     |Expected object member key
 `expected_value`                    |Expected value                     
 `invalid_value`                    |Invalid value                     
 `expected_colon`           |Expected name separator ':'       

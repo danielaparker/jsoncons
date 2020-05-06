@@ -34,8 +34,8 @@ public:
     using allocator_type = Allocator;
 private:
     basic_msgpack_parser<Src,Allocator> parser_;
-    basic_staj_visitor<char_type> event_handler_;
-    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> event_handler_adaptor_;
+    basic_staj_visitor<char_type> cursor_visitor_;
+    basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> cursor_handler_adaptor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -72,8 +72,8 @@ public:
                       const msgpack_decode_options& options = msgpack_decode_options(),
                       const Allocator& alloc = Allocator())
        : parser_(std::forward<Source>(source), options, alloc), 
-         event_handler_(filter), 
-         event_handler_adaptor_(event_handler_, alloc),
+         cursor_visitor_(filter), 
+         cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)
     {
         if (!done())
@@ -107,8 +107,8 @@ public:
                          std::function<bool(const staj_event&, const ser_context&)> filter,
                          std::error_code& ec)
        : parser_(std::forward<Source>(source), alloc), 
-         event_handler_(filter),
-         event_handler_adaptor_(event_handler_, alloc),
+         cursor_visitor_(filter),
+         cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)
     {
         if (!done())
@@ -124,7 +124,7 @@ public:
 
     const basic_staj_event<char_type>& current() const override
     {
-        return event_handler_.event();
+        return cursor_visitor_.event();
     }
 
     void read_to(basic_json_visitor<char_type>& visitor) override
@@ -140,7 +140,7 @@ public:
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
+        if (!staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
         {
             return;
         }
@@ -164,16 +164,16 @@ public:
 
     void read_next(std::error_code& ec)
     {
-        if (event_handler_.in_available())
+        if (cursor_visitor_.in_available())
         {
-            event_handler_.send_available(ec);
+            cursor_visitor_.send_available(ec);
         }
         else
         {
             parser_.restart();
             while (!parser_.stopped())
             {
-                parser_.parse(event_handler_adaptor_, ec);
+                parser_.parse(cursor_handler_adaptor_, ec);
                 if (ec) return;
             }
         }
@@ -181,29 +181,35 @@ public:
 
     void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        struct resource_wrapper
         {
-            basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor;
-            basic_json_visitor<char_type>& original;
-
-            resource_wrapper(basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor,
-                             basic_json_visitor<char_type>& visitor)
-                : adaptor(adaptor), original(adaptor.destination())
+            struct resource_wrapper
             {
-                adaptor.destination(visitor);
-            }
+                basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor;
+                basic_json_visitor<char_type>& original;
 
-            ~resource_wrapper()
+                resource_wrapper(basic_json_visitor2_to_visitor_adaptor<char_type,Allocator>& adaptor,
+                                 basic_json_visitor<char_type>& visitor)
+                    : adaptor(adaptor), original(adaptor.destination())
+                {
+                    adaptor.destination(visitor);
+                }
+
+                ~resource_wrapper()
+                {
+                    adaptor.destination(original);
+                }
+            } wrapper(cursor_handler_adaptor_, visitor);
+
+            parser_.restart();
+            while (!parser_.stopped())
             {
-                adaptor.destination(original);
+                parser_.parse(cursor_handler_adaptor_, ec);
+                if (ec) return;
             }
-        } wrapper(event_handler_adaptor_, visitor);
-
-        parser_.restart();
-        while (!parser_.stopped())
+        }
+        if (!done())
         {
-            parser_.parse(event_handler_adaptor_, ec);
-            if (ec) return;
+            read_next(ec);
         }
     }
 

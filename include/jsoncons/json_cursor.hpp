@@ -375,10 +375,10 @@ public:
             }
             parser_.parse_some(visitor, ec);
             if (ec) return;
-            if (!done())
-            {
-                read_next(ec);
-            }
+        }
+        if (!done())
+        {
+            read_next(ec);
         }
     }
 

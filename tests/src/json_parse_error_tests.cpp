@@ -102,14 +102,14 @@ TEST_CASE("test_expected_colon")
     test_parse_error("{\"name\" []}", jsoncons::json_errc::expected_colon);
 }
 
-TEST_CASE("test_expected_name")
+TEST_CASE("test_expected_key")
 {
-    test_parse_error("{10}", jsoncons::json_errc::expected_name);
-    test_parse_error("{true}", jsoncons::json_errc::expected_name);
-    test_parse_error("{false}", jsoncons::json_errc::expected_name);
-    test_parse_error("{null}", jsoncons::json_errc::expected_name);
-    test_parse_error("{{}}", jsoncons::json_errc::expected_name);
-    test_parse_error("{[]}", jsoncons::json_errc::expected_name);
+    test_parse_error("{10}", jsoncons::json_errc::expected_key);
+    test_parse_error("{true}", jsoncons::json_errc::expected_key);
+    test_parse_error("{false}", jsoncons::json_errc::expected_key);
+    test_parse_error("{null}", jsoncons::json_errc::expected_key);
+    test_parse_error("{{}}", jsoncons::json_errc::expected_key);
+    test_parse_error("{[]}", jsoncons::json_errc::expected_key);
 }
 
 TEST_CASE("test_expected_value")

@@ -48,9 +48,10 @@ namespace jsoncons {
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_cursor<CharT>& cursor, 
                              json_decoder<Json,TempAllocator>&, 
-                             std::error_code&)
+                             std::error_code& ec)
         {
             T v = cursor.current().template as<T>();
+            cursor.next(ec);
             return v;
         }
     };
@@ -66,9 +67,10 @@ namespace jsoncons {
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_cursor<CharT>& cursor, 
                              json_decoder<Json,TempAllocator>&, 
-                             std::error_code&)
+                             std::error_code& ec)
         {
             T v = cursor.current().template as<T>();
+            cursor.next(ec);
             return v;
         }
     };
@@ -82,11 +84,12 @@ namespace jsoncons {
         template <class Json,class TempAllocator>
         static T deserialize(basic_staj_cursor<CharT>& cursor, 
                              json_decoder<Json,TempAllocator>&, 
-                             std::error_code&)
+                             std::error_code& ec)
         {
             auto val = cursor.current().template as<std::basic_string<CharT>>();
             T s;
             unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+            cursor.next(ec);
             return s;
         }
     };
@@ -120,19 +123,7 @@ namespace jsoncons {
                 ec = convert_errc::json_not_pair;
                 return value_type();
             }
-            cursor.next(ec);
-            if (ec)
-            {
-                ec = convert_errc::json_not_pair;
-                return value_type();
-            }
             T2 v2 = deser_traits<T2, CharT>::deserialize(cursor, decoder, ec);
-            if (ec)
-            {
-                ec = convert_errc::json_not_pair;
-                return value_type();
-            }
-            cursor.next(ec);
             if (ec || cursor.current().event_type() != staj_event_type::end_array)
             {
                 ec = convert_errc::json_not_pair;
@@ -169,7 +160,6 @@ namespace jsoncons {
             while (cursor.current().event_type() != staj_event_type::end_array && !ec)
             {
                 v.push_back(deser_traits<value_type,CharT>::deserialize(cursor, decoder, ec));
-                cursor.next(ec);
             }
             return v;
         }
@@ -332,7 +322,6 @@ namespace jsoncons {
             for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
             {
                 v[i] = deser_traits<value_type,CharT>::deserialize(cursor, decoder, ec);
-                cursor.next(ec);
             }
             return v;
         }
@@ -368,13 +357,13 @@ namespace jsoncons {
             {
                 if (cursor.current().event_type() != staj_event_type::key)
                 {
-                    ec = json_errc::expected_name;
+                    ec = json_errc::expected_key;
                     return val;
                 }
                 auto key = cursor.current().template as<key_type>();
                 cursor.next(ec);
+                if (ec) return val;
                 val.emplace(std::move(key),deser_traits<mapped_type,CharT>::deserialize(cursor, decoder, ec));
-                cursor.next(ec);
             }
             return val;
         }
@@ -408,14 +397,14 @@ namespace jsoncons {
             {
                 if (cursor.current().event_type() != staj_event_type::key)
                 {
-                    ec = json_errc::expected_name;
+                    ec = json_errc::expected_key;
                     return val;
                 }
                 auto s = cursor.current().template as<basic_string_view<typename Json::char_type>>();
                 auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 cursor.next(ec);
+                if (ec) return val;
                 val.emplace(key.value(),deser_traits<mapped_type,CharT>::deserialize(cursor, decoder, ec));
-                cursor.next(ec);
             }
             return val;
         }

@@ -852,10 +852,10 @@ public:
                                 ++column_;
                                 break;
                             default:
-                                more_ = err_handler_(json_errc::expected_name, *this);
+                                more_ = err_handler_(json_errc::expected_key, *this);
                                 if (!more_)
                                 {
-                                    ec = json_errc::expected_name;
+                                    ec = json_errc::expected_key;
                                     return;
                                 }
                                 ++input_ptr_;
@@ -930,10 +930,10 @@ public:
                                 ++column_;
                                 break;
                             default:
-                                more_ = err_handler_(json_errc::expected_name, *this);
+                                more_ = err_handler_(json_errc::expected_key, *this);
                                 if (!more_)
                                 {
-                                    ec = json_errc::expected_name;
+                                    ec = json_errc::expected_key;
                                     return;
                                 }
                                 ++input_ptr_;
