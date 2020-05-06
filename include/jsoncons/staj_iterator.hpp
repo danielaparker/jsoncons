@@ -45,6 +45,7 @@ public:
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
+            reader_->next(); // skip past array
             next();
         }
         else
@@ -59,6 +60,7 @@ public:
     {
         if (reader_->current().event_type() == staj_event_type::begin_array)
         {
+            reader_->next(); // skip past array
             next(ec);
             if (ec)
             {
@@ -333,15 +335,11 @@ void staj_array_iterator<Json,T>::next()
 
     if (!done())
     {
-        reader_->next();
-        if (!done())
+        std::error_code ec;
+        value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
+        if (ec)
         {
-            std::error_code ec;
-            value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
-            if (ec)
-            {
-                JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
-            }
+            JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
         }
     }
 }
@@ -353,15 +351,7 @@ void staj_array_iterator<Json,T>::next(std::error_code& ec)
 
     if (!done())
     {
-        reader_->next(ec);
-        if (ec)
-        {
-            return;
-        }
-        if (!done())
-        {
-            value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
-        }
+        value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
     }
 }
 
