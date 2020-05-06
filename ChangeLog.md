@@ -28,6 +28,8 @@ renamed to `use_typed_arrays`.
 
 - `jsonpointer::unflatten_method` has been deprecated and replaced with `jsonpointer::unflatten_options`.
 
+- The name `staj_reader` has been deprecated and renamed to `staj_cursor`.
+
 Enhancements:
 
 - Added classes bson_options, msgpack_options, and ubjson_options
