@@ -401,7 +401,7 @@ namespace detail {
             }
             else 
             {
-                JSONCONS_THROW(ser_error(convert_errc::json_not_vector));
+                JSONCONS_THROW(ser_error(convert_errc::not_vector));
             }
         }
 
@@ -427,7 +427,7 @@ namespace detail {
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::json_not_vector));
+                JSONCONS_THROW(ser_error(convert_errc::not_vector));
             }
         }
 
@@ -596,7 +596,7 @@ namespace detail {
         {
             if (!j.is_object())
             {
-                JSONCONS_THROW(ser_error(convert_errc::json_not_map));
+                JSONCONS_THROW(ser_error(convert_errc::not_map));
             }
             T result;
             for (const auto& item : j.object_range())
@@ -1082,7 +1082,7 @@ namespace detail
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::json_not_array));
+                JSONCONS_THROW(ser_error(convert_errc::not_array));
             }
         }
         

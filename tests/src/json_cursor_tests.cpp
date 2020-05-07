@@ -127,8 +127,6 @@ TEST_CASE("json_cursor string_value as bignum test")
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
     CHECK(s == cursor.current().get<std::string>());
-    bignum c = cursor.current().get<bignum>();
-    CHECK(bool(bignum("-18446744073709551617") == c));
     cursor.next();
     CHECK(cursor.done());
 }
@@ -143,8 +141,6 @@ TEST_CASE("json_cursor bigint value as bignum")
     REQUIRE_FALSE(cursor.done());
     CHECK(cursor.current().event_type() == staj_event_type::string_value);
     CHECK(cursor.current().tag() == semantic_tag::bigint);
-    bignum c = cursor.current().get<bignum>();
-    CHECK(bool(bignum(s) == c));
     cursor.next();
     CHECK(cursor.done());
 }
@@ -511,7 +507,6 @@ TEST_CASE("staj event as object")
 
     std::string buffer;
     encode_json(books, buffer, indenting::indent);
-    std::cout << buffer << "\n";
 
     SECTION("test 1")
     {
@@ -557,6 +552,8 @@ TEST_CASE("staj event as object")
     }
     SECTION("test 2")
     {
+        json document = json::parse(buffer);
+
         json_cursor cursor(buffer);
         REQUIRE_FALSE(cursor.done());
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
@@ -565,16 +562,15 @@ TEST_CASE("staj event as object")
 
         json_decoder<json> decoder;
         cursor.read_to(decoder);
-        json j = decoder.get_result();
-
-        std::cout << pretty_print(j) << "\n";
+        json j0 = decoder.get_result();
+        CHECK((j0 == document[0]));
 
         json_diagnostics_visitor visitor;
 
         json_decoder<json> decoder2;
         cursor.read_to(decoder2);
-        json j2 = decoder2.get_result();
-        std::cout << pretty_print(j2) << "\n";
+        json j1 = decoder2.get_result();
+        CHECK((j1 == document[1]));
     }
 }
 

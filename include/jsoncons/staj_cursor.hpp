@@ -213,72 +213,107 @@ public:
         value_.byte_string_data_ = s.data();
     }
 
+    template <class T>
+    T get() const
+    {
+        std::error_code ec;
+        T val = get<T>(ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+        return val;
+    }
+
     template<class T, class CharT_ = CharT>
     typename std::enable_if<jsoncons::detail::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        get() const
+        get(std::error_code& ec) const
     {
         T s;
         switch (event_type_)
         {
-        case staj_event_type::key:
-        case staj_event_type::string_value:
-            s = T(value_.string_data_, length_);
-            break;
-        case staj_event_type::int64_value:
-        {
-            jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::write_integer(value_.int64_value_, sink);
-            break;
-        }
-        case staj_event_type::uint64_value:
-        {
-            jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::write_integer(value_.uint64_value_, sink);
-            break;
-        }
-        case staj_event_type::half_value:
-        {
-            jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::write_double f{float_chars_format::general,0};
-            double x = jsoncons::detail::decode_half(value_.half_value_);
-            f(x, sink);
-            break;
-        }
-        case staj_event_type::double_value:
-        {
-            jsoncons::string_sink<T> sink(s);
-            jsoncons::detail::write_double f{float_chars_format::general,0};
-            f(value_.double_value_, sink);
-            break;
-        }
-        case staj_event_type::bool_value:
-        {
-            jsoncons::string_sink<T> sink(s);
-            if (value_.bool_value_)
+            case staj_event_type::key:
+            case staj_event_type::string_value:
+                s = T(value_.string_data_, length_);
+                break;
+            case staj_event_type::byte_string_value:
             {
-                sink.append(true_literal<CharT>().data(),true_literal<CharT>().size());
+                switch (tag())
+                {
+                    case semantic_tag::base64:
+                        encode_base64(value_.byte_string_data_,
+                                      value_.byte_string_data_ + length_,
+                                      s);
+                        break;
+                    case semantic_tag::base16:
+                        encode_base16(value_.byte_string_data_,
+                                      value_.byte_string_data_ + length_,
+                                      s);
+                        break;
+                    default:
+                        encode_base64url(value_.byte_string_data_,
+                                         value_.byte_string_data_ + length_,
+                                         s);
+                        break;
+                }
+                break;
             }
-            else
+            case staj_event_type::int64_value:
             {
-                sink.append(false_literal<CharT>().data(),false_literal<CharT>().size());
+                jsoncons::string_sink<T> sink(s);
+                jsoncons::detail::write_integer(value_.int64_value_, sink);
+                break;
             }
-            break;
-        }
-        case staj_event_type::null_value:
-        {
-            jsoncons::string_sink<T> sink(s);
-            sink.append(null_literal<CharT>().data(),null_literal<CharT>().size());
-            break;
-        }
-        default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a string"));
+            case staj_event_type::uint64_value:
+            {
+                jsoncons::string_sink<T> sink(s);
+                jsoncons::detail::write_integer(value_.uint64_value_, sink);
+                break;
+            }
+            case staj_event_type::half_value:
+            {
+                jsoncons::string_sink<T> sink(s);
+                jsoncons::detail::write_double f{float_chars_format::general,0};
+                double x = jsoncons::detail::decode_half(value_.half_value_);
+                f(x, sink);
+                break;
+            }
+            case staj_event_type::double_value:
+            {
+                jsoncons::string_sink<T> sink(s);
+                jsoncons::detail::write_double f{float_chars_format::general,0};
+                f(value_.double_value_, sink);
+                break;
+            }
+            case staj_event_type::bool_value:
+            {
+                jsoncons::string_sink<T> sink(s);
+                if (value_.bool_value_)
+                {
+                    sink.append(true_literal<CharT>().data(),true_literal<CharT>().size());
+                }
+                else
+                {
+                    sink.append(false_literal<CharT>().data(),false_literal<CharT>().size());
+                }
+                break;
+            }
+            case staj_event_type::null_value:
+            {
+                jsoncons::string_sink<T> sink(s);
+                sink.append(null_literal<CharT>().data(),null_literal<CharT>().size());
+                break;
+            }
+            default:
+                ec = convert_errc::not_string;
+                break;
         }
         return s;
     }
 
     template<class T, class CharT_ = CharT>
     typename std::enable_if<jsoncons::detail::is_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        get() const
+        get(std::error_code& ec) const
     {
         T s;
         switch (event_type_)
@@ -288,60 +323,55 @@ public:
             s = T(value_.string_data_, length_);
             break;
         default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a string"));
+            ec = convert_errc::not_string_view;
+            break;        
         }
         return s;
     }
 
     template<class T>
     typename std::enable_if<std::is_same<T, byte_string_view>::value, T>::type
-        get() const
+        get(std::error_code& ec) const
     {
         T s;
         switch (event_type_)
         {
-        case staj_event_type::byte_string_value:
-            s = T(value_.byte_string_data_, length_);
-            break;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a byte_string"));
+            case staj_event_type::byte_string_value:
+                s = T(value_.byte_string_data_, length_);
+                break;
+            default:
+                ec = convert_errc::not_byte_string_view;
+                break;
         }
         return s;
     }
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_integer_like<T>::value, T>::type
-        get() const
+        get(std::error_code& ec) const
     {
-        return static_cast<T>(as_int64());
+        return static_cast<T>(as_int64(ec));
     }
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_uinteger_like<T>::value, T>::type
-        get() const
+        get(std::error_code& ec) const
     {
-        return static_cast<T>(as_uint64());
+        return static_cast<T>(as_uint64(ec));
     }
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_floating_point_like<T>::value, T>::type
-        get() const
+        get(std::error_code& ec) const
     {
-        return static_cast<T>(as_double());
-    }
-
-    template<class T, class UserAllocator = std::allocator<uint8_t>>
-    typename std::enable_if<std::is_same<T, basic_bignum<UserAllocator>>::value, T>::type
-        get() const
-    {
-        return as_bignum<UserAllocator>();
+        return static_cast<T>(as_double(ec));
     }
 
     template<class T>
     typename std::enable_if<std::is_same<T, bool>::value, T>::type
-        get() const
+        get(std::error_code& ec) const
     {
-        return as_bool();
+        return as_bool(ec);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -359,7 +389,7 @@ public:
     semantic_tag tag() const noexcept { return tag_; }
 private:
 
-    int64_t as_int64() const
+    int64_t as_int64(std::error_code& ec) const
     {
         int64_t value = 0;
         switch (event_type_)
@@ -370,9 +400,12 @@ private:
                 auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
                 if (!result)
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
+                    ec = convert_errc::not_signed_integer;
                 }
-                value = result.value();
+                else
+                {
+                    value = result.value();
+                }
                 break;
             }
             case staj_event_type::double_value:
@@ -388,12 +421,13 @@ private:
                 value = value_.bool_value_ ? 1 : 0;
                 break;
             default:
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an integer"));
+                ec = convert_errc::not_signed_integer;
+                break;
         }
         return value;
     }
 
-    uint64_t as_uint64() const
+    uint64_t as_uint64(std::error_code& ec) const
     {
         uint64_t value = 0;
         switch (event_type_)
@@ -404,9 +438,12 @@ private:
                 auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
                 if (!result)
                 {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
+                    ec = convert_errc::not_unsigned_integer;
                 }
-                value = result.value();
+                else
+                {
+                    value = result.value();
+                }
                 break;
             }
             case staj_event_type::double_value:
@@ -422,12 +459,13 @@ private:
                 value = value_.bool_value_ ? 1 : 0;
                 break;
             default:
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an unsigned integer"));
+                ec = convert_errc::not_unsigned_integer;
+                break;
         }
         return value;
     }
 
-    double as_double() const
+    double as_double(std::error_code& ec) const
     {
         switch (event_type_)
         {
@@ -449,11 +487,12 @@ private:
                 return static_cast<double>(x);
             }
             default:
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a double"));
+                ec = convert_errc::not_double;
+                return double();
         }
     }
 
-    bool as_bool() const
+    bool as_bool(std::error_code& ec) const
     {
         switch (event_type_)
         {
@@ -466,34 +505,10 @@ private:
             case staj_event_type::uint64_value:
                 return value_.uint64_value_ != 0;
             default:
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bool"));
+                ec = convert_errc::not_bool;
+                return bool();
         }
     }
-
-    template <class UserAllocator = std::allocator<uint8_t>>
-    basic_bignum<UserAllocator> as_bignum() const
-    {
-        switch (event_type_)
-        {
-            case staj_event_type::string_value:
-                if (!jsoncons::detail::is_base10(value_.string_data_, length_))
-                {
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
-                }
-                return basic_bignum<UserAllocator>(value_.string_data_, length_);
-            case staj_event_type::double_value:
-                return basic_bignum<UserAllocator>(value_.double_value_);
-            case staj_event_type::int64_value:
-                return basic_bignum<UserAllocator>(value_.int64_value_);
-            case staj_event_type::uint64_value:
-                return basic_bignum<UserAllocator>(value_.uint64_value_);
-            case staj_event_type::bool_value:
-                return basic_bignum<UserAllocator>(value_.bool_value_ ? 1 : 0);
-            default:
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a bignum"));
-        }
-    }
-
 };
 
 // basic_staj_visitor

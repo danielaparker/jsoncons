@@ -129,7 +129,7 @@ TEST_CASE("deser_traits std::pair")
         json_cursor cursor(input);
         auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
 
-        CHECK(ec == convert_errc::json_not_pair);
+        CHECK(ec == convert_errc::not_pair);
     }
 }
 

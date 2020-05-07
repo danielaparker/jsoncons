@@ -530,5 +530,28 @@ TEST_CASE("oss-fuzz issues")
         REQUIRE_NOTHROW(reader.read(ec));
         CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
     }
+
+    // Fuzz target: jsoncons:fuzz_json_cursor
+    // Issue: failed_throw
+    SECTION("issue 22091")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_json_cursor-5686693027119104";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::error_code ec;
+        json_cursor reader(is, ec);
+        while (reader.done() == 0 && !ec)
+        {
+            const auto& event = reader.current();
+            std::string s2 = event.get<std::string>(ec); 
+            if (!ec)
+            {
+                reader.next(ec);
+            }
+        }
+        CHECK(ec == convert_errc::not_string);
+    }
 }
 

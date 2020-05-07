@@ -50,8 +50,11 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
-            T v = cursor.current().template get<T>();
-            cursor.next(ec);
+            T v = cursor.current().template get<T>(ec);
+            if (!ec)
+            {
+                cursor.next(ec);
+            }
             return v;
         }
     };
@@ -69,8 +72,11 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
-            T v = cursor.current().template get<T>();
-            cursor.next(ec);
+            T v = cursor.current().template get<T>(ec);
+            if (!ec)
+            {
+                cursor.next(ec);
+            }
             return v;
         }
     };
@@ -86,10 +92,13 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
-            auto val = cursor.current().template get<std::basic_string<CharT>>();
+            auto val = cursor.current().template get<std::basic_string<CharT>>(ec);
             T s;
-            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
-            cursor.next(ec);
+            if (!ec)
+            {
+                unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+                cursor.next(ec);
+            }
             return s;
         }
     };
@@ -107,7 +116,7 @@ namespace jsoncons {
             using value_type = std::pair<T1, T2>;
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::json_not_pair;
+                ec = convert_errc::not_pair;
                 return value_type();
             }
             cursor.next(ec);
@@ -128,7 +137,7 @@ namespace jsoncons {
             }
             if (cursor.current().event_type() != staj_event_type::end_array)
             {
-                ec = convert_errc::json_not_pair;
+                ec = convert_errc::not_pair;
                 return value_type();
             }
             cursor.next(ec);
@@ -160,7 +169,7 @@ namespace jsoncons {
 
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::json_not_vector;
+                ec = convert_errc::not_vector;
                 return v;
             }
             cursor.next(ec);
@@ -181,7 +190,7 @@ namespace jsoncons {
         using value_type = typename T::value_type;
 
         typed_array_visitor(T& v)
-            : default_json_visitor(false,convert_errc::json_not_vector), v_(v), level_(0)
+            : default_json_visitor(false,convert_errc::not_vector), v_(v), level_(0)
         {
         }
     private:
@@ -191,7 +200,7 @@ namespace jsoncons {
         {      
             if (++level_ != 1)
             {
-                ec = convert_errc::json_not_vector;
+                ec = convert_errc::not_vector;
                 return false;
             }
             return true;
@@ -204,7 +213,7 @@ namespace jsoncons {
         {
             if (++level_ != 1)
             {
-                ec = convert_errc::json_not_vector;
+                ec = convert_errc::not_vector;
                 return false;
             }
             v_.reserve(size);
@@ -216,7 +225,7 @@ namespace jsoncons {
         {
             if (level_ != 1)
             {
-                ec = convert_errc::json_not_vector;
+                ec = convert_errc::not_vector;
                 return false;
             }
             return false;
@@ -297,7 +306,7 @@ namespace jsoncons {
 
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::json_not_vector;
+                ec = convert_errc::not_vector;
                 return v;
             }
 
@@ -323,7 +332,7 @@ namespace jsoncons {
             v.fill(T{});
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::json_not_vector;
+                ec = convert_errc::not_vector;
             }
             cursor.next(ec);
             for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
@@ -355,7 +364,7 @@ namespace jsoncons {
             T val;
             if (cursor.current().event_type() != staj_event_type::begin_object)
             {
-                ec = convert_errc::json_not_map;
+                ec = convert_errc::not_map;
                 return val;
             }
             cursor.next(ec);
@@ -367,9 +376,10 @@ namespace jsoncons {
                     ec = json_errc::expected_key;
                     return val;
                 }
-                auto key = cursor.current().template get<key_type>();
+                auto key = cursor.current().template get<key_type>(ec);
+                if (!ec) return val;
                 cursor.next(ec);
-                if (ec) return val;
+                if (!ec) return val;
                 val.emplace(std::move(key),deser_traits<mapped_type,CharT>::deserialize(cursor, decoder, ec));
             }
             return val;
@@ -395,7 +405,7 @@ namespace jsoncons {
             T val;
             if (cursor.current().event_type() != staj_event_type::begin_object)
             {
-                ec = convert_errc::json_not_map;
+                ec = convert_errc::not_map;
                 return val;
             }
             cursor.next(ec);
@@ -407,7 +417,8 @@ namespace jsoncons {
                     ec = json_errc::expected_key;
                     return val;
                 }
-                auto s = cursor.current().template get<basic_string_view<typename Json::char_type>>();
+                auto s = cursor.current().template get<basic_string_view<typename Json::char_type>>(ec);
+                if (ec) return val;
                 auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 cursor.next(ec);
                 if (ec) return val;

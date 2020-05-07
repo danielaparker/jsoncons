@@ -15,10 +15,17 @@ namespace jsoncons {
     enum class convert_errc
     {
         success = 0,
-        json_not_vector,
-        json_not_array,
-        json_not_map,
-        json_not_pair
+        not_vector,
+        not_array,
+        not_map,
+        not_pair,
+        not_string,
+        not_string_view,
+        not_byte_string_view,
+        not_signed_integer,
+        not_unsigned_integer,
+        not_double,
+        not_bool
     };
 }
 
@@ -38,22 +45,36 @@ namespace detail {
     public:
         const char* name() const noexcept override
         {
-            return "jsoncons/conversion";
+            return "jsoncons/convert";
         }
         std::string message(int ev) const override
         {
             switch (static_cast<convert_errc>(ev))
             {
-                case convert_errc::json_not_vector:
-                    return "json cannot be converted to vector";
-                case convert_errc::json_not_array:
-                    return "json cannot be converted to array";
-                case convert_errc::json_not_map:
-                    return "json cannot be converted to map";
-                case convert_errc::json_not_pair:
-                    return "json cannot be converted to std::pair";
+                case convert_errc::not_vector:
+                    return "Cannot convert to vector";
+                case convert_errc::not_array:
+                    return "Cannot convert to std::array";
+                case convert_errc::not_map:
+                    return "Cannot convert to map";
+                case convert_errc::not_pair:
+                    return "Cannot convert to std::pair";
+                case convert_errc::not_string:
+                    return "Cannot convert to string";
+                case convert_errc::not_string_view:
+                    return "Cannot convert to byte_string_view";
+                case convert_errc::not_byte_string_view:
+                    return "Cannot convert to byte_string_view";
+                case convert_errc::not_signed_integer:
+                    return "Cannot convert to signed integer";
+                case convert_errc::not_unsigned_integer:
+                    return "Cannot convert to unsigned integer";
+                case convert_errc::not_double:
+                    return "Cannot convert to double";
+                case convert_errc::not_bool:
+                    return "Cannot convert to bool";
                 default:
-                    return "Unknown conversion error";
+                    return "Unknown convert error";
             }
         }
     };

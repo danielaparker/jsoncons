@@ -13,8 +13,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         while (reader.done() == 0 && !ec)
         {
                 const auto& event = reader.current();
-                std::string s2 = event.get<std::string>();
-                reader.next(ec);
+                std::string s2 = event.get<std::string>(ec);
+                if (!ec)
+                {
+                    reader.next(ec);
+                }
         }
 
         return 0;
