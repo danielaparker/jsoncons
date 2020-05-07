@@ -108,7 +108,6 @@ TEST_CASE("deser_traits std::pair")
         json_cursor cursor(input);
         auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
 
-        std::cout << ec.message() << "\n";
         REQUIRE_FALSE(ec);
 
         REQUIRE(val.size() == 2);
@@ -118,5 +117,35 @@ TEST_CASE("deser_traits std::pair")
         CHECK(val["foo"].second == 1.5);
         CHECK(val["bar"].first == 200);
         CHECK(val["bar"].second == 2.5);
+    }
+    SECTION("Conversion error")
+    {
+        std::string input = R"({"foo": [100,1.5,30],"bar" : [200,2.5]])";
+        using test_type = std::map<std::string,std::pair<int,double>>;
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+
+        CHECK(ec == convert_errc::json_not_pair);
+    }
+}
+
+TEST_CASE("deser_traits deserialization errors")
+{
+    SECTION("Expected comma or right brace")
+    {
+        std::string input = R"({"foo": [100,1.5],"bar" : [200,2.5]])";
+        using test_type = std::map<std::string,std::pair<int,double>>;
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+
+        CHECK(ec == json_errc::expected_comma_or_right_brace);
     }
 }

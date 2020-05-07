@@ -113,18 +113,20 @@ namespace jsoncons {
             cursor.next(ec);
             if (ec)
             {
-                ec = convert_errc::json_not_pair;
                 return value_type();
             }
 
             T1 v1 = deser_traits<T1,CharT>::deserialize(cursor, decoder, ec);
             if (ec)
             {
-                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             T2 v2 = deser_traits<T2, CharT>::deserialize(cursor, decoder, ec);
-            if (ec || cursor.current().event_type() != staj_event_type::end_array)
+            if (ec)
+            {
+                return value_type();
+            }
+            if (cursor.current().event_type() != staj_event_type::end_array)
             {
                 ec = convert_errc::json_not_pair;
                 return value_type();
@@ -132,7 +134,6 @@ namespace jsoncons {
             cursor.next(ec);
             if (ec)
             {
-                ec = convert_errc::json_not_pair;
                 return value_type();
             }
             return std::make_pair(v1, v2);
