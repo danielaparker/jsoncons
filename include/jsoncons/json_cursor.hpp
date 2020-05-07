@@ -203,9 +203,9 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(filter),
-         eof_(false),
          buffer_(alloc),
          buffer_length_(default_max_buffer_length),
+         eof_(false),
          begin_(true)
     {
         buffer_.reserve(buffer_length_);
@@ -225,9 +225,9 @@ public:
                       typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options, err_handler, alloc),
          cursor_visitor_(filter),
-         eof_(false),
          buffer_(alloc),
          buffer_length_(0),
+         eof_(false),
          begin_(false)
     {
         basic_string_view<CharT> sv(std::forward<Source>(source));
