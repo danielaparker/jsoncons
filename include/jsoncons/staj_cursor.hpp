@@ -23,6 +23,7 @@
 #include <jsoncons/sink.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/converter.hpp>
 
 namespace jsoncons {
 
@@ -230,6 +231,7 @@ public:
         get(std::error_code& ec) const
     {
         T s;
+        converter<T> conv;
         switch (event_type_)
         {
             case staj_event_type::key:
@@ -238,70 +240,39 @@ public:
                 break;
             case staj_event_type::byte_string_value:
             {
-                switch (tag())
-                {
-                    case semantic_tag::base64:
-                        encode_base64(value_.byte_string_data_,
-                                      value_.byte_string_data_ + length_,
-                                      s);
-                        break;
-                    case semantic_tag::base16:
-                        encode_base16(value_.byte_string_data_,
-                                      value_.byte_string_data_ + length_,
-                                      s);
-                        break;
-                    default:
-                        encode_base64url(value_.byte_string_data_,
-                                         value_.byte_string_data_ + length_,
-                                         s);
-                        break;
-                }
-                break;
-            }
-            case staj_event_type::int64_value:
-            {
-                jsoncons::string_sink<T> sink(s);
-                jsoncons::detail::write_integer(value_.int64_value_, sink);
+                s = conv.from(byte_string_view(value_.byte_string_data_,length_),
+                                               tag(),
+                                               ec);
                 break;
             }
             case staj_event_type::uint64_value:
             {
-                jsoncons::string_sink<T> sink(s);
-                jsoncons::detail::write_integer(value_.uint64_value_, sink);
+                s = conv.from(value_.uint64_value_, tag(), ec);
+                break;
+            }
+            case staj_event_type::int64_value:
+            {
+                s = conv.from(value_.int64_value_, tag(), ec);
                 break;
             }
             case staj_event_type::half_value:
             {
-                jsoncons::string_sink<T> sink(s);
-                jsoncons::detail::write_double f{float_chars_format::general,0};
-                double x = jsoncons::detail::decode_half(value_.half_value_);
-                f(x, sink);
+                s = conv.from(half_arg, value_.half_value_, tag(), ec);
                 break;
             }
             case staj_event_type::double_value:
             {
-                jsoncons::string_sink<T> sink(s);
-                jsoncons::detail::write_double f{float_chars_format::general,0};
-                f(value_.double_value_, sink);
+                s = conv.from(value_.double_value_, tag(), ec);
                 break;
             }
             case staj_event_type::bool_value:
             {
-                jsoncons::string_sink<T> sink(s);
-                if (value_.bool_value_)
-                {
-                    sink.append(true_literal<CharT>().data(),true_literal<CharT>().size());
-                }
-                else
-                {
-                    sink.append(false_literal<CharT>().data(),false_literal<CharT>().size());
-                }
+                s = conv.from(value_.bool_value_,tag(),ec);
                 break;
             }
             case staj_event_type::null_value:
             {
-                jsoncons::string_sink<T> sink(s);
-                sink.append(null_literal<CharT>().data(),null_literal<CharT>().size());
+                s = conv.from(null_type(),tag(),ec);
                 break;
             }
             default:
