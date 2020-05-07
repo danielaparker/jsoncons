@@ -377,9 +377,9 @@ namespace jsoncons {
                     return val;
                 }
                 auto key = cursor.current().template get<key_type>(ec);
-                if (!ec) return val;
+                if (ec) return val;
                 cursor.next(ec);
-                if (!ec) return val;
+                if (ec) return val;
                 val.emplace(std::move(key),deser_traits<mapped_type,CharT>::deserialize(cursor, decoder, ec));
             }
             return val;
