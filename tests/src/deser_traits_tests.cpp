@@ -3,12 +3,9 @@
 
 #include <jsoncons/json.hpp>
 #include <catch/catch.hpp>
-#include <sstream>
 #include <vector>
 #include <map>
 #include <utility>
-#include <ctime>
-#include <cstdint>
 
 using namespace jsoncons;
 
@@ -99,5 +96,27 @@ TEST_CASE("deser_traits std::pair")
         REQUIRE(val.size() == 2);
         CHECK((val[0] == test_type::value_type("first","second")));
         CHECK((val[1] == test_type::value_type("one","two")));
+    }
+    SECTION("map of std::string-std::pair<int,double>")
+    {
+        std::string input = R"({"foo": [100,1.5],"bar" : [200,2.5]})";
+        using test_type = std::map<std::string,std::pair<int,double>>;
+
+        json_decoder<json> decoder;
+        std::error_code ec;
+
+        json_cursor cursor(input);
+        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+
+        std::cout << ec.message() << "\n";
+        REQUIRE_FALSE(ec);
+
+        REQUIRE(val.size() == 2);
+        REQUIRE(val.count("foo") > 0);
+        REQUIRE(val.count("bar") > 0);
+        CHECK(val["foo"].first == 100);
+        CHECK(val["foo"].second == 1.5);
+        CHECK(val["bar"].first == 200);
+        CHECK(val["bar"].second == 2.5);
     }
 }
