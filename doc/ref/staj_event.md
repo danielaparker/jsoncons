@@ -19,7 +19,7 @@ A JSON-like data event.
 | byte_string_value | 0x660x6F0x6F           | `get<std::string>()`, `get<jsoncons::byte_string>()` |
 | int64_value       | -1000                  | `get<std::string>()`, `get<int>()`, `get<long>`, `get<int64_t>()` |
 | uint64_value      | 1000                   | `get<std::string>()`, `get<int>()`, `get<unsigned>()`, `get<int64_t>()`, `get<uint64_t>()` |
-| half_value        | 1.5 (as double)        | `get<uint16_t>()`, `get<double>()` |
+| half_value        | 1.5 (as double)        | `get<std::string>()`, `get<uint16_t>()`, `get<double>()` |
 | double_value      | 125.72                 | `get<std::string>()`, `get<double>()` |
 | bool_value        | true                   | `get<std::string>()`, `get<bool>()` |
 | null_value        |                        | `get<std::string>()` |
@@ -33,6 +33,10 @@ Returns a [staj_event_type](staj_event_type.md) for this event.
 Returns a [semantic_tag](semantic_tag.md) for this event.
 
     template <class T, class... Args>
-    T get(Args&&... args) const;
+    T get() const;
+Attempts to convert the json value to the template value type.
+
+    template <class T, class... Args>
+    T get(std::error_code& ec) const;
 Attempts to convert the json value to the template value type.
 
