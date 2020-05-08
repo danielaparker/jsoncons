@@ -146,15 +146,15 @@ namespace jsoncons {
 
         constexpr Into from(bool val, semantic_tag tag, std::error_code& ec)
         {
-            static constexpr char_type true_literal[] = {'t','r','u','e'}; 
-            static constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
+            constexpr char_type true_literal[] = {'t','r','u','e'}; 
+            constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
 
             return val ? Into(true_literal,4,alloc_) : Into(false_literal,5,alloc_);
         }
 
         constexpr Into from(null_type, semantic_tag tag, std::error_code& ec)
         {
-            static constexpr char_type null_literal[] = {'n','u','l','l'}; 
+            constexpr char_type null_literal[] = {'n','u','l','l'}; 
             return Into(null_literal,4,alloc_);
         }
     };
