@@ -528,8 +528,8 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
 
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == msgpack::msgpack_errc::unexpected_eof ||
-              ec == msgpack::msgpack_errc::unknown_type);
+        CHECK((ec == msgpack::msgpack_errc::unexpected_eof ||
+               ec == msgpack::msgpack_errc::unknown_type));
     }
 
     // Fuzz target: jsoncons:fuzz_json_cursor
