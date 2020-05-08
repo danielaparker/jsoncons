@@ -58,7 +58,7 @@ namespace jsoncons {
         using traits_type = std::char_traits<CharT>;
     private:
         basic_null_istream<CharT> null_is_;
-        std::basic_istream<CharT>* is_;
+        std::basic_istream<CharT>* stream_ptr_;
         std::basic_streambuf<CharT>* sbuf_;
         std::size_t position_;
 
@@ -67,18 +67,18 @@ namespace jsoncons {
         stream_source& operator=(const stream_source&) = delete;
     public:
         stream_source()
-            : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
         {
         }
 
         stream_source(std::basic_istream<CharT>& is)
-            : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
+            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
         {
         }
 
         stream_source(stream_source&& other) noexcept
         {
-            std::swap(is_,other.is_);
+            std::swap(stream_ptr_,other.stream_ptr_);
             std::swap(sbuf_,other.sbuf_);
             std::swap(position_,other.position_);
         }
@@ -87,7 +87,7 @@ namespace jsoncons {
 
         stream_source& operator=(stream_source&& other) noexcept
         {
-            std::swap(is_,other.is_);
+            std::swap(stream_ptr_,other.stream_ptr_);
             std::swap(sbuf_,other.sbuf_);
             std::swap(position_,other.position_);
             return *this;
@@ -95,12 +95,12 @@ namespace jsoncons {
 
         bool eof() const
         {
-            return is_->eof();  
+            return stream_ptr_->eof();  
         }
 
         bool is_error() const
         {
-            return is_->bad();  
+            return stream_ptr_->bad();  
         }
 
         std::size_t position() const
@@ -121,13 +121,13 @@ namespace jsoncons {
                 }
                 else
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                     return 0;
                 }
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return 0;
             }
         }
@@ -139,7 +139,7 @@ namespace jsoncons {
                 int c = sbuf_->sbumpc();
                 if (c == traits_type::eof())
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
                 else
                 {
@@ -149,7 +149,7 @@ namespace jsoncons {
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return traits_type::eof();
             }
         }
@@ -163,7 +163,7 @@ namespace jsoncons {
                     int c = sbuf_->sbumpc();
                     if (c == traits_type::eof())
                     {
-                        is_->clear(is_->rdstate() | std::ios::eofbit);
+                        stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                         return;
                     }
                     else
@@ -174,7 +174,7 @@ namespace jsoncons {
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
             }
         }
 
@@ -185,13 +185,13 @@ namespace jsoncons {
                 int c = sbuf_->sgetc();
                 if (c == traits_type::eof())
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
                 return c;
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
                 return traits_type::eof();
             }
         }
@@ -203,14 +203,14 @@ namespace jsoncons {
                 std::streamsize count = sbuf_->sgetn(p, length); // never negative
                 if (static_cast<std::size_t>(count) < length)
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
                 position_ += length;
                 return static_cast<std::size_t>(count);
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return 0;
             }
         }
@@ -367,7 +367,7 @@ namespace jsoncons {
         using traits_type = byte_traits;
     private:
         basic_null_istream<char> null_is_;
-        std::istream* is_;
+        std::istream* stream_ptr_;
         std::streambuf* sbuf_;
         std::size_t position_;
 
@@ -376,18 +376,18 @@ namespace jsoncons {
         binary_stream_source& operator=(const binary_stream_source&) = delete;
     public:
         binary_stream_source()
-            : is_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
         {
         }
 
         binary_stream_source(std::istream& is)
-            : is_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
+            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
         {
         }
 
         binary_stream_source(binary_stream_source&& other) noexcept
         {
-            std::swap(is_,other.is_);
+            std::swap(stream_ptr_,other.stream_ptr_);
             std::swap(sbuf_,other.sbuf_);
             std::swap(position_,other.position_);
         }
@@ -398,7 +398,7 @@ namespace jsoncons {
 
         binary_stream_source& operator=(binary_stream_source&& other) noexcept
         {
-            std::swap(is_,other.is_);
+            std::swap(stream_ptr_,other.stream_ptr_);
             std::swap(sbuf_,other.sbuf_);
             std::swap(position_,other.position_);
             return *this;
@@ -406,12 +406,12 @@ namespace jsoncons {
 
         bool eof() const
         {
-            return is_->eof();  
+            return stream_ptr_->eof();  
         }
 
         bool is_error() const
         {
-            return is_->bad();  
+            return stream_ptr_->bad();  
         }
 
         std::size_t position() const
@@ -432,13 +432,13 @@ namespace jsoncons {
                 }
                 else
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                     return 0;
                 }
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return 0;
             }
         }
@@ -450,7 +450,7 @@ namespace jsoncons {
                 int c = sbuf_->sbumpc();
                 if (c == traits_type::eof())
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
                 else
                 {
@@ -460,7 +460,7 @@ namespace jsoncons {
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return traits_type::eof();
             }
         }
@@ -474,7 +474,7 @@ namespace jsoncons {
                     int c = sbuf_->sbumpc();
                     if (c == traits_type::eof())
                     {
-                        is_->clear(is_->rdstate() | std::ios::eofbit);
+                        stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                         return;
                     }
                     else
@@ -485,7 +485,7 @@ namespace jsoncons {
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
             }
         }
 
@@ -496,13 +496,13 @@ namespace jsoncons {
                 int c = sbuf_->sgetc();
                 if (c == traits_type::eof())
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
                 return c;
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
                 return traits_type::eof();
             }
         }
@@ -514,14 +514,14 @@ namespace jsoncons {
                 std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p), length); // never negative
                 if (static_cast<std::size_t>(count) < length)
                 {
-                    is_->clear(is_->rdstate() | std::ios::eofbit);
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
                 position_ += length;
                 return static_cast<std::size_t>(count);
             }
             JSONCONS_CATCH(const std::exception&)     
             {
-                is_->clear(is_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
                 return 0;
             }
         }
