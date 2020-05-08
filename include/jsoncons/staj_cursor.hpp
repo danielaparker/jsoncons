@@ -307,7 +307,7 @@ public:
 
     template<class T>
     typename std::enable_if<jsoncons::detail::is_list_like<T>::value &&
-                            std::is_same<typename T::value_type,uint8_t>,T>::type
+                            std::is_same<typename T::value_type,uint8_t>,T>::type>
     get(std::error_code& ec) const
     {
         converter<T> conv;
