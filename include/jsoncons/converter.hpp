@@ -37,7 +37,7 @@ namespace jsoncons {
 
         constexpr Into from(const byte_string_view& bytes, 
                             semantic_tag,
-                            std::error_code&)
+                            std::error_code&) const
         {
             return Into(bytes.begin(), bytes.end(), alloc_);
         }
@@ -45,7 +45,7 @@ namespace jsoncons {
         template <class CharT>
         constexpr Into from(const jsoncons::basic_string_view<CharT>& s, 
                             semantic_tag tag,
-                            std::error_code& ec)
+                            std::error_code& ec) const
         {
             switch (tag)
             {
@@ -93,14 +93,14 @@ namespace jsoncons {
         constexpr
         typename std::enable_if<std::is_integral<Integer>::value &&
                                !std::is_same<Integer,bool>::value,Into>::type
-        from(Integer val, semantic_tag, std::error_code&)
+        from(Integer val, semantic_tag, std::error_code&) const
         {
             Into s(alloc_);
             jsoncons::detail::write_integer(val, s);
             return s;
         }
 
-        constexpr Into from(double val, semantic_tag, std::error_code&)
+        constexpr Into from(double val, semantic_tag, std::error_code&) const
         {
             Into s(alloc_);
             jsoncons::detail::write_double f{float_chars_format::general,0};
@@ -108,7 +108,7 @@ namespace jsoncons {
             return s;
         }
 
-        constexpr Into from(half_arg_t, uint16_t val, semantic_tag, std::error_code&)
+        constexpr Into from(half_arg_t, uint16_t val, semantic_tag, std::error_code&) const
         {
             Into s(alloc_);
             jsoncons::detail::write_double f{float_chars_format::general,0};
@@ -119,7 +119,7 @@ namespace jsoncons {
 
         constexpr Into from(const byte_string_view& bytes, 
                             semantic_tag tag,
-                            std::error_code&)
+                            std::error_code&) const
         {
             Into s(alloc_);
             switch (tag)
@@ -139,12 +139,12 @@ namespace jsoncons {
 
         constexpr Into from(const jsoncons::basic_string_view<char_type>& s, 
                             semantic_tag,
-                            std::error_code&)
+                            std::error_code&) const
         {
             return Into(s.data(), s.size(), alloc_);
         }
 
-        constexpr Into from(bool val, semantic_tag, std::error_code&)
+        constexpr Into from(bool val, semantic_tag, std::error_code&) const
         {
             constexpr char_type true_literal[] = {'t','r','u','e'}; 
             constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
@@ -152,7 +152,7 @@ namespace jsoncons {
             return val ? Into(true_literal,4,alloc_) : Into(false_literal,5,alloc_);
         }
 
-        constexpr Into from(null_type, semantic_tag, std::error_code&)
+        constexpr Into from(null_type, semantic_tag, std::error_code&) const
         {
             constexpr char_type null_literal[] = {'n','u','l','l'}; 
             return Into(null_literal,4,alloc_);
