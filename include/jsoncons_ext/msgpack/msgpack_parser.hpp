@@ -54,6 +54,7 @@ class basic_msgpack_parser : public ser_context
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
+    std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
 
@@ -67,6 +68,7 @@ public:
          more_(true), 
          done_(false),
          text_buffer_(alloc),
+         bytes_buffer_(alloc),
          state_stack_(alloc),
          nesting_depth_(0)
     {
@@ -550,15 +552,15 @@ private:
                         return;
                     }
 
-                    std::vector<uint8_t> v;
-                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
+                    bytes_buffer_.clear();
+                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
 
-                    more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
                                                       semantic_tag::none, 
                                                       *this,
                                                       ec);
@@ -584,15 +586,15 @@ private:
                         return;
                     }
 
-                    std::vector<uint8_t> v;
-                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
+                    bytes_buffer_.clear();
+                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
 
-                    more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
                                                       semantic_tag::none, 
                                                       *this,
                                                       ec);
@@ -618,15 +620,15 @@ private:
                         return;
                     }
 
-                    std::vector<uint8_t> v;
-                    if (source_reader<Src>::read(source_,v,len) != static_cast<std::size_t>(len))
+                    bytes_buffer_.clear();
+                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
 
-                    more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
                                                       semantic_tag::none, 
                                                       *this,
                                                       ec);

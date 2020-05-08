@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 using namespace jsoncons::msgpack;
-
+#if 0
 TEST_CASE("msgpack_test")
 {
     json j1;
@@ -145,3 +145,68 @@ TEST_CASE("msgpack_test2")
 
     //CHECK(j1 == j2);
 }
+#endif
+TEST_CASE("msgpack binary tests")
+{
+    SECTION("[]")
+    {
+        std::vector<uint8_t> expected;
+
+        std::vector<uint8_t> input1 = {0xc4,0x00};
+        auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
+        CHECK(v1 == expected);
+
+        std::vector<uint8_t> input2 = {0xc5,0x00,0x00};
+        auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
+        CHECK(v2 == expected);
+
+        std::vector<uint8_t> input3 = {0xc6,0x00,0x00,0x00,0x00};
+        auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
+        CHECK(v3 == expected);
+
+        std::vector<uint8_t> output1;
+        encode_msgpack(byte_string_view(v1.data(),v1.size()),output1);
+        CHECK(output1 == input1);
+    }
+    SECTION("[1]")
+    {
+        std::vector<uint8_t> expected = {1};
+
+        std::vector<uint8_t> input1 = {0xc4,0x01,0x01};
+        auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
+        CHECK(v1 == expected);
+
+        std::vector<uint8_t> input2 = {0xc5,0x00,0x01,0x01};
+        auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
+        CHECK(v2 == expected);
+
+        std::vector<uint8_t> input3 = {0xc6,0x00,0x00,0x00,0x01,0x01};
+        auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
+        CHECK(v3 == expected);
+
+        std::vector<uint8_t> output1;
+        encode_msgpack(byte_string_view(v1.data(),v1.size()),output1);
+        CHECK(output1 == input1);
+    }
+    SECTION("[0,255]")
+    {
+        std::vector<uint8_t> expected = {0,255};
+
+        std::vector<uint8_t> input1 = {0xc4,0x02,0x00,0xff};
+        auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
+        CHECK(v1 == expected);
+
+        std::vector<uint8_t> input2 = {0xc5,0x00,0x02,0x00,0xff};
+        auto v2 = decode_msgpack<std::vector<uint8_t>>(input2);
+        CHECK(v2 == expected);
+
+        std::vector<uint8_t> input3 = {0xc6,0x00,0x00,0x00,0x02,0x00,0xff};
+        auto v3 = decode_msgpack<std::vector<uint8_t>>(input3);
+        CHECK(v3 == expected);
+
+        std::vector<uint8_t> output1;
+        encode_msgpack(byte_string_view(v1.data(),v1.size()),output1);
+        CHECK(output1 == input1);
+    }
+}
+

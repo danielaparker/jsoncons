@@ -29,15 +29,25 @@ namespace msgpack_format
     const uint8_t int16_cd = 0xd1;
     const uint8_t int32_cd = 0xd2;
     const uint8_t int64_cd = 0xd3;
+
+    const uint8_t fixext1_cd = 0xd4;
+    const uint8_t fixext2_cd = 0xd5;
+    const uint8_t fixext3_cd = 0xd6;
+    const uint8_t fixext4_cd = 0xd7;
+    const uint8_t fixext5_cd = 0xd8;
+
     const uint8_t fixmap_base_cd = 0x80;
     const uint8_t fixarray_base_cd = 0x90;
     const uint8_t fixstr_base_cd = 0xa0;
     const uint8_t str8_cd = 0xd9;
     const uint8_t str16_cd = 0xda;
     const uint8_t str32_cd = 0xdb;
-    const uint8_t bin8_cd = 0xc7;
-    const uint8_t bin16_cd = 0xc8;
-    const uint8_t bin32_cd = 0xc9;
+    const uint8_t bin8_cd = 0xc4; //  0xC4
+    const uint8_t bin16_cd = 0xc5;
+    const uint8_t bin32_cd = 0xc6;
+    const uint8_t ext8_cd = 0xc7; //  0xC4
+    const uint8_t ext16_cd = 0xc8;
+    const uint8_t ext32_cd = 0xc9;
     const uint8_t array16_cd = 0xdc;
     const uint8_t array32_cd = 0xdd;
     const uint8_t map16_cd = 0xde;

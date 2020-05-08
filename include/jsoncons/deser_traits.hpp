@@ -73,7 +73,7 @@ namespace jsoncons {
                              std::error_code& ec)
         {
             T v = cursor.current().template get<T>(ec);
-            if (!ec)
+            if (!ec) 
             {
                 cursor.next(ec);
             }
@@ -292,6 +292,7 @@ namespace jsoncons {
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_list_like<T>::value &&
+                 jsoncons::detail::has_push_back<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value 
     >::type>
     {
@@ -302,17 +303,35 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
-            T v;
-
-            if (cursor.current().event_type() != staj_event_type::begin_array)
+            switch (cursor.current().event_type())
             {
-                ec = convert_errc::not_vector;
-                return v;
+                case staj_event_type::byte_string_value:
+                {
+                    auto bytes = cursor.current().template get<byte_string_view>(ec);
+                    if (!ec) 
+                    {
+                        auto v = T(bytes.begin(),bytes.end());
+                        cursor.next(ec);
+                        return v;
+                    }
+                    else
+                    {
+                        return T{};
+                    }
+                }
+                case staj_event_type::begin_array:
+                {
+                    T v;
+                    typed_array_visitor<T> visitor(v);
+                    cursor.read_to(visitor, ec);
+                    return v;
+                }
+                default:
+                {
+                    ec = convert_errc::not_vector;
+                    return T{};
+                }
             }
-
-            typed_array_visitor<T> visitor(v);
-            cursor.read_to(visitor, ec);
-            return v;
         }
     };
 
