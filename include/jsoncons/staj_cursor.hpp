@@ -135,10 +135,6 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, staj_event_
     return os;
 }
 
-JSONCONS_STRING_LITERAL(null_literal,'n','u','l','l')
-JSONCONS_STRING_LITERAL(true_literal,'t','r','u','e')
-JSONCONS_STRING_LITERAL(false_literal,'f','a','l','s','e')
-
 template<class CharT>
 class basic_staj_event
 {
@@ -228,58 +224,50 @@ public:
 
     template<class T, class CharT_ = CharT>
     typename std::enable_if<jsoncons::detail::is_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
-        get(std::error_code& ec) const
+    get(std::error_code& ec) const
     {
-        T s;
         converter<T> conv;
         switch (event_type_)
         {
             case staj_event_type::key:
             case staj_event_type::string_value:
-                s = T(value_.string_data_, length_);
-                break;
+                return conv.from(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
             case staj_event_type::byte_string_value:
             {
-                s = conv.from(byte_string_view(value_.byte_string_data_,length_),
+                return conv.from(byte_string_view(value_.byte_string_data_,length_),
                                                tag(),
                                                ec);
-                break;
             }
             case staj_event_type::uint64_value:
             {
-                s = conv.from(value_.uint64_value_, tag(), ec);
-                break;
+                return conv.from(value_.uint64_value_, tag(), ec);
             }
             case staj_event_type::int64_value:
             {
-                s = conv.from(value_.int64_value_, tag(), ec);
-                break;
+                return conv.from(value_.int64_value_, tag(), ec);
             }
             case staj_event_type::half_value:
             {
-                s = conv.from(half_arg, value_.half_value_, tag(), ec);
-                break;
+                return conv.from(half_arg, value_.half_value_, tag(), ec);
             }
             case staj_event_type::double_value:
             {
-                s = conv.from(value_.double_value_, tag(), ec);
-                break;
+                return conv.from(value_.double_value_, tag(), ec);
             }
             case staj_event_type::bool_value:
             {
-                s = conv.from(value_.bool_value_,tag(),ec);
-                break;
+                return conv.from(value_.bool_value_,tag(),ec);
             }
             case staj_event_type::null_value:
             {
-                s = conv.from(null_type(),tag(),ec);
-                break;
+                return conv.from(null_type(),tag(),ec);
             }
             default:
+            {
                 ec = convert_errc::not_string;
-                break;
+                return T{};
+            }
         }
-        return s;
     }
 
     template<class T, class CharT_ = CharT>
@@ -315,6 +303,24 @@ public:
                 break;
         }
         return s;
+    }
+
+    template<class T>
+    typename std::enable_if<jsoncons::detail::is_list_like<T>::value &&
+                            std::is_same<typename T::value_type,uint8_t>,T>::type
+    get(std::error_code& ec) const
+    {
+        converter<T> conv;
+        switch (event_type_)
+        {
+            case staj_event_type::byte_string_value:
+                return conv.from(byte_string_view(value_.byte_string_data_, length_), tag(), ec);
+            case staj_event_type::string_value:
+                return conv.from(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
+            default:
+                ec = convert_errc::not_byte_string;
+                return T{};
+        }
     }
 
     template<class T>

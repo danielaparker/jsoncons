@@ -22,6 +22,61 @@ namespace jsoncons {
     };
 
     template <class Into>
+    class converter<Into,typename std::enable_if<jsoncons::detail::is_list_like<Into>::value &&
+                                                 std::is_same<typename Into::value_type,uint8_t>::value>::type>
+    {
+        using allocator_type = typename Into::allocator_type;
+        allocator_type alloc_;
+
+    public:
+
+        explicit converter(const allocator_type& alloc = allocator_type())
+            : alloc_(alloc)
+        {
+        }
+
+        constexpr Into from(const byte_string_view& bytes, 
+                            semantic_tag tag,
+                            std::error_code& ec)
+        {
+            return Into(bytes.begin(), bytes.end(), alloc_);
+        }
+
+        template <class CharT>
+        constexpr Into from(const jsoncons::basic_string_view<CharT>& s, 
+                            semantic_tag tag,
+                            std::error_code& ec)
+        {
+            switch (tag)
+            {
+                case semantic_tag::base16:
+                {
+                    Into bytes(alloc_);
+                    decode_base16(s.begin(), s.end(), bytes);
+                    return bytes;
+                }
+                case semantic_tag::base64:
+                {
+                    Into bytes(alloc_);
+                    decode_base64(s.begin(), s.end(), bytes);
+                    return bytes;
+                }
+                case semantic_tag::base64url:
+                {
+                    Into bytes(alloc_);
+                    decode_base64url(s.begin(), s.end(), bytes);
+                    return bytes;
+                }
+                default:
+                {
+                    ec = convert_errc::not_byte_string;
+                    return Into(alloc_);
+                }
+            }
+        }
+    };
+
+    template <class Into>
     class converter<Into,typename std::enable_if<jsoncons::detail::is_string<Into>::value>::type>
     {
         using char_type = typename Into::value_type;
@@ -83,6 +138,13 @@ namespace jsoncons {
                     break;
             }
             return s;
+        }
+
+        constexpr Into from(const jsoncons::basic_string_view<char_type>& s, 
+                            semantic_tag tag,
+                            std::error_code& ec)
+        {
+            return Into(s.data(), s.size(), alloc_);
         }
 
         constexpr Into from(bool val, semantic_tag tag, std::error_code& ec)
