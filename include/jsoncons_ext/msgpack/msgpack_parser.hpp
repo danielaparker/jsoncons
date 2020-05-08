@@ -534,7 +534,44 @@ private:
                 }
 
                 case jsoncons::msgpack::detail::msgpack_format::bin8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::bin16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::bin32_cd: 
                 {
+                    std::size_t len = get_size(type,ec);
+                    if (!more_)
+                    {
+                        return;
+                    }
+                    bytes_buffer_.clear();
+                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
+                    {
+                        ec = msgpack_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
+                                                      semantic_tag::none, 
+                                                      *this,
+                                                      ec);
+                    break;
+                }
+                case jsoncons::msgpack::detail::msgpack_format::fixext1_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::fixext2_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::fixext4_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::fixext8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::fixext16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::ext8_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::ext16_cd: 
+                case jsoncons::msgpack::detail::msgpack_format::ext32_cd: 
+                {
+                    std::size_t len = get_size(type,ec);
+                    if (!more_)
+                    {
+                        return;
+                    }
+
+                    // type
                     uint8_t buf[sizeof(int8_t)];
                     source_.read(buf, sizeof(int8_t));
                     if (source_.eof())
@@ -543,95 +580,50 @@ private:
                         more_ = false;
                         return;
                     }
+
                     const uint8_t* endp;
-                    int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
-                    if (len < 0)
+                    int8_t type = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+
+                    semantic_tag tag{}; 
+                    if (type == -1)
                     {
-                        ec = msgpack_errc::length_is_negative;
-                        more_ = false;
-                        return;
+                        if (len == sizeof(uint32_t))
+                        {
+                            tag = semantic_tag::timestamp;
+                        }
                     }
 
-                    bytes_buffer_.clear();
-                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
+                    // payload
+                    if (tag == semantic_tag::timestamp)
                     {
-                        ec = msgpack_errc::unexpected_eof;
-                        more_ = false;
-                        return;
+                        uint8_t buf[sizeof(uint32_t)];
+                        source_.read(buf, sizeof(uint32_t));
+                        if (source_.eof())
+                        {
+                            ec = msgpack_errc::unexpected_eof;
+                            more_ = false;
+                            return;
+                        }
+                        const uint8_t* endp;
+                        uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
+                        more_ = visitor.uint64_value(val, tag, *this, ec);
+
                     }
-
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
-                                                      semantic_tag::none, 
-                                                      *this,
-                                                      ec);
-                    break;
-                }
-
-                case jsoncons::msgpack::detail::msgpack_format::bin16_cd: 
-                {
-                    uint8_t buf[sizeof(int16_t)];
-                    source_.read(buf, sizeof(int16_t));
-                    if (source_.eof())
+                    else
                     {
-                        ec = msgpack_errc::unexpected_eof;
-                        more_ = false;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
-                    if (len < 0)
-                    {
-                        ec = msgpack_errc::length_is_negative;
-                        more_ = false;
-                        return;
-                    }
+                        bytes_buffer_.clear();
+                        if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
+                        {
+                            ec = msgpack_errc::unexpected_eof;
+                            more_ = false;
+                            return;
+                        }
 
-                    bytes_buffer_.clear();
-                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        more_ = false;
-                        return;
+                        more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
+                                                          tag, 
+                                                          *this,
+                                                          ec);
                     }
-
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
-                                                      semantic_tag::none, 
-                                                      *this,
-                                                      ec);
-                    break;
-                }
-
-                case jsoncons::msgpack::detail::msgpack_format::bin32_cd: 
-                {
-                    uint8_t buf[sizeof(int32_t)];
-                    source_.read(buf, sizeof(int32_t));
-                    if (source_.eof())
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        more_ = false;
-                        return;
-                    }
-                    const uint8_t* endp;
-                    int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
-                    if (len < 0)
-                    {
-                        ec = msgpack_errc::length_is_negative;
-                        more_ = false;
-                        return;
-                    }
-
-                    bytes_buffer_.clear();
-                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
-                    {
-                        ec = msgpack_errc::unexpected_eof;
-                        more_ = false;
-                        return;
-                    }
-
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
-                                                      semantic_tag::none, 
-                                                      *this,
-                                                      ec);
                     break;
                 }
 
@@ -812,6 +804,91 @@ private:
         --nesting_depth_;
         more_ = visitor.end_object(*this, ec);
         state_stack_.pop_back();
+    }
+
+    std::size_t get_size(uint8_t format, std::error_code& ec)
+    {
+        switch (format)
+        {
+            case jsoncons::msgpack::detail::msgpack_format::bin8_cd: 
+            case jsoncons::msgpack::detail::msgpack_format::ext8_cd: 
+            {
+                uint8_t buf[sizeof(int8_t)];
+                source_.read(buf, sizeof(int8_t));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
+                    return 0;
+                }
+                const uint8_t* endp;
+                int8_t len = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    more_ = false;
+                    return 0;
+                }
+                return static_cast<std::size_t>(len);
+            }
+
+            case jsoncons::msgpack::detail::msgpack_format::bin16_cd: 
+            case jsoncons::msgpack::detail::msgpack_format::ext16_cd: 
+            {
+                uint8_t buf[sizeof(int16_t)];
+                source_.read(buf, sizeof(int16_t));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
+                    return 0;
+                }
+                const uint8_t* endp;
+                int16_t len = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    more_ = false;
+                    return 0;
+                }
+                return static_cast<std::size_t>(len);
+            }
+
+            case jsoncons::msgpack::detail::msgpack_format::bin32_cd: 
+            case jsoncons::msgpack::detail::msgpack_format::ext32_cd: 
+            {
+                uint8_t buf[sizeof(int32_t)];
+                source_.read(buf, sizeof(int32_t));
+                if (source_.eof())
+                {
+                    ec = msgpack_errc::unexpected_eof;
+                    more_ = false;
+                    return 0;
+                }
+                const uint8_t* endp;
+                int32_t len = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                if (len < 0)
+                {
+                    ec = msgpack_errc::length_is_negative;
+                    more_ = false;
+                    return 0;
+                }
+                return static_cast<std::size_t>(len);
+            }
+            case jsoncons::msgpack::detail::msgpack_format::fixext1_cd: 
+                return 1;
+            case jsoncons::msgpack::detail::msgpack_format::fixext2_cd: 
+                return 2;
+            case jsoncons::msgpack::detail::msgpack_format::fixext4_cd: 
+                return 4;
+            case jsoncons::msgpack::detail::msgpack_format::fixext8_cd: 
+                return 8;
+            case jsoncons::msgpack::detail::msgpack_format::fixext16_cd: 
+                return 16;
+            default:
+                JSONCONS_UNREACHABLE();
+                break;
+        }
     }
 };
 

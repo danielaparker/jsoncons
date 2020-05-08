@@ -146,7 +146,8 @@ TEST_CASE("msgpack_test2")
     //CHECK(j1 == j2);
 }
 #endif
-TEST_CASE("msgpack binary tests")
+
+TEST_CASE("msgpack bin tests")
 {
     SECTION("[]")
     {
@@ -210,3 +211,46 @@ TEST_CASE("msgpack binary tests")
     }
 }
 
+TEST_CASE("msgpack ext tests")
+{
+    SECTION("fixext1, 1, [0x10]")
+    {
+        std::vector<uint8_t> expected = {0x10};
+
+        std::vector<uint8_t> input1 = {0xd4,0x01,0x10};
+        auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
+        CHECK(v1 == expected);
+    }
+    SECTION("fixext2, 2, [20,21]")
+    {
+        std::vector<uint8_t> expected = {0x20,0x21};
+
+        std::vector<uint8_t> input1 = {0xd5,0x02,0x20,0x21};
+        auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
+
+        CHECK((v1 == expected));
+    }
+    SECTION("fixext4, 3, [0x30,0x31,0x32,0x33]")
+    {
+        std::vector<uint8_t> expected = {0x30,0x31,0x32,0x33};
+
+        std::vector<uint8_t> input1 = {0xd6,0x03,0x30,0x31,0x32,0x33};
+        auto v1 = decode_msgpack<std::vector<uint8_t>>(input1);
+        CHECK(v1 == expected);
+    }
+}
+
+TEST_CASE("msgpack timestamp tests")
+{
+    SECTION("test 1")
+    {
+        std::vector<uint8_t> u = {0xce,0x5a,0x4a,0xf6,0xa5};
+        uint64_t expected = decode_msgpack<uint64_t>(u);
+        CHECK(expected == 1514862245);
+
+        std::vector<uint8_t> input1 = {0xd6,0xff,0x5a,0x4a,0xf6,0xa5};
+        auto r = decode_msgpack<uint64_t>(input1);
+
+        CHECK(r == expected);
+    }
+}
