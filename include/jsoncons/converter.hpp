@@ -82,10 +82,6 @@ namespace jsoncons {
         using char_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
 
-        static constexpr char_type true_literal[] = {'t','r','u','e'}; 
-        static constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
-        static constexpr char_type null_literal[] = {'n','u','l','l'}; 
-
         allocator_type alloc_;
     public:
 
@@ -148,13 +144,18 @@ namespace jsoncons {
             return Into(s.data(), s.size(), alloc_);
         }
 
-        constexpr Into from(bool val, semantic_tag, std::error_code&) const
+        Into from(bool val, semantic_tag, std::error_code&) const
         {
+            static constexpr char_type true_literal[] = {'t','r','u','e'}; 
+            static constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
+
             return val ? Into(true_literal,4,alloc_) : Into(false_literal,5,alloc_);
         }
 
-        constexpr Into from(null_type, semantic_tag, std::error_code&) const
+        Into from(null_type, semantic_tag, std::error_code&) const
         {
+            static constexpr char_type null_literal[] = {'n','u','l','l'}; 
+
             return Into(null_literal,4,alloc_);
         }
     };
