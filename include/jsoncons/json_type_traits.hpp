@@ -28,6 +28,7 @@
 #include <functional>
 #include <memory>
 #include <jsoncons/convert_error.hpp>
+#include <jsoncons/converter.hpp>
 
 namespace jsoncons {
 
