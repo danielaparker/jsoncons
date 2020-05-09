@@ -376,7 +376,7 @@ namespace msgpack {
                 sink_.push_back(0xff);
                 jsoncons::detail::native_to_big(static_cast<uint32_t>(val), std::back_inserter(sink_));
             }
-            else if (stack_.back().is_timestamp())
+            else if (!stack_.empty() && stack_.back().is_timestamp())
             {
                 timestamp_parts_.push_back(static_cast<uint64_t>(val));
             }
@@ -459,7 +459,7 @@ namespace msgpack {
                 sink_.push_back(0xff);
                 jsoncons::detail::native_to_big(static_cast<uint32_t>(val), std::back_inserter(sink_));
             }
-            else if (stack_.back().is_timestamp())
+            else if (!stack_.empty() && stack_.back().is_timestamp())
             {
                 timestamp_parts_.push_back(val);
             }
