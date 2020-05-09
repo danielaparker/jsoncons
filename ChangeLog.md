@@ -21,6 +21,8 @@ Bug fixes:
 
 - OSS-Fuzz failed throw issue in CBOR parser [\#235](https://github.com/danielaparker/jsoncons/issues/235)
 
+- Msg pack bin8 wrong format #237
+
 Changes:
 
 - The cbor_option name `enable_typed_arrays` has been deprecated and
