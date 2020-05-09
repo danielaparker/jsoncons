@@ -500,10 +500,10 @@ private:
                     }
 
                     const uint8_t* endp;
-                    int8_t type = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                    int8_t ext_type = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
 
                     semantic_tag tag{}; 
-                    if (type == -1)
+                    if (ext_type == -1)
                     {
                         tag = semantic_tag::timestamp;
                     }
@@ -511,31 +511,28 @@ private:
                     // payload
                     if (tag == semantic_tag::timestamp && len == 4)
                     {
-                        uint8_t buf[sizeof(uint32_t)];
-                        source_.read(buf, sizeof(uint32_t));
+                        uint8_t buf32[sizeof(uint32_t)];
+                        source_.read(buf32, sizeof(uint32_t));
                         if (source_.eof())
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
                             return;
                         }
-                        const uint8_t* endp;
-                        uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
+                        uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf32,buf32+sizeof(buf32),&endp);
                         more_ = visitor.uint64_value(val, tag, *this, ec);
-
                     }
                     else if (tag == semantic_tag::timestamp && len == 8)
                     {
-                        uint8_t buf[sizeof(uint64_t)];
-                        source_.read(buf, sizeof(uint64_t));
+                        uint8_t buf64[sizeof(uint64_t)];
+                        source_.read(buf64, sizeof(uint64_t));
                         if (source_.eof())
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
                             return;
                         }
-                        const uint8_t* endp;
-                        uint64_t data64 = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
+                        uint64_t data64 = jsoncons::detail::big_to_native<uint64_t>(buf64,buf64+sizeof(buf64),&endp);
                         uint64_t sec = data64 & 0x00000003ffffffffL;
                         uint64_t nsec = data64 >> 34;
                         timestamp_buffer_.clear();
@@ -554,7 +551,6 @@ private:
                             more_ = false;
                             return;
                         }
-                        const uint8_t* endp;
                         uint32_t nsec = jsoncons::detail::big_to_native<uint32_t>(buf1,buf1+sizeof(buf1),&endp);
 
                         uint8_t buf2[sizeof(uint64_t)];

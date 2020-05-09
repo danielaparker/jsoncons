@@ -44,8 +44,9 @@ namespace jsoncons {
         }
 
         template <class CharT>
-        constexpr Into from(const jsoncons::basic_string_view<CharT>& s, 
-                            semantic_tag tag,
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(const jsoncons::basic_string_view<CharT>& s, 
+                  semantic_tag tag,
                             std::error_code& ec) const
         {
             switch (tag)
@@ -93,6 +94,7 @@ namespace jsoncons {
         }
 
         template<class Integer>
+        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<std::is_integral<Integer>::value &&
                                !std::is_same<Integer,bool>::value,Into>::type
         from(Integer val, semantic_tag, std::error_code&) const
@@ -102,6 +104,7 @@ namespace jsoncons {
             return s;
         }
 
+        JSONCONS_CPP14_CONSTEXPR 
         Into from(double val, semantic_tag, std::error_code&) const
         {
             Into s(alloc_);
@@ -110,6 +113,7 @@ namespace jsoncons {
             return s;
         }
 
+        JSONCONS_CPP14_CONSTEXPR 
         Into from(half_arg_t, uint16_t val, semantic_tag, std::error_code&) const
         {
             Into s(alloc_);
@@ -119,6 +123,7 @@ namespace jsoncons {
             return s;
         }
 
+        JSONCONS_CPP14_CONSTEXPR 
         Into from(const byte_string_view& bytes, 
                   semantic_tag tag,
                   std::error_code&) const
@@ -139,24 +144,27 @@ namespace jsoncons {
             return s;
         }
 
-        constexpr Into from(const jsoncons::basic_string_view<char_type>& s, 
-                            semantic_tag,
-                            std::error_code&) const
+        constexpr 
+        Into from(const jsoncons::basic_string_view<char_type>& s, 
+                  semantic_tag,
+                  std::error_code&) const
         {
             return Into(s.data(), s.size(), alloc_);
         }
 
+        JSONCONS_CPP14_CONSTEXPR 
         Into from(bool val, semantic_tag, std::error_code&) const
         {
-            static constexpr char_type true_literal[] = {'t','r','u','e'}; 
-            static constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
+            constexpr char_type true_literal[] = {'t','r','u','e'}; 
+            constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
 
             return val ? Into(true_literal,4,alloc_) : Into(false_literal,5,alloc_);
         }
 
+        JSONCONS_CPP14_CONSTEXPR 
         Into from(null_type, semantic_tag, std::error_code&) const
         {
-            static constexpr char_type null_literal[] = {'n','u','l','l'}; 
+            constexpr char_type null_literal[] = {'n','u','l','l'}; 
 
             return Into(null_literal,4,alloc_);
         }

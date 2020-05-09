@@ -410,7 +410,7 @@ namespace detail {
         static typename std::enable_if<std::is_same<Ty,uint8_t>::value,T>::type
         as(const Json& j)
         {
-            converter<Ty> convert{};
+            converter<T> convert{};
             std::error_code ec;
             if (j.is_array())
             {
