@@ -253,4 +253,13 @@ TEST_CASE("msgpack timestamp tests")
 
         CHECK(r == expected);
     }
+    SECTION("test 2")
+    {
+        std::vector<uint64_t> expected = {1514862245,678901234};
+
+        std::vector<uint8_t> input1 = {0xd7,0xff,0xa1,0xdc,0xd7,0xc8,0x5a,0x4a,0xf6,0xa5};
+        auto r = decode_msgpack<std::vector<uint64_t>>(input1);
+
+        CHECK(r == expected);
+    }
 }

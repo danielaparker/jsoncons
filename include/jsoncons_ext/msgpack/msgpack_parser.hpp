@@ -47,6 +47,7 @@ class basic_msgpack_parser : public ser_context
     using temp_allocator_type = Allocator;
     using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;                  
     using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
+    using uint64_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint64_t>;                  
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
     Src source_;
@@ -55,6 +56,7 @@ class basic_msgpack_parser : public ser_context
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
+    std::vector<uint64_t,uint64_allocator_type> timestamp_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
 
@@ -522,6 +524,57 @@ private:
                         more_ = visitor.uint64_value(val, tag, *this, ec);
 
                     }
+                    else if (tag == semantic_tag::timestamp && len == 8)
+                    {
+                        uint8_t buf[sizeof(uint64_t)];
+                        source_.read(buf, sizeof(uint64_t));
+                        if (source_.eof())
+                        {
+                            ec = msgpack_errc::unexpected_eof;
+                            more_ = false;
+                            return;
+                        }
+                        const uint8_t* endp;
+                        uint64_t data64 = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
+                        uint64_t sec = data64 & 0x00000003ffffffffL;
+                        uint64_t nsec = data64 >> 34;
+                        timestamp_buffer_.clear();
+                        timestamp_buffer_.push_back(sec);
+                        timestamp_buffer_.push_back(nsec);
+                        more_ = visitor.typed_array(span<const uint64_t>(timestamp_buffer_), tag, *this, ec);
+                        if (!more_) return;
+                    }
+                    else if (tag == semantic_tag::timestamp && len == 12)
+                    {
+                        uint8_t buf1[sizeof(uint32_t)];
+                        source_.read(buf1, sizeof(uint32_t));
+                        if (source_.eof())
+                        {
+                            ec = msgpack_errc::unexpected_eof;
+                            more_ = false;
+                            return;
+                        }
+                        const uint8_t* endp;
+                        uint32_t nsec = jsoncons::detail::big_to_native<uint32_t>(buf1,buf1+sizeof(buf1),&endp);
+
+                        uint8_t buf2[sizeof(uint64_t)];
+                        source_.read(buf2, sizeof(uint64_t));
+                        if (source_.eof())
+                        {
+                            ec = msgpack_errc::unexpected_eof;
+                            more_ = false;
+                            return;
+                        }
+                        uint64_t sec = jsoncons::detail::big_to_native<uint64_t>(buf2,buf2+sizeof(buf2),&endp);
+                        more_ = visitor.begin_array(2, tag, *this, ec);
+                        if (!more_) return;
+                        more_ = visitor.uint64_value(sec, semantic_tag::none, *this, ec);
+                        if (!more_) return;
+                        more_ = visitor.uint64_value(nsec, semantic_tag::none, *this, ec);
+                        if (!more_) return;
+                        more_ = visitor.end_array(*this, ec);
+                        if (!more_) return;
+                    }
                     else
                     {
                         bytes_buffer_.clear();
@@ -533,7 +586,7 @@ private:
                         }
 
                         more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
-                                                          tag, 
+                                                          semantic_tag::none, 
                                                           *this,
                                                           ec);
                     }
