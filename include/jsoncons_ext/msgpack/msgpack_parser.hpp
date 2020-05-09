@@ -566,13 +566,10 @@ private:
                             return;
                         }
                         uint64_t sec = jsoncons::detail::big_to_native<uint64_t>(buf2,buf2+sizeof(buf2),&endp);
-                        more_ = visitor.begin_array(2, tag, *this, ec);
-                        if (!more_) return;
-                        more_ = visitor.uint64_value(sec, semantic_tag::none, *this, ec);
-                        if (!more_) return;
-                        more_ = visitor.uint64_value(nsec, semantic_tag::none, *this, ec);
-                        if (!more_) return;
-                        more_ = visitor.end_array(*this, ec);
+                        timestamp_buffer_.clear();
+                        timestamp_buffer_.push_back(sec);
+                        timestamp_buffer_.push_back(nsec);
+                        more_ = visitor.typed_array(span<const uint64_t>(timestamp_buffer_), tag, *this, ec);
                         if (!more_) return;
                     }
                     else

@@ -780,7 +780,7 @@ public:
 
     void advance_typed_array(std::error_code& ec)
     {
-        if (data_.type() != typed_array_type())
+        if (is_typed_array())
         {
             if (index_ < data_.size())
             {
@@ -883,12 +883,12 @@ public:
     bool dump(basic_json_visitor<CharT>& visitor, const ser_context& context, std::error_code& ec)
     {
         bool more = true;
-        if (data_.type() != typed_array_type())
+        if (is_typed_array())
         {
             if (index_ != 0)
             {
                 more = staj_to_saj_event(event(), visitor, context, ec);
-                while (more && data_.type() != typed_array_type())
+                while (more && is_typed_array())
                 {
                     if (index_ < data_.size())
                     {
