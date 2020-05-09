@@ -409,6 +409,8 @@ namespace detail {
         static typename std::enable_if<std::is_same<Ty,uint8_t>::value,T>::type
         as(const Json& j)
         {
+            converter<Ty> convert{};
+            std::error_code ec;
             if (j.is_array())
             {
                 T result;
@@ -423,6 +425,15 @@ namespace detail {
             else if (j.is_byte_string_view())
             {
                 T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
+                return v;
+            }
+            else if (j.is_string())
+            {
+                auto v = convert.from(j.as_string_view(),j.tag(), ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(ser_error(ec));
+                }
                 return v;
             }
             else
