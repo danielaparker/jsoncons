@@ -2162,19 +2162,6 @@ public:
             return evaluate().template as_byte_string<BAllocator>();
         }
 
-        template <class SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options) const
-        {
-            return evaluate().as_string(options);
-        }
-
-        template <class SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> as_string(const basic_json_encode_options<char_type>& options,
-                              const SAllocator& alloc) const
-        {
-            return evaluate().as_string(options,alloc);
-        }
-
         template<class T>
         typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
         as() const
@@ -3540,27 +3527,6 @@ public:
         visitor.flush();
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const char_allocator_type& alloc=SAllocator()) const noexcept
-    {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
-        string_type s(alloc);
-        basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
-        dump(encoder);
-        return s;
-    }
-
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options,
-                                                                          const SAllocator& alloc=SAllocator()) const
-    {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
-        string_type s(alloc);
-        basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
-        dump(encoder);
-        return s;
-    }
-
     bool is_null() const noexcept
     {
         return var_.storage() == storage_kind::null_value;
@@ -4012,6 +3978,9 @@ public:
     std::basic_string<char_type,char_traits_type,SAllocator> as_string(const SAllocator& alloc) const 
     {
         using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
+
+        converter<string_type> converter(alloc);
+        std::error_code ec;
         switch (var_.storage())
         {
             case storage_kind::short_string_value:
@@ -4021,24 +3990,10 @@ public:
             }
             case storage_kind::byte_string_value:
             {
-                string_type s(alloc);
-                switch (tag())
+                auto s = converter.from(as_byte_string_view(), tag(), ec);
+                if (ec)
                 {
-                    case semantic_tag::base64:
-                        encode_base64(var_.template cast<typename variant::byte_string_storage>().begin(), 
-                                      var_.template cast<typename variant::byte_string_storage>().end(),
-                                      s);
-                        break;
-                    case semantic_tag::base16:
-                        encode_base16(var_.template cast<typename variant::byte_string_storage>().begin(), 
-                                      var_.template cast<typename variant::byte_string_storage>().end(),
-                                      s);
-                        break;
-                    default:
-                        encode_base64url(var_.template cast<typename variant::byte_string_storage>().begin(), 
-                                         var_.template cast<typename variant::byte_string_storage>().end(),
-                                         s);
-                        break;
+                    JSONCONS_THROW(ser_error(ec));
                 }
                 return s;
             }
@@ -4923,6 +4878,27 @@ public:
             basic_json_compressed_encoder<char_type> encoder(os);
             dump(encoder);
         }
+    }
+
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const char_allocator_type& alloc=SAllocator()) const noexcept
+    {
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
+        string_type s(alloc);
+        basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+        dump(encoder);
+        return s;
+    }
+
+    template <class SAllocator=std::allocator<char_type>>
+    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options,
+                                                                          const SAllocator& alloc=SAllocator()) const
+    {
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
+        string_type s(alloc);
+        basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
+        dump(encoder);
+        return s;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")

@@ -21,6 +21,7 @@ namespace jsoncons {
     {
     };
 
+    // Into list like
     template <class Into>
     class converter<Into,typename std::enable_if<jsoncons::detail::is_list_like<Into>::value &&
                                                  std::is_same<typename Into::value_type,uint8_t>::value>::type>
@@ -76,6 +77,7 @@ namespace jsoncons {
         }
     };
 
+    // Into string
     template <class Into>
     class converter<Into,typename std::enable_if<jsoncons::detail::is_string<Into>::value>::type>
     {
