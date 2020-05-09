@@ -1193,7 +1193,15 @@ private:
             }
         }
 
-        if (s.size() > 0)
+        if (s.size() >= (std::numeric_limits<int32_t>::max)() || 
+                         exponent >= (std::numeric_limits<int32_t>::max)() || 
+                         exponent <= (std::numeric_limits<int32_t>::min)())
+        {
+            ec = cbor_errc::invalid_decimal_fraction;
+            more_ = false;
+            return;
+        }
+        else if (s.size() > 0)
         {
             if (s[0] == '-')
             {

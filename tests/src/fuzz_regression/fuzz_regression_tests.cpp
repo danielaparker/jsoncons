@@ -489,7 +489,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == cbor::cbor_errc::illegal_chunked_string);
+        CHECK((ec == cbor::cbor_errc::illegal_chunked_string || ec == cbor::cbor_errc::invalid_decimal_fraction));
     }
     // Fuzz target: fuzz_cbor_encoder
     // Issue: Stack-overflow
