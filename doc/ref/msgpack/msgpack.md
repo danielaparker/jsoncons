@@ -19,17 +19,17 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 MessagePack data item                              |ext type | jsoncons data item|jsoncons tag  
 -------------------------------------------------- |-----------------|---------------|------------------
- nil                                               ||&#160;                 | null          |                  
- true, false                                     ||&#160;                 | bool          |                  
- negative fixnum, int 8, int 16, int 32, int 64    ||&#160;                 | int64         |                  
- positive fixnum, uint 8, uint 16, uint 32, uint 64||&#160;                 | uint64        |                  
- float32, float64                                ||&#160;                 | double        |                  
- fixstr, str 8, str 16, str 32                   ||&#160;                 | string        |                  
- bin 8, bin 16, bin 32                           | |&#160;                | byte_string   |                  
+ nil                                               |                  | null          |                  
+ true, false                                     |                  | bool          |                  
+ negative fixnum, int 8, int 16, int 32, int 64    |                  | int64         |                  
+ positive fixnum, uint 8, uint 16, uint 32, uint 64|                  | uint64        |                  
+ float32, float64                                |                  | double        |                  
+ fixstr, str 8, str 16, str 32                   |                  | string        |                  
+ bin 8, bin 16, bin 32                           |                  | byte_string   |                  
  fixext1, fixext2, fixext4, fixext8, fixext16, ext8, ext16, ext32    |0-127| byte_string               |
- fixext4, fixext8, ext8, ext16, ext32    |-1                 |uint64 if timestamp 32,<br>array of uint64 if timestamp 64 or timestamp 96| timestamp
- array                                             ||&#160;                 | array         |                  
- map                                               ||&#160;                 | object        |                  
+ fixext4, fixext8, ext8, ext16, ext32    |-1                 |uint64 seconds if timestamp 32,<br>array [seconds,nanoseconds] if timestamp 64 or timestamp 96| timestamp
+ array                                             |                  | array         |                  
+ map                                               |                  | object        |                  
 
 ### Examples
 
