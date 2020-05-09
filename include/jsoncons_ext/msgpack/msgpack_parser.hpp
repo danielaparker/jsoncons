@@ -567,7 +567,7 @@ private:
                         }
                         int64_t sec = jsoncons::detail::big_to_native<int64_t>(buf2,buf2+sizeof(buf2),&endp);
                         timestamp_buffer_.clear();
-                        timestamp_buffer_.push_back(static_cast<int64_t>(sec));
+                        timestamp_buffer_.push_back(sec);
                         timestamp_buffer_.push_back(nsec);
                         more_ = visitor.typed_array(span<const int64_t>(timestamp_buffer_), tag, *this, ec);
                         if (!more_) return;
