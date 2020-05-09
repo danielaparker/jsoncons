@@ -282,4 +282,18 @@ TEST_CASE("msgpack timestamp tests")
         encode_msgpack(j,output);
         CHECK(output == input);
     }
+    SECTION("test 4")
+    {
+        std::vector<uint64_t> expected = {2147483648,1};
+
+        std::vector<uint8_t> input = {0xd7,0xff,0x00,0x00,0x00,0x04,0x80,0x00,0x00,0x00};
+        auto r = decode_msgpack<std::vector<uint64_t>>(input);
+
+        CHECK(r == expected);
+
+        std::vector<uint8_t> output;
+        json j = decode_msgpack<json>(input);
+        encode_msgpack(j,output);
+        CHECK(output == input);
+    }
 }

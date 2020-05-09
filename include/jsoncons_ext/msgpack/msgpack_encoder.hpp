@@ -233,11 +233,21 @@ namespace msgpack {
             if (stack_.back().is_timestamp())
             {
                 JSONCONS_ASSERT(timestamp_parts_.size() == 2);
-                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext8_cd);
-                sink_.push_back(0x0c); // 12
-                sink_.push_back(0xff);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(timestamp_parts_[1]), std::back_inserter(sink_));
-                jsoncons::detail::native_to_big(static_cast<uint64_t>(timestamp_parts_[0]), std::back_inserter(sink_));
+                if ((timestamp_parts_[0] >> 34) == 0) 
+                {
+                    uint64_t data64 = (timestamp_parts_[1] << 34) | timestamp_parts_[0];
+                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext8_cd);
+                    sink_.push_back(0xff);
+                    jsoncons::detail::native_to_big(static_cast<uint64_t>(data64), std::back_inserter(sink_));
+                }
+                else 
+                {
+                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext8_cd);
+                    sink_.push_back(0x0c); // 12
+                    sink_.push_back(0xff);
+                    jsoncons::detail::native_to_big(static_cast<uint32_t>(timestamp_parts_[1]), std::back_inserter(sink_));
+                    jsoncons::detail::native_to_big(static_cast<uint64_t>(timestamp_parts_[0]), std::back_inserter(sink_));
+                }
             }
 
             stack_.pop_back();
