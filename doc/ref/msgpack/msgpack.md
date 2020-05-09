@@ -17,17 +17,20 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 #### Mappings between MessagePack and jsoncons data items
 
-MessagePack data item                              | jsoncons data item|jsoncons tag  
--------------------------------------------------- |---------------|------------------
- nil                                               | null          |                  
- true or false                                     | bool          |                  
- negative fixnum, int 8, int 16, int 32, int 64    | int64         |                  
- positive fixnum, uint 8, uint 16, uint 32, uint 64| uint64        |                  
- float32 or float64                                | double        |                  
- fixstr, str 8, str 16 or str 32                   | string        |                  
- bin 8, bin 16 or bin 32                           | byte_string   |                  
- array                                             | array         |                  
- map                                               | object        |                  
+MessagePack data item                              |ext type | jsoncons data item|jsoncons tag  
+-------------------------------------------------- |-----------------|---------------|------------------
+ nil                                               |                 | null          |                  
+ true, false                                     |                 | bool          |                  
+ negative fixnum, int 8, int 16, int 32, int 64    |                 | int64         |                  
+ positive fixnum, uint 8, uint 16, uint 32, uint 64|                 | uint64        |                  
+ float32, float64                                |                 | double        |                  
+ fixstr, str 8, str 16, str 32                   |                 | string        |                  
+ bin 8, bin 16, bin 32                           |                 | byte_string   |                  
+ fixext1, fixext2, fixext4, fixext8, fixext16, ext8, ext16, ext32    |                 |               |
+ fixext4, fixext8, ext8, ext16, ext32    |-1                 |uint64 if length is 4               | timestamp
+                                         |                   |array of uint64 if length is 8 or 12| timestamp
+ array                                             |                 | array         |                  
+ map                                               |                 | object        |                  
 
 ### Examples
 
