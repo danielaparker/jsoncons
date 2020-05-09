@@ -27,7 +27,7 @@ MessagePack data item                              |ext type | jsoncons data ite
  fixstr, str 8, str 16, str 32                   |                  | string        |                  
  bin 8, bin 16, bin 32                           |                  | byte_string   |                  
  fixext1, fixext2, fixext4, fixext8, fixext16, ext8, ext16, ext32    |0-127| byte_string               |
- fixext4, fixext8, ext8, ext16, ext32    |-1                 |uint64 seconds if timestamp 32,<br>array [seconds,nanoseconds] if timestamp 64 or timestamp 96| timestamp
+ fixext4, fixext8, ext8, ext16, ext32    |-1                 |seconds in unsigned integer if timestamp 32,<br>[seconds,nanoseconds] if timestamp 64 or timestamp 96| timestamp
  array                                             |                  | array         |                  
  map                                               |                  | object        |                  
 
