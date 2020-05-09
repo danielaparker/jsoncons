@@ -28,7 +28,7 @@ MessagePack data item                              |ext type | jsoncons data ite
  bin 8, bin 16, bin 32                           | |&#160;                | byte_string   |                  
  fixext1, fixext2, fixext4, fixext8, fixext16, ext8, ext16, ext32    |                 |               |
  fixext4, fixext8, ext8, ext16, ext32    |-1                 |uint64 if length is 4               | timestamp
-|&#160;                                         | |&#160;                  |array of uint64 if length is 8 or 12| timestamp
+|&#160;                                         |&#160;                  |array of uint64 if length is 8 or 12| timestamp
  array                                             ||&#160;                 | array         |                  
  map                                               ||&#160;                 | object        |                  
 
