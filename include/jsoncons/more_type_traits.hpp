@@ -11,6 +11,14 @@
 
 namespace jsoncons {
 
+    template< template<class...> class Op, class... Args >
+    using
+    is_detected = jsoncons::detail::is_detected<Op, Args...>;
+
+    template< template<class...> class Op, class... Args >
+    using
+    is_detected_t = jsoncons::detail::is_detected_t<Op, Args...>;
+
     template <class T>
     using is_bool = jsoncons::detail::is_bool<T>;
 
@@ -43,6 +51,9 @@ namespace jsoncons {
 
     template <class T>
     using is_unsigned_integer = jsoncons::detail::is_unsigned_integer<T>;
+
+    template <class T>
+    using is_stateless = jsoncons::detail::is_stateless<T>;
 
     template <class Container>
     using is_list_like = jsoncons::detail::is_list_like<Container>;

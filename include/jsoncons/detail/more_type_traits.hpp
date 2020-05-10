@@ -20,6 +20,27 @@
 
 namespace jsoncons
 {
+    inline
+    char to_hex_character(uint8_t c)
+    {
+        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
+    }
+
+    inline
+    bool is_control_character(uint32_t c)
+    {
+        return c <= 0x1F || c == 0x7f;
+    }
+
+    inline
+    bool is_non_ascii_codepoint(uint32_t cp)
+    {
+        return cp >= 0x80;
+    }
+
+// type traits extensions
+
+namespace detail {
     #ifndef JSONCONS_HAS_VOID_T
     // follows https://en.cppreference.com/w/cpp/types/void_t
     template<typename... Ts> struct make_void { typedef void type;};
@@ -89,53 +110,12 @@ namespace jsoncons
     using
     is_detected_convertible = std::is_convertible< is_detected_t<Op, Args...>, To >;
 
-    // static_max
-
-    template <std::size_t arg1, std::size_t ... argn>
-    struct static_max;
-
-    template <std::size_t arg>
-    struct static_max<arg>
-    {
-        static constexpr size_t value = arg;
-    };
-
-    template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
-    struct static_max<arg1,arg2,argn ...>
-    {
-        static constexpr size_t value = arg1 >= arg2 ? 
-            static_max<arg1,argn...>::value :
-            static_max<arg2,argn...>::value; 
-    };
-
-    inline
-    char to_hex_character(uint8_t c)
-    {
-        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
-    }
-
-    inline
-    bool is_control_character(uint32_t c)
-    {
-        return c <= 0x1F || c == 0x7f;
-    }
-
-    inline
-    bool is_non_ascii_codepoint(uint32_t cp)
-    {
-        return cp >= 0x80;
-    }
-
     template <typename T>
     struct is_stateless
      : public std::integral_constant<bool,  
           (std::is_default_constructible<T>::value &&
           std::is_empty<T>::value)>
     {};
-
-// type traits extensions
-
-namespace detail {
 
     // to_plain_pointer
 
