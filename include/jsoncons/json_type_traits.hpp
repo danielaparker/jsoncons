@@ -881,8 +881,9 @@ namespace detail
         }
     };
 
-    template<class Json, class Allocator>
-    struct json_type_traits<Json, basic_byte_string<Allocator>>
+    template<class Json, class T>
+    struct json_type_traits<Json, T,
+                            typename std::enable_if<jsoncons::is_byte_string<T>::value>::type>
     {
     public:
         using allocator_type = typename Json::allocator_type;
@@ -892,12 +893,12 @@ namespace detail
             return j.is_byte_string();
         }
         
-        static basic_byte_string<Allocator> as(const Json& j)
+        static T as(const Json& j)
         { 
-            return j.template as_byte_string<Allocator>();
+            return j.template as_byte_string<typename T::allocator_type>();
         }
         
-        static Json to_json(const basic_byte_string<Allocator>& val, 
+        static Json to_json(const T& val, 
                             const allocator_type& alloc = allocator_type())
         {
             return Json(val, semantic_tag::none, alloc);

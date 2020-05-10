@@ -23,8 +23,8 @@ namespace jsoncons {
 
     // Into list like of bytes
     template <class Into>
-    class converter<Into,typename std::enable_if<jsoncons::is_list_like<Into>::value &&
-                                                 jsoncons::is_bytes<Into>::value>::type>
+    class converter<Into,typename std::enable_if<(is_list_like<Into>::value && is_bytes<Into>::value) ||
+                                                 is_byte_string<Into>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
         allocator_type alloc_;

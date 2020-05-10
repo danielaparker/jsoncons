@@ -1252,7 +1252,8 @@ public:
         template <typename BAllocator=std::allocator<uint8_t>>
         basic_byte_string<BAllocator> as_byte_string() const
         {
-            converter<std::vector<uint8_t>> convert;
+            using byte_string_type = basic_byte_string<BAllocator>;
+            converter<byte_string_type> convert;
             std::error_code ec;
 
             switch (storage())
@@ -1260,12 +1261,12 @@ public:
                 case storage_kind::short_string_value:
                 case storage_kind::long_string_value:
                 {
-                    std::vector<uint8_t> v = convert.from(as_string_view(),tag(),ec);
+                    byte_string_type v = convert.from(as_string_view(),tag(),ec);
                     if (ec)
                     {
                         JSONCONS_THROW(ser_error(ec));
                     }
-                    return basic_byte_string<BAllocator>(v.data(), v.size());
+                    return v;
                 }
                 case storage_kind::byte_string_value:
                     return basic_byte_string<BAllocator>(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
