@@ -80,10 +80,10 @@ namespace jsoncons {
     using is_bytes = jsoncons::detail::is_bytes<Container>;
 
     template <class Container>
-    using is_string = jsoncons::detail::is_string<Container>;
+    using is_basic_string = jsoncons::detail::is_basic_string<Container>;
 
     template <class Container>
-    using is_string_view = jsoncons::detail::is_string_view<Container>;
+    using is_basic_string_view = jsoncons::detail::is_basic_string_view<Container>;
 
 } // namespace jsoncons
 

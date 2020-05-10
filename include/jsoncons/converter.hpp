@@ -94,7 +94,7 @@ namespace jsoncons {
 
     // Into string
     template <class Into>
-    class converter<Into,typename std::enable_if<jsoncons::is_string<Into>::value>::type>
+    class converter<Into,typename std::enable_if<jsoncons::is_basic_string<Into>::value>::type>
     {
         using char_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;

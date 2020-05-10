@@ -484,7 +484,7 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::is_string<T>::value &&
+                                                    jsoncons::is_basic_string<T>::value &&
                                                     std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using allocator_type = typename Json::allocator_type;
@@ -513,7 +513,7 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::is_string<T>::value &&
+                                                    jsoncons::is_basic_string<T>::value &&
                                                     !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using char_type = typename Json::char_type;
@@ -551,7 +551,7 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::is_string_view<T>::value &&
+                                                    jsoncons::is_basic_string_view<T>::value &&
                                                     std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using allocator_type = typename Json::allocator_type;
