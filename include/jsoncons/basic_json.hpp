@@ -4759,6 +4759,27 @@ public:
         }
     }
 
+    template <class SAllocator = std::allocator<char_type>>
+    std::basic_string<char_type, char_traits_type, SAllocator> to_string(const char_allocator_type& alloc = SAllocator()) const noexcept
+    {
+        using string_type = std::basic_string<char_type, char_traits_type, SAllocator>;
+        string_type s(alloc);
+        basic_json_compressed_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s);
+        dump(encoder);
+        return s;
+    }
+
+    template <class SAllocator = std::allocator<char_type>>
+    std::basic_string<char_type, char_traits_type, SAllocator> to_string(const basic_json_encode_options<char_type>& options,
+        const SAllocator& alloc = SAllocator()) const
+    {
+        using string_type = std::basic_string<char_type, char_traits_type, SAllocator>;
+        string_type s(alloc);
+        basic_json_compressed_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s, options);
+        dump(encoder);
+        return s;
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
@@ -4878,27 +4899,6 @@ public:
             basic_json_compressed_encoder<char_type> encoder(os);
             dump(encoder);
         }
-    }
-
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const char_allocator_type& alloc=SAllocator()) const noexcept
-    {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
-        string_type s(alloc);
-        basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
-        dump(encoder);
-        return s;
-    }
-
-    template <class SAllocator=std::allocator<char_type>>
-    std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options,
-                                                                          const SAllocator& alloc=SAllocator()) const
-    {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
-        string_type s(alloc);
-        basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s,options);
-        dump(encoder);
-        return s;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
