@@ -2526,6 +2526,12 @@ public:
             return evaluate().template get_with_default<T>(name,default_value);
         }
 
+        template <class SAllocator=std::allocator<char_type>>
+        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& alloc = SAllocator()) const 
+        {
+            return evaluate().to_string(alloc);
+        }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 
         const basic_json& get_with_default(const string_view_type& name) const
@@ -2685,13 +2691,6 @@ public:
         void dump(std::basic_ostream<char_type>& os, bool pprint) const
         {
             evaluate().dump(os, pprint);
-        }
-
-        template <class SAllocator=std::allocator<char_type>>
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_string<char_type,char_traits_type,SAllocator>&)")
-        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& alloc = SAllocator()) const 
-        {
-            return evaluate().to_string(alloc);
         }
         JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
         void write(basic_json_visitor<char_type>& visitor) const
