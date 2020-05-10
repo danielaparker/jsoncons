@@ -413,6 +413,8 @@ namespace detail {
     template<class T, std::size_t N>
     struct is_c_array<T[N]> : std::true_type {};
 
+namespace impl {
+
     template<class C, class Enable=void>
     struct is_typed_array : std::false_type {};
 
@@ -421,17 +423,22 @@ namespace detail {
     <
         T, 
         typename std::enable_if<jsoncons::detail::is_list_like<T>::value && 
-                                (std::is_same<typename T::value_type,uint8_t>::value ||  
-                                 std::is_same<typename T::value_type,uint16_t>::value ||
-                                 std::is_same<typename T::value_type,uint32_t>::value ||
-                                 std::is_same<typename T::value_type,uint64_t>::value ||
-                                 std::is_same<typename T::value_type,int8_t>::value ||  
-                                 std::is_same<typename T::value_type,int16_t>::value ||
-                                 std::is_same<typename T::value_type,int32_t>::value ||
-                                 std::is_same<typename T::value_type,int64_t>::value ||
-                                 std::is_same<typename T::value_type,float_t>::value ||
-                                 std::is_same<typename T::value_type,double_t>::value)>::type
+                                (std::is_same<typename std::decay<typename T::value_type>::type,uint8_t>::value ||  
+                                 std::is_same<typename std::decay<typename T::value_type>::type,uint16_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,uint32_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,uint64_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int8_t>::value ||  
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int16_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int32_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int64_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,float_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,double_t>::value)>::type
     > : std::true_type{};
+
+} // namespace impl
+    
+    template <typename T>
+    using is_typed_array = impl::is_typed_array<typename std::decay<T>::type>;
 
     // is_compatible_element
 

@@ -5573,6 +5573,8 @@ jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
 
 } // inline namespace literals
 
+namespace detail {
+
 template <class T>
 struct is_basic_json : std::false_type
 {};
@@ -5580,6 +5582,13 @@ struct is_basic_json : std::false_type
 template <class CharT, class ImplementationPolicy, class Allocator>
 struct is_basic_json<basic_json<CharT,ImplementationPolicy,Allocator>> : std::true_type
 {};
+
+} // namespace detail
+
+    
+    template <typename T>
+    using is_basic_json = detail::is_basic_json<typename std::decay<T>::type>;
+
 
 } // namespace jsoncons
 
