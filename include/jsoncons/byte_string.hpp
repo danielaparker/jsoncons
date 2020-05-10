@@ -767,19 +767,19 @@ namespace jsoncons {
 namespace detail {
 
     template <typename T>
-    struct is_byte_string
+    struct is_basic_byte_string
     : std::false_type
     {};
 
-    template <typename AllocT>
-    struct is_byte_string<basic_byte_string<AllocT>>
+    template <typename Allocator>
+    struct is_basic_byte_string<basic_byte_string<Allocator>>
     : std::true_type
     {};
 
 } // namespace detail
 
     template <typename T>
-    using is_byte_string = detail::is_byte_string<typename std::decay<T>::type>;
+    using is_basic_byte_string = detail::is_basic_byte_string<typename std::decay<T>::type>;
 
 } // namespace jsoncons
 

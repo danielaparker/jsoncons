@@ -34,6 +34,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_type_traits.hpp>
+#include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/detail/heap_only_string.hpp>
 
@@ -3790,10 +3791,11 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<std::is_convertible<uint8_t,typename T::value_type>::value,T>::type
+    typename std::enable_if<(is_list_like<T>::value && is_bytes<T>::value) ||
+                            is_basic_byte_string<T>::value,T>::type
     as(byte_string_arg_t, semantic_tag hint) const
     {
-        converter<std::vector<uint8_t>> convert;
+        converter<T> convert;
         std::error_code ec;
         switch (storage())
         {
@@ -3806,12 +3808,12 @@ public:
                     case semantic_tag::base64:
                     case semantic_tag::base64url:
                     {
-                        std::vector<uint8_t> v = convert.from(as_string_view(),tag(),ec);
+                        T v = convert.from(as_string_view(),tag(),ec);
                         if (ec)
                         {
                             JSONCONS_THROW(ser_error(ec));
                         }
-                        return T(v.begin(),v.end());
+                        return v;
                     }
                     default:
                     {

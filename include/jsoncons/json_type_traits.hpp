@@ -883,7 +883,7 @@ namespace detail
 
     template<class Json, class T>
     struct json_type_traits<Json, T,
-                            typename std::enable_if<jsoncons::is_byte_string<T>::value>::type>
+                            typename std::enable_if<jsoncons::is_basic_byte_string<T>::value>::type>
     {
     public:
         using allocator_type = typename Json::allocator_type;
