@@ -63,7 +63,7 @@ namespace jsoncons {
     // bool
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_bool<T>::value 
+        typename std::enable_if<jsoncons::is_bool<T>::value 
     >::type>
     {
         template <class Json>
@@ -79,7 +79,7 @@ namespace jsoncons {
     // uint
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_u8_u16_u32_or_u64<T>::value 
+        typename std::enable_if<jsoncons::is_u8_u16_u32_or_u64<T>::value 
     >::type>
     {
         template <class Json>
@@ -95,7 +95,7 @@ namespace jsoncons {
     // int
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_i8_i16_i32_or_i64<T>::value 
+        typename std::enable_if<jsoncons::is_i8_i16_i32_or_i64<T>::value 
     >::type>
     {
         template <class Json>
@@ -111,7 +111,7 @@ namespace jsoncons {
     // float or double
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_float_or_double<T>::value 
+        typename std::enable_if<jsoncons::is_float_or_double<T>::value 
     >::type>
     {
         template <class Json>
@@ -127,7 +127,7 @@ namespace jsoncons {
     // string
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+        typename std::enable_if<jsoncons::is_string<T>::value &&
                                 std::is_same<typename T::value_type,CharT>::value 
     >::type>
     {
@@ -142,7 +142,7 @@ namespace jsoncons {
     };
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+        typename std::enable_if<jsoncons::is_string<T>::value &&
                                 !std::is_same<typename T::value_type,CharT>::value 
     >::type>
     {
@@ -242,8 +242,8 @@ namespace jsoncons {
     template <class T, class CharT>
     struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 !jsoncons::detail::is_typed_array<T>::value 
+                 jsoncons::is_list_like<T>::value &&
+                 !jsoncons::is_typed_array<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;
@@ -268,8 +268,8 @@ namespace jsoncons {
     template <class T, class CharT>
     struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::is_typed_array<T>::value 
+                 jsoncons::is_list_like<T>::value &&
+                 jsoncons::is_typed_array<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;
@@ -313,8 +313,8 @@ namespace jsoncons {
     template <class T, class CharT>
     struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                jsoncons::detail::is_map_like<T>::value &&
-                                jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
+                                jsoncons::is_map_like<T>::value &&
+                                jsoncons::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
     >::type>
     {
         using mapped_type = typename T::mapped_type;
@@ -343,7 +343,7 @@ namespace jsoncons {
     template <class T, class CharT>
     struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                jsoncons::detail::is_map_like<T>::value &&
+                                jsoncons::is_map_like<T>::value &&
                                 std::is_integral<typename T::key_type>::value
     >::type>
     {

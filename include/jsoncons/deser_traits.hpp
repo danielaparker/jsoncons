@@ -17,6 +17,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/convert_error.hpp>
+#include <jsoncons/more_type_traits.hpp>
 
 namespace jsoncons {
 
@@ -42,7 +43,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct deser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_primitive<T>::value
+        typename std::enable_if<jsoncons::is_primitive<T>::value
     >::type>
     {
         template <class Json,class TempAllocator>
@@ -63,7 +64,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct deser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+        typename std::enable_if<jsoncons::is_string<T>::value &&
                                 std::is_same<typename T::value_type,CharT>::value
     >::type>
     {
@@ -83,7 +84,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct deser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+        typename std::enable_if<jsoncons::is_string<T>::value &&
                                 !std::is_same<typename T::value_type,CharT>::value
     >::type>
     {
@@ -153,9 +154,9 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::has_push_back<T>::value &&
-                 !jsoncons::detail::is_typed_array<T>::value 
+                 jsoncons::is_list_like<T>::value &&
+                 jsoncons::has_push_back<T>::value &&
+                 !jsoncons::is_typed_array<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;
@@ -291,9 +292,10 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::has_push_back<T>::value &&
-                 jsoncons::detail::is_typed_array<T>::value 
+                 jsoncons::is_list_like<T>::value &&
+                 jsoncons::has_push_back<T>::value &&
+                 jsoncons::is_typed_array<T>::value &&
+                 jsoncons::is_bytes<T>::value
     >::type>
     {
         using value_type = typename T::value_type;
@@ -319,6 +321,40 @@ namespace jsoncons {
                         return T{};
                     }
                 }
+                case staj_event_type::begin_array:
+                {
+                    T v;
+                    typed_array_visitor<T> visitor(v);
+                    cursor.read_to(visitor, ec);
+                    return v;
+                }
+                default:
+                {
+                    ec = convert_errc::not_vector;
+                    return T{};
+                }
+            }
+        }
+    };
+
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
+        typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                 jsoncons::is_list_like<T>::value &&
+                 jsoncons::has_push_back<T>::value &&
+                 jsoncons::is_typed_array<T>::value &&
+                 !jsoncons::is_bytes<T>::value
+    >::type>
+    {
+        using value_type = typename T::value_type;
+
+        template <class Json,class TempAllocator>
+        static T deserialize(basic_staj_cursor<CharT>& cursor, 
+                             json_decoder<Json,TempAllocator>&, 
+                             std::error_code& ec)
+        {
+            switch (cursor.current().event_type())
+            {
                 case staj_event_type::begin_array:
                 {
                     T v;
@@ -367,8 +403,8 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                jsoncons::detail::is_map_like<T>::value &&
-                                jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
+                                jsoncons::is_map_like<T>::value &&
+                                jsoncons::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
     >::type>
     {
         using mapped_type = typename T::mapped_type;
@@ -408,7 +444,7 @@ namespace jsoncons {
     template <class T, class CharT>
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                jsoncons::detail::is_map_like<T>::value &&
+                                jsoncons::is_map_like<T>::value &&
                                 std::is_integral<typename T::key_type>::value
     >::type>
     {

@@ -8,7 +8,7 @@
 #define JSONCONS_CONVERTER_HPP
 
 #include <system_error> // std::error_code
-#include <jsoncons/detail/more_type_traits.hpp>
+#include <jsoncons/more_type_traits.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/convert_error.hpp>
@@ -23,7 +23,7 @@ namespace jsoncons {
 
     // Into list like
     template <class Into>
-    class converter<Into,typename std::enable_if<jsoncons::detail::is_list_like<Into>::value &&
+    class converter<Into,typename std::enable_if<jsoncons::is_list_like<Into>::value &&
                                                  std::is_same<typename Into::value_type,uint8_t>::value>::type>
     {
         using allocator_type = typename Into::allocator_type;
@@ -45,7 +45,7 @@ namespace jsoncons {
 
         template <class CharT>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<jsoncons::detail::is_narrow_character<CharT>::value,Into>::type
+        typename std::enable_if<jsoncons::is_narrow_character<CharT>::value,Into>::type
         from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             switch (tag)
@@ -78,7 +78,7 @@ namespace jsoncons {
 
         template <class CharT>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<jsoncons::detail::is_wide_character<CharT>::value, Into>::type
+        typename std::enable_if<jsoncons::is_wide_character<CharT>::value, Into>::type
         from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             std::string u;
@@ -94,7 +94,7 @@ namespace jsoncons {
 
     // Into string
     template <class Into>
-    class converter<Into,typename std::enable_if<jsoncons::detail::is_string<Into>::value>::type>
+    class converter<Into,typename std::enable_if<jsoncons::is_string<Into>::value>::type>
     {
         using char_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
@@ -109,8 +109,7 @@ namespace jsoncons {
 
         template<class Integer>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<std::is_integral<Integer>::value &&
-                               !std::is_same<Integer,bool>::value,Into>::type
+        typename std::enable_if<jsoncons::is_integer<Integer>::value,Into>::type
         from(Integer val, semantic_tag, std::error_code&) const
         {
             Into s(alloc_);

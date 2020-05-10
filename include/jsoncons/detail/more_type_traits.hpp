@@ -20,7 +20,6 @@
 
 namespace jsoncons
 {
-
     #ifndef JSONCONS_HAS_VOID_T
     // follows https://en.cppreference.com/w/cpp/types/void_t
     template<typename... Ts> struct make_void { typedef void type;};
@@ -241,38 +240,50 @@ namespace detail {
                                                       std::is_same<T,double>::value
     >::type> : std::true_type {};
 
-    // is_integer_like
+    // is_integer
 
     template <class T, class Enable=void>
-    struct is_integer_like : std::false_type {};
+    struct is_integer : std::false_type {};
 
     template <class T>
-    struct is_integer_like<T, 
-                           typename std::enable_if<std::is_integral<T>::value && 
-                           std::is_signed<T>::value && 
-                           !std::is_same<T,bool>::value>::type> : std::true_type {};
+    struct is_integer<T, 
+                      typename std::enable_if<std::is_integral<T>::value && 
+                      !std::is_same<T,bool>::value>::type> : std::true_type {};
 
-    // is_uinteger_like
+    // is_signed_integer
 
     template <class T, class Enable=void>
-    struct is_uinteger_like : std::false_type {};
+    struct is_signed_integer : std::false_type {};
 
     template <class T>
-    struct is_uinteger_like<T, 
-                            typename std::enable_if<std::is_integral<T>::value && 
-                            !std::is_signed<T>::value && 
-                            !std::is_same<T,bool>::value>::type> : std::true_type {};
+    struct is_signed_integer<T, 
+                           typename std::enable_if<is_integer<T>::value && 
+                           std::is_signed<T>::value>::type> : std::true_type {};
 
-    // is_floating_point_like
+    // is_unsigned_integer
 
     template <class T, class Enable=void>
-    struct is_floating_point_like : std::false_type {};
+    struct is_unsigned_integer : std::false_type {};
 
     template <class T>
-    struct is_floating_point_like<T, 
-                                  typename std::enable_if<std::is_floating_point<T>::value>::type> : std::true_type {};
+    struct is_unsigned_integer<T, 
+                            typename std::enable_if<is_integer<T>::value && 
+                            !std::is_signed<T>::value>::type> : std::true_type {};
 
     // Containers
+
+    // is_bytes
+
+    template <class Container, class Enable=void>
+    struct is_bytes : std::false_type {};
+
+    template <class Container>
+    struct is_bytes<Container, 
+           typename std::enable_if<std::is_integral<typename Container::value_type>::value &&
+                                   !std::is_same<typename Container::value_type,bool>::value &&
+                                   std::is_unsigned<typename Container::value_type>::value &&
+                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
+    >::type> : std::true_type {};
 
     template <class Container>
     using 

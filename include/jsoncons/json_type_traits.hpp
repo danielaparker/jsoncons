@@ -21,7 +21,7 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/bignum.hpp>
 #include <jsoncons/json_visitor.hpp>
-#include <jsoncons/detail/more_type_traits.hpp>
+#include <jsoncons/more_type_traits.hpp>
 #include <string>
 #include <tuple>
 #include <map>
@@ -89,7 +89,7 @@ namespace detail {
     template<class Json, class T>
     struct is_compatible_array_type<Json,T, 
         typename std::enable_if<!std::is_same<T,typename Json::array>::value &&
-        jsoncons::detail::is_list_like<T>::value && 
+        jsoncons::is_list_like<T>::value && 
         !is_json_type_traits_unspecialized<Json,typename std::iterator_traits<typename T::iterator>::value_type>::value
     >::type> : std::true_type {};
 
@@ -146,7 +146,7 @@ namespace detail {
 
     template<class Json, class T>
     struct json_type_traits<Json, T,
-                            typename std::enable_if<jsoncons::detail::is_integer_like<T>::value
+                            typename std::enable_if<jsoncons::is_signed_integer<T>::value
     >::type>
     {
         using allocator_type = typename Json::allocator_type;
@@ -178,7 +178,7 @@ namespace detail {
 
     template<class Json, class T>
     struct json_type_traits<Json, T,
-                            typename std::enable_if<jsoncons::detail::is_uinteger_like<T>::value>::type>
+                            typename std::enable_if<jsoncons::is_unsigned_integer<T>::value>::type>
     {
         using allocator_type = typename Json::allocator_type;
 
@@ -392,7 +392,7 @@ namespace detail {
             if (j.is_array())
             {
                 T result;
-                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
                     result.push_back(item.template as<value_type>());
@@ -415,7 +415,7 @@ namespace detail {
             if (j.is_array())
             {
                 T result;
-                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(),result,j.size());
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::has_reserve<T>::value>::type(),result,j.size());
                 for (const auto& item : j.array_range())
                 {
                     result.push_back(item.template as<value_type>());
@@ -484,7 +484,7 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_string<T>::value &&
+                                                    jsoncons::is_string<T>::value &&
                                                     std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using allocator_type = typename Json::allocator_type;
@@ -513,7 +513,7 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_string<T>::value &&
+                                                    jsoncons::is_string<T>::value &&
                                                     !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using char_type = typename Json::char_type;
@@ -551,7 +551,7 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_string_view<T>::value &&
+                                                    jsoncons::is_string_view<T>::value &&
                                                     std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
     {
         using allocator_type = typename Json::allocator_type;
@@ -581,8 +581,8 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_map_like<T>::value &&
-                                                    jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                                    jsoncons::is_map_like<T>::value &&
+                                                    jsoncons::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
                                                     is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
     {
@@ -635,7 +635,7 @@ namespace detail {
     template <class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_map_like<T>::value &&
+                                                    jsoncons::is_map_like<T>::value &&
                                                     std::is_integral<typename T::key_type>::value &&
                                                     is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
