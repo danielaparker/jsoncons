@@ -3935,7 +3935,7 @@ public:
     {
         using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
 
-        converter<string_type> converter(alloc);
+        converter<string_type> convert(alloc);
         std::error_code ec;
         switch (var_.storage())
         {
@@ -3946,7 +3946,7 @@ public:
             }
             case storage_kind::byte_string_value:
             {
-                auto s = converter.from(as_byte_string_view(), tag(), ec);
+                auto s = convert.from(as_byte_string_view(), tag(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(ser_error(ec));
