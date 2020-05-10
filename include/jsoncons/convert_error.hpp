@@ -16,6 +16,7 @@ namespace jsoncons {
     {
         success = 0,
         not_utf8,
+        not_wide_char,
         not_vector,
         not_array,
         not_map,
@@ -55,6 +56,8 @@ namespace detail {
             {
                 case convert_errc::not_utf8:
                     return "Cannot convert string to UTF-8";
+                case convert_errc::not_wide_char:
+                    return "Cannot convert string to wide characters";
                 case convert_errc::not_vector:
                     return "Cannot convert to vector";
                 case convert_errc::not_array:

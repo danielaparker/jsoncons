@@ -172,7 +172,7 @@ namespace jsoncons {
             auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));
             if (retval.ec != unicons::conv_errc())
             {
-                ec = convert_errc::not_utf8;
+                ec = convert_errc::not_wide_char;
                 return s;
             }
 
