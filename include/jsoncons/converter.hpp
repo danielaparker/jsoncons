@@ -137,8 +137,10 @@ namespace jsoncons {
             return s;
         }
 
-        JSONCONS_CPP14_CONSTEXPR 
-        Into from(const byte_string_view& bytes, 
+        template <class ChT = char_type>
+        JSONCONS_CPP14_CONSTEXPR
+        typename std::enable_if<sizeof(ChT) == sizeof(uint8_t),Into>::type
+        from(const byte_string_view& bytes, 
                   semantic_tag tag,
                   std::error_code&) const
         {
@@ -155,6 +157,25 @@ namespace jsoncons {
                     encode_base64url(bytes.begin(), bytes.end(), s);
                     break;
             }
+            return s;
+        }
+
+        template <class ChT = char_type>
+        JSONCONS_CPP14_CONSTEXPR
+        typename std::enable_if<sizeof(ChT) != sizeof(uint8_t),Into>::type
+        from(const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
+        {
+            converter<std::string> convert(alloc_);
+            std::string u = convert.from(bytes, tag, ec);
+
+            Into s(alloc_);
+            auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));
+            if (retval.ec != unicons::conv_errc())
+            {
+                ec = convert_errc::not_utf8;
+                return s;
+            }
+
             return s;
         }
 

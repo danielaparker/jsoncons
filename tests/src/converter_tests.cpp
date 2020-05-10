@@ -36,3 +36,33 @@ TEST_CASE("convert into list-like")
     }
 }
 
+TEST_CASE("convert into string")
+{
+    std::vector<uint8_t> bytes = {'f','o','o','b','a','r'};
+
+    SECTION("from byte_string into string")
+    {
+        converter<std::string> convert;
+
+        std::string expected = "Zm9vYmFy";
+
+        std::error_code ec;
+        std::string s = convert.from(byte_string_view{bytes.data(),bytes.size()}, semantic_tag::base64url, ec);
+        REQUIRE(!ec); 
+        
+        CHECK(s == expected);
+    }
+    SECTION("from byte string into wstring")
+    {
+        converter<std::wstring> convert;
+
+        std::wstring expected = L"Zm9vYmFy";
+
+        std::error_code ec;
+        std::wstring s = convert.from(byte_string_view{bytes.data(),bytes.size()}, semantic_tag::base64url, ec);
+        REQUIRE(!ec);
+
+        CHECK(s == expected);
+    }
+}
+
