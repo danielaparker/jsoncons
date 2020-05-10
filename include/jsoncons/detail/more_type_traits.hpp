@@ -18,29 +18,9 @@
 #include <utility> // std::declval
 #include <jsoncons/config/compiler_support.hpp>
 
-namespace jsoncons
-{
-    inline
-    char to_hex_character(uint8_t c)
-    {
-        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
-    }
-
-    inline
-    bool is_control_character(uint32_t c)
-    {
-        return c <= 0x1F || c == 0x7f;
-    }
-
-    inline
-    bool is_non_ascii_codepoint(uint32_t cp)
-    {
-        return cp >= 0x80;
-    }
-
-// type traits extensions
-
+namespace jsoncons {
 namespace detail {
+
     #ifndef JSONCONS_HAS_VOID_T
     // follows https://en.cppreference.com/w/cpp/types/void_t
     template<typename... Ts> struct make_void { typedef void type;};

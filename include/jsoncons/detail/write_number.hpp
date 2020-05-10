@@ -21,6 +21,12 @@
 namespace jsoncons { 
 namespace detail {
 
+    inline
+    char to_hex_character(uint8_t c)
+    {
+        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
+    }
+
     // write_integer
 
     template<class Integer,class Result>

@@ -114,26 +114,26 @@ namespace detail {
 
                                 sink.push_back('\\');
                                 sink.push_back('u');
-                                sink.push_back(to_hex_character(first >> 12 & 0x000F));
-                                sink.push_back(to_hex_character(first >> 8 & 0x000F));
-                                sink.push_back(to_hex_character(first >> 4 & 0x000F));
-                                sink.push_back(to_hex_character(first & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(first >> 12 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(first >> 8 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(first >> 4 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(first & 0x000F));
                                 sink.push_back('\\');
                                 sink.push_back('u');
-                                sink.push_back(to_hex_character(second >> 12 & 0x000F));
-                                sink.push_back(to_hex_character(second >> 8 & 0x000F));
-                                sink.push_back(to_hex_character(second >> 4 & 0x000F));
-                                sink.push_back(to_hex_character(second & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(second >> 12 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(second >> 8 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(second >> 4 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(second & 0x000F));
                                 count += 12;
                             }
                             else
                             {
                                 sink.push_back('\\');
                                 sink.push_back('u');
-                                sink.push_back(to_hex_character(cp >> 12 & 0x000F));
-                                sink.push_back(to_hex_character(cp >> 8 & 0x000F));
-                                sink.push_back(to_hex_character(cp >> 4 & 0x000F));
-                                sink.push_back(to_hex_character(cp & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(cp >> 12 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(cp >> 8 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(cp >> 4 & 0x000F));
+                                sink.push_back(jsoncons::detail::to_hex_character(cp & 0x000F));
                                 count += 6;
                             }
                         }
