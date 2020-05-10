@@ -174,6 +174,26 @@ namespace detail {
                                    std::is_same<T,wchar_t>::value
     >::type> : std::true_type {};
 
+    // is_narrow_character
+
+    template <class T, class Enable=void>
+    struct is_narrow_character : std::false_type {};
+
+    template <class T>
+    struct is_narrow_character<T, 
+           typename std::enable_if<is_character<T>::value && (sizeof(T) == sizeof(char))
+    >::type> : std::true_type {};
+
+    // is_wide_character
+
+    template <class T, class Enable=void>
+    struct is_wide_character : std::false_type {};
+
+    template <class T>
+    struct is_wide_character<T, 
+           typename std::enable_if<is_character<T>::value && (sizeof(T) != sizeof(char))
+    >::type> : std::true_type {};
+
     // is_int
 
     template <class T, class Enable=void>
@@ -294,6 +314,18 @@ namespace detail {
     using
     container_size_t = decltype(std::declval<Container>().size());
 
+    // is_string_or_string_view
+
+    template <class T, class Enable=void>
+    struct is_string_or_string_view : std::false_type {};
+
+    template <class T>
+    struct is_string_or_string_view<T, 
+                     typename std::enable_if<is_character<typename T::value_type>::value &&
+                                             is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
+                                             is_detected<container_npos_t,T>::value
+    >::type> : std::true_type {};
+
     // is_string
 
     template <class T, class Enable=void>
@@ -301,9 +333,7 @@ namespace detail {
 
     template <class T>
     struct is_string<T, 
-                     typename std::enable_if<is_character<typename T::value_type>::value &&
-                                             is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
-                                             is_detected<container_npos_t,T>::value &&
+                     typename std::enable_if<is_string_or_string_view<T>::value &&
                                              is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
 
@@ -314,9 +344,7 @@ namespace detail {
 
     template <class T>
     struct is_string_view<T, 
-                          typename std::enable_if<is_character<typename T::value_type>::value &&
-                                                  is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
-                                                  is_detected<container_npos_t,T>::value &&
+                          typename std::enable_if<is_string_or_string_view<T>::value &&
                                                   !is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
 

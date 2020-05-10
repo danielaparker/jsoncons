@@ -45,7 +45,7 @@ namespace jsoncons {
 
         template <class CharT>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<jsoncons::detail::is_character<CharT>::value && sizeof(CharT) == sizeof(uint8_t),Into>::type
+        typename std::enable_if<jsoncons::detail::is_narrow_character<CharT>::value,Into>::type
         from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             switch (tag)
@@ -78,7 +78,7 @@ namespace jsoncons {
 
         template <class CharT>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<jsoncons::detail::is_character<CharT>::value && sizeof(CharT) != sizeof(uint8_t), Into>::type
+        typename std::enable_if<jsoncons::detail::is_wide_character<CharT>::value, Into>::type
         from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             std::string u;
