@@ -1265,7 +1265,7 @@ public:
                     {
                         JSONCONS_THROW(ser_error(ec));
                     }
-                    return basic_byte_string<BAllocator>(v.begin(), v.size());
+                    return basic_byte_string<BAllocator>(v.data(), v.size());
                 }
                 case storage_kind::byte_string_value:
                     return basic_byte_string<BAllocator>(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
@@ -3793,6 +3793,8 @@ public:
     typename std::enable_if<std::is_convertible<uint8_t,typename T::value_type>::value,T>::type
     as(byte_string_arg_t, semantic_tag hint) const
     {
+        converter<std::vector<uint8_t>> convert;
+        std::error_code ec;
         switch (storage())
         {
             case storage_kind::short_string_value:
@@ -3801,54 +3803,24 @@ public:
                 switch (tag())
                 {
                     case semantic_tag::base16:
-                    {
-                        T bytes;
-                        auto s = as_string_view();
-                        decode_base16(s.begin(), s.end(), bytes);
-                        return bytes;
-                    }
                     case semantic_tag::base64:
-                    {
-                        T bytes;
-                        auto s = as_string_view();
-                        decode_base64(s.begin(), s.end(), bytes);
-                        return bytes;
-                    }
                     case semantic_tag::base64url:
                     {
-                        T bytes;
-                        auto s = as_string_view();
-                        decode_base64url(s.begin(), s.end(), bytes);
-                        return bytes;
+                        std::vector<uint8_t> v = convert.from(as_string_view(),tag(),ec);
+                        if (ec)
+                        {
+                            JSONCONS_THROW(ser_error(ec));
+                        }
+                        return T(v.begin(),v.end());
                     }
                     default:
                     {
-                        switch (hint)
+                        std::vector<uint8_t> v = convert.from(as_string_view(), hint, ec);
+                        if (ec)
                         {
-                            case semantic_tag::base16:
-                            {
-                                T bytes;
-                                auto s = as_string_view();
-                                decode_base16(s.begin(), s.end(), bytes);
-                                return bytes;
-                            }
-                            case semantic_tag::base64:
-                            {
-                                T bytes;
-                                auto s = as_string_view();
-                                decode_base64(s.begin(), s.end(), bytes);
-                                return bytes;
-                            }
-                            case semantic_tag::base64url:
-                            {
-                                T bytes;
-                                auto s = as_string_view();
-                                decode_base64url(s.begin(), s.end(), bytes);
-                                return bytes;
-                            }
-                            default:
-                                JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
+                            JSONCONS_THROW(ser_error(ec));
                         }
+                        return T(v.begin(),v.end());
                     }
                     break;
                 }
