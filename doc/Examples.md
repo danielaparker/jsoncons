@@ -9,8 +9,12 @@
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
-[Parse a very large JSON file with json_cursor](#A7)  
 [Decode a JSON text using stateful result and work allocators](#A9)  
+
+### Stream
+
+[Read JSON parse events](#I1)  
+[Filter JSON parse events](#I2)  
 
 ### Encode
 
@@ -299,9 +303,34 @@ Output:
 }
 ```
 
-<div id="A7"/> 
+<div id="A9"/> 
 
-### Parse a very large JSON file with json_cursor
+### Decode a JSON text using stateful result and work allocators
+
+```c++
+// Given allocator my_alloc with a single-argument constructor my_alloc(int),
+// use my_alloc(1) to allocate basic_json memory, my_alloc(2) to allocate
+// working memory used by json_decoder, and my_alloc(3) to allocate
+// working memory used by basic_json_reader. 
+
+using my_json = basic_json<char,sorted_policy,my_alloc>;
+
+std::ifstream is("book_catalog.json");
+json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
+
+basic_json_reader<char,stream_source<char>,my_alloc> reader(is, decoder, my_alloc(3));
+reader.read();
+
+my_json j = decoder.get_result();
+std::cout << pretty_print(j) << "\n";
+```
+
+
+### Stream
+
+<div id="I1"/> 
+
+#### Read JSON parse events
 
 A typical pull parsing application will repeatedly process the `current()` 
 event and call `next()` to advance to the next event, until `done()` 
@@ -330,7 +359,6 @@ Input JSON file `book_catalog.json`:
 ]
 ```
 
-#### Read JSON parse events
 ```c++
 std::ifstream is("book_catalog.json");
 
@@ -416,27 +444,7 @@ end_object
 end_array
 ```
 
-<div id="A9"/> 
-
-### Decode a JSON text using stateful result and work allocators
-
-```c++
-// Given allocator my_alloc with a single-argument constructor my_alloc(int),
-// use my_alloc(1) to allocate basic_json memory, my_alloc(2) to allocate
-// working memory used by json_decoder, and my_alloc(3) to allocate
-// working memory used by basic_json_reader. 
-
-using my_json = basic_json<char,sorted_policy,my_alloc>;
-
-std::ifstream is("book_catalog.json");
-json_decoder<my_json,my_alloc> decoder(my_alloc(1),my_alloc(2));
-
-basic_json_reader<char,stream_source<char>,my_alloc> reader(is, decoder, my_alloc(3));
-reader.read();
-
-my_json j = decoder.get_result();
-std::cout << pretty_print(j) << "\n";
-```
+<div id="I2"/> 
 
 #### Filter JSON parse events
 
