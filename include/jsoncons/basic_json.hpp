@@ -1252,38 +1252,20 @@ public:
         template <typename BAllocator=std::allocator<uint8_t>>
         basic_byte_string<BAllocator> as_byte_string() const
         {
+            converter<std::vector<uint8_t>> convert;
+            std::error_code ec;
+
             switch (storage())
             {
                 case storage_kind::short_string_value:
                 case storage_kind::long_string_value:
                 {
-                    switch (tag())
+                    std::vector<uint8_t> v = convert.from(as_string_view(),tag(),ec);
+                    if (ec)
                     {
-                        case semantic_tag::base16:
-                        {
-                            basic_byte_string<BAllocator> bytes;
-                            auto s = as_string_view();
-                            decode_base16(s.begin(), s.end(), bytes);
-                            return bytes;
-                        }
-                        case semantic_tag::base64:
-                        {
-                            basic_byte_string<BAllocator> bytes;
-                            auto s = as_string_view();
-                            decode_base64(s.begin(), s.end(), bytes);
-                            return bytes;
-                        }
-                        case semantic_tag::base64url:
-                        {
-                            basic_byte_string<BAllocator> bytes;
-                            auto s = as_string_view();
-                            decode_base64url(s.begin(), s.end(), bytes);
-                            return bytes;
-                        }
-                        default:
-                            JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
+                        JSONCONS_THROW(ser_error(ec));
                     }
-                    break;
+                    return basic_byte_string<BAllocator>(v.begin(), v.size());
                 }
                 case storage_kind::byte_string_value:
                     return basic_byte_string<BAllocator>(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
