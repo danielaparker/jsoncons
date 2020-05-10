@@ -327,6 +327,7 @@ namespace detail {
     template <class T>
     struct is_map_like<T, 
                        typename std::enable_if<is_detected<container_mapped_type_t,T>::value &&
+                                               is_detected<container_allocator_type_t,T>::value &&
                                                is_detected<container_key_type_t,T>::value &&
                                                is_detected<container_value_type_t,T>::value 
         >::type> 
@@ -347,6 +348,7 @@ namespace detail {
     template <class T>
     struct is_list_like<T, 
                           typename std::enable_if<is_detected<container_value_type_t,T>::value &&
+                                                  is_detected<container_allocator_type_t,T>::value &&
                                                   !is_std_array<T>::value && 
                                                   !is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
                                                   !is_map_like<T>::value 
