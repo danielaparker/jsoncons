@@ -8,7 +8,7 @@ to work with the data in a number of ways:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
 
-- As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
+- With cursor-level access to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
@@ -130,7 +130,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
 
-- As a stream of parse events
+- With [cursor-level access](doc/ref/basic_json_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -310,7 +310,7 @@ These macro declarations must be placed outside any namespace blocks.
 
 See [examples](doc/Examples.md#G0) for other ways of specializing `json_type_traits`.
 
-#### As a stream of parse events
+#### With cursor-level access
 
 ```c++
 int main()
@@ -482,7 +482,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
 
-- As a stream of parse events
+- With [cursor-level access](doc/ref/cbor/basic_cbor_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -582,7 +582,7 @@ bar, 50 75 73 73, 1.23456789012345678901234567890
 Note that when decoding the bigfloat and decimal fraction into a `std::string`, we lose the semantic information
 that the variant like data structure preserved with a tag, so serializing back to CBOR produces a text string.
 
-#### As a stream of parse events
+#### With cursor-level access
 
 ```c++
 int main()

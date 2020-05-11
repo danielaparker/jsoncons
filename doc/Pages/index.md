@@ -31,7 +31,7 @@ to work with the data in a number of ways:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
 
-- As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
+- With [cursor-level access](https://github.com/danielaparker/jsoncons/blob/doc/doc/ref/basic_json_cursor.md) to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
@@ -258,7 +258,7 @@ These macro declarations must be placed outside any namespace blocks.
 
 See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
-#### As a stream of parse events
+#### With cursor-level access
 
 ```c++
 int main()

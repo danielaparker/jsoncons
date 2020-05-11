@@ -4,7 +4,6 @@ The msgpack extension implements encode to and decode from the [MessagePack](htt
 You can either parse into or serialize from a variant-like data structure, [basic_json](../basic_json.md), or your own
 data structures, using [json_type_traits](../json_type_traits.md).
 
-
 [decode_msgpack](decode_msgpack.md)
 
 [basic_msgpack_cursor](basic_msgpack_cursor.md)

@@ -66,7 +66,7 @@ jsoncons allows you to work with the UBJSON data similarly to JSON data:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md) 
 
-- As a stream of parse events
+- With [cursor-level access](doc/ref/ubjson/basic_ubjson_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -145,7 +145,7 @@ Output:
 23.8889
 ```
 
-#### As a stream of parse events
+#### With cursor-level access
 
 ```c++
 int main()

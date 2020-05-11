@@ -37,8 +37,7 @@ jsoncons allows you to work with the CSV data similarly to JSON data:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md)
 
-- As a stream of parse events
-
+- With [cursor-level access](doc/ref/csv/basic_csv_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -194,7 +193,7 @@ EUR_LIBOR_06M,2015-10-26,0.0000143
 EUR_LIBOR_06M,2015-10-27,0.0000001
 ```
 
-#### As a stream of parse events
+#### With cursor-level access
 
 ```c++
 int main()
