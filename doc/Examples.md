@@ -15,6 +15,7 @@
 
 [Read JSON parse events](#I1)  
 [Filter JSON parse events](#I2)  
+[Read nested objects into a basic_json](#I3)  
 
 ### Encode
 
@@ -360,55 +361,62 @@ Input JSON file `book_catalog.json`:
 ```
 
 ```c++
-std::ifstream is("book_catalog.json");
+#include <jsoncons/json_cursor.hpp>
+#include <fstream>
 
-json_cursor cursor(is);
-
-for (; !cursor.done(); cursor.next())
+int main()
 {
-    const auto& event = cursor.current();
-    switch (event.event_type())
+    std::ifstream is("book_catalog.json");
+
+    json_cursor cursor(is);
+
+    for (; !cursor.done(); cursor.next())
     {
-        case staj_event_type::begin_array:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::end_array:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::begin_object:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::end_object:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::key:
-            // Or std::string_view, if supported
-            std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
-            break;
-        case staj_event_type::string_value:
-            // Or std::string_view, if supported
-            std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
-            break;
-        case staj_event_type::null_value:
-            std::cout << event.event_type() << "\n";
-            break;
-        case staj_event_type::bool_value:
-            std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
-            break;
-        case staj_event_type::int64_value:
-            std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
-            break;
-        case staj_event_type::uint64_value:
-            std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
-            break;
-        case staj_event_type::double_value:
-            std::cout << event.event_type() << ": " << event.get<double>() << "\n";
-            break;
-        default:
-            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
-            break;
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::key:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << event.event_type() << "\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": " << event.get<double>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
+        }
     }
 }
+
 ```
 Output:
 ```
@@ -449,6 +457,10 @@ end_array
 #### Filter JSON parse events
 
 ```c++
+
+#include <jsoncons/json_cursor.hpp>
+#include <fstream>
+
 // A stream filter to filter out all events except name 
 // and restrict name to "author"
 
@@ -477,29 +489,104 @@ struct author_filter
     }
 };
 
-std::ifstream is("book_catalog.json");
-
-author_filter filter;
-json_cursor cursor(is, filter);
-
-for (; !cursor.done(); cursor.next())
+int main()
 {
-    const auto& event = cursor.current();
-    switch (event.event_type())
-    {
-        case staj_event_type::string_value:
-            std::cout << event.get<jsoncons::string_view>() << "\n";
-            break;
-        default:
-            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
-            break;
-    }
+   std::ifstream is("book_catalog.json");
+
+   author_filter filter;
+   json_cursor cursor(is, filter);
+
+   for (; !cursor.done(); cursor.next())
+   {
+       const auto& event = cursor.current();
+       switch (event.event_type())
+       {
+           case staj_event_type::string_value:
+               std::cout << event.get<jsoncons::string_view>() << "\n";
+               break;
+           default:
+               std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+               break;
+       }
+   }
 }
 ```
 Output:
 ```
 Haruki Murakami
 Graham Greene
+```
+
+<div id="I2"/> 
+
+#### Read nested objects into a basic_json
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json.hpp> // json_decoder and json
+#include <fstream>
+
+int main()
+{
+    std::ifstream is("book_catalog.json");
+
+    json_cursor cursor(is);
+
+    json_decoder<json> decoder;
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::end_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::begin_object:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                cursor.read_to(decoder);
+                json j = decoder.get_result();
+                std::cout << pretty_print(j) << "\n";
+                break;
+            }
+            default:
+            {
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
+            }
+        }
+    }
+}
+```
+Output:
+```
+begin_array
+begin_object
+{
+    "author": "Haruki Murakami",
+    "date": "1993-03-02",
+    "isbn": "0679743464",
+    "price": 18.9,
+    "publisher": "Vintage",
+    "title": "Hard-Boiled Wonderland and the End of the World"
+}
+begin_object
+{
+    "author": "Graham Greene",
+    "date": "2005-09-21",
+    "isbn": "0099478374",
+    "price": 15.74,
+    "publisher": "Vintage Classics",
+    "title": "The Comedians"
+}
+end_array
 ```
 
 See [basic_json_cursor](doc/ref/basic_json_cursor.md) 
