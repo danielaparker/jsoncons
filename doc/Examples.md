@@ -15,7 +15,7 @@
 
 [Read JSON parse events](#I1)  
 [Filter JSON parse events](#I2)  
-[Read nested objects into a basic_json](#I3)  
+[Pull nested objects into a basic_json](#I3)  
 
 ### Encode
 
@@ -519,7 +519,13 @@ Graham Greene
 
 <div id="I3"/> 
 
-#### Read nested objects into a basic_json
+#### Pull nested objects into a basic_json
+
+When positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` ro `end_object`, 
+and when positioned on `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
 
 ```c++
 #include <jsoncons/json_cursor.hpp>
