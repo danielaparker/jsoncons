@@ -309,6 +309,76 @@ Haruki Murakami
 Graham Greene
 ```
 
+#### Pull nested objects into a basic_json
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json.hpp> // json_decoder and json
+#include <fstream>
+
+int main()
+{
+    std::ifstream is("book_catalog.json");
+
+    json_cursor cursor(is);
+
+    json_decoder<json> decoder;
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::end_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::begin_object:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                cursor.read_to(decoder);
+                json j = decoder.get_result();
+                std::cout << pretty_print(j) << "\n";
+                break;
+            }
+            default:
+            {
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
+            }
+        }
+    }
+}
+```
+Output:
+```
+begin_array
+begin_object
+{
+    "author": "Haruki Murakami",
+    "date": "1993-03-02",
+    "isbn": "0679743464",
+    "price": 18.9,
+    "publisher": "Vintage",
+    "title": "Hard-Boiled Wonderland and the End of the World"
+}
+begin_object
+{
+    "author": "Graham Greene",
+    "date": "2005-09-21",
+    "isbn": "0099478374",
+    "price": 15.74,
+    "publisher": "Vintage Classics",
+    "title": "The Comedians"
+}
+end_array
+```
+
 ### See also
 
 - [basic_staj_event](basic_staj_event.md) 
