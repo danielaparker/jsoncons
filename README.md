@@ -67,7 +67,7 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 
 The library requires a C++ Compiler with C++11 support. In addition the library defines `jsoncons::endian`,
 `jsoncons::basic_string_view`, `jsoncons::optional`, and `jsoncons::span`, which will be typedefed to
-their standard library equivalents if detected. Otherwise they will be proxied with internal implementations.
+their standard library equivalents if detected. Otherwise they will be typedefed to internal, C++ 11 compatible, implementations.
 
 The library uses exceptions and in some cases `std::error_code`'s to report errors.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
