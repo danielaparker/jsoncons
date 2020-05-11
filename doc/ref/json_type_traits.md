@@ -598,8 +598,8 @@ Charles Bukowski, Pulp, 22.48
 
 #### Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_type_traits 
 
-`JSONCONS_ALL_CTOR_GETTER_TRAITS` is a macro that can be used to generate the `json_type_traits` boilerplate
-for your own types.
+The macro `JSONCONS_ALL_CTOR_GETTER_TRAITS` will generate the `json_type_traits` boilerplate
+for your own types from a constructor and getter functions.
 
 ```c++
 #include <cassert>
