@@ -46,7 +46,6 @@ namespace jsoncons {
         {
             if (reader_->current().event_type() == staj_event_type::begin_array)
             {
-                reader_->next(); // skip past array
                 next();
             }
             else
@@ -61,8 +60,6 @@ namespace jsoncons {
         {
             if (reader_->current().event_type() == staj_event_type::begin_array)
             {
-                reader_->next(ec); // skip past array
-                if (ec) {reader_ = nullptr;}
                 next(ec);
                 if (ec) {reader_ = nullptr;}
             }
@@ -157,11 +154,15 @@ namespace jsoncons {
 
             if (!done())
             {
-                std::error_code ec;
-                value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
-                if (ec)
+                reader_->next();
+                if (!done())
                 {
-                    JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
+                    std::error_code ec;
+                    value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
+                    if (ec)
+                    {
+                        JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
+                    }
                 }
             }
         }
@@ -172,7 +173,15 @@ namespace jsoncons {
 
             if (!done())
             {
-                value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
+                reader_->next(ec);
+                if (ec)
+                {
+                    return;
+                }
+                if (!done())
+                {
+                    value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
+                }
             }
         }
     };
@@ -217,7 +226,6 @@ namespace jsoncons {
         {
             if (reader_->current().event_type() == staj_event_type::begin_object)
             {
-                reader_->next(); // advance past begin_object
                 next();
             }
             else
@@ -232,8 +240,6 @@ namespace jsoncons {
         {
             if (reader_->current().event_type() == staj_event_type::begin_object)
             {
-                reader_->next(ec); // advance past begin_object
-                if (ec) {reader_ = nullptr;}
                 next(ec);
                 if (ec) {reader_ = nullptr;}
             }
@@ -327,11 +333,11 @@ namespace jsoncons {
         {
             using char_type = typename Json::char_type;
 
-            //reader_->next();
+            reader_->next();
             if (!done())
             {
-                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
-                key_type key = reader_->current().template get<key_type>();
+                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
+                key_type key = reader_->current(). template get<key_type>();
                 reader_->next();
                 if (!done())
                 {
@@ -349,10 +355,15 @@ namespace jsoncons {
         {
             using char_type = typename Json::char_type;
 
+            reader_->next(ec);
+            if (ec)
+            {
+                return;
+            }
             if (!done())
             {
-                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
-                auto key = reader_->current().template get<key_type>();
+                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
+                auto key = reader_->current(). template get<key_type>();
                 reader_->next(ec);
                 if (ec)
                 {

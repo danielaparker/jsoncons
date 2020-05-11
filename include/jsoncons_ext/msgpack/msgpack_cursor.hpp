@@ -144,10 +144,6 @@ public:
         {
             read_next(visitor, ec);
         }
-        if (!done())
-        {
-            read_next(ec);
-        }
     }
 
     void next() override

@@ -565,7 +565,7 @@ TEST_CASE("staj event as object")
         json j0 = decoder.get_result();
         CHECK((j0 == document[0]));
 
-        json_diagnostics_visitor visitor;
+        cursor.next();
 
         json_decoder<json> decoder2;
         cursor.read_to(decoder2);

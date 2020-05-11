@@ -83,7 +83,7 @@ TEST_CASE("object_iterator test")
 
         json_decoder<json> decoder;
         cursor.read_to(decoder);
-
+        cursor.next();
         CHECK(cursor.current().event_type() == staj_event_type::key);
     }
 

@@ -52,10 +52,6 @@ namespace jsoncons {
                              std::error_code& ec)
         {
             T v = cursor.current().template get<T>(ec);
-            if (!ec)
-            {
-                cursor.next(ec);
-            }
             return v;
         }
     };
@@ -74,10 +70,6 @@ namespace jsoncons {
                              std::error_code& ec)
         {
             T v = cursor.current().template get<T>(ec);
-            if (!ec) 
-            {
-                cursor.next(ec);
-            }
             return v;
         }
     };
@@ -98,7 +90,6 @@ namespace jsoncons {
             if (!ec)
             {
                 unicons::convert(val.begin(), val.end(), std::back_inserter(s));
-                cursor.next(ec);
             }
             return s;
         }
@@ -120,30 +111,23 @@ namespace jsoncons {
                 ec = convert_errc::not_pair;
                 return value_type();
             }
-            cursor.next(ec);
+            cursor.next(ec); // skip past array
             if (ec)
             {
                 return value_type();
             }
 
             T1 v1 = deser_traits<T1,CharT>::deserialize(cursor, decoder, ec);
-            if (ec)
-            {
-                return value_type();
-            }
+            if (ec) {return value_type();}
+            cursor.next(ec);
+            if (ec) {return value_type();}
             T2 v2 = deser_traits<T2, CharT>::deserialize(cursor, decoder, ec);
-            if (ec)
-            {
-                return value_type();
-            }
+            if (ec) {return value_type();}
+            cursor.next(ec);
+
             if (cursor.current().event_type() != staj_event_type::end_array)
             {
                 ec = convert_errc::not_pair;
-                return value_type();
-            }
-            cursor.next(ec);
-            if (ec)
-            {
                 return value_type();
             }
             return std::make_pair(v1, v2);
@@ -177,6 +161,7 @@ namespace jsoncons {
             while (cursor.current().event_type() != staj_event_type::end_array && !ec)
             {
                 v.push_back(deser_traits<value_type,CharT>::deserialize(cursor, decoder, ec));
+                cursor.next(ec);
             }
             return v;
         }
@@ -393,6 +378,7 @@ namespace jsoncons {
             for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
             {
                 v[i] = deser_traits<value_type,CharT>::deserialize(cursor, decoder, ec);
+                cursor.next(ec);
             }
             return v;
         }
@@ -436,6 +422,7 @@ namespace jsoncons {
                 cursor.next(ec);
                 if (ec) return val;
                 val.emplace(std::move(key),deser_traits<mapped_type,CharT>::deserialize(cursor, decoder, ec));
+                cursor.next(ec);
             }
             return val;
         }
@@ -478,6 +465,7 @@ namespace jsoncons {
                 cursor.next(ec);
                 if (ec) return val;
                 val.emplace(key.value(),deser_traits<mapped_type,CharT>::deserialize(cursor, decoder, ec));
+                cursor.next(ec);
             }
             return val;
         }
