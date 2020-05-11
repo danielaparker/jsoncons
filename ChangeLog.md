@@ -21,7 +21,7 @@ Bug fixes:
 
 - OSS-Fuzz failed throw issue in CBOR parser [\#235](https://github.com/danielaparker/jsoncons/issues/235)
 
-- Msg pack bin8 wrong format #237
+- Msg pack bin8 wrong format [\#237](https://github.com/danielaparker/jsoncons/issues/237)
 
 Changes:
 
@@ -30,7 +30,7 @@ renamed to `use_typed_arrays`.
 
 - `jsonpointer::unflatten_method` has been deprecated and replaced with `jsonpointer::unflatten_options`.
 
-- The name `staj_reader` has been deprecated and renamed to `staj_cursor`.
+- The cursor functions named `read` have been deprecated and renamed to `read_to`.
 
 Enhancements:
 
