@@ -17,7 +17,7 @@
 #include <type_traits> // std::enable_if
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
-#include <jsoncons/more_type_traits.hpp>
+#include <jsoncons/detail/more_type_traits.hpp>
 
 namespace jsoncons { 
 
@@ -665,8 +665,8 @@ namespace jsoncons {
         template <class Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                jsoncons::has_reserve<Container>::value &&
-                                jsoncons::has_data_exact<value_type*,Container>::value 
+                                jsoncons::detail::has_reserve<Container>::value &&
+                                jsoncons::detail::has_data_exact<value_type*,Container>::value 
             , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {
@@ -688,8 +688,8 @@ namespace jsoncons {
         template <class Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                jsoncons::has_reserve<Container>::value &&
-                                !jsoncons::has_data_exact<value_type*, Container>::value 
+                                jsoncons::detail::has_reserve<Container>::value &&
+                                !detail::has_data_exact<value_type*, Container>::value 
             , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {

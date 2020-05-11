@@ -13,7 +13,7 @@ TEST_CASE("deser_traits primitive")
 {
     SECTION("is_primitive")
     {
-        CHECK(jsoncons::is_primitive<uint64_t>::value);
+        CHECK(detail::is_primitive<uint64_t>::value);
     }
     SECTION("uint64_t")
     {
@@ -50,7 +50,7 @@ TEST_CASE("deser_traits std::string")
 {
     SECTION("is_string")
     {
-        CHECK(jsoncons::is_basic_string<std::string>::value);
+        CHECK(detail::is_basic_string<std::string>::value);
     }
     SECTION("string")
     {

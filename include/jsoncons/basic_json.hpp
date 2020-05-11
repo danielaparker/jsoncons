@@ -265,7 +265,7 @@ struct is_proxy : std::false_type {};
 // is_proxy
 template<class T>
 struct is_proxy<T,
-    typename std::enable_if<jsoncons::is_detected<json_proxy_t,T>::value>::type
+    typename std::enable_if<detail::is_detected<json_proxy_t,T>::value>::type
 > : std::true_type {};
 
 template <class CharT, class ImplementationPolicy, class Allocator>
@@ -3713,7 +3713,7 @@ public:
     template<class U=Allocator>
     void create_object_implicitly()
     {
-        create_object_implicitly(is_stateless<U>());
+        create_object_implicitly(jsoncons::detail::is_stateless<U>());
     }
 
     void create_object_implicitly(std::false_type)
@@ -3791,7 +3791,7 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<(is_list_like<T>::value && is_bytes<T>::value) ||
+    typename std::enable_if<(jsoncons::detail::is_list_like<T>::value && jsoncons::detail::is_bytes<T>::value) ||
                             is_basic_byte_string<T>::value,T>::type
     as(byte_string_arg_t, semantic_tag hint) const
     {
@@ -5587,7 +5587,7 @@ struct is_basic_json<basic_json<CharT,ImplementationPolicy,Allocator>> : std::tr
 
     
     template <typename T>
-    using is_basic_json = detail::is_basic_json<typename std::decay<T>::type>;
+    using is_basic_json = jsoncons::detail::is_basic_json<typename std::decay<T>::type>;
 
 
 } // namespace jsoncons

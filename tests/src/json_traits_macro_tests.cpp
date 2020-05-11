@@ -562,8 +562,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 
     ns::book1a book{an_author, a_title, a_price};
 
-    CHECK(jsoncons::is_json_type_traits_declared<ns::book1a>::value);
-    test_is_json_type_traits_declared(jsoncons::is_json_type_traits_declared<ns::book1a>());
+    CHECK(is_json_type_traits_declared<ns::book1a>::value);
+    test_is_json_type_traits_declared(is_json_type_traits_declared<ns::book1a>());
 
     SECTION("book1a")
     {
@@ -603,7 +603,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
     {
         ns::book1c book{an_author, a_title, a_price, jsoncons::optional<std::string>{}};
 
-        CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
+        CHECK(is_json_type_traits_declared<ns::book1c>::value);
         std::string s;
 
         encode_json(book, s);
@@ -634,7 +634,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
     {
         ns::book1c book{an_author, a_title, a_price, an_isbn};
 
-        CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
+        CHECK(is_json_type_traits_declared<ns::book1c>::value);
         std::string s;
 
         encode_json(book, s);

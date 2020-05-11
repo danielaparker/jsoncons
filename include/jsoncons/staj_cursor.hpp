@@ -223,7 +223,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<jsoncons::is_basic_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<detail::is_basic_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get(std::error_code& ec) const
     {
         converter<T> conv;
@@ -271,7 +271,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<jsoncons::is_basic_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<detail::is_basic_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get(std::error_code& ec) const
     {
         T s;
@@ -306,7 +306,7 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<jsoncons::is_list_like<T>::value &&
+    typename std::enable_if<detail::is_list_like<T>::value &&
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
     get(std::error_code& ec) const
     {
@@ -324,14 +324,14 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<jsoncons::is_signed_integer<T>::value, T>::type
+    typename std::enable_if<detail::is_signed_integer<T>::value, T>::type
         get(std::error_code& ec) const
     {
         return static_cast<T>(as_int64(ec));
     }
 
     template<class T>
-    typename std::enable_if<jsoncons::is_unsigned_integer<T>::value, T>::type
+    typename std::enable_if<detail::is_unsigned_integer<T>::value, T>::type
         get(std::error_code& ec) const
     {
         return static_cast<T>(as_uint64(ec));
@@ -345,7 +345,7 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<jsoncons::is_bool<T>::value, T>::type
+    typename std::enable_if<detail::is_bool<T>::value, T>::type
         get(std::error_code& ec) const
     {
         return as_bool(ec);

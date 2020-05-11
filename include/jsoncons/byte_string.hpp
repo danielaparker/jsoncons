@@ -779,7 +779,7 @@ namespace detail {
 } // namespace detail
 
     template <typename T>
-    using is_basic_byte_string = detail::is_basic_byte_string<typename std::decay<T>::type>;
+    using is_basic_byte_string = jsoncons::detail::is_basic_byte_string<typename std::decay<T>::type>;
 
 } // namespace jsoncons
 
