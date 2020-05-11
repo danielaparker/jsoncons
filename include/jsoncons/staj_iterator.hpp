@@ -336,7 +336,7 @@ namespace jsoncons {
             reader_->next();
             if (!done())
             {
-                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
+                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
                 key_type key = reader_->current(). template get<key_type>();
                 reader_->next();
                 if (!done())
@@ -362,7 +362,7 @@ namespace jsoncons {
             }
             if (!done())
             {
-                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::name);
+                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
                 auto key = reader_->current(). template get<key_type>();
                 reader_->next(ec);
                 if (ec)
