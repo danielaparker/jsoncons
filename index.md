@@ -31,12 +31,13 @@ to work with the data in a number of ways:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md)
 
-- As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
+- With [cursor-level access](https://github.com/danielaparker/jsoncons/blob/doc/doc/ref/basic_json_cursor.md) to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
-SAX style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
-But it also supports incremental parsing into a user's preferred form, using
+SAX-style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
+But it also supports efficient access to the underlying data using StAX-style pull parsing and push serializing.
+And it supports incremental parsing into a user's preferred form, using
 information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
 
 The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
@@ -257,7 +258,7 @@ These macro declarations must be placed outside any namespace blocks.
 
 See [examples](https://github.com/danielaparker/jsoncons/blob/master/doc/Examples.md#G1) for other ways of specializing `json_type_traits`.
 
-#### As a stream of parse events
+#### With cursor-level access
 
 ```c++
 int main()
@@ -314,20 +315,20 @@ Output:
 ```
 Marilyn C
 begin_object
-name: application
+key: application
 string_value: hiking
-name: reputons
+key: reputons
 begin_array
 begin_object
-name: rater
+key: rater
 string_value: HikingAsylum
-name: assertion
+key: assertion
 string_value: advanced
-name: rated
+key: rated
 string_value: Marilyn C
-name: rating
+key: rating
 double_value: 0.9
-name: confidence
+key: confidence
 double_value: 0.99
 end_object
 end_array
