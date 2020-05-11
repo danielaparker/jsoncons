@@ -69,7 +69,7 @@ The library requires a C++ Compiler with C++11 support. In addition the library 
 `jsoncons::basic_string_view`, `jsoncons::optional`, and `jsoncons::span`, which will be typedefed to
 their standard library equivalents if detected. Otherwise they will be typedefed to internal, C++11 compatible, implementations.
 
-The library uses exceptions and in some cases `std::error_code`'s to report errors. Apart from `jsoncons::assertion_error`,
+The library uses exceptions and in some cases [std::error_code](https://en.cppreference.com/w/cpp/error/error_code)'s to report errors. Apart from `jsoncons::assertion_error`,
 all jsoncons exception classes implement the [jsoncons::json_error](doc/ref/json_error.md) interface.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
 
