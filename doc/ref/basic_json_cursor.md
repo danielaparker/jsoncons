@@ -25,7 +25,7 @@ Typedefs for common character types are provided:
 Type                |Definition
 --------------------|------------------------------
 json_cursor     |`basic_json_cursor<char>`
-wjson_cursor    |basic_json_cursor<wchar_t>
+wjson_cursor    |`basic_json_cursor<wchar_t>`
 
 ### Implemented interfaces
 
@@ -106,16 +106,16 @@ from `source`, `source` is dispatched immediately to the parser. Otherwise, the 
 Checks if there are no more events.
 
     const basic_staj_event& current() const override;
-Returns the current [basic_staj_event](staj_event.md).
+Returns the current [basic_staj_event](basic_staj_event.md).
 
     void read_to(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
@@ -250,7 +250,7 @@ end_object
 end_array
 ```
 
-#### Filter JSON parse events
+#### Filter the event stream
 
 ```c++
 #include <jsoncons/json_cursor.hpp>
@@ -311,7 +311,7 @@ Graham Greene
 
 ### See also
 
-- [staj_cursor](staj_cursor.md) 
+- [basic_staj_event](basic_staj_event.md) 
 - [staj_array_iterator](staj_array_iterator.md) 
 - [staj_object_iterator](staj_object_iterator.md)
 

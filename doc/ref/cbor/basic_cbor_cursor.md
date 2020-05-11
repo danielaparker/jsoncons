@@ -70,15 +70,15 @@ as `basic_cbor_cursor` holds a pointer to but does not own this object.
 Checks if there are no more events.
 
     const staj_event& current() const override;
-Returns the current [staj_event](staj_event.md).
+Returns the current [staj_event](basic_staj_event.md).
 
     void read_to(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
     void read_to(json_visitor& visitor, std::error_code& ec) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 

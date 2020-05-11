@@ -14,7 +14,7 @@
 ### Stream
 
 [Read JSON parse events](#I1)  
-[Filter JSON parse events](#I2)  
+[Filter the event stream](#I2)  
 [Pull nested objects into a basic_json](#I3)  
 
 ### Encode
@@ -454,7 +454,7 @@ end_array
 
 <div id="I2"/> 
 
-#### Filter JSON parse events
+#### Filter the event stream
 
 ```c++
 

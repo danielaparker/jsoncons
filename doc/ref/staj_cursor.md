@@ -10,7 +10,7 @@ The `staj_cursor` interface supports forward, read-only, access to JSON and JSON
 
 The `staj_cursor` is designed to iterate over stream events until `done()` returns `true`.
 The `next()` function causes the reader to advance to the next stream event. The `current()` function
-returns the current stream event. The data can be accessed using the [staj_event](staj_event.md) 
+returns the current stream event. The data can be accessed using the [staj_event](basic_staj_event.md) 
 interface. When `next()` is called, copies of data previously accessed may be invalidated.
 
 #### Destructor
@@ -23,7 +23,7 @@ interface. When `next()` is called, copies of data previously accessed may be in
 Check if there are no more events.
 
     virtual const staj_event& current() const = 0;
-Returns the current [staj_event](staj_event.md).
+Returns the current [staj_event](basic_staj_event.md).
 
     virtual void read_to(json_visitor& visitor) = 0;
 Sends the parse events from the current event to the

@@ -105,13 +105,13 @@ Checks if there are no more events.
 Returns the current [basic_staj_event](../staj_event.md).
 
     void read_to(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](../ser_error.md).
 
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
