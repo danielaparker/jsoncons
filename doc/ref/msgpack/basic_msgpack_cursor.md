@@ -9,9 +9,14 @@ template<
 class basic_msgpack_cursor;
 ```
 
-A pull parser for reporting MSGPACK parse events. A typical application will 
+A pull parser for reporting MessagePack parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
+In addition, when positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` ro `end_object`, 
+and when positioned on `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
 
 `basic_msgpack_cursor` is noncopyable and nonmoveable.
 
@@ -92,4 +97,9 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
     const ser_context& context() const override;
 Returns the current [context](ser_context.md)
 
+### See also
+
+- [staj_event](../basic_staj_event.md) 
+- [staj_array_iterator](../staj_array_iterator.md) 
+- [staj_object_iterator](../staj_object_iterator.md)
 

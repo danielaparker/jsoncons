@@ -12,6 +12,11 @@ class basic_ubjson_cursor;
 A pull parser for reporting UBJSON parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
+In addition, when positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` ro `end_object`, 
+and when positioned on `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
 
 `basic_ubjson_cursor` is noncopyable and nonmoveable.
 
@@ -94,7 +99,7 @@ Returns the current [context](ser_context.md)
 
 ### See also
 
-- [staj_cursor](staj_cursor.md) 
-- [staj_array_iterator](staj_array_iterator.md) 
-- [staj_object_iterator](staj_object_iterator.md)
+- [staj_event](../basic_staj_event.md) 
+- [staj_array_iterator](../staj_array_iterator.md) 
+- [staj_object_iterator](../staj_object_iterator.md)
 

@@ -12,6 +12,11 @@ class basic_bson_cursor;
 A pull parser for reporting BSON parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
+In addition, when positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` ro `end_object`, 
+and when positioned on `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
 
 `basic_bson_cursor` is noncopyable and nonmoveable.
 
@@ -274,7 +279,7 @@ Graham Greene
 
 ### See also
 
-- [basic_staj_event](../basic_staj_event.md) 
+- [staj_event](../basic_staj_event.md) 
 - [staj_array_iterator](../staj_array_iterator.md) 
 - [staj_object_iterator](../staj_object_iterator.md)
 
