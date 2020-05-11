@@ -7,7 +7,17 @@ template<class CharT>
 class basic_staj_event
 ```
 
-A JSON-like data event.
+A JSON-like parse event.
+
+Typedefs for common character types are provided:
+
+Type                |Definition
+--------------------|------------------------------
+staj_event     |`basic_staj_event<char>`
+wstaj_event    |`basic_staj_event<wchar_t>`
+
+The `event_type()` function returns the [event type](doc/ref/staj_event_type.md).
+You can use the `get<T>()` function to access a string, number, or boolean value.
 
 | Event type        | Sample data | Valid accessors |
 |-------------------|------------------------|-----------------|
@@ -24,14 +34,6 @@ A JSON-like data event.
 | double_value      | 125.72                 | `get<std::string>()`<br>`get<double>()` |
 | bool_value        | true                   | `get<std::string>()`<br>`get<bool>()` |
 | null_value        |                        | `get<std::string>()` |
-
-
-Typedefs for common character types are provided:
-
-Type                |Definition
---------------------|------------------------------
-staj_event     |`basic_staj_event<char>`
-wstaj_event    |`basic_staj_event<wchar_t>`
 
 #### Member functions
 
