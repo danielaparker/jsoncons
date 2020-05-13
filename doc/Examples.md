@@ -622,8 +622,8 @@ Graham Greene
 
 When positioned on a `begin_object` event, 
 the `read_to` function can pull a complete object representing
-the events from `begin_object` ro `end_object`, 
-and when positioned on `begin_array` event, a complete array
+the events from `begin_object` to `end_object`, 
+and when positioned on a `begin_array` event, a complete array
 representing the events from `begin_array` ro `end_array`.
 
 ```c++
