@@ -11,18 +11,18 @@
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
 [Decode a JSON text using stateful result and work allocators](#A9)  
 
-### Stream
-
-[Read JSON parse events](#I1)  
-[Filter the event stream](#I2)  
-[Pull nested objects into a basic_json](#I3)  
-
 ### Encode
 
 [Encode a json value to a string](#B1)  
 [Encode a json value to a stream](#B2)  
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
+
+### Stream
+
+[Read JSON parse events](#I1)  
+[Filter the event stream](#I2)  
+[Pull nested objects into a basic_json](#I3)  
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
@@ -326,6 +326,105 @@ my_json j = decoder.get_result();
 std::cout << pretty_print(j) << "\n";
 ```
 
+### Encode
+
+<div id="B1"/>
+
+#### Encode a json value to a string
+
+```
+std::string s;
+
+j.dump(s); // compressed
+
+j.dump(s, indenting::indent); // pretty print
+```
+
+<div id="B2"/>
+
+#### Encode a json value to a stream
+
+```
+j.dump(std::cout); // compressed
+
+j.dump(std::cout, indenting::indent); // pretty print
+```
+or
+```
+std::cout << j << std::endl; // compressed
+
+std::cout << pretty_print(j) << std::endl; // pretty print
+```
+
+<div id="B3"/>
+
+#### Escape all non-ascii characters
+
+```
+json_options options;
+options.escape_all_non_ascii(true);
+
+j.dump(std::cout, options); // compressed
+
+j.dump(std::cout, options, indenting::indent); // pretty print
+```
+or
+```
+std::cout << print(j, options) << std::endl; // compressed
+
+std::cout << pretty_print(j, options) << std::endl; // pretty print
+```
+
+<div id="B4"/>
+
+#### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
+
+Set the serializing options for `nan` and `inf` to distinct string values.
+
+```c++
+json j;
+j["field1"] = std::sqrt(-1.0);
+j["field2"] = 1.79e308 * 1000;
+j["field3"] = -1.79e308 * 1000;
+
+json_options options;
+options.nan_to_str("NaN")
+       .inf_to_str("Inf"); 
+
+std::ostringstream os;
+os << pretty_print(j, options);
+
+std::cout << "(1)\n" << os.str() << std::endl;
+
+json j2 = json::parse(os.str(),options);
+
+std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
+std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
+std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
+
+std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
+```
+
+Output:
+```json
+(1)
+{
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
+
+(2) nan
+(3) inf
+(4) -inf
+
+(5)
+{
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
+```
 
 ### Stream
 
@@ -1929,106 +2028,6 @@ Output:
 ```
 (1) 100000000000000000000000000000000.1234
 (2) 100000000000000000000000000000000.1234
-```
-
-### Encode
-
-<div id="B1"/>
-
-#### Encode a json value to a string
-
-```
-std::string s;
-
-j.dump(s); // compressed
-
-j.dump(s, indenting::indent); // pretty print
-```
-
-<div id="B2"/>
-
-#### Encode a json value to a stream
-
-```
-j.dump(std::cout); // compressed
-
-j.dump(std::cout, indenting::indent); // pretty print
-```
-or
-```
-std::cout << j << std::endl; // compressed
-
-std::cout << pretty_print(j) << std::endl; // pretty print
-```
-
-<div id="B3"/>
-
-#### Escape all non-ascii characters
-
-```
-json_options options;
-options.escape_all_non_ascii(true);
-
-j.dump(std::cout, options); // compressed
-
-j.dump(std::cout, options, indenting::indent); // pretty print
-```
-or
-```
-std::cout << print(j, options) << std::endl; // compressed
-
-std::cout << pretty_print(j, options) << std::endl; // pretty print
-```
-
-<div id="B4"/>
-
-#### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
-
-Set the serializing options for `nan` and `inf` to distinct string values.
-
-```c++
-json j;
-j["field1"] = std::sqrt(-1.0);
-j["field2"] = 1.79e308 * 1000;
-j["field3"] = -1.79e308 * 1000;
-
-json_options options;
-options.nan_to_str("NaN")
-       .inf_to_str("Inf"); 
-
-std::ostringstream os;
-os << pretty_print(j, options);
-
-std::cout << "(1)\n" << os.str() << std::endl;
-
-json j2 = json::parse(os.str(),options);
-
-std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
-std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
-std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
-
-std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
-```
-
-Output:
-```json
-(1)
-{
-    "field1": "NaN",
-    "field2": "Inf",
-    "field3": "-Inf"
-}
-
-(2) nan
-(3) inf
-(4) -inf
-
-(5)
-{
-    "field1": "NaN",
-    "field2": "Inf",
-    "field3": "-Inf"
-}
 ```
 
 ### Construct
