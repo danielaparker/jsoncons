@@ -1,3 +1,11 @@
+master
+------
+
+Enhancements:
+
+- Generalized `basic_json(byte_string_arg_t, ...` constructor to allow any byte sequence argument,
+which is a container that has member functions `data()` and `size()`, and member type `value_type` with width of exactly 8 bits.
+
 v0.151.1
 --------
 
