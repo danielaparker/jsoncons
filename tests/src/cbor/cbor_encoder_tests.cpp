@@ -438,5 +438,22 @@ TEST_CASE("cbor encode with semantic_tags")
 
         CHECK(j == original);
     }
+    SECTION("byte_string")
+    {
+        const std::vector<uint8_t> s1 = {'f','o'};
+        const std::vector<uint8_t> s2 = {'f','o','o','b','a'};
+        const std::vector<uint8_t> s3 = {'f','o','o','b','a','r'};
+
+        json original;
+        original["base64url"] = json(byte_string_arg, s1, semantic_tag::base64url);
+        original["base64"] = json(byte_string_arg, s2, semantic_tag::base64);
+        original["base16"] = json(byte_string_arg, s3, semantic_tag::base16);
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(original, buffer);
+        json j = cbor::decode_cbor<json>(buffer);
+
+        CHECK(j == original);
+    }
 }
 

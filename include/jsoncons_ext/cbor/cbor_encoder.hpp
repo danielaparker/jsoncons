@@ -873,13 +873,13 @@ private:
         switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:
-                write_tag(0xd5);
+                write_tag(21);
                 break;
             case byte_string_chars_format::base64:
-                write_tag(0xd6);
+                write_tag(22);
                 break;
             case byte_string_chars_format::base16:
-                write_tag(0xd7);
+                write_tag(23);
                 break;
             default:
                 break;
