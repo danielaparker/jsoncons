@@ -375,7 +375,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
     {
         CHECK(encoder.begin_array(4)); // a fixed length array
         CHECK(encoder.string_value("foo"));
-        CHECK(encoder.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
+        CHECK(encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'})); // no suggested conversion
         CHECK(encoder.string_value("-18446744073709551617", semantic_tag::bigint));
         CHECK(encoder.string_value("273.15", semantic_tag::bigdec));
         CHECK(encoder.end_array());

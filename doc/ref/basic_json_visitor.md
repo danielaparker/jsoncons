@@ -60,9 +60,14 @@ Member type                         |Definition
                       semantic_tag tag = semantic_tag::none, 
                       const ser_context& context=ser_context()); // (11) 
 
-    bool byte_string_value(const byte_string_view& b, 
+    bool byte_string_value(const byte_string_view& source, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=ser_context()); // (12)
+                           const ser_context& context=ser_context()); // (12) (until v0.152.0)
+
+    template <class Source>
+    bool byte_string_value(const Source& souce, 
+                           semantic_tag tag=semantic_tag::none, 
+                           const ser_context& context=ser_context()); // (12) (since v0.152.0)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
@@ -122,10 +127,16 @@ Member type                         |Definition
                       const ser_context& context,
                       std::error_code& ec); // (26) 
 
-    bool byte_string_value(const byte_string_view& b, 
+    bool byte_string_value(const byte_string_view& source, 
                            semantic_tag tag, 
                            const ser_context& context,
-                           std::error_code& ec); // (27)
+                           std::error_code& ec); // (27) (until v0.152.0)
+
+    template <class Source>   
+    bool byte_string_value(const Source& source, 
+                           semantic_tag tag, 
+                           const ser_context& context,
+                           std::error_code& ec); // (27) (since v0.152.0)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag, 
@@ -306,7 +317,9 @@ Throws a [ser_error](ser_error.md) on parse errors.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(12) Writes a byte string value.
+(12) Writes a byte string value `source`.
+Type `Source` must be a container that has member functions `data()` and `size()`, 
+and member type `value_type` with width of exactly 8 bits (since v0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 

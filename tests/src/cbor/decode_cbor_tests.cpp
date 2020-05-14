@@ -498,7 +498,7 @@ TEST_CASE("cbor conversion tests")
     encoder.begin_array(); // indefinite length outer array
     encoder.begin_array(4); // a fixed length array
     encoder.string_value("foo");
-    encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
+    encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'}); // no suggested conversion
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);
     encoder.string_value("273.15", semantic_tag::bigdec);
     encoder.end_array();
@@ -518,7 +518,7 @@ TEST_CASE("cbor conversion tests")
     auto it2 = range2.begin();
     CHECK(it2->as_string() == "foo");
     it2++;
-    CHECK(it2->as_byte_string() == byte_string{'P','u','s','s'});
+    CHECK(it2->as_byte_string() == std::vector<uint8_t>{'P','u','s','s'});
     it2++;
     CHECK(bool(it2->as<bignum>() == bignum{"-18446744073709551617"}));
     it2++;

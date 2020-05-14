@@ -160,12 +160,14 @@ namespace jsoncons {
             return more;
         }
 
-        bool byte_string_value(const byte_string_view& b, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
                                semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
+                               const ser_context& context=ser_context(),
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
             std::error_code ec;
-            bool more = visit_byte_string(b, tag, context, ec);
+            bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -295,12 +297,14 @@ namespace jsoncons {
             return visit_string(value, tag, context, ec);
         }
 
-        bool byte_string_value(const byte_string_view& b, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
                                semantic_tag tag, 
                                const ser_context& context,
-                               std::error_code& ec)
+                               std::error_code& ec,
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return visit_byte_string(b, tag, context, ec);
+            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
         }
 
         bool byte_string_value(const uint8_t* p, std::size_t size, 
