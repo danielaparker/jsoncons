@@ -6,6 +6,10 @@ Enhancements:
 - Generalized `basic_json(byte_string_arg_t, ...` constructor to allow any byte sequence argument,
 which is a container that has member functions `data()` and `size()`, and member type `value_type` with width of exactly 8 bits.
 
+- Generalized the functions `decode_bson`, `decode_cbor`, `decode_msgpack` and `decode_ubjson`
+to accept any byte sequence argument, which is a container that has member functions `data()` and `size()`, 
+and member type `value_type` with width of exactly 8 bits.
+
 v0.151.1
 --------
 
