@@ -21,9 +21,10 @@
 namespace jsoncons { 
 namespace msgpack {
 
-    template<class T>
-    typename std::enable_if<is_basic_json<T>::value,T>::type 
-    decode_msgpack(const std::vector<uint8_t>& v, 
+    template<class T, class Source>
+    typename std::enable_if<is_basic_json<T>::value &&
+                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
+    decode_msgpack(const Source& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
         jsoncons::json_decoder<T> decoder;
@@ -33,9 +34,10 @@ namespace msgpack {
         return decoder.get_result();
     }
 
-    template<class T>
-    typename std::enable_if<!is_basic_json<T>::value,T>::type 
-    decode_msgpack(const std::vector<uint8_t>& v, 
+    template<class T, class Source>
+    typename std::enable_if<!is_basic_json<T>::value &&
+                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
+    decode_msgpack(const Source& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
         basic_msgpack_cursor<bytes_source> cursor(v, options);
@@ -81,10 +83,11 @@ namespace msgpack {
 
     // With leading allocator parameter
 
-    template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    template<class T, class Source, class TempAllocator>
+    typename std::enable_if<is_basic_json<T>::value &&
+                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                   const std::vector<uint8_t>& v, 
+                   const Source& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
         json_decoder<T,TempAllocator> decoder(temp_alloc);
@@ -94,10 +97,11 @@ namespace msgpack {
         return decoder.get_result();
     }
 
-    template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    template<class T, class Source, class TempAllocator>
+    typename std::enable_if<!is_basic_json<T>::value &&
+                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
     decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-                   const std::vector<uint8_t>& v, 
+                   const Source& v, 
                    const msgpack_decode_options& options = msgpack_decode_options())
     {
         basic_msgpack_cursor<bytes_source,TempAllocator> cursor(v, options, temp_alloc);

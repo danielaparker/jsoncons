@@ -127,3 +127,17 @@ TEST_CASE("Compare msgpack packed item and jsoncons item")
     REQUIRE(j == expected);
 }
 
+TEST_CASE("decode msgpack from source")
+{
+    SECTION("from std::string")
+    {
+        std::vector<uint8_t> v = {0x91,0xa5,'H','e','l','l','o'};
+        std::string s(reinterpret_cast<const char*>(v.data()),v.size());
+
+        json j = msgpack::decode_msgpack<json>(s);
+
+        REQUIRE(j.size() == 1);
+        CHECK(j[0].as<std::string>() == std::string("Hello"));
+    }
+}
+

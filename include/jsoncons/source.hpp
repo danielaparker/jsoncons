@@ -528,12 +528,6 @@ namespace jsoncons {
         }
     };
 
-    template <class T, class Enable=void>
-    struct is_bytes_sourceable : std::false_type {};
-
-    template <class T>
-    struct is_bytes_sourceable<T,typename std::enable_if<std::is_same<typename T::value_type,uint8_t>::value>::type> : std::true_type {};
-
     class bytes_source 
     {
     public:
@@ -554,19 +548,13 @@ namespace jsoncons {
         {
         }
 
-        bytes_source(const span<const value_type>& s)
-            : data_(s.data()), 
-              input_ptr_(s.data()), 
-              input_end_(s.data()+s.size()), 
-              eof_(s.size() == 0)
-        {
-        }
-
-        bytes_source(const value_type* data, std::size_t size)
-            : data_(data), 
-              input_ptr_(data), 
-              input_end_(data+size), 
-              eof_(size == 0)  
+        template <class Source>
+        bytes_source(const Source& source,
+                     typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
+            : data_(reinterpret_cast<const uint8_t*>(source.data())), 
+              input_ptr_(data_), 
+              input_end_(data_+source.size()), 
+              eof_(source.size() == 0)
         {
         }
 
