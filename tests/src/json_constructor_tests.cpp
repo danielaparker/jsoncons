@@ -12,6 +12,24 @@
 
 using namespace jsoncons;
 
+TEST_CASE("json constructor byte_string_arg tests")
+{
+    std::string expected_base64url = "Zm9vYmFy";
+
+    SECTION("byte_string_arg std::vector<uint8_t>")
+    {
+        std::vector<uint8_t> bytes = {'f','o','o','b','a','r'};
+        json j(byte_string_arg, bytes, semantic_tag::base64url);
+        CHECK(j.as<std::string>() == expected_base64url);
+    }
+    SECTION("byte_string_arg std::string")
+    {
+        std::string bytes = {'f','o','o','b','a','r'};
+        json j(byte_string_arg, bytes, semantic_tag::base64url);
+        CHECK(j.as<std::string>() == expected_base64url);
+    }
+}
+
 TEST_CASE("json constructor tests")
 {
     SECTION("json json_object_arg")
@@ -67,7 +85,6 @@ TEST_CASE("json constructor tests")
         CHECK(j2[1].as<int>() == 2);
     }
 }
-
 TEST_CASE("json(string_view)")
 {
     json::string_view_type sv("Hello world.");

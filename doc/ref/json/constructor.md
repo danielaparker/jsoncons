@@ -68,7 +68,12 @@ basic_json(const byte_string_view& bytes,
 
 basic_json(byte_string_arg_t, const jsoncons::span<const uint8_t>& bytes, 
            semantic_tag tag = semantic_tag::none,
-           const Allocator& alloc = Allocator()); // (21)
+           const Allocator& alloc = Allocator()); // (21) (until v0.152)
+
+template <class Source>
+basic_json(byte_string_arg_t, const Source& source, 
+           semantic_tag tag = semantic_tag::none,
+           const Allocator& alloc = Allocator()); // (21) (since v0.152)
 ```
 
 (1) Constructs an empty json object. 
@@ -117,7 +122,10 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 
 (20) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
 
-(21) Constructs a `basic_json` value for a byte string from any container of `utf8_t` values.
+(21) Constructs a `basic_json` value for a byte string from a byte sequence provided by source,
+which is a container that has `data()` and `size()` member functions and a value_type with width of exactly 8 bits (since v0.152.0.)
+Any of the values types `uint8_t`, `char`, `std::byte` (since C++17), and `char8_t` (since C++20) are allowed.
+
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 
 ### Helpers

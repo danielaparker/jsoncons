@@ -3249,10 +3249,12 @@ public:
     {
     }
 
-    basic_json(byte_string_arg_t, const span<const uint8_t>& bytes, 
+    template <class Source>
+    basic_json(byte_string_arg_t, const Source& source, 
                semantic_tag tag = semantic_tag::none,
-               const Allocator& alloc = Allocator())
-        : var_(byte_string_arg, bytes, tag, alloc)
+               const Allocator& alloc = Allocator(),
+               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
+        : var_(byte_string_arg, span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size()), tag, alloc)
     {
     }
 

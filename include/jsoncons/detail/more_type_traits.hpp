@@ -243,7 +243,7 @@ namespace detail {
                                    !std::is_same<typename Container::value_type,bool>::value &&
                                    std::is_unsigned<typename Container::value_type>::value &&
                                    sizeof(typename Container::value_type) == sizeof(uint8_t)
-    >::type> : std::true_type {};
+     >::type> : std::true_type {};
 
     template <class Container>
     using 
@@ -401,6 +401,17 @@ namespace detail {
     {
         static constexpr bool value = has_data<Container>::value && has_size<Container>::value;
     };
+
+    // is_byte_sequence
+
+    template <class Container, class Enable=void>
+    struct is_byte_sequence : std::false_type {};
+
+    template <class Container>
+    struct is_byte_sequence<Container, 
+           typename std::enable_if<has_data_and_size<Container>::value &&
+                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
+    >::type> : std::true_type {};
 
     // is_c_array
 
