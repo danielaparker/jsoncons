@@ -7,8 +7,11 @@ Enhancements:
 which is a container that has member functions `data()` and `size()`, and member type `value_type` with width of exactly 8 bits.
 
 - Generalized the functions `decode_bson`, `decode_cbor`, `decode_msgpack` and `decode_ubjson`
-to accept any byte sequence argument, which is a container that has member functions `data()` and `size()`, 
-and member type `value_type` with width of exactly 8 bits.
+to accept any byte sequence argument.
+
+- Generalized the `json_visitor` member function `byte_string_value`
+to accept any byte sequence argument. In particular this means that `byte_string_value`
+can be called on an encoder with any bytes sequence argument.
 
 v0.151.1
 --------
