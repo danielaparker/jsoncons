@@ -423,3 +423,20 @@ TEST_CASE("encode stringref")
     CHECK(j2 == j);
 }
 
+TEST_CASE("cbor encode with semantic_tags")
+{
+    SECTION("string")
+    {
+        json original;
+        original["uri"] = json("https://gmail.com/", semantic_tag::uri);
+        original["base64url"] = json("Zm9vYmFy", semantic_tag::base64url);
+        original["base64"] = json("Zm9vYmE=", semantic_tag::base64);
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(original, buffer);
+        json j = cbor::decode_cbor<json>(buffer);
+
+        CHECK(j == original);
+    }
+}
+

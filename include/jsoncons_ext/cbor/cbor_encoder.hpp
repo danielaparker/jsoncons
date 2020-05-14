@@ -820,21 +820,21 @@ private:
             }
             case semantic_tag::uri:
             {
-                sink_.push_back(32);
+                write_tag(32);
                 write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64url:
             {
-                sink_.push_back(33);
+                write_tag(33);
                 write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64:
             {
-                sink_.push_back(34);
+                write_tag(34);
                 write_string(sv);
                 end_value();
                 break;
@@ -873,13 +873,13 @@ private:
         switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:
-                sink_.push_back(0xd5);
+                write_tag(0xd5);
                 break;
             case byte_string_chars_format::base64:
-                sink_.push_back(0xd6);
+                write_tag(0xd6);
                 break;
             case byte_string_chars_format::base16:
-                sink_.push_back(0xd7);
+                write_tag(0xd7);
                 break;
             default:
                 break;
