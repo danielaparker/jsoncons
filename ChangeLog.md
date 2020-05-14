@@ -1,3 +1,11 @@
+v0.151.1
+--------
+
+Bug fixes:
+
+- Fixed `jsoncons::semantic_tag::uri`, `jsoncons::semantic_tag::base64` and `jsoncons::semantic_tag::base64url`
+applied to text strings incorrectly encoded into CBOR [\238](https://github.com/danielaparker/jsoncons/issues/238)
+
 v0.151.0
 --------
 
