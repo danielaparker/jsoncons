@@ -518,7 +518,7 @@ TEST_CASE("cbor conversion tests")
     auto it2 = range2.begin();
     CHECK(it2->as_string() == "foo");
     it2++;
-    CHECK(it2->as_byte_string() == std::vector<uint8_t>{'P','u','s','s'});
+    CHECK(it2->as<std::vector<uint8_t>>() == std::vector<uint8_t>{'P','u','s','s'});
     it2++;
     CHECK(bool(it2->as<bignum>() == bignum{"-18446744073709551617"}));
     it2++;

@@ -35,7 +35,7 @@ T decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
 
 (1) Reads a BSON byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](bson_options.md). 
 Type `Source` must be a container that has member functions `data()` and `size()`, 
-and member type `value_type` with width of exactly 8 bits (since v0.152.0.)
+and member type `value_type` an integral type of size exactly 8 bits (since v0.152.0.)
 Type T must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
