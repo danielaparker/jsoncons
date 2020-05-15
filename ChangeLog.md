@@ -3,14 +3,14 @@ master
 
 Enhancements:
 
-- Generalized `basic_json(byte_string_arg_t, ...` constructor to allow any byte sequence argument,
-which is a contiguous container that has member functions `data()` and `size()`, and member type `value_type` an integral type of size exactly 8 bits.
+- Generalized `basic_json(byte_string_arg_t, ...` constructor to accomodate any contiguous byte sequence container,
+which is a contiguous container that has member functions `data()` and `size()`, and member type `value_type` with size exactly 8 bits.
 
 - Generalized the functions `decode_bson`, `decode_cbor`, `decode_msgpack` and `decode_ubjson`
-to accept any byte sequence argument.
+to accept any contiguous byte sequence argument.
 
 - Generalized the `json_visitor` member function `byte_string_value`
-to accept any byte sequence argument. In particular this means that `byte_string_value`
+to accept any contiguous byte sequence argument. In particular this means that `byte_string_value`
 can be called on an encoder with any bytes sequence argument.
 
 v0.151.1

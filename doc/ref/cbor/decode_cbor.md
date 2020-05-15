@@ -37,7 +37,7 @@ T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
               const cbor_decode_options& options = cbor_decode_options()); // (4)
 ```
 
-(1) Reads a CBOR byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+(1) Reads a CBOR contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](cbor_options.md). 
 Type `Source` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` an integral type of size exactly 8 bits (since v0.152.0.)
 Type T must be an instantiation of [basic_json](../basic_json.md) 

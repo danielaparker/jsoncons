@@ -33,7 +33,7 @@ T decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const bson_decode_options& options = bson_decode_options()); // (4)
 ```
 
-(1) Reads a UBJSON byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](ubjson_options.md). 
+(1) Reads a UBJSON contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](ubjson_options.md). 
 Type `Source` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` an integral type of size exactly 8 bits (since v0.152.0.)
 Type T must be an instantiation of [basic_json](../basic_json.md) 
