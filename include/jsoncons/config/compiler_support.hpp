@@ -88,8 +88,8 @@
 #endif
 
 #if defined(ANDROID) || defined(__ANDROID__)
-#define JSONCONS_HAS_STRTOLD_L
 #if __ANDROID_API__ >= 21
+#define JSONCONS_HAS_STRTOLD_L
 #else
 #define JSONCONS_NO_LOCALECONV
 #endif
