@@ -409,7 +409,8 @@ namespace detail {
 
     template <class Container>
     struct is_byte_sequence<Container, 
-           typename std::enable_if<has_data_and_size<Container>::value &&
+           typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
+                                   has_size<Container>::value &&
                                    is_integer<typename Container::value_type>::value &&
                                    sizeof(typename Container::value_type) == sizeof(uint8_t)
     >::type> : std::true_type {};
