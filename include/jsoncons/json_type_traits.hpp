@@ -448,7 +448,7 @@ namespace detail {
             Json j(json_array_arg);
             auto first = std::begin(val);
             auto last = std::end(val);
-            size_t size = std::distance(first,last);
+            std::size_t size = std::distance(first,last);
             j.reserve(size);
             for (auto it = first; it != last; ++it)
             {
@@ -462,7 +462,7 @@ namespace detail {
             Json j(json_array_arg, alloc);
             auto first = std::begin(val);
             auto last = std::end(val);
-            size_t size = std::distance(first, last);
+            std::size_t size = std::distance(first, last);
             j.reserve(size);
             for (auto it = first; it != last; ++it)
             {
@@ -471,12 +471,12 @@ namespace detail {
             return j;
         }
 
-        static void visit_reserve_(std::true_type, T& v, size_t size)
+        static void visit_reserve_(std::true_type, T& v, std::size_t size)
         {
             v.reserve(size);
         }
 
-        static void visit_reserve_(std::false_type, T&, size_t)
+        static void visit_reserve_(std::false_type, T&, std::size_t)
         {
         }
     };
@@ -697,7 +697,7 @@ namespace detail {
 
     // std::array
 
-    template<class Json, class E, size_t N>
+    template<class Json, class E, std::size_t N>
     struct json_type_traits<Json, std::array<E, N>>
     {
         using allocator_type = typename Json::allocator_type;
@@ -758,7 +758,7 @@ namespace detail {
 
 namespace detail
 {
-    template<size_t Pos, size_t Size, class Json, class Tuple>
+    template<size_t Pos, std::size_t Size, class Json, class Tuple>
     struct json_tuple_helper
     {
         using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
@@ -1104,7 +1104,7 @@ namespace detail
             Json j(json_array_arg);
             auto first = std::begin(val);
             auto last = std::end(val);
-            size_t size = std::distance(first,last);
+            std::size_t size = std::distance(first,last);
             j.reserve(size);
             for (auto it = first; it != last; ++it)
             {
@@ -1118,7 +1118,7 @@ namespace detail
             Json j(json_array_arg, alloc);
             auto first = std::begin(val);
             auto last = std::end(val);
-            size_t size = std::distance(first,last);
+            std::size_t size = std::distance(first,last);
             j.reserve(size);
             for (auto it = first; it != last; ++it)
             {

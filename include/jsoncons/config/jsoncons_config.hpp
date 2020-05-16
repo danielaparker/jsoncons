@@ -90,7 +90,7 @@ namespace jsoncons {
         typedef std::unique_ptr<T[]> value_is_array_of_unknown_bound;
     };
 
-    template<class T, size_t N> 
+    template<class T, std::size_t N> 
     struct unique_if<T[N]> {
         using value_is_array_of_known_bound = void;
     };

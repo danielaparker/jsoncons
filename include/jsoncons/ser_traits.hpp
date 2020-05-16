@@ -185,7 +185,7 @@ namespace jsoncons {
 
     namespace detail
     {
-        template<size_t Pos, size_t Size, class Json, class Tuple>
+        template<size_t Pos, std::size_t Size, class Json, class Tuple>
         struct json_serialize_tuple_helper
         {
             using char_type = typename Json::char_type;

@@ -40,7 +40,7 @@ namespace detail {
     }
 
     template <class CharT, class Sink>
-    size_t escape_string(const CharT* s, std::size_t length,
+    std::size_t escape_string(const CharT* s, std::size_t length,
                          bool escape_all_non_ascii, bool escape_solidus,
                          Sink& sink)
     {

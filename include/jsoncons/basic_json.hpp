@@ -36,7 +36,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_error.hpp>
-#include <jsoncons/detail/boxed_string.hpp>
+#include <jsoncons/detail/string_wrapper.hpp>
 
 namespace jsoncons { 
 namespace detail {
@@ -549,7 +549,7 @@ public:
         public:
             uint8_t ext_type_;
         private:
-            jsoncons::detail::boxed_string<char_type,Allocator> s_;
+            jsoncons::detail::string_wrapper<char_type,Allocator> s_;
         public:
 
             long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)

@@ -560,49 +560,49 @@ public:
         swap(*this,other);
     }
 
-    typed_array_view(const uint8_t* data,size_t size)
+    typed_array_view(const uint8_t* data, std::size_t size)
         : type_(typed_array_type::uint8_value), size_(size)
     {
         data_.uint8_data_ = data;
     }
 
-    typed_array_view(const uint16_t* data,size_t size)
+    typed_array_view(const uint16_t* data, std::size_t size)
         : type_(typed_array_type::uint16_value), size_(size)
     {
         data_.uint16_data_ = data;
     }
 
-    typed_array_view(const uint32_t* data,size_t size)
+    typed_array_view(const uint32_t* data, std::size_t size)
         : type_(typed_array_type::uint32_value), size_(size)
     {
         data_.uint32_data_ = data;
     }
 
-    typed_array_view(const uint64_t* data,size_t size)
+    typed_array_view(const uint64_t* data, std::size_t size)
         : type_(typed_array_type::uint64_value), size_(size)
     {
         data_.uint64_data_ = data;
     }
 
-    typed_array_view(const int8_t* data,size_t size)
+    typed_array_view(const int8_t* data, std::size_t size)
         : type_(typed_array_type::int8_value), size_(size)
     {
         data_.int8_data_ = data;
     }
 
-    typed_array_view(const int16_t* data,size_t size)
+    typed_array_view(const int16_t* data, std::size_t size)
         : type_(typed_array_type::int16_value), size_(size)
     {
         data_.int16_data_ = data;
     }
 
-    typed_array_view(const int32_t* data,size_t size)
+    typed_array_view(const int32_t* data, std::size_t size)
         : type_(typed_array_type::int32_value), size_(size)
     {
         data_.int32_data_ = data;
     }
 
-    typed_array_view(const int64_t* data,size_t size)
+    typed_array_view(const int64_t* data, std::size_t size)
         : type_(typed_array_type::int64_value), size_(size)
     {
         data_.int64_data_ = data;
@@ -614,13 +614,13 @@ public:
         data_.uint16_data_ = data;
     }
 
-    typed_array_view(const float* data,size_t size)
+    typed_array_view(const float* data, std::size_t size)
         : type_(typed_array_type::float_value), size_(size)
     {
         data_.float_data_ = data;
     }
 
-    typed_array_view(const double* data,size_t size)
+    typed_array_view(const double* data, std::size_t size)
         : type_(typed_array_type::double_value), size_(size)
     {
         data_.double_data_ = data;
