@@ -2,7 +2,7 @@
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
-#include <jsoncons/detail/string_storage.hpp>
+#include <jsoncons/detail/boxed_string.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
@@ -14,7 +14,7 @@ using namespace jsoncons;
 TEST_CASE("test_heap_only_string")
 {
     std::string input = "Hello World";
-    jsoncons::detail::string_storage<char, std::allocator<char>> s(input.data(), input.size(), std::allocator<char>());
+    jsoncons::detail::boxed_string<char, std::allocator<char>> s(input.data(), input.size(), std::allocator<char>());
 
     //std::cout << s->c_str() << std::endl;
     CHECK(input == std::string(s.c_str()));
@@ -23,7 +23,7 @@ TEST_CASE("test_heap_only_string")
 TEST_CASE("test_heap_only_string_wchar_t")
 {
     std::wstring input = L"Hello World";
-    jsoncons::detail::string_storage<wchar_t, std::allocator<wchar_t>> s(input.data(), input.size(), std::allocator<wchar_t>());
+    jsoncons::detail::boxed_string<wchar_t, std::allocator<wchar_t>> s(input.data(), input.size(), std::allocator<wchar_t>());
 
     //std::wcout << s->c_str() << std::endl;
 

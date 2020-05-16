@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_STRING_STORAGE_HPP
-#define JSONCONS_DETAIL_STRING_STORAGE_HPP
+#ifndef JSONCONS_DETAIL_BOXED_STRING_HPP
+#define JSONCONS_DETAIL_BOXED_STRING_HPP
 
 #include <stdexcept>
 #include <string>
@@ -32,7 +32,7 @@ namespace detail {
     }
 
     template <class CharT,class Allocator>
-    class string_storage
+    class boxed_string
     {
     public:
         using char_type = CharT;
@@ -105,29 +105,29 @@ namespace detail {
 
         string_pointer ptr_;
     public:
-        string_storage() = default;
+        boxed_string() = default;
 
-        string_storage(string_pointer ptr)
+        boxed_string(string_pointer ptr)
             : ptr_(ptr)
         {
         }
 
-        string_storage(const char_type* data, std::size_t length, const Allocator& a) 
+        boxed_string(const char_type* data, std::size_t length, const Allocator& a) 
         {
             ptr_ = create(data,length,a);
         }
 
-        string_storage(const string_storage& val) 
+        boxed_string(const boxed_string& val) 
         {
             ptr_ = create(val.data(),val.length(),val.get_allocator());
         }
 
-        string_storage(const string_storage& val, const Allocator& a) 
+        boxed_string(const boxed_string& val, const Allocator& a) 
         {
             ptr_ = create(val.data(),val.length(),a);
         }
 
-        ~string_storage() noexcept
+        ~boxed_string() noexcept
         {
             if (ptr_ != nullptr)
             {
@@ -135,7 +135,7 @@ namespace detail {
             }
         }
 
-        void swap(string_storage& other) noexcept
+        void swap(boxed_string& other) noexcept
         {
             std::swap(ptr_,other.ptr_);
         }
