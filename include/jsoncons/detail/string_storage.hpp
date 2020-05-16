@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_STRING_STORE_HPP
-#define JSONCONS_DETAIL_STRING_STORE_HPP
+#ifndef JSONCONS_DETAIL_STRING_STORAGE_HPP
+#define JSONCONS_DETAIL_STRING_STORAGE_HPP
 
 #include <stdexcept>
 #include <string>
@@ -32,7 +32,7 @@ namespace detail {
     }
 
     template <class CharT,class Allocator>
-    class string_store
+    class string_storage
     {
     public:
         using char_type = CharT;
@@ -105,29 +105,29 @@ namespace detail {
 
         string_pointer ptr_;
     public:
-        string_store() = default;
+        string_storage() = default;
 
-        string_store(string_pointer ptr)
+        string_storage(string_pointer ptr)
             : ptr_(ptr)
         {
         }
 
-        string_store(const char_type* data, std::size_t length, const Allocator& a) 
+        string_storage(const char_type* data, std::size_t length, const Allocator& a) 
         {
             ptr_ = create(data,length,a);
         }
 
-        string_store(const string_store& val) 
+        string_storage(const string_storage& val) 
         {
             ptr_ = create(val.data(),val.length(),val.get_allocator());
         }
 
-        string_store(const string_store& val, const Allocator& a) 
+        string_storage(const string_storage& val, const Allocator& a) 
         {
             ptr_ = create(val.data(),val.length(),a);
         }
 
-        ~string_store() noexcept
+        ~string_storage() noexcept
         {
             if (ptr_ != nullptr)
             {
@@ -135,7 +135,7 @@ namespace detail {
             }
         }
 
-        void swap(string_store& other) noexcept
+        void swap(string_storage& other) noexcept
         {
             std::swap(ptr_,other.ptr_);
         }
