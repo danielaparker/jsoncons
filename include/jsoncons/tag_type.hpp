@@ -74,7 +74,8 @@ enum class semantic_tag : uint8_t
     uri = 0x0a,
     clamped = 0x0b,
     multi_dim_row_major = 0x0c,
-    multi_dim_column_major = 0x0d
+    multi_dim_column_major = 0x0d,
+    ext = 0x0e
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec

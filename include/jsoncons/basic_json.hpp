@@ -5447,8 +5447,7 @@ private:
                 visitor.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
-                visitor.byte_string_value(var_.template cast<typename variant::byte_string_storage>().data(), var_.template cast<typename variant::byte_string_storage>().length(), 
-                                          var_.tag(), context, ec);
+                visitor.byte_string_value(as_byte_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::half_value:
                 visitor.half_value(var_.template cast<typename variant::half_storage>().value(), var_.tag(), context, ec);
