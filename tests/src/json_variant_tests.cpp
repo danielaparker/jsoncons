@@ -38,65 +38,65 @@ TEST_CASE("test_move_constructor")
     json::variant var2(std::move(var1));
     //CHECK(storage_kind::null_value == var1.storage());
     CHECK(storage_kind::int64_value == var2.storage());
-    CHECK(var2.cast<json::variant::int64_storage>().value() == val1);
+    CHECK(var2.cast<json::variant::int64_box>().value() == val1);
 
     uint64_t val3 = 9999;
     json::variant var3(val3, semantic_tag::none);
     json::variant var4(std::move(var3));
     //CHECK(storage_kind::null_value == var3.storage());
     CHECK(storage_kind::uint64_value == var4.storage());
-    CHECK(var4.cast<json::variant::uint64_storage>().value() == val3);
+    CHECK(var4.cast<json::variant::uint64_box>().value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5, semantic_tag::none);
     json::variant var6(std::move(var5));
     //CHECK(storage_kind::null_value == var5.storage());
     CHECK(storage_kind::double_value == var6.storage());
-    CHECK(var6.cast<json::variant::double_storage>().value() == val5);
+    CHECK(var6.cast<json::variant::double_box>().value() == val5);
 
     std::string val7("Too long for small string");
     json::variant var7(val7.data(), val7.length(), semantic_tag::none);
     json::variant var8(std::move(var7));
     //CHECK(storage_kind::null_value == var7.storage());
     CHECK(storage_kind::long_string_value == var8.storage());
-    CHECK(val7 == var8.cast<json::variant::long_string_storage>().data());
-    CHECK(val7.length() == var8.cast<json::variant::long_string_storage>().length());
+    CHECK(val7 == var8.cast<json::variant::long_string_box>().data());
+    CHECK(val7.length() == var8.cast<json::variant::long_string_box>().length());
 
     std::string val9("Small string");
     json::variant var9(val9.data(), val9.length(), semantic_tag::none);
     json::variant var10(std::move(var9));
     //CHECK(storage_kind::null_value == var9.storage());
     CHECK(storage_kind::short_string_value == var10.storage());
-    CHECK(val9 == var10.cast<json::variant::short_string_storage>().data());
-    CHECK(val9.length() == var10.cast<json::variant::short_string_storage>().length());
+    CHECK(val9 == var10.cast<json::variant::short_string_box>().data());
+    CHECK(val9.length() == var10.cast<json::variant::short_string_box>().length());
 
     bool val11 = true;
     json::variant var11(val11, semantic_tag::none);
     json::variant var12(std::move(var11));
     //CHECK(storage_kind::null_value == var11.storage());
     CHECK(storage_kind::bool_value == var12.storage());
-    CHECK(var12.cast<json::variant::bool_storage>().value() == val11);
+    CHECK(var12.cast<json::variant::bool_box>().value() == val11);
 
     std::string val13("Too long for small string");
     json::variant var13(val13.data(), val13.length(), semantic_tag::none);
     json::variant var14(std::move(var13));
     //CHECK(storage_kind::null_value == var13.storage());
     CHECK(storage_kind::long_string_value == var14.storage());
-    CHECK(val13 == var14.cast<json::variant::long_string_storage>().data());
+    CHECK(val13 == var14.cast<json::variant::long_string_box>().data());
 
     json::object val15 = { {"first",1},{"second",2} };
     json::variant var15(val15, semantic_tag::none);
     json::variant var16(std::move(var15));
     CHECK(storage_kind::null_value == var15.storage());
     CHECK(storage_kind::object_value == var16.storage());
-    CHECK(val15 == var16.cast<json::variant::object_storage>().value());
+    CHECK(val15 == var16.cast<json::variant::object_box>().value());
 
     json::array val17 = {1,2,3,4};
     json::variant var17(val17, semantic_tag::none);
     json::variant var18(std::move(var17));
     CHECK(storage_kind::null_value == var17.storage());
     CHECK(storage_kind::array_value == var18.storage());
-    CHECK(val17 == var18.cast<json::variant::array_storage>().value());
+    CHECK(val17 == var18.cast<json::variant::array_box>().value());
 }
 
 TEST_CASE("test_copy_constructor")
@@ -106,56 +106,56 @@ TEST_CASE("test_copy_constructor")
     json::variant var2(var1);
     CHECK(storage_kind::int64_value == var1.storage());
     CHECK(storage_kind::int64_value == var2.storage());
-    CHECK(var2.cast<json::variant::int64_storage>().value() == val1);
+    CHECK(var2.cast<json::variant::int64_box>().value() == val1);
 
     uint64_t val3 = 123456789;
     json::variant var3(val3, semantic_tag::none);
     json::variant var4(var3);
     CHECK(storage_kind::uint64_value == var3.storage());
     CHECK(storage_kind::uint64_value == var4.storage());
-    CHECK(var4.cast<json::variant::uint64_storage>().value() == val3);
+    CHECK(var4.cast<json::variant::uint64_box>().value() == val3);
 
     double val5 = 123456789.9;
     json::variant var5(val5, semantic_tag::none);
     json::variant var6(var5);
     CHECK(storage_kind::double_value == var5.storage());
     CHECK(storage_kind::double_value == var6.storage());
-    CHECK(var6.cast<json::variant::double_storage>().value() == val5);
+    CHECK(var6.cast<json::variant::double_box>().value() == val5);
 
     std::string val9 = "Small string";
     json::variant var9(val9.data(), val9.length(), semantic_tag::none);
     json::variant var10(var9);
     CHECK(storage_kind::short_string_value == var9.storage());
     CHECK(storage_kind::short_string_value == var10.storage());
-    CHECK(var10.cast<json::variant::short_string_storage>().data() == val9);
+    CHECK(var10.cast<json::variant::short_string_box>().data() == val9);
 
     bool val11 = true;
     json::variant var11(val11, semantic_tag::none);
     json::variant var12(var11);
     CHECK(storage_kind::bool_value == var11.storage());
     CHECK(storage_kind::bool_value == var12.storage());
-    CHECK(var12.cast<json::variant::bool_storage>().value() == val11);
+    CHECK(var12.cast<json::variant::bool_box>().value() == val11);
 
     std::string val13 = "Too long for small string";
     json::variant var13(val13.data(), val13.length(), semantic_tag::none);
     json::variant var14(var13);
     CHECK(storage_kind::long_string_value == var13.storage());
     CHECK(storage_kind::long_string_value == var14.storage());
-    CHECK(var14.cast<json::variant::long_string_storage>().data() == val13);
+    CHECK(var14.cast<json::variant::long_string_box>().data() == val13);
 
     json::object val15 = { {"first",1},{"second",2} };
     json::variant var15(val15, semantic_tag::none);
     json::variant var16(var15);
     CHECK(storage_kind::object_value == var15.storage());
     CHECK(storage_kind::object_value == var16.storage());
-    CHECK(val15 == var16.cast<json::variant::object_storage>().value());
+    CHECK(val15 == var16.cast<json::variant::object_box>().value());
 
     json::array val17 = {1,2,3,4};
     json::variant var17(val17, semantic_tag::none);
     json::variant var18(var17);
     CHECK(storage_kind::array_value == var17.storage());
     CHECK(storage_kind::array_value == var18.storage());
-    CHECK(val17 == var18.cast<json::variant::array_storage>().value());
+    CHECK(val17 == var18.cast<json::variant::array_box>().value());
 }
 
 TEST_CASE("test_equals")
