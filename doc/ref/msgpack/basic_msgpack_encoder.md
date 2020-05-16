@@ -18,7 +18,7 @@ Four specializations for common character types and result types are defined:
 Type                       |Definition
 ---------------------------|------------------------------
 msgpack_stream_encoder            |basic_msgpack_encoder<jsoncons::binary_stream_sink>
-bson_bytes_encoder     |basic_msgpack_encoder<jsoncons::bytes_sink>
+bson_bytes_encoder     |basic_msgpack_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>
 
 #### Member types
 

@@ -139,7 +139,7 @@ namespace jsoncons {
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::has_push_back<T>::value &&
+                 jsoncons::detail::is_back_insertable<T>::value &&
                  !detail::is_typed_array<T>::value 
     >::type>
     {
@@ -278,7 +278,7 @@ namespace jsoncons {
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::has_push_back<T>::value &&
+                 jsoncons::detail::is_back_insertable<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value &&
                  jsoncons::detail::is_bytes<T>::value
     >::type>
@@ -326,7 +326,7 @@ namespace jsoncons {
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::has_push_back<T>::value &&
+                 jsoncons::detail::is_back_insertable<T>::value &&
                  jsoncons::detail::is_typed_array<T>::value &&
                  !detail::is_bytes<T>::value
     >::type>

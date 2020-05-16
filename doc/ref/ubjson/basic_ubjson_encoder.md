@@ -17,7 +17,7 @@ Four specializations for common character types and result types are defined:
 Type                       |Definition
 ---------------------------|------------------------------
 ubjson_stream_encoder            |basic_ubjson_encoder<jsoncons::binary_stream_sink>
-ubjson_bytes_encoder     |basic_ubjson_encoder<jsoncons::bytes_sink>
+ubjson_bytes_encoder     |basic_ubjson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>
 
 #### Member types
 

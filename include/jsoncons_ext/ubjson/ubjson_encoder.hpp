@@ -471,7 +471,7 @@ private:
 };
 
 using ubjson_stream_encoder = basic_ubjson_encoder<jsoncons::binary_stream_sink>;
-using ubjson_bytes_encoder = basic_ubjson_encoder<jsoncons::bytes_sink>;
+using ubjson_bytes_encoder = basic_ubjson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Sink=jsoncons::binary_stream_sink>

@@ -17,7 +17,7 @@ Two specializations for common sink types are defined:
 Type                       |Definition
 ---------------------------|------------------------------
 bson_stream_encoder        |basic_bson_encoder<jsoncons::binary_stream_sink>
-bson_bytes_encoder         |basic_bson_encoder<jsoncons::bytes_sink>
+bson_bytes_encoder         |basic_bson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>
 
 #### Member types
 
