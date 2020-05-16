@@ -35,12 +35,13 @@ T decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
 
 (1) Reads a UBJSON contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](ubjson_options.md). 
 Type `Source` must be a container that has member functions `data()` and `size()`, 
-and member type `value_type` an integral type of size exactly 8 bits (since v0.152.0.)
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+and member type `value_type` with size exactly 8 bits (since v0.152.0.)
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).  
 
 (2) Reads a UBJSON binary stream into a type T, using the specified (or defaulted) [options](ubjson_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
 #### Exceptions

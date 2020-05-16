@@ -26,11 +26,11 @@ T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
 ```
 
 (1) Reads a JSON string value into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
 (2) Reads a JSON input stream into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
 Functions (1)-(2) perform encodings using the default json type `basic_json<CharT>`.

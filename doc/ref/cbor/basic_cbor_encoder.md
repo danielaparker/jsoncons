@@ -17,7 +17,7 @@ Four specializations for common sink types are defined:
 Type                       |Definition
 ---------------------------|------------------------------
 cbor_stream_encoder            |basic_cbor_encoder<jsoncons::binary_stream_sink>
-cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::bytes_sink>
+cbor_bytes_encoder     |basic_cbor_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>
 
 #### Member types
 
@@ -330,7 +330,7 @@ Throws a [ser_error](ser_error.md) on parse errors.
 
 (11) Writes a byte string value `source`.
 Type `Source` must be a container that has member functions `data()` and `size()`, 
-and member type `value_type` an integral type of size exactly 8 bits (since v0.152.0.)
+and member type `value_type` with size exactly 8 bits (since v0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 

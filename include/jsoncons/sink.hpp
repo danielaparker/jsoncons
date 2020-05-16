@@ -27,7 +27,7 @@ namespace jsoncons {
     {
     public:
         using value_type = CharT;
-        using output_type = std::basic_ostream<CharT>;
+        using container_type = std::basic_ostream<CharT>;
 
     private:
         static constexpr size_t default_buffer_length = 16384;
@@ -112,7 +112,7 @@ namespace jsoncons {
     {
     public:
         typedef uint8_t value_type;
-        using output_type = std::basic_ostream<char>;
+        using container_type = std::basic_ostream<char>;
     private:
         static constexpr size_t default_buffer_length = 16384;
 
@@ -203,9 +203,9 @@ namespace jsoncons {
     {
     public:
         using value_type = typename StringT::value_type;
-        using output_type = StringT;
+        using container_type = StringT;
     private:
-        output_type* buf_ptr;
+        container_type* buf_ptr;
 
         // Noncopyable
         string_sink(const string_sink&) = delete;
@@ -217,7 +217,7 @@ namespace jsoncons {
             std::swap(buf_ptr,val.buf_ptr);
         }
 
-        string_sink(output_type& buf)
+        string_sink(container_type& buf)
             : buf_ptr(std::addressof(buf))
         {
         }
@@ -241,13 +241,19 @@ namespace jsoncons {
 
     // bytes_sink
 
-    class bytes_sink 
+    template <class Container, class = void>
+    class bytes_sink
+    {
+    };
+
+    template <class Container>
+    class bytes_sink<Container,typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value>::type> 
     {
     public:
-        typedef uint8_t value_type;
-        typedef std::vector<uint8_t> output_type;
+        using container_type = Container;
+        using value_type = typename Container::value_type;
     private:
-        output_type* buf_ptr;
+        container_type* buf_ptr;
 
         // Noncopyable
         bytes_sink(const bytes_sink&) = delete;
@@ -255,7 +261,7 @@ namespace jsoncons {
     public:
         bytes_sink(bytes_sink&&) = default;
 
-        bytes_sink(output_type& buf)
+        bytes_sink(container_type& buf)
             : buf_ptr(std::addressof(buf))
         {
         }
@@ -266,14 +272,9 @@ namespace jsoncons {
         {
         }
 
-        void append(const uint8_t* s, std::size_t length)
-        {
-            buf_ptr->insert(buf_ptr->end(), s, s+length);
-        }
-
         void push_back(uint8_t ch)
         {
-            buf_ptr->push_back(ch);
+            buf_ptr->push_back(static_cast<value_type>(ch));
         }
     };
 

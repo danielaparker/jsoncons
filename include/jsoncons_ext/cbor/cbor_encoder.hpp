@@ -1659,7 +1659,7 @@ private:
 };
 
 using cbor_stream_encoder = basic_cbor_encoder<jsoncons::binary_stream_sink>;
-using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink>;
+using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_bytes_serializer;

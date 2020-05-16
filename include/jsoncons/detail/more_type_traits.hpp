@@ -372,11 +372,11 @@ namespace detail {
     using
     has_reserve = is_detected<container_reserve_t, Container>;
 
-    // has_push_back
+    // is_back_insertable
 
     template<class Container>
     using
-    has_push_back = is_detected<container_push_back_t, Container>;
+    is_back_insertable = is_detected<container_push_back_t, Container>;
 
     // has_data, has_data_exact
 
@@ -411,6 +411,17 @@ namespace detail {
     struct is_byte_sequence<Container, 
            typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
                                    has_size<Container>::value &&
+                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
+    >::type> : std::true_type {};
+
+    // is_back_insertable_byte_container
+
+    template <class Container, class Enable=void>
+    struct is_back_insertable_byte_container : std::false_type {};
+
+    template <class Container>
+    struct is_back_insertable_byte_container<Container, 
+           typename std::enable_if<is_back_insertable<Container>::value &&
                                    sizeof(typename Container::value_type) == sizeof(uint8_t)
     >::type> : std::true_type {};
 
