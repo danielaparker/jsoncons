@@ -1,6 +1,10 @@
 master
 ------
 
+Bug fixes:
+
+- Fixed compile error when building with Android SDK level less than 21 [\#240](https://github.com/danielaparker/jsoncons/pull/240)
+
 Enhancements:
 
 - Generalized `basic_json(byte_string_arg_t, ...` constructor to accomodate any contiguous byte sequence container,
