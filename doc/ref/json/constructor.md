@@ -125,7 +125,7 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 (21) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`,
 which is a contiguous container that has member functions `data()` and `size()`, and member type `value_type` 
 with width of exactly 8 bits (since v0.152.0.)
-Any of the values types `int8_t`, `uint8_t`, `char` and `unsigned char` are allowed.
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` are allowed.
 
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 

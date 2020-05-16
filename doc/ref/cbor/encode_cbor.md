@@ -4,8 +4,12 @@
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class T>
-void encode_cbor(const T& val, std::vector<uint8_t>& buffer, 
-                 const cbor_encode_options& options = cbor_encode_options()); // (1)
+void encode_cbor(const T& jval, std::vector<uint8_t>& v,
+                 const cbor_decode_options& options = cbor_decode_options()); // (1) (until v0.152.0)
+
+template<class T, class Container>
+void encode_cbor(const T& jval, Container& v,
+                 const cbor_decode_options& options = cbor_decode_options()); // (1) (since v0.152.0)
 
 template<class T>
 void encode_cbor(const T& val, std::ostream& os, 
@@ -14,12 +18,14 @@ void encode_cbor(const T& val, std::ostream& os,
 
 Encodes a C++ data structure to the [Concise Binary Object Representation](http://cbor.io/) data format.
 
-(1) Writes a value of type T into a bytes buffer in the CBOR data format, using the specified (or defaulted) [options](cbor_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+(1) Writes a value of type T into a byte container in the CBOR data format, using the specified (or defaulted) [options](cbor_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
+Type `Container` must be back insertable and have member type `value_type` with size exactly 8 bits (since v0.152.0.)
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` are allowed.
 
 (2) Writes a value of type T into a binary stream in the CBOR data format, using the specified (or defaulted) [options](cbor_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
 ### See also
