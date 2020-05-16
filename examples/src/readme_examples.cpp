@@ -11,8 +11,8 @@
 #include <vector>
 #include <iomanip>
 
-namespace readme
-{
+namespace {
+
     using namespace jsoncons;    
 
     void as_a_variant_like_structure()
@@ -342,17 +342,18 @@ namespace readme
         std::cout << "(10)\n";
         csv::encode_csv(j, std::cout, csv_options);
     }
-}
+
+} // namespace
 
 void readme_examples()
 {
     std::cout << "\nReadme examples\n\n";
 
-    readme::playing_around();
-    readme::as_a_strongly_typed_cpp_structure();
-    readme::as_a_filtered_stream_of_json_events();
-    readme::as_a_stream_of_json_events();
-    readme::as_a_variant_like_structure();
+    playing_around();
+    as_a_strongly_typed_cpp_structure();
+    as_a_filtered_stream_of_json_events();
+    as_a_stream_of_json_events();
+    as_a_variant_like_structure();
     std::cout << std::endl;
 }
 
