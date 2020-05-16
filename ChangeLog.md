@@ -5,13 +5,18 @@ Enhancements:
 
 - Generalized `basic_json(byte_string_arg_t, ...` constructor to accomodate any contiguous byte sequence container,
 which is a contiguous container that has member functions `data()` and `size()`, and member type `value_type` with size exactly 8 bits.
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 - Generalized the functions `decode_bson`, `decode_cbor`, `decode_msgpack` and `decode_ubjson`
-to accept any contiguous byte sequence argument.
+to read from any contiguous byte sequence.
 
 - Generalized the `json_visitor` member function `byte_string_value`
 to accept any contiguous byte sequence argument. In particular this means that `byte_string_value`
 can be called on an encoder with any bytes sequence argument.
+
+- Generalized the functions `encode_bson`, `encode_cbor`, `encode_msgpack` and `encode_ubjson`
+to write to any back insertable byte container.
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 v0.151.1
 --------
