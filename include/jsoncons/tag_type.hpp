@@ -177,7 +177,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
         }
         case semantic_tag::ext:
         {
-            os << ext;
+            os << ext_name;
             break;
         }
     }
