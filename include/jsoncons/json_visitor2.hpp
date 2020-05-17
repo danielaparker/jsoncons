@@ -493,7 +493,7 @@ namespace jsoncons {
                                     std::error_code& ec) = 0;
 
         virtual bool visit_byte_string(const byte_string_view& value, 
-                                       uint64_t /* ext_tag */, 
+                                       uint64_t /*ext_tag*/, 
                                        const ser_context& context,
                                        std::error_code& ec) 
         {
@@ -1141,6 +1141,63 @@ namespace jsoncons {
                         break;
                     default:
                         retval = destination_->byte_string_value(value, tag, context, ec);
+                        break;
+                }
+            }
+
+            level_stack_.back().advance();
+            return retval;
+        }
+
+        bool visit_byte_string(const byte_string_view& value, 
+                               uint64_t ext_tag,
+                               const ser_context& context,
+                               std::error_code& ec) override
+        {
+            bool retval = true;
+
+            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            {
+                key_.clear();
+                encode_base64url(value.begin(), value.end(),key_);
+            }
+
+            if (level_stack_.back().is_key())
+            {
+                switch (level_stack_.back().target())
+                {
+                    case target_t::buffer:
+                        if (level_stack_.back().count() > 0)
+                        {
+                            key_buffer_.push_back(',');
+                        }
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back('\"');
+                        key_buffer_.push_back(':');
+                        retval = true; 
+                        break;
+                    default:
+                        retval = destination_->key(key_, context, ec);
+                        break;
+                }
+            }
+            else
+            {
+                switch (level_stack_.back().target())
+                {
+                    case target_t::buffer:
+                        if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
+                        {
+                            key_buffer_.push_back(',');
+                        }
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back('\"');
+                        retval = true; 
+                        break;
+                    default:
+                        retval = destination_->byte_string_value(value, ext_tag, context, ec);
                         break;
                 }
             }
