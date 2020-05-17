@@ -16,7 +16,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("array_iterator test")
+TEST_CASE("jtaj_array_view tests")
 {
     std::string s = R"(
     [
@@ -43,8 +43,10 @@ TEST_CASE("array_iterator test")
 
     json_cursor cursor(s);
 
-    auto it = make_array_iterator<json>(cursor);
-    auto end = jsoncons::end(it);
+    staj_array_view<json> view(cursor);
+
+    auto it = view.begin();
+    auto end = view.end();
 
     const auto& j1 = *it;
     REQUIRE(j1.is_object());
@@ -74,25 +76,10 @@ TEST_CASE("object_iterator test")
     {
         std::istringstream is(s);
         json_cursor cursor(is);
+        staj_object_view<json> view(cursor);
 
-        REQUIRE_FALSE(cursor.done());
-        CHECK(cursor.current().event_type() == staj_event_type::begin_object);
-        cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
-        cursor.next();
-
-        json_decoder<json> decoder;
-        cursor.read_to(decoder);
-        cursor.next();
-        CHECK(cursor.current().event_type() == staj_event_type::key);
-    }
-
-    SECTION("test 2")
-    {
-        std::istringstream is(s);
-        json_cursor cursor(is);
-        auto it = make_object_iterator<json>(cursor);
-        auto end = jsoncons::end(it);
+        auto it = view.begin();
+        auto end = view.end();
 
         const auto& p1 = *it;
         CHECK(p1.second.as<int>() == 100);
@@ -109,6 +96,5 @@ TEST_CASE("object_iterator test")
         CHECK((it == end));
     }
 }
-
 
 
