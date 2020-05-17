@@ -302,9 +302,6 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
 #endif
 
-    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
-    using byte_string_storage_type = typename implementation_policy::template sequence_container_type<uint8_t, byte_allocator_type>;
-
     using array = json_array<basic_json>;
 
     using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
@@ -615,7 +612,7 @@ public:
         public:
 
             byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t ext_tag, const Allocator& alloc)
-                : ext_type_(from_storage_and_tag(storage_kind::long_string_value, tag)),
+                : ext_type_(from_storage_and_tag(storage_kind::byte_string_value, tag)),
                   s_(data, length, ext_tag, alloc)
             {
             }
@@ -654,6 +651,11 @@ public:
             std::size_t length() const
             {
                 return s_.length();
+            }
+
+            uint64_t ext_tag() const
+            {
+                return s_.tag();
             }
 
             allocator_type get_allocator() const
@@ -1898,6 +1900,11 @@ public:
         allocator_type get_allocator() const
         {
             return evaluate().get_allocator();
+        }
+
+        uint64_t ext_tag() const
+        {
+            return evaluate().ext_tag();
         }
 
         bool contains(const string_view_type& key) const noexcept
@@ -3498,6 +3505,19 @@ public:
             }
             default:
                 return allocator_type();
+        }
+    }
+
+    uint64_t ext_tag() const
+    {
+        switch (var_.storage())
+        {
+            case storage_kind::byte_string_value:
+            {
+                return var_.template cast<typename variant::byte_string_storage>().ext_tag();
+            }
+            default:
+                return 0;
         }
     }
 
@@ -5414,7 +5434,14 @@ private:
                 visitor.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
-                visitor.byte_string_value(as_byte_string_view(), var_.tag(), context, ec);
+                if (var_.tag() == semantic_tag::ext)
+                {
+                    visitor.byte_string_value(as_byte_string_view(), ext_tag(), context, ec);
+                }
+                else
+                {
+                    visitor.byte_string_value(as_byte_string_view(), var_.tag(), context, ec);
+                }
                 break;
             case storage_kind::half_value:
                 visitor.half_value(var_.template cast<typename variant::half_storage>().value(), var_.tag(), context, ec);

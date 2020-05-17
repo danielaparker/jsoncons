@@ -17,6 +17,7 @@ TEST_CASE("test string_wrapper char")
     jsoncons::detail::string_wrapper<char, std::allocator<char>> s(input.data(), input.size(), std::allocator<char>());
 
     CHECK(input == std::string(s.c_str()));
+    CHECK(s.length() == 11);
 }
 
 TEST_CASE("test string_wrapper wchar_t")
@@ -25,6 +26,7 @@ TEST_CASE("test string_wrapper wchar_t")
     jsoncons::detail::string_wrapper<wchar_t, std::allocator<wchar_t>> s(input.data(), input.size(), std::allocator<wchar_t>());
 
     CHECK(input == std::wstring(s.c_str()));
+    CHECK(s.length() == 11);
 }
 
 TEST_CASE("test tagged_string_wrapper char")
@@ -34,6 +36,7 @@ TEST_CASE("test tagged_string_wrapper char")
 
     CHECK(input == std::string(s.c_str()));
     CHECK(s.tag() == 100);
+    CHECK(s.length() == 11);
 }
 
 TEST_CASE("test tagged_string_wrapper wchar_t")
@@ -43,5 +46,6 @@ TEST_CASE("test tagged_string_wrapper wchar_t")
 
     CHECK(input == std::wstring(s.c_str()));
     CHECK(s.tag() == 100);
+    CHECK(s.length() == 11);
 }
 
