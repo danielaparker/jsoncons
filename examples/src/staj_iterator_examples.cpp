@@ -61,7 +61,7 @@ void staj_array_iterator_example2()
 
     json_cursor cursor(is);
 
-    staj_array_view<json> view(cursor);
+    staj_array_view<json,ns::employee> view(cursor);
 
     for (const auto& val : view)
     {
