@@ -380,6 +380,18 @@ namespace jsoncons {
         }
     };
 
+    template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    staj_array_view<Json,T> staj_array(basic_staj_cursor<CharT>& cursor)
+    {
+        return staj_array_view<Json,T>(cursor);
+    }
+
+    template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    staj_object_view<Json,T> staj_object(basic_staj_cursor<CharT>& cursor)
+    {
+        return staj_object_view<Json,T>(cursor);
+    }
+
 } // namespace jsoncons
 
 #endif
