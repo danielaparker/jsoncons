@@ -302,9 +302,6 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use key_value_type") typedef key_value_type member_type;
 #endif
 
-    using byte_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint8_t>;                  
-    using byte_string_storage_type = typename implementation_policy::template sequence_container_type<uint8_t, byte_allocator_type>;
-
     using array = json_array<basic_json>;
 
     using key_value_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<key_value_type>;                       
@@ -611,92 +608,59 @@ public:
         public:
             uint8_t ext_type_;
         private:
-            using byte_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<byte_string_storage_type>;                  
-            using pointer = typename std::allocator_traits<byte_allocator_type>::pointer;
-
-            pointer ptr_;
-
-            template <typename... Args>
-            void create(byte_allocator_type alloc, Args&& ... args)
-            {
-                ptr_ = std::allocator_traits<byte_allocator_type>::allocate(alloc, 1);
-                JSONCONS_TRY
-                {
-                    std::allocator_traits<byte_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
-                }
-                JSONCONS_CATCH(...)
-                {
-                    std::allocator_traits<byte_allocator_type>::deallocate(alloc, ptr_,1);
-                    JSONCONS_RETHROW;
-                }
-            }
+            jsoncons::detail::tagged_string_wrapper<uint8_t,Allocator> s_;
         public:
 
-            byte_string_storage(semantic_tag semantic_type, 
-                             const uint8_t* data, std::size_t length, 
-                             const Allocator& a)
-                : ext_type_(from_storage_and_tag(storage_kind::byte_string_value, semantic_type))
+            byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t ext_tag, const Allocator& alloc)
+                : ext_type_(from_storage_and_tag(storage_kind::byte_string_value, tag)),
+                  s_(data, length, ext_tag, alloc)
             {
-                create(byte_allocator_type(a), data, data+length, a);
             }
 
             byte_string_storage(const byte_string_storage& val)
-                : ext_type_(val.ext_type_)
+                : ext_type_(val.ext_type_), s_(val.s_)
             {
-                create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             byte_string_storage(byte_string_storage&& val) noexcept
                 : ext_type_(val.ext_type_), 
-                  ptr_(nullptr)
+                  s_(nullptr)
             {
-                std::swap(val.ptr_,ptr_);
+                swap(val);
             }
 
             byte_string_storage(const byte_string_storage& val, const Allocator& a)
-                : ext_type_(val.ext_type_)
-            { 
-                create(byte_allocator_type(a), *(val.ptr_), a);
+                : ext_type_(val.ext_type_), s_(val.s_, a)
+            {
             }
 
             ~byte_string_storage() noexcept
             {
-                if (ptr_ != nullptr)
-                {
-                    byte_allocator_type alloc(ptr_->get_allocator());
-                    std::allocator_traits<byte_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
-                    std::allocator_traits<byte_allocator_type>::deallocate(alloc, ptr_,1);
-                }
             }
 
             void swap(byte_string_storage& val) noexcept
             {
-                std::swap(val.ptr_,ptr_);
+                s_.swap(val.s_);
             }
 
             const uint8_t* data() const
             {
-                return ptr_->data();
+                return s_.data();
             }
 
             std::size_t length() const
             {
-                return ptr_->size();
+                return s_.length();
             }
 
-            const uint8_t* begin() const
+            uint64_t ext_tag() const
             {
-                return ptr_->data();
-            }
-
-            const uint8_t* end() const
-            {
-                return ptr_->data() + ptr_->size();
+                return s_.tag();
             }
 
             allocator_type get_allocator() const
             {
-                return ptr_->get_allocator();
+                return s_.get_allocator();
             }
         };
 
@@ -961,19 +925,14 @@ public:
             }
         }
 
-        variant(const byte_string_view& bytes, semantic_tag tag)
-        {
-            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), byte_allocator_type());
-        }
-
-        variant(const byte_string_view& bytes, semantic_tag tag, const Allocator& alloc)
-        {
-            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
-        }
-
         variant(byte_string_arg_t, const span<const uint8_t>& bytes, semantic_tag tag, const Allocator& alloc)
         {
-            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), alloc);
+            construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), 0, alloc);
+        }
+
+        variant(byte_string_arg_t, const span<const uint8_t>& bytes, uint64_t ext_tag, const Allocator& alloc)
+        {
+            construct_var<byte_string_storage>(semantic_tag::ext, bytes.data(), bytes.size(), ext_tag, alloc);
         }
 
         variant(const object& val, semantic_tag tag)
@@ -1941,6 +1900,11 @@ public:
         allocator_type get_allocator() const
         {
             return evaluate().get_allocator();
+        }
+
+        uint64_t ext_tag() const
+        {
+            return evaluate().ext_tag();
         }
 
         bool contains(const string_view_type& key) const noexcept
@@ -3242,19 +3206,21 @@ public:
     {
     }
 
-    explicit basic_json(const byte_string_view& bytes, 
-                        semantic_tag tag, 
-                        const Allocator& alloc = Allocator())
-        : var_(bytes, tag, alloc)
-    {
-    }
-
     template <class Source>
     basic_json(byte_string_arg_t, const Source& source, 
                semantic_tag tag = semantic_tag::none,
                const Allocator& alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         : var_(byte_string_arg, span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size()), tag, alloc)
+    {
+    }
+
+    template <class Source>
+    basic_json(byte_string_arg_t, const Source& source, 
+               uint64_t ext_tag,
+               const Allocator& alloc = Allocator(),
+               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
+        : var_(byte_string_arg, span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size()), ext_tag, alloc)
     {
     }
 
@@ -3539,6 +3505,19 @@ public:
             }
             default:
                 return allocator_type();
+        }
+    }
+
+    uint64_t ext_tag() const
+    {
+        switch (var_.storage())
+        {
+            case storage_kind::byte_string_value:
+            {
+                return var_.template cast<typename variant::byte_string_storage>().ext_tag();
+            }
+            default:
+                return 0;
         }
     }
 
@@ -4740,6 +4719,14 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
+    JSONCONS_DEPRECATED_MSG("Instead, use basic_json(byte_string_arg_t, const Source&, semantic_tag=semantic_tag::none,const Allocator& = Allocator())")
+    basic_json(const byte_string_view& bytes, 
+               semantic_tag tag, 
+               const Allocator& alloc = Allocator())
+        : var_(byte_string_arg, bytes, tag, alloc)
+    {
+    }
+
     JSONCONS_DEPRECATED_MSG("Instead, use at_or_null(const string_view_type&)")
     const basic_json& get_with_default(const string_view_type& name) const
     {
@@ -5447,8 +5434,14 @@ private:
                 visitor.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
-                visitor.byte_string_value(var_.template cast<typename variant::byte_string_storage>().data(), var_.template cast<typename variant::byte_string_storage>().length(), 
-                                          var_.tag(), context, ec);
+                if (var_.tag() == semantic_tag::ext)
+                {
+                    visitor.byte_string_value(as_byte_string_view(), ext_tag(), context, ec);
+                }
+                else
+                {
+                    visitor.byte_string_value(as_byte_string_view(), var_.tag(), context, ec);
+                }
                 break;
             case storage_kind::half_value:
                 visitor.half_value(var_.template cast<typename variant::half_storage>().value(), var_.tag(), context, ec);

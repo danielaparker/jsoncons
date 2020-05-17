@@ -579,7 +579,7 @@ private:
                         }
 
                         more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(),bytes_buffer_.size()), 
-                                                          semantic_tag::none, 
+                                                          static_cast<uint8_t>(ext_type), 
                                                           *this,
                                                           ec);
                     }

@@ -1848,7 +1848,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::none, *this, ec);
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), item_tag_, *this, ec);
                     break;
                 }
             }

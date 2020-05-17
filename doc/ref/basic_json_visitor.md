@@ -69,211 +69,139 @@ Member type                         |Definition
                            semantic_tag tag=semantic_tag::none, 
                            const ser_context& context=ser_context()); // (12) (since v0.152.0)
 
+    template <class Source>
+    bool byte_string_value(const Source& souce, 
+                           uint64_t ext_tag, 
+                           const ser_context& context=ser_context()); // (13) (since v0.152.0)
+
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=ser_context()); // (13)
+                      const ser_context& context=ser_context()); // (14)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag = semantic_tag::none, 
-                     const ser_context& context=ser_context()); // (14)
+                     const ser_context& context=ser_context()); // (15)
 
     bool half_value(uint16_t value, 
                     semantic_tag tag = semantic_tag::none, 
-                    const ser_context& context=ser_context()); // (15)
+                    const ser_context& context=ser_context()); // (16)
 
     bool double_value(double value, 
                       semantic_tag tag = semantic_tag::none, 
-                      const ser_context& context=ser_context()); // (16)
+                      const ser_context& context=ser_context()); // (17)
 
     bool begin_object(semantic_tag tag,
                       const ser_context& context,
-                      std::error_code& ec); // (17)
+                      std::error_code& ec); // (18)
 
     bool begin_object(std::size_t length, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (18)
+                      std::error_code& ec); // (19)
 
     bool end_object(const ser_context& context, 
-                    std::error_code& ec); // (19)
+                    std::error_code& ec); // (20)
 
     bool begin_array(semantic_tag tag, 
                      const ser_context& context, 
-                     std::error_code& ec); // (20)
+                     std::error_code& ec); // (21)
 
     bool begin_array(std::size_t length, 
                      semantic_tag tag, 
                      const ser_context& context, 
-                     std::error_code& ec); // (21)
+                     std::error_code& ec); // (22)
 
     bool end_array(const ser_context& context, 
-                   std::error_code& ec); // (22)
+                   std::error_code& ec); // (23)
 
     bool key(const string_view_type& name, 
               const ser_context& context, 
-              std::error_code& ec); // (23)
+              std::error_code& ec); // (24)
 
     bool null_value(semantic_tag tag,
                     const ser_context& context,
-                    std::error_code& ec); // (24) 
+                    std::error_code& ec); // (25) 
 
     bool bool_value(bool value, 
                     semantic_tag tag,
                     const ser_context& context,
-                    std::error_code& ec); // (25) 
+                    std::error_code& ec); // (26) 
 
     bool string_value(const string_view_type& value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (26) 
+                      std::error_code& ec); // (27) 
 
     bool byte_string_value(const byte_string_view& source, 
                            semantic_tag tag, 
                            const ser_context& context,
-                           std::error_code& ec); // (27) (until v0.152.0)
+                           std::error_code& ec); // (28) (until v0.152.0)
 
     template <class Source>   
     bool byte_string_value(const Source& source, 
                            semantic_tag tag, 
                            const ser_context& context,
-                           std::error_code& ec); // (27) (since v0.152.0)
+                           std::error_code& ec); // (28) (since v0.152.0)
+
+    template <class Source>   
+    bool byte_string_value(const Source& source, 
+                           uint64_t ext_tag, 
+                           const ser_context& context,
+                           std::error_code& ec); // (29) (since v0.152.0)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (28)
+                      std::error_code& ec); // (30)
 
     bool int64_value(int64_t value, 
                      semantic_tag tag, 
                      const ser_context& context,
-                     std::error_code& ec); // (29)
+                     std::error_code& ec); // (31)
 
     bool half_value(uint16_t value, 
                     semantic_tag tag, 
                     const ser_context& context,
-                    std::error_code& ec); // (30)
+                    std::error_code& ec); // (32)
 
     bool double_value(double value, 
                       semantic_tag tag, 
                       const ser_context& context,
-                      std::error_code& ec); // (31)
+                      std::error_code& ec); // (33)
 
-    bool typed_array(const span<const uint8_t>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (32)
-
-    bool typed_array(const span<const uint16_t>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (33)
-
-    bool typed_array(const span<const uint32_t>& data, 
+    template <class T>
+    bool typed_array(const span<T>& data, 
                      semantic_tag tag=semantic_tag::none,
                      const ser_context& context=ser_context()); // (34)
 
-    bool typed_array(const span<const uint64_t>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (35)
-
-    bool typed_array(const span<const int8_t>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (36)
-
-    bool typed_array(const span<const int16_t>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (37)
-
-    bool typed_array(const span<const int32_t>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (38)
-
-    bool typed_array(const span<const int64_t>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (39)
-
-    bool typed_array(half_arg_t, const span<const uint16_t>& data,
-                     semantic_tag tag = semantic_tag::none,
-                     const ser_context& context = ser_context()); // (40)
-
-    bool typed_array(const span<const float>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (41)
-
-    bool typed_array(const span<const double>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (42)
-
-    bool typed_array(const span<const float128_type>& data, 
-                     semantic_tag tag=semantic_tag::none,
-                     const ser_context& context=ser_context()); // (43)
+    bool typed_array(half_arg_t, const span<const uint16_t>& s,
+        semantic_tag tag = semantic_tag::none,
+        const ser_context& context = ser_context()); // (35)
 
     bool begin_multi_dim(const span<const size_t>& shape,
                          semantic_tag tag,
-                         const ser_context& context); // (44) 
+                         const ser_context& context); // (36) 
 
-    bool end_multi_dim(const ser_context& context=ser_context()); // (45) 
+    bool end_multi_dim(const ser_context& context=ser_context()); // (37) 
 
-    bool typed_array(const span<const uint8_t>& v, 
+    template <class T>
+    bool typed_array(const span<T>& data, 
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (46)
+                     const ser_context& context,
+                     std::error_code& ec); // (38)
 
-    bool typed_array(const span<const uint16_t>& data, 
+    bool typed_array(half_arg_t, const span<const uint16_t>& s,
                      semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (47)
-
-    bool typed_array(const span<const uint32_t>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (48)
-
-    bool typed_array(const span<const uint64_t>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (49)
-
-    bool typed_array(const span<const int8_t>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (50)
-
-    bool typed_array(const span<const int16_t>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (51)
-
-    bool typed_array(const span<const int32_t>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (52)
-
-    bool typed_array(const span<const int64_t>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (53)
-
-    bool typed_array(half_arg_t arg, const span<const uint16_t>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (54)
-
-    bool typed_array(const span<const float>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (55)
-
-    bool typed_array(const span<const double>& data, 
-                     semantic_tag tag,
-                     const ser_context& context, 
-                     std::error_code& ec); // (56)
+                     const ser_context& context,
+                     std::error_code& ec); // (39)
 
     bool begin_multi_dim(const span<const size_t>& shape,
                          semantic_tag tag,
                          const ser_context& context, 
-                         std::error_code& ec); // (57)
+                         std::error_code& ec); // (40)
 
     bool end_multi_dim(const ser_context& context,
-                       std::error_code& ec); // (58) 
+                       std::error_code& ec); // (41) 
 
 (1) Flushes whatever is buffered to the destination.
 
@@ -317,29 +245,35 @@ Throws a [ser_error](ser_error.md) on parse errors.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(12) Writes a byte string value `source`.
+(12) Writes a byte string value `source` with a generic tag.
 Type `Source` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since v0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(13) Writes a non-negative integer value.
+(13) Writes a byte string value `source` with a format specific tag, `ext_tag`.
+Type `Source` must be a container that has member functions `data()` and `size()`, 
+and member type `value_type` with size exactly 8 bits (since v0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(14) Writes a signed integer value.
+(14) Writes a non-negative integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(15) Writes a half precision floating point value.
+(15) Writes a signed integer value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(16) Writes a double precision floating point value.
+(16) Writes a half precision floating point value.
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
-(17)-(31) Same as (2)-(16), except sets `ec` and returns `false` on parse errors.
+(17) Writes a double precision floating point value.
+Returns `true` if the consumer wishes to receive more events, `false` otherwise.
+Throws a [ser_error](ser_error.md) on parse errors. 
+
+(18)-(33) Same as (2)-(17), except sets `ec` and returns `false` on parse errors.
 
 #### Private event consumer interface
 
@@ -392,94 +326,99 @@ Throws a [ser_error](ser_error.md) on parse errors.
                                    const ser_context& context,
                                    std::error_code& ec) = 0; // (12)
 
+    virtual bool visit_byte_string(const byte_string_view& value, 
+                                   uint64_t ext_tag, 
+                                   const ser_context& context,
+                                   std::error_code& ec); // (13)
+
     virtual bool visit_uint64(uint64_t value, 
                               semantic_tag tag, 
                               const ser_context& context,
-                              std::error_code& ec) = 0; // (13)
+                              std::error_code& ec) = 0; // (14)
 
     virtual bool visit_int64(int64_t value, 
                              semantic_tag tag,
                              const ser_context& context,
-                             std::error_code& ec) = 0; // (14)
+                             std::error_code& ec) = 0; // (15)
 
     virtual bool visit_half(uint16_t value, 
                             semantic_tag tag,
                             const ser_context& context,
-                            std::error_code& ec); // (15)
+                            std::error_code& ec); // (16)
 
     virtual bool visit_double(double value, 
                               semantic_tag tag,
                               const ser_context& context,
-                              std::error_code& ec) = 0; // (16)
+                              std::error_code& ec) = 0; // (17)
 
     virtual bool visit_typed_array(const span<const uint8_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (17)
+                                   std::error_code& ec); // (18)
 
     virtual bool visit_typed_array(const span<const uint16_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (18)
+                                   std::error_code& ec); // (19)
 
     virtual bool visit_typed_array(const span<const uint32_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (19)
+                                   std::error_code& ec); // (20)
 
     virtual bool visit_typed_array(const span<const uint64_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (20)
+                                   std::error_code& ec); // (21)
 
     virtual bool visit_typed_array(const span<const int8_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (21)
+                                   std::error_code& ec); // (22)
 
     virtual bool visit_typed_array(const span<const int16_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (22)
+                                   std::error_code& ec); // (23)
 
     virtual bool visit_typed_array(const span<const int32_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (23)
+                                   std::error_code& ec); // (24)
 
     virtual bool visit_typed_array(const span<const int64_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (24)
+                                   std::error_code& ec); // (25)
 
     virtual bool visit_typed_array(half_arg_t, 
                                    const span<const uint16_t>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (25)
+                                   std::error_code& ec); // (26)
 
     virtual bool visit_typed_array(const span<const float>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (26)
+                                   std::error_code& ec); // (27)
 
     virtual bool visit_typed_array(const span<const double>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (27)
+                                   std::error_code& ec); // (28)
 
     virtual bool visit_typed_array(const span<const float128_type>& data, 
                                    semantic_tag tag,
                                    const ser_context& context, 
-                                   std::error_code& ec); // (28)
+                                   std::error_code& ec); // (29)
 
     virtual bool visit_begin_multi_dim(const span<const size_t>& shape,
                                        semantic_tag tag,
                                        const ser_context& context, 
-                                       std::error_code& ec); // (29)
+                                       std::error_code& ec); // (30)
 
     virtual bool visit_end_multi_dim(const ser_context& context,
-                                     std::error_code& ec); // (30)
+                                     std::error_code& ec); // (31)
 
 (1) Allows producers of json events to flush any buffered data.
 
@@ -523,23 +462,27 @@ Sets `ec` and returns `false` on parse errors.
 Returns `true` if the producer should generate more events, `false` otherwise.
 Sets `ec` and returns `false` on parse errors. 
 
-(12) Handles a byte string value.
+(12) Handles a byte string value associated with a generic tag.
 Returns `true` if the producer should generate more events, `false` otherwise.
 Sets `ec` and returns `false` on parse errors. 
 
-(13) Handles a non-negative integer value.
+(13) Handles a byte string value associated with a format specific tag.
 Returns `true` if the producer should generate more events, `false` otherwise.
 Sets `ec` and returns `false` on parse errors. 
 
-(14) Handles a signed integer value.
+(14) Handles a non-negative integer value.
 Returns `true` if the producer should generate more events, `false` otherwise.
 Sets `ec` and returns `false` on parse errors. 
 
-(15) Handles a half precision floating point value. 
+(15) Handles a signed integer value.
 Returns `true` if the producer should generate more events, `false` otherwise.
 Sets `ec` and returns `false` on parse errors. 
 
-(16) Handles a double precision floating point value. 
+(16) Handles a half precision floating point value. 
+Returns `true` if the producer should generate more events, `false` otherwise.
+Sets `ec` and returns `false` on parse errors. 
+
+(17) Handles a double precision floating point value. 
 Returns `true` if the producer should generate more events, `false` otherwise.
 Sets `ec` and returns `false` on parse errors. 
 

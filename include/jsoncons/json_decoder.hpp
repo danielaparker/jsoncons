@@ -287,18 +287,37 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                              semantic_tag tag, 
-                              const ser_context&,
-                              std::error_code&) override
+                           semantic_tag tag, 
+                           const ser_context&,
+                           std::error_code&) override
     {
         switch (structure_stack_.back().type_)
         {
             case structure_type::object_t:
             case structure_type::array_t:
-                item_stack_.emplace_back(std::forward<key_type>(name_), b, tag, byte_allocator_);
+                item_stack_.emplace_back(std::forward<key_type>(name_), byte_string_arg, b, tag, byte_allocator_);
                 break;
             case structure_type::root_t:
-                result_ = Json(b, tag, byte_allocator_);
+                result_ = Json(byte_string_arg, b, tag, byte_allocator_);
+                is_valid_ = true;
+                return false;
+        }
+        return true;
+    }
+
+    bool visit_byte_string(const byte_string_view& b, 
+                           uint64_t ext_tag, 
+                           const ser_context&,
+                           std::error_code&) override
+    {
+        switch (structure_stack_.back().type_)
+        {
+            case structure_type::object_t:
+            case structure_type::array_t:
+                item_stack_.emplace_back(std::forward<key_type>(name_), byte_string_arg, b, ext_tag, byte_allocator_);
+                break;
+            case structure_type::root_t:
+                result_ = Json(byte_string_arg, b, ext_tag, byte_allocator_);
                 is_valid_ = true;
                 return false;
         }

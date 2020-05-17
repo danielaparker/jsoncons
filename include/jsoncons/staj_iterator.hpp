@@ -26,7 +26,7 @@ namespace jsoncons {
     {
         using char_type = typename Json::char_type;
 
-        basic_staj_cursor<char_type>* reader_;
+        basic_staj_cursor<char_type>* cursor_;
         optional<T> value_;
         json_decoder<Json> decoder_;
     public:
@@ -37,47 +37,47 @@ namespace jsoncons {
         using iterator_category = std::input_iterator_tag;
 
         staj_array_iterator() noexcept
-            : reader_(nullptr)
+            : cursor_(nullptr)
         {
         }
 
         staj_array_iterator(basic_staj_cursor<char_type>& reader)
-            : reader_(std::addressof(reader))
+            : cursor_(std::addressof(reader))
         {
-            if (reader_->current().event_type() == staj_event_type::begin_array)
+            if (cursor_->current().event_type() == staj_event_type::begin_array)
             {
                 next();
             }
             else
             {
-                reader_ = nullptr;
+                cursor_ = nullptr;
             }
         }
 
         staj_array_iterator(basic_staj_cursor<char_type>& reader,
                             std::error_code& ec)
-            : reader_(std::addressof(reader))
+            : cursor_(std::addressof(reader))
         {
-            if (reader_->current().event_type() == staj_event_type::begin_array)
+            if (cursor_->current().event_type() == staj_event_type::begin_array)
             {
                 next(ec);
-                if (ec) {reader_ = nullptr;}
+                if (ec) {cursor_ = nullptr;}
             }
             else
             {
-                reader_ = nullptr;
+                cursor_ = nullptr;
             }
         }
 
         staj_array_iterator(const staj_array_iterator& other)
-            : reader_(other.reader_), value_(other.value_)
+            : cursor_(other.cursor_), value_(other.value_)
         {
         }
 
         staj_array_iterator(staj_array_iterator&& other) noexcept
-            : reader_(nullptr), value_(std::move(other.value_))
+            : cursor_(nullptr), value_(std::move(other.value_))
         {
-            std::swap(reader_,other.reader_);
+            std::swap(cursor_,other.cursor_);
         }
 
         ~staj_array_iterator() noexcept
@@ -86,14 +86,14 @@ namespace jsoncons {
 
         staj_array_iterator& operator=(const staj_array_iterator& other)
         {
-            reader_ = other.reader_;
+            cursor_ = other.cursor_;
             value_ = other.value;
             return *this;
         }
 
         staj_array_iterator& operator=(staj_array_iterator&& other) noexcept
         {
-            std::swap(reader_,other.reader_);
+            std::swap(cursor_,other.cursor_);
             value_.swap(other.value_);
             return *this;
         }
@@ -117,7 +117,7 @@ namespace jsoncons {
         staj_array_iterator& increment(std::error_code& ec)
         {
             next(ec);
-            if (ec) {reader_ = nullptr;}
+            if (ec) {cursor_ = nullptr;}
             return *this;
         }
 
@@ -130,9 +130,9 @@ namespace jsoncons {
 
         friend bool operator==(const staj_array_iterator<Json,T>& a, const staj_array_iterator<Json,T>& b)
         {
-            return (!a.reader_ && !b.reader_)
-                || (!a.reader_ && b.done())
-                || (!b.reader_ && a.done());
+            return (!a.cursor_ && !b.cursor_)
+                || (!a.cursor_ && b.done())
+                || (!b.cursor_ && a.done());
         }
 
         friend bool operator!=(const staj_array_iterator<Json,T>& a, const staj_array_iterator<Json,T>& b)
@@ -144,7 +144,7 @@ namespace jsoncons {
 
         bool done() const
         {
-            return reader_->done() || reader_->current().event_type() == staj_event_type::end_array;
+            return cursor_->done() || cursor_->current().event_type() == staj_event_type::end_array;
         }
 
 
@@ -154,14 +154,14 @@ namespace jsoncons {
 
             if (!done())
             {
-                reader_->next();
+                cursor_->next();
                 if (!done())
                 {
                     std::error_code ec;
-                    value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
+                    value_ = deser_traits<T,char_type>::deserialize(*cursor_, decoder_, ec);
                     if (ec)
                     {
-                        JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
+                        JSONCONS_THROW(ser_error(ec, cursor_->context().line(), cursor_->context().column()));
                     }
                 }
             }
@@ -173,14 +173,14 @@ namespace jsoncons {
 
             if (!done())
             {
-                reader_->next(ec);
+                cursor_->next(ec);
                 if (ec)
                 {
                     return;
                 }
                 if (!done())
                 {
-                    value_ = deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec);
+                    value_ = deser_traits<T,char_type>::deserialize(*cursor_, decoder_, ec);
                 }
             }
         }
@@ -211,51 +211,51 @@ namespace jsoncons {
         using iterator_category = std::input_iterator_tag;
 
     private:
-        basic_staj_cursor<char_type>* reader_;
+        basic_staj_cursor<char_type>* cursor_;
         optional<value_type> key_value_;
         json_decoder<Json> decoder_;
     public:
 
         staj_object_iterator() noexcept
-            : reader_(nullptr)
+            : cursor_(nullptr)
         {
         }
 
         staj_object_iterator(basic_staj_cursor<char_type>& reader)
-            : reader_(std::addressof(reader))
+            : cursor_(std::addressof(reader))
         {
-            if (reader_->current().event_type() == staj_event_type::begin_object)
+            if (cursor_->current().event_type() == staj_event_type::begin_object)
             {
                 next();
             }
             else
             {
-                reader_ = nullptr;
+                cursor_ = nullptr;
             }
         }
 
         staj_object_iterator(basic_staj_cursor<char_type>& reader, 
                              std::error_code& ec)
-            : reader_(std::addressof(reader))
+            : cursor_(std::addressof(reader))
         {
-            if (reader_->current().event_type() == staj_event_type::begin_object)
+            if (cursor_->current().event_type() == staj_event_type::begin_object)
             {
                 next(ec);
-                if (ec) {reader_ = nullptr;}
+                if (ec) {cursor_ = nullptr;}
             }
             else
             {
-                reader_ = nullptr;
+                cursor_ = nullptr;
             }
         }
 
         staj_object_iterator(const staj_object_iterator& other)
-            : reader_(other.reader_), key_value_(other.key_value_)
+            : cursor_(other.cursor_), key_value_(other.key_value_)
         {
         }
 
         staj_object_iterator(staj_object_iterator&& other) noexcept
-            : reader_(other.reader_), key_value_(std::move(other.key_value_))
+            : cursor_(other.cursor_), key_value_(std::move(other.key_value_))
         {
         }
 
@@ -265,14 +265,14 @@ namespace jsoncons {
 
         staj_object_iterator& operator=(const staj_object_iterator& other)
         {
-            reader_ = other.reader_;
+            cursor_ = other.cursor_;
             key_value_ = other.key_value_;
             return *this;
         }
 
         staj_object_iterator& operator=(staj_object_iterator&& other) noexcept
         {
-            std::swap(reader_,other.reader_);
+            std::swap(cursor_,other.cursor_);
             std::swap(key_value_,other.key_value_);
             return *this;
         }
@@ -298,7 +298,7 @@ namespace jsoncons {
             next(ec);
             if (ec)
             {
-                reader_ = nullptr;
+                cursor_ = nullptr;
             }
             return *this;
         }
@@ -312,9 +312,9 @@ namespace jsoncons {
 
         friend bool operator==(const staj_object_iterator<Json,T>& a, const staj_object_iterator<Json,T>& b)
         {
-            return (!a.reader_ && !b.reader_)
-                   || (!a.reader_ && b.done())
-                   || (!b.reader_ && a.done());
+            return (!a.cursor_ && !b.cursor_)
+                   || (!a.cursor_ && b.done())
+                   || (!b.cursor_ && a.done());
         }
 
         friend bool operator!=(const staj_object_iterator<Json,T>& a, const staj_object_iterator<Json,T>& b)
@@ -326,26 +326,26 @@ namespace jsoncons {
 
         bool done() const
         {
-            return reader_->done() || reader_->current().event_type() == staj_event_type::end_object;
+            return cursor_->done() || cursor_->current().event_type() == staj_event_type::end_object;
         }
 
         void next()
         {
             using char_type = typename Json::char_type;
 
-            reader_->next();
+            cursor_->next();
             if (!done())
             {
-                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
-                key_type key = reader_->current(). template get<key_type>();
-                reader_->next();
+                JSONCONS_ASSERT(cursor_->current().event_type() == staj_event_type::key);
+                key_type key = cursor_->current(). template get<key_type>();
+                cursor_->next();
                 if (!done())
                 {
                     std::error_code ec;
-                    key_value_ = value_type(std::move(key),deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec));
+                    key_value_ = value_type(std::move(key),deser_traits<T,char_type>::deserialize(*cursor_, decoder_, ec));
                     if (ec)
                     {
-                        JSONCONS_THROW(ser_error(ec, reader_->context().line(), reader_->context().column()));
+                        JSONCONS_THROW(ser_error(ec, cursor_->context().line(), cursor_->context().column()));
                     }
                 }
             }
@@ -355,23 +355,23 @@ namespace jsoncons {
         {
             using char_type = typename Json::char_type;
 
-            reader_->next(ec);
+            cursor_->next(ec);
             if (ec)
             {
                 return;
             }
             if (!done())
             {
-                JSONCONS_ASSERT(reader_->current().event_type() == staj_event_type::key);
-                auto key = reader_->current(). template get<key_type>();
-                reader_->next(ec);
+                JSONCONS_ASSERT(cursor_->current().event_type() == staj_event_type::key);
+                auto key = cursor_->current(). template get<key_type>();
+                cursor_->next(ec);
                 if (ec)
                 {
                     return;
                 }
                 if (!done())
                 {
-                    key_value_ = value_type(std::move(key),deser_traits<T,char_type>::deserialize(*reader_, decoder_, ec));
+                    key_value_ = value_type(std::move(key),deser_traits<T,char_type>::deserialize(*cursor_, decoder_, ec));
                 }
             }
         }

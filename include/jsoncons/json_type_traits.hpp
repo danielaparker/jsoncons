@@ -901,7 +901,7 @@ namespace detail
         static Json to_json(const T& val, 
                             const allocator_type& alloc = allocator_type())
         {
-            return Json(val, semantic_tag::none, alloc);
+            return Json(byte_string_arg, val, semantic_tag::none, alloc);
         }
     };
 
@@ -1004,7 +1004,7 @@ namespace detail
         
         static Json to_json(const byte_string_view& val, const allocator_type& alloc = allocator_type())
         {
-            return Json(val, semantic_tag::none, alloc);
+            return Json(byte_string_arg, val, semantic_tag::none, alloc);
         }
     };
 

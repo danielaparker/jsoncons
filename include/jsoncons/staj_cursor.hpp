@@ -140,6 +140,7 @@ class basic_staj_event
 {
     staj_event_type event_type_;
     semantic_tag tag_;
+    uint64_t ext_tag_;
     union
     {
         bool bool_value_;
@@ -155,41 +156,41 @@ public:
     using string_view_type = basic_string_view<CharT>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), length_(0)
+        : event_type_(event_type), tag_(tag), ext_tag_(0), length_(0)
     {
     }
 
     basic_staj_event(null_type, semantic_tag tag)
-        : event_type_(staj_event_type::null_value), tag_(tag), length_(0)
+        : event_type_(staj_event_type::null_value), tag_(tag), ext_tag_(0), length_(0)
     {
     }
 
     basic_staj_event(bool value, semantic_tag tag)
-        : event_type_(staj_event_type::bool_value), tag_(tag), length_(0)
+        : event_type_(staj_event_type::bool_value), tag_(tag), ext_tag_(0), length_(0)
     {
         value_.bool_value_ = value;
     }
 
     basic_staj_event(int64_t value, semantic_tag tag)
-        : event_type_(staj_event_type::int64_value), tag_(tag), length_(0)
+        : event_type_(staj_event_type::int64_value), tag_(tag), ext_tag_(0), length_(0)
     {
         value_.int64_value_ = value;
     }
 
     basic_staj_event(uint64_t value, semantic_tag tag)
-        : event_type_(staj_event_type::uint64_value), tag_(tag), length_(0)
+        : event_type_(staj_event_type::uint64_value), tag_(tag), ext_tag_(0), length_(0)
     {
         value_.uint64_value_ = value;
     }
 
     basic_staj_event(half_arg_t, uint16_t value, semantic_tag tag)
-        : event_type_(staj_event_type::half_value), tag_(tag), length_(0)
+        : event_type_(staj_event_type::half_value), tag_(tag), ext_tag_(0), length_(0)
     {
         value_.half_value_ = value;
     }
 
     basic_staj_event(double value, semantic_tag tag)
-        : event_type_(staj_event_type::double_value), tag_(tag), length_(0)
+        : event_type_(staj_event_type::double_value), tag_(tag), ext_tag_(0), length_(0)
     {
         value_.double_value_ = value;
     }
@@ -197,7 +198,7 @@ public:
     basic_staj_event(const string_view_type& s,
         staj_event_type event_type,
         semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), length_(s.length())
+        : event_type_(event_type), tag_(tag), ext_tag_(0), length_(s.length())
     {
         value_.string_data_ = s.data();
     }
@@ -205,7 +206,15 @@ public:
     basic_staj_event(const byte_string_view& s,
         staj_event_type event_type,
         semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), length_(s.size())
+        : event_type_(event_type), tag_(tag), ext_tag_(0), length_(s.size())
+    {
+        value_.byte_string_data_ = s.data();
+    }
+
+    basic_staj_event(const byte_string_view& s,
+        staj_event_type event_type,
+        uint64_t ext_tag)
+        : event_type_(event_type), tag_(semantic_tag::ext), ext_tag_(ext_tag), length_(s.size())
     {
         value_.byte_string_data_ = s.data();
     }
@@ -364,6 +373,8 @@ public:
     staj_event_type event_type() const noexcept { return event_type_; }
 
     semantic_tag tag() const noexcept { return tag_; }
+
+    uint64_t ext_tag() const noexcept { return ext_tag_; }
 private:
 
     int64_t as_int64(std::error_code& ec) const
@@ -1082,11 +1093,20 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& s, 
-                        semantic_tag tag,
-                        const ser_context& context,
-                        std::error_code&) override
+                           semantic_tag tag,
+                           const ser_context& context,
+                           std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
+        return !filter_(event_, context);
+    }
+
+    bool visit_byte_string(const byte_string_view& s, 
+                           uint64_t ext_tag,
+                           const ser_context& context,
+                           std::error_code&) override
+    {
+        event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, ext_tag);
         return !filter_(event_, context);
     }
 

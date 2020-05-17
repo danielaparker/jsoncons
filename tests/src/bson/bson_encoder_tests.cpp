@@ -26,7 +26,6 @@ TEST_CASE("serialize object to bson")
     JSONCONS_TRY
     {
         json result = bson::decode_bson<json>(v);
-        std::cout << result << std::endl;
     }
     JSONCONS_CATCH (const std::exception& e)
     {
@@ -34,7 +33,7 @@ TEST_CASE("serialize object to bson")
     }
 } 
 
-namespace jsoncons { namespace bson {
+namespace {
 
     void test_equal(const std::vector<uint8_t>& v, const std::vector<uint8_t>& expected)
     {
@@ -61,7 +60,7 @@ namespace jsoncons { namespace bson {
             std::cout << e.what() << std::endl;
         }
     }
-}}
+}
 
 TEST_CASE("serialize to bson")
 {
@@ -119,9 +118,11 @@ TEST_CASE("serialize to bson")
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+
+        check_equal(v,bson);
 
     }
+
     SECTION("object")
     {
         std::vector<uint8_t> v;
@@ -184,7 +185,7 @@ TEST_CASE("serialize to bson")
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+        check_equal(v,bson);
     }
 
     SECTION("outer object")
@@ -213,7 +214,7 @@ TEST_CASE("serialize to bson")
                                      0x00, // terminator
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+        check_equal(v,bson);
     }
 
     SECTION("outer array")
@@ -241,7 +242,7 @@ TEST_CASE("serialize to bson")
                                      0x00, // terminator
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+        check_equal(v,bson);
     }
 }
 

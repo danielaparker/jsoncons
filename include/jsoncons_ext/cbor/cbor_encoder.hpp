@@ -850,9 +850,9 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                              semantic_tag tag, 
-                              const ser_context&,
-                              std::error_code&) override
+                           semantic_tag tag, 
+                           const ser_context&,
+                           std::error_code&) override
     {
         byte_string_chars_format encoding_hint;
         switch (tag)
@@ -901,6 +901,37 @@ private:
         }
         else
         {
+            write_byte_string_value(b);
+        }
+
+        end_value();
+        return true;
+    }
+
+    bool visit_byte_string(const byte_string_view& b, 
+                           uint64_t ext_tag, 
+                           const ser_context&,
+                           std::error_code&) override
+    {
+        if (options_.pack_strings() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        {
+            byte_string_type bs(b.data(), b.size(), alloc_);
+            auto it = bytestringref_map_.find(bs);
+            if (it == bytestringref_map_.end())
+            {
+                bytestringref_map_.emplace(std::make_pair(bs, next_stringref_++));
+                write_tag(ext_tag);
+                write_byte_string_value(bs);
+            }
+            else
+            {
+                write_tag(25);
+                write_uint64_value(it->second);
+            }
+        }
+        else
+        {
+            write_tag(ext_tag);
             write_byte_string_value(b);
         }
 
