@@ -316,9 +316,9 @@ namespace msgpack {
         }
 
         bool visit_byte_string(const byte_string_view& b, 
-                                  semantic_tag, 
-                                  const ser_context&,
-                                  std::error_code&) override
+                               semantic_tag, 
+                               const ser_context&,
+                               std::error_code&) override
         {
 
             const size_t length = b.size();
@@ -339,6 +339,44 @@ namespace msgpack {
                 // str 32 stores a byte array whose length is upto (2^32)-1 bytes
                 jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::msgpack::detail::msgpack_format ::bin32_cd), std::back_inserter(sink_));
                 jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+            }
+
+            for (auto c : b)
+            {
+                sink_.push_back(c);
+            }
+
+            end_value();
+            return true;
+        }
+
+        bool visit_byte_string(const byte_string_view& b, 
+                               uint64_t ext_tag, 
+                               const ser_context&,
+                               std::error_code&) override
+        {
+
+            const size_t length = b.size();
+            if (length <= (std::numeric_limits<uint8_t>::max)())
+            {
+                // str 8 stores a byte array whose length is upto (2^8)-1 bytes
+                jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::msgpack::detail::msgpack_format ::ext8_cd), std::back_inserter(sink_));
+                jsoncons::detail::native_to_big(static_cast<uint8_t>(length), std::back_inserter(sink_));
+                sink_.push_back(static_cast<uint8_t>(ext_tag));
+            }
+            else if (length <= (std::numeric_limits<uint16_t>::max)())
+            {
+                // str 16 stores a byte array whose length is upto (2^16)-1 bytes
+                jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::msgpack::detail::msgpack_format ::ext16_cd), std::back_inserter(sink_));
+                jsoncons::detail::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
+                sink_.push_back(static_cast<uint8_t>(ext_tag));
+            }
+            else if (length <= (std::numeric_limits<uint32_t>::max)())
+            {
+                // str 32 stores a byte array whose length is upto (2^32)-1 bytes
+                jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::msgpack::detail::msgpack_format ::ext32_cd), std::back_inserter(sink_));
+                jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+                sink_.push_back(static_cast<uint8_t>(ext_tag));
             }
 
             for (auto c : b)
