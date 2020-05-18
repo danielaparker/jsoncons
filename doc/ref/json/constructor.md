@@ -77,7 +77,7 @@ basic_json(byte_string_arg_t, const Source& source,
 
 template <class Source>
 basic_json(byte_string_arg_t, const Source& source, 
-           uint64_t ext_tag,
+           uint64_t custom_tag,
            const Allocator& alloc = Allocator()); // (22) (since v0.152)
 ```
 

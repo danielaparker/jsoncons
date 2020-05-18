@@ -18,7 +18,8 @@ enum class semantic_tag : uint8_t
     uri,
     clamped,
     multi_dim_row_major,
-    multi_dim_column_major
+    multi_dim_column_major,
+    custom
 };
 ```
 
