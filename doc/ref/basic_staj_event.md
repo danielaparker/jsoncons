@@ -43,8 +43,8 @@ Returns a [staj_event_type](staj_event_type.md) for this event.
     semantic_tag tag() const noexcept;
 Returns a [semantic_tag](semantic_tag.md) for this event.
 
-    uint64_t ext_tag() const
-If `tag()` == `semantic_tag::ext`, returns a format specific tag associated with a byte string value,
+    uint64_t custom_tag() const
+If `tag()` == `semantic_tag::custom`, returns a format specific tag associated with a byte string value,
 otherwise return 0. An example is a MessagePack `type` in the range 0-127 associated with the
 MessagePack ext format family, or a CBOR tag preceeding a byte string. 
 

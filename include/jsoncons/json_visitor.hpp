@@ -178,12 +178,12 @@ namespace jsoncons {
 
         template <class Source>
         bool byte_string_value(const Source& b, 
-                               uint64_t ext_tag, 
+                               uint64_t custom_tag, 
                                const ser_context& context=ser_context(),
                                typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
             std::error_code ec;
-            bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), custom_tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -318,12 +318,12 @@ namespace jsoncons {
 
         template <class Source>
         bool byte_string_value(const Source& b, 
-                               uint64_t ext_tag, 
+                               uint64_t custom_tag, 
                                const ser_context& context,
                                std::error_code& ec,
                                typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), custom_tag, context, ec);
         }
 
         bool uint64_value(uint64_t value, 
@@ -672,7 +672,7 @@ namespace jsoncons {
                                        std::error_code& ec) = 0;
 
         virtual bool visit_byte_string(const byte_string_view& value, 
-                                       uint64_t /* ext_tag */, 
+                                       uint64_t /* custom_tag */, 
                                        const ser_context& context,
                                        std::error_code& ec) 
         {

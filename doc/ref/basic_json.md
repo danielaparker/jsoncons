@@ -164,8 +164,8 @@ Returns the allocator associated with the basic_json value.
     semantic_tag tag() const
 Returns the [semantic_tag](semantic_tag.md) associated with this value
 
-    uint64_t ext_tag() const
-If `tag()` == `semantic_tag::ext`, returns a format specific tag associated with a byte string value,
+    uint64_t custom_tag() const
+If `tag()` == `semantic_tag::custom`, returns a format specific tag associated with a byte string value,
 otherwise return 0. An example is a MessagePack `type` in the range 0-127 associated with the
 MessagePack ext format family, or a CBOR tag preceeding a byte string. 
 

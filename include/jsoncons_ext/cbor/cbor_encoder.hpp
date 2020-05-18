@@ -909,7 +909,7 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                           uint64_t ext_tag, 
+                           uint64_t custom_tag, 
                            const ser_context&,
                            std::error_code&) override
     {
@@ -920,7 +920,7 @@ private:
             if (it == bytestringref_map_.end())
             {
                 bytestringref_map_.emplace(std::make_pair(bs, next_stringref_++));
-                write_tag(ext_tag);
+                write_tag(custom_tag);
                 write_byte_string_value(bs);
             }
             else
@@ -931,7 +931,7 @@ private:
         }
         else
         {
-            write_tag(ext_tag);
+            write_tag(custom_tag);
             write_byte_string_value(b);
         }
 
