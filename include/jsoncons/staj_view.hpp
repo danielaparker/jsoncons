@@ -392,6 +392,22 @@ namespace jsoncons {
         return staj_object_view<Json,T>(cursor);
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+    template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    JSONCONS_DEPRECATED_MSG("Instead, use staj_array()")
+    staj_array_view<Json,T> make_array_iterator(basic_staj_cursor<CharT>& cursor)
+    {
+        return staj_array_view<Json,T>(cursor);
+    }
+
+    template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    JSONCONS_DEPRECATED_MSG("Instead, use staj_object()")
+    staj_object_view<Json,T> make_object_iterator(basic_staj_cursor<CharT>& cursor)
+    {
+        return staj_object_view<Json,T>(cursor);
+    }
+#endif
+
 } // namespace jsoncons
 
 #endif

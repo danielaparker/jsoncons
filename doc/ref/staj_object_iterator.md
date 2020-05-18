@@ -101,9 +101,9 @@ int main()
 {
     json_cursor cursor(example);
 
-    auto it = make_object_iterator<json>(cursor);
+    auto view = staj_object<json>(cursor);
 
-    for (const auto& kv : it)
+    for (const auto& kv : view)
     {
         std::cout << kv.first << ":\n" << pretty_print(kv.second) << "\n";
     }

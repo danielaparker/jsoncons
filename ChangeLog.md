@@ -5,6 +5,14 @@ Bug fixes:
 
 - Fixed compile error when building with Android SDK level less than 21 [\#240](https://github.com/danielaparker/jsoncons/pull/240)
 
+Changes:
+
+- The factory function `make_array_iterator()` has been replaced by
+`staj_array()`.
+
+- The factory function `make_object_iterator()` has been replaced by
+`staj_object()`.
+
 Enhancements:
 
 - Generalized `basic_json(byte_string_arg_t, ...` constructor to accomodate any contiguous byte sequence container,
