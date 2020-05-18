@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_STAJ_ITERATOR_HPP
-#define JSONCONS_STAJ_ITERATOR_HPP
+#ifndef JSONCONS_STAJ_VIEW_HPP
+#define JSONCONS_STAJ_VIEW_HPP
 
 #include <new> // placement new
 #include <memory>

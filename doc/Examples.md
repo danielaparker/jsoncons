@@ -629,7 +629,6 @@ and when positioned on a `begin_array` event, a complete array
 representing the events from `begin_array` ro `end_array`.
 
 ```c++
-#include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json.hpp> // json_decoder and json
 #include <fstream>
 
@@ -703,8 +702,7 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 #### Iterate over basic_json items
 
 ```c++
-#include <jsoncons/json_cursor.hpp>
-#include <jsoncons/json.hpp> // json_decoder and json
+#include <jsoncons/json.hpp> 
 #include <fstream>
 
 int main()
@@ -745,8 +743,7 @@ Output:
 #### Iterate over strongly typed items
 
 ```c++
-#include <jsoncons/json_cursor.hpp>
-#include <jsoncons/json.hpp> // json_decoder and json
+#include <jsoncons/json.hpp> 
 #include <fstream>
 
 namespace ns {
