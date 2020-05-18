@@ -23,6 +23,8 @@
 [Read JSON parse events](#I1)  
 [Filter the event stream](#I2)  
 [Pull nested objects into a basic_json](#I3)  
+[Iterate over basic_json items](#I4)
+[Iterate over strongly typed items](#I5)
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
@@ -692,6 +694,94 @@ begin_object
     "title": "The Comedians"
 }
 end_array
+```
+
+See [basic_json_cursor](doc/ref/basic_json_cursor.md) 
+
+<div id="I4"/> 
+
+#### Iterate over basic_json items
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json.hpp> // json_decoder and json
+#include <fstream>
+
+int main()
+{
+    std::ifstream is("book_catalog.json");
+
+    json_cursor cursor(is);
+
+    auto view = staj_array<json>(cursor);
+    for (const auto& j : view)
+    {
+        std::cout << pretty_print(j) << "\n";
+    }
+}
+```
+Output:
+```
+{
+    "author": "Haruki Murakami",
+    "date": "1993-03-02",
+    "isbn": "0679743464",
+    "price": 18.9,
+    "publisher": "Vintage",
+    "title": "Hard-Boiled Wonderland and the End of the World"
+}
+{
+    "author": "Graham Greene",
+    "date": "2005-09-21",
+    "isbn": "0099478374",
+    "price": 15.74,
+    "publisher": "Vintage Classics",
+    "title": "The Comedians"
+}
+```
+
+<div id="I5"/> 
+
+#### Iterate over strongly typed items
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json.hpp> // json_decoder and json
+#include <fstream>
+
+namespace ns {
+
+    struct book
+    {
+        std::string author;
+        std::string title;
+        std::string isbn;
+        std::string publisher;
+        std::string date;
+        double price;
+    };
+
+} // namespace ns
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,isbn,publisher,date,price);
+
+int main()
+{
+    std::ifstream is("book_catalog.json");
+
+    json_cursor cursor(is);
+
+    auto view = staj_array<ns::book>(cursor);
+    for (const auto& book : view)
+    {
+        std::cout << book.author << ", " << book.title << "\n";
+    }
+}
+```
+Output:
+```
+Haruki Murakami, Hard-Boiled Wonderland and the End of the World
+Graham Greene, The Comedians
 ```
 
 See [basic_json_cursor](doc/ref/basic_json_cursor.md) 

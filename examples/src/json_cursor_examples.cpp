@@ -9,6 +9,24 @@
 using namespace jsoncons;
 
 namespace {
+namespace ns {
+
+    struct book
+    {
+        std::string author;
+        std::string title;
+        std::string isbn;
+        std::string publisher;
+        std::string date;
+        double price;
+    };
+
+} // namespace ns
+} // namespace
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,isbn,publisher,date,price);
+
+namespace {
 
     // Example JSON text
     const std::string example = R"(
@@ -171,6 +189,28 @@ namespace {
         }
     }
 
+    void iterate_over_complete_objects1()
+    {
+        json_cursor cursor(example);
+
+        auto view = staj_array<json>(cursor);
+        for (const auto& j : view)
+        {
+            std::cout << pretty_print(j) << "\n";
+        }
+    }
+
+    void iterate_over_complete_objects2()
+    {
+        json_cursor cursor(example);
+
+        auto view = staj_array<ns::book>(cursor);
+        for (const auto& book : view)
+        {
+            std::cout << book.author << ", " << book.title << "\n";
+        }
+    }
+
 } // namespace
 
 void json_cursor_examples()
@@ -181,6 +221,8 @@ void json_cursor_examples()
     filtering_a_json_stream();
     reading_a_json_stream();
     read_nested_objects_to_basic_json();
+    iterate_over_complete_objects1();
+    iterate_over_complete_objects2();
 
     std::cout << "\n";
 }

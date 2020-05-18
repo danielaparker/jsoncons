@@ -95,7 +95,7 @@ namespace {
         std::cout << s << "\n";
     }
 
-    void as_a_stream_of_json_events()
+    void with_cursor_level_access()
     {
         // Some JSON input data
         std::string data = R"(
@@ -352,7 +352,7 @@ void readme_examples()
     playing_around();
     as_a_strongly_typed_cpp_structure();
     as_a_filtered_stream_of_json_events();
-    as_a_stream_of_json_events();
+    with_cursor_level_access();
     as_a_variant_like_structure();
     std::cout << std::endl;
 }

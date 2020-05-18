@@ -584,6 +584,10 @@ that the variant like data structure preserved with a tag, so serializing back t
 
 #### With cursor-level access
 
+A typical pull parsing application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
+
 ```c++
 int main()
 {
