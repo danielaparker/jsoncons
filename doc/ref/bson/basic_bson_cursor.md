@@ -239,16 +239,12 @@ struct author_filter
             accept_next_ = true;
             return false;
         }
-        else if (accept_next_)
+        if (accept_next_)
         {
             accept_next_ = false;
             return true;
         }
-        else
-        {
-            accept_next_ = false;
-            return false;
-        }
+        return false;
     }
 };
 
@@ -257,11 +253,12 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    bson_cursor cursor(is, filter);
+    bson_cursor cursor(is);
 
-    for (; !cursor.done(); cursor.next())
+    auto filtered_c = cursor | filter;
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:

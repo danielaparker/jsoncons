@@ -41,24 +41,64 @@ TEST_CASE("jtaj_array_view tests")
     ]
     )";
 
-    json_cursor cursor(s);
+    SECTION("test 1")
+    {
+        json_cursor cursor(s);
 
-    auto view = staj_array<json>(cursor);
+        auto view = staj_array<json>(cursor);
 
-    auto it = view.begin();
-    auto end = view.end();
+        auto it = view.begin();
+        auto end = view.end();
 
-    const auto& j1 = *it;
-    REQUIRE(j1.is_object());
-    CHECK(j1["firstName"].as<std::string>() == std::string("Tom"));
-    ++it;
-    const auto& j2 = *it;
-    CHECK(j2["firstName"].as<std::string>() == std::string("Catherine"));
-    ++it;
-    const auto& j3 = *it;
-    CHECK(j3["firstName"].as<std::string>() == std::string("William"));
-    ++it;
-    CHECK((it == end));
+        const auto& j1 = *it;
+        REQUIRE(j1.is_object());
+        CHECK(j1["firstName"].as<std::string>() == std::string("Tom"));
+        ++it;
+        const auto& j2 = *it;
+        CHECK(j2["firstName"].as<std::string>() == std::string("Catherine"));
+        ++it;
+        const auto& j3 = *it;
+        CHECK(j3["firstName"].as<std::string>() == std::string("William"));
+        ++it;
+        CHECK((it == end));
+    }
+
+    SECTION("filter test")
+    {
+        json_cursor cursor(s);
+
+        bool author_next = false;
+        auto filtered_c = cursor |
+            [&](const staj_event& event, const ser_context&) -> bool
+        {
+            if (event.event_type() == staj_event_type::key &&
+                event.get<jsoncons::string_view>() == "firstName")
+            {
+                author_next = true;
+                return false;
+            }
+            if (author_next)
+            {
+                author_next = false;
+                return true;
+            }
+            return false;
+        };
+
+        REQUIRE(!filtered_c.done());
+        CHECK(filtered_c.current().event_type() == staj_event_type::string_value);
+        CHECK(filtered_c.current().get<std::string>() == std::string("Tom"));
+        filtered_c.next();
+        REQUIRE(!filtered_c.done());
+        CHECK(filtered_c.current().event_type() == staj_event_type::string_value);
+        CHECK(filtered_c.current().get<std::string>() == std::string("Catherine"));
+        filtered_c.next();
+        REQUIRE(!filtered_c.done());
+        CHECK(filtered_c.current().event_type() == staj_event_type::string_value);
+        CHECK(filtered_c.current().get<std::string>() == std::string("William"));
+        filtered_c.next();
+        REQUIRE(filtered_c.done());
+    }
 }
 
 TEST_CASE("object_iterator test")

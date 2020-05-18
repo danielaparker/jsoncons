@@ -258,11 +258,12 @@ int main()
     std::ifstream is("book_catalog.json");
 
     author_filter filter;
-    cbor_cursor cursor(is, filter);
+    cbor_cursor cursor(is);
 
-    for (; !cursor.done(); cursor.next())
+    auto filtered_c = cursor | filter;
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:

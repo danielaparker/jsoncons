@@ -106,40 +106,32 @@ namespace {
         }
     }
 
-    struct author_filter 
-    {
-        bool accept_next_ = false;
-
-        bool operator()(const staj_event& event, const ser_context&) 
-        {
-            if (event.event_type()  == staj_event_type::key &&
-                event.get<jsoncons::string_view>() == "author")
-            {
-                accept_next_ = true;
-                return false;
-            }
-            else if (accept_next_)
-            {
-                accept_next_ = false;
-                return true;
-            }
-            else
-            {
-                accept_next_ = false;
-                return false;
-            }
-        }
-    };
-
     // Filtering the stream
     void filtering_a_json_stream()
     {
-        author_filter filter;
-        json_cursor cursor(example, filter);
+        json_cursor cursor(example);
 
-        for (; !cursor.done(); cursor.next())
+        bool author_next = false;
+        auto filtered_c = cursor |
+            [&](const staj_event& event, const ser_context&) -> bool
         {
-            const auto& event = cursor.current();
+            if (event.event_type() == staj_event_type::key &&
+                event.get<jsoncons::string_view>() == "author")
+            {
+                author_next = true;
+                return false;
+            }
+            if (author_next)
+            {
+                author_next = false;
+                return true;
+            }
+            return false;
+        };
+
+        for (; !filtered_c.done(); filtered_c.next())
+        {
+            const auto& event = filtered_c.current();
             switch (event.event_type())
             {
                 case staj_event_type::string_value:

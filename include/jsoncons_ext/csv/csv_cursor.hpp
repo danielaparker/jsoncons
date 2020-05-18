@@ -393,6 +393,13 @@ public:
         return parser_.column();
     }
 
+    friend
+    staj_filter_view<CharT> operator|(basic_csv_cursor& cursor, 
+                                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
+    {
+        return staj_filter_view<CharT>(cursor, pred);
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&)")
     void read(basic_json_visitor<CharT>& visitor) 

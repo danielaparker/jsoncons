@@ -119,7 +119,7 @@ public:
         return parser_.done();
     }
 
-    const basic_staj_event<char_type>& current() const override
+    const staj_event& current() const override
     {
         return cursor_visitor_.event();
     }
@@ -158,26 +158,6 @@ public:
         read_next(ec);
     }
 
-    void read_next(std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
-        {
-            parser_.parse(cursor_visitor_, ec);
-            if (ec) return;
-        }
-    }
-
-    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
-        {
-            parser_.parse(visitor, ec);
-            if (ec) return;
-        }
-    }
-
     const ser_context& context() const override
     {
         return *this;
@@ -198,6 +178,13 @@ public:
         return parser_.column();
     }
 
+    friend
+    staj_filter_view<char_type> operator|(basic_bson_cursor& cursor, 
+                                      std::function<bool(const staj_event&, const ser_context&)> pred)
+    {
+        return staj_filter_view<char_type>(cursor, pred);
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
     void read(basic_json_visitor<char_type>& visitor)
@@ -213,9 +200,29 @@ public:
     }
 #endif
 private:
-    static bool accept_all(const basic_staj_event<char_type>&, const ser_context&) 
+    static bool accept_all(const staj_event&, const ser_context&) 
     {
         return true;
+    }
+
+    void read_next(std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(cursor_visitor_, ec);
+            if (ec) return;
+        }
+    }
+
+    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(visitor, ec);
+            if (ec) return;
+        }
     }
 };
 

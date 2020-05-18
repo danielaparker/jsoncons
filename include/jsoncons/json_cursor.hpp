@@ -300,11 +300,6 @@ public:
         read_next(ec);
     }
 
-    static bool accept_all(const basic_staj_event<CharT>&, const ser_context&) 
-    {
-        return true;
-    }
-
     void read_buffer(std::error_code& ec)
     {
         buffer_.clear();
@@ -330,50 +325,6 @@ public:
         else
         {
             parser_.update(buffer_.data(),buffer_.size());
-        }
-    }
-
-    void read_next(std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
-        {
-            if (parser_.source_exhausted())
-            {
-                if (!source_.eof())
-                {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
-                }
-            }
-            parser_.parse_some(cursor_visitor_, ec);
-            if (ec) return;
-        }
-    }
-
-    void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
-        {
-            if (parser_.source_exhausted())
-            {
-                if (!source_.eof())
-                {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
-                }
-            }
-            parser_.parse_some(visitor, ec);
-            if (ec) return;
         }
     }
 
@@ -444,6 +395,13 @@ public:
         return parser_.column();
     }
 
+    friend
+    staj_filter_view<CharT> operator|(basic_json_cursor& cursor, 
+                                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
+    {
+        return staj_filter_view<CharT>(cursor, pred);
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&)")
     void read(basic_json_visitor<CharT>& visitor)
@@ -459,6 +417,55 @@ public:
     }
 #endif
 private:
+
+    static bool accept_all(const basic_staj_event<CharT>&, const ser_context&) 
+    {
+        return true;
+    }
+
+    void read_next(std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            if (parser_.source_exhausted())
+            {
+                if (!source_.eof())
+                {
+                    read_buffer(ec);
+                    if (ec) return;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            parser_.parse_some(cursor_visitor_, ec);
+            if (ec) return;
+        }
+    }
+
+    void read_next(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            if (parser_.source_exhausted())
+            {
+                if (!source_.eof())
+                {
+                    read_buffer(ec);
+                    if (ec) return;
+                }
+                else
+                {
+                    eof_ = true;
+                }
+            }
+            parser_.parse_some(visitor, ec);
+            if (ec) return;
+        }
+    }
 };
 
 using json_cursor = basic_json_cursor<char>;

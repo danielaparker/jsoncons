@@ -400,21 +400,20 @@ int main()
             name = ev.get<std::string>();
             return false;
         }
-        else if (name == "rated")
+        if (name == "rated")
         {
             name.clear();
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     };
 
-    json_cursor cursor(data, filter);
-    for (; !cursor.done(); cursor.next())
+    json_cursor cursor(data);
+
+    auto filtered_c = cursor | filter;
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:

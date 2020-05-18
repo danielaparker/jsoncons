@@ -219,10 +219,12 @@ int main()
         return (ev.event_type() == staj_event_type::double_value) && (ev.get<double>() < 30.0);  
     };
 
-    ubjson::ubjson_bytes_cursor cursor(data, filter);
-    for (; !cursor.done(); cursor.next())
+    ubjson::ubjson_bytes_cursor cursor(data);
+
+    auto filtered_c = cursor | filter;
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::double_value:

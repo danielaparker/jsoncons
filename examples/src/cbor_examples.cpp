@@ -531,10 +531,12 @@ namespace {
             return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
         };
 
-        cbor::cbor_bytes_cursor cursor(data, filter);
-        for (; !cursor.done(); cursor.next())
+        cbor::cbor_bytes_cursor cursor(data);
+
+        auto filtered_c = cursor | filter;
+        for (; !filtered_c.done(); filtered_c.next())
         {
-            const auto& event = cursor.current();
+            const auto& event = filtered_c.current();
             switch (event.event_type())
             {
                 case staj_event_type::string_value:

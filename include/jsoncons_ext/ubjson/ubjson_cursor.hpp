@@ -118,7 +118,7 @@ public:
         return parser_.done();
     }
 
-    const basic_staj_event<char_type>& current() const override
+    const staj_event& current() const override
     {
         return cursor_visitor_.event();
     }
@@ -177,6 +177,13 @@ public:
         return parser_.column();
     }
 
+    friend
+    staj_filter_view<char_type> operator|(basic_ubjson_cursor& cursor, 
+                                          std::function<bool(const staj_event&, const ser_context&)> pred)
+    {
+        return staj_filter_view<char_type>(cursor, pred);
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
     void read(basic_json_visitor<char_type>& visitor)
@@ -192,7 +199,7 @@ public:
     }
 #endif
 private:
-    static bool accept_all(const basic_staj_event<char_type>&, const ser_context&) 
+    static bool accept_all(const staj_event&, const ser_context&) 
     {
         return true;
     }

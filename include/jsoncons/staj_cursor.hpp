@@ -733,7 +733,7 @@ public:
     using char_type = CharT;
     using typename super_type::string_view_type;
 private:
-    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter_;
+    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred_;
     basic_staj_event<CharT> event_;
 
     staj_cursor_state state_;
@@ -742,13 +742,13 @@ private:
     std::size_t index_;
 public:
     basic_staj_visitor()
-        : filter_(accept), event_(staj_event_type::null_value),
+        : pred_(accept), event_(staj_event_type::null_value),
           state_(), data_(), shape_(), index_(0)
     {
     }
 
-    basic_staj_visitor(std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter)
-        : filter_(filter), event_(staj_event_type::null_value),
+    basic_staj_visitor(std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
+        : pred_(pred), event_(staj_event_type::null_value),
           state_(), data_(), shape_(), index_(0)
     {
     }
@@ -1047,49 +1047,49 @@ private:
     bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_object, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_end_object(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_object);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::begin_array, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_end_array(const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::end_array);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_key(const string_view_type& name, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(name, staj_event_type::key);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_null(semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(staj_event_type::null_value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_string(const string_view_type& s, semantic_tag tag, const ser_context& context, std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::string_value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_byte_string(const byte_string_view& s, 
@@ -1098,7 +1098,7 @@ private:
                            std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_byte_string(const byte_string_view& s, 
@@ -1107,7 +1107,7 @@ private:
                            std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(s, staj_event_type::byte_string_value, custom_tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_uint64(uint64_t value, 
@@ -1116,7 +1116,7 @@ private:
                          std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_int64(int64_t value, 
@@ -1125,7 +1125,7 @@ private:
                   std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_half(uint16_t value, 
@@ -1134,7 +1134,7 @@ private:
                  std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(half_arg, value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_double(double value, 
@@ -1143,7 +1143,7 @@ private:
                    std::error_code&) override
     {
         event_ = basic_staj_event<CharT>(value, tag);
-        return !filter_(event_, context);
+        return !pred_(event_, context);
     }
 
     bool visit_typed_array(const span<const uint8_t>& v, 
@@ -1357,6 +1357,74 @@ public:
     virtual void next(std::error_code& ec) = 0;
 
     virtual const ser_context& context() const = 0;
+};
+
+template<class CharT>
+class staj_filter_view : basic_staj_cursor<CharT>
+{
+    basic_staj_cursor<CharT>* cursor_;
+    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred_;
+public:
+    staj_filter_view(basic_staj_cursor<CharT>& cursor, 
+                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
+        : cursor_(std::addressof(cursor)), pred_(pred)
+    {
+        while (!done() && !pred_(current(),context()))
+        {
+            cursor_->next();
+        }
+    }
+
+    bool done() const override
+    {
+        return cursor_->done();
+    }
+
+    const basic_staj_event<CharT>& current() const override
+    {
+        return cursor_->current();
+    }
+
+    void read_to(basic_json_visitor<CharT>& visitor) override
+    {
+        cursor_->read_to(visitor);
+    }
+
+    void read_to(basic_json_visitor<CharT>& visitor,
+                 std::error_code& ec) override
+    {
+        cursor_->read_to(visitor, ec);
+    }
+
+    void next() override
+    {
+        cursor_->next();
+        while (!done() && !pred_(current(),context()))
+        {
+            cursor_->next();
+        }
+    }
+
+    void next(std::error_code& ec) override
+    {
+        cursor_->next(ec);
+        while (!done() && !pred_(current(),context()) && !ec)
+        {
+            cursor_->next(ec);
+        }
+    }
+
+    const ser_context& context() const override
+    {
+        return cursor_->context();
+    }
+
+    friend
+    staj_filter_view<CharT> operator|(staj_filter_view& cursor, 
+                                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
+    {
+        return staj_filter_view<CharT>(cursor, pred);
+    }
 };
 
 using staj_event = basic_staj_event<char>;

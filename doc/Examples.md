@@ -562,54 +562,45 @@ end_array
 #include <jsoncons/json_cursor.hpp>
 #include <fstream>
 
-// A stream filter to filter out all events except name 
-// and restrict name to "author"
-
-struct author_filter 
-{
-    bool accept_next_ = false;
-
-    bool operator()(const staj_event& event, const ser_context&) 
-    {
-        if (event.event_type()  == staj_event_type::key &&
-            event.get<jsoncons::string_view>() == "author")
-        {
-            accept_next_ = true;
-            return false;
-        }
-        else if (accept_next_)
-        {
-            accept_next_ = false;
-            return true;
-        }
-        else
-        {
-            accept_next_ = false;
-            return false;
-        }
-    }
-};
+// Filter out all events except names of authors
 
 int main()
 {
    std::ifstream is("book_catalog.json");
 
-   author_filter filter;
-   json_cursor cursor(is, filter);
+   json_cursor cursor(is);
 
-   for (; !cursor.done(); cursor.next())
-   {
-       const auto& event = cursor.current();
-       switch (event.event_type())
-       {
-           case staj_event_type::string_value:
-               std::cout << event.get<jsoncons::string_view>() << "\n";
-               break;
-           default:
-               std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
-               break;
-       }
-   }
+    bool author_next = false;
+    auto filtered_c = cursor |
+        [&](const staj_event& event, const ser_context&) -> bool
+    {
+        if (event.event_type() == staj_event_type::key &&
+            event.get<jsoncons::string_view>() == "author")
+        {
+            author_next = true;
+            return false;
+        }
+        if (author_next)
+        {
+            author_next = false;
+            return true;
+        }
+        return false;
+    };
+
+    for (; !filtered_c.done(); filtered_c.next())
+    {
+        const auto& event = filtered_c.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::string_value:
+                std::cout << event.get<jsoncons::string_view>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
+        }
+    }
 }
 ```
 Output:
