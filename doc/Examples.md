@@ -23,8 +23,8 @@
 [Read JSON parse events](#I1)  
 [Filter the event stream](#I2)  
 [Pull nested objects into a basic_json](#I3)  
-[Iterate over basic_json items](#I4)
-[Iterate over strongly typed items](#I5)
+[Iterate over basic_json items](#I4)  
+[Iterate over strongly typed items](#I5)  
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
