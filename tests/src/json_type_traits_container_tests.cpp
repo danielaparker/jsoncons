@@ -413,3 +413,83 @@ TEST_CASE("map with integer key")
         CHECK(other_j["2"] == 2);
     }
 }
+
+namespace {
+namespace ns {
+
+    enum class MyCriterionType{
+		First,
+		Presentation = First,
+		MessageType,
+		Version,
+		Release,
+		Last
+	};
+
+    template <typename E>
+    class TCriterion
+    {
+    public:
+    	TCriterion() = default;
+    	TCriterion(E iType, std::string iVal) : _type(iType), _value(iVal) {}
+
+    	const std::string& getValue() const {
+    		return _value;
+    	}
+
+    	const E getType() const {
+    		return _type;
+    	}
+
+    protected:
+    	JSONCONS_TYPE_TRAITS_FRIEND;
+    	E _type;
+    	std::string _value;
+    };
+
+	struct EnumClassHash {
+		template<typename T>
+		std::size_t operator()(T t) const{
+			return static_cast<std::size_t>(t);
+		}
+	};//To be able to use the enum class as key
+
+    template <typename E>
+    class TCriteria
+    {
+    public:
+    	TCriteria() = default;
+
+    	const std::unordered_map <E, TCriterion<E>>& getCriteriaMap() const {
+    		return _criteriaMap;
+    	}
+
+    protected:
+    	JSONCONS_TYPE_TRAITS_FRIEND;
+    	std::unordered_map<E, TCriterion<E>, EnumClassHash> _criteriaMap;
+    };
+
+} // ns
+} // namespace
+
+JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(1,ns::TCriterion, (_type,"name"), (_value,"value"))
+JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(1, ns::TCriteria, (_criteriaMap, "criteriaList"))
+JSONCONS_ENUM_NAME_TRAITS(ns::MyCriterionType,(First,"first"),(MessageType,"message-type"),(Version,"version"),(Release,"release"),(Last,"last"))
+
+TEST_CASE("map with enum key")
+{
+    SECTION("test 1")
+    {
+        ns::TCriterion<ns::MyCriterionType> criterion(ns::MyCriterionType::MessageType,"foo");
+
+        std::string buffer;
+        encode_json(criterion, buffer, indenting::indent);
+        std::cout << buffer << "\n";
+
+        auto val = decode_json<ns::TCriterion<ns::MyCriterionType>>(buffer);
+
+        CHECK(val.getValue() == std::string("foo"));
+        CHECK(val.getType() == ns::MyCriterionType::MessageType);
+
+    }
+}
