@@ -74,7 +74,7 @@ void staj_object_iterator_example()
 {
     json_cursor cursor(object_example);
 
-    auto view = staj_object<json>(cursor);
+    auto view = staj_object<std::string,json>(cursor);
 
     for (const auto& kv : view)
     {

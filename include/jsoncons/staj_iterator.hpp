@@ -21,15 +21,15 @@
 
 namespace jsoncons {
 
-    template <class Json,class T=Json>
+    template <class T, class Json>
     class staj_array_view;
 
-    template<class Json, class T>
+    template<class T, class Json>
     class staj_array_iterator
     {
         using char_type = typename Json::char_type;
 
-        staj_array_view<Json, T>* view_;
+        staj_array_view<T, Json>* view_;
     public:
         using value_type = T;
         using difference_type = std::ptrdiff_t;
@@ -42,7 +42,7 @@ namespace jsoncons {
         {
         }
 
-        staj_array_iterator(staj_array_view<Json, T>& view)
+        staj_array_iterator(staj_array_view<T, Json>& view)
             : view_(std::addressof(view))
         {
             if (view_->cursor_->current().event_type() == staj_event_type::begin_array)
@@ -55,7 +55,7 @@ namespace jsoncons {
             }
         }
 
-        staj_array_iterator(staj_array_view<Json, T>& view,
+        staj_array_iterator(staj_array_view<T, Json>& view,
                             std::error_code& ec)
             : view_(std::addressof(view))
         {
@@ -104,14 +104,14 @@ namespace jsoncons {
             return temp;
         }
 
-        friend bool operator==(const staj_array_iterator<Json,T>& a, const staj_array_iterator<Json,T>& b)
+        friend bool operator==(const staj_array_iterator& a, const staj_array_iterator& b)
         {
             return (!a.view_ && !b.view_)
                 || (!a.view_ && b.done())
                 || (!b.view_ && a.done());
         }
 
-        friend bool operator!=(const staj_array_iterator<Json,T>& a, const staj_array_iterator<Json,T>& b)
+        friend bool operator!=(const staj_array_iterator& a, const staj_array_iterator& b)
         {
             return !(a == b);
         }
@@ -162,15 +162,15 @@ namespace jsoncons {
         }
     };
 
-    template <class Json,class T=Json>
+    template <class Key,class Json,class T=Json>
     class staj_object_view;
 
-    template <class Json, class T=Json>
+    template <class Key, class T, class Json>
     class staj_object_iterator
     {
         using char_type = typename Json::char_type;
 
-        staj_object_view<Json, T>* view_;
+        staj_object_view<Key, T, Json>* view_;
     public:
         using key_type = std::basic_string<char_type>;
         using value_type = std::pair<key_type,T>;
@@ -186,7 +186,7 @@ namespace jsoncons {
         {
         }
 
-        staj_object_iterator(staj_object_view<Json, T>& view)
+        staj_object_iterator(staj_object_view<Key, T, Json>& view)
             : view_(std::addressof(view))
         {
             if (view_->cursor_->current().event_type() == staj_event_type::begin_object)
@@ -199,7 +199,7 @@ namespace jsoncons {
             }
         }
 
-        staj_object_iterator(staj_object_view<Json, T>& view, 
+        staj_object_iterator(staj_object_view<Key, T, Json>& view, 
                              std::error_code& ec)
             : view_(std::addressof(view))
         {
@@ -251,14 +251,14 @@ namespace jsoncons {
             return temp;
         }
 
-        friend bool operator==(const staj_object_iterator<Json,T>& a, const staj_object_iterator<Json,T>& b)
+        friend bool operator==(const staj_object_iterator& a, const staj_object_iterator& b)
         {
             return (!a.view_ && !b.view_)
                    || (!a.view_ && b.done())
                    || (!b.view_ && a.done());
         }
 
-        friend bool operator!=(const staj_object_iterator<Json,T>& a, const staj_object_iterator<Json,T>& b)
+        friend bool operator!=(const staj_object_iterator& a, const staj_object_iterator& b)
         {
             return !(a == b);
         }
@@ -320,13 +320,13 @@ namespace jsoncons {
 
     // staj_array_view
 
-    template <class Json,class T>
+    template <class T, class Json>
     class staj_array_view
     {
-        friend class staj_array_iterator<Json,T>;
+        friend class staj_array_iterator<T, Json>;
     public:
         using char_type = typename Json::char_type;
-        using iterator = staj_array_iterator<Json,T>;
+        using iterator = staj_array_iterator<T, Json>;
     private:
         basic_staj_cursor<char_type>* cursor_;
         json_decoder<Json> decoder_;
@@ -339,24 +339,24 @@ namespace jsoncons {
 
         iterator begin()
         {
-            return staj_array_iterator<Json,T>(*this);
+            return staj_array_iterator<T, Json>(*this);
         }
 
         iterator end()
         {
-            return staj_array_iterator<Json,T>();
+            return staj_array_iterator<T, Json>();
         }
     };
 
     // staj_object_view
 
-    template <class Json,class T>
+    template <class Key, class T, class Json>
     class staj_object_view
     {
-        friend class staj_object_iterator<Json,T>;
+        friend class staj_object_iterator<Key,T,Json>;
     public:
         using char_type = typename Json::char_type;
-        using iterator = staj_object_iterator<Json,T>;
+        using iterator = staj_object_iterator<Key,T,Json>;
         using key_type = std::basic_string<char_type>;
         using value_type = std::pair<key_type,T>;
     private:
@@ -371,40 +371,40 @@ namespace jsoncons {
 
         iterator begin()
         {
-            return staj_object_iterator<Json,T>(*this);
+            return staj_object_iterator<Key,T,Json>(*this);
         }
 
         iterator end()
         {
-            return staj_object_iterator<Json,T>();
+            return staj_object_iterator<Key,T,Json>();
         }
     };
 
     template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
-    staj_array_view<Json,T> staj_array(basic_staj_cursor<CharT>& cursor)
+    staj_array_view<T, Json> staj_array(basic_staj_cursor<CharT>& cursor)
     {
-        return staj_array_view<Json,T>(cursor);
+        return staj_array_view<T, Json>(cursor);
     }
 
-    template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
-    staj_object_view<Json,T> staj_object(basic_staj_cursor<CharT>& cursor)
+    template <class Key, class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
+    staj_object_view<Key, T, Json> staj_object(basic_staj_cursor<CharT>& cursor)
     {
-        return staj_object_view<Json,T>(cursor);
+        return staj_object_view<Key, T, Json>(cursor);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
     template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
     JSONCONS_DEPRECATED_MSG("Instead, use staj_array()")
-    staj_array_view<Json,T> make_array_iterator(basic_staj_cursor<CharT>& cursor)
+    staj_array_view<T, Json> make_array_iterator(basic_staj_cursor<CharT>& cursor)
     {
-        return staj_array_view<Json,T>(cursor);
+        return staj_array_view<T, Json>(cursor);
     }
 
     template <class T, class CharT, class Json=typename std::conditional<is_basic_json<T>::value,T,basic_json<CharT>>::type>
     JSONCONS_DEPRECATED_MSG("Instead, use staj_object()")
-    staj_object_view<Json,T> make_object_iterator(basic_staj_cursor<CharT>& cursor)
+    staj_object_view<std::basic_string<CharT>, T, Json> make_object_iterator(basic_staj_cursor<CharT>& cursor)
     {
-        return staj_object_view<Json,T>(cursor);
+        return staj_object_view<std::basic_string<CharT>, T, Json>(cursor);
     }
 #endif
 

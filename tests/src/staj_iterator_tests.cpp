@@ -116,7 +116,7 @@ TEST_CASE("object_iterator test")
     {
         std::istringstream is(s);
         json_cursor cursor(is);
-        auto view = staj_object<json>(cursor);
+        auto view = staj_object<std::string,json>(cursor);
 
         auto it = view.begin();
         auto end = view.end();
