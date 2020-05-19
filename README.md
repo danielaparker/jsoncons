@@ -43,6 +43,8 @@ _"I am so happy I have come across your json c++ library!"_
 
 _"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript ... it's a great library"_
 
+_"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
+
 _"this software is great and the ability to have an xpath like facility is so useful"_
 
 _"I think this is the closest
@@ -312,6 +314,10 @@ See [examples](doc/Examples.md#G0) for other ways of specializing `json_type_tra
 
 #### With cursor-level access
 
+A typical pull parsing application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
+
 ```c++
 int main()
 {
@@ -387,7 +393,7 @@ end_array
 end_object
 ```
 
-You can apply a filter to the stream, for example,
+You can apply a filter to the stream using the pipe syntax, for example,
 
 ```c++
 int main()
@@ -658,7 +664,7 @@ end_array (n/a)
 end_array (n/a)
 ```
 
-You can apply a filter to the stream, for example,
+You can apply a filter to the stream using the pipe syntax, for example,
 
 ```c++
 int main()
