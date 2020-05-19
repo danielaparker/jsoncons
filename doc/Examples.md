@@ -557,7 +557,7 @@ end_array
 
 #### Filter the event stream
 
-You can apply a filter to the stream using the pipe syntax.
+You can apply a filter to a cursor using the pipe syntax.
 
 ```c++
 

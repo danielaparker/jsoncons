@@ -393,7 +393,7 @@ end_array
 end_object
 ```
 
-You can apply a filter to the stream using the pipe syntax, for example,
+You can apply a filter to a cursor using the pipe syntax, for example,
 
 ```c++
 int main()
@@ -664,7 +664,7 @@ end_array (n/a)
 end_array (n/a)
 ```
 
-You can apply a filter to the stream using the pipe syntax, for example,
+You can apply a filter to a cursor using the pipe syntax, for example,
 
 ```c++
 int main()
