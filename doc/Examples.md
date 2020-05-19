@@ -557,6 +557,8 @@ end_array
 
 #### Filter the event stream
 
+You can apply a filter to the stream using the pipe syntax.
+
 ```c++
 
 #include <jsoncons/json_cursor.hpp>
