@@ -1338,16 +1338,6 @@ public:
                     }
                     break;
                 case storage_kind::short_string_value:
-                    switch (rhs.storage())
-                    {
-                        case storage_kind::short_string_value:
-                            return as_string_view() == rhs.as_string_view();
-                        case storage_kind::long_string_value:
-                            return as_string_view() == rhs.as_string_view();
-                        default:
-                            return false;
-                    }
-                    break;
                 case storage_kind::long_string_value:
                     switch (rhs.storage())
                     {
@@ -1471,16 +1461,6 @@ public:
                     }
                     break;
                 case storage_kind::short_string_value:
-                    switch (rhs.storage())
-                    {
-                        case storage_kind::short_string_value:
-                            return as_string_view() < rhs.as_string_view();
-                        case storage_kind::long_string_value:
-                            return as_string_view() < rhs.as_string_view();
-                        default:
-                            return (int)storage() < (int)rhs.storage();
-                    }
-                    break;
                 case storage_kind::long_string_value:
                     switch (rhs.storage())
                     {
