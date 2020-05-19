@@ -349,6 +349,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_json_cursor(Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
@@ -371,6 +372,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_json_cursor(Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
@@ -399,6 +401,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_json_cursor(Source&& source,
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       std::error_code& ec)
@@ -411,6 +414,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_json_cursor(Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options,
@@ -424,6 +428,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_json_cursor(Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options,
@@ -439,6 +444,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
                       Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
@@ -462,6 +468,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
                       Source&& source, 
                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,

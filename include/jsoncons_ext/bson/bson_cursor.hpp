@@ -170,6 +170,7 @@ public:
 #if !defined(JSONCONS_NO_DEPRECATED)
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
                       std::error_code& ec)
@@ -179,6 +180,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_bson_cursor(Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
                       const bson_decode_options& options = bson_decode_options(),
@@ -194,6 +196,7 @@ public:
     }
 
     template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter, 
