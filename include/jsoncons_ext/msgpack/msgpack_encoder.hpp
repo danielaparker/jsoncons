@@ -348,7 +348,7 @@ namespace msgpack {
         }
 
         bool visit_byte_string(const byte_string_view& b, 
-                               uint64_t custom_tag, 
+                               uint64_t ext_tag, 
                                const ser_context&,
                                std::error_code&) override
         {
@@ -357,42 +357,42 @@ namespace msgpack {
             {
                 case 1:
                     sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext1_cd);
-                    sink_.push_back(static_cast<uint8_t>(custom_tag));
+                    sink_.push_back(static_cast<uint8_t>(ext_tag));
                     break;
                 case 2:
                     sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext2_cd);
-                    sink_.push_back(static_cast<uint8_t>(custom_tag));
+                    sink_.push_back(static_cast<uint8_t>(ext_tag));
                     break;
                 case 4:
                     sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext4_cd);
-                    sink_.push_back(static_cast<uint8_t>(custom_tag));
+                    sink_.push_back(static_cast<uint8_t>(ext_tag));
                     break;
                 case 8:
                     sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext8_cd);
-                    sink_.push_back(static_cast<uint8_t>(custom_tag));
+                    sink_.push_back(static_cast<uint8_t>(ext_tag));
                     break;
                 case 16:
                     sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext16_cd);
-                    sink_.push_back(static_cast<uint8_t>(custom_tag));
+                    sink_.push_back(static_cast<uint8_t>(ext_tag));
                     break;
                 default:
                     if (length <= (std::numeric_limits<uint8_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext8_cd);
                         sink_.push_back(static_cast<uint8_t>(length));
-                        sink_.push_back(static_cast<uint8_t>(custom_tag));
+                        sink_.push_back(static_cast<uint8_t>(ext_tag));
                     }
                     else if (length <= (std::numeric_limits<uint16_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext16_cd);
                         jsoncons::detail::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
-                        sink_.push_back(static_cast<uint8_t>(custom_tag));
+                        sink_.push_back(static_cast<uint8_t>(ext_tag));
                     }
                     else if (length <= (std::numeric_limits<uint32_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext32_cd);
                         jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
-                        sink_.push_back(static_cast<uint8_t>(custom_tag));
+                        sink_.push_back(static_cast<uint8_t>(ext_tag));
                     }
                     break;
             }

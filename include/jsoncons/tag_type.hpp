@@ -75,7 +75,7 @@ enum class semantic_tag : uint8_t
     clamped = 0x0b,
     multi_dim_row_major = 0x0c,
     multi_dim_column_major = 0x0d,
-    custom = 0x0e
+    ext = 0x0e
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec
@@ -175,7 +175,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
             os << multi_dim_column_major_name;
             break;
         }
-        case semantic_tag::custom:
+        case semantic_tag::ext:
         {
             os << ext_name;
             break;

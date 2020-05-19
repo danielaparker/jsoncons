@@ -611,9 +611,9 @@ public:
             jsoncons::detail::tagged_string_wrapper<uint8_t,Allocator> s_;
         public:
 
-            byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t custom_tag, const Allocator& alloc)
+            byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t ext_tag, const Allocator& alloc)
                 : ext_type_(from_storage_and_tag(storage_kind::byte_string_value, tag)),
-                  s_(data, length, custom_tag, alloc)
+                  s_(data, length, ext_tag, alloc)
             {
             }
 
@@ -653,7 +653,7 @@ public:
                 return s_.length();
             }
 
-            uint64_t custom_tag() const
+            uint64_t ext_tag() const
             {
                 return s_.tag();
             }
@@ -930,9 +930,9 @@ public:
             construct_var<byte_string_storage>(tag, bytes.data(), bytes.size(), 0, alloc);
         }
 
-        variant(byte_string_arg_t, const span<const uint8_t>& bytes, uint64_t custom_tag, const Allocator& alloc)
+        variant(byte_string_arg_t, const span<const uint8_t>& bytes, uint64_t ext_tag, const Allocator& alloc)
         {
-            construct_var<byte_string_storage>(semantic_tag::custom, bytes.data(), bytes.size(), custom_tag, alloc);
+            construct_var<byte_string_storage>(semantic_tag::ext, bytes.data(), bytes.size(), ext_tag, alloc);
         }
 
         variant(const object& val, semantic_tag tag)
@@ -1902,9 +1902,9 @@ public:
             return evaluate().get_allocator();
         }
 
-        uint64_t custom_tag() const
+        uint64_t ext_tag() const
         {
-            return evaluate().custom_tag();
+            return evaluate().ext_tag();
         }
 
         bool contains(const string_view_type& key) const noexcept
@@ -3217,10 +3217,10 @@ public:
 
     template <class Source>
     basic_json(byte_string_arg_t, const Source& source, 
-               uint64_t custom_tag,
+               uint64_t ext_tag,
                const Allocator& alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
-        : var_(byte_string_arg, span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size()), custom_tag, alloc)
+        : var_(byte_string_arg, span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size()), ext_tag, alloc)
     {
     }
 
@@ -3508,13 +3508,13 @@ public:
         }
     }
 
-    uint64_t custom_tag() const
+    uint64_t ext_tag() const
     {
         switch (var_.storage())
         {
             case storage_kind::byte_string_value:
             {
-                return var_.template cast<typename variant::byte_string_storage>().custom_tag();
+                return var_.template cast<typename variant::byte_string_storage>().ext_tag();
             }
             default:
                 return 0;
@@ -5434,9 +5434,9 @@ private:
                 visitor.string_value(as_string_view(), var_.tag(), context, ec);
                 break;
             case storage_kind::byte_string_value:
-                if (var_.tag() == semantic_tag::custom)
+                if (var_.tag() == semantic_tag::ext)
                 {
-                    visitor.byte_string_value(as_byte_string_view(), custom_tag(), context, ec);
+                    visitor.byte_string_value(as_byte_string_view(), ext_tag(), context, ec);
                 }
                 else
                 {

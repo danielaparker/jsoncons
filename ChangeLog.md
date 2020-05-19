@@ -37,11 +37,11 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 MessagePack types associated with the MessagePack ext family and CBOR tags preceding a byte string
 that are not mapped into a generic `semantic_tag` are now preserved. 
 
-- If in `basic_json` `tag()` == `semantic_tag::custom`, the function `custom_tag()` will return a format 
+- If in `basic_json` `tag()` == `semantic_tag::ext`, the function `ext_tag()` will return a format 
 specific tag associated with a byte string value. 
 
 - The `basic_json` constructor with parameter `byte_string_arg_t` now allows constructing a byte string
-associated with a custom tag.  
+associated with a format specific tag.  
 
 v0.151.1
 --------
