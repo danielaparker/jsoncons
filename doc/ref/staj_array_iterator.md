@@ -1,7 +1,7 @@
 ### jsoncons::staj_array_iterator
 
 ```c++
-#include <jsoncons/staj_view.hpp>
+#include <jsoncons/staj_iterator.hpp>
 
 template<
     class Json, 

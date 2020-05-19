@@ -7,11 +7,15 @@ Bug fixes:
 
 Changes:
 
-- The factory function `make_array_iterator()` has been replaced by
-`staj_array()`.
+- The factory function `make_array_iterator()` has been replaced by `staj_array()`.
 
-- The factory function `make_object_iterator()` has been replaced by
-`staj_object()`.
+- The factory function `make_object_iterator()` has been replaced by `staj_object()`.
+
+- The constructors for `json_cursor`, `csv_cursor`, `bson_cursor`, `cbor_cursor`, `msgpack_cursor`, and `ubjson_cursor`
+that take a filter argument have been deprecated. Instead filters may be applied to a cursor using the pipe syntax, e.g.
+
+    json_cursor cursor(is);
+    auto filtered_c = cursor | filter1 | filter2;
 
 Enhancements:
 

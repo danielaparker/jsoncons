@@ -243,7 +243,7 @@ using namespace jsoncons;
 int main()
 {
     bool author_next = false;
-    auto pred = [&](const staj_event& event, const ser_context&) -> bool
+    auto filter = [&](const staj_event& event, const ser_context&) -> bool
     {
         if (event.event_type() == staj_event_type::key &&
             event.get<jsoncons::string_view>() == "author")
@@ -262,7 +262,7 @@ int main()
     std::ifstream is("book_catalog.json");
 
     json_cursor cursor(is);
-    auto filtered_c = cursor | pred;
+    auto filtered_c = cursor | filter;
 
     for (; !filtered_c.done(); filtered_c.next())
     {

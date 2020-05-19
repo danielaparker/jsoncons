@@ -3,7 +3,7 @@
 
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_cursor.hpp>
-#include <jsoncons/staj_view.hpp>
+#include <jsoncons/staj_iterator.hpp>
 #include <string>
 #include <sstream>
 #include "sample_types.hpp"

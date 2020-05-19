@@ -393,7 +393,7 @@ You can apply a filter to the stream, for example,
 int main()
 {
     std::string name;
-    auto pred = [&](const staj_event& ev, const ser_context&) -> bool
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
     {
         if (ev.event_type() == staj_event_type::key)
         {
@@ -409,7 +409,7 @@ int main()
     };
 
     json_cursor cursor(data);
-    auto filtered_c = cursor | pred;
+    auto filtered_c = cursor | filter;
 
     for (; !filtered_c.done(); filtered_c.next())
     {
@@ -663,13 +663,13 @@ You can apply a filter to the stream, for example,
 ```c++
 int main()
 {
-    auto pred = [&](const staj_event& ev, const ser_context&) -> bool
+    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
     {
         return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
     };
 
     cbor::cbor_bytes_cursor cursor(data);
-    auto filtered_c = cursor | pred;
+    auto filtered_c = cursor | filter;
 
     for (; !filtered_c.done(); filtered_c.next())
     {
