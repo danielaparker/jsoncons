@@ -35,31 +35,28 @@ ubjson_bytes_cursor   |basic_ubjson_cursor<jsoncons::bytes_source>
 
     template <class Source>
     basic_ubjson_cursor(Source&& source,
-                        const Allocator& alloc = Allocator()); // (1)
+                      const ubjson_decode_options& options = ubjson_decode_options(),
+                      const Allocator& alloc = Allocator()); // (1)
 
     template <class Source>
-    basic_ubjson_cursor(Source&& source,
-                        std::function<bool(const staj_event&, const ser_context&)> filter,
-                        const Allocator& alloc = Allocator()); // (2)
+    basic_ubjson_cursor(Source&& source, 
+                        std::error_code& ec); // (2)
 
     template <class Source>
-    basic_ubjson_cursor(Source&& source, std::error_code& ec); // (3)
-
-    template <class Source>
-    basic_ubjson_cursor(Source&& source,
-                        std::function<bool(const staj_event&, const ser_context&)> filter, 
-                        std::error_code& ec); // (4)
+    basic_ubjson_cursor(Source&& source, 
+                        const ubjson_decode_options& options,
+                        std::error_code& ec); // (3)
 
     template <class Source>
     basic_ubjson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                         Source&& source,
-                        std::function<bool(const staj_event&, const ser_context&)> filter,
-                        std::error_code& ec); // (5)
+                        const ubjson_decode_options& options,
+                        std::error_code& ec); // (4)
 
-Constructors (1)-(2) read from a buffer or stream source and throw a 
+Constructor (1) reads from a buffer or stream source and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
-Constructors (3)-(5) read from a buffer or stream source and set `ec`
+Constructors (2)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_ubjson_cursor` does not outlive any source passed in the constuctor, 
@@ -96,6 +93,12 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const ser_context& context() const override;
 Returns the current [context](ser_context.md)
+
+#### Non-member functions
+
+   template <class Src, class Allocator>
+   staj_filter_view<char> operator|(basic_ubjson_cursor<Src,Allocator>& cursor, 
+                                    std::function<bool(const staj_event&, const ser_context&)> pred);
 
 ### See also
 

@@ -46,33 +46,11 @@ public:
 
     template <class Source>
     basic_bson_cursor(Source&& source,
-                      const Allocator& alloc = Allocator())
-       : basic_bson_cursor(std::forward<Source>(source), 
-                           accept_all,
-                           bson_decode_options(),
-                           alloc)
-    {
-    }
-
-    template <class Source>
-    basic_bson_cursor(Source&& source,
-                      const bson_decode_options& options,
-                      const Allocator& alloc = Allocator())
-       : basic_bson_cursor(std::forward<Source>(source), 
-                           accept_all,
-                           options,
-                           alloc)
-    {
-    }
-
-    template <class Source>
-    basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
                       const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), options, alloc), 
-         cursor_visitor_(filter), 
-         eof_(false)
+        : parser_(std::forward<Source>(source), options, alloc), 
+          cursor_visitor_(accept_all),
+          eof_(false)
     {
         if (!done())
         {
@@ -86,26 +64,30 @@ public:
     basic_bson_cursor(Source&& source,
                       std::error_code& ec)
         : basic_bson_cursor(std::allocator_arg, Allocator(),
-                            std::forward<Source>(source), accept_all, ec)
+                            std::forward<Source>(source), 
+                            bson_decode_options(), 
+                            ec)
     {
     }
 
     template <class Source>
     basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const bson_decode_options& options,
                       std::error_code& ec)
-       : basic_bson_cursor(std::allocator_arg, Allocator(), 
-                           std::forward<Source>(source), filter, ec)
+        : basic_bson_cursor(std::allocator_arg, Allocator(),
+                            std::forward<Source>(source), 
+                            options, 
+                            ec)
     {
     }
 
     template <class Source>
     basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
+                      const bson_decode_options& options,
                       std::error_code& ec)
-       : parser_(std::forward<Source>(source),alloc), 
-         cursor_visitor_(filter),
+       : parser_(std::forward<Source>(source), alloc, options), 
+         cursor_visitor_(accept_all),
          eof_(false)
     {
         if (!done())
@@ -186,6 +168,46 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
+
+    template <class Source>
+    basic_bson_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      std::error_code& ec)
+       : basic_bson_cursor(std::allocator_arg, Allocator(), 
+                           std::forward<Source>(source), filter, ec)
+    {
+    }
+
+    template <class Source>
+    basic_bson_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const bson_decode_options& options = bson_decode_options(),
+                      const Allocator& alloc = Allocator())
+       : parser_(std::forward<Source>(source), options, alloc), 
+         cursor_visitor_(filter), 
+         eof_(false)
+    {
+        if (!done())
+        {
+            next();
+        }
+    }
+
+    template <class Source>
+    basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
+                      Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter, 
+                      std::error_code& ec)
+       : parser_(std::forward<Source>(source),alloc), 
+         cursor_visitor_(filter),
+         eof_(false)
+    {
+        if (!done())
+        {
+            next(ec);
+        }
+    }
+
     JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
     void read(basic_json_visitor<char_type>& visitor)
     {

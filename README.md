@@ -393,7 +393,7 @@ You can apply a filter to the stream, for example,
 int main()
 {
     std::string name;
-    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    auto pred = [&](const staj_event& ev, const ser_context&) -> bool
     {
         if (ev.event_type() == staj_event_type::key)
         {
@@ -409,15 +409,15 @@ int main()
     };
 
     json_cursor cursor(data);
+    auto filtered_c = cursor | pred;
 
-    auto filtered_c = cursor | filter;
     for (; !filtered_c.done(); filtered_c.next())
     {
         const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:
-                // Or std::string_view, if supported
+                // Or std::string_view, if C++17
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
             default:
@@ -663,15 +663,17 @@ You can apply a filter to the stream, for example,
 ```c++
 int main()
 {
-    auto filter = [&](const staj_event& ev, const ser_context&) -> bool
+    auto pred = [&](const staj_event& ev, const ser_context&) -> bool
     {
         return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
     };
 
-    cbor::cbor_bytes_cursor cursor(data, filter);
-    for (; !cursor.done(); cursor.next())
+    cbor::cbor_bytes_cursor cursor(data);
+    auto filtered_c = cursor | pred;
+
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:

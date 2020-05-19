@@ -109,11 +109,8 @@ namespace {
     // Filtering the stream
     void filtering_a_json_stream()
     {
-        json_cursor cursor(example);
-
         bool author_next = false;
-        auto filtered_c = cursor |
-            [&](const staj_event& event, const ser_context&) -> bool
+        auto pred = [&](const staj_event& event, const ser_context&) -> bool
         {
             if (event.event_type() == staj_event_type::key &&
                 event.get<jsoncons::string_view>() == "author")
@@ -128,6 +125,9 @@ namespace {
             }
             return false;
         };
+
+        json_cursor cursor(example);
+        auto filtered_c = cursor | pred;
 
         for (; !filtered_c.done(); filtered_c.next())
         {

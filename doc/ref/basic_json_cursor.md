@@ -40,7 +40,8 @@ wjson_cursor    |`basic_json_cursor<wchar_t>`
                       const Allocator& alloc = Allocator()); // (1)
 
     template <class Source>
-    basic_json_cursor(Source&& source, std::error_code& ec); // (2)
+    basic_json_cursor(Source&& source, 
+                      std::error_code& ec); // (2)
 
     template <class Source>
     basic_json_cursor(Source&& source, 
@@ -53,9 +54,16 @@ wjson_cursor    |`basic_json_cursor<wchar_t>`
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec) // (4)
 
+    template <class Source>
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
+                      Source&& source, 
+                      const basic_json_decode_options<CharT>& options,
+                      std::function<bool(json_errc,const ser_context&)> err_handler,
+                      std::error_code& ec); // (5)
+
 Constructor (1) reads from a character sequence or stream and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
-Constructors (2)-(4) read from a character sequence or stream and set `ec`
+Constructors (2)-(5) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive the source, 
@@ -95,6 +103,12 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const ser_context& context() const override;
 Returns the current [context](ser_context.md)
+
+#### Non-member functions
+
+   template <class CharT, class Src, class Allocator>
+   staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Src,Allocator>& cursor, 
+                                    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 
 ### Examples
 
@@ -228,13 +242,8 @@ using namespace jsoncons;
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
-
-    json_cursor cursor(is);
-
     bool author_next = false;
-    auto filtered_c = cursor |
-        [&](const staj_event& event, const ser_context&) -> bool
+    auto pred = [&](const staj_event& event, const ser_context&) -> bool
     {
         if (event.event_type() == staj_event_type::key &&
             event.get<jsoncons::string_view>() == "author")
@@ -249,6 +258,11 @@ int main()
         }
         return false;
     };
+
+    std::ifstream is("book_catalog.json");
+
+    json_cursor cursor(is);
+    auto filtered_c = cursor | pred;
 
     for (; !filtered_c.done(); filtered_c.next())
     {

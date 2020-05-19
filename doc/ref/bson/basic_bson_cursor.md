@@ -35,31 +35,28 @@ bson_bytes_cursor   |basic_bson_cursor<jsoncons::bytes_source>
 
     template <class Source>
     basic_bson_cursor(Source&& source,
+                      const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator()); // (1)
 
     template <class Source>
-    basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
-                      const Allocator& alloc = Allocator()); // (2)
-
-    template <class Source>
-    basic_bson_cursor(Source&& source, std::error_code& ec); // (3)
+    basic_bson_cursor(Source&& source, 
+                      std::error_code& ec); // (2)
 
     template <class Source>
     basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
-                      std::error_code& ec); // (4)
+                      const bson_decode_options& options,
+                      std::error_code& ec); // (3)
 
     template <class Source>
     basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
-                      std::error_code& ec); // (5)
+                      const bson_decode_options& options,
+                      std::error_code& ec); // (4)
 
-Constructors (1)-(2) read from a buffer or stream source and throw a 
+Constructors (1) reads from a buffer or stream source and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
-Constructors (3)-(5) read from a buffer or stream source and set `ec`
+Constructors (2)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_bson_cursor` does not outlive any source passed in the constuctor, 
@@ -96,6 +93,12 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const ser_context& context() const override;
 Returns the current [context](ser_context.md)
+
+#### Non-member functions
+
+   template <class Src, class Allocator>
+   staj_filter_view<char> operator|(basic_bson_cursor<Src,Allocator>& cursor, 
+                                    std::function<bool(const staj_event&, const ser_context&)> pred);
 
 ### Examples
 
@@ -227,35 +230,30 @@ end_array
 
 using namespace jsoncons;
 
-struct author_filter 
+int main()
 {
-    bool accept_next_ = false;
-
-    bool operator()(const staj_event& event, const ser_context&) 
+    bool author_next = false;
+    auto pred = [&](const staj_event& event, const ser_context&) -> bool
     {
-        if (event.event_type()  == staj_event_type::key &&
+        if (event.event_type() == staj_event_type::key &&
             event.get<jsoncons::string_view>() == "author")
         {
-            accept_next_ = true;
+            author_next = true;
             return false;
         }
-        if (accept_next_)
+        if (author_next)
         {
-            accept_next_ = false;
+            author_next = false;
             return true;
         }
         return false;
-    }
-};
+    };
 
-int main()
-{
     std::ifstream is("book_catalog.json");
 
-    author_filter filter;
     bson_cursor cursor(is);
+    auto filtered_c = cursor | pred;
 
-    auto filtered_c = cursor | filter;
     for (; !filtered_c.done(); filtered_c.next())
     {
         const auto& event = filtered_c.current();

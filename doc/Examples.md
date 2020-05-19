@@ -566,13 +566,8 @@ end_array
 
 int main()
 {
-   std::ifstream is("book_catalog.json");
-
-   json_cursor cursor(is);
-
     bool author_next = false;
-    auto filtered_c = cursor |
-        [&](const staj_event& event, const ser_context&) -> bool
+    auto pred = [&](const staj_event& event, const ser_context&) -> bool
     {
         if (event.event_type() == staj_event_type::key &&
             event.get<jsoncons::string_view>() == "author")
@@ -587,6 +582,11 @@ int main()
         }
         return false;
     };
+
+   std::ifstream is("book_catalog.json");
+
+   json_cursor cursor(is);
+    auto filtered_c = cursor | pred;
 
     for (; !filtered_c.done(); filtered_c.next())
     {
