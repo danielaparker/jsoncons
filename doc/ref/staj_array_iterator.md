@@ -4,8 +4,9 @@
 #include <jsoncons/staj_iterator.hpp>
 
 template<
-    class Json, 
-    class T=Json>
+    class T,
+    class Json
+    >
 class staj_array_iterator
 ```
 
@@ -30,9 +31,9 @@ Member type                         |Definition
 
     staj_array_iterator() noexcept; // (1)
 
-    staj_array_iterator(basic_staj_cursor<char_type>& reader); // (2)
+    staj_array_iterator(staj_array_view<T, Json>& view); // (2)
 
-    staj_array_iterator(basic_staj_cursor<char_type>& reader,
+    staj_array_iterator(staj_array_view<T, Json>& view,
                         std::error_code& ec); // (3)
 
 (1) Constructs the end iterator
@@ -60,33 +61,11 @@ Advances the iterator to the next array element.
 
 #### Non-member functions
 
-Range-based for loop support
+    template <class class T, class Json>
+    bool operator==(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
 
     template <class Json, class T>
-    staj_array_iterator<Json, T> begin(staj_array_iterator<Json, T> iter) noexcept; // (1)
-
-    template <class Json, class T>
-    staj_array_iterator<Json, T> end(const staj_array_iterator<Json, T>&) noexcept; // (2)
-
-(1) Returns iter unchanged (range-based for loop support.)
-
-(2) Returns a default-constructed `stax_array_iterator`, which serves as an end iterator. The argument is ignored.
-
-    template <class T, class CharT>
-    staj_array_iterator<Json, T> make_array_iterator(basic_staj_cursor<CharT>& reader); // (1)
-
-    template <class T, class CharT>
-    staj_array_iterator<Json, T> make_array_iterator(basic_staj_cursor<CharT>& reader, std::error_code& ec); // (1)
-
-(1) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
-
-(2) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
-
-    template <class Json, class T>
-    bool operator==(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
-
-    template <class Json, class T>
-    bool operator!=(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
+    bool operator!=(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
 
 ### Examples
 
