@@ -347,10 +347,10 @@ public:
     }
 
     friend
-    staj_filter_view<CharT> operator|(basic_csv_cursor& cursor, 
+    basic_staj_filter_view<CharT> operator|(basic_csv_cursor& cursor, 
                                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
     {
-        return staj_filter_view<CharT>(cursor, pred);
+        return basic_staj_filter_view<CharT>(cursor, pred);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)

@@ -169,10 +169,10 @@ public:
     }
 
     friend
-    staj_filter_view<char_type> operator|(basic_cbor_cursor& cursor, 
-                                      std::function<bool(const staj_event&, const ser_context&)> pred)
+    staj_filter_view operator|(basic_cbor_cursor& cursor, 
+                               std::function<bool(const staj_event&, const ser_context&)> pred)
     {
-        return staj_filter_view<char_type>(cursor, pred);
+        return staj_filter_view(cursor, pred);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)

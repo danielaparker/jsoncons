@@ -97,8 +97,8 @@ Returns the current [context](ser_context.md)
 #### Non-member functions
 
    template <class Src, class Allocator>
-   staj_filter_view<char> operator|(basic_ubjson_cursor<Src,Allocator>& cursor, 
-                                    std::function<bool(const staj_event&, const ser_context&)> pred);
+   staj_filter_view operator|(basic_ubjson_cursor<Src,Allocator>& cursor, 
+                              std::function<bool(const staj_event&, const ser_context&)> pred);
 
 ### See also
 

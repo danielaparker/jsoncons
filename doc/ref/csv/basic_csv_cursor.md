@@ -108,7 +108,7 @@ Returns the current [context](../ser_context.md)
 #### Non-member functions
 
    template <class CharT, class Src, class Allocator>
-   staj_filter_view<CharT> operator|(basic_csv_cursor<CharT,Src,Allocator>& cursor, 
+   basic_staj_filter_view<CharT> operator|(basic_csv_cursor<CharT,Src,Allocator>& cursor, 
                                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 
 ### Examples

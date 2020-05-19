@@ -1360,12 +1360,12 @@ public:
 };
 
 template<class CharT>
-class staj_filter_view : basic_staj_cursor<CharT>
+class basic_staj_filter_view : basic_staj_cursor<CharT>
 {
     basic_staj_cursor<CharT>* cursor_;
     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred_;
 public:
-    staj_filter_view(basic_staj_cursor<CharT>& cursor, 
+    basic_staj_filter_view(basic_staj_cursor<CharT>& cursor, 
                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
         : cursor_(std::addressof(cursor)), pred_(pred)
     {
@@ -1420,10 +1420,10 @@ public:
     }
 
     friend
-    staj_filter_view<CharT> operator|(staj_filter_view& cursor, 
+    basic_staj_filter_view<CharT> operator|(basic_staj_filter_view& cursor, 
                                       std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred)
     {
-        return staj_filter_view<CharT>(cursor, pred);
+        return basic_staj_filter_view<CharT>(cursor, pred);
     }
 };
 
@@ -1432,6 +1432,9 @@ using wstaj_event = basic_staj_event<wchar_t>;
 
 using staj_cursor = basic_staj_cursor<char>;
 using wstaj_cursor = basic_staj_cursor<wchar_t>;
+
+using staj_filter_view = basic_staj_filter_view<char>;
+using wstaj_filter_view = basic_staj_filter_view<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
