@@ -484,7 +484,7 @@ TEST_CASE("map with enum key")
 
         std::string buffer;
         encode_json(criterion, buffer, indenting::indent);
-        std::cout << buffer << "\n";
+        //std::cout << buffer << "\n";
 
         auto val = decode_json<ns::TCriterion<ns::MyCriterionType>>(buffer);
 
@@ -496,7 +496,7 @@ TEST_CASE("map with enum key")
         ns::TCriterion<ns::MyCriterionType> criterion(ns::MyCriterionType::MessageType, "foo");
             
         ns::TCriteria<ns::MyCriterionType> criteria;
-        criteria._criteriaMap.insert_or_assign(ns::MyCriterionType::MessageType, criterion);
+        criteria._criteriaMap.emplace(ns::MyCriterionType::MessageType, criterion);
 
         std::string buffer = R"(
 {
@@ -510,15 +510,13 @@ TEST_CASE("map with enum key")
 }
         )";
         encode_json(criteria, buffer, indenting::indent);
-        std::cout << buffer << "\n";
+        //std::cout << buffer << "\n";
 
         auto val = decode_json<ns::TCriteria<ns::MyCriterionType>>(buffer);
 
-        json_type_traits<json,ns::MyCriterionType>::to_json(ns::MyCriterionType::MessageType);
+        auto x = val._criteriaMap.at(ns::MyCriterionType::MessageType);
 
-        json_type_traits<json,ns::TCriteria<ns::MyCriterionType>>::to_json(criteria);
-
-        //CHECK(val.getValue() == std::string("foo"));
-        //CHECK(val.getType() == ns::MyCriterionType::MessageType);
+        CHECK(x.getValue() == std::string("foo"));
+        CHECK(x.getType() == ns::MyCriterionType::MessageType);
     }
 }
