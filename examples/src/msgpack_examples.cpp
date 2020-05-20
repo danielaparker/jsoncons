@@ -9,7 +9,7 @@ using namespace jsoncons;
 
 namespace {
 
-    void message_pack_example1()
+    void example1()
     {
     ojson j1 = ojson::parse(R"(
     [
@@ -46,7 +46,7 @@ namespace {
         //std::cout << std::endl;
     }
 
-    void message_pack_example2()
+    void example2()
     {
         ojson j1;
         j1["zero"] = 0;
@@ -84,13 +84,30 @@ namespace {
         std::cout << std::endl;
     }
 
+    void ext_example()
+    {
+        std::vector<uint8_t> input = {
+            0xc7, // ext8 format code
+              0x06, // length 6
+              0x07, // type
+                'f','o','o','b','a','r'
+        };
+
+        ojson j = msgpack::decode_msgpack<ojson>(input);
+
+        std::cout << "(1)\n" << pretty_print(j) << "\n";
+        std::cout << "(2) " << j.tag() << "\n";
+        std::cout << "(3) " << j.ext_tag() << "\n";
+    }
+
 } // namespace
 
 void msgpack_examples()
 {
     std::cout << "\nmsgpack examples\n\n";
-    message_pack_example1();
-    message_pack_example2();
+    example1();
+    example2();
+    ext_example();
     std::cout << std::endl;
 }
 

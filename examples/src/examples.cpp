@@ -383,8 +383,6 @@ int main()
 
         json_filter_examples();
 
-        msgpack_examples();
-
         validation_example();
 
         comment_example();
@@ -438,6 +436,8 @@ int main()
         json_traits_macros_named_examples();
 
         json_cursor_examples();
+
+        msgpack_examples();
     }
     catch (const std::exception& e)
     {
