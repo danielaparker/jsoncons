@@ -106,6 +106,7 @@ namespace {
         std::cout << "(1)\n" << pretty_print(j) << "\n\n";
         std::cout << "(2) " << j["Data"].tag() << "("  << j["Data"].ext_tag() << ")\n\n";
         
+        // Get ext value as a std::vector<uint8_t>
         auto v = j["Data"].as<std::vector<uint8_t>>(); 
 
         std::cout << "(3)\n";
