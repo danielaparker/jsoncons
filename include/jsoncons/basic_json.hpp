@@ -3391,7 +3391,7 @@ public:
         }
         else
         {
-            basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
+            basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
             dump(encoder, ec);
         }
     }
@@ -3409,7 +3409,7 @@ public:
         }
         else
         {
-            basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+            basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
             dump(encoder, ec);
         }
     }
@@ -3426,7 +3426,7 @@ public:
         }
         else
         {
-            basic_json_compressed_encoder<char_type> encoder(os, options);
+            basic_compact_json_encoder<char_type> encoder(os, options);
             dump(encoder, ec);
         }
     }
@@ -3442,7 +3442,7 @@ public:
         }
         else
         {
-            basic_json_compressed_encoder<char_type> encoder(os);
+            basic_compact_json_encoder<char_type> encoder(os);
             dump(encoder, ec);
         }
     }
@@ -3918,7 +3918,7 @@ public:
             {
                 string_type s(alloc);
                 {
-                    basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+                    basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
                     dump(encoder);
                 }
                 return s;
@@ -3926,7 +3926,7 @@ public:
             default:
             {
                 string_type s(alloc);
-                basic_json_compressed_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+                basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
                 dump(encoder);
                 return s;
             }
@@ -4681,7 +4681,7 @@ public:
     {
         using string_type = std::basic_string<char_type, char_traits_type, SAllocator>;
         string_type s(alloc);
-        basic_json_compressed_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s);
+        basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s);
         dump(encoder);
         return s;
     }
@@ -4692,7 +4692,7 @@ public:
     {
         using string_type = std::basic_string<char_type, char_traits_type, SAllocator>;
         string_type s(alloc);
-        basic_json_compressed_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s, options);
+        basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s, options);
         dump(encoder);
         return s;
     }
@@ -4821,7 +4821,7 @@ public:
         }
         else
         {
-            basic_json_compressed_encoder<char_type> encoder(os);
+            basic_compact_json_encoder<char_type> encoder(os);
             dump(encoder);
         }
     }
@@ -4836,7 +4836,7 @@ public:
         }
         else
         {
-            basic_json_compressed_encoder<char_type> encoder(os, options);
+            basic_compact_json_encoder<char_type> encoder(os, options);
             dump(encoder);
         }
     }
