@@ -430,12 +430,7 @@ int main()
     encoder.end_array();
     encoder.flush();
 
-    for (auto c : buffer)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
 
 /* 
     9f -- Start indefinte length array
@@ -455,7 +450,7 @@ int main()
 ```
 Output:
 ```
-9f636361744470757272d64468697373c11a554bbfd3ff
+9f,63,63,61,74,44,70,75,72,72,d6,44,68,69,73,73,c1,1a,55,4b,bf,d3,ff
 ```
 
 #### Encode to CBOR stream

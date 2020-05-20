@@ -304,17 +304,12 @@ int main()
     encoder.begin_array(); // The total number of bytes comprising 
                           // the bson document will be calculated
     encoder.string_value("cat");
-    encoder.byte_string_value(byte_string{'p','u','r','r'});
+    encoder.byte_string_value(byte_string({'p','u','r','r'}));
     encoder.int64_value(1431027667, semantic_tag::timestamp);
     encoder.end_array();
     encoder.flush();
 
-    for (auto c : buffer)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
 
 /* 
     22000000 -- Total number of bytes comprising the document (34 bytes) 
@@ -336,5 +331,5 @@ int main()
 ```
 Output:
 ```
-2200000002300004000000636174000531000400000070757272093200d3bf4b5500
+22,00,00,00,02,30,00,04,00,00,00,63,61,74,00,05,31,00,04,00,00,00,70,75,72,72,09,32,00,d3,bf,4b,55,00
 ```

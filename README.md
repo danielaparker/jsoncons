@@ -557,25 +557,19 @@ int main()
     std::cout << "\n";
 
     // Serialize back to CBOR
-    std::cout << "(2)\n";
     std::vector<uint8_t> buffer;
     cbor::encode_cbor(val, buffer);
-    for (auto c : buffer) 
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
-    }
-    std::cout << "\n\n";
+    std::cout << "(2)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
 }
 ```
 Output:
 ```
 (1)
-foo, 50 75 73 73, 0x3p-1
-bar, 50 75 73 73, 1.23456789012345678901234567890
+foo, 50,75,73,73, 0x3p-1
+bar, 50,75,73,73, 1.23456789012345678901234567890
 
 (2)
-82 83 63 66 6f 6f 44 50 75 73 73 66 30 78 33 70 2d 31 83 63 62 61 72 44 50 75 73 73 78 1f 31 2e 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30
+82,9f,63,66,6f,6f,44,50,75,73,73,66,30,78,33,70,2d,31,ff,9f,63,62,61,72,44,50,75,73,73,78,1f,31,2e,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30,ff
 ```
 
 Note that when decoding the bigfloat and decimal fraction into a `std::string`, we lose the semantic information
