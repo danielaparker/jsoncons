@@ -32,7 +32,64 @@ MessagePack data item                              |ext type | jsoncons data ite
 
 ### Examples
 
-Input JSON file `book.json`:
+#### ext format code example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <cassert>
+
+using namespace jsoncons;
+
+int main()
+{
+    std::vector<uint8_t> input = {
+
+        0x82, // map, length 2
+          0xa5, // string, length 5
+            'H','e','l','l','o',
+          0xa5, // string, length 5
+            'W','o','r','l','d',
+          0xa4, // string, length 5
+             'D','a','t','a',
+          0xc7, // ext8 format code
+            0x06, // length 6
+            0x07, // type
+              'f','o','o','b','a','r'
+    };
+
+    ojson j = msgpack::decode_msgpack<ojson>(input);
+
+    std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+    std::cout << "(2) " << j["Data"].tag() << "("  << j["Data"].ext_tag() << ")\n\n";
+    
+    auto v = j["Data"].as<std::vector<uint8_t>>(); 
+
+    std::cout << "(3)\n";
+    std::cout << byte_string_view(v.data(),v.size()) << "\n\n";
+
+    std::vector<uint8_t> output;
+    msgpack::encode_msgpack(j,output);
+    assert(output == input);
+}
+```
+Output:
+```
+(1)
+{
+    "Hello": "World",
+    "Data": "Zm9vYmFy"
+}
+
+(2) ext(7)
+
+(3)
+66,6f,6f,62,61,72
+```
+
+#### JSON to message pack
+
+Input JSON file `book.json`
 
 ```json
 [

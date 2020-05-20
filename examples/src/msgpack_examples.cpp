@@ -87,17 +87,33 @@ namespace {
     void ext_example()
     {
         std::vector<uint8_t> input = {
-            0xc7, // ext8 format code
-              0x06, // length 6
-              0x07, // type
-                'f','o','o','b','a','r'
+
+            0x82, // map, length 2
+              0xa5, // string, length 5
+                'H','e','l','l','o',
+              0xa5, // string, length 5
+                'W','o','r','l','d',
+              0xa4, // string, length 5
+                 'D','a','t','a',
+              0xc7, // ext8 format code
+                0x06, // length 6
+                0x07, // type
+                  'f','o','o','b','a','r'
         };
 
         ojson j = msgpack::decode_msgpack<ojson>(input);
 
-        std::cout << "(1)\n" << pretty_print(j) << "\n";
-        std::cout << "(2) " << j.tag() << "\n";
-        std::cout << "(3) " << j.ext_tag() << "\n";
+        std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+        std::cout << "(2) " << j["Data"].tag() << "("  << j["Data"].ext_tag() << ")\n\n";
+        
+        auto v = j["Data"].as<std::vector<uint8_t>>(); 
+
+        std::cout << "(3)\n";
+        std::cout << byte_string_view(v.data(),v.size()) << "\n\n";
+
+        std::vector<uint8_t> output;
+        msgpack::encode_msgpack(j,output);
+        assert(output == input);
     }
 
 } // namespace
