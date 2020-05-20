@@ -432,15 +432,9 @@ namespace {
         std::cout << pretty_print(result) << "\n\n";
 
         // Serialize back to CBOR
-        std::cout << "(4)\n";
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(j, buffer);
-        for (auto c : buffer) 
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                      << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
-        }
-        std::cout << "\n\n";
+        std::cout << "(4)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
     }
 
     void working_with_cbor2()
@@ -573,9 +567,9 @@ void run_cbor_examples()
     std::cout << "\n";
     working_with_cbor4();
     std::cout << "\n";
-    working_with_cbor1();
-    std::cout << std::endl;
     working_with_cbor2();
     std::cout << "\n";
+    working_with_cbor1();
+    std::cout << std::endl;
 }
 

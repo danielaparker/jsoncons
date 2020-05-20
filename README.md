@@ -514,15 +514,9 @@ int main()
     std::cout << pretty_print(result) << "\n\n";
 
     // Serialize back to CBOR
-    std::cout << "(4)\n";
     std::vector<uint8_t> buffer;
     cbor::encode_cbor(j, buffer);
-    for (auto c : buffer) 
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
-    }
-    std::cout << "\n\n";
+    std::cout << "(4)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
 }
 ```
 Output:
@@ -534,8 +528,8 @@ Output:
 ]
 
 (2)
-50 75 73 73 (n/a)
-50 75 73 73 (base64)
+50,75,73,73 (n/a)
+50,75,73,73 (base64)
 
 (3)
 [
@@ -544,7 +538,7 @@ Output:
 ]
 
 (4)
-82 83 63 66 6f 6f 44 50 75 73 73 c5 82 20 03 83 63 62 61 72 d6 44 50 75 73 73 c4 82 38 1c c2 4d 01 8e e9 0f f6 c3 73 e0 ee 4e 3f 0a d2
+82,83,63,66,6f,6f,44,50,75,73,73,c5,82,20,03,83,63,62,61,72,d6,44,50,75,73,73,c4,82,38,1c,c2,4d,01,8e,e9,0f,f6,c3,73,e0,ee,4e,3f,0a,d2
 ```
 
 #### As a strongly typed C++ data structure
@@ -772,9 +766,9 @@ using namespace jsoncons;
 
 int main()
 {
-    // Construct some CBOR using the push serializer
-    std::vector<uint8_t> b;
-    cbor::cbor_bytes_encoder encoder(b);
+    // Construct some CBOR using the streaming API
+    std::vector<uint8_t> bytes_in;
+    cbor::cbor_bytes_encoder encoder(bytes_in);
     encoder.begin_array(); // indefinite length outer array
     encoder.begin_array(3); // a fixed length array
     encoder.string_value("foo");
@@ -785,13 +779,7 @@ int main()
     encoder.flush();
 
     // Print bytes
-    std::cout << "(1) ";
-    for (auto c : b)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(bytes_in.data(), bytes_in.size()) << "\n\n";
 /*
     9f -- Start indefinte length array
       83 -- Array of length 3
@@ -805,7 +793,7 @@ int main()
       ff -- "break" 
 */
     // Unpack bytes into a json variant value, and add some more elements
-    json j = cbor::decode_cbor<json>(b);
+    json j = cbor::decode_cbor<json>(bytes_in);
 
     // Loop over the rows
     std::cout << "(2)\n";
@@ -833,7 +821,7 @@ int main()
     // Add some more elements
 
     json another_array(json_array_arg); 
-    another_array.emplace_back(byte_string({'P','u','s','s'}),
+    another_array.emplace_back(byte_string_arg, std::vector<uint8_t>({'P','u','s','s'}),
                                semantic_tag::base64); // suggested conversion to base64
     another_array.emplace_back("273.15", semantic_tag::bigdec);
     another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
@@ -851,25 +839,16 @@ int main()
     __int128 i = j[1][2].as<__int128>();
 #endif
 
-    // Get byte string value at position /1/1 as a byte_string
-    byte_string bytes = j[1][1].as<byte_string>();
-    std::cout << "(8) " << bytes << "\n\n";
-
-    // or alternatively as a std::vector<uint8_t>
-    std::vector<uint8_t> u = j[1][1].as<std::vector<uint8_t>>();
+    // Get byte string value at position /1/1 as a std::vector<uint8_t>
+    auto bstr = j[1][1].as<std::vector<uint8_t>>();
+    std::cout << "(8) " << byte_string_view(bstr.data(), bstr.size()) << "\n\n";
 
     // Repack bytes
-    std::vector<uint8_t> b2;
-    cbor::encode_cbor(j, b2);
+    std::vector<uint8_t> bytes_out;
+    cbor::encode_cbor(j, bytes_out);
 
     // Print the repacked bytes
-    std::cout << "(9) ";
-    for (auto c : b2)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(9)\n" << byte_string_view(bytes_out.data(),bytes_out.size()) << "\n\n";
 /*
     82 -- Array of length 2
       83 -- Array of length 3
@@ -896,13 +875,14 @@ int main()
     csv_options.column_names("Column 1,Column 2,Column 3");
 
     std::cout << "(10)\n";
-    csv::encode_csv(j, std::cout, csv_options);
+    csv::encode_csv(j, std::cout, csv_options);    
 }
 
 ```
 Output:
 ```
-(1) 9f8363666f6f4450757373c349010000000000000000ff
+(1)
+9f,83,63,66,6f,6f,44,50,75,73,73,c3,49,01,00,00,00,00,00,00,00,00,ff
 
 (2)
 ["foo","UHVzcw","-18446744073709551617"]
@@ -927,9 +907,10 @@ Output:
 
 (7) 273.15
 
-(8) 50 75 73 73
+(8) 50,75,73,73
 
-(9) 828363666f6f4450757373c3490100000000000000008363626172d64450757373c48221196ab3
+(9)
+82,83,63,66,6f,6f,44,50,75,73,73,c3,49,01,00,00,00,00,00,00,00,00,83,63,62,61,72,d6,44,50,75,73,73,c4,82,21,19,6a,b3
 
 (10)
 Column 1,Column 2,Column 3
