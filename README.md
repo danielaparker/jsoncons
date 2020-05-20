@@ -393,7 +393,7 @@ end_array
 end_object
 ```
 
-You can apply a filter to a cursor using the pipe syntax (e.g., cursor | filter1 | filter2 | ...)
+You can apply a filter to a cursor using the pipe syntax (e.g., `cursor | filter1 | filter2 | ...`)
 
 ```c++
 int main()
