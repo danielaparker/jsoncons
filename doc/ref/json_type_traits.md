@@ -356,7 +356,6 @@ json j{m};
 std::cout << "(1)\n";
 std::cout << pretty_print(j) << "\n\n";
 
-assert((j.is<std::map<uint64_t, std::string>>()));
 auto other = j.as<std::map<uint64_t, std::string>>();
 
 std::cout << "(2)\n";

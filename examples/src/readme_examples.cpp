@@ -215,8 +215,8 @@ namespace {
     void playing_around()
     {
         // Construct some CBOR using the streaming API
-        std::vector<uint8_t> b;
-        cbor::cbor_bytes_encoder encoder(b);
+        std::vector<uint8_t> bytes_in;
+        cbor::cbor_bytes_encoder encoder(bytes_in);
         encoder.begin_array(); // indefinite length outer array
         encoder.begin_array(3); // a fixed length array
         encoder.string_value("foo");
@@ -227,13 +227,7 @@ namespace {
         encoder.flush();
 
         // Print bytes
-        std::cout << "(1) ";
-        for (auto c : b)
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                      << std::setfill('0') << static_cast<int>(c);
-        }
-        std::cout << "\n\n";
+        std::cout << "(1)\n" << byte_string_view(bytes_in.data(), bytes_in.size()) << "\n\n";
 /*
         9f -- Start indefinte length array
           83 -- Array of length 3
@@ -247,7 +241,7 @@ namespace {
           ff -- "break" 
 */
         // Unpack bytes into a json variant value, and add some more elements
-        json j = cbor::decode_cbor<json>(b);
+        json j = cbor::decode_cbor<json>(bytes_in);
 
         // Loop over the rows
         std::cout << "(2)\n";
@@ -293,25 +287,16 @@ namespace {
         __int128 i = j[1][2].as<__int128>();
 #endif
 
-        // Get byte string value at position /1/1 as a byte_string
-        byte_string bytes = j[1][1].as<byte_string>();
-        std::cout << "(8) " << bytes << "\n\n";
-
-        // or alternatively as a std::vector<uint8_t>
-        std::vector<uint8_t> u = j[1][1].as<std::vector<uint8_t>>();
+        // Get byte string value at position /1/1 as a std::vector<uint8_t>
+        auto bstr = j[1][1].as<std::vector<uint8_t>>();
+        std::cout << "(8) " << byte_string_view(bstr.data(), bstr.size()) << "\n\n";
 
         // Repack bytes
-        std::vector<uint8_t> b2;
-        cbor::encode_cbor(j, b2);
+        std::vector<uint8_t> bytes_out;
+        cbor::encode_cbor(j, bytes_out);
 
         // Print the repacked bytes
-        std::cout << "(9) ";
-        for (auto c : b2)
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                      << std::setfill('0') << static_cast<int>(c);
-        }
-        std::cout << "\n\n";
+        std::cout << "(9)\n" << byte_string_view(bytes_out.data(),bytes_out.size()) << "\n\n";
 /*
         82 -- Array of length 2
           83 -- Array of length 3

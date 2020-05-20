@@ -34,6 +34,9 @@ can be called on an encoder with any bytes sequence argument.
 to write to any back insertable byte container.
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
+- Generalized the `json_type_traits` for maps to accomodate all key types 
+that themselves have json_type_traits defined [\#241](https://github.com/danielaparker/jsoncons/issues/241)
+
 MessagePack types associated with the MessagePack ext family and CBOR tags preceding a byte string
 that are not mapped into a generic `semantic_tag` are now preserved. 
 

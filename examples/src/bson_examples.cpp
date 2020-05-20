@@ -20,12 +20,7 @@ void encode_to_bson()
     encoder.end_array();
     encoder.flush();
 
-    for (auto c : buffer)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
 
 /* 
     22000000 -- Total number of bytes comprising the document (34 bytes) 

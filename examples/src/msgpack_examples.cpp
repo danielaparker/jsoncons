@@ -9,7 +9,7 @@ using namespace jsoncons;
 
 namespace {
 
-    void message_pack_example1()
+    void example1()
     {
     ojson j1 = ojson::parse(R"(
     [
@@ -46,7 +46,7 @@ namespace {
         //std::cout << std::endl;
     }
 
-    void message_pack_example2()
+    void example2()
     {
         ojson j1;
         j1["zero"] = 0;
@@ -84,13 +84,47 @@ namespace {
         std::cout << std::endl;
     }
 
+    void ext_example()
+    {
+        std::vector<uint8_t> input = {
+
+            0x82, // map, length 2
+              0xa5, // string, length 5
+                'H','e','l','l','o',
+              0xa5, // string, length 5
+                'W','o','r','l','d',
+              0xa4, // string, length 4
+                 'D','a','t','a',
+              0xc7, // ext8 format code
+                0x06, // length 6
+                0x07, // type
+                  'f','o','o','b','a','r'
+        };
+
+        ojson j = msgpack::decode_msgpack<ojson>(input);
+
+        std::cout << "(1)\n" << pretty_print(j) << "\n\n";
+        std::cout << "(2) " << j["Data"].tag() << "("  << j["Data"].ext_tag() << ")\n\n";
+        
+        // Get ext value as a std::vector<uint8_t>
+        auto v = j["Data"].as<std::vector<uint8_t>>(); 
+
+        std::cout << "(3)\n";
+        std::cout << byte_string_view(v.data(),v.size()) << "\n\n";
+
+        std::vector<uint8_t> output;
+        msgpack::encode_msgpack(j,output);
+        assert(output == input);
+    }
+
 } // namespace
 
 void msgpack_examples()
 {
     std::cout << "\nmsgpack examples\n\n";
-    message_pack_example1();
-    message_pack_example2();
+    example1();
+    example2();
+    ext_example();
     std::cout << std::endl;
 }
 

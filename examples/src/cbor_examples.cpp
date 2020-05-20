@@ -28,12 +28,7 @@ namespace {
         encoder.end_array();
         encoder.flush();
 
-        for (auto c : buffer)
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                      << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-        }
-        std::cout << "\n\n";
+        std::cout << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
 
     /* 
         9f -- Start indefinte length array
@@ -236,13 +231,7 @@ namespace {
         std::vector<uint8_t> v;
         cbor::encode_cbor(j,v);
 
-        std::cout << "(3)\n";
-        for (auto c : v)
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                      << std::setfill('0') << static_cast<int>(c);
-        }
-        std::cout << "\n\n";
+        std::cout << "(3)\n" << byte_string_view(v.data(), v.size()) << "\n\n";
     /*
         85 -- Array of length 5     
           fa -- float 
@@ -432,15 +421,9 @@ namespace {
         std::cout << pretty_print(result) << "\n\n";
 
         // Serialize back to CBOR
-        std::cout << "(4)\n";
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(j, buffer);
-        for (auto c : buffer) 
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                      << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
-        }
-        std::cout << "\n\n";
+        std::cout << "(4)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
     }
 
     void working_with_cbor2()
@@ -456,18 +439,9 @@ namespace {
         std::cout << "\n";
 
         // Serialize back to CBOR
-        std::cout << "(2)\n";
         std::vector<uint8_t> buffer;
         cbor::encode_cbor(val, buffer);
-        for (auto c : buffer) 
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                      << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
-        }
-        std::cout << "\n\n";
-
-        json j = cbor::decode_cbor<json>(buffer);
-        std::cout << pretty_print(j) << "\n\n";
+        std::cout << "(2)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
     }
 
     void working_with_cbor3()
@@ -558,10 +532,8 @@ void run_cbor_examples()
 
     encode_byte_string_with_encoding_hint();
     encode_cbor_byte_string();
-    encode_to_cbor_buffer();
     encode_to_cbor_stream();
     cbor_reputon_example();
-    query_cbor();
     encode_cbor_with_packed_strings();
 
     decode_cbor_with_packed_strings();
@@ -574,8 +546,10 @@ void run_cbor_examples()
     working_with_cbor4();
     std::cout << "\n";
     working_with_cbor1();
-    std::cout << std::endl;
-    working_with_cbor2();
     std::cout << "\n";
+    working_with_cbor2();
+    std::cout << std::endl;
+    encode_to_cbor_buffer();
+    query_cbor();
 }
 

@@ -442,7 +442,7 @@ namespace jsoncons {
                 }
                 else 
                 {
-                    ss << ' ';
+                    ss << ',';
                 }
                 ss << std::setw(2) << static_cast<int>(b);
             }

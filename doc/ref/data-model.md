@@ -91,13 +91,7 @@ int main()
 
     std::vector<uint8_t> bytes;
     cbor::encode_cbor(j, bytes);
-    std::cout << "(2)\n";
-    for (auto c : bytes)
-    {
-        std::cout << std::hex << std::noshowbase << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(2)\n" << byte_string_view(bytes.data(), bytes.size()) << "\n\n";
 /*
 88 -- Array of length 8
   63 -- String value of length 3 
@@ -141,7 +135,7 @@ Output
 ]
 
 (2)
-8863666f6f43626172c349010000000000000000c48221196ab3c07819323031382d31302d31392031323a34313a30372d30373a3030c11a554bbfd3c13a554bbfd2c1fb41d552eff4e00000
+88,63,66,6f,6f,43,62,61,72,c3,49,01,00,00,00,00,00,00,00,00,c4,82,21,19,6a,b3,c0,78,19,32,30,31,38,2d,31,30,2d,31,39,20,31,32,3a,34,31,3a,30,37,2d,30,37,3a,30,30,c1,1a,55,4b,bf,d3,c1,3a,55,4b,bf,d2,c1,fb,41,d5,52,ef,f4,e0,00,00
 ```
 
 #### CBOR item to json value
@@ -158,23 +152,17 @@ void main()
     cbor::cbor_bytes_encoder encoder(bytes);
     encoder.begin_array(); // indefinite length outer array
     encoder.string_value("foo");
-    encoder.byte_string_value(byte_string({'b','a','r'}));
+    encoder.byte_string_value(byte_string{'b','a','r'});
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);
-    encoder.decimal_value("273.15");
+    encoder.string_value("273.15", semantic_tag::bigdec);
     encoder.string_value("2018-10-19 12:41:07-07:00", semantic_tag::datetime) ;
-    encoder.epoch_time_value(1431027667);
+    encoder.int64_value(1431027667, semantic_tag::timestamp);
     encoder.int64_value(-1431027667, semantic_tag::timestamp);
     encoder.double_value(1431027667.5, semantic_tag::timestamp);
     encoder.end_array();
     encoder.flush();
 
-    std::cout << "(1)\n";
-    for (auto c : bytes)
-    {
-        std::cout << std::hex << std::noshowbase << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(bytes.data(), bytes.size()) << "\n\n";
 
 /*
 9f -- Start indefinite length array 
@@ -207,12 +195,11 @@ void main()
     json j = cbor::decode_cbor<json>(bytes);
 
     std::cout << "(2)\n" << pretty_print(j) << "\n\n";
-}
 ```
 Output:
 ```
 (1)
-9f63666f6f43626172c349010000000000000000c48221196ab3c07819323031382d31302d31392031323a34313a30372d30373a3030c11a554bbfd3c13a554bbfd2c1fb41d552eff4e00000ff
+9f,63,66,6f,6f,43,62,61,72,c3,49,01,00,00,00,00,00,00,00,00,c4,82,21,19,6a,b3,c0,78,19,32,30,31,38,2d,31,30,2d,31,39,20,31,32,3a,34,31,3a,30,37,2d,30,37,3a,30,30,c1,1a,55,4b,bf,d3,c1,3a,55,4b,bf,d2,c1,fb,41,d5,52,ef,f4,e0,00,00,ff
 
 (2)
 [
