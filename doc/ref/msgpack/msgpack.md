@@ -50,7 +50,7 @@ int main()
             'H','e','l','l','o',
           0xa5, // string, length 5
             'W','o','r','l','d',
-          0xa4, // string, length 5
+          0xa4, // string, length 4
              'D','a','t','a',
           0xc7, // ext8 format code
             0x06, // length 6
