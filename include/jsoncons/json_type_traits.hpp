@@ -636,6 +636,81 @@ namespace detail {
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_map_like<T>::value &&
+                                                    !jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value &&
+                                                    is_json_type_traits_specialized<Json,typename T::key_type>::value &&
+                                                    is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
+    >
+    {
+        using mapped_type = typename T::mapped_type;
+        using value_type = typename T::value_type;
+        using key_type = typename T::key_type;
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& val) noexcept 
+        {
+            if (!val.is_object())
+                return false;
+            for (const auto& item : val.object_range())
+            {
+                Json j(item.key());
+                if (!j.template is<key_type>())
+                {
+                    return false;
+                }
+                if (!item.value().template is<mapped_type>())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        static T as(const Json& val) 
+        {
+            T result;
+            for (const auto& item : val.object_range())
+            {
+                Json j(item.key());
+                auto key = json_type_traits<Json,key_type>::as(j);
+                result.emplace(std::move(key), item.value().template as<mapped_type>());
+            }
+
+            return result;
+        }
+
+        static Json to_json(const T& val) 
+        {
+            Json j(json_object_arg);
+            j.reserve(val.size());
+            for (const auto& item : val)
+            {
+                auto temp = json_type_traits<Json,key_type>::to_json(item.first);
+                typename Json::key_type key;
+                temp.dump(key);
+                j.try_emplace(std::move(key), item.second);
+            }
+            return j;
+        }
+
+        static Json to_json(const T& val, const allocator_type& alloc) 
+        {
+            Json j(json_object_arg, semantic_tag::none, alloc);
+            j.reserve(val.size());
+            for (const auto& item : val)
+            {
+                auto temp = json_type_traits<Json,key_type>::to_json(item.first, alloc);
+                typename Json::key_type key(alloc);
+                temp.dump(key);
+                j.try_emplace(std::move(key), item.second, alloc);
+            }
+            return j;
+        }
+    };
+/*
+    template <class Json, typename T>
+    struct json_type_traits<Json, T, 
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_map_like<T>::value &&
                                                     std::is_integral<typename T::key_type>::value &&
                                                     is_json_type_traits_specialized<Json,typename T::mapped_type>::value>::type
     >
@@ -694,7 +769,7 @@ namespace detail {
             return j;
         }
     };
-
+*/
     // std::array
 
     template<class Json, class E, std::size_t N>
