@@ -251,9 +251,9 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                              semantic_tag, 
-                              const ser_context&,
-                              std::error_code&) override
+                           semantic_tag, 
+                           const ser_context&,
+                           std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::binary_cd);
 
@@ -261,11 +261,36 @@ private:
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         std::size_t string_offset = buffer_.size();
 
+        buffer_.push_back(0x00); // default subtype
+
         for (auto c : b)
         {
             buffer_.push_back(c);
         }
-        std::size_t length = buffer_.size() - string_offset;
+        std::size_t length = buffer_.size() - string_offset - 1;
+        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
+
+        return true;
+    }
+
+    bool visit_byte_string(const byte_string_view& b, 
+                           uint64_t ext_tag, 
+                           const ser_context&,
+                           std::error_code&) override
+    {
+        before_value(jsoncons::bson::detail::bson_format::binary_cd);
+
+        std::size_t offset = buffer_.size();
+        buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
+        std::size_t string_offset = buffer_.size();
+
+        buffer_.push_back(static_cast<uint8_t>(ext_tag)); // default subtype
+
+        for (auto c : b)
+        {
+            buffer_.push_back(c);
+        }
+        std::size_t length = buffer_.size() - string_offset - 1;
         jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;

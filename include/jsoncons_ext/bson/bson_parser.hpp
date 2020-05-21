@@ -428,6 +428,14 @@ private:
                     more_ = false;
                     return;
                 }
+                uint8_t subtype;
+                if (source_.get(subtype) == 0)
+                {
+                    ec = bson_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+
                 std::vector<uint8_t> v;
                 if (source_reader<Src>::read(source_, v, len) != static_cast<std::size_t>(len))
                 {
@@ -437,7 +445,7 @@ private:
                 }
 
                 more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                                  semantic_tag::none, 
+                                                  subtype, 
                                                   *this,
                                                   ec);
                 break;
