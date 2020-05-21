@@ -436,6 +436,10 @@ Output:
 #### Write some JSON (push)
 
 ```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_encoder.hpp>
+#include <cassert>
+
 int main()
 {
     std::ofstream os("./output/book_catalog.json", 
@@ -450,12 +454,6 @@ int main()
     encoder.string_value("Haruki Murakami");
     encoder.key("title");
     encoder.string_value("Hard-Boiled Wonderland and the End of the World");
-    encoder.key("isbn");
-    encoder.string_value("0679743464");
-    encoder.key("publisher");
-    encoder.string_value("Vintage");
-    encoder.key("date");
-    encoder.string_value("1993-03-02");
     encoder.key("price");
     encoder.double_value(18.9);
     encoder.end_object();
@@ -464,12 +462,6 @@ int main()
     encoder.string_value("Graham Greene");
     encoder.key("title");
     encoder.string_value("The Comedians");
-    encoder.key("isbn");
-    encoder.string_value("0099478374");
-    encoder.key("publisher");
-    encoder.string_value("Vintage Classics");
-    encoder.key("date");
-    encoder.string_value("2005-09-21");
     encoder.key("price");
     encoder.double_value(15.74);
     encoder.end_object();
@@ -495,17 +487,11 @@ Output:
     {
         "author": "Haruki Murakami",
         "title": "Hard-Boiled Wonderland and the End of the World",
-        "isbn": "0679743464",
-        "publisher": "Vintage",
-        "date": "1993-03-02",
         "price": 18.9
     },
     {
         "author": "Graham Greene",
         "title": "The Comedians",
-        "isbn": "0099478374",
-        "publisher": "Vintage Classics",
-        "date": "2005-09-21",
         "price": 15.74
     }
 ]
@@ -585,28 +571,16 @@ key: author
 string_value: Haruki Murakami
 key: title
 string_value: Hard-Boiled Wonderland and the End of the World
-key: isbn
-string_value: 0679743464
-key: publisher
-string_value: Vintage
-key: date
-string_value: 1993-03-02
 key: price
-double_value: 19
+double_value: 18.9
 end_object
 begin_object
 key: author
 string_value: Graham Greene
 key: title
 string_value: The Comedians
-key: isbn
-string_value: 0099478374
-key: publisher
-string_value: Vintage Classics
-key: date
-string_value: 2005-09-21
 key: price
-double_value: 16
+double_value: 15.74
 end_object
 end_array
 ```
@@ -728,19 +702,13 @@ begin_array
 begin_object
 {
     "author": "Haruki Murakami",
-    "date": "1993-03-02",
-    "isbn": "0679743464",
     "price": 18.9,
-    "publisher": "Vintage",
     "title": "Hard-Boiled Wonderland and the End of the World"
 }
 begin_object
 {
     "author": "Graham Greene",
-    "date": "2005-09-21",
-    "isbn": "0099478374",
     "price": 15.74,
-    "publisher": "Vintage Classics",
     "title": "The Comedians"
 }
 end_array
@@ -773,18 +741,12 @@ Output:
 ```
 {
     "author": "Haruki Murakami",
-    "date": "1993-03-02",
-    "isbn": "0679743464",
     "price": 18.9,
-    "publisher": "Vintage",
     "title": "Hard-Boiled Wonderland and the End of the World"
 }
 {
     "author": "Graham Greene",
-    "date": "2005-09-21",
-    "isbn": "0099478374",
     "price": 15.74,
-    "publisher": "Vintage Classics",
     "title": "The Comedians"
 }
 ```
@@ -803,15 +765,12 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        std::string isbn;
-        std::string publisher;
-        std::string date;
         double price;
     };
 
 } // namespace ns
 
-JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,isbn,publisher,date,price);
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
 int main()
 {

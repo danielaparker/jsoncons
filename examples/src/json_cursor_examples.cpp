@@ -16,45 +16,19 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        std::string isbn;
-        std::string publisher;
-        std::string date;
         double price;
     };
 
 } // namespace ns
 } // namespace
 
-JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,isbn,publisher,date,price);
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
 namespace {
 
-    // Example JSON text
-    const std::string example = R"(
-    [ 
-      { 
-          "author" : "Haruki Murakami",
-          "title" : "Hard-Boiled Wonderland and the End of the World",
-          "isbn" : "0679743464",
-          "publisher" : "Vintage",
-          "date" : "1993-03-02",
-          "price": 18.90
-      },
-      { 
-          "author" : "Graham Greene",
-          "title" : "The Comedians",
-          "isbn" : "0099478374",
-          "publisher" : "Vintage Classics",
-          "date" : "2005-09-21",
-          "price": 15.74
-      }
-    ]
-    )";
-
+    // Create some JSON (push)
     void create_some_json()
     {
-        // Create some JSON (push)
-
         std::ofstream os("./output/book_catalog.json", 
                          std::ios_base::out | std::ios_base::trunc);
         assert(os);
@@ -67,12 +41,6 @@ namespace {
         encoder.string_value("Haruki Murakami");
         encoder.key("title");
         encoder.string_value("Hard-Boiled Wonderland and the End of the World");
-        encoder.key("isbn");
-        encoder.string_value("0679743464");
-        encoder.key("publisher");
-        encoder.string_value("Vintage");
-        encoder.key("date");
-        encoder.string_value("1993-03-02");
         encoder.key("price");
         encoder.double_value(18.9);
         encoder.end_object();
@@ -81,12 +49,6 @@ namespace {
         encoder.string_value("Graham Greene");
         encoder.key("title");
         encoder.string_value("The Comedians");
-        encoder.key("isbn");
-        encoder.string_value("0099478374");
-        encoder.key("publisher");
-        encoder.string_value("Vintage Classics");
-        encoder.key("date");
-        encoder.string_value("2005-09-21");
         encoder.key("price");
         encoder.double_value(15.74);
         encoder.end_object();
@@ -106,13 +68,13 @@ namespace {
         std::cout << "\n\n";
     }
 
+    // Read some JSON (pull)
+
     // In the example, the application pulls the next event in the 
     // JSON input stream by calling next().
 
     void read_json_parse_events()
     {
-        // Read some JSON (pull)
-
         std::ifstream is("./output/book_catalog.json");
         assert(is);
 
