@@ -10,7 +10,7 @@ template<
 > class basic_csv_encoder : public jsoncons::basic_json_visitor<CharT>
 ```
 
-`basic_csv_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
+`basic_csv_encoder` and `basic_compact_json_encoder` are noncopyable and nonmoveable.
 
 ![basic_csv_encoder](./diagrams/basic_csv_encoder.png)
 

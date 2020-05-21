@@ -41,7 +41,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
+            basic_compact_json_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
             val.dump(encoder);
         }
     }
@@ -60,7 +60,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
+            basic_compact_json_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>> encoder(s, options);
             encode_json(val, encoder);
         }
     }
@@ -89,7 +89,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT> encoder(os, options);
+            basic_compact_json_encoder<CharT> encoder(os, options);
             val.dump(encoder);
         }
     }
@@ -108,7 +108,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT> encoder(os, options);
+            basic_compact_json_encoder<CharT> encoder(os, options);
             encode_json(val, encoder);
         }
     }
@@ -150,7 +150,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
+            basic_compact_json_encoder<CharT, jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
             val.dump(encoder);
         }
     }
@@ -170,7 +170,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
+            basic_compact_json_encoder<CharT,jsoncons::string_sink<std::basic_string<CharT>>,TempAllocator> encoder(s, options, temp_alloc);
             encode_json(temp_allocator_arg, temp_alloc, val, encoder);
         }
     }
@@ -199,7 +199,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT,jsoncons::stream_sink<CharT>,TempAllocator> encoder(os, options, temp_alloc);
+            basic_compact_json_encoder<CharT,jsoncons::stream_sink<CharT>,TempAllocator> encoder(os, options, temp_alloc);
             val.dump(encoder);
         }
     }
@@ -219,7 +219,7 @@ namespace jsoncons {
         }
         else
         {
-            basic_json_compressed_encoder<CharT> encoder(os, options);
+            basic_compact_json_encoder<CharT> encoder(os, options);
             encode_json(temp_allocator_arg, temp_alloc, val, encoder);
         }
     }

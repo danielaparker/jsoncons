@@ -11,10 +11,10 @@ template<
 template<
     class CharT,
     class Sink>
-> basic_json_compressed_encoder : public jsoncons::basic_json_visitor<CharT>
+> basic_compact_json_encoder : public jsoncons::basic_json_visitor<CharT>
 ```
 
-`basic_json_encoder` and `basic_json_compressed_encoder` are noncopyable and nonmoveable.
+`basic_json_encoder` and `basic_compact_json_encoder` are noncopyable and nonmoveable.
 
 ![basic_json_encoder](./diagrams/basic_json_encoder.png)
 
@@ -27,10 +27,10 @@ json_stream_encoder            |basic_json_encoder<char,jsoncons::stream_sink<ch
 json_string_encoder     |basic_json_encoder<char,jsoncons::string_sink<std::string>>
 wjson_stream_encoder           |basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>
 wjson_string_encoder    |basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>>
-json_compressed_stream_encoder            |basic_json_compressed_encoder<char,jsoncons::stream_sink<char>>
-json_compressed_string_encoder     |basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>>
-wjson_compressed_stream_encoder           |basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>
-wjson_compressed_string_encoder    |basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>>
+compact_json_stream_encoder (since 0.151.2) |basic_compact_json_encoder<char,jsoncons::stream_sink<char>>
+compact_json_string_encoder (since 0.151.2) |basic_compact_json_encoder<char,jsoncons::string_sink<std::string>>
+compact_wjson_stream_encoder (since 0.151.2) |basic_compact_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>
+compact_wjson_string_encoder (since 0.151.2) |basic_compact_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>>
 
 #### Member types
 
