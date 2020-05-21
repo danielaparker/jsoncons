@@ -425,8 +425,6 @@ int main()
 
         json_traits_macros_named_examples();
 
-        json_cursor_examples();
-
         msgpack_examples();
 
         readme_examples();
@@ -438,6 +436,8 @@ int main()
         data_model_examples();
 
         bson_examples();
+
+        json_cursor_examples();
     }
     catch (const std::exception& e)
     {
