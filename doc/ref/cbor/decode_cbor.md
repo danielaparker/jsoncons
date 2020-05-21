@@ -166,10 +166,10 @@ int main()
     std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
     json j = cbor::decode_cbor<json>(buf);
 
-    auto bs = j.as<byte_string>();
+    auto bstr = j.as<std::vector<uint8_t>>();
 
-    // byte_string to ostream displays as hex
-    std::cout << "(1) "<< bs << "\n\n";
+    // use byte_string_view to display as hex
+    std::cout << "(1) "<< byte_string_view(bstr.data(), bstr.size()) << "\n\n";
 
     // byte string value to JSON text becomes base64url
     std::cout << "(2) " << j << std::endl;
@@ -177,7 +177,7 @@ int main()
 ```
 Output:
 ```
-(1) 48 65 6c 6c 6f
+(1) 48,65,6c,6c,6f
 
 (2) "SGVsbG8"
 ```

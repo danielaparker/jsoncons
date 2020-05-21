@@ -56,8 +56,8 @@ TEST_CASE("serialize to bson")
         encoder.bool_value(false);
         encoder.null_value();
         encoder.string_value("Pussy cat");
-        std::vector<uint8_t> bstr = {'h','i','s','s'};
-        encoder.byte_string_value(bstr,7);
+        std::vector<uint8_t> purr = {'h','i','s','s'};
+        encoder.byte_string_value(purr, 7);
         encoder.end_array();
         encoder.flush();
 
@@ -125,8 +125,8 @@ TEST_CASE("serialize to bson")
         encoder.key("6");
         encoder.string_value("Pussy cat");
         encoder.key("7");
-        std::vector<uint8_t> bstr = {'h','i','s','s'};
-        encoder.byte_string_value(bstr);
+        std::vector<uint8_t> hiss = {'h','i','s','s'};
+        encoder.byte_string_value(hiss);
         encoder.end_object();
         encoder.flush();
 

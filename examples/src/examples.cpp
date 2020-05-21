@@ -433,11 +433,11 @@ int main()
 
         run_cbor_typed_array_examples();
 
-        data_model_examples();
-
         run_cbor_examples();
 
         bson_examples();
+
+        data_model_examples();
     }
     catch (const std::exception& e)
     {
