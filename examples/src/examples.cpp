@@ -435,9 +435,9 @@ int main()
 
         run_cbor_examples();
 
-        bson_examples();
-
         data_model_examples();
+
+        bson_examples();
     }
     catch (const std::exception& e)
     {
