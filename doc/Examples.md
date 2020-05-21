@@ -20,7 +20,8 @@
 
 ### Stream
 
-[Read JSON parse events](#I1)  
+[Write some JSON (push)](#I6)  
+[Read some JSON (pull)](#I1)  
 [Filter the event stream](#I2)  
 [Pull nested objects into a basic_json](#I3)  
 [Iterate over basic_json items](#I4)  
@@ -430,36 +431,93 @@ Output:
 
 ### Stream
 
+<div id="I6"/> 
+
+#### Write some JSON (push)
+
+```c++
+int main()
+{
+    std::ofstream os("./output/book_catalog.json", 
+                     std::ios_base::out | std::ios_base::trunc);
+    assert(os);
+
+    compact_json_stream_encoder encoder(os); // no indent
+
+    encoder.begin_array();
+    encoder.begin_object();
+    encoder.key("author");
+    encoder.string_value("Haruki Murakami");
+    encoder.key("title");
+    encoder.string_value("Hard-Boiled Wonderland and the End of the World");
+    encoder.key("isbn");
+    encoder.string_value("0679743464");
+    encoder.key("publisher");
+    encoder.string_value("Vintage");
+    encoder.key("date");
+    encoder.string_value("1993-03-02");
+    encoder.key("price");
+    encoder.double_value(18.9);
+    encoder.end_object();
+    encoder.begin_object();
+    encoder.key("author");
+    encoder.string_value("Graham Greene");
+    encoder.key("title");
+    encoder.string_value("The Comedians");
+    encoder.key("isbn");
+    encoder.string_value("0099478374");
+    encoder.key("publisher");
+    encoder.string_value("Vintage Classics");
+    encoder.key("date");
+    encoder.string_value("2005-09-21");
+    encoder.key("price");
+    encoder.double_value(15.74);
+    encoder.end_object();
+    encoder.end_array();
+    encoder.flush();
+
+    os.close();
+
+    // Read the JSON and write it prettified to std::cout
+    json_stream_encoder writer(std::cout); // indent
+
+    std::ifstream is("./output/book_catalog.json");
+    assert(is);
+
+    json_reader reader(is, writer);
+    reader.read();
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+[
+    {
+        "author": "Haruki Murakami",
+        "title": "Hard-Boiled Wonderland and the End of the World",
+        "isbn": "0679743464",
+        "publisher": "Vintage",
+        "date": "1993-03-02",
+        "price": 18.9
+    },
+    {
+        "author": "Graham Greene",
+        "title": "The Comedians",
+        "isbn": "0099478374",
+        "publisher": "Vintage Classics",
+        "date": "2005-09-21",
+        "price": 15.74
+    }
+]
+```
+
 <div id="I1"/> 
 
-#### Read JSON parse events
+#### Read some JSON (pull)
 
 A typical pull parsing application will repeatedly process the `current()` 
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
-
-Input JSON file `book_catalog.json`:
-
-```json
-[ 
-  { 
-      "author" : "Haruki Murakami",
-      "title" : "Hard-Boiled Wonderland and the End of the World",
-      "isbn" : "0679743464",
-      "publisher" : "Vintage",
-      "date" : "1993-03-02",
-      "price": 18.90
-  },
-  { 
-      "author" : "Graham Greene",
-      "title" : "The Comedians",
-      "isbn" : "0099478374",
-      "publisher" : "Vintage Classics",
-      "date" : "2005-09-21",
-      "price": 15.74
-  }
-]
-```
 
 ```c++
 #include <jsoncons/json_cursor.hpp>
@@ -467,7 +525,7 @@ Input JSON file `book_catalog.json`:
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 
@@ -585,7 +643,7 @@ int main()
         return false;
     };
 
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
     auto filtered_c = cursor | filter;
@@ -627,7 +685,7 @@ representing the events from `begin_array` ro `end_array`.
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 
@@ -700,7 +758,7 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 
@@ -757,7 +815,7 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,isbn,publisher,date,price);
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 

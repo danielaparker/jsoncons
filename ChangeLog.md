@@ -5,7 +5,17 @@ Bug fixes:
 
 - Fixed compile error when building with Android SDK level less than 21 [\#240](https://github.com/danielaparker/jsoncons/pull/240)
 
+- Fixed bson encode/decode of binary type (wasn't reading/writing subtype.)
+
 Changes:
+
+- `basic_json_compressed_encoder` has been deprecated and renamed to
+`basic_compact_json_encoder`. Rationale: consistency with other names.
+The typedefs `json_compressed_stream_encoder`, `wjson_compressed_stream_encoder`,
+`json_compressed_string_encoder`, and `wjson_compressed_string_encoder` have
+been deprecated and renamed to `compact_json_stream_encoder`, 
+`compact_wjson_stream_encoder`, `compact_json_string_encoder`, and
+`compact_wjson_string_encoder`. 
 
 - The factory function `make_array_iterator()` has been replaced by `staj_array()`.
 
@@ -37,8 +47,9 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 - Generalized the `json_type_traits` for maps to accomodate all key types 
 that themselves have json_type_traits defined [\#241](https://github.com/danielaparker/jsoncons/issues/241)
 
-MessagePack types associated with the MessagePack ext family and CBOR tags preceding a byte string
-that are not mapped into a generic `semantic_tag` are now preserved. 
+- Unknown CBOR tags preceding a byte string (unknown to jsoncons), 
+MessagePack types associated with the MessagePack ext family,
+and bson binary subtypes associated with a binary value are now captured. 
 
 - If in `basic_json` `tag()` == `semantic_tag::ext`, the function `ext_tag()` will return a format 
 specific tag associated with a byte string value. 
