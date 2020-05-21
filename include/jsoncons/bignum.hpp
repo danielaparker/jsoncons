@@ -1377,15 +1377,22 @@ private:
 
     void set_length(std::size_t n)
     {
+        std::size_t len_old = length_;
        length_ = n;
        if ( length_ > capacity() )
        {
+           std::size_t capacity_new = round_up(length_);
+           uint64_t* data_old = data_;
+           data_ = alloc().allocate(capacity_new);
+           if ( len_old > 0 )
+           {
+               std::memcpy( data_, data_old, len_old*sizeof(uint64_t));
+           }
            if ( dynamic_ )
            {
-               delete[] data_;
+               alloc().deallocate(data_old,capacity_);
            }
-           capacity_ = round_up(length_);
-           data_ = alloc().allocate(capacity_);
+           capacity_ = capacity_new;
            dynamic_ = true;
        }
     }
