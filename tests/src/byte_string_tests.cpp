@@ -104,3 +104,12 @@ TEST_CASE("test_base16_conversion")
     check_encode_base16({'f','o','o','b','a','r'}, "666F6F626172");
 }
 
+TEST_CASE("byte_string_view constructors")
+{
+    SECTION("test 1")
+    {
+        std::vector<uint8_t> v = {'f','o','o','b','a','r'};
+        byte_string_view bstr(v);
+    }
+}
+
