@@ -554,5 +554,34 @@ TEST_CASE("oss-fuzz issues")
         }
         CHECK(ec == convert_errc::not_string);
     }
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: TIMEOUT
+    // Resolution: 
+
+    /* SECTION("issue 	22379")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-6266427819687936";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        try
+        {
+            reader.read(ec);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+        //REQUIRE_NOTHROW(reader.read(ec));
+        //CHECK(ec == cbor::cbor_errc::unexpected_eof);
+    }*/
 }
 

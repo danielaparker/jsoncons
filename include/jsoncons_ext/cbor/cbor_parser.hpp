@@ -1174,12 +1174,13 @@ private:
                     }
                     if (tag == 2)
                     {
-                        bignum n(1, v.data(), v.size());
+                        bignum n = bignum::from_be(v.data(), v.size());
                         n.dump(s);
                     }
                     else if (tag == 3)
                     {
-                        bignum n(-1, v.data(), v.size());
+                        bignum n = bignum::from_be(v.data(), v.size());
+                        n = -1 - n;
                         n.dump(s);
                     }
                 }
@@ -1327,14 +1328,15 @@ private:
                         s.push_back('-');
                         s.push_back('0');
                         s.push_back('x');
-                        bignum n(1, v.data(), v.size());
+                        bignum n = bignum::from_be(v.data(), v.size());
                         n.dump_hex_string(s);
                     }
                     else if (tag == 3)
                     {
                         s.push_back('-');
                         s.push_back('0');
-                        bignum n(-1, v.data(), v.size());
+                        bignum n = bignum::from_be(v.data(), v.size());
+                        n = -1 - n;
                         n.dump_hex_string(s);
                         s[2] = 'x';
                     }
@@ -1508,7 +1510,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    bignum n(1, v.data(), v.size());
+                    bignum n = bignum::from_be(v.data(), v.size());
                     text_buffer_.clear();
                     n.dump(text_buffer_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
@@ -1523,7 +1525,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    bignum n(-1, v.data(), v.size());
+                    bignum n = bignum::from_be(v.data(), v.size());
+                    n = -1 - n;
                     text_buffer_.clear();
                     n.dump(text_buffer_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);

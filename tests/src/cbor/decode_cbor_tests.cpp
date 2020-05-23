@@ -195,7 +195,8 @@ TEST_CASE("dump cbor to string test")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
+    bignum n = bignum::from_be(bytes.data(), bytes.size());
+    n = -1 - n;
     std::string s;
     n.dump(s);
     encoder.string_value(s, semantic_tag::bigint);
@@ -237,7 +238,8 @@ TEST_CASE("test_dump_to_stream")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
+    bignum n = bignum::from_be(bytes.data(), bytes.size());
+    n = -1 - n;
     std::string s;
     n.dump(s);
     encoder.string_value(s, semantic_tag::bigint);

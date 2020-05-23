@@ -62,6 +62,7 @@ class basic_bignum : protected basic_bignum_base<Allocator>
 {
 private:
     using basic_bignum_base<Allocator>::alloc;
+    using bignum_type = basic_bignum<Allocator>;
 
     static constexpr uint64_t max_basic_type = (std::numeric_limits<uint64_t>::max)();
     static constexpr uint64_t basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
@@ -177,31 +178,6 @@ public:
             for (auto c: l)
             {
                 v = (v * 256) + (uint64_t)(c);
-            }
-
-            if (signum == -1)
-            {
-                v = -1 - v;
-            }
-
-            initialize(v);
-        }
-        else
-        {
-            neg_ = false;
-            initialize_from_integer(0u);
-        }
-    }
-
-    basic_bignum(int signum, const uint8_t* str, std::size_t n)
-        : values_{0,0}
-    {
-        if (n > 0)
-        {
-            basic_bignum<Allocator> v = 0;
-            for (std::size_t i = 0; i < n; i++)
-            {
-                v = (v * 256) + (uint64_t)(str[i]);
             }
 
             if (signum == -1)
@@ -347,6 +323,29 @@ public:
         }
     }
 
+    static basic_bignum from_be(const uint8_t* str, std::size_t n)
+    {
+        double radix_log2 = std::log2(next_power_of_two(256));
+        // Estimate how big the result will be, so we can pre-allocate it.
+        double bits = radix_log2 * n;
+        double big_digits = std::ceil(bits / 64.0);
+        //std::cout << "ESTIMATED: " << big_digits << "\n";
+
+        bignum_type v = 0;
+        v.reserve(static_cast<std::size_t>(big_digits));
+
+        if (n > 0)
+        {
+            for (std::size_t i = 0; i < n; i++)
+            {
+                v = (v * 256) + (uint64_t)(str[i]);
+            }
+        }
+        //std::cout << "ACTUAL: " << v.length() << "\n";
+
+        return v;
+    }
+
     std::size_t capacity() const { return dynamic_ ? capacity_ : 2; }
 
 //  Operators
@@ -366,7 +365,7 @@ public:
     {
         if ( this != &y )
         {
-            set_length( y.length() );
+            resize( y.length() );
             neg_ = y.neg_;
             if ( y.length() > 0 )
             {
@@ -473,7 +472,7 @@ public:
             data_[0] = a * b;
             if ( data_[0] / a != b )
             {
-                set_length( 2 );
+                resize( 2 );
                 DDproduct( a, b, data_[1], data_[0] );
             }
             neg_ = difSigns;
@@ -495,7 +494,7 @@ public:
                 uint64_t sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bignum<Allocator> x = *this;
-                set_length( lenProd ); // Give *this length lenProd
+                resize( lenProd ); // Give *this length lenProd
 
                 for (std::size_t i = 0; i < lenProd; i++ )
                 {
@@ -571,13 +570,13 @@ public:
         std::size_t q = (std::size_t)(k / basic_type_bits);
         if ( q >= length() )
         {
-            set_length( 0 );
+            resize( 0 );
             return *this;
         }
         if (q > 0)
         {
             memmove( data_, data_+q, (std::size_t)((length() - q)*sizeof(uint64_t)) );
-            set_length( length() - q );
+            resize( length() - q );
             k %= basic_type_bits;
             if ( k == 0 )
             {
@@ -671,7 +670,7 @@ public:
     {
         std::size_t old_length = length();
 
-        set_length( (std::min)( length(), a.length() ) );
+        resize( (std::min)( length(), a.length() ) );
 
         const uint64_t* pBegin = begin();
         uint64_t* p = end() - 1;
@@ -1322,7 +1321,7 @@ private:
             // Denominator fits into a half word
             uint64_t divisor = denom.data_[0], dHi = 0,
                      q1, r, q2, dividend;
-            quot.set_length(length());
+            quot.resize(length());
             for (std::size_t i=length(); i-- > 0; )
             {
                 dividend = (dHi << basic_type_halfBits) | (data_[i] >> basic_type_halfBits);
@@ -1343,7 +1342,7 @@ private:
         int second_done = normalize(denom, num, x);
         std::size_t l = denom.length() - 1;
         std::size_t n = num.length() - 1;
-        quot.set_length(n - l);
+        quot.resize(n - l);
         for (std::size_t i=quot.length(); i-- > 0; )
             quot.data_[i] = 0;
         rem = num;
@@ -1375,7 +1374,7 @@ private:
     uint64_t* end() { return data_ + length_; }
     const uint64_t* end() const { return data_ + length_; }
 
-    void set_length(std::size_t n)
+    void resize(std::size_t n)
     {
         std::size_t len_old = length_;
        length_ = n;
@@ -1387,6 +1386,26 @@ private:
            if ( len_old > 0 )
            {
                std::memcpy( data_, data_old, len_old*sizeof(uint64_t));
+           }
+           if ( dynamic_ )
+           {
+               alloc().deallocate(data_old,capacity_);
+           }
+           capacity_ = capacity_new;
+           dynamic_ = true;
+       }
+    }
+
+    void reserve(std::size_t n)
+    {
+       if (capacity() < n)
+       {
+           std::size_t capacity_new = round_up(n);
+           uint64_t* data_old = data_;
+           data_ = alloc().allocate(capacity_new);
+           if (length_ > 0)
+           {
+               std::memcpy( data_, data_old, length_*sizeof(uint64_t));
            }
            if ( dynamic_ )
            {
@@ -1617,6 +1636,17 @@ private:
             v.neg_ = true;
         }
         initialize(std::move(v));
+    }
+
+    static uint64_t next_power_of_two(uint64_t n) {
+        n = n - 1;
+        n |= n >> 1;
+        n |= n >> 2;
+        n |= n >> 4;
+        n |= n >> 8;
+        n |= n >> 16;
+        n |= n >> 32;
+        return n + 1;
     }
 };
 
