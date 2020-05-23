@@ -329,7 +329,7 @@ public:
         // Estimate how big the result will be, so we can pre-allocate it.
         double bits = radix_log2 * n;
         double big_digits = std::ceil(bits / 64.0);
-        //std::cout << "ESTIMATED: " << big_digits << "\n";
+        std::cout << "ESTIMATED: " << big_digits << "\n";
 
         bignum_type v = 0;
         v.reserve(static_cast<std::size_t>(big_digits));
@@ -341,7 +341,7 @@ public:
                 v = (v * 256) + (uint64_t)(str[i]);
             }
         }
-        //std::cout << "ACTUAL: " << v.length() << "\n";
+        std::cout << "ACTUAL: " << v.length() << "\n";
 
         return v;
     }

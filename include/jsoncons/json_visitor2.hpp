@@ -1951,6 +1951,92 @@ namespace jsoncons {
         }
     };
 
+    class diagnostics_visitor2 : public basic_default_json_visitor2<char>
+    {
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object" << std::endl; 
+            return true;
+        }
+
+        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object " << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_object(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_object" << std::endl; 
+            return true;
+        }
+        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_array " << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_array(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_array" << std::endl; 
+            return true;
+        }
+
+        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_string " << s << std::endl; 
+            return true;
+        }
+        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_int64 " << val << std::endl; 
+            return true;
+        }
+        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_uint64 " << val << std::endl; 
+            return true;
+        }
+        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_bool " << val << std::endl; 
+            return true;
+        }
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_null " << std::endl; 
+            return true;
+        }
+
+        bool visit_typed_array(const span<const uint16_t>& s, 
+                                    semantic_tag tag, 
+                                    const ser_context&, 
+                                    std::error_code&) override  
+        {
+            std::cout << "visit_typed_array uint16_t " << tag << std::endl; 
+            for (auto val : s)
+            {
+                std::cout << val << "" << std::endl;
+            }
+            std::cout << "" << std::endl;
+            return true;
+        }
+
+        bool visit_typed_array(half_arg_t, const span<const uint16_t>& s,
+            semantic_tag tag,
+            const ser_context&,
+            std::error_code&) override
+        {
+            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << std::endl;
+            for (auto val : s)
+            {
+                std::cout << val << "" << std::endl;
+            }
+            std::cout << "" << std::endl;
+            return true;
+        }
+    };
+
     using json_visitor2 = basic_json_visitor2<char>;
     using default_json_visitor2 = basic_default_json_visitor2<char>;
     using json_visitor2_to_visitor_adaptor = basic_json_visitor2_to_visitor_adaptor<char>;
