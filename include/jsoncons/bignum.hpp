@@ -1,4 +1,4 @@
-// Copyright 2018 Daniel Parker
+// Copyright 2018 vDaniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -51,7 +51,7 @@ public:
     {
     }
 
-    basic_type_allocator_type alloc() const
+    basic_type_allocator_type get_allocator() const
     {
         return alloc_;
     }
@@ -61,8 +61,9 @@ template <class Allocator = std::allocator<uint64_t>>
 class basic_bignum : protected basic_bignum_base<Allocator>
 {
 private:
-    using basic_bignum_base<Allocator>::alloc;
+    using base_t = basic_bignum_base<Allocator>;
     using bignum_type = basic_bignum<Allocator>;
+    using base_t::get_allocator;
 
     static constexpr uint64_t max_basic_type = (std::numeric_limits<uint64_t>::max)();
     static constexpr uint64_t basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
@@ -79,52 +80,55 @@ private:
         uint64_t values_[2];
     };
     uint64_t* data_;
-    bool      neg_;
-    bool      dynamic_;
+    bool      is_negative_;
+    bool      is_dynamic_;
     std::size_t    length_;
 public:
+    bool is_dynamic() const {return is_dynamic_;}
+    bool is_negative() const {return is_negative_;}
+
 //  Constructors and Destructor
     basic_bignum()
-        : values_{0,0}, data_(values_), neg_(false), dynamic_(false), length_(0)
+        : values_{0,0}, data_(values_), is_negative_(false), is_dynamic_(false), length_(0)
     {
     }
 
     explicit basic_bignum(const Allocator& alloc)
-        : basic_bignum_base<Allocator>(alloc), values_{0,0}, data_(values_), neg_(false), dynamic_(false), length_(0)
+        : basic_bignum_base<Allocator>(alloc), values_{0,0}, data_(values_), is_negative_(false), is_dynamic_(false), length_(0)
     {
     }
 
     basic_bignum(const basic_bignum<Allocator>& n)
-        : basic_bignum_base<Allocator>(n.alloc()), neg_(n.neg_), length_(n.length_)
+        : basic_bignum_base<Allocator>(n.get_allocator()), is_negative_(n.is_negative()), length_(n.length_)
     {
-        if (!n.dynamic_)
+        if (!n.is_dynamic())
         {
             values_[0] = n.values_[0];
             values_[1] = n.values_[1];
             data_ = values_;
-            dynamic_ = false;
+            is_dynamic_ = false;
         }
         else
         {
             capacity_ = n.capacity_;
-            data_ = alloc().allocate(capacity_);
-            dynamic_ = true;
+            data_ = get_allocator().allocate(capacity_);
+            is_dynamic_ = true;
             std::memcpy( data_, n.data_, n.length_*sizeof(uint64_t) );
         }
     }
 
     basic_bignum(basic_bignum<Allocator>&& other) noexcept
-        : basic_bignum_base<Allocator>(other.alloc()), neg_(other.neg_), dynamic_(other.dynamic_), length_(other.length_)
+        : basic_bignum_base<Allocator>(other.get_allocator()), is_negative_(other.is_negative()), is_dynamic_(other.is_dynamic()), length_(other.length_)
     {
-        if (other.dynamic_)
+        if (other.is_dynamic())
         {
             capacity_ = other.capacity_;
             data_ = other.data_;
 
             other.data_ = other.values_;
-            other.dynamic_ = false;
+            other.is_dynamic_ = false;
             other.length_ = 0;
-            other.neg_ = false;
+            other.is_negative_ = false;
         }
         else
         {
@@ -132,41 +136,6 @@ public:
             values_[1] = other.data_[1];
             data_ = values_;
         }
-    }
-
-    template <typename CharT>
-    explicit basic_bignum(const CharT* str)
-        : values_{0,0}
-    {
-        initialize(str, strlen(str));
-    }
-
-    template <typename CharT, typename CharTraits, typename UserAllocator>
-    basic_bignum(const std::basic_string<CharT,CharTraits,UserAllocator>& s)
-        : values_{0,0}
-    {
-        initialize(s.data(), s.length());
-    }
-
-    template <typename CharT>
-    basic_bignum(const CharT* data, std::size_t length)
-        : values_{0,0}
-    {
-        initialize(data, length);
-    }
-
-    template <typename CharT, typename CharTraits, typename UserAllocator>
-    basic_bignum(const std::basic_string<CharT,CharTraits,UserAllocator>& s, uint8_t base)
-        : values_{0,0}
-    {
-        initialize(s.data(), s.length(), base);
-    }
-
-    template <typename CharT>
-    basic_bignum(const CharT* data, std::size_t length, uint8_t base)
-        : values_{0,0}
-    {
-        initialize(data, length, base);
     }
 
     basic_bignum(int signum, std::initializer_list<uint8_t> l)
@@ -189,7 +158,7 @@ public:
         }
         else
         {
-            neg_ = false;
+            is_negative_ = false;
             initialize_from_integer(0u);
         }
     }
@@ -197,60 +166,60 @@ public:
     basic_bignum(short i)
         : values_{0,0}
     {
-        neg_ = i < 0;
-        uint64_t u = neg_ ? -i : i;
+        is_negative_ = i < 0;
+        uint64_t u = is_negative() ? -i : i;
         initialize_from_integer( u );
     }
 
     basic_bignum(unsigned short u)
         : values_{0,0}
     {
-        neg_ = false;
+        is_negative_ = false;
         initialize_from_integer( u );
     }
 
     basic_bignum(int i)
         : values_{0,0}
     {
-        neg_ = i < 0;
-        uint64_t u = neg_ ? -i : i;
+        is_negative_ = i < 0;
+        uint64_t u = is_negative() ? -i : i;
         initialize_from_integer( u );
     }
 
     basic_bignum(unsigned int u)
         : values_{0,0}
     {
-        neg_ = false;
+        is_negative_ = false;
         initialize_from_integer( u );
     }
 
     basic_bignum(long i)
         : values_{0,0}
     {
-        neg_ = i < 0;
-        uint64_t u = neg_ ? -i : i;
+        is_negative_ = i < 0;
+        uint64_t u = is_negative() ? -i : i;
         initialize_from_integer( u );
     }
 
     basic_bignum(unsigned long u)
         : values_{0,0}
     {
-        neg_ = false;
+        is_negative_ = false;
         initialize_from_integer( u );
     }
 
     basic_bignum(long long i)
         : values_{0,0}
     {
-        neg_ = i < 0;
-        uint64_t u = neg_ ? -i : i;
+        is_negative_ = i < 0;
+        uint64_t u = is_negative() ? -i : i;
         initialize_from_integer( u );
     }
 
     basic_bignum(unsigned long long u)
         : values_{0,0}
     {
-        neg_ = false;
+        is_negative_ = false;
         initialize_from_integer( u );
     }
 
@@ -279,7 +248,7 @@ public:
 
         if ( neg )
         {
-            v.neg_ = true;
+            v.is_negative_ = true;
         }
         initialize( v );
     }
@@ -310,16 +279,16 @@ public:
 
         if ( neg )
         {
-            v.neg_ = true;
+            v.is_negative_ = true;
         }
         initialize( v );
     }
 
     ~basic_bignum() noexcept
     {
-        if ( dynamic_ )
+        if ( is_dynamic() )
         {
-            alloc().deallocate(data_, capacity_);
+            get_allocator().deallocate(data_, capacity_);
         }
     }
 
@@ -346,7 +315,7 @@ public:
         return v;
     }
 
-    std::size_t capacity() const { return dynamic_ ? capacity_ : 2; }
+    std::size_t capacity() const { return is_dynamic() ? capacity_ : 2; }
 
 //  Operators
     bool operator!() const
@@ -357,7 +326,7 @@ public:
     basic_bignum operator-() const
     {
         basic_bignum<Allocator> v = *this;
-        v.neg_ = !v.neg_;
+        v.is_negative_ = !v.is_negative();
         return v;
     }
 
@@ -366,7 +335,7 @@ public:
         if ( this != &y )
         {
             resize( y.length() );
-            neg_ = y.neg_;
+            is_negative_ = y.is_negative();
             if ( y.length() > 0 )
             {
                 std::memcpy( data_, y.data_, y.length()*sizeof(uint64_t) );
@@ -377,7 +346,7 @@ public:
 
     basic_bignum& operator+=( const basic_bignum<Allocator>& y )
     {
-        if ( neg_ != y.neg_ )
+        if ( is_negative() != y.is_negative() )
             return *this -= -y;
         uint64_t d;
         uint64_t carry = 0;
@@ -405,9 +374,9 @@ public:
 
     basic_bignum& operator-=( const basic_bignum<Allocator>& y )
     {
-        if ( neg_ != y.neg_ )
+        if ( is_negative() != y.is_negative() )
             return *this += -y;
-        if ( (!neg_ && y > *this) || (neg_ && y < *this) )
+        if ( (!is_negative() && y > *this) || (is_negative() && y < *this) )
             return *this = -(y - *this);
         uint64_t borrow = 0;
         uint64_t d;
@@ -434,7 +403,7 @@ public:
     {
         *this *= uint64_t(y < 0 ? -y : y);
         if ( y < 0 )
-            neg_ = !neg_;
+            is_negative_ = !is_negative();
         return *this;
     }
 
@@ -465,7 +434,7 @@ public:
     {
         if ( length() == 0 || y.length() == 0 )
                     return *this = 0;
-        bool difSigns = neg_ != y.neg_;
+        bool difSigns = is_negative() != y.is_negative();
         if ( length() + y.length() == 2 ) // length() = y.length() = 1
         {
             uint64_t a = data_[0], b = y.data_[0];
@@ -475,7 +444,7 @@ public:
                 resize( 2 );
                 DDproduct( a, b, data_[1], data_[0] );
             }
-            neg_ = difSigns;
+            is_negative_ = difSigns;
             return *this;
         }
         if ( length() == 1 )  //  && y.length() > 1
@@ -521,7 +490,7 @@ public:
             }
         }
        reduce();
-       neg_ = difSigns;
+       is_negative_ = difSigns;
        return *this;
     }
 
@@ -704,7 +673,7 @@ public:
            x = data_ [0];
        }
 
-       return neg_ ? -x : x;
+       return is_negative() ? -x : x;
     }
 
     explicit operator uint64_t() const
@@ -733,7 +702,7 @@ public:
             ++p;
         }
 
-       return neg_ ? -x : x;
+       return is_negative() ? -x : x;
     }
 
     explicit operator long double() const
@@ -751,14 +720,14 @@ public:
             ++p;
         }
 
-       return neg_ ? -x : x;
+       return is_negative() ? -x : x;
     }
 
     template <typename Alloc>
     void dump(int& signum, std::vector<uint8_t,Alloc>& data) const
     {
         basic_bignum<Allocator> n(*this);
-        if (neg_)
+        if (is_negative())
         {
             signum = -1;
             n = - n -1;
@@ -816,7 +785,7 @@ public:
             }                     // p10 is max unsigned power of 10
             basic_bignum<Allocator> R;
             basic_bignum<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
-            if ( v.neg_ )
+            if ( v.is_negative() )
             {
                 data[0] = '-';
                 i = 1;
@@ -871,7 +840,7 @@ public:
             }                     // p10 is max unsigned power of 16
             basic_bignum<Allocator> R;
             basic_bignum<Allocator> LP10 = p10; // LP10 = p10 = ::pow(16, ip10)
-            if ( v.neg_ )
+            if ( v.is_negative() )
             {
                 data[0] = '-';
                 i = 1;
@@ -1074,7 +1043,7 @@ public:
 
     friend basic_bignum<Allocator> abs( const basic_bignum<Allocator>& a )
     {
-        if ( a.neg_ )
+        if ( a.is_negative() )
         {
             return -a;
         }
@@ -1129,8 +1098,8 @@ public:
 
     int compare( const basic_bignum<Allocator>& y ) const
     {
-        if ( neg_ != y.neg_ )
-            return y.neg_ - neg_;
+        if ( is_negative() != y.is_negative() )
+            return y.is_negative() - is_negative();
         int code = 0;
         if ( length() == 0 && y.length() == 0 )
             code = 0;
@@ -1154,7 +1123,110 @@ public:
                 }
             }
         }
-        return neg_ ? -code : code;
+        return is_negative() ? -code : code;
+    }
+
+    template <typename CharT>
+    static basic_bignum<Allocator> from_string(const std::basic_string<CharT>& s)
+    {
+        return from_string(s.data(), s.length());
+    }
+
+    template <typename CharT>
+    static basic_bignum<Allocator> from_string(const CharT* s)
+    {
+        return from_string(s, std::char_traits<CharT>::length(s));
+    }
+
+    template <typename CharT>
+    static basic_bignum<Allocator> from_string(const CharT* data, std::size_t length)
+    {
+        bool neg;
+        if (*data == '-')
+        {
+            neg = true;
+            data++;
+            --length;
+        }
+        else
+        {
+            neg = false;
+        }
+
+        basic_bignum<Allocator> v = 0;
+        for (std::size_t i = 0; i < length; i++)
+        {
+            CharT c = data[i];
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    v = (v * 10) + (uint64_t)(c - '0');
+                    break;
+                default:
+                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
+            }
+        }
+
+        if ( neg )
+        {
+            v.is_negative_ = true;
+        }
+
+        return v;
+    }
+
+    template <typename CharT>
+    static basic_bignum<Allocator> from_string(const CharT* data, std::size_t length, uint8_t base)
+    {
+        if (!(base >= 2 && base <= 16))
+        {
+            JSONCONS_THROW(std::runtime_error("Unsupported base"));
+        }
+
+        bool neg;
+        if (*data == '-')
+        {
+            neg = true;
+            data++;
+            --length;
+        }
+        else
+        {
+            neg = false;
+        }
+
+        basic_bignum<Allocator> v = 0;
+        for (std::size_t i = 0; i < length; i++)
+        {
+            CharT c = data[i];
+            uint64_t d;
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    d = (uint64_t)(c - '0');
+                    break;
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    d = (uint64_t)(c - ('a' - 10));
+                    break;
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                    d = (uint64_t)(c - ('A' - 10));
+                    break;
+                default:
+                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
+            }
+            if (d >= base)
+            {
+                JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
+            }
+            v = (v * base) + d;
+        }
+
+        if ( neg )
+        {
+            v.is_negative_ = true;
+        }
+
+        return v;
     }
 
 private:
@@ -1296,24 +1368,24 @@ private:
         {
             JSONCONS_THROW(std::runtime_error( "Zero divide." ));
         }
-        bool quot_neg = neg_ ^ denom.neg_;
-        bool rem_neg = neg_;
+        bool quot_neg = is_negative() ^ denom.is_negative();
+        bool rem_neg = is_negative();
         int x = 0;
         basic_bignum<Allocator> num = *this;
-        num.neg_ = denom.neg_ = false;
+        num.is_negative_ = denom.is_negative_ = false;
         if ( num < denom )
         {
             quot = uint64_t(0);
             rem = num;
-            rem.neg_ = rem_neg;
+            rem.is_negative_ = rem_neg;
             return;
         }
         if ( denom.length() == 1 && num.length() == 1 )
         {
             quot = uint64_t( num.data_[0]/denom.data_[0] );
             rem = uint64_t( num.data_[0]%denom.data_[0] );
-            quot.neg_ = quot_neg;
-            rem.neg_ = rem_neg;
+            quot.is_negative_ = quot_neg;
+            rem.is_negative_ = rem_neg;
             return;
         }
         else if (denom.length() == 1 && (denom.data_[0] & l_mask) == 0 )
@@ -1334,8 +1406,8 @@ private:
             }
             quot.reduce();
             rem = dHi;
-            quot.neg_ = quot_neg;
-            rem.neg_ = rem_neg;
+            quot.is_negative_ = quot_neg;
+            rem.is_negative_ = rem_neg;
             return;
         }
         basic_bignum<Allocator> num0 = num, denom0 = denom;
@@ -1360,11 +1432,11 @@ private:
             quot.data_[k - l - 1] = q;
         }
         quot.reduce();
-        quot.neg_ = quot_neg;
+        quot.is_negative_ = quot_neg;
         if ( remDesired )
         {
             unnormalize(rem, x, second_done);
-            rem.neg_ = rem_neg;
+            rem.is_negative_ = rem_neg;
         }
     }
 
@@ -1382,17 +1454,17 @@ private:
        {
            std::size_t capacity_new = round_up(length_);
            uint64_t* data_old = data_;
-           data_ = alloc().allocate(capacity_new);
+           data_ = get_allocator().allocate(capacity_new);
            if ( len_old > 0 )
            {
                std::memcpy( data_, data_old, len_old*sizeof(uint64_t));
            }
-           if ( dynamic_ )
+           if ( is_dynamic() )
            {
-               alloc().deallocate(data_old,capacity_);
+               get_allocator().deallocate(data_old,capacity_);
            }
            capacity_ = capacity_new;
-           dynamic_ = true;
+           is_dynamic_ = true;
        }
     }
 
@@ -1402,17 +1474,17 @@ private:
        {
            std::size_t capacity_new = round_up(n);
            uint64_t* data_old = data_;
-           data_ = alloc().allocate(capacity_new);
+           data_ = get_allocator().allocate(capacity_new);
            if (length_ > 0)
            {
                std::memcpy( data_, data_old, length_*sizeof(uint64_t));
            }
-           if ( dynamic_ )
+           if ( is_dynamic() )
            {
-               alloc().deallocate(data_old,capacity_);
+               get_allocator().deallocate(data_old,capacity_);
            }
            capacity_ = capacity_new;
-           dynamic_ = true;
+           is_dynamic_ = true;
        }
     }
 
@@ -1428,7 +1500,7 @@ private:
     initialize_from_integer(T u)
     {
         data_ = values_;
-        dynamic_ = false;
+        is_dynamic_ = false;
         length_ = u != 0 ? 1 : 0;
 
         data_ [0] = u;
@@ -1442,7 +1514,7 @@ private:
         initialize_from_integer(T u)
     {
         data_ = values_;
-        dynamic_ = false;
+        is_dynamic_ = false;
         length_ = u != 0 ? 2 : 0;
 
         data_[0] = uint64_t(u & max_basic_type);
@@ -1452,21 +1524,21 @@ private:
 
     void initialize( const basic_bignum<Allocator>& n )
     {
-        neg_ = n.neg_;
+        is_negative_ = n.is_negative();
         length_ = n.length_;
 
         if ( length_ <= 2 )
         {
             data_ = values_;
-            dynamic_ = false;
+            is_dynamic_ = false;
             values_ [0] = n.data_ [0];
             values_ [1] = n.data_ [1];
         }
         else
         {
             capacity_ = round_up( length_ );
-            data_ = alloc().allocate(capacity_);
-            dynamic_ = true;
+            data_ = get_allocator().allocate(capacity_);
+            is_dynamic_ = true;
             if ( length_ > 0 )
             {
                 std::memcpy( data_, n.data_, length_*sizeof(uint64_t) );
@@ -1477,19 +1549,19 @@ private:
 
     void initialize(basic_bignum<Allocator>&& other)
     {
-        neg_ = other.neg_;
+        is_negative_ = other.is_negative();
         length_ = other.length_;
-        dynamic_ = other.dynamic_;
+        is_dynamic_ = other.is_dynamic();
 
-        if (other.dynamic_)
+        if (other.is_dynamic())
         {
             capacity_ = other.capacity_;
             data_ = other.data_;
 
             other.data_ = other.values_;
-            other.dynamic_ = false;
+            other.is_dynamic_ = false;
             other.length_ = 0;
-            other.neg_ = false;
+            other.is_negative_ = false;
         }
         else
         {
@@ -1514,7 +1586,7 @@ private:
         }
         if ( length_ == 0 )
         {
-            neg_ = false;
+            is_negative_ = false;
         }
     }
 
@@ -1529,113 +1601,24 @@ private:
 
             uint64_t* data_old = data_;
 
-            data_ = alloc().allocate(capacity_new);
+            data_ = get_allocator().allocate(capacity_new);
 
             if ( len_old > 0 )
             {
                 std::memcpy( data_, data_old, len_old*sizeof(uint64_t) );
             }
-            if ( dynamic_ )
+            if ( is_dynamic() )
             {
-                alloc().deallocate(data_old,capacity_);
+                get_allocator().deallocate(data_old,capacity_);
             }
             capacity_ = capacity_new;
-            dynamic_ = true;
+            is_dynamic_ = true;
         }
 
         if ( length_ > len_old )
         {
             memset( data_+len_old, 0, (length_ - len_old)*sizeof(uint64_t) );
         }
-    }
-
-    template <typename CharT>
-    void initialize(const CharT* data, std::size_t length)
-    {
-        bool neg;
-        if (*data == '-')
-        {
-            neg = true;
-            data++;
-            --length;
-        }
-        else
-        {
-            neg = false;
-        }
-
-        basic_bignum<Allocator> v = 0;
-        for (std::size_t i = 0; i < length; i++)
-        {
-            CharT c = data[i];
-            switch (c)
-            {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    v = (v * 10) + (uint64_t)(c - '0');
-                    break;
-                default:
-                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
-            }
-        }
-
-        if ( neg )
-        {
-            v.neg_ = true;
-        }
-        initialize(std::move(v));
-    }
-
-    template <typename CharT>
-    void initialize(const CharT* data, std::size_t length, uint8_t base)
-    {
-        if (!(base >= 2 && base <= 16))
-        {
-            JSONCONS_THROW(std::runtime_error("Unsupported base"));
-        }
-
-        bool neg;
-        if (*data == '-')
-        {
-            neg = true;
-            data++;
-            --length;
-        }
-        else
-        {
-            neg = false;
-        }
-
-        basic_bignum<Allocator> v = 0;
-        for (std::size_t i = 0; i < length; i++)
-        {
-            CharT c = data[i];
-            uint64_t d;
-            switch (c)
-            {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    d = (uint64_t)(c - '0');
-                    break;
-                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                    d = (uint64_t)(c - ('a' - 10));
-                    break;
-                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                    d = (uint64_t)(c - ('A' - 10));
-                    break;
-                default:
-                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
-            }
-            if (d >= base)
-            {
-                JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
-            }
-            v = (v * base) + d;
-        }
-
-        if ( neg )
-        {
-            v.neg_ = true;
-        }
-        initialize(std::move(v));
     }
 
     static uint64_t next_power_of_two(uint64_t n) {

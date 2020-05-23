@@ -1239,7 +1239,7 @@ namespace detail
                     {
                         JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
                     }
-                    return basic_bignum<Allocator>(j.as_string_view().data(), j.as_string_view().length());
+                    return basic_bignum<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length());
                 case json_type::half_value:
                 case json_type::double_value:
                     return basic_bignum<Allocator>(j.template as<double>());

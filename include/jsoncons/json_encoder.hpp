@@ -934,7 +934,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bignum n = bignum::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -952,7 +952,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64url:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bignum n = bignum::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -1232,7 +1232,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bignum n = bignum::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -1248,7 +1248,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64url:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bignum n = bignum::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
