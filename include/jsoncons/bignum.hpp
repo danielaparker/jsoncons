@@ -104,7 +104,7 @@ private:
         uint8_t is_dynamic_:1; 
         uint8_t is_negative_:1; 
         size_type length_;
-        uint64_t values_[3];
+        uint64_t values_[2];
 
         short_storage()
             : is_dynamic_(false), 
@@ -123,6 +123,7 @@ private:
               length_(n == 0 ? 0 : 1)
         {
             values_[0] = is_negative_ ? -n : n;
+            values_[1] = 0;
         }
 
         template <class T>
@@ -135,6 +136,7 @@ private:
               length_(n == 0 ? 0 : 1)
         {
             values_[0] = n;
+            values_[1] = 0;
         }
 
         template <class T>
