@@ -565,10 +565,23 @@ JSONCONS_N_MEMBER_TRAITS(ns::Project, 0,
 TEST_CASE("xyz")
 {
     ns::Project project;
+    project.name = "Jane Doe";
+    project.showNotes = true;
+    project.values.insert({ "foo",1 });
+    project.values.insert({ "bar",2 });
+    project.values.insert({ "foo",1 });
 
     std::string s;
-    encode_json(project, s);
+    encode_json(project, s, indenting::indent);
 
     std::cout << s << "\n";
 
+    auto v = decode_json<ns::Project>(s);
+
+    REQUIRE(v.values.size() == 3);
+
+    for (auto& item : v.values)
+    {
+        std::cout << item.name << ", " << item.value << "\n";
+    }
 }
