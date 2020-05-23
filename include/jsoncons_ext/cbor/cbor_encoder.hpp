@@ -780,7 +780,7 @@ private:
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
-            bignum n = bignum::from_string(s.data(), s.length(), 16);
+            bignum n = bignum::from_string_radix(s.data(), s.length(), 16);
             write_bignum(n);
             end_value();
         }

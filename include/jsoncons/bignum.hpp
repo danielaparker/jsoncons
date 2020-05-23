@@ -1176,7 +1176,7 @@ public:
     }
 
     template <typename CharT>
-    static basic_bignum<Allocator> from_string(const CharT* data, std::size_t length, uint8_t base)
+    static basic_bignum<Allocator> from_string_radix(const CharT* data, std::size_t length, uint8_t base)
     {
         if (!(base >= 2 && base <= 16))
         {
