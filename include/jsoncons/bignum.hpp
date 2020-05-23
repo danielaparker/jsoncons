@@ -116,6 +116,7 @@ private:
         template <class T>
         short_storage(T n, 
                       typename std::enable_if<std::is_integral<T>::value &&
+                                              sizeof(T) <= sizeof(int64_t) &&
                                               std::is_signed<T>::value>::type* = 0)
             : is_dynamic_(false), 
               is_negative_(n < 0),
@@ -127,12 +128,42 @@ private:
         template <class T>
         short_storage(T n, 
                       typename std::enable_if<std::is_integral<T>::value &&
+                                              sizeof(T) <= sizeof(int64_t) &&
                                               !std::is_signed<T>::value>::type* = 0)
             : is_dynamic_(false), 
               is_negative_(false),
               length_(n == 0 ? 0 : 1)
         {
             values_[0] = n;
+        }
+
+        template <class T>
+        short_storage(T n, 
+                      typename std::enable_if<std::is_integral<T>::value &&
+                                              sizeof(int64_t) < sizeof(T) &&
+                                              std::is_signed<T>::value>::type* = 0)
+            : is_dynamic_(false), 
+              is_negative_(n < 0),
+              length_(n == 0 ? 0 : 2)
+        {
+            auto u = is_negative_ ? -n : n;
+            values_[0] = uint64_t(u & max_basic_type);;
+            u >>= basic_type_bits;
+            values_[1] = uint64_t(u & max_basic_type);;
+        }
+
+        template <class T>
+        short_storage(T n, 
+                      typename std::enable_if<std::is_integral<T>::value &&
+                                              sizeof(int64_t) < sizeof(T) &&
+                                              !std::is_signed<T>::value>::type* = 0)
+            : is_dynamic_(false), 
+              is_negative_(false),
+              length_(n == 0 ? 0 : 2)
+        {
+            values_[0] = uint64_t(n & max_basic_type);;
+            n >>= basic_type_bits;
+            values_[1] = uint64_t(n & max_basic_type);;
         }
 
         short_storage(const short_storage& stor)
@@ -1323,8 +1354,7 @@ private:
     {
         if (is_dynamic())
         {
-            //dynamic_stor_.destroy(get_allocator());
-            ~dynamic_stor_();
+            dynamic_stor_.destroy(get_allocator());
         }
     }
     void DDproduct( uint64_t A, uint64_t B,

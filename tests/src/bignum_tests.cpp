@@ -101,7 +101,7 @@ TEST_CASE("test_longlong")
 {
     long long n = (std::numeric_limits<long long>::max)();
 
-    bignum val = n;
+    bignum val(n);
 
     //std::cout << "long long " << n << " == " << val << std::endl;
     //std::cout << val.to_string(16) << std::endl;
