@@ -520,3 +520,55 @@ TEST_CASE("map with enum key")
         CHECK(x.getType() == ns::MyCriterionType::MessageType);
     }
 }
+
+namespace {
+namespace ns {
+
+    struct Value {
+    	std::string  name;
+    	std::int32_t value;
+
+    	JSONCONS_TYPE_TRAITS_FRIEND
+    };
+
+    inline bool operator<(const Value &l, const Value &r) {
+      return l.name < r.name;
+    }
+    struct Project {
+    	std::int32_t         version = 1;
+    	std::string          name;
+    	std::string          author;
+    	std::string          notes;
+    	bool                 showNotes;
+    	std::multiset<Value> values;
+
+    	JSONCONS_TYPE_TRAITS_FRIEND
+    };
+
+} // namespace ns
+} // namespace
+
+JSONCONS_N_MEMBER_TRAITS(ns::Value, 0,
+	name,
+	value
+)
+
+JSONCONS_N_MEMBER_TRAITS(ns::Project, 0,
+	version,
+	name,
+	author,
+	notes,
+	showNotes,
+	values
+)
+
+TEST_CASE("xyz")
+{
+    ns::Project project;
+
+    std::string s;
+    encode_json(project, s);
+
+    std::cout << s << "\n";
+
+}
