@@ -217,10 +217,13 @@ private:
 
         void destroy(const real_allocator_type& a) noexcept
         {
-            real_allocator_type alloc(a);
+            if (data_ != nullptr)
+            {
+                real_allocator_type alloc(a);
 
-            std::allocator_traits<real_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(data_));
-            std::allocator_traits<real_allocator_type>::deallocate(alloc, data_,capacity_);
+                std::allocator_traits<real_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(data_));
+                std::allocator_traits<real_allocator_type>::deallocate(alloc, data_,capacity_);
+            }
         }
 
         void reserve(size_type n, const real_allocator_type& a)
@@ -234,7 +237,7 @@ private:
             {
                 std::memcpy( data_, data_old, length_*sizeof(uint64_t));
             }
-            if (capacity_ > 0)
+            if (capacity_ > 0 && data_ != nullptr)
             {
                 std::allocator_traits<real_allocator_type>::deallocate(alloc, data_old, capacity_);
             }
