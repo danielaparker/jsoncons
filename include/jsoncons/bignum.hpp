@@ -1323,7 +1323,8 @@ private:
     {
         if (is_dynamic())
         {
-            dynamic_stor_.destroy(get_allocator());
+            //dynamic_stor_.destroy(get_allocator());
+            ~dynamic_stor_();
         }
     }
     void DDproduct( uint64_t A, uint64_t B,
