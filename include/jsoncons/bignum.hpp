@@ -47,7 +47,7 @@ namespace detail {
        using allocator_traits_type = std::allocator_traits<allocator_type>;
        using stored_allocator_type = allocator_type;
        using pointer = typename allocator_traits_type::pointer;
-       using value_type = typename allocator_traits_type::value_type;
+       //using value_type = typename allocator_traits_type::value_type;
        using size_type = typename allocator_traits_type::size_type;
        using pointer_traits = std::pointer_traits<pointer>;
 
