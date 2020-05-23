@@ -31,39 +31,54 @@ Chichester: John Wiley.
 
 */
 
-template <class Allocator>
-class basic_bignum_base
-{
-public:
-    using allocator_type = Allocator;
-    using basic_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t>;
 
-private:
-    basic_type_allocator_type alloc_;
+namespace detail {
 
-public:
-    basic_bignum_base()
-        : alloc_()
+    template <class Allocator>
+    class basic_bignum_base
     {
-    }
-    explicit basic_bignum_base(const allocator_type& alloc)
-        : alloc_(basic_type_allocator_type(alloc))
-    {
-    }
+    public:
+        using allocator_type = Allocator;
+        using basic_type_allocator_type = typename std::allocator_traits<allocator_type>:: template rebind_alloc<uint64_t>;
 
-    basic_type_allocator_type get_allocator() const
-    {
-        return alloc_;
-    }
-};
+    private:
+        basic_type_allocator_type alloc_;
+    public:
+       using allocator_traits_type = std::allocator_traits<allocator_type>;
+       using stored_allocator_type = allocator_type;
+       using pointer = typename allocator_traits_type::pointer;
+       using value_type = typename allocator_traits_type::value_type;
+       using size_type = typename allocator_traits_type::size_type;
+       using pointer_traits = std::pointer_traits<pointer>;
+
+        basic_bignum_base()
+            : alloc_()
+        {
+        }
+        explicit basic_bignum_base(const allocator_type& alloc)
+            : alloc_(basic_type_allocator_type(alloc))
+        {
+        }
+
+        basic_type_allocator_type get_allocator() const
+        {
+            return alloc_;
+        }
+    };
+
+} // namespace detail
 
 template <class Allocator = std::allocator<uint64_t>>
-class basic_bignum : protected basic_bignum_base<Allocator>
+class basic_bignum : protected detail::basic_bignum_base<Allocator>
 {
-private:
-    using base_t = basic_bignum_base<Allocator>;
-    using bignum_type = basic_bignum<Allocator>;
+    using base_t = detail::basic_bignum_base<Allocator>;
+
+public:
+    enum sign_type {minus, plus};
+
+    using size_type = base_t::size_type;
     using base_t::get_allocator;
+    using bignum_type = basic_bignum<Allocator>;
 
     static constexpr uint64_t max_basic_type = (std::numeric_limits<uint64_t>::max)();
     static constexpr uint64_t basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
@@ -74,222 +89,357 @@ private:
     static constexpr uint64_t l_mask = max_basic_type - r_mask;
     static constexpr uint64_t l_bit = max_basic_type - (max_basic_type >> 1);
 
+private:
+
+    struct common_storage
+    {
+        uint8_t is_dynamic_:1; 
+        uint8_t is_negative_:1; 
+        size_type length_;
+    };
+
+    struct short_storage
+    {
+        uint8_t is_dynamic_:1; 
+        uint8_t is_negative_:1; 
+        size_type length_;
+        uint64_t values_[2];
+
+        short_storage()
+            : is_dynamic_(false), 
+              is_negative_(false),
+              length_(0)
+        {
+        }
+
+        template <class T>
+        short_storage(T n, 
+                      typename std::enable_if<std::is_integral<T>::value &&
+                                              std::is_signed<T>::value>::type* = 0)
+            : is_dynamic_(false), 
+              is_negative_(n < 0),
+              length_(n == 0 ? 0 : 1)
+        {
+            values_[0] = is_negative_ ? -n : n;
+        }
+
+        template <class T>
+        short_storage(T n, 
+                      typename std::enable_if<std::is_integral<T>::value &&
+                                              !std::is_signed<T>::value>::type* = 0)
+            : is_dynamic_(false), 
+              is_negative_(false),
+              length_(n == 0 ? 0 : 1)
+        {
+            values_[0] = n;
+        }
+
+        short_storage(const short_storage& stor)
+            : is_dynamic_(false), 
+              is_negative_(stor.is_negative_),
+              length_(stor.length_)
+        {
+            values_[0] = stor.values_[0];
+            values_[1] = stor.values_[1];
+        }
+    };
+
+    struct dynamic_storage
+    {
+        using real_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<uint64_t>;
+        using pointer = typename std::allocator_traits<real_allocator_type>::pointer;
+
+        uint8_t is_dynamic_:1; 
+        uint8_t is_negative_:1; 
+        size_type length_;
+        size_type capacity_;
+        pointer data_;
+
+        dynamic_storage()
+            : is_dynamic_(true), 
+              is_negative_(false),
+              length_(0),
+              capacity_(0),
+              data_(nullptr)
+        {
+        }
+
+        dynamic_storage(sign_type sign, int64_t* data, size_type length,
+                        const real_allocator_type& alloc)
+            : is_dynamic_(true), 
+              is_negative_(sign == sign_type::minus),
+              length_(length),
+              capacity_(0),
+              data_(nullptr)
+        {
+            create(length, alloc);
+            std::memcpy(data_, data, length*sizeof(uint64_t));
+        }
+
+        dynamic_storage(const dynamic_storage& stor, const real_allocator_type& alloc)
+            : is_dynamic_(true), 
+              is_negative_(stor.is_negative_),
+              length_(stor.length_),
+              capacity_(0),
+              data_(nullptr)
+        {
+            create(stor.length_, alloc);
+            std::memcpy(data_, stor.data_, stor.length_*sizeof(uint64_t));
+        }
+
+        dynamic_storage(dynamic_storage&& stor)
+            : is_dynamic_(true), 
+              is_negative_(stor.is_negative_),
+              length_(stor.length_),
+              capacity_(stor.capacity_),
+              data_(stor.data_)
+        {
+            stor.length_ = 0;
+            stor.capacity_ = 0;
+            stor.data_ = nullptr;
+        }
+
+        void create(size_type length, real_allocator_type alloc)
+        {
+            capacity_ = round_up(length);
+            data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_);
+            JSONCONS_TRY
+            {
+                std::allocator_traits<real_allocator_type>::construct(alloc, jsoncons::detail::to_plain_pointer(data_));
+            }
+            JSONCONS_CATCH(...)
+            {
+                std::allocator_traits<real_allocator_type>::deallocate(alloc, data_, capacity_);
+                JSONCONS_RETHROW;
+            }
+        }
+
+        void destroy(const real_allocator_type& a) noexcept
+        {
+            real_allocator_type alloc(a);
+
+            std::allocator_traits<real_allocator_type>::destroy(alloc, jsoncons::detail::to_plain_pointer(data_));
+            std::allocator_traits<real_allocator_type>::deallocate(alloc, data_,capacity_);
+        }
+
+        void reserve(size_type n, const real_allocator_type& a)
+        {
+            real_allocator_type alloc(a);
+
+            size_type capacity_new = round_up(n);
+            uint64_t* data_old = data_;
+            data_ = std::allocator_traits<real_allocator_type>::allocate(alloc, capacity_new);
+            if (length_ > 0)
+            {
+                std::memcpy( data_, data_old, length_*sizeof(uint64_t));
+            }
+            if (capacity_ > 0)
+            {
+                std::allocator_traits<real_allocator_type>::deallocate(alloc, data_old, capacity_);
+            }
+            capacity_ = capacity_new;
+        }
+
+        // Find suitable new block size
+        constexpr size_type round_up(size_type i) const 
+        {
+            return (i/word_length + 1) * word_length;
+        }
+    };
+
     union
     {
-        std::size_t capacity_;
-        uint64_t values_[2];
+        common_storage common_stor_;
+        short_storage short_stor_;
+        dynamic_storage dynamic_stor_;
     };
-    uint64_t* data_;
-    bool      is_negative_;
-    bool      is_dynamic_;
-    std::size_t    length_;
-public:
-    bool is_dynamic() const {return is_dynamic_;}
-    bool is_negative() const {return is_negative_;}
 
-//  Constructors and Destructor
+public:
     basic_bignum()
-        : values_{0,0}, data_(values_), is_negative_(false), is_dynamic_(false), length_(0)
     {
+        ::new (&short_stor_) short_storage();
     }
 
     explicit basic_bignum(const Allocator& alloc)
-        : basic_bignum_base<Allocator>(alloc), values_{0,0}, data_(values_), is_negative_(false), is_dynamic_(false), length_(0)
+        : base_t(alloc)
     {
+        ::new (&short_stor_) short_storage();
     }
 
+
     basic_bignum(const basic_bignum<Allocator>& n)
-        : basic_bignum_base<Allocator>(n.get_allocator()), is_negative_(n.is_negative()), length_(n.length_)
+        : base_t(n.get_allocator())
     {
         if (!n.is_dynamic())
         {
-            values_[0] = n.values_[0];
-            values_[1] = n.values_[1];
-            data_ = values_;
-            is_dynamic_ = false;
+            ::new (&short_stor_) short_storage(n.short_stor_);
         }
         else
         {
-            capacity_ = n.capacity_;
-            data_ = get_allocator().allocate(capacity_);
-            is_dynamic_ = true;
-            std::memcpy( data_, n.data_, n.length_*sizeof(uint64_t) );
+            ::new (&dynamic_stor_) dynamic_storage(n.dynamic_stor_, get_allocator());
         }
     }
 
     basic_bignum(basic_bignum<Allocator>&& other) noexcept
-        : basic_bignum_base<Allocator>(other.get_allocator()), is_negative_(other.is_negative()), is_dynamic_(other.is_dynamic()), length_(other.length_)
+        : base_t(other.get_allocator())
     {
-        if (other.is_dynamic())
+        if (!other.is_dynamic())
         {
-            capacity_ = other.capacity_;
-            data_ = other.data_;
-
-            other.data_ = other.values_;
-            other.is_dynamic_ = false;
-            other.length_ = 0;
-            other.is_negative_ = false;
+            ::new (&short_stor_) short_storage(other.short_stor_);
         }
         else
         {
-            values_[0] = other.data_[0];
-            values_[1] = other.data_[1];
-            data_ = values_;
+            ::new (&dynamic_stor_) dynamic_storage(std::move(other.dynamic_stor_));
         }
     }
 
-    basic_bignum(int signum, std::initializer_list<uint8_t> l)
-        : values_{0,0}
+    template <class Integer>
+    basic_bignum(Integer n, 
+                 typename std::enable_if<std::is_integral<Integer>::value>::type* = 0)
     {
-        if (l.size() > 0)
-        {
-            basic_bignum<Allocator> v = 0;
-            for (auto c: l)
-            {
-                v = (v * 256) + (uint64_t)(c);
-            }
-
-            if (signum == -1)
-            {
-                v = -1 - v;
-            }
-
-            initialize(v);
-        }
-        else
-        {
-            is_negative_ = false;
-            initialize_from_integer(0u);
-        }
-    }
-
-    basic_bignum(short i)
-        : values_{0,0}
-    {
-        is_negative_ = i < 0;
-        uint64_t u = is_negative() ? -i : i;
-        initialize_from_integer( u );
-    }
-
-    basic_bignum(unsigned short u)
-        : values_{0,0}
-    {
-        is_negative_ = false;
-        initialize_from_integer( u );
-    }
-
-    basic_bignum(int i)
-        : values_{0,0}
-    {
-        is_negative_ = i < 0;
-        uint64_t u = is_negative() ? -i : i;
-        initialize_from_integer( u );
-    }
-
-    basic_bignum(unsigned int u)
-        : values_{0,0}
-    {
-        is_negative_ = false;
-        initialize_from_integer( u );
-    }
-
-    basic_bignum(long i)
-        : values_{0,0}
-    {
-        is_negative_ = i < 0;
-        uint64_t u = is_negative() ? -i : i;
-        initialize_from_integer( u );
-    }
-
-    basic_bignum(unsigned long u)
-        : values_{0,0}
-    {
-        is_negative_ = false;
-        initialize_from_integer( u );
-    }
-
-    basic_bignum(long long i)
-        : values_{0,0}
-    {
-        is_negative_ = i < 0;
-        uint64_t u = is_negative() ? -i : i;
-        initialize_from_integer( u );
-    }
-
-    basic_bignum(unsigned long long u)
-        : values_{0,0}
-    {
-        is_negative_ = false;
-        initialize_from_integer( u );
-    }
-
-    explicit basic_bignum( double x )
-        : values_{0,0}
-    {
-        bool neg = false;
-
-        if ( x < 0 )
-        {
-            neg = true;
-            x = -x;
-        }
-        basic_bignum<Allocator> v = 0;
-
-        double values = (double)max_basic_type + 1.0;
-        basic_bignum<Allocator> factor = 1;
-
-        while ( x >= 1 )
-        {
-            uint64_t u = (uint64_t) std::fmod( x, values );
-            v = v + factor* basic_bignum<Allocator>(u);
-            x /= values;
-            factor = factor*(basic_bignum<Allocator>( max_basic_type ) + basic_bignum<Allocator>(1));
-        }
-
-        if ( neg )
-        {
-            v.is_negative_ = true;
-        }
-        initialize( v );
-    }
-
-    explicit basic_bignum(long double x)
-        : values_{0,0}
-    {
-        bool neg = false;
-
-        if ( x < 0 )
-        {
-            neg = true;
-            x = -x;
-        }
-
-        basic_bignum<Allocator> v = 0;
-
-        long double values = (long double)max_basic_type + 1.0;
-        basic_bignum<Allocator> factor = 1;
-
-        while ( x >= 1.0 )
-        {
-            uint64_t u = (uint64_t) std::fmod( x, values );
-            v = v + factor* basic_bignum<Allocator>(u);
-            x /= values;
-            factor = factor*(basic_bignum<Allocator>( max_basic_type ) + basic_bignum<Allocator>(1));
-        }
-
-        if ( neg )
-        {
-            v.is_negative_ = true;
-        }
-        initialize( v );
+        ::new (&short_stor_) short_storage(n);
     }
 
     ~basic_bignum() noexcept
     {
-        if ( is_dynamic() )
+        destroy();
+    }
+
+    constexpr bool is_dynamic() const
+    {
+        return common_stor_.is_dynamic_;
+    }
+
+    constexpr size_type length() const
+    {
+        return common_stor_.length_;
+    }
+
+    constexpr size_type capacity() const
+    {
+        return is_dynamic() ? dynamic_stor_.capacity_ : 2;
+    }
+
+    bool is_negative() const
+    {
+        return common_stor_.is_negative_;
+    }
+
+    void is_negative(bool value) 
+    {
+        common_stor_.is_negative_ = value;
+    }
+
+    constexpr const uint64_t* data() const
+    {
+        return is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_;
+    }
+
+    uint64_t* data() 
+    {
+        return is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_;
+    }
+
+    template <class CharT>
+    static basic_bignum<Allocator> from_string(const std::basic_string<CharT>& s)
+    {
+        return from_string(s.data(), s.length());
+    }
+
+    template <class CharT>
+    static basic_bignum<Allocator> from_string(const CharT* s)
+    {
+        return from_string(s, std::char_traits<CharT>::length(s));
+    }
+
+    template <class CharT>
+    static basic_bignum<Allocator> from_string(const CharT* data, size_type length)
+    {
+        bool neg;
+        if (*data == '-')
         {
-            get_allocator().deallocate(data_, capacity_);
+            neg = true;
+            data++;
+            --length;
         }
+        else
+        {
+            neg = false;
+        }
+
+        basic_bignum<Allocator> v = 0;
+        for (size_type i = 0; i < length; i++)
+        {
+            CharT c = data[i];
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    v = (v * 10) + (uint64_t)(c - '0');
+                    break;
+                default:
+                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
+            }
+        }
+
+        if (neg)
+        {
+            v.common_stor_.is_negative_ = true;
+        }
+
+        return v;
+    }
+
+    template <class CharT>
+    static basic_bignum<Allocator> from_string_radix(const CharT* data, size_type length, uint8_t radix)
+    {
+        if (!(radix >= 2 && radix <= 16))
+        {
+            JSONCONS_THROW(std::runtime_error("Unsupported radix"));
+        }
+
+        bool neg;
+        if (*data == '-')
+        {
+            neg = true;
+            data++;
+            --length;
+        }
+        else
+        {
+            neg = false;
+        }
+
+        basic_bignum<Allocator> v = 0;
+        for (size_type i = 0; i < length; i++)
+        {
+            CharT c = data[i];
+            uint64_t d;
+            switch (c)
+            {
+                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    d = (uint64_t)(c - '0');
+                    break;
+                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
+                    d = (uint64_t)(c - ('a' - 10));
+                    break;
+                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
+                    d = (uint64_t)(c - ('A' - 10));
+                    break;
+                default:
+                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in radix ") + std::to_string(radix) + ": \'" + (char)c + "\'"));
+            }
+            if (d >= radix)
+            {
+                JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in radix ") + std::to_string(radix) + ": \'" + (char)c + "\'"));
+            }
+            v = (v * radix) + d;
+        }
+
+        if ( neg )
+        {
+            v.common_stor_.is_negative_ = true;
+        }
+        return v;
     }
 
     static basic_bignum from_be(const uint8_t* str, std::size_t n)
@@ -298,7 +448,7 @@ public:
         // Estimate how big the result will be, so we can pre-allocate it.
         double bits = radix_log2 * n;
         double big_digits = std::ceil(bits / 64.0);
-        std::cout << "ESTIMATED: " << big_digits << "\n";
+        //std::cout << "ESTIMATED: " << big_digits << "\n";
 
         bignum_type v = 0;
         v.reserve(static_cast<std::size_t>(big_digits));
@@ -310,14 +460,53 @@ public:
                 v = (v * 256) + (uint64_t)(str[i]);
             }
         }
-        std::cout << "ACTUAL: " << v.length() << "\n";
+        //std::cout << "ACTUAL: " << v.length() << "\n";
 
         return v;
     }
 
-    std::size_t capacity() const { return is_dynamic() ? capacity_ : 2; }
+    uint64_t* begin() { return is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_; }
+    const uint64_t* begin() const { return is_dynamic() ? dynamic_stor_.data_ : short_stor_.values_; }
+    uint64_t* end() { return begin() + length(); }
+    const uint64_t* end() const { return begin() + length(); }
 
-//  Operators
+    void resize(size_type n)
+    {
+        size_type len_old = common_stor_.length_;
+        reserve(n);
+        common_stor_.length_ = n;
+        if ( common_stor_.length_ > len_old )
+        {
+            memset( data()+len_old, 0, (common_stor_.length_ - len_old)*sizeof(uint64_t) );
+        }
+    }
+
+    void reserve(size_type n)
+    {
+       if (capacity() < n)
+       {
+           if (!is_dynamic())
+           {
+               size_type size = short_stor_.length_;
+               size_type is_neg = short_stor_.is_negative_;
+               uint64_t values[2] = {short_stor_.values_[0], short_stor_.values_[1]};
+
+               ::new (&dynamic_stor_) dynamic_storage();
+               dynamic_stor_.reserve(n, get_allocator());
+               dynamic_stor_.length_ = size;
+               dynamic_stor_.is_negative_ = is_neg;
+               dynamic_stor_.data_[0] = values[0];
+               dynamic_stor_.data_[1] = values[1];
+           }
+           else
+           {
+               dynamic_stor_.reserve(n, get_allocator());
+           }
+       }
+    }
+
+    // operators
+
     bool operator!() const
     {
         return length() == 0 ? true : false;
@@ -325,8 +514,8 @@ public:
 
     basic_bignum operator-() const
     {
-        basic_bignum<Allocator> v = *this;
-        v.is_negative_ = !v.is_negative();
+        basic_bignum<Allocator> v(*this);
+        v.common_stor_.is_negative_ = !v.is_negative();
         return v;
     }
 
@@ -335,10 +524,10 @@ public:
         if ( this != &y )
         {
             resize( y.length() );
-            is_negative_ = y.is_negative();
+            common_stor_.is_negative_ = y.is_negative();
             if ( y.length() > 0 )
             {
-                std::memcpy( data_, y.data_, y.length()*sizeof(uint64_t) );
+                std::memcpy( data(), y.data(), y.length()*sizeof(uint64_t) );
             }
         }
         return *this;
@@ -351,22 +540,22 @@ public:
         uint64_t d;
         uint64_t carry = 0;
 
-        incr_length( (std::max)(y.length(), length()) + 1 );
+        resize( (std::max)(y.length(), length()) + 1 );
 
-        for (std::size_t i = 0; i < length(); i++ )
+        for (size_type i = 0; i < length(); i++ )
         {
             if ( i >= y.length() && carry == 0 )
                 break;
-            d = data_[i] + carry;
+            d = data()[i] + carry;
             carry = d < carry;
             if ( i < y.length() )
             {
-                data_[i] = d + y.data_[i];
-                if ( data_[i] < d )
+                data()[i] = d + y.data()[i];
+                if ( data()[i] < d )
                     carry = 1;
             }
             else
-                data_[i] = d;
+                data()[i] = d;
         }
         reduce();
         return *this;
@@ -380,20 +569,20 @@ public:
             return *this = -(y - *this);
         uint64_t borrow = 0;
         uint64_t d;
-        for (std::size_t i = 0; i < length(); i++ )
+        for (size_type i = 0; i < length(); i++ )
         {
             if ( i >= y.length() && borrow == 0 )
                 break;
-            d = data_[i] - borrow;
-            borrow = d > data_[i];
+            d = data()[i] - borrow;
+            borrow = d > data()[i];
             if ( i < y.length())
             {
-                data_[i] = d - y.data_[i];
-                if ( data_[i] > d )
+                data()[i] = d - y.data()[i];
+                if ( data()[i] > d )
                     borrow = 1;
             }
             else 
-                data_[i] = d;
+                data()[i] = d;
         }
         reduce();
         return *this;
@@ -403,29 +592,29 @@ public:
     {
         *this *= uint64_t(y < 0 ? -y : y);
         if ( y < 0 )
-            is_negative_ = !is_negative();
+            common_stor_.is_negative_ = !is_negative();
         return *this;
     }
 
     basic_bignum& operator*=( uint64_t y )
     {
-        std::size_t len0 = length();
+        size_type len0 = length();
         uint64_t hi;
         uint64_t lo;
-        uint64_t dig = data_[0];
+        uint64_t dig = data()[0];
         uint64_t carry = 0;
 
-        incr_length( length() + 1 );
+        resize( length() + 1 );
 
-        std::size_t i = 0;
+        size_type i = 0;
         for (i = 0; i < len0; i++ )
         {
             DDproduct( dig, y, hi, lo );
-            data_[i] = lo + carry;
-            dig = data_[i+1];
-            carry = hi + (data_[i] < lo);
+            data()[i] = lo + carry;
+            dig = data()[i+1];
+            carry = hi + (data()[i] < lo);
         }
-        data_[i] = carry;
+        data()[i] = carry;
         reduce();
         return *this;
     }
@@ -437,35 +626,35 @@ public:
         bool difSigns = is_negative() != y.is_negative();
         if ( length() + y.length() == 2 ) // length() = y.length() = 1
         {
-            uint64_t a = data_[0], b = y.data_[0];
-            data_[0] = a * b;
-            if ( data_[0] / a != b )
+            uint64_t a = data()[0], b = y.data()[0];
+            data()[0] = a * b;
+            if ( data()[0] / a != b )
             {
                 resize( 2 );
-                DDproduct( a, b, data_[1], data_[0] );
+                DDproduct( a, b, data()[1], data()[0] );
             }
-            is_negative_ = difSigns;
+            common_stor_.is_negative_ = difSigns;
             return *this;
         }
         if ( length() == 1 )  //  && y.length() > 1
         {
-            uint64_t digit = data_[0];
+            uint64_t digit = data()[0];
             *this = y;
             *this *= digit;
         }
         else
         {
             if ( y.length() == 1 )
-                *this *= y.data_[0];
+                *this *= y.data()[0];
             else
             {
-                std::size_t lenProd = length() + y.length(), jA, jB;
+                size_type lenProd = length() + y.length(), jA, jB;
                 uint64_t sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
                 basic_bignum<Allocator> x = *this;
                 resize( lenProd ); // Give *this length lenProd
 
-                for (std::size_t i = 0; i < lenProd; i++ )
+                for (size_type i = 0; i < lenProd; i++ )
                 {
                     sumLo = sumHi;
                     sumHi = carry;
@@ -475,7 +664,7 @@ public:
                         jB = i - jA;
                         if ( jB >= 0 && jB < y.length() )
                         {
-                            DDproduct( x.data_[jA], y.data_[jB], hi, lo );
+                            DDproduct( x.data()[jA], y.data()[jB], hi, lo );
                             sumLo_old = sumLo;
                             sumHi_old = sumHi;
                             sumLo += lo;
@@ -485,12 +674,12 @@ public:
                             carry += (sumHi < sumHi_old);
                         }
                     }
-                    data_[i] = sumLo;
+                    data()[i] = sumLo;
                 }
             }
         }
        reduce();
-       is_negative_ = difSigns;
+       common_stor_.is_negative_ = difSigns;
        return *this;
     }
 
@@ -510,24 +699,24 @@ public:
 
     basic_bignum& operator<<=( uint64_t k )
     {
-        std::size_t q = (std::size_t)(k / basic_type_bits);
-        if ( q ) // Increase length_ by q:
+        size_type q = (size_type)(k / basic_type_bits);
+        if ( q ) // Increase common_stor_.length_ by q:
         {
-            incr_length(length() + q);
-            for (std::size_t i = length(); i-- > 0; )
-                data_[i] = ( i < q ? 0 : data_[i - q]);
+            resize(length() + q);
+            for (size_type i = length(); i-- > 0; )
+                data()[i] = ( i < q ? 0 : data()[i - q]);
             k %= basic_type_bits;
         }
         if ( k )  // 0 < k < basic_type_bits:
         {
             uint64_t k1 = basic_type_bits - k;
             uint64_t mask = (1 << k) - 1;
-            incr_length( length() + 1 );
-            for (std::size_t i = length(); i-- > 0; )
+            resize( length() + 1 );
+            for (size_type i = length(); i-- > 0; )
             {
-                data_[i] <<= k;
+                data()[i] <<= k;
                 if ( i > 0 )
-                    data_[i] |= (data_[i-1] >> k1) & mask;
+                    data()[i] |= (data()[i-1] >> k1) & mask;
             }
         }
         reduce();
@@ -536,7 +725,7 @@ public:
 
     basic_bignum& operator>>=(uint64_t k)
     {
-        std::size_t q = (std::size_t)(k / basic_type_bits);
+        size_type q = (size_type)(k / basic_type_bits);
         if ( q >= length() )
         {
             resize( 0 );
@@ -544,7 +733,7 @@ public:
         }
         if (q > 0)
         {
-            memmove( data_, data_+q, (std::size_t)((length() - q)*sizeof(uint64_t)) );
+            memmove( data(), data()+q, (size_type)((length() - q)*sizeof(uint64_t)) );
             resize( length() - q );
             k %= basic_type_bits;
             if ( k == 0 )
@@ -554,14 +743,14 @@ public:
             }
         }
 
-        std::size_t n = (std::size_t)(length() - 1);
+        size_type n = (size_type)(length() - 1);
         int64_t k1 = basic_type_bits - k;
         uint64_t mask = (1 << k) - 1;
-        for (std::size_t i = 0; i <= n; i++)
+        for (size_type i = 0; i <= n; i++)
         {
-            data_[i] >>= k;
+            data()[i] >>= k;
             if ( i < n )
-                data_[i] |= ((data_[i+1] & mask) << k1);
+                data()[i] |= ((data()[i+1] & mask) << k1);
         }
         reduce();
         return *this;
@@ -597,7 +786,7 @@ public:
     {
         if ( length() < a.length() )
         {
-            incr_length( a.length() );
+            resize( a.length() );
         }
 
         const uint64_t* qBegin = a.begin();
@@ -618,7 +807,7 @@ public:
     {
         if ( length() < a.length() )
         {
-            incr_length( a.length() );
+            resize( a.length() );
         }
 
         const uint64_t* qBegin = a.begin();
@@ -637,7 +826,7 @@ public:
 
     basic_bignum& operator&=( const basic_bignum<Allocator>& a )
     {
-        std::size_t old_length = length();
+        size_type old_length = length();
 
         resize( (std::min)( length(), a.length() ) );
 
@@ -652,7 +841,7 @@ public:
 
         if ( old_length > length() )
         {
-            memset( data_ + length(), 0, old_length - length() );
+            memset( data() + length(), 0, old_length - length() );
         }
 
         reduce();
@@ -670,7 +859,7 @@ public:
        int64_t x = 0;
        if ( length() > 0 )
        {
-           x = data_ [0];
+           x = data() [0];
        }
 
        return is_negative() ? -x : x;
@@ -681,7 +870,7 @@ public:
        uint64_t u = 0;
        if ( length() > 0 )
        {
-           u = data_ [0];
+           u = data() [0];
        }
 
        return u;
@@ -793,8 +982,8 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
-                r = (R.length() ? R.data_[0] : 0);
-                for ( std::size_t j=0; j < ip10; j++ )
+                r = (R.length() ? R.data()[0] : 0);
+                for ( size_type j=0; j < ip10; j++ )
                 {
                     data[--n] = char(r % 10 + '0');
                     r /= 10;
@@ -848,8 +1037,8 @@ public:
             do
             {
                 v.divide( LP10, v, R, true );
-                r = (R.length() ? R.data_[0] : 0);
-                for ( std::size_t j=0; j < ip10; j++ )
+                r = (R.length() ? R.data()[0] : 0);
+                for ( size_type j=0; j < ip10; j++ )
                 {
                     uint8_t c = r % 16;
                     data[--n] = (c < 10) ? ('0' + c) : ('A' - 10 + c);
@@ -1109,14 +1298,14 @@ public:
             code = +1;
         else
         {
-            for (std::size_t i = length(); i-- > 0; )
+            for (size_type i = length(); i-- > 0; )
             {
-                if (data_[i] > y.data_[i])
+                if (data()[i] > y.data()[i])
                 {
                     code = 1;
                     break;
                 }
-                else if (data_[i] < y.data_[i])
+                else if (data()[i] < y.data()[i])
                 {
                     code = -1;
                     break;
@@ -1125,111 +1314,14 @@ public:
         }
         return is_negative() ? -code : code;
     }
-
-    template <typename CharT>
-    static basic_bignum<Allocator> from_string(const std::basic_string<CharT>& s)
-    {
-        return from_string(s.data(), s.length());
-    }
-
-    template <typename CharT>
-    static basic_bignum<Allocator> from_string(const CharT* s)
-    {
-        return from_string(s, std::char_traits<CharT>::length(s));
-    }
-
-    template <typename CharT>
-    static basic_bignum<Allocator> from_string(const CharT* data, std::size_t length)
-    {
-        bool neg;
-        if (*data == '-')
-        {
-            neg = true;
-            data++;
-            --length;
-        }
-        else
-        {
-            neg = false;
-        }
-
-        basic_bignum<Allocator> v = 0;
-        for (std::size_t i = 0; i < length; i++)
-        {
-            CharT c = data[i];
-            switch (c)
-            {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    v = (v * 10) + (uint64_t)(c - '0');
-                    break;
-                default:
-                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit ") + "\'" + (char)c + "\'"));
-            }
-        }
-
-        if ( neg )
-        {
-            v.is_negative_ = true;
-        }
-
-        return v;
-    }
-
-    template <typename CharT>
-    static basic_bignum<Allocator> from_string_radix(const CharT* data, std::size_t length, uint8_t base)
-    {
-        if (!(base >= 2 && base <= 16))
-        {
-            JSONCONS_THROW(std::runtime_error("Unsupported base"));
-        }
-
-        bool neg;
-        if (*data == '-')
-        {
-            neg = true;
-            data++;
-            --length;
-        }
-        else
-        {
-            neg = false;
-        }
-
-        basic_bignum<Allocator> v = 0;
-        for (std::size_t i = 0; i < length; i++)
-        {
-            CharT c = data[i];
-            uint64_t d;
-            switch (c)
-            {
-                case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    d = (uint64_t)(c - '0');
-                    break;
-                case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                    d = (uint64_t)(c - ('a' - 10));
-                    break;
-                case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                    d = (uint64_t)(c - ('A' - 10));
-                    break;
-                default:
-                    JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
-            }
-            if (d >= base)
-            {
-                JSONCONS_THROW(std::runtime_error(std::string("Invalid digit in base ") + std::to_string(base) + ": \'" + (char)c + "\'"));
-            }
-            v = (v * base) + d;
-        }
-
-        if ( neg )
-        {
-            v.is_negative_ = true;
-        }
-
-        return v;
-    }
-
 private:
+    void destroy() noexcept
+    {
+        if (is_dynamic())
+        {
+            dynamic_stor_.destroy(get_allocator());
+        }
+    }
     void DDproduct( uint64_t A, uint64_t B,
                     uint64_t& hi, uint64_t& lo ) const
     // Multiplying two digits: (hi, lo) = A * B
@@ -1292,11 +1384,11 @@ private:
         return (qHi << basic_type_halfBits) + qLo;
     }
 
-    void subtractmul( uint64_t* a, uint64_t* b, std::size_t n, uint64_t& q ) const
+    void subtractmul( uint64_t* a, uint64_t* b, size_type n, uint64_t& q ) const
     // a -= q * b: b in n positions; correct q if necessary
     {
         uint64_t hi, lo, d, carry = 0;
-        std::size_t i;
+        size_type i;
         for ( i = 0; i < n; i++ )
         {
             DDproduct( b[i], q, hi, lo );
@@ -1326,8 +1418,8 @@ private:
 
     int normalize( basic_bignum<Allocator>& denom, basic_bignum<Allocator>& num, int& x ) const
     {
-        std::size_t r = denom.length() - 1;
-        uint64_t y = denom.data_[r];
+        size_type r = denom.length() - 1;
+        uint64_t y = denom.data()[r];
 
         x = 0;
         while ( (y & l_bit) == 0 )
@@ -1337,7 +1429,7 @@ private:
         }
         denom <<= x;
         num <<= x;
-        if ( r > 0 && denom.data_[r] < denom.data_[r-1] )
+        if ( r > 0 && denom.data()[r] < denom.data()[r-1] )
         {
             denom *= max_basic_type;
                     num *= max_basic_type;
@@ -1372,203 +1464,77 @@ private:
         bool rem_neg = is_negative();
         int x = 0;
         basic_bignum<Allocator> num = *this;
-        num.is_negative_ = denom.is_negative_ = false;
+        num.common_stor_.is_negative_ = denom.common_stor_.is_negative_ = false;
         if ( num < denom )
         {
             quot = uint64_t(0);
             rem = num;
-            rem.is_negative_ = rem_neg;
+            rem.common_stor_.is_negative_ = rem_neg;
             return;
         }
         if ( denom.length() == 1 && num.length() == 1 )
         {
-            quot = uint64_t( num.data_[0]/denom.data_[0] );
-            rem = uint64_t( num.data_[0]%denom.data_[0] );
-            quot.is_negative_ = quot_neg;
-            rem.is_negative_ = rem_neg;
+            quot = uint64_t( num.data()[0]/denom.data()[0] );
+            rem = uint64_t( num.data()[0]%denom.data()[0] );
+            quot.common_stor_.is_negative_ = quot_neg;
+            rem.common_stor_.is_negative_ = rem_neg;
             return;
         }
-        else if (denom.length() == 1 && (denom.data_[0] & l_mask) == 0 )
+        else if (denom.length() == 1 && (denom.data()[0] & l_mask) == 0 )
         {
             // Denominator fits into a half word
-            uint64_t divisor = denom.data_[0], dHi = 0,
+            uint64_t divisor = denom.data()[0], dHi = 0,
                      q1, r, q2, dividend;
             quot.resize(length());
-            for (std::size_t i=length(); i-- > 0; )
+            for (size_type i=length(); i-- > 0; )
             {
-                dividend = (dHi << basic_type_halfBits) | (data_[i] >> basic_type_halfBits);
+                dividend = (dHi << basic_type_halfBits) | (data()[i] >> basic_type_halfBits);
                 q1 = dividend/divisor;
                 r = dividend % divisor;
-                dividend = (r << basic_type_halfBits) | (data_[i] & r_mask);
+                dividend = (r << basic_type_halfBits) | (data()[i] & r_mask);
                 q2 = dividend/divisor;
                 dHi = dividend % divisor;
-                quot.data_[i] = (q1 << basic_type_halfBits) | q2;
+                quot.data()[i] = (q1 << basic_type_halfBits) | q2;
             }
             quot.reduce();
             rem = dHi;
-            quot.is_negative_ = quot_neg;
-            rem.is_negative_ = rem_neg;
+            quot.common_stor_.is_negative_ = quot_neg;
+            rem.common_stor_.is_negative_ = rem_neg;
             return;
         }
         basic_bignum<Allocator> num0 = num, denom0 = denom;
         int second_done = normalize(denom, num, x);
-        std::size_t l = denom.length() - 1;
-        std::size_t n = num.length() - 1;
+        size_type l = denom.length() - 1;
+        size_type n = num.length() - 1;
         quot.resize(n - l);
-        for (std::size_t i=quot.length(); i-- > 0; )
-            quot.data_[i] = 0;
+        for (size_type i=quot.length(); i-- > 0; )
+            quot.data()[i] = 0;
         rem = num;
-        if ( rem.data_[n] >= denom.data_[l] )
+        if ( rem.data()[n] >= denom.data()[l] )
         {
-            rem.incr_length(rem.length() + 1);
+            rem.resize(rem.length() + 1);
             n++;
-            quot.incr_length(quot.length() + 1);
+            quot.resize(quot.length() + 1);
         }
-        uint64_t d = denom.data_[l];
-        for ( std::size_t k = n; k > l; k-- )
+        uint64_t d = denom.data()[l];
+        for ( size_type k = n; k > l; k-- )
         {
-            uint64_t q = DDquotient(rem.data_[k], rem.data_[k-1], d);
-            subtractmul( rem.data_ + k - l - 1, denom.data_, l + 1, q );
-            quot.data_[k - l - 1] = q;
+            uint64_t q = DDquotient(rem.data()[k], rem.data()[k-1], d);
+            subtractmul( rem.data() + k - l - 1, denom.data(), l + 1, q );
+            quot.data()[k - l - 1] = q;
         }
         quot.reduce();
-        quot.is_negative_ = quot_neg;
+        quot.common_stor_.is_negative_ = quot_neg;
         if ( remDesired )
         {
             unnormalize(rem, x, second_done);
-            rem.is_negative_ = rem_neg;
+            rem.common_stor_.is_negative_ = rem_neg;
         }
     }
 
-    std::size_t length() const { return length_; }
-    uint64_t* begin() { return data_; }
-    const uint64_t* begin() const { return data_; }
-    uint64_t* end() { return data_ + length_; }
-    const uint64_t* end() const { return data_ + length_; }
-
-    void resize(std::size_t n)
-    {
-        std::size_t len_old = length_;
-       length_ = n;
-       if ( length_ > capacity() )
-       {
-           std::size_t capacity_new = round_up(length_);
-           uint64_t* data_old = data_;
-           data_ = get_allocator().allocate(capacity_new);
-           if ( len_old > 0 )
-           {
-               std::memcpy( data_, data_old, len_old*sizeof(uint64_t));
-           }
-           if ( is_dynamic() )
-           {
-               get_allocator().deallocate(data_old,capacity_);
-           }
-           capacity_ = capacity_new;
-           is_dynamic_ = true;
-       }
-    }
-
-    void reserve(std::size_t n)
-    {
-       if (capacity() < n)
-       {
-           std::size_t capacity_new = round_up(n);
-           uint64_t* data_old = data_;
-           data_ = get_allocator().allocate(capacity_new);
-           if (length_ > 0)
-           {
-               std::memcpy( data_, data_old, length_*sizeof(uint64_t));
-           }
-           if ( is_dynamic() )
-           {
-               get_allocator().deallocate(data_old,capacity_);
-           }
-           capacity_ = capacity_new;
-           is_dynamic_ = true;
-       }
-    }
-
-    std::size_t round_up(std::size_t i) const // Find suitable new block size
+    size_type round_up(size_type i) const // Find suitable new block size
     {
         return (i/word_length + 1) * word_length;
-    }
-
-    template <typename T>
-    typename std::enable_if<std::is_integral<T>::value && 
-                            !std::is_signed<T>::value &&
-                            sizeof(T) <= sizeof(int64_t),void>::type
-    initialize_from_integer(T u)
-    {
-        data_ = values_;
-        is_dynamic_ = false;
-        length_ = u != 0 ? 1 : 0;
-
-        data_ [0] = u;
-    }
- 
-    template <typename T>
-    typename std::enable_if<std::is_integral<T>::value &&
-                           !std::is_signed<T>::value &&
-                           sizeof(int64_t) < sizeof(T) &&
-                           sizeof(T) <= sizeof(int64_t)*2, void>::type
-        initialize_from_integer(T u)
-    {
-        data_ = values_;
-        is_dynamic_ = false;
-        length_ = u != 0 ? 2 : 0;
-
-        data_[0] = uint64_t(u & max_basic_type);
-        u >>= basic_type_bits;
-        data_[1] = uint64_t(u & max_basic_type);
-    }
-
-    void initialize( const basic_bignum<Allocator>& n )
-    {
-        is_negative_ = n.is_negative();
-        length_ = n.length_;
-
-        if ( length_ <= 2 )
-        {
-            data_ = values_;
-            is_dynamic_ = false;
-            values_ [0] = n.data_ [0];
-            values_ [1] = n.data_ [1];
-        }
-        else
-        {
-            capacity_ = round_up( length_ );
-            data_ = get_allocator().allocate(capacity_);
-            is_dynamic_ = true;
-            if ( length_ > 0 )
-            {
-                std::memcpy( data_, n.data_, length_*sizeof(uint64_t) );
-            }
-            reduce();
-        }
-    }
-
-    void initialize(basic_bignum<Allocator>&& other)
-    {
-        is_negative_ = other.is_negative();
-        length_ = other.length_;
-        is_dynamic_ = other.is_dynamic();
-
-        if (other.is_dynamic())
-        {
-            capacity_ = other.capacity_;
-            data_ = other.data_;
-
-            other.data_ = other.values_;
-            other.is_dynamic_ = false;
-            other.length_ = 0;
-            other.is_negative_ = false;
-        }
-        else
-        {
-            values_[0] = other.data_[0];
-            values_[1] = other.data_[1];
-            data_ = values_;
-        }
     }
 
     void reduce()
@@ -1581,43 +1547,12 @@ private:
             {
                 break;
             }
-            --length_;
+            --common_stor_.length_;
             --p;
         }
-        if ( length_ == 0 )
+        if ( length() == 0 )
         {
-            is_negative_ = false;
-        }
-    }
-
-    void incr_length( std::size_t len_new )
-    {
-        std::size_t len_old = length_;
-        length_ = len_new;  // length_ > len_old
-
-        if ( length_ > capacity() )
-        {
-            std::size_t capacity_new = round_up( length_ );
-
-            uint64_t* data_old = data_;
-
-            data_ = get_allocator().allocate(capacity_new);
-
-            if ( len_old > 0 )
-            {
-                std::memcpy( data_, data_old, len_old*sizeof(uint64_t) );
-            }
-            if ( is_dynamic() )
-            {
-                get_allocator().deallocate(data_old,capacity_);
-            }
-            capacity_ = capacity_new;
-            is_dynamic_ = true;
-        }
-
-        if ( length_ > len_old )
-        {
-            memset( data_+len_old, 0, (length_ - len_old)*sizeof(uint64_t) );
+            common_stor_.is_negative_ = false;
         }
     }
 

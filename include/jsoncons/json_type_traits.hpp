@@ -1242,7 +1242,7 @@ namespace detail
                     return basic_bignum<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length());
                 case json_type::half_value:
                 case json_type::double_value:
-                    return basic_bignum<Allocator>(j.template as<double>());
+                    return basic_bignum<Allocator>(j.template as<int64_t>());
                 case json_type::int64_value:
                     return basic_bignum<Allocator>(j.template as<int64_t>());
                 case json_type::uint64_value:

@@ -154,7 +154,7 @@ TEST_CASE("test_multiplication")
 
 TEST_CASE("test_conversion_0")
 {
-    bignum x(1, {});
+    bignum x;
 
     json j(x);
 
@@ -169,7 +169,8 @@ TEST_CASE("test_conversion_0")
 
 TEST_CASE("test_traits1")
 {
-    bignum x(1, {0x01,0x00});
+    std::vector<uint8_t> data = {0x01,0x00};
+    bignum x = bignum::from_be(data.data(), data.size());
 
     json j(x);
 
@@ -184,7 +185,8 @@ TEST_CASE("test_traits1")
 
 TEST_CASE("test_traits2")
 {
-    bignum x(1, {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
+    std::vector<uint8_t> data = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    bignum x = bignum::from_be(data.data(), data.size());
 
     json j(x);
 
@@ -199,7 +201,10 @@ TEST_CASE("test_traits2")
 
 TEST_CASE("test_traits3")
 {
-    bignum x(-1, {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
+    std::vector<uint8_t> data = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    bignum x = bignum::from_be(data.data(), data.size());
+
+    x = -1 - x;
 
     int signum;
     std::vector<uint8_t> v;
