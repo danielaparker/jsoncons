@@ -99,13 +99,13 @@ TEST_CASE("json::as<jsoncons::bignum>()")
     SECTION("from double")
     {
         jsoncons::json j(1000.0);
-        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(1000.0)));
+        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(1000)));
     }
     SECTION("from bignum")
     {
         std::string s = "-18446744073709551617";
         jsoncons::json j(s,  jsoncons::semantic_tag::bigint);
-        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(s)));
+        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum::from_string(s)));
     }
 }
 
