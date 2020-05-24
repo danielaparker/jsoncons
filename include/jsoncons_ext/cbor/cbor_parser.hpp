@@ -104,7 +104,7 @@ class basic_cbor_parser : public ser_context
 
     bool more_;
     bool done_;
-    std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
+    string_type text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     uint64_t item_tag_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
@@ -1175,13 +1175,13 @@ private:
                     if (tag == 2)
                     {
                         bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
-                        n.dump(s);
+                        s = n.to_string<string_type>();
                     }
                     else if (tag == 3)
                     {
                         bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
                         n = -1 - n;
-                        n.dump(s);
+                        s = n.to_string<string_type>();
                     }
                 }
                 break;
@@ -1511,8 +1511,7 @@ private:
                         return;
                     }
                     bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
-                    text_buffer_.clear();
-                    n.dump(text_buffer_);
+                    text_buffer_ = n.to_string<string_type>(alloc_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     break;
                 }
@@ -1527,8 +1526,7 @@ private:
                     }
                     bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
                     n = -1 - n;
-                    text_buffer_.clear();
-                    n.dump(text_buffer_);
+                    text_buffer_ = n.to_string<string_type>(alloc_);;
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     break;
                 }

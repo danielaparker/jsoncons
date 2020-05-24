@@ -20,19 +20,16 @@ TEST_CASE("test_positive_bignum")
     std::vector<uint8_t> v = {1,0,0,0,0,0,0,0,0};
     bigint x = bigint::from_bytes_be(sign_t::plus, v.data(),v.size());
 
-    std::string sx;
-    x.dump(sx);
+    std::string sx = x.to_string();
     CHECK(sx == expected);
 
     bigint y(x);
-    std::string sy;
-    y.dump(sy);
+    std::string sy = y.to_string();
     CHECK(sy == expected);
 
     bigint z;
     z = x;
-    std::string sz;
-    y.dump(sz);
+    std::string sz = y.to_string();
     CHECK(sz == expected);
 
     SECTION("dump_hex_string")
@@ -62,19 +59,16 @@ TEST_CASE("test_negative_bignum")
     bigint x = bigint::from_bytes_be(sign_t::plus, b.data(),b.size());
     x = -1 - x;
 
-    std::string sx;
-    x.dump(sx);
+    std::string sx = x.to_string();
     CHECK(sx == expected);
 
     bigint y(x);
-    std::string sy;
-    y.dump(sy);
+    std::string sy = y.to_string();
     CHECK(sy == expected);
 
     bigint z;
     z = x;
-    std::string sz;
-    y.dump(sz);
+    std::string sz = z.to_string();
     CHECK(sz == expected);
 
     int signum;
@@ -161,8 +155,7 @@ TEST_CASE("test_conversion_0")
     bigint y = j.as<bigint>();
     CHECK(bool(x == y));
 
-    std::string s;
-    y.dump(s);
+    std::string s = y.to_string();
 
     CHECK(s == "0");
 }
@@ -177,8 +170,7 @@ TEST_CASE("test_traits1")
     bigint y = j.as<bigint>();
     CHECK(bool(x == y));
 
-    std::string s;
-    y.dump(s);
+    std::string s = y.to_string();
 
     CHECK(s == "256");
 }
@@ -193,8 +185,7 @@ TEST_CASE("test_traits2")
     bigint y = j.as<bigint>();
     CHECK(bool(x == y));
 
-    std::string s;
-    y.dump(s);
+    std::string s = y.to_string();
 
     CHECK(s == "18446744073709551616");
 }
@@ -222,8 +213,7 @@ TEST_CASE("test_traits3")
     bigint y = j.as<bigint>();
     CHECK(bool(x == y));
 
-    std::string s;
-    y.dump(s);
+    std::string s = y.to_string();
 
     CHECK(s == "-18446744073709551617");
 }
@@ -234,16 +224,14 @@ TEST_CASE("test shift left")
     {
         bigint n = bigint::from_string("1");
         bigint x = n << 1;
-        std::string s;
-        x.dump(s);
+        std::string s = x.to_string();
         CHECK(s == "2");
     }
     SECTION("n << 100")
     {
         bigint n(1);
         bigint x = n << 100;
-        std::string s;
-        x.dump(s);
+        std::string s = x.to_string();
         CHECK(s == "1267650600228229401496703205376");
     }
     SECTION("n << 100, += 1")
@@ -251,8 +239,7 @@ TEST_CASE("test shift left")
         bigint n(1);
         bigint x = n << 100;
         x += 1;
-        std::string s;
-        x.dump(s);
+        std::string s = x.to_string();
         CHECK(s == "1267650600228229401496703205377");
     }
 }
@@ -263,8 +250,7 @@ TEST_CASE("times 10")
     {
         bigint n = bigint::from_string("1234");
         bigint m = n * 10;
-        std::string s;
-        m.dump(s);
+        std::string s = m.to_string();
         CHECK(s == "12340");
     }
     SECTION("31")
@@ -277,8 +263,7 @@ TEST_CASE("times 10")
             n *= (uint64_t)10;
             expected.push_back('0');
         }
-        std::string s;
-        n.dump(s);
+        std::string s = n.to_string();
         CHECK(s == expected);
         //std::cout << "x31: " << s << "\n";
     }
@@ -291,8 +276,7 @@ TEST_CASE("times 10")
             n *= (uint64_t)10;
             expected.push_back('0');
         }
-        std::string s;
-        n.dump(s);
+        std::string s = n.to_string();
         CHECK(s == expected);
         //std::cout << "x31: " << s << "\n";
     }
