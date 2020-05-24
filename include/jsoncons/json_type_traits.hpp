@@ -1257,7 +1257,7 @@ namespace detail
         
         static Json to_json(const basic_bigint<Allocator>& val)
         {
-            auto s = val.to_string<std::basic_string<char_type>>();
+            auto s = val.template to_string<std::basic_string<char_type>>();
             return Json(s,semantic_tag::bigint);
         }
     };
