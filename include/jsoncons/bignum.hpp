@@ -68,13 +68,14 @@ namespace detail {
 
 } // namespace detail
 
+enum sign_t {minus, plus};
+
 template <class Allocator = std::allocator<uint64_t>>
 class basic_bignum : protected detail::basic_bignum_base<Allocator>
 {
     using base_t = detail::basic_bignum_base<Allocator>;
 
 public:
-    enum sign_type {minus, plus};
 
     using size_type = typename base_t::size_type;
     using value_type = typename base_t::value_type;
@@ -196,18 +197,6 @@ private:
               capacity_(0),
               data_(nullptr)
         {
-        }
-
-        dynamic_storage(sign_type sign, int64_t* data, size_type length,
-                        const real_allocator_type& alloc)
-            : is_dynamic_(true), 
-              is_negative_(sign == sign_type::minus),
-              length_(length),
-              capacity_(0),
-              data_(nullptr)
-        {
-            create(length, alloc);
-            std::memcpy(data_, data, length*sizeof(uint64_t));
         }
 
         dynamic_storage(const dynamic_storage& stor, const real_allocator_type& alloc)
@@ -479,9 +468,9 @@ public:
         return v;
     }
 
-    static basic_bignum from_be(const uint8_t* str, std::size_t n)
+    static basic_bignum from_bytes_be(sign_t sign, const uint8_t* str, std::size_t n)
     {
-        double radix_log2 = std::log2(next_power_of_two(256));
+        static const double radix_log2 = std::log2(next_power_of_two(256));
         // Estimate how big the result will be, so we can pre-allocate it.
         double bits = radix_log2 * n;
         double big_digits = std::ceil(bits / 64.0);
@@ -498,6 +487,11 @@ public:
             }
         }
         //std::cout << "ACTUAL: " << v.length() << "\n";
+
+        if (sign == sign_t::minus)
+        {
+            v.common_stor_.is_negative_ = true;
+        }
 
         return v;
     }
