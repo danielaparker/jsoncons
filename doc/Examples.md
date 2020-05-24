@@ -438,6 +438,7 @@ Output:
 ```c++
 #include <jsoncons/json_cursor.hpp>
 #include <jsoncons/json_encoder.hpp>
+#include <fstream>
 #include <cassert>
 
 int main()
