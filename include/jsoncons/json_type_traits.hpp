@@ -488,8 +488,9 @@ namespace detail {
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_compatible_array_type<Json,T>::value &&
-                                                    !jsoncons::detail::is_back_insertable<T>::value
-                                                    >::type>
+                                                    !jsoncons::detail::is_back_insertable<T>::value /*&&
+                                                    jsoncons::detail::is_insertable<T>::value*/
+                            >::type>
     {
         typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
         using allocator_type = typename Json::allocator_type;
