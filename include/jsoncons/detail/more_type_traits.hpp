@@ -271,7 +271,7 @@ namespace detail {
 
     template<class Container>
     using
-    container_push_back_t = decltype(std::declval<Container>().push_back(typename Container::value_type()));
+    container_push_back_t = decltype(std::declval<Container>().push_back(*(typename Container::pointer())));
 
     template<class Container>
     using
