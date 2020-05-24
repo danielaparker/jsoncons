@@ -9,7 +9,7 @@
 
 #include <string>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/bignum.hpp>
+#include <jsoncons/bigint.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>

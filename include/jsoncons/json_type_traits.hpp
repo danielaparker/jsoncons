@@ -19,7 +19,7 @@
 #include <type_traits> // std::enable_if
 #include <iterator> // std::iterator_traits, std::input_iterator_tag
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/bignum.hpp>
+#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
 #include <string>
@@ -1210,10 +1210,10 @@ namespace detail
         }
     };
 
-    // basic_bignum
+    // basic_bigint
 
     template<class Json, class Allocator>
-    struct json_type_traits<Json, basic_bignum<Allocator>>
+    struct json_type_traits<Json, basic_bigint<Allocator>>
     {
     public:
         static bool is(const Json& j) noexcept
@@ -1230,29 +1230,29 @@ namespace detail
             }
         }
         
-        static basic_bignum<Allocator> as(const Json& j)
+        static basic_bigint<Allocator> as(const Json& j)
         {
             switch (j.type())
             {
                 case json_type::string_value:
                     if (!jsoncons::detail::is_base10(j.as_string_view().data(), j.as_string_view().length()))
                     {
-                        JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
+                        JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bigint"));
                     }
-                    return basic_bignum<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length());
+                    return basic_bigint<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length());
                 case json_type::half_value:
                 case json_type::double_value:
-                    return basic_bignum<Allocator>(j.template as<int64_t>());
+                    return basic_bigint<Allocator>(j.template as<int64_t>());
                 case json_type::int64_value:
-                    return basic_bignum<Allocator>(j.template as<int64_t>());
+                    return basic_bigint<Allocator>(j.template as<int64_t>());
                 case json_type::uint64_value:
-                    return basic_bignum<Allocator>(j.template as<uint64_t>());
+                    return basic_bigint<Allocator>(j.template as<uint64_t>());
                 default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bignum"));
+                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bigint"));
             }
         }
         
-        static Json to_json(const basic_bignum<Allocator>& val)
+        static Json to_json(const basic_bigint<Allocator>& val)
         {
             std::basic_string<typename Json::char_type> s;
             val.dump(s);

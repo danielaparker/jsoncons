@@ -17,7 +17,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/byte_string.hpp>
-#include <jsoncons/bignum.hpp>
+#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -934,7 +934,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64:
                 {
-                    bignum n = bignum::from_string(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -952,7 +952,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64url:
                 {
-                    bignum n = bignum::from_string(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -1232,7 +1232,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64:
                 {
-                    bignum n = bignum::from_string(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -1248,7 +1248,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64url:
                 {
-                    bignum n = bignum::from_string(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);

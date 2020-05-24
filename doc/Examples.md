@@ -2402,8 +2402,8 @@ int main()
     double d = j.as<double>();
     std::cout << "(2) " << std::setprecision(17) << d << "\n\n";
 
-    // Access as jsoncons::bignum
-    jsoncons::bignum bn = j.as<jsoncons::bignum>();
+    // Access as jsoncons::bigint
+    jsoncons::bigint bn = j.as<jsoncons::bigint>();
     std::cout << "(3) " << bn << "\n\n";
 
     // If your compiler supports extended integral types for which std::numeric_limits is specialized 

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_BIGNUM_HPP
-#define JSONCONS_BIGNUM_HPP
+#ifndef JSONCONS_BIGINT_HPP
+#define JSONCONS_BIGINT_HPP
 
 #include <cstdint>
 #include <vector> // std::vector
@@ -35,7 +35,7 @@ Chichester: John Wiley.
 namespace detail {
 
     template <class Allocator>
-    class basic_bignum_base
+    class basic_bigint_base
     {
     public:
         using allocator_type = Allocator;
@@ -51,11 +51,11 @@ namespace detail {
        using size_type = typename allocator_traits_type::size_type;
        using pointer_traits = std::pointer_traits<pointer>;
 
-        basic_bignum_base()
+        basic_bigint_base()
             : alloc_()
         {
         }
-        explicit basic_bignum_base(const allocator_type& alloc)
+        explicit basic_bigint_base(const allocator_type& alloc)
             : alloc_(basic_type_allocator_type(alloc))
         {
         }
@@ -71,16 +71,16 @@ namespace detail {
 enum sign_t {minus, plus};
 
 template <class Allocator = std::allocator<uint64_t>>
-class basic_bignum : protected detail::basic_bignum_base<Allocator>
+class basic_bigint : protected detail::basic_bigint_base<Allocator>
 {
-    using base_t = detail::basic_bignum_base<Allocator>;
+    using base_t = detail::basic_bigint_base<Allocator>;
 
 public:
 
     using size_type = typename base_t::size_type;
     using value_type = typename base_t::value_type;
     using base_t::get_allocator;
-    using bignum_type = basic_bignum<Allocator>;
+    using bigint_type = basic_bigint<Allocator>;
 
     static constexpr uint64_t max_basic_type = (std::numeric_limits<uint64_t>::max)();
     static constexpr uint64_t basic_type_bits = sizeof(uint64_t) * 8;  // Number of bits
@@ -281,19 +281,19 @@ private:
     };
 
 public:
-    basic_bignum()
+    basic_bigint()
     {
         ::new (&short_stor_) short_storage();
     }
 
-    explicit basic_bignum(const Allocator& alloc)
+    explicit basic_bigint(const Allocator& alloc)
         : base_t(alloc)
     {
         ::new (&short_stor_) short_storage();
     }
 
 
-    basic_bignum(const basic_bignum<Allocator>& n)
+    basic_bigint(const basic_bigint<Allocator>& n)
         : base_t(n.get_allocator())
     {
         if (!n.is_dynamic())
@@ -306,7 +306,7 @@ public:
         }
     }
 
-    basic_bignum(basic_bignum<Allocator>&& other) noexcept
+    basic_bigint(basic_bigint<Allocator>&& other) noexcept
         : base_t(other.get_allocator())
     {
         if (!other.is_dynamic())
@@ -320,13 +320,13 @@ public:
     }
 
     template <class Integer>
-    basic_bignum(Integer n, 
+    basic_bigint(Integer n, 
                  typename std::enable_if<std::is_integral<Integer>::value>::type* = 0)
     {
         ::new (&short_stor_) short_storage(n);
     }
 
-    ~basic_bignum() noexcept
+    ~basic_bigint() noexcept
     {
         destroy();
     }
@@ -367,19 +367,19 @@ public:
     }
 
     template <class CharT>
-    static basic_bignum<Allocator> from_string(const std::basic_string<CharT>& s)
+    static basic_bigint<Allocator> from_string(const std::basic_string<CharT>& s)
     {
         return from_string(s.data(), s.length());
     }
 
     template <class CharT>
-    static basic_bignum<Allocator> from_string(const CharT* s)
+    static basic_bigint<Allocator> from_string(const CharT* s)
     {
         return from_string(s, std::char_traits<CharT>::length(s));
     }
 
     template <class CharT>
-    static basic_bignum<Allocator> from_string(const CharT* data, size_type length)
+    static basic_bigint<Allocator> from_string(const CharT* data, size_type length)
     {
         bool neg;
         if (*data == '-')
@@ -393,7 +393,7 @@ public:
             neg = false;
         }
 
-        basic_bignum<Allocator> v = 0;
+        basic_bigint<Allocator> v = 0;
         for (size_type i = 0; i < length; i++)
         {
             CharT c = data[i];
@@ -416,7 +416,7 @@ public:
     }
 
     template <class CharT>
-    static basic_bignum<Allocator> from_string_radix(const CharT* data, size_type length, uint8_t radix)
+    static basic_bigint<Allocator> from_string_radix(const CharT* data, size_type length, uint8_t radix)
     {
         if (!(radix >= 2 && radix <= 16))
         {
@@ -435,7 +435,7 @@ public:
             neg = false;
         }
 
-        basic_bignum<Allocator> v = 0;
+        basic_bigint<Allocator> v = 0;
         for (size_type i = 0; i < length; i++)
         {
             CharT c = data[i];
@@ -468,7 +468,7 @@ public:
         return v;
     }
 
-    static basic_bignum from_bytes_be(sign_t sign, const uint8_t* str, std::size_t n)
+    static basic_bigint from_bytes_be(sign_t sign, const uint8_t* str, std::size_t n)
     {
         static const double radix_log2 = std::log2(next_power_of_two(256));
         // Estimate how big the result will be, so we can pre-allocate it.
@@ -476,7 +476,7 @@ public:
         double big_digits = std::ceil(bits / 64.0);
         //std::cout << "ESTIMATED: " << big_digits << "\n";
 
-        bignum_type v = 0;
+        bigint_type v = 0;
         v.reserve(static_cast<std::size_t>(big_digits));
 
         if (n > 0)
@@ -543,14 +543,14 @@ public:
         return length() == 0 ? true : false;
     }
 
-    basic_bignum operator-() const
+    basic_bigint operator-() const
     {
-        basic_bignum<Allocator> v(*this);
+        basic_bigint<Allocator> v(*this);
         v.common_stor_.is_negative_ = !v.is_negative();
         return v;
     }
 
-    basic_bignum& operator=( const basic_bignum<Allocator>& y )
+    basic_bigint& operator=( const basic_bigint<Allocator>& y )
     {
         if ( this != &y )
         {
@@ -564,7 +564,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator+=( const basic_bignum<Allocator>& y )
+    basic_bigint& operator+=( const basic_bigint<Allocator>& y )
     {
         if ( is_negative() != y.is_negative() )
             return *this -= -y;
@@ -592,7 +592,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator-=( const basic_bignum<Allocator>& y )
+    basic_bigint& operator-=( const basic_bigint<Allocator>& y )
     {
         if ( is_negative() != y.is_negative() )
             return *this += -y;
@@ -619,7 +619,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator*=( int64_t y )
+    basic_bigint& operator*=( int64_t y )
     {
         *this *= uint64_t(y < 0 ? -y : y);
         if ( y < 0 )
@@ -627,7 +627,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator*=( uint64_t y )
+    basic_bigint& operator*=( uint64_t y )
     {
         size_type len0 = length();
         uint64_t hi;
@@ -650,7 +650,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator*=( basic_bignum<Allocator> y )
+    basic_bigint& operator*=( basic_bigint<Allocator> y )
     {
         if ( length() == 0 || y.length() == 0 )
                     return *this = 0;
@@ -682,7 +682,7 @@ public:
                 size_type lenProd = length() + y.length(), jA, jB;
                 uint64_t sumHi = 0, sumLo, hi, lo,
                 sumLo_old, sumHi_old, carry=0;
-                basic_bignum<Allocator> x = *this;
+                basic_bigint<Allocator> x = *this;
                 resize( lenProd ); // Give *this length lenProd
 
                 for (size_type i = 0; i < lenProd; i++ )
@@ -714,21 +714,21 @@ public:
        return *this;
     }
 
-    basic_bignum& operator/=( const basic_bignum<Allocator>& divisor )
+    basic_bigint& operator/=( const basic_bigint<Allocator>& divisor )
     {
-        basic_bignum<Allocator> r;
+        basic_bigint<Allocator> r;
         divide( divisor, *this, r, false );
         return *this;
     }
 
-    basic_bignum& operator%=( const basic_bignum<Allocator>& divisor )
+    basic_bigint& operator%=( const basic_bigint<Allocator>& divisor )
     {
-        basic_bignum<Allocator> q;
+        basic_bigint<Allocator> q;
         divide( divisor, q, *this, true );
         return *this;
     }
 
-    basic_bignum& operator<<=( uint64_t k )
+    basic_bigint& operator<<=( uint64_t k )
     {
         size_type q = (size_type)(k / basic_type_bits);
         if ( q ) // Increase common_stor_.length_ by q:
@@ -754,7 +754,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator>>=(uint64_t k)
+    basic_bigint& operator>>=(uint64_t k)
     {
         size_type q = (size_type)(k / basic_type_bits);
         if ( q >= length() )
@@ -787,33 +787,33 @@ public:
         return *this;
     }
 
-    basic_bignum& operator++()
+    basic_bigint& operator++()
     {
         *this += 1;
         return *this;
     }
 
-    basic_bignum<Allocator> operator++(int)
+    basic_bigint<Allocator> operator++(int)
     {
-        basic_bignum<Allocator> old = *this;
+        basic_bigint<Allocator> old = *this;
         ++(*this);
         return old;
     }
 
-    basic_bignum<Allocator>& operator--()
+    basic_bigint<Allocator>& operator--()
     {
         *this -= 1;
         return *this;
     }
 
-    basic_bignum<Allocator> operator--(int)
+    basic_bigint<Allocator> operator--(int)
     {
-        basic_bignum<Allocator> old = *this;
+        basic_bigint<Allocator> old = *this;
         --(*this);
         return old;
     }
 
-    basic_bignum& operator|=( const basic_bignum<Allocator>& a )
+    basic_bigint& operator|=( const basic_bigint<Allocator>& a )
     {
         if ( length() < a.length() )
         {
@@ -834,7 +834,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator^=( const basic_bignum<Allocator>& a )
+    basic_bigint& operator^=( const basic_bigint<Allocator>& a )
     {
         if ( length() < a.length() )
         {
@@ -855,7 +855,7 @@ public:
         return *this;
     }
 
-    basic_bignum& operator&=( const basic_bignum<Allocator>& a )
+    basic_bigint& operator&=( const basic_bigint<Allocator>& a )
     {
         size_type old_length = length();
 
@@ -946,7 +946,7 @@ public:
     template <typename Alloc>
     void dump(int& signum, std::vector<uint8_t,Alloc>& data) const
     {
-        basic_bignum<Allocator> n(*this);
+        basic_bigint<Allocator> n(*this);
         if (is_negative())
         {
             signum = -1;
@@ -956,12 +956,12 @@ public:
         {
             signum = 1;
         }
-        basic_bignum<Allocator> divisor(256);
+        basic_bigint<Allocator> divisor(256);
 
         while (n >= 256)
         {
-            basic_bignum<Allocator> q;
-            basic_bignum<Allocator> r;
+            basic_bigint<Allocator> q;
+            basic_bigint<Allocator> r;
             n.divide(divisor, q, r, true);
             n = q;
             data.push_back((uint8_t)(uint64_t)r);
@@ -976,9 +976,9 @@ public:
     template <typename Ch, typename Traits, typename Alloc>
     void dump(std::basic_string<Ch,Traits,Alloc>& data) const
     {
-        basic_bignum<Allocator> v(*this);
+        basic_bigint<Allocator> v(*this);
 
-        int len = int(uint32_t(v.length()) * basic_bignum<Allocator>::basic_type_bits / 3) + 2;
+        int len = int(uint32_t(v.length()) * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
         data.resize(len);
 
         int n = len;
@@ -1003,8 +1003,8 @@ public:
                     ip10++;
                 }
             }                     // p10 is max unsigned power of 10
-            basic_bignum<Allocator> R;
-            basic_bignum<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
+            basic_bigint<Allocator> R;
+            basic_bigint<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
             if ( v.is_negative() )
             {
                 data[0] = '-';
@@ -1031,9 +1031,9 @@ public:
     template <typename Ch, typename Traits, typename Alloc>
     void dump_hex_string(std::basic_string<Ch,Traits,Alloc>& data) const
     {
-        basic_bignum<Allocator> v(*this);
+        basic_bigint<Allocator> v(*this);
 
-        int len = int(uint32_t(v.length()) * basic_bignum<Allocator>::basic_type_bits / 3) + 2;
+        int len = int(uint32_t(v.length()) * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
         data.resize(len);
 
         int n = len;
@@ -1058,8 +1058,8 @@ public:
                     ip10++;
                 }
             }                     // p10 is max unsigned power of 16
-            basic_bignum<Allocator> R;
-            basic_bignum<Allocator> LP10 = p10; // LP10 = p10 = ::pow(16, ip10)
+            basic_bigint<Allocator> R;
+            basic_bigint<Allocator> LP10 = p10; // LP10 = p10 = ::pow(16, ip10)
             if ( v.is_negative() )
             {
                 data[0] = '-';
@@ -1086,182 +1086,182 @@ public:
 
 //  Global Operators
 
-    friend bool operator==( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
+    friend bool operator==( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
     {
         return x.compare(y) == 0 ? true : false;
     }
 
-    friend bool operator==( const basic_bignum<Allocator>& x, int y )
+    friend bool operator==( const basic_bigint<Allocator>& x, int y )
     {
         return x.compare(y) == 0 ? true : false;
     }
 
-    friend bool operator!=( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
+    friend bool operator!=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
     {
         return x.compare(y) != 0 ? true : false;
     }
 
-    friend bool operator!=( const basic_bignum<Allocator>& x, int y )
+    friend bool operator!=( const basic_bigint<Allocator>& x, int y )
     {
-        return x.compare(basic_bignum<Allocator>(y)) != 0 ? true : false;
+        return x.compare(basic_bigint<Allocator>(y)) != 0 ? true : false;
     }
 
-    friend bool operator<( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
-    {
-       return x.compare(y) < 0 ? true : false;
-    }
-
-    friend bool operator<( const basic_bignum<Allocator>& x, int64_t y )
+    friend bool operator<( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
     {
        return x.compare(y) < 0 ? true : false;
     }
 
-    friend bool operator>( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
+    friend bool operator<( const basic_bigint<Allocator>& x, int64_t y )
+    {
+       return x.compare(y) < 0 ? true : false;
+    }
+
+    friend bool operator>( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
     {
         return x.compare(y) > 0 ? true : false;
     }
 
-    friend bool operator>( const basic_bignum<Allocator>& x, int y )
+    friend bool operator>( const basic_bigint<Allocator>& x, int y )
     {
-        return x.compare(basic_bignum<Allocator>(y)) > 0 ? true : false;
+        return x.compare(basic_bigint<Allocator>(y)) > 0 ? true : false;
     }
 
-    friend bool operator<=( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
-    {
-        return x.compare(y) <= 0 ? true : false;
-    }
-
-    friend bool operator<=( const basic_bignum<Allocator>& x, int y )
+    friend bool operator<=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
     {
         return x.compare(y) <= 0 ? true : false;
     }
 
-    friend bool operator>=( const basic_bignum<Allocator>& x, const basic_bignum<Allocator>& y )
+    friend bool operator<=( const basic_bigint<Allocator>& x, int y )
+    {
+        return x.compare(y) <= 0 ? true : false;
+    }
+
+    friend bool operator>=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
     {
         return x.compare(y) >= 0 ? true : false;
     }
 
-    friend bool operator>=( const basic_bignum<Allocator>& x, int y )
+    friend bool operator>=( const basic_bigint<Allocator>& x, int y )
     {
         return x.compare(y) >= 0 ? true : false;
     }
 
-    friend basic_bignum<Allocator> operator+( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator+( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x += y;
     }
 
-    friend basic_bignum<Allocator> operator+( basic_bignum<Allocator> x, int64_t y )
+    friend basic_bigint<Allocator> operator+( basic_bigint<Allocator> x, int64_t y )
     {
         return x += y;
     }
 
-    friend basic_bignum<Allocator> operator-( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator-( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x -= y;
     }
 
-    friend basic_bignum<Allocator> operator-( basic_bignum<Allocator> x, int64_t y )
+    friend basic_bigint<Allocator> operator-( basic_bigint<Allocator> x, int64_t y )
     {
         return x -= y;
     }
 
-    friend basic_bignum<Allocator> operator*( int64_t x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator*( int64_t x, const basic_bigint<Allocator>& y )
     {
-        return basic_bignum<Allocator>(y) *= x;
+        return basic_bigint<Allocator>(y) *= x;
     }
 
-    friend basic_bignum<Allocator> operator*( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
-    {
-        return x *= y;
-    }
-
-    friend basic_bignum<Allocator> operator*( basic_bignum<Allocator> x, int64_t y )
+    friend basic_bigint<Allocator> operator*( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x *= y;
     }
 
-    friend basic_bignum<Allocator> operator/( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator*( basic_bigint<Allocator> x, int64_t y )
+    {
+        return x *= y;
+    }
+
+    friend basic_bigint<Allocator> operator/( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x /= y;
     }
 
-    friend basic_bignum<Allocator> operator/( basic_bignum<Allocator> x, int y )
+    friend basic_bigint<Allocator> operator/( basic_bigint<Allocator> x, int y )
     {
         return x /= y;
     }
 
-    friend basic_bignum<Allocator> operator%( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator%( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x %= y;
     }
 
-    friend basic_bignum<Allocator> operator<<( basic_bignum<Allocator> u, unsigned k )
+    friend basic_bigint<Allocator> operator<<( basic_bigint<Allocator> u, unsigned k )
     {
         return u <<= k;
     }
 
-    friend basic_bignum<Allocator> operator<<( basic_bignum<Allocator> u, int k )
+    friend basic_bigint<Allocator> operator<<( basic_bigint<Allocator> u, int k )
     {
         return u <<= k;
     }
 
-    friend basic_bignum<Allocator> operator>>( basic_bignum<Allocator> u, unsigned k )
+    friend basic_bigint<Allocator> operator>>( basic_bigint<Allocator> u, unsigned k )
     {
         return u >>= k;
     }
 
-    friend basic_bignum<Allocator> operator>>( basic_bignum<Allocator> u, int k )
+    friend basic_bigint<Allocator> operator>>( basic_bigint<Allocator> u, int k )
     {
         return u >>= k;
     }
 
-    friend basic_bignum<Allocator> operator|( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator|( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x |= y;
     }
 
-    friend basic_bignum<Allocator> operator|( basic_bignum<Allocator> x, int y )
+    friend basic_bigint<Allocator> operator|( basic_bigint<Allocator> x, int y )
     {
         return x |= y;
     }
 
-    friend basic_bignum<Allocator> operator|( basic_bignum<Allocator> x, unsigned y )
+    friend basic_bigint<Allocator> operator|( basic_bigint<Allocator> x, unsigned y )
     {
         return x |= y;
     }
 
-    friend basic_bignum<Allocator> operator^( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator^( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x ^= y;
     }
 
-    friend basic_bignum<Allocator> operator^( basic_bignum<Allocator> x, int y )
+    friend basic_bigint<Allocator> operator^( basic_bigint<Allocator> x, int y )
     {
         return x ^= y;
     }
 
-    friend basic_bignum<Allocator> operator^( basic_bignum<Allocator> x, unsigned y )
+    friend basic_bigint<Allocator> operator^( basic_bigint<Allocator> x, unsigned y )
     {
         return x ^= y;
     }
 
-    friend basic_bignum<Allocator> operator&( basic_bignum<Allocator> x, const basic_bignum<Allocator>& y )
+    friend basic_bigint<Allocator> operator&( basic_bigint<Allocator> x, const basic_bigint<Allocator>& y )
     {
         return x &= y;
     }
 
-    friend basic_bignum<Allocator> operator&( basic_bignum<Allocator> x, int y )
+    friend basic_bigint<Allocator> operator&( basic_bigint<Allocator> x, int y )
     {
         return x &= y;
     }
 
-    friend basic_bignum<Allocator> operator&( basic_bignum<Allocator> x, unsigned y )
+    friend basic_bigint<Allocator> operator&( basic_bigint<Allocator> x, unsigned y )
     {
         return x &= y;
     }
 
-    friend basic_bignum<Allocator> abs( const basic_bignum<Allocator>& a )
+    friend basic_bigint<Allocator> abs( const basic_bigint<Allocator>& a )
     {
         if ( a.is_negative() )
         {
@@ -1270,9 +1270,9 @@ public:
         return a;
     }
 
-    friend basic_bignum<Allocator> power( basic_bignum<Allocator> x, unsigned n )
+    friend basic_bigint<Allocator> power( basic_bigint<Allocator> x, unsigned n )
     {
-        basic_bignum<Allocator> y = 1;
+        basic_bigint<Allocator> y = 1;
 
         while ( n )
         {
@@ -1287,11 +1287,11 @@ public:
         return y;
     }
 
-    friend basic_bignum<Allocator> sqrt( const basic_bignum<Allocator>& a )
+    friend basic_bigint<Allocator> sqrt( const basic_bigint<Allocator>& a )
     {
-        basic_bignum<Allocator> x = a;
-        basic_bignum<Allocator> b = a;
-        basic_bignum<Allocator> q;
+        basic_bigint<Allocator> x = a;
+        basic_bigint<Allocator> b = a;
+        basic_bigint<Allocator> q;
 
         b <<= 1;
         while ( b >>= 2, b > 0 )
@@ -1307,7 +1307,7 @@ public:
     }
 
     template <class CharT>
-    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bignum<Allocator>& v)
+    friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigint<Allocator>& v)
     {
         std::basic_string<CharT> s; 
         v.dump(s);
@@ -1316,7 +1316,7 @@ public:
         return os;
     }
 
-    int compare( const basic_bignum<Allocator>& y ) const
+    int compare( const basic_bigint<Allocator>& y ) const
     {
         if ( is_negative() != y.is_negative() )
             return y.is_negative() - is_negative();
@@ -1447,7 +1447,7 @@ private:
         }
     }
 
-    int normalize( basic_bignum<Allocator>& denom, basic_bignum<Allocator>& num, int& x ) const
+    int normalize( basic_bigint<Allocator>& denom, basic_bigint<Allocator>& num, int& x ) const
     {
         size_type r = denom.length() - 1;
         uint64_t y = denom.data()[r];
@@ -1469,7 +1469,7 @@ private:
         return 0;
     }
 
-    void unnormalize( basic_bignum<Allocator>& rem, int x, int secondDone ) const
+    void unnormalize( basic_bigint<Allocator>& rem, int x, int secondDone ) const
     {
         if ( secondDone )
         {
@@ -1485,7 +1485,7 @@ private:
         }
     }
 
-    void divide( basic_bignum<Allocator> denom, basic_bignum<Allocator>& quot, basic_bignum<Allocator>& rem, bool remDesired ) const
+    void divide( basic_bigint<Allocator> denom, basic_bigint<Allocator>& quot, basic_bigint<Allocator>& rem, bool remDesired ) const
     {
         if ( denom.length() == 0 )
         {
@@ -1494,7 +1494,7 @@ private:
         bool quot_neg = is_negative() ^ denom.is_negative();
         bool rem_neg = is_negative();
         int x = 0;
-        basic_bignum<Allocator> num = *this;
+        basic_bigint<Allocator> num = *this;
         num.common_stor_.is_negative_ = denom.common_stor_.is_negative_ = false;
         if ( num < denom )
         {
@@ -1533,7 +1533,7 @@ private:
             rem.common_stor_.is_negative_ = rem_neg;
             return;
         }
-        basic_bignum<Allocator> num0 = num, denom0 = denom;
+        basic_bigint<Allocator> num0 = num, denom0 = denom;
         int second_done = normalize(denom, num, x);
         size_type l = denom.length() - 1;
         size_type n = num.length() - 1;
@@ -1599,7 +1599,11 @@ private:
     }
 };
 
-using bignum = basic_bignum<std::allocator<uint8_t>>;
+using bigint = basic_bigint<std::allocator<uint8_t>>;
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use bigint") typedef bigint bignum;
+#endif
 
 }
 

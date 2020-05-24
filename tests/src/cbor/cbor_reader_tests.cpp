@@ -246,7 +246,7 @@ TEST_CASE("test_cbor_parsing")
     // bignum
     std::vector<uint8_t> data = { 0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 };
     check_parse_cbor({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
-                  json(bignum::from_bytes_be(sign_t::plus, data.data(),data.size())));
+                  json(bigint::from_bytes_be(sign_t::plus, data.data(),data.size())));
 
     // datetime
     check_parse_cbor({0xc0,0x78,0x19,'2','0','1','5','-','0','5','-','0','7',' ','1','2',':','4','1',':','0','7','-','0','7',':','0','0'},

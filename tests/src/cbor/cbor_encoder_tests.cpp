@@ -135,7 +135,7 @@ TEST_CASE("test_serialize_bignum")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n = bignum::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
     std::string s;
     n.dump(s);
     encoder.string_value(s, semantic_tag::bigint);
@@ -160,7 +160,7 @@ TEST_CASE("test_serialize_negative_bignum1")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n = bignum::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s;
     n.dump(s);
@@ -186,7 +186,7 @@ TEST_CASE("test_serialize_negative_bignum2")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n = bignum::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s;
     n.dump(s);
@@ -217,7 +217,7 @@ TEST_CASE("test_serialize_negative_bignum3")
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-    bignum n = bignum::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
+    bigint n = bigint::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
     n = -1 - n;
     std::string s;
     n.dump(s);

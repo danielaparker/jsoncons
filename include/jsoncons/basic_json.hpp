@@ -28,7 +28,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/pretty_print.hpp>
 #include <jsoncons/json_container_types.hpp>
-#include <jsoncons/bignum.hpp>
+#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <jsoncons/json_decoder.hpp>
