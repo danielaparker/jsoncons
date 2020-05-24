@@ -1217,6 +1217,8 @@ namespace detail
     struct json_type_traits<Json, basic_bigint<Allocator>>
     {
     public:
+        using char_type = typename Json::char_type;
+
         static bool is(const Json& j) noexcept
         {
             switch (j.type())
@@ -1255,7 +1257,7 @@ namespace detail
         
         static Json to_json(const basic_bigint<Allocator>& val)
         {
-            auto s = val.to_string<std::basic_string<typename Json::char_type>>();
+            auto s = val.to_string<std::basic_string<char_type>>();
             return Json(s,semantic_tag::bigint);
         }
     };

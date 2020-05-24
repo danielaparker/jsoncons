@@ -973,61 +973,6 @@ public:
         std::reverse(data.begin(),data.end());
     }
 
-    /*template <typename Ch, typename Traits, typename Alloc>
-    void dump(std::basic_string<Ch,Traits,Alloc>& data) const
-    {
-        basic_bigint<Allocator> v(*this);
-
-        int len = int(uint32_t(v.length()) * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
-        data.resize(len);
-
-        int n = len;
-        int i = 0;
-                                      // 1/3 > ln(2)/ln(10)
-        static uint64_t p10 = 1;
-        static uint64_t ip10 = 0;
-
-        if ( v.length() == 0 )
-        {
-            data[0] = '0';
-            i = 1;
-        }
-        else
-        {
-            uint64_t r;
-            if ( p10 == 1 )
-            {
-                while ( p10 <= (std::numeric_limits<uint64_t>::max)()/10 )
-                {
-                    p10 *= 10;
-                    ip10++;
-                }
-            }                     // p10 is max unsigned power of 10
-            basic_bigint<Allocator> R;
-            basic_bigint<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
-            if ( v.is_negative() )
-            {
-                data[0] = '-';
-                i = 1;
-            }
-            do
-            {
-                v.divide( LP10, v, R, true );
-                r = (R.length() ? R.data()[0] : 0);
-                for ( size_type j=0; j < ip10; j++ )
-                {
-                    data[--n] = char(r % 10 + '0');
-                    r /= 10;
-                    if ( r + v.length() == 0 )
-                        break;
-                }
-            } while ( v.length() );
-            while ( n < len )
-                data[i++] = data[n++];
-        }
-        data.resize(i);
-    }*/
-
     template <class String = std::string>
     typename std::enable_if<jsoncons::detail::is_basic_string<String>::value,String>::type
     to_string(const typename String::allocator_type& alloc = typename String::allocator_type()) const
@@ -1036,11 +981,11 @@ public:
 
         basic_bigint<Allocator> v(*this);
 
-        int len = int(uint32_t(v.length()) * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
+        size_t len = (v.length() * basic_type_bits / 3) + 2;
         data.resize(len);
 
-        int n = len;
-        int i = 0;
+        size_t n = len;
+        size_t i = 0;
                                       // 1/3 > ln(2)/ln(10)
         static uint64_t p10 = 1;
         static uint64_t ip10 = 0;
@@ -1093,11 +1038,11 @@ public:
     {
         basic_bigint<Allocator> v(*this);
 
-        int len = int(uint32_t(v.length()) * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
+        std::size_t len = (v.length() * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
         data.resize(len);
 
-        int n = len;
-        int i = 0;
+        size_t n = len;
+        size_t i = 0;
                                       // 1/3 > ln(2)/ln(10)
         static uint64_t p10 = 1;
         static uint64_t ip10 = 0;
