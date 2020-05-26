@@ -525,7 +525,11 @@ namespace detail {
             }
             else if (j.is_byte_string_view())
             {
-                T v(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
+                auto v = convert.from(j.as_byte_string_view(),j.tag(), ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(ser_error(ec));
+                }
                 return v;
             }
             else if (j.is_string())
