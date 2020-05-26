@@ -235,8 +235,12 @@ struct preserve_order_policy : public sorted_policy
 template <typename IteratorT>
 class range 
 {
-    IteratorT first_;
-    IteratorT last_;
+public:
+    using iterator = IteratorT;
+    using reverse_iterator = std::reverse_iterator<IteratorT>;
+private:
+    iterator first_;
+    iterator last_;
 public:
     range(const IteratorT& first, const IteratorT& last)
         : first_(first), last_(last)
@@ -244,13 +248,21 @@ public:
     }
 
 public:
-    IteratorT begin()
+    iterator begin()
     {
         return first_;
     }
-    IteratorT end()
+    iterator end()
     {
         return last_;
+    }
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(last_);
+    }
+    reverse_iterator rend()
+    {
+        return reverse_iterator(first_);
     }
 };
 

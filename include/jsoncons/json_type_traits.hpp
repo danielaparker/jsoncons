@@ -488,8 +488,8 @@ namespace detail {
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_compatible_array_type<Json,T>::value &&
-                                                    !jsoncons::detail::is_back_insertable<T>::value /*&&
-                                                    jsoncons::detail::is_insertable<T>::value*/
+                                                    !jsoncons::detail::is_back_insertable<T>::value &&
+                                                    jsoncons::detail::is_insertable<T>::value
                             >::type>
     {
         typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
@@ -555,6 +555,136 @@ namespace detail {
                 T val;
                 val.insert(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
                 return val;
+            }
+            /* else if (j.is_string())
+            {
+                auto v = convert.from(j.as_string_view(),j.tag(), ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(ser_error(ec));
+                }
+                return v;
+            }*/
+            else
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+            }
+        }
+
+        static Json to_json(const T& val)
+        {
+            Json j(json_array_arg);
+            auto first = std::begin(val);
+            auto last = std::end(val);
+            std::size_t size = std::distance(first,last);
+            j.reserve(size);
+            for (auto it = first; it != last; ++it)
+            {
+                j.push_back(*it);
+            }
+            return j;
+        }
+
+        static Json to_json(const T& val, const allocator_type& alloc)
+        {
+            Json j(json_array_arg, alloc);
+            auto first = std::begin(val);
+            auto last = std::end(val);
+            std::size_t size = std::distance(first, last);
+            j.reserve(size);
+            for (auto it = first; it != last; ++it)
+            {
+                j.push_back(*it);
+            }
+            return j;
+        }
+
+        static void visit_reserve_(std::true_type, T& v, std::size_t size)
+        {
+            v.reserve(size);
+        }
+
+        static void visit_reserve_(std::false_type, T&, std::size_t)
+        {
+        }
+    };
+
+    template<class Json, typename T>
+    struct json_type_traits<Json, T, 
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_compatible_array_type<Json,T>::value &&
+                                                    !jsoncons::detail::is_back_insertable<T>::value &&
+                                                    !jsoncons::detail::is_insertable<T>::value &&
+                                                    jsoncons::detail::is_front_insertable<T>::value
+                            >::type>
+    {
+        typedef typename std::iterator_traits<typename T::iterator>::value_type value_type;
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            bool result = j.is_array();
+            if (result)
+            {
+                for (auto e : j.array_range())
+                {
+                    if (!e.template is<value_type>())
+                    {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
+        template <class Ty = value_type>
+        static typename std::enable_if<!std::is_same<Ty,uint8_t>::value,T>::type
+        as(const Json& j)
+        {
+            if (j.is_array())
+            {
+                T result;
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(), result, j.size());
+
+                auto it = j.array_range().rbegin();
+                auto end = j.array_range().rend();
+                for (; it != end; ++it)
+                {
+                    result.push_front((*it).template as<value_type>());
+                }
+
+                return result;
+            }
+            else 
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+            }
+        }
+
+        template <class Ty = value_type>
+        static typename std::enable_if<std::is_same<Ty,uint8_t>::value,T>::type
+        as(const Json& j)
+        {
+            converter<T> convert{};
+            std::error_code ec;
+            if (j.is_array())
+            {
+                T result;
+                visit_reserve_(typename std::integral_constant<bool, jsoncons::detail::has_reserve<T>::value>::type(), result, j.size());
+
+                auto it = j.array_range().rbegin();
+                auto end = j.array_range().rend();
+                for (; it != end; ++it)
+                {
+                    result.push_front((*it).template as<value_type>());
+                }
+
+                return result;
+            }
+            else if (j.is_byte_string_view())
+            {
+                return T(j.as_byte_string_view().begin(),j.as_byte_string_view().end());
             }
             /* else if (j.is_string())
             {
