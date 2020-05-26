@@ -532,6 +532,10 @@ namespace ns {
         {
             return lhs.name == rhs.name && lhs.value == rhs.value;
         }
+        friend bool operator!=(const Value& lhs, const Value& rhs)
+        {
+            return !(lhs == rhs);
+        }
     };
 
     struct ValueHash {
