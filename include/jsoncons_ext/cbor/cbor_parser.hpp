@@ -104,7 +104,7 @@ class basic_cbor_parser : public ser_context
 
     bool more_;
     bool done_;
-    std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
+    string_type text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     uint64_t item_tag_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
@@ -1174,13 +1174,14 @@ private:
                     }
                     if (tag == 2)
                     {
-                        bignum n(1, v.data(), v.size());
-                        n.dump(s);
+                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                        s = n.to_string<string_type>();
                     }
                     else if (tag == 3)
                     {
-                        bignum n(-1, v.data(), v.size());
-                        n.dump(s);
+                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                        n = -1 - n;
+                        s = n.to_string<string_type>();
                     }
                 }
                 break;
@@ -1327,14 +1328,15 @@ private:
                         s.push_back('-');
                         s.push_back('0');
                         s.push_back('x');
-                        bignum n(1, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
                         n.dump_hex_string(s);
                     }
                     else if (tag == 3)
                     {
                         s.push_back('-');
                         s.push_back('0');
-                        bignum n(-1, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                        n = -1 - n;
                         n.dump_hex_string(s);
                         s[2] = 'x';
                     }
@@ -1508,9 +1510,8 @@ private:
                         more_ = false;
                         return;
                     }
-                    bignum n(1, v.data(), v.size());
-                    text_buffer_.clear();
-                    n.dump(text_buffer_);
+                    bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                    text_buffer_ = n.to_string<string_type>(alloc_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     break;
                 }
@@ -1523,9 +1524,9 @@ private:
                         more_ = false;
                         return;
                     }
-                    bignum n(-1, v.data(), v.size());
-                    text_buffer_.clear();
-                    n.dump(text_buffer_);
+                    bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                    n = -1 - n;
+                    text_buffer_ = n.to_string<string_type>(alloc_);;
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     break;
                 }

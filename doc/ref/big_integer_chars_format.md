@@ -10,7 +10,7 @@ Specifies `bignum` formatting.
 
 ### Examples
 
-#### Initializing with bignum
+#### Initializing with bigint
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -21,7 +21,7 @@ int main()
 {
     std::string s = "-18446744073709551617";
 
-    json j(bignum(s.c_str()));
+    json j(bigint::from_string(s.c_str()));
 
     std::cout << "(default) ";
     j.dump(std::cout);

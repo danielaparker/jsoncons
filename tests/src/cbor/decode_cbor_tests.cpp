@@ -195,9 +195,9 @@ TEST_CASE("dump cbor to string test")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
+    n = -1 - n;
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -237,9 +237,9 @@ TEST_CASE("test_dump_to_stream")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(sign_t::plus, bytes.data(), bytes.size());
+    n = -1 - n;
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -520,7 +520,7 @@ TEST_CASE("cbor conversion tests")
     it2++;
     CHECK(it2->as<std::vector<uint8_t>>() == std::vector<uint8_t>{'P','u','s','s'});
     it2++;
-    CHECK(bool(it2->as<bignum>() == bignum{"-18446744073709551617"}));
+    CHECK(bool(it2->as<bigint>() == bigint::from_string("-18446744073709551617")));
     it2++;
     CHECK(bool(it2->as_string() == std::string{"273.15"}));
     it2++;
@@ -588,7 +588,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[0].is<std::string>());
         CHECK(j[1].is<byte_string>());
         CHECK(j[1].is<byte_string_view>());
-        CHECK(j[2].is<bignum>());
+        CHECK(j[2].is<bigint>());
         CHECK(j[3].is_string());
         CHECK(j[3].tag() == semantic_tag::bigdec);
         CHECK(j[4].is<std::string>());
@@ -604,7 +604,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[0].as<std::string>() == std::string("foo"));
         CHECK(j[1].as<jsoncons::byte_string>() == jsoncons::byte_string({'b','a','r'}));
         CHECK(j[2].as<std::string>() == std::string("-18446744073709551617"));
-        CHECK(bool(j[2].as<jsoncons::bignum>() == jsoncons::bignum("-18446744073709551617")));
+        CHECK(bool(j[2].as<jsoncons::bigint>() == jsoncons::bigint::from_string("-18446744073709551617")));
         CHECK(j[3].as<std::string>() == std::string("273.15"));
         CHECK(j[4].as<std::string>() == std::string("2015-05-07 12:41:07-07:00"));
         CHECK(j[5].as<int64_t>() == 1431027667);
@@ -618,7 +618,7 @@ TEST_CASE("cbor array as<> test")
         auto it = j.array_range().begin();
         CHECK(it++->is<std::string>());
         CHECK(it++->is<byte_string>());
-        CHECK(it++->is<bignum>());
+        CHECK(it++->is<bigint>());
         CHECK(it++->is<std::string>());
         CHECK(it++->is<std::string>());
         CHECK(it++->is<int>());

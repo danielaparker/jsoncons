@@ -209,7 +209,7 @@ int main()
         {"Jane Doe",{"Commission","Sales",20000}}
     };
 
-    json_compressed_stream_encoder encoder(std::cout);
+    compact_json_stream_encoder encoder(std::cout);
 
     encoder.begin_object();
     encoder.key("Employees");

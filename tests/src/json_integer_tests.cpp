@@ -36,7 +36,7 @@ TEST_CASE("test_integer_limits")
 
         os << "{\"int overflow\":-" << (std::numeric_limits<int64_t>::max)() << "0}";
         json val = json::parse(os.str());
-        REQUIRE(val["int overflow"].is<jsoncons::bignum>());
+        REQUIRE(val["int overflow"].is<jsoncons::bigint>());
     }
     {
         std::ostringstream os;
@@ -51,7 +51,7 @@ TEST_CASE("test_integer_limits")
 
         os << "{\"uint overflow\":" << (std::numeric_limits<uint64_t>::max)() << "0}";
         json val = json::parse(os.str());
-        REQUIRE(val["uint overflow"].is<jsoncons::bignum>());
+        REQUIRE(val["uint overflow"].is<jsoncons::bigint>());
     }
 }
 

@@ -271,7 +271,15 @@ namespace detail {
 
     template<class Container>
     using
-    container_push_back_t = decltype(std::declval<Container>().push_back(typename Container::value_type()));
+    container_push_back_t = decltype(std::declval<Container>().push_back(std::declval<typename Container::value_type>()));
+
+    template<class Container>
+    using
+    container_push_front_t = decltype(std::declval<Container>().push_front(std::declval<typename Container::value_type>()));
+
+    template<class Container>
+    using
+    container_insert_t = decltype(std::declval<Container>().insert(std::declval<typename Container::value_type>()));
 
     template<class Container>
     using
@@ -377,6 +385,18 @@ namespace detail {
     template<class Container>
     using
     is_back_insertable = is_detected<container_push_back_t, Container>;
+
+    // is_front_insertable
+
+    template<class Container>
+    using
+    is_front_insertable = is_detected<container_push_front_t, Container>;
+
+    // is_insertable
+
+    template<class Container>
+    using
+    is_insertable = is_detected<container_insert_t, Container>;
 
     // has_data, has_data_exact
 

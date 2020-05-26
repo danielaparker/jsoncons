@@ -17,7 +17,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/byte_string.hpp>
-#include <jsoncons/bignum.hpp>
+#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/json_error.hpp>
 #include <jsoncons/json_visitor.hpp>
@@ -934,7 +934,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -952,7 +952,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64url:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -1025,7 +1025,7 @@ namespace detail {
     };
 
     template<class CharT,class Sink=jsoncons::stream_sink<CharT>,class Allocator=std::allocator<char>>
-    class basic_json_compressed_encoder final : public basic_json_visitor<CharT>
+    class basic_compact_json_encoder final : public basic_json_visitor<CharT>
     {
         static const std::array<CharT, 4>& null_k()
         {
@@ -1086,16 +1086,16 @@ namespace detail {
         int nesting_depth_;
 
         // Noncopyable
-        basic_json_compressed_encoder(const basic_json_compressed_encoder&) = delete;
-        basic_json_compressed_encoder& operator=(const basic_json_compressed_encoder&) = delete;
+        basic_compact_json_encoder(const basic_compact_json_encoder&) = delete;
+        basic_compact_json_encoder& operator=(const basic_compact_json_encoder&) = delete;
     public:
-        basic_json_compressed_encoder(Sink&& sink, 
+        basic_compact_json_encoder(Sink&& sink, 
                                       const Allocator& alloc = Allocator())
-            : basic_json_compressed_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>(), alloc)
+            : basic_compact_json_encoder(std::forward<Sink>(sink), basic_json_encode_options<CharT>(), alloc)
         {
         }
 
-        basic_json_compressed_encoder(Sink&& sink, 
+        basic_compact_json_encoder(Sink&& sink, 
                                       const basic_json_encode_options<CharT>& options, 
                                       const Allocator& alloc = Allocator())
            : sink_(std::forward<Sink>(sink)),
@@ -1106,10 +1106,10 @@ namespace detail {
         {
         }
 
-        basic_json_compressed_encoder(basic_json_compressed_encoder&&) = default;
-        basic_json_compressed_encoder& operator=(basic_json_compressed_encoder&&) = default;
+        basic_compact_json_encoder(basic_compact_json_encoder&&) = default;
+        basic_compact_json_encoder& operator=(basic_compact_json_encoder&&) = default;
 
-        ~basic_json_compressed_encoder() noexcept
+        ~basic_compact_json_encoder() noexcept
         {
             JSONCONS_TRY
             {
@@ -1232,7 +1232,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -1248,7 +1248,7 @@ namespace detail {
                 }
                 case bigint_chars_format::base64url:
                 {
-                    bignum n(sv.data(), sv.length());
+                    bigint n = bigint::from_string(sv.data(), sv.length());
                     int signum;
                     std::vector<uint8_t> v;
                     n.dump(signum, v);
@@ -1496,37 +1496,45 @@ namespace detail {
 
     using json_stream_encoder = basic_json_encoder<char,jsoncons::stream_sink<char>>;
     using wjson_stream_encoder = basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>;
-    using json_compressed_stream_encoder = basic_json_compressed_encoder<char,jsoncons::stream_sink<char>>;
-    using wjson_compressed_stream_encoder = basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>;
+    using compact_json_stream_encoder = basic_compact_json_encoder<char,jsoncons::stream_sink<char>>;
+    using compact_wjson_stream_encoder = basic_compact_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>>;
 
     using json_string_encoder = basic_json_encoder<char,jsoncons::string_sink<std::string>>;
     using wjson_string_encoder = basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
-    using json_compressed_string_encoder = basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>>;
-    using wjson_compressed_string_encoder = basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
+    using compact_json_string_encoder = basic_compact_json_encoder<char,jsoncons::string_sink<std::string>>;
+    using compact_wjson_string_encoder = basic_compact_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>>;
 
     #if !defined(JSONCONS_NO_DEPRECATED)
     template<class CharT,class Sink=jsoncons::stream_sink<CharT>>
     using basic_json_serializer = basic_json_encoder<CharT,Sink>; 
 
     template<class CharT,class Sink=jsoncons::stream_sink<CharT>>
-    using basic_json_compressed_serializer = basic_json_compressed_encoder<CharT,Sink>; 
+    using basic_json_compressed_serializer = basic_compact_json_encoder<CharT,Sink>; 
+
+    template<class CharT,class Sink=jsoncons::stream_sink<CharT>>
+    using basic_json_compressed_encoder = basic_compact_json_encoder<CharT,Sink>; 
+
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_json_stream_encoder") typedef basic_compact_json_encoder<char,jsoncons::stream_sink<char>> json_compressed_stream_encoder;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_wjson_stream_encoder")typedef basic_compact_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_compressed_stream_encoder;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_json_string_encoder") typedef basic_compact_json_encoder<char,jsoncons::string_sink<char>> json_compressed_string_encoder;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_wjson_string_encoder")typedef basic_compact_json_encoder<wchar_t,jsoncons::string_sink<wchar_t>> wjson_compressed_string_encoder;
 
     JSONCONS_DEPRECATED_MSG("Instead, use json_stream_encoder") typedef json_stream_encoder json_encoder;
     JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_encoder") typedef wjson_stream_encoder wjson_encoder;
-    JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_stream_encoder") typedef json_compressed_stream_encoder json_compressed_encoder;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_stream_encoder") typedef wjson_compressed_stream_encoder wjson_compressed_encoder;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_json_stream_encoder") typedef compact_json_stream_encoder compact_json_encoder;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_wjson_stream_encoder") typedef compact_wjson_stream_encoder wcompact_json_encoder;
 
     JSONCONS_DEPRECATED_MSG("Instead, use json_stream_encoder") typedef basic_json_encoder<char,jsoncons::stream_sink<char>> json_serializer;
     JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_encoder") typedef basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_serializer;
 
-    JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_stream_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::stream_sink<char>> json_compressed_serializer;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_stream_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_compressed_serializer;
+    JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_stream_encoder")  typedef basic_compact_json_encoder<char,jsoncons::stream_sink<char>> json_compressed_serializer;
+    JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_stream_encoder") typedef basic_compact_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_compressed_serializer;
 
     JSONCONS_DEPRECATED_MSG("Instead, use json_string_encoder")  typedef basic_json_encoder<char,jsoncons::string_sink<std::string>> json_string_serializer;
     JSONCONS_DEPRECATED_MSG("Instead, use wjson_string_encoder") typedef basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_string_serializer;
 
-    JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_string_encoder")  typedef basic_json_compressed_encoder<char,jsoncons::string_sink<std::string>> json_compressed_string_serializer;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_string_encoder") typedef basic_json_compressed_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_compressed_string_serializer;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_json_string_encoder")  typedef basic_compact_json_encoder<char,jsoncons::string_sink<std::string>> json_compressed_string_serializer;
+    JSONCONS_DEPRECATED_MSG("Instead, use wcompact_json_string_encoder") typedef basic_compact_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_compressed_string_serializer;
     #endif
 
 } // namespace jsoncons

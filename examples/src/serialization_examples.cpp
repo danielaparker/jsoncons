@@ -340,7 +340,7 @@ void bignum_serialization_examples1()
 {
     std::string s = "-18446744073709551617";
 
-    json j(bignum(s.c_str()));
+    json j(bigint::from_string(s.c_str()));
 
     std::cout << "(default) ";
     j.dump(std::cout);
@@ -402,8 +402,8 @@ void bignum_access_examples()
     double d = j.as<double>();
     std::cout << "(2) " << std::setprecision(17) << d << "\n\n";
 
-    // Access as jsoncons::bignum
-    jsoncons::bignum bn = j.as<jsoncons::bignum>();
+    // Access as jsoncons::bigint
+    jsoncons::bigint bn = j.as<jsoncons::bigint>();
     std::cout << "(3) " << bn << "\n\n";
 
     // If your compiler supports extended integral types for which std::numeric_limits is specialized 

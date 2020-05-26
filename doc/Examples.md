@@ -20,7 +20,8 @@
 
 ### Stream
 
-[Read JSON parse events](#I1)  
+[Write some JSON (push)](#I6)  
+[Read some JSON (pull)](#I1)  
 [Filter the event stream](#I2)  
 [Pull nested objects into a basic_json](#I3)  
 [Iterate over basic_json items](#I4)  
@@ -430,36 +431,80 @@ Output:
 
 ### Stream
 
+<div id="I6"/> 
+
+#### Write some JSON (push)
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_encoder.hpp>
+#include <fstream>
+#include <cassert>
+
+int main()
+{
+    std::ofstream os("./output/book_catalog.json", 
+                     std::ios_base::out | std::ios_base::trunc);
+    assert(os);
+
+    compact_json_stream_encoder encoder(os); // no indent
+
+    encoder.begin_array();
+    encoder.begin_object();
+    encoder.key("author");
+    encoder.string_value("Haruki Murakami");
+    encoder.key("title");
+    encoder.string_value("Hard-Boiled Wonderland and the End of the World");
+    encoder.key("price");
+    encoder.double_value(18.9);
+    encoder.end_object();
+    encoder.begin_object();
+    encoder.key("author");
+    encoder.string_value("Graham Greene");
+    encoder.key("title");
+    encoder.string_value("The Comedians");
+    encoder.key("price");
+    encoder.double_value(15.74);
+    encoder.end_object();
+    encoder.end_array();
+    encoder.flush();
+
+    os.close();
+
+    // Read the JSON and write it prettified to std::cout
+    json_stream_encoder writer(std::cout); // indent
+
+    std::ifstream is("./output/book_catalog.json");
+    assert(is);
+
+    json_reader reader(is, writer);
+    reader.read();
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+[
+    {
+        "author": "Haruki Murakami",
+        "title": "Hard-Boiled Wonderland and the End of the World",
+        "price": 18.9
+    },
+    {
+        "author": "Graham Greene",
+        "title": "The Comedians",
+        "price": 15.74
+    }
+]
+```
+
 <div id="I1"/> 
 
-#### Read JSON parse events
+#### Read some JSON (pull)
 
 A typical pull parsing application will repeatedly process the `current()` 
 event and call `next()` to advance to the next event, until `done()` 
 returns `true`.
-
-Input JSON file `book_catalog.json`:
-
-```json
-[ 
-  { 
-      "author" : "Haruki Murakami",
-      "title" : "Hard-Boiled Wonderland and the End of the World",
-      "isbn" : "0679743464",
-      "publisher" : "Vintage",
-      "date" : "1993-03-02",
-      "price": 18.90
-  },
-  { 
-      "author" : "Graham Greene",
-      "title" : "The Comedians",
-      "isbn" : "0099478374",
-      "publisher" : "Vintage Classics",
-      "date" : "2005-09-21",
-      "price": 15.74
-  }
-]
-```
 
 ```c++
 #include <jsoncons/json_cursor.hpp>
@@ -467,7 +512,7 @@ Input JSON file `book_catalog.json`:
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 
@@ -527,28 +572,16 @@ key: author
 string_value: Haruki Murakami
 key: title
 string_value: Hard-Boiled Wonderland and the End of the World
-key: isbn
-string_value: 0679743464
-key: publisher
-string_value: Vintage
-key: date
-string_value: 1993-03-02
 key: price
-double_value: 19
+double_value: 18.9
 end_object
 begin_object
 key: author
 string_value: Graham Greene
 key: title
 string_value: The Comedians
-key: isbn
-string_value: 0099478374
-key: publisher
-string_value: Vintage Classics
-key: date
-string_value: 2005-09-21
 key: price
-double_value: 16
+double_value: 15.74
 end_object
 end_array
 ```
@@ -585,7 +618,7 @@ int main()
         return false;
     };
 
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
     auto filtered_c = cursor | filter;
@@ -627,7 +660,7 @@ representing the events from `begin_array` ro `end_array`.
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 
@@ -670,19 +703,13 @@ begin_array
 begin_object
 {
     "author": "Haruki Murakami",
-    "date": "1993-03-02",
-    "isbn": "0679743464",
     "price": 18.9,
-    "publisher": "Vintage",
     "title": "Hard-Boiled Wonderland and the End of the World"
 }
 begin_object
 {
     "author": "Graham Greene",
-    "date": "2005-09-21",
-    "isbn": "0099478374",
     "price": 15.74,
-    "publisher": "Vintage Classics",
     "title": "The Comedians"
 }
 end_array
@@ -700,7 +727,7 @@ See [basic_json_cursor](doc/ref/basic_json_cursor.md)
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 
@@ -715,18 +742,12 @@ Output:
 ```
 {
     "author": "Haruki Murakami",
-    "date": "1993-03-02",
-    "isbn": "0679743464",
     "price": 18.9,
-    "publisher": "Vintage",
     "title": "Hard-Boiled Wonderland and the End of the World"
 }
 {
     "author": "Graham Greene",
-    "date": "2005-09-21",
-    "isbn": "0099478374",
     "price": 15.74,
-    "publisher": "Vintage Classics",
     "title": "The Comedians"
 }
 ```
@@ -745,19 +766,16 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        std::string isbn;
-        std::string publisher;
-        std::string date;
         double price;
     };
 
 } // namespace ns
 
-JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,isbn,publisher,date,price);
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
 int main()
 {
-    std::ifstream is("book_catalog.json");
+    std::ifstream is("./output/book_catalog.json");
 
     json_cursor cursor(is);
 
@@ -2385,8 +2403,8 @@ int main()
     double d = j.as<double>();
     std::cout << "(2) " << std::setprecision(17) << d << "\n\n";
 
-    // Access as jsoncons::bignum
-    jsoncons::bignum bn = j.as<jsoncons::bignum>();
+    // Access as jsoncons::bigint
+    jsoncons::bigint bn = j.as<jsoncons::bigint>();
     std::cout << "(3) " << bn << "\n\n";
 
     // If your compiler supports extended integral types for which std::numeric_limits is specialized 

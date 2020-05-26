@@ -5,6 +5,7 @@
 #include <jsoncons/json.hpp> // json_decoder and json
 #include <string>
 #include <sstream>
+#include <fstream>
 
 using namespace jsoncons;
 
@@ -15,47 +16,67 @@ namespace ns {
     {
         std::string author;
         std::string title;
-        std::string isbn;
-        std::string publisher;
-        std::string date;
         double price;
     };
 
 } // namespace ns
 } // namespace
 
-JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,isbn,publisher,date,price);
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
 namespace {
 
-    // Example JSON text
-    const std::string example = R"(
-    [ 
-      { 
-          "author" : "Haruki Murakami",
-          "title" : "Hard-Boiled Wonderland and the End of the World",
-          "isbn" : "0679743464",
-          "publisher" : "Vintage",
-          "date" : "1993-03-02",
-          "price": 18.90
-      },
-      { 
-          "author" : "Graham Greene",
-          "title" : "The Comedians",
-          "isbn" : "0099478374",
-          "publisher" : "Vintage Classics",
-          "date" : "2005-09-21",
-          "price": 15.74
-      }
-    ]
-    )";
+    // Create some JSON (push)
+    void create_some_json()
+    {
+        std::ofstream os("./output/book_catalog.json", 
+                         std::ios_base::out | std::ios_base::trunc);
+        assert(os);
+
+        compact_json_stream_encoder encoder(os); // no indent
+
+        encoder.begin_array();
+        encoder.begin_object();
+        encoder.key("author");
+        encoder.string_value("Haruki Murakami");
+        encoder.key("title");
+        encoder.string_value("Hard-Boiled Wonderland and the End of the World");
+        encoder.key("price");
+        encoder.double_value(18.9);
+        encoder.end_object();
+        encoder.begin_object();
+        encoder.key("author");
+        encoder.string_value("Graham Greene");
+        encoder.key("title");
+        encoder.string_value("The Comedians");
+        encoder.key("price");
+        encoder.double_value(15.74);
+        encoder.end_object();
+        encoder.end_array();
+        encoder.flush();
+
+        os.close();
+
+        // Read the JSON and write it prettified to std::cout
+        json_stream_encoder writer(std::cout); // indent
+
+        std::ifstream is("./output/book_catalog.json");
+        assert(is);
+
+        json_reader reader(is, writer);
+        reader.read();
+        std::cout << "\n\n";
+    }
+
+    // Read some JSON (pull)
 
     // In the example, the application pulls the next event in the 
     // JSON input stream by calling next().
 
-    void reading_a_json_stream()
+    void read_json_parse_events()
     {
-        std::istringstream is(example);
+        std::ifstream is("./output/book_catalog.json");
+        assert(is);
 
         json_cursor cursor(is);
 
@@ -126,7 +147,10 @@ namespace {
             return false;
         };
 
-        json_cursor cursor(example);
+        std::ifstream is("./output/book_catalog.json");
+        assert(is);
+
+        json_cursor cursor(is);
         auto filtered_c = cursor | filter;
 
         for (; !filtered_c.done(); filtered_c.next())
@@ -146,7 +170,10 @@ namespace {
 
     void read_nested_objects_to_basic_json()
     {
-        json_cursor cursor(example);
+        std::ifstream is("./output/book_catalog.json");
+        assert(is);
+
+        json_cursor cursor(is);
 
         json_decoder<json> decoder;
         for (; !cursor.done(); cursor.next())
@@ -183,7 +210,10 @@ namespace {
 
     void iterate_over_complete_objects1()
     {
-        json_cursor cursor(example);
+        std::ifstream is("./output/book_catalog.json");
+        assert(is);
+
+        json_cursor cursor(is);
 
         auto view = staj_array<json>(cursor);
         for (const auto& j : view)
@@ -194,7 +224,10 @@ namespace {
 
     void iterate_over_complete_objects2()
     {
-        json_cursor cursor(example);
+        std::ifstream is("./output/book_catalog.json");
+        assert(is);
+
+        json_cursor cursor(is);
 
         auto view = staj_array<ns::book>(cursor);
         for (const auto& book : view)
@@ -210,8 +243,9 @@ void json_cursor_examples()
     std::cout << "\njson_cursor examples\n\n";
 
     std::cout << "\n";
+    create_some_json();
+    read_json_parse_events();
     filtering_a_json_stream();
-    reading_a_json_stream();
     read_nested_objects_to_basic_json();
     iterate_over_complete_objects1();
     iterate_over_complete_objects2();

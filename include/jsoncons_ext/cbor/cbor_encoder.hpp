@@ -407,7 +407,7 @@ private:
         }
     }
 
-    void write_bignum(const bignum& n)
+    void write_bignum(const bigint& n)
     {
         int signum;
         std::vector<uint8_t> data;
@@ -599,7 +599,7 @@ private:
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
-            bignum n(s.data(), s.length());
+            bigint n = bigint::from_string(s.data(), s.length());
             write_bignum(n);
             end_value();
         }
@@ -780,7 +780,7 @@ private:
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
-            bignum n(s.data(), s.length(), 16);
+            bigint n = bigint::from_string_radix(s.data(), s.length(), 16);
             write_bignum(n);
             end_value();
         }
@@ -797,7 +797,7 @@ private:
         {
             case semantic_tag::bigint:
             {
-                bignum n(sv.data(), sv.length());
+                bigint n = bigint::from_string(sv.data(), sv.length());
                 write_bignum(n);
                 end_value();
                 break;

@@ -356,6 +356,39 @@ namespace jsoncons {
         }
     };
 
+    // set like
+    template <class T, class CharT>
+    struct deser_traits<T,CharT,
+        typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                 jsoncons::detail::is_list_like<T>::value &&
+                 !jsoncons::detail::is_back_insertable<T>::value &&
+                 jsoncons::detail::is_insertable<T>::value 
+    >::type>
+    {
+        using value_type = typename T::value_type;
+
+        template <class Json,class TempAllocator>
+        static T deserialize(basic_staj_cursor<CharT>& cursor, 
+                             json_decoder<Json,TempAllocator>& decoder, 
+                             std::error_code& ec)
+        {
+            T v;
+
+            if (cursor.current().event_type() != staj_event_type::begin_array)
+            {
+                ec = convert_errc::not_vector;
+                return v;
+            }
+            cursor.next(ec);
+            while (cursor.current().event_type() != staj_event_type::end_array && !ec)
+            {
+                v.insert(deser_traits<value_type,CharT>::deserialize(cursor, decoder, ec));
+                cursor.next(ec);
+            }
+            return v;
+        }
+    };
+
     // std::array
 
     template <class T, class CharT, std::size_t N>

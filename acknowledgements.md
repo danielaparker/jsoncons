@@ -52,7 +52,7 @@ and to json::as_string to remove warnings
 load of misaligned addresses, and verifying fix
 
 - [Tobias Hermann](https://github.com/Dobiasd), for reporting issue with `UINT_MAX` not declared 
-in `bignum.hpp`, and proposing fix.
+in `bigint.hpp`, and proposing fix.
 
 - [Cebtenzzre](https://github.com/Cebtenzzre), for finding and fixing an issue with conversions on 
 a basic_json value leading to an infinite recursion when the 

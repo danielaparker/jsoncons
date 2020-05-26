@@ -84,28 +84,28 @@ TEST_CASE("as with byte_string_arg hint)")
     CHECK(u == v);
 }
 
-TEST_CASE("json::as<jsoncons::bignum>()")
+TEST_CASE("json::as<jsoncons::bigint>()")
 {
     SECTION("from integer")
     {
         jsoncons::json j(-1000);
-        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(-1000)));
+        CHECK(bool(j.as<jsoncons::bigint>() == jsoncons::bigint(-1000)));
     }
     SECTION("from unsigned integer")
     {
         jsoncons::json j(1000u);
-        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(1000u)));
+        CHECK(bool(j.as<jsoncons::bigint>() == jsoncons::bigint(1000u)));
     }
     SECTION("from double")
     {
         jsoncons::json j(1000.0);
-        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(1000.0)));
+        CHECK(bool(j.as<jsoncons::bigint>() == jsoncons::bigint(1000)));
     }
-    SECTION("from bignum")
+    SECTION("from bigint")
     {
         std::string s = "-18446744073709551617";
         jsoncons::json j(s,  jsoncons::semantic_tag::bigint);
-        CHECK(bool(j.as<jsoncons::bignum>() == jsoncons::bignum(s)));
+        CHECK(bool(j.as<jsoncons::bigint>() == jsoncons::bigint::from_string(s)));
     }
 }
 
