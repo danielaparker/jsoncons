@@ -4,20 +4,20 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <catch/catch.hpp>
-#include <sstream>
-#include <vector>
-#include <map>
-#include <utility>
-#include <ctime>
+#include <array>
 #include <cstdint>
-#include <unordered_set>
-#include <unordered_map>
-#include <set>
+#include <ctime>
 #include <deque>
 #include <forward_list>
 #include <list>
-#include <array>
+#include <map>
+#include <set>
+#include <sstream>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 #include <valarray>
+#include <vector>
 
 using namespace jsoncons;
 
@@ -528,21 +528,46 @@ namespace ns {
     	std::string  name;
     	std::int32_t value;
 
-    	JSONCONS_TYPE_TRAITS_FRIEND
+        friend bool operator==(const Value& lhs, const Value& rhs)
+        {
+            return lhs.name == rhs.name && lhs.value == rhs.value;
+        }
     };
+
+    struct ValueHash {
+		std::size_t operator()(const Value& val) const
+        {
+            std::size_t h1 = std::hash<std::string>{}(val.name);
+            std::size_t h2 = std::hash<std::int32_t>{}(val.value);
+            return h1 ^ (h2 << 1);
+		}
+	};
 
     inline bool operator<(const Value &l, const Value &r) {
       return l.name < r.name;
     }
+
+    template <class Container>
     struct Project {
     	std::int32_t         version = 1;
     	std::string          name;
     	std::string          author;
     	std::string          notes;
     	bool                 showNotes;
-    	std::multiset<Value> values;
+    	Container values;
 
-    	JSONCONS_TYPE_TRAITS_FRIEND
+        friend bool operator==(const Project& lhs, const Project& rhs)
+        {
+            if (lhs.version != rhs.version || 
+                lhs.name != rhs.name ||
+                lhs.author != rhs.author ||
+                lhs.notes != rhs.notes ||
+                lhs.showNotes != rhs.showNotes ||
+                lhs.values != rhs.values)
+                return false;
+
+            return true;
+        }
     };
 
 } // namespace ns
@@ -553,7 +578,7 @@ JSONCONS_N_MEMBER_TRAITS(ns::Value, 0,
 	value
 )
 
-JSONCONS_N_MEMBER_TRAITS(ns::Project, 0,
+JSONCONS_TPL_N_MEMBER_TRAITS(1, ns::Project, 0,
 	version,
 	name,
 	author,
@@ -562,26 +587,226 @@ JSONCONS_N_MEMBER_TRAITS(ns::Project, 0,
 	values
 )
 
-TEST_CASE("xyz")
+TEST_CASE("encode/decode set traits")
 {
-    ns::Project project;
-    project.name = "Jane Doe";
+    using project_type = ns::Project<std::set<ns::Value>>;
+
+    project_type project;
+    project.name = "xyz";
+    project.author = "Jane Doe";
     project.showNotes = true;
     project.values.insert({ "foo",1 });
     project.values.insert({ "bar",2 });
     project.values.insert({ "foo",1 });
+    project.values.insert({ "baz",1 });
 
-    std::string s;
-    encode_json(project, s, indenting::indent);
-
-    std::cout << s << "\n";
-
-    auto v = decode_json<ns::Project>(s);
-
-    REQUIRE(v.values.size() == 3);
-
-    for (auto& item : v.values)
+    SECTION("encode/decode")
     {
-        std::cout << item.name << ", " << item.value << "\n";
+        std::string s;
+        encode_json(project, s, indenting::indent);
+
+        auto project2 = decode_json<project_type>(s);
+
+        CHECK(project2 == project);
+    }
+
+    SECTION("json_type_traits")
+    {
+        json j{project};
+
+        auto project2 = j.as<project_type>();
+        CHECK(project2 == project);
+    }
+}
+
+TEST_CASE("encode/decode multiset traits")
+{
+    using project_type = ns::Project<std::multiset<ns::Value>>;
+
+    project_type project;
+    project.name = "xyz";
+    project.author = "Jane Doe";
+    project.showNotes = true;
+    project.values.insert({ "foo",1 });
+    project.values.insert({ "bar",2 });
+    project.values.insert({ "foo",1 });
+    project.values.insert({ "baz",1 });
+
+    SECTION("encode/decode")
+    {
+        std::string s;
+        encode_json(project, s, indenting::indent);
+
+        auto project2 = decode_json<project_type>(s);
+
+        CHECK(project2 == project);
+    }
+
+    SECTION("json_type_traits")
+    {
+        json j{project};
+
+        auto project2 = j.as<project_type>();
+        CHECK(project2 == project);
+    }
+}
+
+TEST_CASE("encode/decode unordered_set traits")
+{
+    using project_type = ns::Project<std::unordered_set<ns::Value,ns::ValueHash>>;
+
+    project_type project;
+    project.name = "xyz";
+    project.author = "Jane Doe";
+    project.showNotes = true;
+    project.values.insert({ "foo",1 });
+    project.values.insert({ "bar",2 });
+    project.values.insert({ "foo",1 });
+    project.values.insert({ "baz",1 });
+
+    SECTION("encode/decode")
+    {
+        std::string s;
+        encode_json(project, s, indenting::indent);
+
+        auto project2 = decode_json<project_type>(s);
+
+        CHECK(project2 == project);
+    }
+
+    SECTION("json_type_traits")
+    {
+        json j{project};
+
+        auto project2 = j.as<project_type>();
+        CHECK(project2 == project);
+    }
+}
+
+TEST_CASE("encode/decode unordered_multiset traits")
+{
+    using project_type = ns::Project<std::unordered_set<ns::Value,ns::ValueHash>>;
+
+    project_type project;
+    project.name = "xyz";
+    project.author = "Jane Doe";
+    project.showNotes = true;
+    project.values.insert({ "foo",1 });
+    project.values.insert({ "bar",2 });
+    project.values.insert({ "foo",1 });
+    project.values.insert({ "baz",1 });
+
+    SECTION("encode/decode")
+    {
+        std::string s;
+        encode_json(project, s, indenting::indent);
+
+        auto project2 = decode_json<project_type>(s);
+
+        CHECK(project2 == project);
+    }
+
+    SECTION("json_type_traits")
+    {
+        json j{project};
+
+        auto project2 = j.as<project_type>();
+        CHECK(project2 == project);
+    }
+}
+
+TEST_CASE("encode/decode std::forward_list traits")
+{
+    using project_type = ns::Project<std::forward_list<ns::Value>>;
+
+    project_type project;
+    project.name = "xyz";
+    project.author = "Jane Doe";
+    project.showNotes = true;
+    project.values.push_front({ "foo",1 });
+    project.values.push_front({ "bar",2 });
+    project.values.push_front({ "foo",1 });
+    project.values.push_front({ "baz",1 });
+
+    SECTION("encode/decode")
+    {
+        std::string s;
+        encode_json(project, s, indenting::indent);
+
+        auto project2 = decode_json<project_type>(s);
+
+        CHECK(project2 == project);
+    }
+
+    SECTION("json_type_traits")
+    {
+        json j{project};
+
+        auto project2 = j.as<project_type>();
+        CHECK(project2 == project);
+    }
+}
+
+TEST_CASE("encode/decode std::deque traits")
+{
+    using project_type = ns::Project<std::deque<ns::Value>>;
+
+    project_type project;
+    project.name = "xyz";
+    project.author = "Jane Doe";
+    project.showNotes = true;
+    project.values.push_back({ "foo",1 });
+    project.values.push_back({ "bar",2 });
+    project.values.push_back({ "foo",1 });
+    project.values.push_back({ "baz",1 });
+
+    SECTION("encode/decode")
+    {
+        std::string s;
+        encode_json(project, s, indenting::indent);
+
+        auto project2 = decode_json<project_type>(s);
+
+        CHECK(project2 == project);
+    }
+
+    SECTION("json_type_traits")
+    {
+        json j{project};
+
+        auto project2 = j.as<project_type>();
+        CHECK(project2 == project);
+    }
+}
+
+TEST_CASE("encode/decode std::vector traits")
+{
+    using project_type = ns::Project<std::vector<ns::Value>>;
+
+    project_type project;
+    project.name = "xyz";
+    project.author = "Jane Doe";
+    project.showNotes = true;
+    project.values.push_back({ "foo",1 });
+    project.values.push_back({ "bar",2 });
+    project.values.push_back({ "foo",1 });
+    project.values.push_back({ "baz",1 });
+
+    SECTION("encode/decode")
+    {
+        std::string s;
+        encode_json(project, s, indenting::indent);
+
+        auto project2 = decode_json<project_type>(s);
+
+        CHECK(project2 == project);
+    }
+
+    SECTION("json_type_traits")
+    {
+        json j{project};
+
+        auto project2 = j.as<project_type>();
+        CHECK(project2 == project);
     }
 }
