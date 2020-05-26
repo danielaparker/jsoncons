@@ -232,12 +232,14 @@ struct preserve_order_policy : public sorted_policy
     using key_order = preserve_key_order;
 };
 
-template <typename IteratorT>
+template <class IteratorT, class ConstIteratorT>
 class range 
 {
 public:
     using iterator = IteratorT;
     using reverse_iterator = std::reverse_iterator<IteratorT>;
+    using const_iterator = ConstIteratorT;
+    using const_reverse_iterator = std::reverse_iterator<ConstIteratorT>;
 private:
     iterator first_;
     iterator last_;
@@ -256,11 +258,27 @@ public:
     {
         return last_;
     }
+    const_iterator cbegin()
+    {
+        return first_;
+    }
+    const_iterator cend()
+    {
+        return last_;
+    }
     reverse_iterator rbegin()
     {
         return reverse_iterator(last_);
     }
     reverse_iterator rend()
+    {
+        return reverse_iterator(first_);
+    }
+    const_reverse_iterator crbegin()
+    {
+        return reverse_iterator(last_);
+    }
+    const_reverse_iterator crend()
     {
         return reverse_iterator(first_);
     }
@@ -1840,22 +1858,22 @@ public:
             return evaluate();
         }
 
-        range<object_iterator> object_range()
+        range<object_iterator, const_object_iterator> object_range()
         {
             return evaluate().object_range();
         }
 
-        range<const_object_iterator> object_range() const
+        range<const_object_iterator, const_object_iterator> object_range() const
         {
             return evaluate().object_range();
         }
 
-        range<array_iterator> array_range()
+        range<array_iterator, const_array_iterator> array_range()
         {
             return evaluate().array_range();
         }
 
-        range<const_array_iterator> array_range() const
+        range<const_array_iterator, const_array_iterator> array_range() const
         {
             return evaluate().array_range();
         }
@@ -2718,25 +2736,25 @@ public:
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-        range<object_iterator> members()
+        range<object_iterator, const_object_iterator> members()
         {
             return evaluate().members();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-        range<const_object_iterator> members() const
+        range<const_object_iterator, const_object_iterator> members() const
         {
             return evaluate().members();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-        range<array_iterator> elements()
+        range<array_iterator, const_array_iterator> elements()
         {
             return evaluate().elements();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-        range<const_array_iterator> elements() const
+        range<const_array_iterator, const_array_iterator> elements() const
         {
             return evaluate().elements();
         }
@@ -5280,25 +5298,25 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-    range<object_iterator> members()
+    range<object_iterator, const_object_iterator> members()
     {
         return object_range();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use object_range()")
-    range<const_object_iterator> members() const
+    range<const_object_iterator, const_object_iterator> members() const
     {
         return object_range();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-    range<array_iterator> elements()
+    range<array_iterator, const_array_iterator> elements()
     {
         return array_range();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use array_range()")
-    range<const_array_iterator> elements() const
+    range<const_array_iterator, const_array_iterator> elements() const
     {
         return array_range();
     }
@@ -5310,51 +5328,51 @@ public:
     }
 #endif
 
-    range<object_iterator> object_range()
+    range<object_iterator, const_object_iterator> object_range()
     {
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
-            return range<object_iterator>(object_iterator(), object_iterator());
+            return range<object_iterator, const_object_iterator>(object_iterator(), object_iterator());
         case storage_kind::object_value:
-            return range<object_iterator>(object_iterator(object_value().begin()),
+            return range<object_iterator, const_object_iterator>(object_iterator(object_value().begin()),
                                           object_iterator(object_value().end()));
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
         }
     }
 
-    range<const_object_iterator> object_range() const
+    range<const_object_iterator, const_object_iterator> object_range() const
     {
         switch (var_.storage())
         {
         case storage_kind::empty_object_value:
-            return range<const_object_iterator>(const_object_iterator(), const_object_iterator());
+            return range<const_object_iterator, const_object_iterator>(const_object_iterator(), const_object_iterator());
         case storage_kind::object_value:
-            return range<const_object_iterator>(const_object_iterator(object_value().begin()),
+            return range<const_object_iterator, const_object_iterator>(const_object_iterator(object_value().begin()),
                                                 const_object_iterator(object_value().end()));
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
         }
     }
 
-    range<array_iterator> array_range()
+    range<array_iterator, const_array_iterator> array_range()
     {
         switch (var_.storage())
         {
         case storage_kind::array_value:
-            return range<array_iterator>(array_value().begin(),array_value().end());
+            return range<array_iterator, const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
         }
     }
 
-    range<const_array_iterator> array_range() const
+    range<const_array_iterator, const_array_iterator> array_range() const
     {
         switch (var_.storage())
         {
         case storage_kind::array_value:
-            return range<const_array_iterator>(array_value().begin(),array_value().end());
+            return range<const_array_iterator, const_array_iterator>(array_value().begin(),array_value().end());
         default:
             JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
         }
