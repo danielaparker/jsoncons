@@ -364,6 +364,102 @@ namespace detail {
     template<class Json, typename T>
     struct json_type_traits<Json, T, 
                             typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_basic_string<T>::value &&
+                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
+    {
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_string();
+        }
+
+        static T as(const Json& j)
+        {
+            return T(j.as_string());
+        }
+
+        static Json to_json(const T& val)
+        {
+            return Json(val, semantic_tag::none);
+        }
+
+        static Json to_json(const T& val, const allocator_type& alloc)
+        {
+            return Json(val, semantic_tag::none, alloc);
+        }
+    };
+
+    template<class Json, typename T>
+    struct json_type_traits<Json, T, 
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_basic_string<T>::value &&
+                                                    !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
+    {
+        using char_type = typename Json::char_type;
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_string();
+        }
+
+        static T as(const Json& j)
+        {
+            auto s = j.as_string();
+            T val;
+            unicons::convert(s.begin(), s.end(), std::back_inserter(val));
+            return val;
+        }
+
+        static Json to_json(const T& val)
+        {
+            std::basic_string<char_type> s;
+            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+
+            return Json(s, semantic_tag::none);
+        }
+
+        static Json to_json(const T& val, const allocator_type& alloc)
+        {
+            std::basic_string<char_type> s;
+            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
+            return Json(s, semantic_tag::none, alloc);
+        }
+    };
+
+    template<class Json, typename T>
+    struct json_type_traits<Json, T, 
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
+                                                    jsoncons::detail::is_basic_string_view<T>::value &&
+                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
+    {
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_string_view();
+        }
+
+        static T as(const Json& j)
+        {
+            return T(j.as_string_view().data(),j.as_string_view().size());
+        }
+
+        static Json to_json(const T& val)
+        {
+            return Json(val, semantic_tag::none);
+        }
+
+        static Json to_json(const T& val, const allocator_type& alloc)
+        {
+            return Json(val, semantic_tag::none, alloc);
+        }
+    };
+
+    template<class Json, typename T>
+    struct json_type_traits<Json, T, 
+                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                                                     jsoncons::detail::is_compatible_array_type<Json,T>::value
                                                     >::type>
     {
@@ -530,102 +626,6 @@ namespace detail {
 
         static void visit_reserve_(std::false_type, T&, std::size_t)
         {
-        }
-    };
-
-    template<class Json, typename T>
-    struct json_type_traits<Json, T, 
-                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_basic_string<T>::value &&
-                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
-    {
-        using allocator_type = typename Json::allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_string();
-        }
-
-        static T as(const Json& j)
-        {
-       	    return T(j.as_string());
-        }
-
-        static Json to_json(const T& val)
-        {
-            return Json(val, semantic_tag::none);
-        }
-
-        static Json to_json(const T& val, const allocator_type& alloc)
-        {
-            return Json(val, semantic_tag::none, alloc);
-        }
-    };
-
-    template<class Json, typename T>
-    struct json_type_traits<Json, T, 
-                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_basic_string<T>::value &&
-                                                    !std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
-    {
-        using char_type = typename Json::char_type;
-        using allocator_type = typename Json::allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_string();
-        }
-
-        static T as(const Json& j)
-        {
-            auto s = j.as_string();
-            T val;
-            unicons::convert(s.begin(), s.end(), std::back_inserter(val));
-            return val;
-        }
-
-        static Json to_json(const T& val)
-        {
-            std::basic_string<char_type> s;
-            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
-
-            return Json(s, semantic_tag::none);
-        }
-
-        static Json to_json(const T& val, const allocator_type& alloc)
-        {
-            std::basic_string<char_type> s;
-            unicons::convert(val.begin(), val.end(), std::back_inserter(s));
-            return Json(s, semantic_tag::none, alloc);
-        }
-    };
-
-    template<class Json, typename T>
-    struct json_type_traits<Json, T, 
-                            typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                                    jsoncons::detail::is_basic_string_view<T>::value &&
-                                                    std::is_same<typename Json::char_type,typename T::value_type>::value>::type>
-    {
-        using allocator_type = typename Json::allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_string_view();
-        }
-
-        static T as(const Json& j)
-        {
-       	    return T(j.as_string_view().data(),j.as_string_view().size());
-        }
-
-        static Json to_json(const T& val)
-        {
-            return Json(val, semantic_tag::none);
-        }
-
-        static Json to_json(const T& val, const allocator_type& alloc)
-        {
-            return Json(val, semantic_tag::none, alloc);
         }
     };
 
