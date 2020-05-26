@@ -558,15 +558,12 @@ namespace ns {
 
         friend bool operator==(const Project& lhs, const Project& rhs)
         {
-            if (lhs.version != rhs.version || 
-                lhs.name != rhs.name ||
-                lhs.author != rhs.author ||
-                lhs.notes != rhs.notes ||
-                lhs.showNotes != rhs.showNotes ||
-                lhs.values != rhs.values)
-                return false;
-
-            return true;
+            return (lhs.version == rhs.version && 
+                lhs.name == rhs.name &&
+                lhs.author == rhs.author &&
+                lhs.notes == rhs.notes &&
+                lhs.showNotes == rhs.showNotes &&
+                lhs.values == rhs.values);
         }
     };
 
