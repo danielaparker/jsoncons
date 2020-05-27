@@ -38,9 +38,8 @@ namespace jsoncons {
         {
         }
 
-        constexpr Into from(const byte_string_view& bstr, 
-                            semantic_tag,
-                            std::error_code&) const
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(const byte_string_view& bstr, semantic_tag, std::error_code&) const
         {
             Into bytes(alloc_);
             for (auto ch : bstr)
