@@ -485,7 +485,7 @@ namespace detail {
 
         template <class Container = T>
         static typename std::enable_if<jsoncons::detail::is_back_insertable<Container>::value &&
-                                       !std::is_same<typename Container::value_type,uint8_t>::value,Container>::type
+                                       !jsoncons::detail::is_back_insertable_byte_container<Container>::value,Container>::type
         as(const Json& j)
         {
             if (j.is_array())
@@ -506,8 +506,7 @@ namespace detail {
         }
 
         template <class Container = T>
-        static typename std::enable_if<jsoncons::detail::is_back_insertable<Container>::value &&
-                                       std::is_same<typename Container::value_type,uint8_t>::value,T>::type
+        static typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,T>::type
         as(const Json& j)
         {
             converter<T> convert{};
