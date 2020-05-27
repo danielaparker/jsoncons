@@ -232,19 +232,6 @@ namespace detail {
 
     // Containers
 
-    // is_bytes
-
-    template <class Container, class Enable=void>
-    struct is_bytes : std::false_type {};
-
-    template <class Container>
-    struct is_bytes<Container, 
-           typename std::enable_if<//std::is_integral<typename Container::value_type>::value &&
-                                   !std::is_same<typename Container::value_type,bool>::value &&
-                                   //std::is_unsigned<typename Container::value_type>::value &&
-                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
-     >::type> : std::true_type {};
-
     template <class Container>
     using 
     container_npos_t = decltype(Container::npos);
