@@ -116,15 +116,15 @@ Returns the allocator associated with the basic_json value.
   </tr>
   <tr>
     <td><a>void reserve(std::size_t n)</a></td>
-    <td>Increases the capacity of a basic_json object or array to allow at least `n` members or elements</td> 
+    <td>Increases the capacity of a basic_json object or array to allow at least <code>n</code> members or elements</td> 
   </tr>
   <tr>
     <td><a>void resize(std::size_t n)</a></td>
-    <td>Resizes a basic_json array so that it contains `n` elements</td> 
+    <td>Resizes a basic_json array so that it contains <code>n</code> elements</td> 
   </tr>
   <tr>
     <td><a>void resize(std::size_t n, const basic_json& val)</a></td>
-    <td>Resizes a basic_json array so that it contains `n` elements that are initialized to `val`</td> 
+    <td>Resizes a basic_json array so that it contains <code>n</code> elements that are initialized to <code>val</code></td> 
   </tr>
   <tr>
     <td><a>void shrink_to_fit()</a></td>
@@ -137,7 +137,7 @@ Returns the allocator associated with the basic_json value.
 <table border="0">
   <tr>
     <td><code>bool contains(const string_view_type& key) const noexcept</code></td>
-    <td>Returns <code>true</code> if an object has a member with the given `key`, otherwise <code>false</code></td> 
+    <td>Returns <code>true</code> if an object has a member with the given <code>key</code> , otherwise <code>false</code></td> 
   </tr>
   <tr>
     <td><a href="json/is.md">is</a></td>
