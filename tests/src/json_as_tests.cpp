@@ -147,5 +147,16 @@ TEST_CASE("as byte string tests")
 
         CHECK(u == v);
     }
+    SECTION("as<std::vector<char>>(jsoncons::byte_string_arg, ...")
+    {
+        std::vector<char> v = {'H','e','l','l','o'};
+        jsoncons::json j(jsoncons::byte_string_arg, v, jsoncons::semantic_tag::base64);
+        jsoncons::json sj(j.as<std::string>());
+
+        auto u = sj.as<std::vector<char>>(jsoncons::byte_string_arg,
+                                          jsoncons::semantic_tag::base64);
+
+        CHECK(u == v);
+    }
 }
 

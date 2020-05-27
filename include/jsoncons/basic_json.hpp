@@ -3782,7 +3782,8 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<(jsoncons::detail::is_list_like<T>::value && jsoncons::detail::is_bytes<T>::value) ||
+    typename std::enable_if<(!jsoncons::detail::is_basic_string<T>::value && 
+                             jsoncons::detail::is_back_insertable_byte_container<T>::value) ||
                             is_basic_byte_string<T>::value,T>::type
     as(byte_string_arg_t, semantic_tag hint) const
     {
@@ -3808,7 +3809,7 @@ public:
                     }
                     default:
                     {
-                        std::vector<uint8_t> v = convert.from(as_string_view(), hint, ec);
+                        T v = convert.from(as_string_view(), hint, ec);
                         if (ec)
                         {
                             JSONCONS_THROW(ser_error(ec));
