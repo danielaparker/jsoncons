@@ -373,8 +373,6 @@ int main()
 
         second_example_a();
 
-        array_examples();
-
         wjson_examples();
 
         unicode_examples();
@@ -413,8 +411,6 @@ int main()
 
         json_accessor_examples();
 
-        json_accessor_examples();
-
         jsonpatch_examples();
 
         jsonpath_examples();
@@ -438,6 +434,10 @@ int main()
         bson_examples();
 
         json_cursor_examples();
+
+        json_accessor_examples();
+
+        array_examples();
     }
     catch (const std::exception& e)
     {

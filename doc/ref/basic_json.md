@@ -91,11 +91,11 @@ Returns the allocator associated with the basic_json value.
 <table border="0">
   <tr>
     <td><a href="json/array_range.md">array_range</a></td>
-    <td>Returns a "range" that supports a range-based for loop over the elements of a `basic_json` array.</td> 
+    <td>Returns a [range](json/range.md) that supports a range-based for loop over the elements of a `basic_json` array.</td> 
   </tr>
   <tr>
     <td><a href="json/object_range.md">obect_range</a></td>
-    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `basic_json` object.</td> 
+    <td>Returns a [range](json/range.md) that supports a range-based for loop over the key-value pairs of a `basic_json` object.</td> 
   </tr>
 </table>
 

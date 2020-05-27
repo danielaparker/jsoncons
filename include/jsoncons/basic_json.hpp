@@ -94,9 +94,9 @@ namespace detail {
             return *it_;
         }
 
-        Iterator operator->() const 
+        pointer operator->() const 
         {
-            return it_;
+            return &(*it_);
         }
 
         random_access_iterator_wrapper& operator++() 
@@ -237,8 +237,8 @@ class range
 {
 public:
     using iterator = IteratorT;
-    using reverse_iterator = std::reverse_iterator<IteratorT>;
     using const_iterator = ConstIteratorT;
+    using reverse_iterator = std::reverse_iterator<IteratorT>;
     using const_reverse_iterator = std::reverse_iterator<ConstIteratorT>;
 private:
     iterator first_;
