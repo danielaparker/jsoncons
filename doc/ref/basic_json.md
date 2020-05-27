@@ -104,7 +104,7 @@ Returns the allocator associated with the basic_json value.
 <table border="0">
   <tr>
     <td><a>size_t size() const noexcept</a></td>
-    <td>Returns the number of elements in a basic_json array, or the number of members in a code><basic_json</code> object, or `zero`</td> 
+    <td>Returns the number of elements in a basic_json array, or the number of members in a <code><basic_json</code> object, or <code>zero</code></td> 
   </tr>
   <tr>
     <td><a>bool empty() const noexcept</a></td>
