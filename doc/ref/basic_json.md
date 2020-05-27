@@ -1,7 +1,7 @@
 ### jsoncons::basic_json
 
 ```c++
-#include <jsoncons/json.hpp>
+#include <jsoncons/basic_json.hpp>
 
 template< 
     class CharT,
