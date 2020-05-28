@@ -1175,13 +1175,13 @@ private:
                     if (tag == 2)
                     {
                         bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
-                        s = n.to_string<string_type>();
+                        n.write_string(s);
                     }
                     else if (tag == 3)
                     {
                         bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
                         n = -1 - n;
-                        s = n.to_string<string_type>();
+                        n.write_string(s);
                     }
                 }
                 break;
@@ -1283,7 +1283,7 @@ private:
                 }
                 s.push_back('0');
                 s.push_back('x');
-                jsoncons::detail::integer_to_hex_string(val, s);
+                jsoncons::detail::integer_to_string_hex(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1296,7 +1296,7 @@ private:
                 s.push_back('-');
                 s.push_back('0');
                 s.push_back('x');
-                jsoncons::detail::integer_to_hex_string(static_cast<uint64_t>(-val), s);
+                jsoncons::detail::integer_to_string_hex(static_cast<uint64_t>(-val), s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
@@ -1325,11 +1325,10 @@ private:
                     }
                     if (tag == 2)
                     {
-                        s.push_back('-');
                         s.push_back('0');
                         s.push_back('x');
                         bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
-                        n.dump_hex_string(s);
+                        n.write_string_hex(s);
                     }
                     else if (tag == 3)
                     {
@@ -1337,8 +1336,8 @@ private:
                         s.push_back('0');
                         bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
                         n = -1 - n;
-                        n.dump_hex_string(s);
-                        s[2] = 'x';
+                        n.write_string_hex(s);
+                        s[2] = 'x'; // overwrite minus
                     }
                 }
                 break;
@@ -1354,12 +1353,12 @@ private:
         s.push_back('p');
         if (exponent >=0)
         {
-            jsoncons::detail::integer_to_hex_string(static_cast<uint64_t>(exponent), s);
+            jsoncons::detail::integer_to_string_hex(static_cast<uint64_t>(exponent), s);
         }
         else
         {
             s.push_back('-');
-            jsoncons::detail::integer_to_hex_string(static_cast<uint64_t>(-exponent), s);
+            jsoncons::detail::integer_to_string_hex(static_cast<uint64_t>(-exponent), s);
         }
     }
 
@@ -1475,7 +1474,8 @@ private:
                         return;
                     }
                     bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
-                    text_buffer_ = n.to_string<string_type>(alloc_);
+                    text_buffer_.clear();
+                    n.write_string(text_buffer_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     break;
                 }
@@ -1490,7 +1490,8 @@ private:
                     }
                     bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
                     n = -1 - n;
-                    text_buffer_ = n.to_string<string_type>(alloc_);;
+                    text_buffer_.clear();
+                    n.write_string(text_buffer_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
                     break;
                 }

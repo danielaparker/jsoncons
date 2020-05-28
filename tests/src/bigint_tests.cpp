@@ -32,11 +32,11 @@ TEST_CASE("test_positive_bignum")
     std::string sz = y.to_string();
     CHECK(sz == expected);
 
-    SECTION("dump_hex_string")
+    SECTION("write_string_hex")
     {
         std::string exp = "10000000000000000";
         std::string s;
-        x.dump_hex_string(s);
+        x.write_string_hex(s);
         CHECK(s == exp);
     }
 
@@ -81,11 +81,11 @@ TEST_CASE("test_negative_bignum")
         REQUIRE(v[i] == b[i]);
     }
 
-    SECTION("dump_hex_string")
+    SECTION("write_string_hex")
     {
         std::string exp = "-10000000000000001";
         std::string s;
-        x.dump_hex_string(s);
+        x.write_string_hex(s);
         //std::cout << "bigint: " << expected << ", s: " << s << "\n";
         CHECK(s == exp);
     }

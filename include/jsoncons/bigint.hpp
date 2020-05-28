@@ -973,12 +973,16 @@ public:
         std::reverse(data.begin(),data.end());
     }
 
-    template <class String = std::string>
-    typename std::enable_if<jsoncons::detail::is_basic_string<String>::value,String>::type
-    to_string(const typename String::allocator_type& alloc = typename String::allocator_type()) const
+    std::string to_string() const
     {
-        String data(alloc);
+        std::string s;
+        write_string(s);
+        return s;
+    }
 
+    template <typename Ch, typename Traits, typename Alloc>
+    void write_string(std::basic_string<Ch,Traits,Alloc>& data) const
+    {
         basic_bigint<Allocator> v(*this);
 
         size_t len = (v.length() * basic_type_bits / 3) + 2;
@@ -1029,12 +1033,17 @@ public:
                 data[i++] = data[n++];
         }
         data.resize(i);
+    }
 
-        return data;
+    std::string to_string_hex() const
+    {
+        std::string s;
+        write_string_hex(s);
+        return s;
     }
 
     template <typename Ch, typename Traits, typename Alloc>
-    void dump_hex_string(std::basic_string<Ch,Traits,Alloc>& data) const
+    void write_string_hex(std::basic_string<Ch,Traits,Alloc>& data) const
     {
         basic_bigint<Allocator> v(*this);
 
@@ -1314,7 +1323,8 @@ public:
     template <class CharT>
     friend std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_bigint<Allocator>& v)
     {
-        auto s = v.to_string<std::basic_string<CharT>>(); 
+        std::basic_string<CharT> s;
+        v.write_string(s); 
         os << s;
 
         return os;
