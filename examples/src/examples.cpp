@@ -438,6 +438,8 @@ int main()
         json_accessor_examples();
 
         array_examples();
+
+        run_cbor_examples();
     }
     catch (const std::exception& e)
     {

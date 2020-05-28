@@ -1402,45 +1402,9 @@ private:
                 case 256: // stringref-namespace
                     other_tags_[stringref_namespace_tag] = true;
                     break;
-                case 0: // datetime
-                case 1: // timestamp
-                case 0x2: // positive bignum
-                case 0x3: // negative bignum
-                case 0x04: // big decimal
-                case 0x05: // big float
-                case 0x15: // byte string base64url
-                case 0x16: // byte string base64
-                case 0x17: // byte string base16
-                case 32: // uri
-                case 33: // string base64url hint
-                case 34: // string base64 hint
-                case 40: // row major storage
-                case 1040: // column major storage
-                case 0x40: // typed arrays
-                case 0x44:
-                case 0x41:
-                case 0x45:
-                case 0x42:
-                case 0x46:
-                case 0x43:
-                case 0x47:
-                case 0x48:
-                case 0x49:
-                case 0x4d:
-                case 0x4a:
-                case 0x4e:
-                case 0x4b:
-                case 0x4f:
-                case 0x50:
-                case 0x54:
-                case 0x51:
-                case 0x55:
-                case 0x52:
-                case 0x56:
+                default:
                     other_tags_[item_tag] = true;
                     item_tag_ = val;
-                    break;
-                default:
                     break;
             }
             c = source_.peek();
