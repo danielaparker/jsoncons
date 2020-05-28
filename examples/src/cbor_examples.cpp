@@ -525,6 +525,39 @@ namespace {
         }
     }
 
+    void ext_type_example()
+    {
+        // Create some CBOR
+        std::vector<uint8_t> buffer;
+        cbor::cbor_bytes_encoder encoder(buffer);
+
+        std::vector<uint8_t> bstr = {'f','o','o','b','a','r'};
+        encoder.byte_string_value(bstr, 274); // byte string with tag 274
+        encoder.flush();
+
+        std::cout << "(1)\n" << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
+
+        /*
+            d9, // tag
+                01,12, // 274
+            46, // byte string, length 6
+                66,6f,6f,62,61,72 // 'f','o','o','b','a','r'         
+        */ 
+
+        json j = cbor::decode_cbor<json>(buffer);
+
+        std::cout << "(2)\n" << pretty_print(j) << "\n\n";
+        std::cout << "(3) " << j.tag() << "("  << j.ext_tag() << ")\n\n";
+
+        // Get byte string as a std::vector<uint8_t>
+        auto bstr2 = j.as<std::vector<uint8_t>>();
+
+        std::vector<uint8_t> buffer2;
+        cbor::encode_cbor(j, buffer2);
+        std::cout << "(4)\n" << byte_string_view(buffer2.data(),buffer2.size()) << "\n";
+    }
+    
+
 }; // namespace
 
 void run_cbor_examples()
@@ -552,5 +585,7 @@ void run_cbor_examples()
     std::cout << std::endl;
     encode_to_cbor_buffer();
     query_cbor();
+
+    ext_type_example();
 }
 

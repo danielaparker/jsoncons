@@ -23,9 +23,11 @@ namespace jsoncons {
 
     // Into list like of bytes
     template <class Into>
-    class converter<Into,typename std::enable_if<(detail::is_list_like<Into>::value && jsoncons::detail::is_bytes<Into>::value) ||
+    class converter<Into,typename std::enable_if<(!jsoncons::detail::is_basic_string<Into>::value && 
+                                                   jsoncons::detail::is_back_insertable_byte_container<Into>::value) ||
                                                  jsoncons::detail::is_basic_byte_string<Into>::value>::type>
     {
+        using value_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
         allocator_type alloc_;
 
@@ -36,11 +38,16 @@ namespace jsoncons {
         {
         }
 
-        constexpr Into from(const byte_string_view& bytes, 
-                            semantic_tag,
-                            std::error_code&) const
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(const byte_string_view& bstr, semantic_tag, std::error_code&) const
         {
-            return Into(bytes.begin(), bytes.end(), alloc_);
+            Into bytes(alloc_);
+            for (auto ch : bstr)
+            {
+                bytes.push_back(static_cast<value_type>(ch));
+            }
+
+            return bytes;
         }
 
         template <class CharT>

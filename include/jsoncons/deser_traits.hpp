@@ -278,9 +278,8 @@ namespace jsoncons {
     struct deser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::is_back_insertable<T>::value &&
-                 jsoncons::detail::is_typed_array<T>::value &&
-                 jsoncons::detail::is_bytes<T>::value
+                 jsoncons::detail::is_back_insertable_byte_container<T>::value &&
+                 jsoncons::detail::is_typed_array<T>::value
     >::type>
     {
         using value_type = typename T::value_type;
@@ -297,7 +296,11 @@ namespace jsoncons {
                     auto bytes = cursor.current().template get<byte_string_view>(ec);
                     if (!ec) 
                     {
-                        auto v = T(bytes.begin(),bytes.end());
+                        T v;
+                        for (auto ch : bytes)
+                        {
+                            v.push_back(static_cast<value_type>(ch));
+                        }
                         cursor.next(ec);
                         return v;
                     }
@@ -327,8 +330,8 @@ namespace jsoncons {
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_list_like<T>::value &&
                  jsoncons::detail::is_back_insertable<T>::value &&
-                 jsoncons::detail::is_typed_array<T>::value &&
-                 !detail::is_bytes<T>::value
+                 !jsoncons::detail::is_back_insertable_byte_container<T>::value &&
+                 jsoncons::detail::is_typed_array<T>::value
     >::type>
     {
         using value_type = typename T::value_type;

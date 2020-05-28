@@ -1,7 +1,7 @@
 ### jsoncons::basic_json
 
 ```c++
-#include <jsoncons/json.hpp>
+#include <jsoncons/basic_json.hpp>
 
 template< 
     class CharT,
@@ -91,11 +91,11 @@ Returns the allocator associated with the basic_json value.
 <table border="0">
   <tr>
     <td><a href="json/array_range.md">array_range</a></td>
-    <td>Returns a "range" that supports a range-based for loop over the elements of a `basic_json` array.</td> 
+    <td>Returns a range that supports a range-based for loop over the elements of a <code>basic_json</code> array.</td> 
   </tr>
   <tr>
     <td><a href="json/object_range.md">obect_range</a></td>
-    <td>Returns a "range" that supports a range-based for loop over the key-value pairs of a `basic_json` object.</td> 
+    <td>Returns a range that supports a range-based for loop over the key-value pairs of a <code>basic_json</code> object.</td> 
   </tr>
 </table>
 
@@ -104,7 +104,7 @@ Returns the allocator associated with the basic_json value.
 <table border="0">
   <tr>
     <td><a>size_t size() const noexcept</a></td>
-    <td>Returns the number of elements in a basic_json array, or the number of members in a basic_json object, or `zero`</td> 
+    <td>Returns the number of elements in a basic_json array, or the number of members in a <code><basic_json</code> object, or <code>zero</code></td> 
   </tr>
   <tr>
     <td><a>bool empty() const noexcept</a></td>
@@ -116,15 +116,15 @@ Returns the allocator associated with the basic_json value.
   </tr>
   <tr>
     <td><a>void reserve(std::size_t n)</a></td>
-    <td>Increases the capacity of a basic_json object or array to allow at least `n` members or elements</td> 
+    <td>Increases the capacity of a basic_json object or array to allow at least <code>n</code> members or elements</td> 
   </tr>
   <tr>
     <td><a>void resize(std::size_t n)</a></td>
-    <td>Resizes a basic_json array so that it contains `n` elements</td> 
+    <td>Resizes a basic_json array so that it contains <code>n</code> elements</td> 
   </tr>
   <tr>
     <td><a>void resize(std::size_t n, const basic_json& val)</a></td>
-    <td>Resizes a basic_json array so that it contains `n` elements that are initialized to `val`</td> 
+    <td>Resizes a basic_json array so that it contains <code>n</code> elements that are initialized to <code>val</code></td> 
   </tr>
   <tr>
     <td><a>void shrink_to_fit()</a></td>
@@ -137,7 +137,7 @@ Returns the allocator associated with the basic_json value.
 <table border="0">
   <tr>
     <td><code>bool contains(const string_view_type& key) const noexcept</code></td>
-    <td>Returns <code>true</code> if an object has a member with the given `key`, otherwise <code>false</code></td> 
+    <td>Returns <code>true</code> if an object has a member with the given <code>key</code> , otherwise <code>false</code></td> 
   </tr>
   <tr>
     <td><a href="json/is.md">is</a></td>

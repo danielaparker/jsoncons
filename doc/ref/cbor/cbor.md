@@ -107,7 +107,8 @@ CBOR data item|CBOR tag                                         | jsoncons data 
 [Working with CBOR data](#A1)  
 [Encode and decode of a large typed array](#A2)  
 [CBOR and basic_json](#A3)  
-[Query CBOR with JSONPath](#A4)  
+[Byte string with unknown CBOR tag (unknown to jsoncons)](#A4)  
+[Query CBOR with JSONPath](#A5)  
 
 <div id="A1"/> 
 
@@ -485,6 +486,60 @@ Marilyn C, 0.9
 ```
 
 <div id="A4"/> 
+
+### Byte string with unknown CBOR tag (unknown to jsoncons)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
+int main()
+{
+    // Create some CBOR
+    std::vector<uint8_t> buffer;
+    cbor::cbor_bytes_encoder encoder(buffer);
+
+    std::vector<uint8_t> bstr = {'f','o','o','b','a','r'};
+    encoder.byte_string_value(bstr, 274); // byte string with tag 274
+    encoder.flush();
+
+    std::cout << "(1)\n" << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
+
+    /*
+        d9, // tag
+            01,12, // 274
+        46, // byte string, length 6
+            66,6f,6f,62,61,72 // 'f','o','o','b','a','r'         
+    */ 
+
+    json j = cbor::decode_cbor<json>(buffer);
+
+    std::cout << "(2)\n" << pretty_print(j) << "\n\n";
+    std::cout << "(3) " << j.tag() << "("  << j.ext_tag() << ")\n\n";
+
+    // Get byte string as a std::vector<uint8_t>
+    auto bstr2 = j.as<std::vector<uint8_t>>();
+
+    std::vector<uint8_t> buffer2;
+    cbor::encode_cbor(j, buffer2);
+    std::cout << "(4)\n" << byte_string_view(buffer2.data(),buffer2.size()) << "\n";
+}
+```
+Output:
+```
+(1)
+d9,01,12,46,66,6f,6f,62,61,72
+
+(2)
+"Zm9vYmFy"
+
+(3) ext(274)
+
+(4)
+d9,01,12,46,66,6f,6f,62,61,72
+```
+
+<div id="A5"/> 
 
 ### Query CBOR with JSONPath
 ```c++

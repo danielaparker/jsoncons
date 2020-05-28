@@ -94,9 +94,9 @@ namespace detail {
             return *it_;
         }
 
-        Iterator operator->() const 
+        pointer operator->() const 
         {
-            return it_;
+            return &(*it_);
         }
 
         random_access_iterator_wrapper& operator++() 
@@ -237,8 +237,8 @@ class range
 {
 public:
     using iterator = IteratorT;
-    using reverse_iterator = std::reverse_iterator<IteratorT>;
     using const_iterator = ConstIteratorT;
+    using reverse_iterator = std::reverse_iterator<IteratorT>;
     using const_reverse_iterator = std::reverse_iterator<ConstIteratorT>;
 private:
     iterator first_;
@@ -3782,7 +3782,8 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<(jsoncons::detail::is_list_like<T>::value && jsoncons::detail::is_bytes<T>::value) ||
+    typename std::enable_if<(!jsoncons::detail::is_basic_string<T>::value && 
+                             jsoncons::detail::is_back_insertable_byte_container<T>::value) ||
                             is_basic_byte_string<T>::value,T>::type
     as(byte_string_arg_t, semantic_tag hint) const
     {
@@ -3808,7 +3809,7 @@ public:
                     }
                     default:
                     {
-                        std::vector<uint8_t> v = convert.from(as_string_view(), hint, ec);
+                        T v = convert.from(as_string_view(), hint, ec);
                         if (ec)
                         {
                             JSONCONS_THROW(ser_error(ec));

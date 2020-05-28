@@ -72,18 +72,6 @@ TEST_CASE("json::as<jsoncons::string_view>()")
     CHECK(j2.as<jsoncons::string_view>() == jsoncons::string_view(s2));
 }
 
-TEST_CASE("as with byte_string_arg hint)")
-{
-    std::vector<uint8_t> v = {'H','e','l','l','o'};
-    jsoncons::json j(jsoncons::byte_string_arg, v, jsoncons::semantic_tag::base64);
-    jsoncons::json sj(j.as<std::string>());
-
-    auto u = sj.as<std::vector<uint8_t>>(jsoncons::byte_string_arg,
-                                         jsoncons::semantic_tag::base64);
-
-    CHECK(u == v);
-}
-
 TEST_CASE("json::as<jsoncons::bigint>()")
 {
     SECTION("from integer")
@@ -136,3 +124,39 @@ TEST_CASE("json::as<unsigned __int128>()")
     CHECK(result.value() == val);
 }
 #endif
+
+TEST_CASE("as byte string tests")
+{
+    SECTION("byte_string_arg hint")
+    {
+        std::vector<uint8_t> v = {'H','e','l','l','o'};
+        jsoncons::json j(jsoncons::byte_string_arg, v, jsoncons::semantic_tag::base64);
+        jsoncons::json sj(j.as<std::string>());
+
+        auto u = sj.as<std::vector<uint8_t>>(jsoncons::byte_string_arg,
+                                             jsoncons::semantic_tag::base64);
+
+        CHECK(u == v);
+    }
+    SECTION("as std::vector<char>")
+    {
+        std::vector<char> v = {'H','e','l','l','o'};
+        jsoncons::json j(jsoncons::byte_string_arg, v, jsoncons::semantic_tag::base64);
+
+        auto u = j.as<std::vector<char>>();
+
+        CHECK(u == v);
+    }
+    SECTION("as<std::vector<char>>(jsoncons::byte_string_arg, ...")
+    {
+        std::vector<char> v = {'H','e','l','l','o'};
+        jsoncons::json j(jsoncons::byte_string_arg, v, jsoncons::semantic_tag::base64);
+        jsoncons::json sj(j.as<std::string>());
+
+        auto u = sj.as<std::vector<char>>(jsoncons::byte_string_arg,
+                                          jsoncons::semantic_tag::base64);
+
+        CHECK(u == v);
+    }
+}
+
