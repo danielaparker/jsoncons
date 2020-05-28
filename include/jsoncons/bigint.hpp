@@ -986,18 +986,14 @@ public:
         basic_bigint<Allocator> v(*this);
 
         size_t len = (v.length() * basic_type_bits / 3) + 2;
-        data.resize(len);
+        data.reserve(len);
 
-        size_t n = len;
-        size_t i = 0;
-                                      // 1/3 > ln(2)/ln(10)
         static uint64_t p10 = 1;
         static uint64_t ip10 = 0;
 
         if ( v.length() == 0 )
         {
-            data[0] = '0';
-            i = 1;
+            data.push_back('0');
         }
         else
         {
@@ -1009,30 +1005,30 @@ public:
                     p10 *= 10;
                     ip10++;
                 }
-            }                     // p10 is max unsigned power of 10
+            }                     
+            // p10 is max unsigned power of 10
             basic_bigint<Allocator> R;
             basic_bigint<Allocator> LP10 = p10; // LP10 = p10 = ::pow(10, ip10)
-            if ( v.is_negative() )
-            {
-                data[0] = '-';
-                i = 1;
-            }
+
             do
             {
                 v.divide( LP10, v, R, true );
                 r = (R.length() ? R.data()[0] : 0);
                 for ( size_type j=0; j < ip10; j++ )
                 {
-                    data[--n] = char(r % 10 + '0');
+                    data.push_back(char(r % 10 + '0'));
                     r /= 10;
                     if ( r + v.length() == 0 )
                         break;
                 }
-            } while ( v.length() );
-            while ( n < len )
-                data[i++] = data[n++];
+            } 
+            while ( v.length() );
+            if (is_negative())
+            {
+                data.push_back('-');
+            }
+            std::reverse(data.begin(),data.end());
         }
-        data.resize(i);
     }
 
     std::string to_string_hex() const
@@ -1048,18 +1044,14 @@ public:
         basic_bigint<Allocator> v(*this);
 
         std::size_t len = (v.length() * basic_bigint<Allocator>::basic_type_bits / 3) + 2;
-        data.resize(len);
-
-        size_t n = len;
-        size_t i = 0;
-                                      // 1/3 > ln(2)/ln(10)
+        data.reserve(len);
+        // 1/3 > ln(2)/ln(10)
         static uint64_t p10 = 1;
         static uint64_t ip10 = 0;
 
         if ( v.length() == 0 )
         {
-            data[0] = '0';
-            i = 1;
+            data.push_back('0');
         }
         else
         {
@@ -1074,11 +1066,6 @@ public:
             }                     // p10 is max unsigned power of 16
             basic_bigint<Allocator> R;
             basic_bigint<Allocator> LP10 = p10; // LP10 = p10 = ::pow(16, ip10)
-            if ( v.is_negative() )
-            {
-                data[0] = '-';
-                i = 1;
-            }
             do
             {
                 v.divide( LP10, v, R, true );
@@ -1086,16 +1073,20 @@ public:
                 for ( size_type j=0; j < ip10; j++ )
                 {
                     uint8_t c = r % 16;
-                    data[--n] = (c < 10) ? ('0' + c) : ('A' - 10 + c);
+                    data.push_back((c < 10) ? ('0' + c) : ('A' - 10 + c));
                     r /= 16;
                     if ( r + v.length() == 0 )
                         break;
                 }
-            } while ( v.length() );
-            while ( n < len )
-                data[i++] = data[n++];
+            } 
+            while (v.length());
+
+            if (is_negative())
+            {
+                data.push_back('-');
+            }
+            std::reverse(data.begin(),data.end());
         }
-        data.resize(i);
     }
 
 //  Global Operators
