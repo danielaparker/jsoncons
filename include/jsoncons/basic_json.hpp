@@ -2502,10 +2502,9 @@ public:
             return evaluate().template get_with_default<T>(name,default_value);
         }
 
-        template <class SAllocator=std::allocator<char_type>>
-        std::basic_string<char_type,char_traits_type,SAllocator> to_string(const SAllocator& alloc = SAllocator()) const 
+        std::basic_string<char_type> to_string() const 
         {
-            return evaluate().to_string(alloc);
+            return evaluate().to_string();
         }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -4707,17 +4706,19 @@ public:
         }
     }
 
-    template <class SAllocator = std::allocator<char_type>>
-    std::basic_string<char_type, char_traits_type, SAllocator> to_string(const char_allocator_type& alloc = SAllocator()) const noexcept
+    std::basic_string<char_type> to_string() const noexcept
     {
-        using string_type = std::basic_string<char_type, char_traits_type, SAllocator>;
-        string_type s(alloc);
+        using string_type = std::basic_string<char_type>;
+        string_type s;
         basic_compact_json_encoder<char_type, jsoncons::string_sink<string_type>> encoder(s);
         dump(encoder);
         return s;
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
     template <class SAllocator = std::allocator<char_type>>
+    JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
     std::basic_string<char_type, char_traits_type, SAllocator> to_string(const basic_json_encode_options<char_type>& options,
         const SAllocator& alloc = SAllocator()) const
     {
@@ -4727,8 +4728,6 @@ public:
         dump(encoder);
         return s;
     }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
 
     JSONCONS_DEPRECATED_MSG("Instead, use basic_json(byte_string_arg_t, const Source&, semantic_tag=semantic_tag::none,const Allocator& = Allocator())")
     basic_json(const byte_string_view& bytes, 
