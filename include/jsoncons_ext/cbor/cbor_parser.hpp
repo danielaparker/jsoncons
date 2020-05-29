@@ -676,20 +676,16 @@ private:
 
     void read_text_string(string_type& s, std::error_code& ec)
     {
-        jsoncons::cbor::detail::cbor_major_type major_type;
-        uint8_t info;
-        int c = source_.peek();
-        switch (c)
+        auto c = source_.peek_character();
+        if (!c)
         {
-            case Src::traits_type::eof():
-                ec = cbor_errc::unexpected_eof;
-                more_ = false;
-                return;
-            default:
-                major_type = get_major_type((uint8_t)c);
-                info = get_additional_information_value((uint8_t)c);
-                break;
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return;
         }
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
+        uint8_t info = get_additional_information_value(c.value());
+
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
         auto func = [&s](Src& source, std::size_t length, std::error_code& ec) -> bool
         {
@@ -729,20 +725,16 @@ private:
     {
         bool more = true;
         v.clear();
-        jsoncons::cbor::detail::cbor_major_type major_type;
-        uint8_t info;
-        int c = source_.peek();
-        switch (c)
+        auto c = source_.peek_character();
+        if (!c)
         {
-            case Src::traits_type::eof():
-                ec = cbor_errc::unexpected_eof;
-                more = false;
-                return more;
-            default:
-                major_type = get_major_type((uint8_t)c);
-                info = get_additional_information_value((uint8_t)c);
-                break;
+            ec = cbor_errc::unexpected_eof;
+            more = false;
+            return more;
         }
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
+        uint8_t info = get_additional_information_value(c.value());
+
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
 
         switch(info)
@@ -795,14 +787,14 @@ private:
         bool done = false;
         while (!done)
         {
-            int c = source_.peek();
-            if (c == Src::traits_type::eof())
+            auto c = source_.peek_character();
+            if (!c)
             {
                 ec = cbor_errc::unexpected_eof;
                 more_ = false;
                 return;
             }
-            if (nesting_level > 0 && c == 0xff)
+            if (nesting_level > 0 && c.value() == 0xff)
             {
                 --nesting_level;
                 if (nesting_level == 0)
@@ -813,14 +805,14 @@ private:
                 continue;
             }
 
-            jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
+            jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
             if (major_type != type)
             {
                 ec = cbor_errc::illegal_chunked_string;
                 more_ = false;
                 return;
             }
-            uint8_t info = get_additional_information_value((uint8_t)c);
+            uint8_t info = get_additional_information_value(c.value());
 
             switch (info)
             {
@@ -924,16 +916,19 @@ private:
     int64_t get_int64_value(std::error_code& ec)
     {
         int64_t val = 0;
-        if (JSONCONS_UNLIKELY(source_.eof()))
+        const uint8_t* endp = nullptr;
+
+        auto ch = source_.peek_character();
+        if (!ch)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return val;
         }
-        const uint8_t* endp = nullptr;
 
-        uint8_t info = get_additional_information_value((uint8_t)source_.peek());
-        switch (get_major_type((uint8_t)source_.peek()))
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(ch.value());
+        uint8_t info = get_additional_information_value(ch.value());
+        switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
                 source_.ignore(1);

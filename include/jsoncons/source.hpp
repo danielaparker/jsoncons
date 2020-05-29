@@ -322,7 +322,6 @@ namespace jsoncons {
                 if (static_cast<std::size_t>(count) < length)
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    return 0;
                 }
                 position_ += length;
                 return static_cast<std::size_t>(count);
@@ -617,7 +616,6 @@ namespace jsoncons {
                 if (static_cast<std::size_t>(count) < length)
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    return 0;
                 }
                 position_ += length;
                 return static_cast<std::size_t>(count);
