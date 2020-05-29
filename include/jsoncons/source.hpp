@@ -91,12 +91,11 @@ namespace jsoncons {
         IteratorT current_;
         IteratorT end_;
         std::size_t position_;
-        bool eof_;
     public:
         using value_type = typename std::iterator_traits<IteratorT>::value_type;
 
         iterator_source(const IteratorT& first, const IteratorT& last)
-            : current_(first), end_(last), position_(0), eof_(first == last)
+            : current_(first), end_(last), position_(0)
         {
         }
 
@@ -117,53 +116,46 @@ namespace jsoncons {
 
         character_result<value_type> get_character()
         {
-            if (current_ < end_)
+            if (current_ != end_)
             {
+                ++position_;
                 return character_result<value_type>(*current_++);
             }
             else
            {
-                eof_ = true;
-                current_ = end_;
                 return character_result<value_type>();
             }
         }
 
         void ignore(std::size_t count)
         {
-            std::size_t len;
-            if ((std::size_t)(end_ - current_) < count)
+            while (count-- > 0 && current_ != end_)
             {
-                len = end_ - current_;
-                eof_ = true;
+                ++position_;
+                ++current_;
             }
-            else
-            {
-                len = count;
-            }
-            current_ += len;
         }
 
         character_result<value_type> peek_character() 
         {
-            return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
+            return current_ != end_ ? character_result<value_type>(*current_) : character_result<value_type>();
         }
 
-        std::size_t read(value_type* p, std::size_t length)
+        std::size_t read(value_type* data, std::size_t length)
         {
-            std::size_t len;
-            if ((std::size_t)(end_ - current_) < length)
+            value_type* p = data;
+            value_type* pend = data + length;
+
+            while (p < pend && current_ != end_)
             {
-                len = end_ - current_;
-                eof_ = true;
+                *p = *current_;
+                ++p;
+                ++current_;
             }
-            else
-            {
-                len = length;
-            }
-            std::memcpy(p, current_, len*sizeof(value_type));
-            current_  += len;
-            return len;
+
+            position_ += (p - data);
+
+            return p - data;
         }
     };
 
