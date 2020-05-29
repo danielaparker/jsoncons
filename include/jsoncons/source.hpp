@@ -49,6 +49,140 @@ namespace jsoncons {
         basic_null_istream& operator=(basic_null_istream&&) = default;
     };
 
+    template <class CharT>
+    class character_result
+    {
+        CharT value_;
+        bool eof_;
+    public:
+        using value_type = CharT;
+
+        constexpr character_result()
+            : value_(0), eof_(true)
+        {
+        }
+
+        character_result& operator=(const character_result& other)
+        {
+            if (&other != this)
+            {
+                value_ = other.value_; 
+                eof_ = other.eof_; 
+            }
+            return *this;
+        }
+
+        constexpr character_result(CharT value)
+            : value_(value), eof_(false)
+        {
+        }
+
+        constexpr explicit operator bool() const noexcept
+        {
+            return !eof_;
+        }
+
+        constexpr value_type value() const
+        {
+            return value_;
+        }
+
+        constexpr bool eof() const
+        {
+            return eof_;
+        }
+    };
+
+    // iterator sources
+
+    template <class IteratorT>
+    class iterator_source
+    {
+        IteratorT current_;
+        IteratorT end_;
+        std::size_t position_;
+        bool eof_;
+    public:
+        using value_type = typename std::iterator_traits<IteratorT>::value_type;
+        using traits_type = std::char_traits<value_type>;
+
+        iterator_source(const IteratorT& first, const IteratorT& last)
+            : current_(first), end_(last), position_(0), eof_(first == last)
+        {
+        }
+
+        bool eof() const
+        {
+            return current_ == end_;  
+        }
+
+        bool is_error() const
+        {
+            return false;  
+        }
+
+        std::size_t position() const
+        {
+            return position_;
+        }
+
+        character_result<value_type> get_character()
+        {
+            if (current_ < end_)
+            {
+                return character_result<value_type>(*current_++);
+            }
+            else
+           {
+                eof_ = true;
+                current_ = end_;
+                return character_result<value_type>();
+            }
+        }
+
+        void ignore(std::size_t count)
+        {
+            std::size_t len;
+            if ((std::size_t)(end_ - current_) < count)
+            {
+                len = end_ - current_;
+                eof_ = true;
+            }
+            else
+            {
+                len = count;
+            }
+            current_ += len;
+        }
+
+        int peek() 
+        {
+            return current_ < end_ ? *current_ : traits_type::eof();
+        }
+
+        character_result<value_type> peek_character() 
+        {
+            return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
+        }
+
+        std::size_t read(value_type* p, std::size_t length)
+        {
+            std::size_t len;
+            if ((std::size_t)(end_ - current_) < length)
+            {
+                len = end_ - current_;
+                eof_ = true;
+            }
+            else
+            {
+                len = length;
+            }
+            std::memcpy(p, current_, len*sizeof(value_type));
+            current_  += len;
+            return len;
+        }
+    };
+
     // text sources
 
     template <class CharT>
@@ -109,31 +243,7 @@ namespace jsoncons {
             return position_;
         }
 
-        std::size_t get(value_type& c)
-        {
-            JSONCONS_TRY
-            {
-                int val = sbuf_->sbumpc();
-                if (!(val == traits_type::eof()))
-                {
-                    c = (value_type)val;
-                    ++position_;
-                    return 1;
-                }
-                else
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    return 0;
-                }
-            }
-            JSONCONS_CATCH(const std::exception&)     
-            {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return 0;
-            }
-        }
-
-        int get()
+        character_result<value_type> get_character()
         {
             JSONCONS_TRY
             {
@@ -146,12 +256,12 @@ namespace jsoncons {
                 {
                     ++position_;
                 }
-                return c;
+                return character_result<value_type>(static_cast<value_type>(c));
             }
             JSONCONS_CATCH(const std::exception&)     
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return traits_type::eof();
+                return character_result<value_type>();
             }
         }
 
@@ -194,6 +304,24 @@ namespace jsoncons {
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
                 return traits_type::eof();
+            }
+        }
+
+        character_result<value_type> peek_character() 
+        {
+            JSONCONS_TRY
+            {
+                int c = sbuf_->sgetc();
+                if (c == traits_type::eof())
+                {
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                }
+                return character_result<value_type>(static_cast<value_type>(c));
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
+                return character_result<value_type>();
             }
         }
 
@@ -292,32 +420,17 @@ namespace jsoncons {
             return (input_ptr_ - data_)/sizeof(value_type) + 1;
         }
 
-        std::size_t get(value_type& c)
+        character_result<value_type> get_character()
         {
             if (input_ptr_ < input_end_)
             {
-                c = *input_ptr_++;
-                return 1;
+                return character_result<value_type>(*input_ptr_++);
             }
             else
            {
                 eof_ = true;
                 input_ptr_ = input_end_;
-                return 0;
-            }
-        }
-
-        int get()
-        {
-            if (input_ptr_ < input_end_)
-            {
-                return *input_ptr_++;
-            }
-            else
-           {
-                eof_ = true;
-                input_ptr_ = input_end_;
-                return traits_type::eof();
+                return character_result<value_type>();
             }
         }
 
@@ -339,6 +452,11 @@ namespace jsoncons {
         int peek() 
         {
             return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
+        }
+
+        character_result<value_type> peek_character() 
+        {
+            return input_ptr_ < input_end_ ? character_result<value_type>(*input_ptr_) : character_result<value_type>();
         }
 
         std::size_t read(value_type* p, std::size_t length)
@@ -420,31 +538,7 @@ namespace jsoncons {
             return position_;
         }
 
-        std::size_t get(value_type& c)
-        {
-            JSONCONS_TRY
-            {
-                int val = sbuf_->sbumpc();
-                if (!(val == traits_type::eof()))
-                {
-                    c = (value_type)val;
-                    ++position_;
-                    return 1;
-                }
-                else
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    return 0;
-                }
-            }
-            JSONCONS_CATCH(const std::exception&)     
-            {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return 0;
-            }
-        }
-
-        int get()
+        character_result<value_type> get_character()
         {
             JSONCONS_TRY
             {
@@ -457,12 +551,12 @@ namespace jsoncons {
                 {
                     ++position_;
                 }
-                return c;
+                return character_result<value_type>(static_cast<value_type>(c));
             }
             JSONCONS_CATCH(const std::exception&)     
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return traits_type::eof();
+                return character_result<value_type>();
             }
         }
 
@@ -505,6 +599,24 @@ namespace jsoncons {
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
                 return traits_type::eof();
+            }
+        }
+
+        character_result<value_type> peek_character() 
+        {
+            JSONCONS_TRY
+            {
+                int c = sbuf_->sgetc();
+                if (c == traits_type::eof())
+                {
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                }
+                return character_result<value_type>(static_cast<value_type>(c));
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
+                return character_result<value_type>();
             }
         }
 
@@ -577,32 +689,17 @@ namespace jsoncons {
             return input_ptr_ - data_ + 1;
         }
 
-        std::size_t get(value_type& c)
+        character_result<value_type> get_character()
         {
             if (input_ptr_ < input_end_)
             {
-                c = *input_ptr_++;
-                return 1;
+                return character_result<value_type>(*input_ptr_++);
             }
             else
            {
                 eof_ = true;
                 input_ptr_ = input_end_;
-                return 0;
-            }
-        }
-
-        int get()
-        {
-            if (input_ptr_ < input_end_)
-            {
-                return *input_ptr_++;
-            }
-            else
-           {
-                eof_ = true;
-                input_ptr_ = input_end_;
-                return traits_type::eof();
+                return character_result<value_type>();
             }
         }
 
@@ -624,6 +721,11 @@ namespace jsoncons {
         int peek() 
         {
             return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
+        }
+
+        character_result<value_type> peek_character() 
+        {
+            return input_ptr_ < input_end_ ? character_result<value_type>(*input_ptr_) : character_result<value_type>();
         }
 
         std::size_t read(value_type* p, std::size_t length)
@@ -690,12 +792,12 @@ namespace jsoncons {
                 std::size_t actual = 0;
                 while (actual < n)
                 {
-                    int c = source.get();
-                    if (c == Source::traits_type::eof())
+                    auto c = source.get_character();
+                    if (!c)
                     {
                         break;
                     }
-                    v.push_back((value_type)c);
+                    v.push_back(c.value());
                     ++actual;
                 }
                 unread -= actual;

@@ -194,13 +194,14 @@ private:
             return;
         }   
 
-        uint8_t type{};
-        if (source_.get(type) == 0)
+        auto ch = source_.get_character();
+        if (!ch)
         {
             ec = msgpack_errc::unexpected_eof;
             more_ = false;
             return;
         }
+        uint8_t type = ch.value();
 
         if (type <= 0xbf)
         {
@@ -299,14 +300,14 @@ private:
 
                 case jsoncons::msgpack::detail::msgpack_format::uint8_cd: 
                 {
-                    uint8_t val{};
-                    if (source_.get(val) == 0)
+                    auto val = source_.get_character();
+                    if (!val)
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
+                    more_ = visitor.uint64_value(val.value(), semantic_tag::none, *this, ec);
                     break;
                 }
 
