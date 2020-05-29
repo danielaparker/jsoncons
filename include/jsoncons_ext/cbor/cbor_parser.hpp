@@ -1122,7 +1122,16 @@ private:
         }
 
         string_type s;
-        switch (get_major_type((uint8_t)source_.peek()))
+
+        c = source_.peek_character();
+        if (!c)
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+
+        switch (get_major_type(c.value()))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
@@ -1271,7 +1280,14 @@ private:
             }
         }
 
-        switch (get_major_type((uint8_t)source_.peek()))
+        c = source_.peek_character();
+        if (!c)
+        {
+            ec = cbor_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        switch (get_major_type(c.value()))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
@@ -1380,14 +1396,15 @@ private:
 
     void read_tags(std::error_code& ec)
     {
-        int c = source_.peek();
-        if (c == Src::traits_type::eof())
+        auto c = source_.peek_character();
+        if (!c)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
+
         while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
             uint64_t val = get_uint64_value(ec);
@@ -1408,14 +1425,14 @@ private:
                     item_tag_ = val;
                     break;
             }
-            c = source_.peek();
-            if (c == Src::traits_type::eof())
+            c = source_.peek_character();
+            if (!c)
             {
                 ec = cbor_errc::unexpected_eof;
                 more_ = false;
                 return;
             }
-            major_type = get_major_type((uint8_t)c);
+            major_type = get_major_type(c.value());
         }
     }
 
@@ -1873,26 +1890,25 @@ private:
             {
                 while (true)
                 {
-                    int c = source_.peek();
-                    switch (c)
+                    auto c = source_.peek_character();
+                    if (!c)
                     {
-                        case Src::traits_type::eof():
-                            ec = cbor_errc::unexpected_eof;
-                            more_ = false;
-                            return;
-                        case 0xff:
-                            source_.ignore(1);
-                            break;
-                        default:
+                        ec = cbor_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    if (c.value() == 0xff)
+                    {
+                        source_.ignore(1);
+                    }
+                    else
+                    {
+                        std::size_t dim = get_size(ec);
+                        if (!more_)
                         {
-                            std::size_t dim = get_size(ec);
-                            if (!more_)
-                            {
-                                return;
-                            }
-                            shape_.push_back(dim);
-                            break;
+                            return;
                         }
+                        shape_.push_back(dim);
                     }
                 }
                 break;
