@@ -94,7 +94,6 @@ namespace jsoncons {
         bool eof_;
     public:
         using value_type = typename std::iterator_traits<IteratorT>::value_type;
-        using traits_type = std::char_traits<value_type>;
 
         iterator_source(const IteratorT& first, const IteratorT& last)
             : current_(first), end_(last), position_(0), eof_(first == last)
@@ -175,8 +174,10 @@ namespace jsoncons {
     {
     public:
         using value_type = CharT;
-        using traits_type = std::char_traits<CharT>;
     private:
+        using traits_type = std::char_traits<CharT>;
+        using int_type = typename traits_type::int_type;
+
         basic_null_istream<CharT> null_is_;
         std::basic_istream<CharT>* stream_ptr_;
         std::basic_streambuf<CharT>* sbuf_;
@@ -232,7 +233,7 @@ namespace jsoncons {
         {
             JSONCONS_TRY
             {
-                int c = sbuf_->sbumpc();
+                int_type c = sbuf_->sbumpc();
                 if (c == traits_type::eof())
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
@@ -254,7 +255,7 @@ namespace jsoncons {
             {
                 for (std::size_t i = 0; i < count; ++i)
                 {
-                    int c = sbuf_->sbumpc();
+                    int_type c = sbuf_->sbumpc();
                     if (c == traits_type::eof())
                     {
                         stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
@@ -276,7 +277,7 @@ namespace jsoncons {
         {
             JSONCONS_TRY
             {
-                int c = sbuf_->sgetc();
+                int_type c = sbuf_->sgetc();
                 if (c == traits_type::eof())
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
@@ -324,7 +325,6 @@ namespace jsoncons {
     {
     public:
         using value_type = CharT;
-        using traits_type = std::char_traits<CharT>;
         using string_view_type = basic_string_view<value_type>;
     private:
         const value_type* data_;
@@ -444,8 +444,8 @@ namespace jsoncons {
     {
     public:
         typedef uint8_t value_type;
-        using traits_type = byte_traits;
     private:
+        using traits_type = byte_traits;
         basic_null_istream<char> null_is_;
         std::istream* stream_ptr_;
         std::streambuf* sbuf_;
@@ -586,7 +586,6 @@ namespace jsoncons {
     {
     public:
         typedef uint8_t value_type;
-        using traits_type = byte_traits;
     private:
         const value_type* data_;
         const value_type* input_ptr_;
