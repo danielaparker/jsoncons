@@ -329,16 +329,16 @@ private:
         {
             return;
         }
-        int c = source_.peek();
-        if (c == Src::traits_type::eof())
+        auto c = source_.peek_character();
+        if (!c)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type((uint8_t)c);
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
+        uint8_t info = get_additional_information_value(c.value());
 
-        uint8_t info = get_additional_information_value((uint8_t)c);
         switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:

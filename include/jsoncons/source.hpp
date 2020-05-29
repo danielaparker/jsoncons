@@ -145,11 +145,6 @@ namespace jsoncons {
             current_ += len;
         }
 
-        int peek() 
-        {
-            return current_ < end_ ? *current_ : traits_type::eof();
-        }
-
         character_result<value_type> peek_character() 
         {
             return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
@@ -274,24 +269,6 @@ namespace jsoncons {
             JSONCONS_CATCH(const std::exception&)     
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-            }
-        }
-
-        int peek() 
-        {
-            JSONCONS_TRY
-            {
-                int c = sbuf_->sgetc();
-                if (c == traits_type::eof())
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                }
-                return c;
-            }
-            JSONCONS_CATCH(const std::exception&)     
-            {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
-                return traits_type::eof();
             }
         }
 
@@ -438,11 +415,6 @@ namespace jsoncons {
             input_ptr_ += len;
         }
 
-        int peek() 
-        {
-            return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
-        }
-
         character_result<value_type> peek_character() 
         {
             return input_ptr_ < input_end_ ? character_result<value_type>(*input_ptr_) : character_result<value_type>();
@@ -571,24 +543,6 @@ namespace jsoncons {
             }
         }
 
-        int peek() 
-        {
-            JSONCONS_TRY
-            {
-                int c = sbuf_->sgetc();
-                if (c == traits_type::eof())
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                }
-                return c;
-            }
-            JSONCONS_CATCH(const std::exception&)     
-            {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
-                return traits_type::eof();
-            }
-        }
-
         character_result<value_type> peek_character() 
         {
             JSONCONS_TRY
@@ -704,11 +658,6 @@ namespace jsoncons {
                 len = count;
             }
             input_ptr_ += len;
-        }
-
-        int peek() 
-        {
-            return input_ptr_ < input_end_ ? *input_ptr_ : traits_type::eof();
         }
 
         character_result<value_type> peek_character() 

@@ -146,34 +146,35 @@ public:
                 }
                 case parse_mode::indefinite_array:
                 {
-                    int c = source_.peek();
-                    switch (c)
+                    auto c = source_.peek_character();
+                    if (!c)
                     {
-                        case Src::traits_type::eof():
-                            ec = ubjson_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    if (c.value() == jsoncons::ubjson::detail::ubjson_format::end_array_marker)
+                    {
+                        source_.ignore(1);
+                        end_array(visitor, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (++state_stack_.back().index > options_.max_items())
+                        {
+                            ec = ubjson_errc::max_items_exceeded;
                             more_ = false;
                             return;
-                        case jsoncons::ubjson::detail::ubjson_format::end_array_marker:
-                            source_.ignore(1);
-                            end_array(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            break;
-                        default:
-                            if (++state_stack_.back().index > options_.max_items())
-                            {
-                                ec = ubjson_errc::max_items_exceeded;
-                                more_ = false;
-                                return;
-                            }
-                            read_type_and_value(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            break;
+                        }
+                        read_type_and_value(visitor, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
                     }
                     break;
                 }
@@ -235,35 +236,36 @@ public:
                 }
                 case parse_mode::indefinite_map_key:
                 {
-                    int c = source_.peek();
-                    switch (c)
+                    auto c = source_.peek_character();
+                    if (!c)
                     {
-                        case Src::traits_type::eof():
-                            ec = ubjson_errc::unexpected_eof;
+                        ec = ubjson_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    if (c.value() == jsoncons::ubjson::detail::ubjson_format::end_object_marker)
+                    {
+                        source_.ignore(1);
+                        end_object(visitor, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (++state_stack_.back().index > options_.max_items())
+                        {
+                            ec = ubjson_errc::max_items_exceeded;
                             more_ = false;
                             return;
-                        case jsoncons::ubjson::detail::ubjson_format::end_object_marker:
-                            source_.ignore(1);
-                            end_object(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            break;
-                        default:
-                            if (++state_stack_.back().index > options_.max_items())
-                            {
-                                ec = ubjson_errc::max_items_exceeded;
-                                more_ = false;
-                                return;
-                            }
-                            read_key(visitor, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            state_stack_.back().mode = parse_mode::indefinite_map_value;
-                            break;
+                        }
+                        read_key(visitor, ec);
+                        if (ec)
+                        {
+                            return;
+                        }
+                        state_stack_.back().mode = parse_mode::indefinite_map_value;
                     }
                     break;
                 }
@@ -541,10 +543,17 @@ private:
             more_ = false;
             return;
         } 
-        if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
+
+        auto c = source_.peek_character();
+        if (!c)
+        {
+            ec = ubjson_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        if (c.value() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
             source_.ignore(1);
-            // Revisit
             auto item_type = source_.get_character();
             if (!item_type)
             {
@@ -552,7 +561,14 @@ private:
                 more_ = false;
                 return;
             }
-            if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+            c = source_.peek_character();
+            if (!c)
+            {
+                ec = ubjson_errc::unexpected_eof;
+                more_ = false;
+                return;
+            }
+            if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
@@ -576,7 +592,7 @@ private:
                 return;
             }
         }
-        else if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+        else if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
         {
             source_.ignore(1);
             std::size_t length = get_length(ec);
@@ -616,7 +632,15 @@ private:
             more_ = false;
             return;
         } 
-        if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::type_marker)
+
+        auto c = source_.peek_character();
+        if (!c)
+        {
+            ec = ubjson_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        if (c.value() == jsoncons::ubjson::detail::ubjson_format::type_marker)
         {
             source_.ignore(1);
             auto item_type = source_.get_character();
@@ -626,7 +650,14 @@ private:
                 more_ = false;
                 return;
             }
-            if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+            c = source_.peek_character();
+            if (!c)
+            {
+                ec = ubjson_errc::unexpected_eof;
+                more_ = false;
+                return;
+            }
+            if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
@@ -652,7 +683,14 @@ private:
         }
         else
         {
-            if (source_.peek() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+            c = source_.peek_character();
+            if (!c)
+            {
+                ec = ubjson_errc::unexpected_eof;
+                more_ = false;
+                return;
+            }
+            if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
