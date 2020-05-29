@@ -1473,52 +1473,6 @@ TEST_CASE("csv detect bom")
     }
 }
 
-TEST_CASE("test_encode_decode csv string")
-{
-    using cpp_type = std::vector<std::tuple<std::string,int>>;
-    std::string s1 = "\"a\",1\n\"b\",2";
-    csv::csv_options options;
-    options.mapping(csv::mapping_kind::n_rows)
-           .assume_header(false);
-
-    SECTION("string")
-    {
-        cpp_type v = csv::decode_csv<cpp_type>(s1, options);
-        REQUIRE(v.size() == 2);
-        CHECK(std::get<0>(v[0]) == "a");
-        CHECK(std::get<1>(v[0]) == 1);
-        CHECK(std::get<0>(v[1]) == "b");
-        CHECK(std::get<1>(v[1]) == 2);
-
-        std::string s2;
-        csv::encode_csv(v, s2, options);
-
-        json j1 = csv::decode_csv<json>(s1);
-        json j2 = csv::decode_csv<json>(s2);
-
-        CHECK(j1 == j2);
-    }
-
-    SECTION("stream")
-    {
-        std::stringstream ss1(s1);
-        cpp_type v = csv::decode_csv<cpp_type>(ss1, options);
-        REQUIRE(v.size() == 2);
-        CHECK(std::get<0>(v[0]) == "a");
-        CHECK(std::get<1>(v[0]) == 1);
-        CHECK(std::get<0>(v[1]) == "b");
-        CHECK(std::get<1>(v[1]) == 2);
-
-        std::stringstream ss2;
-        csv::encode_csv(v, ss2, options);
-
-        json j1 = csv::decode_csv<json>(s1);
-        json j2 = csv::decode_csv<json>(ss2);
-
-        CHECK(j1 == j2);
-    }
-}
-
 #if !(defined(__GNUC__) || (defined(_MSC_VER) && _MSC_VER == 1900))
 TEST_CASE("csv_reader constructors")
 {

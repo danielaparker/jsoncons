@@ -1,35 +1,36 @@
 ### jsoncons::basic_json::parse
 
 ```c++
-static basic_json parse(const string_view_type& s); // (1)
+static basic_json parse(const string_view_type& s, 
+                        const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (1)
 
 static basic_json parse(const string_view_type& s, 
-                        const basic_json_options<char_type>& options); // (2)
+                        std::function<bool(json_errc,const ser_context&)> err_handler); // (2)
 
-static basic_json parse(const string_view_type& s, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (3)
-
-static basic_json parse(const string_view_type& s, 
-                        const basic_json_options<char_type>& options,
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (4)
-
-static basic_json parse(std::istream& is); // (5)
-
-static basic_json parse(std::istream& is,
-                        const basic_json_options<char_type>& options); // (6)
+static basic_json parse(std::basic_istream<char_type>& is, 
+                        const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (3)
               
 static basic_json parse(std::istream& is, 
-                        const basic_json_options<char_type>& options,
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (7)
+                        std::function<bool(json_errc,const ser_context&)> err_handler); // (4)
 
-static basic_json parse(std::istream& is, 
-                        const basic_json_options<char_type>& options,
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (8)
+template <class Iterator>
+static basic_json parse(Iterator first, Iterator last, 
+                        const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (5)
+              
+template <class Iterator>
+static basic_json parse(Iterator first, Iterator last, 
+                        std::function<bool(json_errc,const ser_context&)> err_handler); // (6)
 ```
-(1) - (4) Parses a string of JSON text and returns a json object or array value. 
+(1) - (2) Parses JSON data from a string and returns a `basic_json` value. 
 Throws [ser_error](ser_error.md) if parsing fails.
 
-(5) - (8) Parses an input stream of JSON text and returns a json object or array value. 
+(3) - (4) Parses JSON data from an input stream and returns a `basic_json` value. 
+Throws [ser_error](ser_error.md) if parsing fails.
+
+(5) - (6) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
 Throws [ser_error](ser_error.md) if parsing fails.
 
 ### Examples

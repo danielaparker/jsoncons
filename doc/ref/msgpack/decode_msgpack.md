@@ -33,14 +33,18 @@ T decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
 
 Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ data structure.
 
-(1) Reads a MessagePack contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](msgpack_options.md). 
+(1) Reads MessagePack data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](msgpack_options.md). 
 Type `Source` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since v0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
-(2) Reads a MessagePack binary stream into a type T, using the specified (or defaulted) [options](msgpack_options.md). 
+(2) Reads MessagePack data from a binary stream into a type T, using the specified (or defaulted) [options](msgpack_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
+
+(3) Reads MessagePack data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](msgpack_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 

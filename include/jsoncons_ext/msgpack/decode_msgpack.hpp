@@ -81,6 +81,35 @@ namespace msgpack {
         return val;
     }
 
+    template<class T, class Iterator>
+    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    decode_msgpack(Iterator first, Iterator last,
+                const msgpack_decode_options& options = msgpack_decode_options())
+    {
+        jsoncons::json_decoder<T> decoder;
+        auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
+        basic_msgpack_reader<binary_iterator_source<Iterator>> reader(binary_iterator_source<Iterator>(first, last), adaptor, options);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template<class T, class Iterator>
+    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    decode_msgpack(Iterator first, Iterator last,
+                const msgpack_decode_options& options = msgpack_decode_options())
+    {
+        basic_msgpack_cursor<binary_iterator_source<Iterator>> cursor(binary_iterator_source<Iterator>(first, last), options);
+        json_decoder<basic_json<char,sorted_policy>> decoder{};
+
+        std::error_code ec;
+        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        }
+        return val;
+    }
+
     // With leading allocator parameter
 
     template<class T, class Source, class TempAllocator>

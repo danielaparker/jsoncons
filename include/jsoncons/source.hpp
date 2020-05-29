@@ -83,82 +83,6 @@ namespace jsoncons {
         }
     };
 
-    // iterator sources
-
-    template <class IteratorT>
-    class iterator_source
-    {
-        IteratorT current_;
-        IteratorT end_;
-        std::size_t position_;
-    public:
-        using value_type = typename std::iterator_traits<IteratorT>::value_type;
-
-        iterator_source(const IteratorT& first, const IteratorT& last)
-            : current_(first), end_(last), position_(0)
-        {
-        }
-
-        bool eof() const
-        {
-            return !(current_ != end_);  
-        }
-
-        bool is_error() const
-        {
-            return false;  
-        }
-
-        std::size_t position() const
-        {
-            return position_;
-        }
-
-        character_result<value_type> get_character()
-        {
-            if (current_ != end_)
-            {
-                ++position_;
-                return character_result<value_type>(*current_++);
-            }
-            else
-           {
-                return character_result<value_type>();
-            }
-        }
-
-        void ignore(std::size_t count)
-        {
-            while (count-- > 0 && current_ != end_)
-            {
-                ++position_;
-                ++current_;
-            }
-        }
-
-        character_result<value_type> peek_character() 
-        {
-            return current_ != end_ ? character_result<value_type>(*current_) : character_result<value_type>();
-        }
-
-        std::size_t read(value_type* data, std::size_t length)
-        {
-            value_type* p = data;
-            value_type* pend = data + length;
-
-            while (p < pend && current_ != end_)
-            {
-                *p = *current_;
-                ++p;
-                ++current_;
-            }
-
-            position_ += (p - data);
-
-            return p - data;
-        }
-    };
-
     // text sources
 
     template <class CharT>
@@ -430,6 +354,82 @@ namespace jsoncons {
         }
     };
 
+    // iterator source
+
+    template <class IteratorT>
+    class iterator_source
+    {
+        IteratorT current_;
+        IteratorT end_;
+        std::size_t position_;
+    public:
+        using value_type = typename std::iterator_traits<IteratorT>::value_type;
+
+        iterator_source(const IteratorT& first, const IteratorT& last)
+            : current_(first), end_(last), position_(0)
+        {
+        }
+
+        bool eof() const
+        {
+            return !(current_ != end_);  
+        }
+
+        bool is_error() const
+        {
+            return false;  
+        }
+
+        std::size_t position() const
+        {
+            return position_;
+        }
+
+        character_result<value_type> get_character()
+        {
+            if (current_ != end_)
+            {
+                ++position_;
+                return character_result<value_type>(*current_++);
+            }
+            else
+           {
+                return character_result<value_type>();
+            }
+        }
+
+        void ignore(std::size_t count)
+        {
+            while (count-- > 0 && current_ != end_)
+            {
+                ++position_;
+                ++current_;
+            }
+        }
+
+        character_result<value_type> peek_character() 
+        {
+            return current_ != end_ ? character_result<value_type>(*current_) : character_result<value_type>();
+        }
+
+        std::size_t read(value_type* data, std::size_t length)
+        {
+            value_type* p = data;
+            value_type* pend = data + length;
+
+            while (p < pend && current_ != end_)
+            {
+                *p = *current_;
+                ++p;
+                ++current_;
+            }
+
+            position_ += (p - data);
+
+            return p - data;
+        }
+    };
+
     // binary sources
 
     class binary_stream_source 
@@ -671,6 +671,82 @@ namespace jsoncons {
             std::memcpy(p, input_ptr_, len);
             input_ptr_  += len;
             return len;
+        }
+    };
+
+    // binary_iterator source
+
+    template <class IteratorT>
+    class binary_iterator_source
+    {
+        IteratorT current_;
+        IteratorT end_;
+        std::size_t position_;
+    public:
+        using value_type = uint8_t;
+
+        binary_iterator_source(const IteratorT& first, const IteratorT& last)
+            : current_(first), end_(last), position_(0)
+        {
+        }
+
+        bool eof() const
+        {
+            return !(current_ != end_);  
+        }
+
+        bool is_error() const
+        {
+            return false;  
+        }
+
+        std::size_t position() const
+        {
+            return position_;
+        }
+
+        character_result<value_type> get_character()
+        {
+            if (current_ != end_)
+            {
+                ++position_;
+                return character_result<value_type>(*current_++);
+            }
+            else
+           {
+                return character_result<value_type>();
+            }
+        }
+
+        void ignore(std::size_t count)
+        {
+            while (count-- > 0 && current_ != end_)
+            {
+                ++position_;
+                ++current_;
+            }
+        }
+
+        character_result<value_type> peek_character() 
+        {
+            return current_ != end_ ? character_result<value_type>(static_cast<value_type>(*current_)) : character_result<value_type>();
+        }
+
+        std::size_t read(value_type* data, std::size_t length)
+        {
+            value_type* p = data;
+            value_type* pend = data + length;
+
+            while (p < pend && current_ != end_)
+            {
+                *p = static_cast<value_type>(*current_);
+                ++p;
+                ++current_;
+            }
+
+            position_ += (p - data);
+
+            return p - data;
         }
     };
 

@@ -21,30 +21,38 @@ template<class T>
 T decode_cbor(std::istream& is,
               const cbor_decode_options& options = cbor_decode_options()); // (2)
 
+template<class T, class Iterator>
+T decode_cbor(Iterator first, Iterator last,
+              const cbor_decode_options& options = cbor_decode_options()); // (3)
+
 template<class T,class TempAllocator>
 T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
               const std::vector<uint8_t>& source,
-              const cbor_decode_options& options = cbor_decode_options()); // (3) (until 0.152.0)
+              const cbor_decode_options& options = cbor_decode_options()); // (4) (until 0.152.0)
 
 template<class T, class Source, class TempAllocator>
 T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
               const Source& source,
-              const cbor_decode_options& options = cbor_decode_options()); // (3) (since 0.152.0)
+              const cbor_decode_options& options = cbor_decode_options()); // (4) (since 0.152.0)
 
 template<class T,class TempAllocator>
 T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
               std::istream& is,
-              const cbor_decode_options& options = cbor_decode_options()); // (4)
+              const cbor_decode_options& options = cbor_decode_options()); // (5)
 ```
 
-(1) Reads a CBOR contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+(1) Reads CBOR data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](cbor_options.md). 
 Type `Source` must be a container that has member functions `data()` and `size()`, 
 and member type `value_type` with size exactly 8 bits (since v0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
-(2) Reads a CBOR binary stream into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+(2) Reads CBOR data from a binary stream into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
+
+(3) Reads CBOR data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](cbor_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
