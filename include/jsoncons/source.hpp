@@ -101,7 +101,7 @@ namespace jsoncons {
 
         bool eof() const
         {
-            return current_ == end_;  
+            return !(current_ != end_);  
         }
 
         bool is_error() const

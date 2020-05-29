@@ -74,6 +74,39 @@ namespace jsoncons {
         return val;
     }
 
+    template <class T, class Iterator>
+    typename std::enable_if<is_basic_json<T>::value,T>::type
+    decode_json(Iterator first, Iterator last,
+                const basic_json_decode_options<typename std::iterator_traits<Iterator>::value_type>& options = 
+                    basic_json_decode_options<typename std::iterator_traits<Iterator>::value_type>())
+    {
+        using char_type = typename std::iterator_traits<Iterator>::value_type;
+
+        jsoncons::json_decoder<T> decoder;
+        basic_json_reader<char_type, iterator_source<Iterator>> reader(iterator_source<Iterator>(first,last), decoder, options);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template <class T, class Iterator>
+    typename std::enable_if<!is_basic_json<T>::value,T>::type
+    decode_json(Iterator first, Iterator last,
+                const basic_json_decode_options<typename std::iterator_traits<Iterator>::value_type>& options = 
+                    basic_json_decode_options<typename std::iterator_traits<Iterator>::value_type>())
+    {
+        using char_type = typename std::iterator_traits<Iterator>::value_type;
+
+        basic_json_cursor<char_type,iterator_source<Iterator>> cursor(iterator_source<Iterator>(first, last), options, default_json_parsing());
+        jsoncons::json_decoder<basic_json<char_type>> decoder;
+        std::error_code ec;
+        T val = deser_traits<T,char_type>::deserialize(cursor, decoder, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        }
+        return val;
+    }
+
     // With leading allocator parameter
 
     template <class T,class CharT,class TempAllocator>
