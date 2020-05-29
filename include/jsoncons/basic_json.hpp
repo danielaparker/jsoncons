@@ -2907,6 +2907,12 @@ public:
         return decoder.get_result();
     }
 
+    static basic_json parse(const string_view_type& s, 
+                            std::function<bool(json_errc,const ser_context&)> err_handler)
+    {
+        return parse(s, basic_json_decode_options<CharT>(), err_handler);
+    }
+
     // from iterator
 
     template <class Iterator>
