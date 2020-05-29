@@ -238,20 +238,21 @@ public:
                 }
                 case parse_mode::indefinite_array:
                 {
-                    int c = source_.peek();
-                    switch (c)
+                    auto c = source_.peek_character();
+                    if (!c)
                     {
-                        case Src::traits_type::eof():
-                            ec = cbor_errc::unexpected_eof;
-                            more_ = false;
-                            return;
-                        case 0xff:
-                            source_.ignore(1);
-                            end_array(visitor, ec);
-                            break;
-                        default:
-                            read_item(visitor, ec);
-                            break;
+                        ec = cbor_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    if (c.value() == 0xff)
+                    {
+                        source_.ignore(1);
+                        end_array(visitor, ec);
+                    }
+                    else
+                    {
+                        read_item(visitor, ec);
                     }
                     break;
                 }
@@ -277,21 +278,22 @@ public:
                 }
                 case parse_mode::indefinite_map_key:
                 {
-                    int c = source_.peek();
-                    switch (c)
+                    auto c = source_.peek_character();
+                    if (!c)
                     {
-                        case Src::traits_type::eof():
-                            ec = cbor_errc::unexpected_eof;
-                            more_ = false;
-                            return;
-                        case 0xff:
-                            source_.ignore(1);
-                            end_object(visitor, ec);
-                            break;
-                        default:
-                            state_stack_.back().mode = parse_mode::indefinite_map_value;
-                            read_item(visitor, ec);
-                            break;
+                        ec = cbor_errc::unexpected_eof;
+                        more_ = false;
+                        return;
+                    }
+                    if (c.value() == 0xff)
+                    {
+                        source_.ignore(1);
+                        end_object(visitor, ec);
+                    }
+                    else
+                    {
+                        state_stack_.back().mode = parse_mode::indefinite_map_value;
+                        read_item(visitor, ec);
                     }
                     break;
                 }
