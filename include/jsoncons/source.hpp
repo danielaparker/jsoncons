@@ -62,16 +62,6 @@ namespace jsoncons {
         {
         }
 
-        character_result& operator=(const character_result& other)
-        {
-            if (&other != this)
-            {
-                value_ = other.value_; 
-                eof_ = other.eof_; 
-            }
-            return *this;
-        }
-
         constexpr character_result(CharT value)
             : value_(value), eof_(false)
         {
@@ -251,11 +241,9 @@ namespace jsoncons {
                 if (c == traits_type::eof())
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    return character_result<value_type>();
                 }
-                else
-                {
-                    ++position_;
-                }
+                ++position_;
                 return character_result<value_type>(static_cast<value_type>(c));
             }
             JSONCONS_CATCH(const std::exception&)     
@@ -315,6 +303,7 @@ namespace jsoncons {
                 if (c == traits_type::eof())
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    return character_result<value_type>();
                 }
                 return character_result<value_type>(static_cast<value_type>(c));
             }
@@ -333,6 +322,7 @@ namespace jsoncons {
                 if (static_cast<std::size_t>(count) < length)
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    return 0;
                 }
                 position_ += length;
                 return static_cast<std::size_t>(count);
@@ -546,11 +536,9 @@ namespace jsoncons {
                 if (c == traits_type::eof())
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    return character_result<value_type>();
                 }
-                else
-                {
-                    ++position_;
-                }
+                ++position_;
                 return character_result<value_type>(static_cast<value_type>(c));
             }
             JSONCONS_CATCH(const std::exception&)     
@@ -610,6 +598,7 @@ namespace jsoncons {
                 if (c == traits_type::eof())
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    return character_result<value_type>();
                 }
                 return character_result<value_type>(static_cast<value_type>(c));
             }
@@ -628,6 +617,7 @@ namespace jsoncons {
                 if (static_cast<std::size_t>(count) < length)
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    return 0;
                 }
                 position_ += length;
                 return static_cast<std::size_t>(count);

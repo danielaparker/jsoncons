@@ -99,7 +99,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK_FALSE(ec);
+        CHECK(ec);
 
         //std::cout << visitor.get_result() << "" << std::endl;
     }
@@ -463,7 +463,7 @@ TEST_CASE("oss-fuzz issues")
                 reader.next(ec);
             }
         }
-        CHECK(ec == convert_errc::not_string);
+        CHECK(ec == json_errc::unexpected_eof);
     }
 
     // Fuzz target: fuzz_cbor_encoder
