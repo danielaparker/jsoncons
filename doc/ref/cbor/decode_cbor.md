@@ -21,9 +21,9 @@ template<class T>
 T decode_cbor(std::istream& is,
               const cbor_decode_options& options = cbor_decode_options()); // (2)
 
-template<class T, class Iterator>
-T decode_cbor(Iterator first, Iterator last,
-              const cbor_decode_options& options = cbor_decode_options()); // (3)
+template<class T, class InputIt>
+T decode_cbor(InputIt first, InputIt last,
+              const cbor_decode_options& options = cbor_decode_options()); // (3) (since v0.153.0)
 
 template<class T,class TempAllocator>
 T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,

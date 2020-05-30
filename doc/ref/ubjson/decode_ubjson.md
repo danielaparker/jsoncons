@@ -17,20 +17,24 @@ template<class T>
 T decode_ubjson(std::istream>& is,
                 const bson_decode_options& options = bson_decode_options()); // (2)
 
+template<class T, class InputIt>
+T decode_ubjson(InputIt first, InputIt last,
+                const bson_decode_options& options = bson_decode_options()); // (3)
+
 template<class T, class TempAllocator>
 T decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const std::vector<uint8_t>& source,
-                const bson_decode_options& options = bson_decode_options()); // (3) (until v0.152.0)
+                const bson_decode_options& options = bson_decode_options()); // (4) (until v0.152.0)
 
 template<class T, class Source, class TempAllocator>
 T decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const Source& source,
-                const bson_decode_options& options = bson_decode_options()); // (3) (since v0.152.0)
+                const bson_decode_options& options = bson_decode_options()); // (4) (since v0.152.0)
 
 template<class T,class TempAllocator>
 T decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 std::istream>& is,
-                const bson_decode_options& options = bson_decode_options()); // (4)
+                const bson_decode_options& options = bson_decode_options()); // (5)
 ```
 
 (1) Reads UBJSON data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](ubjson_options.md). 

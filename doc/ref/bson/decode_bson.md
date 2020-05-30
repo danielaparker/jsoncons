@@ -17,9 +17,9 @@ template<class T>
 T decode_bson(std::istream& is,
               const bson_decode_options& options = bson_decode_options()); // (2)
 
-template<class T, class Iterator>
-T decode_bson(Iterator first, Iterator last,
-              const bson_decode_options& options = bson_decode_options()); // (3)
+template<class T, class InputIt>
+T decode_bson(InputIt first, InputIt last,
+              const bson_decode_options& options = bson_decode_options()); // (3) (since v0.153.0)
 
 template<class T,class TempAllocator>
 T decode_bson(temp_allocator_arg_t, const TempAllocator& temp_alloc,

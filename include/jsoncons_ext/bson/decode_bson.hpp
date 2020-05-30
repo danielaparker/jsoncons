@@ -80,24 +80,24 @@ namespace bson {
         return val;
     }
 
-    template<class T, class Iterator>
+    template<class T, class InputIt>
     typename std::enable_if<is_basic_json<T>::value,T>::type 
-    decode_bson(Iterator first, Iterator last,
+    decode_bson(InputIt first, InputIt last,
                 const bson_decode_options& options = bson_decode_options())
     {
         jsoncons::json_decoder<T> decoder;
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
-        basic_bson_reader<binary_iterator_source<Iterator>> reader(binary_iterator_source<Iterator>(first, last), adaptor, options);
+        basic_bson_reader<binary_iterator_source<InputIt>> reader(binary_iterator_source<InputIt>(first, last), adaptor, options);
         reader.read();
         return decoder.get_result();
     }
 
-    template<class T, class Iterator>
+    template<class T, class InputIt>
     typename std::enable_if<!is_basic_json<T>::value,T>::type 
-    decode_bson(Iterator first, Iterator last,
+    decode_bson(InputIt first, InputIt last,
                 const bson_decode_options& options = bson_decode_options())
     {
-        basic_bson_cursor<binary_iterator_source<Iterator>> cursor(binary_iterator_source<Iterator>(first, last), options);
+        basic_bson_cursor<binary_iterator_source<InputIt>> cursor(binary_iterator_source<InputIt>(first, last), options);
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;

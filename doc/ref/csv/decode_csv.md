@@ -13,9 +13,9 @@ template <class T,class CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (2)
 
-template <class T,class Iterator>
-T decode_csv(Iterator first, Iterator last,
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (3)
+template <class T,class InputIt>
+T decode_csv(InputIt first, InputIt last,
+             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (3) (since v0.153.0)
 
 template <class T,class CharT,class TempAllocator>
 T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,

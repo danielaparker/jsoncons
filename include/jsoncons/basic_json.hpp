@@ -2915,13 +2915,13 @@ public:
 
     // from iterator
 
-    template <class Iterator>
-    static basic_json parse(Iterator first, Iterator last, 
+    template <class InputIt>
+    static basic_json parse(InputIt first, InputIt last, 
                             const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
                             std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
     {
         json_decoder<basic_json> visitor;
-        basic_json_reader<char_type,iterator_source<Iterator>> reader(iterator_source<Iterator>(std::forward<Iterator>(first),std::forward<Iterator>(last)), visitor, options, err_handler);
+        basic_json_reader<char_type,iterator_source<InputIt>> reader(iterator_source<InputIt>(std::forward<InputIt>(first),std::forward<InputIt>(last)), visitor, options, err_handler);
         reader.read_next();
         reader.check_done();
         if (!visitor.is_valid())
@@ -2931,8 +2931,8 @@ public:
         return visitor.get_result();
     }
 
-    template <class Iterator>
-    static basic_json parse(Iterator first, Iterator last, 
+    template <class InputIt>
+    static basic_json parse(InputIt first, InputIt last, 
                             std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         return parse(first, last, basic_json_decode_options<CharT>(), err_handler);
