@@ -399,8 +399,6 @@ int main()
 
         type_extensibility_examples();
 
-        json_reader_examples();
-
         run_csv_examples();
 
         byte_string_examples();
@@ -440,6 +438,8 @@ int main()
         array_examples();
 
         run_cbor_examples();
+
+        json_reader_examples();
     }
     catch (const std::exception& e)
     {

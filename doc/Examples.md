@@ -4,6 +4,7 @@
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
+[Parse JSON from an iterator range](#A10)  
 [Parse numbers without loosing precision](#A8)  
 [Validate JSON without incurring parse exceptions](#A3)  
 [How to allow comments? How not to?](#A4)  
@@ -102,6 +103,23 @@ json j = R"(
 <div id="A2"/> 
 
 #### Parse JSON from a file
+
+```
+std::ifstream is("myfile.json");    
+
+json j = json::parse(is);
+```
+
+<div id="A10"/> 
+
+#### Parse JSON from an iterator range
+
+```c++
+```
+Output:
+```json
+["foo","bar"]
+```
 
 ```
 std::ifstream is("myfile.json");    
