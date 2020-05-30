@@ -22,7 +22,7 @@ Bug fixes:
 
 - Fixed compile error when building with Android SDK level less than 21 [\#240](https://github.com/danielaparker/jsoncons/pull/240)
 
-- Fixed bson encode/decode of bson binary type (wasn't reading/writing subtype.)
+- Fixed bson encode/decode of binary type (wasn't reading/writing subtype.)
 
 Changes:
 
