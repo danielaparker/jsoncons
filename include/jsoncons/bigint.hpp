@@ -68,8 +68,6 @@ namespace detail {
 
 } // namespace detail
 
-enum sign_t {minus, plus};
-
 template <class Allocator = std::allocator<uint64_t>>
 class basic_bigint : protected detail::basic_bigint_base<Allocator>
 {
@@ -468,7 +466,7 @@ public:
         return v;
     }
 
-    static basic_bigint from_bytes_be(sign_t sign, const uint8_t* str, std::size_t n)
+    static basic_bigint from_bytes_be(int signum, const uint8_t* str, std::size_t n)
     {
         static const double radix_log2 = std::log2(next_power_of_two(256));
         // Estimate how big the result will be, so we can pre-allocate it.
@@ -488,7 +486,7 @@ public:
         }
         //std::cout << "ACTUAL: " << v.length() << "\n";
 
-        if (sign == sign_t::minus)
+        if (signum < 0)
         {
             v.common_stor_.is_negative_ = true;
         }
@@ -944,18 +942,11 @@ public:
     }
 
     template <typename Alloc>
-    void dump(int& signum, std::vector<uint8_t,Alloc>& data) const
+    void write_bytes_be(int& signum, std::vector<uint8_t,Alloc>& data) const
     {
         basic_bigint<Allocator> n(*this);
-        if (is_negative())
-        {
-            signum = -1;
-            n = - n -1;
-        }
-        else
-        {
-            signum = 1;
-        }
+        signum = (n < 0) ? -1 : (n > 0 ? 1 : 0); 
+
         basic_bigint<Allocator> divisor(256);
 
         while (n >= 256)

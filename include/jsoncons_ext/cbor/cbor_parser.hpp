@@ -1182,12 +1182,12 @@ private:
                     }
                     if (tag == 2)
                     {
-                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
                         n.write_string(s);
                     }
                     else if (tag == 3)
                     {
-                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
                         n = -1 - n;
                         n.write_string(s);
                     }
@@ -1345,14 +1345,14 @@ private:
                     {
                         s.push_back('0');
                         s.push_back('x');
-                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
                         n.write_string_hex(s);
                     }
                     else if (tag == 3)
                     {
                         s.push_back('-');
                         s.push_back('0');
-                        bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
                         n = -1 - n;
                         n.write_string_hex(s);
                         s[2] = 'x'; // overwrite minus
@@ -1492,7 +1492,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                    bigint n = bigint::from_bytes_be(1, v.data(), v.size());
                     text_buffer_.clear();
                     n.write_string(text_buffer_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
@@ -1507,7 +1507,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    bigint n = bigint::from_bytes_be(sign_t::plus, v.data(), v.size());
+                    bigint n = bigint::from_bytes_be(1, v.data(), v.size());
                     n = -1 - n;
                     text_buffer_.clear();
                     n.write_string(text_buffer_);

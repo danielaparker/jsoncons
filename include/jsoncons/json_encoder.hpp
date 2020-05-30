@@ -935,12 +935,17 @@ namespace detail {
                 case bigint_chars_format::base64:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
+                    bool is_neg = n < 0;
+                    if (is_neg)
+                    {
+                        n = - n -1;
+                    }
                     int signum;
                     std::vector<uint8_t> v;
-                    n.dump(signum, v);
+                    n.write_bytes_be(signum, v);
 
                     sink_.push_back('\"');
-                    if (signum == -1)
+                    if (is_neg)
                     {
                         sink_.push_back('~');
                         ++column_;
@@ -953,12 +958,17 @@ namespace detail {
                 case bigint_chars_format::base64url:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
+                    bool is_neg = n < 0;
+                    if (is_neg)
+                    {
+                        n = - n -1;
+                    }
                     int signum;
                     std::vector<uint8_t> v;
-                    n.dump(signum, v);
+                    n.write_bytes_be(signum, v);
 
                     sink_.push_back('\"');
-                    if (signum == -1)
+                    if (is_neg)
                     {
                         sink_.push_back('~');
                         ++column_;
@@ -1233,12 +1243,17 @@ namespace detail {
                 case bigint_chars_format::base64:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
+                    bool is_neg = n < 0;
+                    if (is_neg)
+                    {
+                        n = - n -1;
+                    }
                     int signum;
                     std::vector<uint8_t> v;
-                    n.dump(signum, v);
+                    n.write_bytes_be(signum, v);
 
                     sink_.push_back('\"');
-                    if (signum == -1)
+                    if (is_neg)
                     {
                         sink_.push_back('~');
                     }
@@ -1249,12 +1264,17 @@ namespace detail {
                 case bigint_chars_format::base64url:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
+                    bool is_neg = n < 0;
+                    if (is_neg)
+                    {
+                        n = - n -1;
+                    }
                     int signum;
                     std::vector<uint8_t> v;
-                    n.dump(signum, v);
+                    n.write_bytes_be(signum, v);
 
                     sink_.push_back('\"');
-                    if (signum == -1)
+                    if (is_neg)
                     {
                         sink_.push_back('~');
                     }

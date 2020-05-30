@@ -407,14 +407,20 @@ private:
         }
     }
 
-    void write_bignum(const bigint& n)
+    void write_bignum(bigint& n)
     {
+        bool is_neg = n < 0;
+        if (is_neg)
+        {
+            n = - n -1;
+        }
+
         int signum;
         std::vector<uint8_t> data;
-        n.dump(signum, data);
+        n.write_bytes_be(signum, data);
         std::size_t length = data.size();
 
-        if (signum == -1)
+        if (is_neg)
         {
             write_tag(3);
         }
