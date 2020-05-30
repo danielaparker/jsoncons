@@ -64,7 +64,7 @@ Output:
 Extra comma at line 1 and column 10
 ```
 
-#### Parse from string with serializing options
+#### Parse from string with options
 
 ```c++
 std::string s = R"({"field1":"NaN","field2":"PositiveInfinity","field3":"NegativeInfinity"})";
