@@ -18,7 +18,7 @@ TEST_CASE("test_positive_bignum")
 {
     std::string expected = "18446744073709551616";
     std::vector<uint8_t> v = {1,0,0,0,0,0,0,0,0};
-    bigint x = bigint::from_bytes_be(sign_t::plus, v.data(),v.size());
+    bigint x = bigint::from_bytes_be(1, v.data(),v.size());
 
     std::string sx = x.to_string();
     CHECK(sx == expected);
@@ -56,7 +56,7 @@ TEST_CASE("test_negative_bignum")
 {
     std::string expected = "-18446744073709551617";
     std::vector<uint8_t> b = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint x = bigint::from_bytes_be(sign_t::plus, b.data(),b.size());
+    bigint x = bigint::from_bytes_be(1, b.data(),b.size());
     x = -1 - x;
 
     std::string sx = x.to_string();
@@ -163,7 +163,7 @@ TEST_CASE("test_conversion_0")
 TEST_CASE("test_traits1")
 {
     std::vector<uint8_t> data = {0x01,0x00};
-    bigint x = bigint::from_bytes_be(sign_t::plus, data.data(), data.size());
+    bigint x = bigint::from_bytes_be(1, data.data(), data.size());
 
     json j(x);
 
@@ -178,7 +178,7 @@ TEST_CASE("test_traits1")
 TEST_CASE("test_traits2")
 {
     std::vector<uint8_t> data = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint x = bigint::from_bytes_be(sign_t::plus, data.data(), data.size());
+    bigint x = bigint::from_bytes_be(1, data.data(), data.size());
 
     json j(x);
 
@@ -193,7 +193,7 @@ TEST_CASE("test_traits2")
 TEST_CASE("test_traits3")
 {
     std::vector<uint8_t> data = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bigint x = bigint::from_bytes_be(sign_t::plus, data.data(), data.size());
+    bigint x = bigint::from_bytes_be(1, data.data(), data.size());
 
     x = -1 - x;
 
