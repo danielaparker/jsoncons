@@ -20,8 +20,8 @@ static basic_json parse(InputIt first, InputIt last,
                         const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
                         std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (5) (since v0.153.0)
               
-template <class Iterator>
-static basic_json parse(Iterator first, Iterator last, 
+template <class InputIt>
+static basic_json parse(InputIt first, InputIt last, 
                         std::function<bool(json_errc,const ser_context&)> err_handler); // (6)
 ```
 (1) - (2) Parses JSON data from a string and returns a `basic_json` value. 
@@ -33,32 +33,15 @@ Throws [ser_error](ser_error.md) if parsing fails.
 (5) - (6) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
 Throws [ser_error](ser_error.md) if parsing fails.
 
+#### Parameters
+
+`s` - s string view
+`is` - an input stream
+`first`, `last` - pair of [LegacyInputIterators](https://en.cppreference.com/w/cpp/named_req/InputIterator) that specify a character sequence
+`options` - a [json_options](doc/ref/json_options.md)
+`err_handler` - an error handler
+
 ### Examples
-
-#### Parse from stream
-
-Input JSON file `example.json`:
-
-```json
-{"File Format Options":{"Color Spaces":["sRGB","AdobeRGB","ProPhoto RGB"]}}
-```
-
-```c++
-std::ifstream is("example.json");
-json j = json::parse(is);
-
-std::cout << pretty_print(j) << std::endl;
-```
-
-Output:
-
-```json
-{
-    "File Format Options": {
-        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
-    }
-}
-```
 
 #### Parse from string
 
@@ -107,6 +90,31 @@ Output:
     "field1": "NaN",
     "field2": "PositiveInfinity",
     "field3": "NegativeInfinity"
+}
+```
+
+#### Parse from stream
+
+Input JSON file `example.json`:
+
+```json
+{"File Format Options":{"Color Spaces":["sRGB","AdobeRGB","ProPhoto RGB"]}}
+```
+
+```c++
+std::ifstream is("example.json");
+json j = json::parse(is);
+
+std::cout << pretty_print(j) << std::endl;
+```
+
+Output:
+
+```json
+{
+    "File Format Options": {
+        "Color Spaces": ["sRGB","AdobeRGB","ProPhoto RGB"]
+    }
 }
 ```
 

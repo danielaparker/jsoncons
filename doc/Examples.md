@@ -100,6 +100,8 @@ json j = R"(
 )"_json;
 ```
 
+See [basic_json::parse](doc/ref/json/parse.md). 
+
 <div id="A2"/> 
 
 #### Parse JSON from a file
@@ -109,6 +111,8 @@ std::ifstream is("myfile.json");
 
 json j = json::parse(is);
 ```
+
+See [basic_json::parse](doc/ref/json/parse.md). 
 
 <div id="A10"/> 
 
@@ -179,6 +183,8 @@ Output:
 ```json
 ["foo","bar"]
 ```
+
+See [basic_json::parse](doc/ref/json/parse.md). 
 
 <div id="A8"/> 
 
