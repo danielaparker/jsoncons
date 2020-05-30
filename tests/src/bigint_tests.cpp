@@ -57,23 +57,23 @@ TEST_CASE("test_negative_bignum")
     std::string expected = "-18446744073709551617";
     std::vector<uint8_t> b = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
     bigint x = bigint::from_bytes_be(1, b.data(),b.size());
-    x = -1 - x;
+    bigint x2 = -1 - x;
 
-    std::string sx = x.to_string();
+    std::string sx = x2.to_string();
     CHECK(sx == expected);
 
-    bigint y(x);
+    bigint y(x2);
     std::string sy = y.to_string();
     CHECK(sy == expected);
 
     bigint z;
-    z = x;
+    z = x2;
     std::string sz = z.to_string();
     CHECK(sz == expected);
 
     int signum;
     std::vector<uint8_t> v;
-    x.dump(signum, v);
+    x.write_bytes_be(signum, v);
 
     REQUIRE(v.size() == b.size());
     for (std::size_t i = 0; i < v.size(); ++i)
@@ -85,7 +85,7 @@ TEST_CASE("test_negative_bignum")
     {
         std::string exp = "-10000000000000001";
         std::string s;
-        x.write_string_hex(s);
+        x2.write_string_hex(s);
         //std::cout << "bigint: " << expected << ", s: " << s << "\n";
         CHECK(s == exp);
     }
@@ -199,7 +199,7 @@ TEST_CASE("test_traits3")
 
     int signum;
     std::vector<uint8_t> v;
-    x.dump(signum,v);
+    x.write_bytes_be(signum,v);
 
     REQUIRE(signum == -1);
     //for (auto c : v)

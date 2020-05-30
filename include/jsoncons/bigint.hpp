@@ -942,18 +942,11 @@ public:
     }
 
     template <typename Alloc>
-    void dump(int& signum, std::vector<uint8_t,Alloc>& data) const
+    void write_bytes_be(int& signum, std::vector<uint8_t,Alloc>& data) const
     {
         basic_bigint<Allocator> n(*this);
-        if (is_negative())
-        {
-            signum = -1;
-            n = - n -1;
-        }
-        else
-        {
-            signum = 1;
-        }
+        signum = (n < 0) ? -1 : (n > 0 ? 1 : 0); 
+
         basic_bigint<Allocator> divisor(256);
 
         while (n >= 256)
