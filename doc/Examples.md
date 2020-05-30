@@ -100,7 +100,7 @@ json j = R"(
 )"_json;
 ```
 
-See [basic_json::parse](doc/ref/json/parse.md). 
+See [basic_json::parse](ref/json/parse.md). 
 
 <div id="A2"/> 
 
@@ -112,7 +112,7 @@ std::ifstream is("myfile.json");
 json j = json::parse(is);
 ```
 
-See [basic_json::parse](doc/ref/json/parse.md). 
+See [basic_json::parse](ref/json/parse.md). 
 
 <div id="A10"/> 
 
@@ -184,7 +184,7 @@ Output:
 ["foo","bar"]
 ```
 
-See [basic_json::parse](doc/ref/json/parse.md). 
+See [basic_json::parse](ref/json/parse.md). 
 
 <div id="A8"/> 
 
@@ -792,7 +792,7 @@ begin_object
 end_array
 ```
 
-See [basic_json_cursor](doc/ref/basic_json_cursor.md) 
+See [basic_json_cursor](ref/basic_json_cursor.md) 
 
 <div id="I4"/> 
 
@@ -869,7 +869,7 @@ Haruki Murakami, Hard-Boiled Wonderland and the End of the World
 Graham Greene, The Comedians
 ```
 
-See [basic_json_cursor](doc/ref/basic_json_cursor.md) 
+See [basic_json_cursor](ref/basic_json_cursor.md) 
 
 <div id="G0"/>
 
@@ -1418,8 +1418,8 @@ Key 'ssn' not found
 
 #### Specialize json_type_traits explicitly
 
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](ref/decode_json.md) 
+and [encode_json](ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](ref/json_type_traits.md) 
 defined. The standard library containers are already supported, 
