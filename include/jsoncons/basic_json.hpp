@@ -348,40 +348,23 @@ public:
         static constexpr uint8_t major_type_shift = 0x04;
         static constexpr uint8_t additional_information_mask = (1U << 4) - 1;
 
-        static constexpr uint8_t from_storage_and_tag(storage_kind storage, semantic_tag tag)
-        {
-            return (static_cast<uint8_t>(storage) << major_type_shift) | static_cast<uint8_t>(tag);
-        }
-
-        static storage_kind to_storage(uint8_t ext_type) 
-        {
-            uint8_t value = ext_type >> major_type_shift;
-            return static_cast<storage_kind>(value);
-        }
-
-        static semantic_tag to_tag(uint8_t ext_type)
-        {
-            uint8_t value = ext_type & additional_information_mask;
-            return static_cast<semantic_tag>(value);
-        }
-
         class common_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         };
 
         class null_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
 
-            null_storage()
-                : ext_type_(from_storage_and_tag(storage_kind::null_value, semantic_tag::none))
-            {
-            }
-            null_storage(semantic_tag tag)
-                : ext_type_(from_storage_and_tag(storage_kind::null_value, tag))
+            null_storage(semantic_tag tag = semantic_tag::none)
+                : storage_(static_cast<uint8_t>(storage_kind::null_value)), length_(0), tag_(tag)
             {
             }
         };
@@ -389,10 +372,12 @@ public:
         class empty_object_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
 
             empty_object_storage(semantic_tag tag)
-                : ext_type_(from_storage_and_tag(storage_kind::empty_object_value, tag))
+                : storage_(static_cast<uint8_t>(storage_kind::empty_object_value)), length_(0), tag_(tag)
             {
             }
         };  
@@ -400,19 +385,15 @@ public:
         class bool_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             bool val_;
         public:
             bool_storage(bool val, semantic_tag tag)
-                : ext_type_(from_storage_and_tag(storage_kind::bool_value, tag)),
+                : storage_(static_cast<uint8_t>(storage_kind::bool_value)), length_(0), tag_(tag),
                   val_(val)
-            {
-            }
-
-            bool_storage(const bool_storage& val)
-                : ext_type_(val.ext_type_),
-                  val_(val.val_)
             {
             }
 
@@ -426,20 +407,16 @@ public:
         class int64_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             int64_t val_;
         public:
             int64_storage(int64_t val, 
                        semantic_tag tag = semantic_tag::none)
-                : ext_type_(from_storage_and_tag(storage_kind::int64_value, tag)),
+                : storage_(static_cast<uint8_t>(storage_kind::int64_value)), length_(0), tag_(tag),
                   val_(val)
-            {
-            }
-
-            int64_storage(const int64_storage& val)
-                : ext_type_(val.ext_type_),
-                  val_(val.val_)
             {
             }
 
@@ -452,20 +429,16 @@ public:
         class uint64_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             uint64_t val_;
         public:
             uint64_storage(uint64_t val, 
                         semantic_tag tag = semantic_tag::none)
-                : ext_type_(from_storage_and_tag(storage_kind::uint64_value, tag)),
+                : storage_(static_cast<uint8_t>(storage_kind::uint64_value)), length_(0), tag_(tag),
                   val_(val)
-            {
-            }
-
-            uint64_storage(const uint64_storage& val)
-                : ext_type_(val.ext_type_),
-                  val_(val.val_)
             {
             }
 
@@ -478,19 +451,15 @@ public:
         class half_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             uint16_t val_;
         public:
             half_storage(uint16_t val, semantic_tag tag = semantic_tag::none)
-                : ext_type_(from_storage_and_tag(storage_kind::half_value, tag)), 
+                : storage_(static_cast<uint8_t>(storage_kind::half_value)), length_(0), tag_(tag),
                   val_(val)
-            {
-            }
-
-            half_storage(const half_storage& val)
-                : ext_type_(val.ext_type_),
-                  val_(val.val_)
             {
             }
 
@@ -503,20 +472,16 @@ public:
         class double_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             double val_;
         public:
             double_storage(double val, 
-                        semantic_tag tag = semantic_tag::none)
-                : ext_type_(from_storage_and_tag(storage_kind::double_value, tag)), 
+                           semantic_tag tag = semantic_tag::none)
+                : storage_(static_cast<uint8_t>(storage_kind::double_value)), length_(0), tag_(tag),
                   val_(val)
-            {
-            }
-
-            double_storage(const double_storage& val)
-                : ext_type_(val.ext_type_),
-                  val_(val.val_)
             {
             }
 
@@ -529,17 +494,17 @@ public:
         class short_string_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             static constexpr size_t capacity = (2*sizeof(uint64_t) - 2*sizeof(uint8_t))/sizeof(char_type);
-            uint8_t length_;
             char_type data_[capacity];
         public:
             static constexpr size_t max_length = capacity - 1;
 
             short_string_storage(semantic_tag tag, const char_type* p, uint8_t length)
-                : ext_type_(from_storage_and_tag(storage_kind::short_string_value, tag)), 
-                  length_(length)
+                : storage_(static_cast<uint8_t>(storage_kind::short_string_value)), length_(length), tag_(tag)
             {
                 JSONCONS_ASSERT(length <= max_length);
                 std::memcpy(data_,p,length*sizeof(char_type));
@@ -547,8 +512,7 @@ public:
             }
 
             short_string_storage(const short_string_storage& val)
-                : ext_type_(val.ext_type_), 
-                  length_(val.length_)
+                : storage_(val.storage_), length_(val.length_), tag_(val.tag_)
             {
                 std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
                 data_[length_] = 0;
@@ -574,31 +538,35 @@ public:
         class long_string_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             jsoncons::detail::string_wrapper<char_type,Allocator> s_;
         public:
 
             long_string_storage(semantic_tag tag, const char_type* data, std::size_t length, const Allocator& a)
-                : ext_type_(from_storage_and_tag(storage_kind::long_string_value, tag)),
+                : storage_(static_cast<uint8_t>(storage_kind::long_string_value)), length_(0), tag_(tag),
                   s_(data, length, a)
             {
             }
 
             long_string_storage(const long_string_storage& val)
-                : ext_type_(val.ext_type_), s_(val.s_)
+                : storage_(val.storage_), tag_(val.tag_),
+                  s_(val.s_)
             {
             }
 
             long_string_storage(long_string_storage&& val) noexcept
-                : ext_type_(val.ext_type_), 
+                : storage_(val.storage_), tag_(val.tag_),
                   s_(nullptr)
             {
                 swap(val);
             }
 
             long_string_storage(const long_string_storage& val, const Allocator& a)
-                : ext_type_(val.ext_type_), s_(val.s_, a)
+                : storage_(val.storage_), tag_(val.tag_),
+                  s_(val.s_, a)
             {
             }
 
@@ -636,31 +604,35 @@ public:
         class byte_string_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             jsoncons::detail::tagged_string_wrapper<uint8_t,Allocator> s_;
         public:
 
             byte_string_storage(semantic_tag tag, const uint8_t* data, std::size_t length, uint64_t ext_tag, const Allocator& alloc)
-                : ext_type_(from_storage_and_tag(storage_kind::byte_string_value, tag)),
+                : storage_(static_cast<uint8_t>(storage_kind::byte_string_value)), length_(0), tag_(tag),
                   s_(data, length, ext_tag, alloc)
             {
             }
 
             byte_string_storage(const byte_string_storage& val)
-                : ext_type_(val.ext_type_), s_(val.s_)
+                : storage_(val.storage_), tag_(val.tag_),
+                  s_(val.s_)
             {
             }
 
             byte_string_storage(byte_string_storage&& val) noexcept
-                : ext_type_(val.ext_type_), 
+                : storage_(val.storage_), tag_(val.tag_),
                   s_(nullptr)
             {
                 swap(val);
             }
 
             byte_string_storage(const byte_string_storage& val, const Allocator& a)
-                : ext_type_(val.ext_type_), s_(val.s_, a)
+                : storage_(val.storage_), tag_(val.tag_),
+                  s_(val.s_, a)
             {
             }
 
@@ -698,7 +670,9 @@ public:
         class array_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             using array_allocator = typename std::allocator_traits<Allocator>:: template rebind_alloc<array>;
             using pointer = typename std::allocator_traits<array_allocator>::pointer;
@@ -728,32 +702,32 @@ public:
             }
         public:
             array_storage(const array& val, semantic_tag tag)
-                : ext_type_(from_storage_and_tag(storage_kind::array_value, tag))
+                : storage_(static_cast<uint8_t>(storage_kind::array_value)), length_(0), tag_(tag)
             {
                 create(val.get_allocator(), val);
             }
 
             array_storage(const array& val, semantic_tag tag, const Allocator& a)
-                : ext_type_(from_storage_and_tag(storage_kind::array_value, tag))
+                : storage_(val.storage_), length_(0), tag_(val.tag_)
             {
                 create(array_allocator(a), val, a);
             }
 
             array_storage(const array_storage& val)
-                : ext_type_(val.ext_type_)
+                : storage_(val.storage_), length_(0), tag_(val.tag_)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             array_storage(array_storage&& val) noexcept
-                : ext_type_(val.ext_type_), 
+                : storage_(val.storage_), length_(0), tag_(val.tag_),
                   ptr_(nullptr)
             {
                 std::swap(val.ptr_, ptr_);
             }
 
             array_storage(const array_storage& val, const Allocator& a)
-                : ext_type_(val.ext_type_)
+                : storage_(val.storage_), length_(0), tag_(val.tag_)
             {
                 create(array_allocator(a), *(val.ptr_), a);
             }
@@ -790,7 +764,9 @@ public:
         class object_storage final
         {
         public:
-            uint8_t ext_type_;
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
         private:
             using object_allocator = typename std::allocator_traits<Allocator>:: template rebind_alloc<object>;
             using pointer = typename std::allocator_traits<object_allocator>::pointer;
@@ -813,32 +789,32 @@ public:
             }
         public:
             explicit object_storage(const object& val, semantic_tag tag)
-                : ext_type_(from_storage_and_tag(storage_kind::object_value, tag))
+                : storage_(static_cast<uint8_t>(storage_kind::object_value)), length_(0), tag_(tag)
             {
                 create(val.get_allocator(), val);
             }
 
             explicit object_storage(const object& val, semantic_tag tag, const Allocator& a)
-                : ext_type_(from_storage_and_tag(storage_kind::object_value, tag))
+                : storage_(val.storage_), length_(0), tag_(val.tag_)
             {
                 create(object_allocator(a), val, a);
             }
 
             explicit object_storage(const object_storage& val)
-                : ext_type_(val.ext_type_)
+                : storage_(val.storage_), length_(0), tag_(val.tag_)
             {
                 create(val.ptr_->get_allocator(), *(val.ptr_));
             }
 
             explicit object_storage(object_storage&& val) noexcept
-                : ext_type_(val.ext_type_), 
+                : storage_(val.storage_), length_(0), tag_(val.tag_),
                   ptr_(nullptr)
             {
                 std::swap(val.ptr_,ptr_);
             }
 
             explicit object_storage(const object_storage& val, const Allocator& a)
-                : ext_type_(val.ext_type_)
+                : storage_(val.storage_), tag_(val.tag_)
             {
                 create(object_allocator(a), *(val.ptr_), a);
             }
@@ -1050,20 +1026,20 @@ public:
 
         storage_kind storage() const
         {
-            // It is legal to access 'common_stor_.ext_type_' even though 
-            // common_stor_ is not the active member of the union because 'ext_type_' 
+            // It is legal to access 'common_stor_.storage_' even though 
+            // common_stor_ is not the active member of the union because 'storage_' 
             // is a part of the common initial sequence of all union members
             // as defined in 11.4-25 of the Standard.
-            return to_storage(common_stor_.ext_type_);
+            return static_cast<storage_kind>(common_stor_.storage_);
         }
 
         semantic_tag tag() const
         {
-            // It is legal to access 'common_stor_.ext_type_' even though 
-            // common_stor_ is not the active member of the union because 'ext_type_' 
+            // It is legal to access 'common_stor_.tag_' even though 
+            // common_stor_ is not the active member of the union because 'tag_' 
             // is a part of the common initial sequence of all union members
             // as defined in 11.4-25 of the Standard.
-            return to_tag(common_stor_.ext_type_);
+            return common_stor_.tag_;
         }
 
         template <class VariantType, class... Args>
