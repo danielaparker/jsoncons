@@ -47,7 +47,7 @@ Throws [ser_error](../ser_error.md) if parsing fails.
 
 ### Examples
 
-#### Parse from a string
+#### Parse from string
 
 ```c++
 try 
@@ -64,7 +64,7 @@ Output:
 Extra comma at line 1 and column 10
 ```
 
-#### Parse from a string with options
+#### Parse from string with options
 
 ```c++
 std::string s = R"({"field1":"NaN","field2":"PositiveInfinity","field3":"NegativeInfinity"})";
@@ -97,7 +97,7 @@ Output:
 }
 ```
 
-#### Parse from a stream
+#### Parse from stream
 
 Input JSON file `example.json`:
 
@@ -122,7 +122,7 @@ Output:
 }
 ```
 
-#### Parse from a pair of input iterators
+#### Parse from pair of input iterators
 
 ```c++
 #include <jsoncons/json.hpp>
