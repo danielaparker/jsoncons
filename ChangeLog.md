@@ -1,3 +1,20 @@
+master
+--------
+
+Bug fixes:
+
+- Fixed decode issue with `json_type_traits` defined for `set`, `unordered_set`, `multiset`, 
+`unordered_multiset` and `forward_list` [\#242](https://github.com/danielaparker/jsoncons/issues/242)
+
+- Fixed issue with preserving original CBOR semantic tag for CBOR byte strings  
+associated with an unknown (to jsoncons) tag.
+
+Enhancements:
+
+- `basic_json::parse`, `decode_json`, `decode_csv`, `decode_bson`, `decode_cbor`,
+`decode_msgpack`, and `decode_ubjson` now support reading data from a pair of 
+LegacyInputIterators that specify a character or byte sequence.
+
 v0.152.0
 --------
 
@@ -5,7 +22,7 @@ Bug fixes:
 
 - Fixed compile error when building with Android SDK level less than 21 [\#240](https://github.com/danielaparker/jsoncons/pull/240)
 
-- Fixed bson encode/decode of binary type (wasn't reading/writing subtype.)
+- Fixed bson encode/decode of bson binary type (wasn't reading/writing subtype.)
 
 Changes:
 
