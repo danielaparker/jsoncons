@@ -115,8 +115,67 @@ json j = json::parse(is);
 #### Parse JSON from an iterator range
 
 ```c++
+#include <jsoncons/json.hpp>
+
+class MyIterator
+{
+    const char* p_;
+public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = char;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const char*; 
+    using reference = const char&;
+
+    MyIterator(const char* p)
+        : p_(p)
+    {
+    }
+
+    reference operator*() const
+    {
+        return *p_;
+    }
+
+    pointer operator->() const 
+    {
+        return p_;
+    }
+
+    MyIterator& operator++()
+    {
+        ++p_;
+        return *this;
+    }
+
+    MyIterator operator++(int) 
+    {
+        MyIterator temp(*this);
+        ++*this;
+        return temp;
+    }
+
+    bool operator!=(const MyIterator& rhs) const
+    {
+        return p_ != rhs.p_;
+    }
+};
+
+int main()
+{
+    char source[] = {'[','\"', 'f','o','o','\"',',','\"', 'b','a','r','\"',']'};
+
+    MyIterator first(source);
+    MyIterator last(source + sizeof(source));
+
+    json j = json::parse(first, last);
+
+    std::cout << j << "\n\n";
+}
 ```
+
 Output:
+
 ```json
 ["foo","bar"]
 ```
