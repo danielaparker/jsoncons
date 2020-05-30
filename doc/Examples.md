@@ -180,12 +180,6 @@ Output:
 ["foo","bar"]
 ```
 
-```
-std::ifstream is("myfile.json");    
-
-json j = json::parse(is);
-```
-
 <div id="A8"/> 
 
 #### Parse numbers without loosing precision

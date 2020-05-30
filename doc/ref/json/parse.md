@@ -171,6 +171,7 @@ int main()
     std::cout << j << "\n\n";
 }
 ```
+
 Output:
 ```json
 ["foo","bar"]
