@@ -36,9 +36,13 @@ Throws [ser_error](../ser_error.md) if parsing fails.
 #### Parameters
 
 `s` - s string view  
+
 `is` - an input stream  
+
 `first`, `last` - pair of [LegacyInputIterators](https://en.cppreference.com/w/cpp/named_req/InputIterator) that specify a character sequence  
+
 `options` - a [basic_json_options](../basic_json_options.md)  
+
 `err_handler` - an error handler  
 
 ### Examples
