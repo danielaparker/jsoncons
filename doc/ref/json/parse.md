@@ -122,7 +122,7 @@ Output:
 }
 ```
 
-#### Parse from an iterator range
+#### Parse from a pair of input iterators
 
 ```c++
 #include <jsoncons/json.hpp>
