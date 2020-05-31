@@ -169,6 +169,113 @@ bool is_base10(const CharT* s, std::size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
+to_integer_decimal(const CharT* s, std::size_t length)
+{
+    integer_chars_state state = integer_chars_state::initial;
+    T n = 0;
+
+    const CharT* end = s + length; 
+    while (s < end)
+    {
+        switch(state)
+        {
+            case integer_chars_state::initial:
+            {
+                switch(*s)
+                {
+                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
+                        state = integer_chars_state::decimal;
+                        break;
+                    default:
+                        return to_integer_result<T>(to_integer_errc::invalid_digit);
+                }
+                break;
+            }
+            case integer_chars_state::decimal:
+            {
+                static constexpr T max_value = (std::numeric_limits<T>::max)();
+                static constexpr T max_value_div_10 = max_value / 10;
+                for (; s < end; ++s)
+                {
+                    T x = 0;
+                    switch(*s)
+                    {
+                        case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                            x = static_cast<T>(*s) - static_cast<T>('0');
+                            break;
+                        default:
+                            return to_integer_result<T>(to_integer_errc::invalid_digit);
+                    }
+                    if (n > max_value_div_10)
+                    {
+                        return to_integer_result<T>(to_integer_errc::overflow);
+                    }
+                    n = n * 10;
+                    if (n > max_value - x)
+                    {
+                        return to_integer_result<T>(to_integer_errc::overflow);
+                    }
+                    n += x;
+                }
+                break;
+            }
+            default:
+                JSONCONS_UNREACHABLE();
+                break;
+        }
+    }
+    return (state == integer_chars_state::initial) ? to_integer_result<T>(to_integer_errc::invalid_number) : to_integer_result<T>(n);
+}
+
+template <class T, class CharT>
+typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+to_integer_decimal(const CharT* s, std::size_t length)
+{
+    if (length == 0)
+    {
+        return to_integer_result<T>(to_integer_errc::invalid_number);
+    }
+
+    bool is_negative = *s == '-' ? true : false;
+    if (is_negative)
+    {
+        ++s;
+        --length;
+    }
+
+    using U = typename std::make_unsigned<T>::type;
+
+    auto u = to_integer_decimal<U>(s, length);
+    if (!u)
+    {
+        return to_integer_result<T>(u.errc());
+    }
+    if (is_negative)
+    {
+        if (u.value() > static_cast<U>(-((std::numeric_limits<T>::min)()+T(1))) + U(1))
+        {
+            return to_integer_result<T>(to_integer_errc::overflow);
+        }
+        else
+        {
+            return to_integer_result<T>(static_cast<T>(U(0) - u.value()));
+        }
+    }
+    else
+    {
+        if (u.value() > static_cast<U>((std::numeric_limits<T>::max)()))
+        {
+            return to_integer_result<T>(to_integer_errc::overflow);
+        }
+        else
+        {
+            return to_integer_result<T>(static_cast<T>(u.value()));
+        }
+    }
+}
+
+template <class T, class CharT>
+typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
 to_integer(const CharT* s, std::size_t length)
 {
     integer_chars_state state = integer_chars_state::initial;
@@ -342,6 +449,7 @@ to_integer(const CharT* s, std::size_t length)
                 break;
             }
             default:
+                JSONCONS_UNREACHABLE();
                 break;
         }
     }
