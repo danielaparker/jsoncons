@@ -310,7 +310,7 @@ int main()
     encoder.end_array();
     encoder.flush();
 
-    std::cout << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
+    std::cout << byte_string_view(buffer) << "\n\n";
 
 /* 
     23000000 -- Total number of bytes comprising the document (35 bytes) 

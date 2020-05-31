@@ -35,7 +35,7 @@ TEST_CASE("cbor encode multi dim array test")
     encoder.end_array();
     encoder.end_multi_dim();
 
-    byte_string_view bstr(v.data(), v.size());
+    byte_string_view bstr(v);
     std::cout << "bstr: " << bstr << "\n\n";
 
     for (auto ch : bstr)

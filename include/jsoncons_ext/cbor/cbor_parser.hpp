@@ -378,7 +378,7 @@ private:
                         }
                         case jsoncons::cbor::detail::cbor_major_type::byte_string:
                         {
-                            read_byte_string_from_buffer read(byte_string_view(str.bytes.data(), str.bytes.size()));
+                            read_byte_string_from_buffer read(byte_string_view(str.bytes));
                             write_byte_string(read, visitor, ec);
                             if (ec)
                             {
@@ -1522,7 +1522,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64url, *this, ec);
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::base64url, *this, ec);
                     break;
                 }
                 case 0x16:
@@ -1533,7 +1533,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base64, *this, ec);
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::base64, *this, ec);
                     break;
                 }
                 case 0x17:
@@ -1544,7 +1544,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::base16, *this, ec);
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::base16, *this, ec);
                     break;
                 }
                 case 0x40:
@@ -1833,7 +1833,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), item_tag_, *this, ec);
+                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), item_tag_, *this, ec);
                     break;
                 }
             }
@@ -1846,7 +1846,7 @@ private:
             {
                 return;
             }
-            more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_.data(), bytes_buffer_.size()), semantic_tag::none, *this, ec);
+            more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::none, *this, ec);
         }
     }
 

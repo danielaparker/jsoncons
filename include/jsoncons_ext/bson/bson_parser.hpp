@@ -444,7 +444,7 @@ private:
                     return;
                 }
 
-                more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
+                more_ = visitor.byte_string_value(byte_string_view(v), 
                                                   subtype.value(), 
                                                   *this,
                                                   ec);

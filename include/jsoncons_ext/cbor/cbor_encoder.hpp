@@ -1211,7 +1211,7 @@ private:
                     write_tag(0x40);
                     break;
             }
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1241,7 +1241,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
             memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1271,7 +1271,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint32_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(uint32_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1301,7 +1301,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint64_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(uint64_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1329,7 +1329,7 @@ private:
             write_tag(0x48);
             std::vector<uint8_t> v(data.size()*sizeof(int8_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int8_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1359,7 +1359,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int16_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int16_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1389,7 +1389,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int32_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int32_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1419,7 +1419,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int64_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int64_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1449,7 +1449,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
             memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1479,7 +1479,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(float));
             memcpy(v.data(), data.data(), data.size()*sizeof(float));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1509,7 +1509,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(double));
             memcpy(v.data(), data.data(), data.size()*sizeof(double));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else

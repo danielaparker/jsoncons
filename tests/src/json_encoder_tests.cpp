@@ -14,7 +14,7 @@ using namespace jsoncons;
 TEST_CASE("test_byte_string_serialization")
 {
     std::vector<uint8_t> bytes = {'H','e','l','l','o'};
-    json j(byte_string_view(bytes.data(), bytes.size()));
+    json j(byte_string_arg, bytes);
 
     std::ostringstream os;
     os << j;

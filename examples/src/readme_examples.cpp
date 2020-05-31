@@ -227,7 +227,7 @@ namespace {
         encoder.flush();
 
         // Print bytes
-        std::cout << "(1)\n" << byte_string_view(bytes_in.data(), bytes_in.size()) << "\n\n";
+        std::cout << "(1)\n" << byte_string_view(bytes_in) << "\n\n";
 /*
         9f -- Start indefinte length array
           83 -- Array of length 3
@@ -289,14 +289,14 @@ namespace {
 
         // Get byte string value at position /1/1 as a std::vector<uint8_t>
         auto bstr = j[1][1].as<std::vector<uint8_t>>();
-        std::cout << "(8) " << byte_string_view(bstr.data(), bstr.size()) << "\n\n";
+        std::cout << "(8) " << byte_string_view(bstr) << "\n\n";
 
         // Repack bytes
         std::vector<uint8_t> bytes_out;
         cbor::encode_cbor(j, bytes_out);
 
         // Print the repacked bytes
-        std::cout << "(9)\n" << byte_string_view(bytes_out.data(),bytes_out.size()) << "\n\n";
+        std::cout << "(9)\n" << byte_string_view(bytes_out) << "\n\n";
 /*
         82 -- Array of length 2
           83 -- Array of length 3

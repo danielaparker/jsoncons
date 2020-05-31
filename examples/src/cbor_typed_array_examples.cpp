@@ -38,7 +38,7 @@ void decode_float64_big_endian_array()
     cbor::encode_cbor(v, output1);
 
     // output1 contains a classical CBOR array
-    std::cout << "(3)\n" << byte_string_view(output1.data(), output1.size()) << "\n\n";
+    std::cout << "(3)\n" << byte_string_view(output1) << "\n\n";
 
     std::vector<uint8_t> output2;
     cbor::cbor_options options;
@@ -46,7 +46,7 @@ void decode_float64_big_endian_array()
     cbor::encode_cbor(v, output2, options);
 
     // output2 contains a float64, native endian, Typed Array 
-    std::cout << "(4)\n" << byte_string_view(output2.data(), output2.size()) << "\n\n";
+    std::cout << "(4)\n" << byte_string_view(output2) << "\n\n";
 }
 
 void decode_mult_dim_row_major()
@@ -127,7 +127,7 @@ void encode_mult_dim_array()
     encoder.end_array();
     encoder.end_multi_dim();
 
-    std::cout << "(1)\n" << byte_string_view(v.data(), v.size()) << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(v) << "\n\n";
 
     auto j = cbor::decode_cbor<json>(v);
     std::cout << "(2) " << j.tag() << "\n";
@@ -146,7 +146,7 @@ void encode_half_array()
     encoder.typed_array(half_arg, values);
 
     // buffer contains a half precision floating-point, native endian, Typed Array 
-    std::cout << "(1)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(buffer) << "\n\n";
 
     auto j = cbor::decode_cbor<json>(buffer);
 
@@ -273,7 +273,7 @@ void read_to_cbor_visitor()
     cbor::encode_cbor(v, buffer, options);
 
     std::cout << "(1)\n";
-    std::cout << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
+    std::cout << byte_string_view(buffer) << "\n\n";
 /*
     0xd8, // Tag
         0x56, // Tag 86, float64, little endian, Typed Array

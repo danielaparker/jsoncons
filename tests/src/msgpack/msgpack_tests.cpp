@@ -167,7 +167,7 @@ TEST_CASE("msgpack bin tests")
         CHECK(v3 == expected);
 
         std::vector<uint8_t> output1;
-        encode_msgpack(byte_string_view(v1.data(),v1.size()),output1);
+        encode_msgpack(byte_string_view(v1),output1);
         CHECK(output1 == input1);
     }
     SECTION("[1]")
@@ -187,7 +187,7 @@ TEST_CASE("msgpack bin tests")
         CHECK(v3 == expected);
 
         std::vector<uint8_t> output1;
-        encode_msgpack(byte_string_view(v1.data(),v1.size()),output1);
+        encode_msgpack(byte_string_view(v1),output1);
         CHECK(output1 == input1);
     }
     SECTION("[0,255]")
@@ -207,7 +207,7 @@ TEST_CASE("msgpack bin tests")
         CHECK(v3 == expected);
 
         std::vector<uint8_t> output1;
-        encode_msgpack(byte_string_view(v1.data(),v1.size()),output1);
+        encode_msgpack(byte_string_view(v1),output1);
         CHECK(output1 == input1);
     }
 }

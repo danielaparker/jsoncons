@@ -25,7 +25,7 @@ void data_model_example1()
 
     std::vector<uint8_t> bytes;
     cbor::encode_cbor(j, bytes);
-    std::cout << "(2)\n" << byte_string_view(bytes.data(), bytes.size()) << "\n\n";
+    std::cout << "(2)\n" << byte_string_view(bytes) << "\n\n";
 /*
 88 -- Array of length 8
   63 -- String value of length 3 
@@ -70,7 +70,7 @@ void data_model_example2()
     encoder.end_array();
     encoder.flush();
 
-    std::cout << "(1)\n" << byte_string_view(bytes.data(), bytes.size()) << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(bytes) << "\n\n";
 
 /*
 9f -- Start indefinite length array 

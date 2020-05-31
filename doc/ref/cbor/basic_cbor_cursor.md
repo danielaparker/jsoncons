@@ -307,7 +307,7 @@ int main()
     cbor::encode_cbor(v, buffer, options);
 
     std::cout << "(1)\n";
-    std::cout << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
+    std::cout << byte_string_view(buffer) << "\n\n";
 /*
     0xd8, // Tag
         0x56, // Tag 86, float64, little endian, Typed Array

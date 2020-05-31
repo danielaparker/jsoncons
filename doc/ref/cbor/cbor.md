@@ -188,7 +188,7 @@ int main()
     // Serialize back to CBOR
     std::vector<uint8_t> buffer;
     cbor::encode_cbor(j, buffer);
-    std::cout << "(4)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
+    std::cout << "(4)\n" << byte_string_view(buffer) << "\n\n";
 }
 ```
 Output:
@@ -231,7 +231,7 @@ int main()
     // Serialize back to CBOR
     std::vector<uint8_t> buffer;
     cbor::encode_cbor(val, buffer);
-    std::cout << "(2)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
+    std::cout << "(2)\n" << byte_string_view(buffer) << "\n\n";
 }
 ```
 Output:
@@ -503,7 +503,7 @@ int main()
     encoder.byte_string_value(bstr, 274); // byte string with tag 274
     encoder.flush();
 
-    std::cout << "(1)\n" << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(buffer) << "\n\n";
 
     /*
         d9, // tag
@@ -585,7 +585,7 @@ int main()
     std::vector<uint8_t> v;
     cbor::encode_cbor(j,v);
 
-    std::cout << "(3)\n" << byte_string_view(v.data(), v.size()) << "\n\n";
+    std::cout << "(3)\n" << byte_string_view(v) << "\n\n";
 /*
     85 -- Array of length 5     
       fa -- float 

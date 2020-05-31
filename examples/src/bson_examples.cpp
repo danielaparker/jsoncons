@@ -24,7 +24,7 @@ namespace
         encoder.end_array();
         encoder.flush();
 
-        std::cout << byte_string_view(buffer.data(),buffer.size()) << "\n\n";
+        std::cout << byte_string_view(buffer) << "\n\n";
 
     /* 
         23000000 -- Total number of bytes comprising the document (35 bytes) 
@@ -60,7 +60,7 @@ namespace
         encoder.end_object();
         encoder.flush();
 
-        std::cout << "(1)\n" << byte_string_view(buffer.data(),buffer.size()) << "\n";
+        std::cout << "(1)\n" << byte_string_view(buffer) << "\n";
 
         /*
             0x27,0x00,0x00,0x00, // Total number of bytes comprising the document (40 bytes) 

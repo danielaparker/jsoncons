@@ -67,7 +67,7 @@ int main()
     auto v = j["Data"].as<std::vector<uint8_t>>(); 
 
     std::cout << "(3)\n";
-    std::cout << byte_string_view(v.data(),v.size()) << "\n\n";
+    std::cout << byte_string_view(v) << "\n\n";
 
     std::vector<uint8_t> output;
     msgpack::encode_msgpack(j,output);

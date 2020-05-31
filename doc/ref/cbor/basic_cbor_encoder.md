@@ -431,7 +431,7 @@ int main()
     encoder.end_array();
     encoder.flush();
 
-    std::cout << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
+    std::cout << byte_string_view(buffer) << "\n\n";
 
 /* 
     9f -- Start indefinte length array
@@ -522,7 +522,7 @@ int main()
     encoder.typed_array(half_arg, values);
 
     // buffer contains a half precision floating-point, native endian, Typed Array 
-    std::cout << "(1)\n" << byte_string_view(buffer.data(), buffer.size()) << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(buffer) << "\n\n";
 
     auto j = cbor::decode_cbor<json>(buffer);
 
@@ -581,7 +581,7 @@ int main()
     encoder.end_array();
     encoder.end_multi_dim();
 
-    std::cout << "(1)\n" << byte_string_view(v.data(), v.size()) << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(v) << "\n\n";
 
     auto j = cbor::decode_cbor<json>(v);
     std::cout << "(2) " << j.tag() << "\n";

@@ -177,7 +177,7 @@ int main()
     auto bstr = j.as<std::vector<uint8_t>>();
 
     // use byte_string_view to display as hex
-    std::cout << "(1) "<< byte_string_view(bstr.data(), bstr.size()) << "\n\n";
+    std::cout << "(1) "<< byte_string_view(bstr) << "\n\n";
 
     // byte string value to JSON text becomes base64url
     std::cout << "(2) " << j << std::endl;
@@ -303,7 +303,7 @@ int main()
     cbor::encode_cbor(v, output1);
 
     // output1 contains a classical CBOR array
-    std::cout << "(3)\n" << byte_string_view(output1.data(), output1.size()) << "\n\n";
+    std::cout << "(3)\n" << byte_string_view(output1) << "\n\n";
 
     std::vector<uint8_t> output2;
     cbor::cbor_options options;
@@ -311,7 +311,7 @@ int main()
     cbor::encode_cbor(v, output2, options);
 
     // output2 contains a float64, native endian, Typed Array 
-    std::cout << "(4)\n" << byte_string_view(output2.data(), output2.size()) << "\n\n";
+    std::cout << "(4)\n" << byte_string_view(output2) << "\n\n";
 }
 ```
 
