@@ -39,6 +39,23 @@
 #include <jsoncons/detail/string_wrapper.hpp>
 
 namespace jsoncons { 
+
+namespace detail {
+
+template <class T>
+struct is_basic_json : std::false_type
+{};
+
+template <class CharT, class ImplementationPolicy, class Allocator>
+struct is_basic_json<basic_json<CharT,ImplementationPolicy,Allocator>> : std::true_type
+{};
+
+} // namespace detail
+
+    
+    template <typename T>
+    using is_basic_json = jsoncons::detail::is_basic_json<typename std::decay<T>::type>;
+
 namespace detail {
 
     template <class Iterator,class Enable = void>
@@ -3098,19 +3115,34 @@ public:
     }
 
     template <class T,
-              class = typename std::enable_if<!is_proxy<T>::value>::type>
+              class = typename std::enable_if<!is_proxy<T>::value && !is_basic_json<T>::value>::type>
     basic_json(const T& val)
         : var_(json_type_traits<basic_json,T>::to_json(val).var_)
     {
     }
 
     template <class T,
-              class = typename std::enable_if<!is_proxy<T>::value>::type>
+              class = typename std::enable_if<!is_proxy<T>::value && !is_basic_json<T>::value>::type>
     basic_json(const T& val, const Allocator& alloc)
         : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
     {
     }
+ 
+/*
+    template <class T,
+              class = typename std::enable_if<!is_proxy<T>::value && !is_basic_json<T>::value && is_json_type_traits_specialized<basic_json,T>::value,int>::type>
+    basic_json(const T& val)
+        : var_(json_type_traits<basic_json,T>::to_json(val).var_)
+    {
+    }
 
+    template <class T,
+              class = typename std::enable_if<!is_proxy<T>::value && !is_basic_json<T>::value && is_json_type_traits_specialized<basic_json,T>::value,int>::type>
+    basic_json(const T& val, const Allocator& alloc)
+        : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
+    {
+    }
+*/
     basic_json(const char_type* s, semantic_tag tag = semantic_tag::none)
         : var_(s, char_traits_type::length(s), tag)
     {
@@ -5538,22 +5570,6 @@ jsoncons::wojson operator "" _ojson(const wchar_t* s, std::size_t n)
 }
 
 } // inline namespace literals
-
-namespace detail {
-
-template <class T>
-struct is_basic_json : std::false_type
-{};
-
-template <class CharT, class ImplementationPolicy, class Allocator>
-struct is_basic_json<basic_json<CharT,ImplementationPolicy,Allocator>> : std::true_type
-{};
-
-} // namespace detail
-
-    
-    template <typename T>
-    using is_basic_json = jsoncons::detail::is_basic_json<typename std::decay<T>::type>;
 
 
 } // namespace jsoncons
