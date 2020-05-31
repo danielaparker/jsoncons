@@ -1194,9 +1194,9 @@ private:
             }
         }
 
-        if (s.size() >= (std::numeric_limits<int32_t>::max)() || 
-                         exponent >= (std::numeric_limits<int32_t>::max)() || 
-                         exponent <= (std::numeric_limits<int32_t>::min)())
+        if (s.size() >= static_cast<std::size_t>((std::numeric_limits<int32_t>::max)()) || 
+            exponent >= (std::numeric_limits<int32_t>::max)() || 
+            exponent <= (std::numeric_limits<int32_t>::min)())
         {
             ec = cbor_errc::invalid_decimal_fraction;
             more_ = false;
