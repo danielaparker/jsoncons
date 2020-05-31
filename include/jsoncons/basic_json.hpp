@@ -3127,22 +3127,7 @@ public:
         : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
     {
     }
- 
-/*
-    template <class T,
-              class = typename std::enable_if<!is_proxy<T>::value && !is_basic_json<T>::value && is_json_type_traits_specialized<basic_json,T>::value,int>::type>
-    basic_json(const T& val)
-        : var_(json_type_traits<basic_json,T>::to_json(val).var_)
-    {
-    }
 
-    template <class T,
-              class = typename std::enable_if<!is_proxy<T>::value && !is_basic_json<T>::value && is_json_type_traits_specialized<basic_json,T>::value,int>::type>
-    basic_json(const T& val, const Allocator& alloc)
-        : var_(json_type_traits<basic_json,T>::to_json(val,alloc).var_)
-    {
-    }
-*/
     basic_json(const char_type* s, semantic_tag tag = semantic_tag::none)
         : var_(s, char_traits_type::length(s), tag)
     {
