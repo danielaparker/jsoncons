@@ -89,7 +89,10 @@ TEST_CASE("encode decode csv source")
         json j1 = csv::decode_csv<json>(input);
         json j2 = csv::decode_csv<json>(s2);
 
-        CHECK(j1 == j2);
+        CHECK(j2 == j1);
+
+        json j3 = csv::decode_csv<json>(s2.begin(), s2.end());
+        CHECK(j3 == j1);
     }
 
     SECTION("from stream")
@@ -106,9 +109,9 @@ TEST_CASE("encode decode csv source")
         csv::encode_csv(v, ss2, options);
 
         json j1 = csv::decode_csv<json>(input);
-        json j2 = csv::decode_csv<json>(ss2);
 
-        CHECK(j1 == j2);
+        json j2 = csv::decode_csv<json>(ss2);
+        CHECK(j2 == j1);
     }
 
     SECTION("from iterator")
@@ -126,7 +129,7 @@ TEST_CASE("encode decode csv source")
         json j1 = csv::decode_csv<json>(input);
         json j2 = csv::decode_csv<json>(ss2);
 
-        CHECK(j1 == j2);
+        CHECK(j2 == j1);
     }
 
     SECTION("from custom iterator")
@@ -147,7 +150,7 @@ TEST_CASE("encode decode csv source")
         json j1 = csv::decode_csv<json>(input);
         json j2 = csv::decode_csv<json>(ss2);
 
-        CHECK(j1 == j2);
+        CHECK(j2 == j1);
     }
 }
 

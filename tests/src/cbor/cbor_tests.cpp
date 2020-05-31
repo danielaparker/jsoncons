@@ -25,8 +25,10 @@ TEST_CASE("cbor_test_floating_point")
     cbor::encode_cbor(j1, v);
 
     json j2 = cbor::decode_cbor<json>(v);
+    CHECK(j2 == j1);
 
-    CHECK(j1 == j2);
+    json j3 = cbor::decode_cbor<json>(v.begin(), v.end());
+    CHECK(j3 == j1);
 } 
 
 TEST_CASE("cbor_test")
@@ -89,8 +91,10 @@ TEST_CASE("cbor_test")
     cbor::encode_cbor(j1, v);
 
     json j2 = cbor::decode_cbor<json>(v);
+    CHECK(j2 == j1);
 
-    CHECK(j1 == j2);
+    json j3 = cbor::decode_cbor<json>(v.begin(), v.end());
+    CHECK(j3 == j1);
 } 
 
 TEST_CASE("cbor_test2")
@@ -155,8 +159,10 @@ TEST_CASE("cbor_test2")
     cbor::encode_cbor(j1, v);
 
     wjson j2 = cbor::decode_cbor<wjson>(v);
+    CHECK(j2 == j1);
 
-    CHECK(j1 == j2);
+    wjson j3 = cbor::decode_cbor<wjson>(v.begin(), v.end());
+    CHECK(j3 == j1);
 }
 
 TEST_CASE("cbor_reputon_test")
@@ -179,7 +185,9 @@ ojson j1 = ojson::parse(R"(
     cbor::encode_cbor(j1, v);
 
     ojson j2 = cbor::decode_cbor<ojson>(v);
-    CHECK(j1 == j2);
-    //std::cout << pretty_print(j2) << std::endl;
+    CHECK(j2 == j1);
+
+    ojson j3 = cbor::decode_cbor<ojson>(v.begin(), v.end());
+    CHECK(j3 == j1);
 }
 

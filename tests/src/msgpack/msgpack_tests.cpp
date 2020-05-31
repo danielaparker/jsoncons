@@ -75,9 +75,13 @@ TEST_CASE("msgpack_test")
     std::vector<uint8_t> v;
     encode_msgpack(j1, v);
 
+    // from bytes
     json j2 = decode_msgpack<json>(v);
+    CHECK(j2 == j1);
 
-    CHECK(j1 == j2);
+    // from pair of iterators
+    json j3 = decode_msgpack<json>(v.begin(), v.end());
+    CHECK(j3 == j1);
 } 
 
 TEST_CASE("msgpack_test2")
@@ -143,7 +147,7 @@ TEST_CASE("msgpack_test2")
 
     //wjson j2 = decode_msgpack<wjson>(v);
 
-    //CHECK(j1 == j2);
+    //CHECK(j2 == j1);
 }
 
 // Includes test cases from https://github.com/kawanet/msgpack-test-suite, MIT license

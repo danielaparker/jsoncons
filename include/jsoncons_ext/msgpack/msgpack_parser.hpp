@@ -269,8 +269,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::float32_cd: 
                 {
                     uint8_t buf[sizeof(float)];
-                    source_.read(buf, sizeof(float));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(float)) != sizeof(float))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -285,8 +284,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::float64_cd: 
                 {
                     uint8_t buf[sizeof(double)];
-                    source_.read(buf, sizeof(double));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(double)) != sizeof(double))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -314,8 +312,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::uint16_cd: 
                 {
                     uint8_t buf[sizeof(uint16_t)];
-                    source_.read(buf, sizeof(uint16_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(uint16_t)) !=sizeof(uint16_t)) 
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -330,8 +327,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::uint32_cd: 
                 {
                     uint8_t buf[sizeof(uint32_t)];
-                    source_.read(buf, sizeof(uint32_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -346,8 +342,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::uint64_cd: 
                 {
                     uint8_t buf[sizeof(uint64_t)];
-                    source_.read(buf, sizeof(uint64_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -362,8 +357,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::int8_cd: 
                 {
                     uint8_t buf[sizeof(int8_t)];
-                    source_.read(buf, sizeof(int8_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(int8_t)) != sizeof(int8_t))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -378,8 +372,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::int16_cd: 
                 {
                     uint8_t buf[sizeof(int16_t)];
-                    source_.read(buf, sizeof(int16_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(int16_t)) != sizeof(int16_t))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -394,8 +387,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::int32_cd: 
                 {
                     uint8_t buf[sizeof(int32_t)];
-                    source_.read(buf, sizeof(int32_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -410,8 +402,7 @@ private:
                 case jsoncons::msgpack::detail::msgpack_format::int64_cd: 
                 {
                     uint8_t buf[sizeof(int64_t)];
-                    source_.read(buf, sizeof(int64_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -492,8 +483,7 @@ private:
 
                     // type
                     uint8_t buf[sizeof(int8_t)];
-                    source_.read(buf, sizeof(int8_t));
-                    if (source_.eof())
+                    if (source_.read(buf, sizeof(int8_t)) != sizeof(int8_t))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -513,8 +503,7 @@ private:
                     if (tag == semantic_tag::timestamp && len == 4)
                     {
                         uint8_t buf32[sizeof(uint32_t)];
-                        source_.read(buf32, sizeof(uint32_t));
-                        if (source_.eof())
+                        if (source_.read(buf32, sizeof(uint32_t)) != sizeof(uint32_t))
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
@@ -526,8 +515,7 @@ private:
                     else if (tag == semantic_tag::timestamp && len == 8)
                     {
                         uint8_t buf64[sizeof(uint64_t)];
-                        source_.read(buf64, sizeof(uint64_t));
-                        if (source_.eof())
+                        if (source_.read(buf64, sizeof(uint64_t)) != sizeof(uint64_t))
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
@@ -545,8 +533,7 @@ private:
                     else if (tag == semantic_tag::timestamp && len == 12)
                     {
                         uint8_t buf1[sizeof(uint32_t)];
-                        source_.read(buf1, sizeof(uint32_t));
-                        if (source_.eof())
+                        if (source_.read(buf1, sizeof(uint32_t)) != sizeof(uint32_t))
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
@@ -555,8 +542,7 @@ private:
                         uint32_t nsec = jsoncons::detail::big_to_native<uint32_t>(buf1,buf1+sizeof(buf1),&endp);
 
                         uint8_t buf2[sizeof(uint64_t)];
-                        source_.read(buf2, sizeof(uint64_t));
-                        if (source_.eof())
+                        if (source_.read(buf2, sizeof(uint64_t)) != sizeof(uint64_t))
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
@@ -669,8 +655,7 @@ private:
             case jsoncons::msgpack::detail::msgpack_format::ext8_cd: 
             {
                 uint8_t buf[sizeof(int8_t)];
-                source_.read(buf, sizeof(int8_t));
-                if (source_.eof())
+                if (source_.read(buf, sizeof(int8_t)) != sizeof(int8_t))
                 {
                     ec = msgpack_errc::unexpected_eof;
                     more_ = false;
@@ -694,8 +679,7 @@ private:
             case jsoncons::msgpack::detail::msgpack_format::map16_cd:
             {
                 uint8_t buf[sizeof(int16_t)];
-                source_.read(buf, sizeof(int16_t));
-                if (source_.eof())
+                if (source_.read(buf, sizeof(int16_t)) != sizeof(int16_t))
                 {
                     ec = msgpack_errc::unexpected_eof;
                     more_ = false;
@@ -719,8 +703,7 @@ private:
             case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
             {
                 uint8_t buf[sizeof(int32_t)];
-                source_.read(buf, sizeof(int32_t));
-                if (source_.eof())
+                if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
                 {
                     ec = msgpack_errc::unexpected_eof;
                     more_ = false;

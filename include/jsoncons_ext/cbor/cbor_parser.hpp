@@ -847,12 +847,6 @@ private:
     uint64_t get_uint64_value(std::error_code& ec)
     {
         uint64_t val = 0;
-        if (JSONCONS_UNLIKELY(source_.eof()))
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return val;
-        }
         const uint8_t* endp = nullptr;
 
         auto type = source_.get_character();
@@ -957,6 +951,8 @@ private:
                             uint8_t buf[sizeof(uint16_t)];
                             if (source_.read(buf, sizeof(uint16_t)) != sizeof(uint16_t))
                             {
+                                ec = cbor_errc::unexpected_eof;
+                                more_ = false;
                                 return val;
                             }
                             auto x = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
@@ -969,6 +965,8 @@ private:
                             uint8_t buf[sizeof(uint32_t)];
                             if (source_.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
                             {
+                                ec = cbor_errc::unexpected_eof;
+                                more_ = false;
                                 return val;
                             }
                             auto x = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
@@ -981,6 +979,8 @@ private:
                             uint8_t buf[sizeof(uint64_t)];
                             if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
                             {
+                                ec = cbor_errc::unexpected_eof;
+                                more_ = false;
                                 return val;
                             }
                             auto x = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
@@ -1019,12 +1019,6 @@ private:
     double get_double(std::error_code& ec)
     {
         double val = 0;
-        if (JSONCONS_UNLIKELY(source_.eof()))
-        {
-            ec = cbor_errc::unexpected_eof;
-            more_ = false;
-            return val;
-        }
         const uint8_t* endp = nullptr;
 
         auto type = source_.get_character();
@@ -1040,8 +1034,7 @@ private:
         case 0x1a: // Single-Precision Float (four-byte IEEE 754)
             {
                 uint8_t buf[sizeof(float)];
-                source_.read(buf, sizeof(float));
-                if (source_.eof())
+                if (source_.read(buf, sizeof(float)) !=sizeof(float)) 
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
@@ -1054,8 +1047,7 @@ private:
         case 0x1b: //  Double-Precision Float (eight-byte IEEE 754)
             {
                 uint8_t buf[sizeof(double)];
-                source_.read(buf, sizeof(double));
-                if (source_.eof())
+                if (source_.read(buf, sizeof(double)) != sizeof(double))
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
