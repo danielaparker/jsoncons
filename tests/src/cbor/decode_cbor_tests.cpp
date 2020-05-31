@@ -709,7 +709,7 @@ TEST_CASE("cbor bigfloat tests")
     }
 } 
 
-TEST_CASE("encode decode bson source uint8_t")
+TEST_CASE("encode decode cbor source")
 {
     std::vector<uint8_t> input = {
 0x88, // Array of length 8
