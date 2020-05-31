@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace detail {
 
-    enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit};
+    enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit,invalid_number};
 
     class to_integer_error_category_impl
        : public std::error_category
@@ -102,6 +102,11 @@ public:
     {
         return make_error_code(ec);
     }
+
+    to_integer_errc errc() const
+    {
+        return ec;
+    }
 };
 
 enum class integer_chars_format : uint8_t {decimal=1,hex};
@@ -160,351 +165,6 @@ bool is_base10(const CharT* s, std::size_t length)
         }
     }
     return state == integer_chars_state::decimal ? true : false;
-}
-
-template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
-to_integer(const CharT* s, std::size_t length)
-{
-    integer_chars_state state = integer_chars_state::initial;
-    T n = 0;
-    bool is_negative = false;
-
-    const CharT* end = s + length; 
-    while (s < end)
-    {
-        switch(state)
-        {
-            case integer_chars_state::initial:
-            {
-                switch(*s)
-                {
-                    case '0':
-                        state = integer_chars_state::integer; // Could be binary, octal, hex
-                        ++s;
-                        break;
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
-                        state = integer_chars_state::decimal;
-                        break;
-                    case '-':
-                        is_negative = true;
-                        state = integer_chars_state::minus;
-                        ++s;
-                        break;
-                    default:
-                        return to_integer_result<T>(to_integer_errc::invalid_digit);
-                }
-                break;
-            }
-            case integer_chars_state::minus:
-            {
-                switch(*s)
-                {
-                    case '0': // Could be binary, octal, hex
-                        state = integer_chars_state::integer; 
-                        ++s;
-                        break;
-                    case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
-                        state = integer_chars_state::decimal;
-                        break;
-                    default:
-                        return to_integer_result<T>(to_integer_errc::invalid_digit);
-                }
-                break;
-            }
-            case integer_chars_state::integer:
-            {
-                switch(*s)
-                {
-                    case 'b':case 'B':
-                    {
-                        state = integer_chars_state::binary;
-                        ++s;
-                        break;
-                    }
-                    case 'x':case 'X':
-                    {
-                        state = integer_chars_state::hex;
-                        ++s;
-                        break;
-                    }
-                    case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                    {
-                        state = integer_chars_state::octal;
-                        break;
-                    }
-                    default:
-                        return to_integer_result<T>(to_integer_errc::invalid_digit);
-                }
-                break;
-            }
-            case integer_chars_state::binary:
-            {
-                if (is_negative)
-                {
-                    static constexpr T min_value = (std::numeric_limits<T>::lowest)();
-                    static constexpr T min_value_div_2 = min_value / 2;
-                    for (; s < end; ++s)
-                    {
-                        T x = 0;
-                        switch(*s)
-                        {
-                            case '0':case '1':
-                                x = (T)*s - (T)('0');
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n < min_value_div_2)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 2;
-                        if (n < min_value + x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n -= x;
-                    }
-                }
-                else
-                {
-                    static constexpr T max_value = (std::numeric_limits<T>::max)();
-                    static constexpr T max_value_div_2 = max_value / 2;
-                    for (; s < end; ++s)
-                    {
-                        T x = 0;
-                        switch(*s)
-                        {
-                            case '0':case '1':
-                                x = static_cast<T>(*s) - static_cast<T>('0');
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n > max_value_div_2)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 2;
-                        if (n > max_value - x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n += x;
-                    }
-                }
-                break;
-            }
-            case integer_chars_state::octal:
-            {
-                if (is_negative)
-                {
-                    static constexpr T min_value = (std::numeric_limits<T>::lowest)();
-                    static constexpr T min_value_div_8 = min_value / 8;
-                    for (; s < end; ++s)
-                    {
-                        T x = 0;
-                        switch(*s)
-                        {
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':
-                                x = (T)*s - (T)('0');
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n < min_value_div_8)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 8;
-                        if (n < min_value + x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n -= x;
-                    }
-                }
-                else
-                {
-                    static constexpr T max_value = (std::numeric_limits<T>::max)();
-                    static constexpr T max_value_div_8 = max_value / 8;
-                    for (; s < end; ++s)
-                    {
-                        T x = 0;
-                        switch(*s)
-                        {
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':
-                                x = static_cast<T>(*s) - static_cast<T>('0');
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n > max_value_div_8)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 8;
-                        if (n > max_value - x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n += x;
-                    }
-                }
-                break;
-            }
-            case integer_chars_state::decimal:
-            {
-                if (is_negative)
-                {
-                    static constexpr T min_value = (std::numeric_limits<T>::lowest)();
-                    static constexpr T min_value_div_10 = min_value / 10;
-                    for (; s < end; ++s)
-                    {
-                        T x = 0;
-                        switch(*s)
-                        {
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                                x = (T)*s - (T)('0');
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n < min_value_div_10)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 10;
-                        if (n < min_value + x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n -= x;
-                    }
-                }
-                else
-                {
-                    static constexpr T max_value = (std::numeric_limits<T>::max)();
-                    static constexpr T max_value_div_10 = max_value / 10;
-                    for (; s < end; ++s)
-                    {
-                        T x = 0;
-                        switch(*s)
-                        {
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                                x = static_cast<T>(*s) - static_cast<T>('0');
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n > max_value_div_10)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 10;
-                        if (n > max_value - x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n += x;
-                    }
-                }
-                break;
-            }
-            case integer_chars_state::hex:
-            {
-                if (is_negative)
-                {
-                    static constexpr T min_value = (std::numeric_limits<T>::lowest)();
-                    static constexpr T min_value_div_16 = min_value / 16;
-                    for (; s < end; ++s)
-                    {
-                        CharT c = *s;
-                        T x = 0;
-                        switch (c)
-                        {
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                                x = c - '0';
-                                break;
-                            case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                                x = c - ('a' - 10);
-                                break;
-                            case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                                x = c - ('A' - 10);
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n < min_value_div_16)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 16;
-                        if (n < min_value + x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n -= x;
-                    }
-                }
-                else
-                {
-                    static constexpr T max_value = (std::numeric_limits<T>::max)();
-                    static constexpr T max_value_div_16 = max_value / 16;
-                    for (; s < end; ++s)
-                    {
-                        CharT c = *s;
-                        T x = 0;
-                        switch (c)
-                        {
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                                x = c - '0';
-                                break;
-                            case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-                                x = c - ('a' - 10);
-                                break;
-                            case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-                                x = c - ('A' - 10);
-                                break;
-                            case ',':
-                                break;
-                            default:
-                                return to_integer_result<T>(to_integer_errc::invalid_digit);
-                        }
-                        if (n > max_value_div_16)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-                        n = n * 16;
-                        if (n > max_value - x)
-                        {
-                            return to_integer_result<T>(to_integer_errc::overflow);
-                        }
-
-                        n += x;
-                    }
-                }
-                break;
-            }
-        }
-    }
-    return (state == integer_chars_state::initial || state == integer_chars_state::minus) ? to_integer_result<T>(to_integer_errc::invalid_digit) : 
-                                                                                            to_integer_result<T>(n);
 }
 
 template <class T, class CharT>
@@ -685,7 +345,54 @@ to_integer(const CharT* s, std::size_t length)
                 break;
         }
     }
-    return to_integer_result<T>(n);
+    return (state == integer_chars_state::initial) ? to_integer_result<T>(to_integer_errc::invalid_number) : to_integer_result<T>(n);
+}
+
+template <class T, class CharT>
+typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+to_integer(const CharT* s, std::size_t length)
+{
+    if (length == 0)
+    {
+        return to_integer_result<T>(to_integer_errc::invalid_number);
+    }
+
+    bool is_negative = *s == '-' ? true : false;
+    if (is_negative)
+    {
+        ++s;
+        --length;
+    }
+
+    using U = typename std::make_unsigned<T>::type;
+
+    auto u = to_integer<U>(s, length);
+    if (!u)
+    {
+        return to_integer_result<T>(u.errc());
+    }
+    if (is_negative)
+    {
+        if (u.value() > static_cast<U>(-((std::numeric_limits<T>::min)()+T(1))) + U(1))
+        {
+            return to_integer_result<T>(to_integer_errc::overflow);
+        }
+        else
+        {
+            return to_integer_result<T>(static_cast<T>(U(0) - u.value()));
+        }
+    }
+    else
+    {
+        if (u.value() > static_cast<U>((std::numeric_limits<T>::max)()))
+        {
+            return to_integer_result<T>(to_integer_errc::overflow);
+        }
+        else
+        {
+            return to_integer_result<T>(static_cast<T>(u.value()));
+        }
+    }
 }
 
 // Precondition: s satisfies
