@@ -15,6 +15,9 @@ Enhancements:
 `decode_msgpack`, and `decode_ubjson` now support reading data from a pair of 
 LegacyInputIterators that specify a character or byte sequence.
 
+- `byte_string_view` now has an explicit constructor that allows any contiguous
+byte sequence container. 
+
 v0.152.0
 --------
 
