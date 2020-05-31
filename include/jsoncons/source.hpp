@@ -244,52 +244,49 @@ namespace jsoncons {
         using string_view_type = basic_string_view<value_type>;
     private:
         const value_type* data_;
-        const value_type* input_ptr_;
-        const value_type* input_end_;
-        bool eof_;
+        const value_type* current_;
+        const value_type* end_;
 
         // Noncopyable 
         string_source(const string_source&) = delete;
         string_source& operator=(const string_source&) = delete;
     public:
         string_source()
-            : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)  
+            : data_(nullptr), current_(nullptr), end_(nullptr)
         {
         }
 
         template <class Source>
         string_source(const Source& s,
                       typename std::enable_if<is_string_sourceable<value_type,typename std::decay<Source>::type>::value>::type* = 0)
-            : data_(s.data()), input_ptr_(s.data()), input_end_(s.data()+s.size()), eof_(s.size() == 0)
+            : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
         {
         }
 
         string_source(const value_type* data, std::size_t size)
-            : data_(data), input_ptr_(data), input_end_(data+size), eof_(size == 0)  
+            : data_(data), current_(data), end_(data+size)
         {
         }
 
         string_source(string_source&& val) 
-            : data_(nullptr), input_ptr_(nullptr), input_end_(nullptr), eof_(true)
+            : data_(nullptr), current_(nullptr), end_(nullptr)
         {
             std::swap(data_,val.data_);
-            std::swap(input_ptr_,val.input_ptr_);
-            std::swap(input_end_,val.input_end_);
-            std::swap(eof_,val.eof_);
+            std::swap(current_,val.current_);
+            std::swap(end_,val.end_);
         }
 
         string_source& operator=(string_source&& val)
         {
             std::swap(data_,val.data_);
-            std::swap(input_ptr_,val.input_ptr_);
-            std::swap(input_end_,val.input_end_);
-            std::swap(eof_,val.eof_);
+            std::swap(current_,val.current_);
+            std::swap(end_,val.end_);
             return *this;
         }
 
         bool eof() const
         {
-            return eof_;  
+            return current_ == end_;  
         }
 
         bool is_error() const
@@ -299,19 +296,17 @@ namespace jsoncons {
 
         std::size_t position() const
         {
-            return (input_ptr_ - data_)/sizeof(value_type) + 1;
+            return (current_ - data_)/sizeof(value_type) + 1;
         }
 
         character_result<value_type> get_character()
         {
-            if (input_ptr_ < input_end_)
+            if (current_ < end_)
             {
-                return character_result<value_type>(*input_ptr_++);
+                return character_result<value_type>(*current_++);
             }
             else
            {
-                eof_ = true;
-                input_ptr_ = input_end_;
                 return character_result<value_type>();
             }
         }
@@ -319,37 +314,35 @@ namespace jsoncons {
         void ignore(std::size_t count)
         {
             std::size_t len;
-            if ((std::size_t)(input_end_ - input_ptr_) < count)
+            if ((std::size_t)(end_ - current_) < count)
             {
-                len = input_end_ - input_ptr_;
-                eof_ = true;
+                len = end_ - current_;
             }
             else
             {
                 len = count;
             }
-            input_ptr_ += len;
+            current_ += len;
         }
 
         character_result<value_type> peek_character() 
         {
-            return input_ptr_ < input_end_ ? character_result<value_type>(*input_ptr_) : character_result<value_type>();
+            return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
         }
 
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len;
-            if ((std::size_t)(input_end_ - input_ptr_) < length)
+            if ((std::size_t)(end_ - current_) < length)
             {
-                len = input_end_ - input_ptr_;
-                eof_ = true;
+                len = end_ - current_;
             }
             else
             {
                 len = length;
             }
-            std::memcpy(p, input_ptr_, len*sizeof(value_type));
-            input_ptr_  += len;
+            std::memcpy(p, current_, len*sizeof(value_type));
+            current_  += len;
             return len;
         }
     };
@@ -582,14 +575,13 @@ namespace jsoncons {
         const value_type* data_;
         const value_type* current_;
         const value_type* end_;
-        bool eof_;
 
         // Noncopyable 
         bytes_source(const bytes_source&) = delete;
         bytes_source& operator=(const bytes_source&) = delete;
     public:
         bytes_source()
-            : data_(nullptr), current_(nullptr), end_(nullptr), eof_(true)  
+            : data_(nullptr), current_(nullptr), end_(nullptr)
         {
         }
 
@@ -598,8 +590,7 @@ namespace jsoncons {
                      typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
             : data_(reinterpret_cast<const uint8_t*>(source.data())), 
               current_(data_), 
-              end_(data_+source.size()), 
-              eof_(source.size() == 0)
+              end_(data_+source.size())
         {
         }
 
@@ -609,7 +600,7 @@ namespace jsoncons {
 
         bool eof() const
         {
-            return eof_;  
+            return current_ == end_;  
         }
 
         bool is_error() const
@@ -629,9 +620,7 @@ namespace jsoncons {
                 return character_result<value_type>(*current_++);
             }
             else
-           {
-                eof_ = true;
-                current_ = end_;
+            {
                 return character_result<value_type>();
             }
         }
@@ -642,7 +631,6 @@ namespace jsoncons {
             if ((std::size_t)(end_ - current_) < count)
             {
                 len = end_ - current_;
-                eof_ = true;
             }
             else
             {
@@ -662,7 +650,6 @@ namespace jsoncons {
             if ((std::size_t)(end_ - current_) < length)
             {
                 len = end_ - current_;
-                eof_ = true;
             }
             else
             {

@@ -357,7 +357,7 @@ namespace jsoncons {
         template <class Container>
         constexpr explicit byte_string_view(const Container& cont,
                           typename std::enable_if<jsoncons::detail::is_byte_sequence<Container>::value,int>::type = 0) 
-            : data_(cont.data()), size_(cont.size())
+            : data_(reinterpret_cast<const uint8_t*>(cont.data())), size_(cont.size())
         {
         }
     
