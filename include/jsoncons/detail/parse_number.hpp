@@ -183,6 +183,8 @@ to_integer_decimal(const CharT* s, std::size_t length)
             {
                 switch(*s)
                 {
+                    case '0':
+                        return (++s == end) ? to_integer_result<T>(0) : to_integer_result<T>(to_integer_errc::invalid_digit);
                     case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9': // Must be decimal
                         state = integer_chars_state::decimal;
                         break;
