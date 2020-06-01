@@ -59,12 +59,7 @@ namespace {
         encoder.end_array();
         encoder.flush();
 
-        for (auto c : os.str())
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                      << std::noshowbase << std::setfill('0') << (int)unsigned char(c);
-        }
-        std::cout << "\n\n";
+        std::cout << byte_string_view(os.str()) << "\n\n";
 
     /*
         83 -- array of length 3
@@ -169,12 +164,7 @@ namespace {
         std::vector<uint8_t> buf;
         cbor::encode_cbor(j, buf);
 
-        std::cout << std::hex << std::showbase << "(1) ";
-        for (auto c : buf)
-        {
-            std::cout << (int)c;
-        }
-        std::cout << std::dec << "\n\n";
+        std::cout << byte_string_view(buf) << "\n\n";
 
         json j2 = cbor::decode_cbor<json>(buf);
         std::cout << "(2) " << j2 << std::endl;
@@ -188,12 +178,7 @@ namespace {
         std::vector<uint8_t> buf;
         cbor::encode_cbor(j1, buf);
 
-        std::cout << std::hex << std::showbase << "(1) ";
-        for (auto c : buf)
-        {
-            std::cout << (int)c;
-        }
-        std::cout << std::dec << "\n\n";
+        std::cout << byte_string_view(buf) << "\n\n";
 
         json j2 = cbor::decode_cbor<json>(buf);
         std::cout << "(2) " << j2 << std::endl;
@@ -293,12 +278,7 @@ namespace {
 
         cbor::encode_cbor(j, buf, options);
 
-        for (auto c : buf)
-        {
-            std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                      << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-        }
-        std::cout << "\n";
+        std::cout << byte_string_view(buf)<< "\n\n";
 
     /*
         d90100 -- tag (256)

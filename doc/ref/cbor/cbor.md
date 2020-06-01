@@ -380,12 +380,7 @@ int main()
     cbor::encode_cbor(x, buf, options);
 
     std::cout << "first 19 bytes:\n\n";
-    for (size_t i = 0; i < 19; ++i) 
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(buf[i]) << ' ';
-    }
-    std::cout << "\n\n";
+    std::cout << byte_string_view(buf).substr(0, 19) << "\n\n";
 /*
     0xd8,0x55 -- Tag 85 (float32 little endian Typed Array)
     0x5a - byte string (four-byte uint32_t for n, and then  n bytes follow)
@@ -403,7 +398,7 @@ Output:
 ```
 first 19 bytes:
 
-d8 55 5a 03 93 87 00 00 00 00 00 00 00 80 3f 00 00 00 40
+d8,55,5a,03,93,87,00,00,00,00,00,00,00,80,3f,00,00,00,40
 ```
 
 <div id="A3"/> 

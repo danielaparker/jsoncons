@@ -474,12 +474,7 @@ int main()
     encoder.end_array();
     encoder.flush();
 
-    for (auto c : os.str())
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << (int)unsigned char(c);
-    }
-    std::cout << "\n\n";
+    std::cout << byte_string_view(os.str()) << "\n\n";
 
 /*
     83 -- array of length 3
@@ -500,7 +495,7 @@ int main()
 ```
 Output:
 ```
-83c349010000000000000000c48221c249010000000000000000c11a554bbfd3
+83,c3,49,01,00,00,00,00,00,00,00,00,c4,82,21,c2,49,01,00,00,00,00,00,00,00,00,c1,1a,55,4b,bf,d3
 ```
 
 #### Encode Typed Array tags - array of half precision floating-point

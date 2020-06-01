@@ -119,17 +119,13 @@ using namespace jsoncons;
 int main()
 {
     // construct byte string value
-    json j(byte_string{'H','e','l','l','o'});
+    std::vector<uint8_t> v = {'H','e','l','l','o'};
+    json j(byte_string_arg, v);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j, buf);
 
-    std::cout << std::hex << std::showbase << "(1) ";
-    for (auto c : buf)
-    {
-        std::cout << (int)c;
-    }
-    std::cout << std::dec << "\n\n";
+    std::cout << "(1) " << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
     std::cout << "(2) " << j2 << std::endl;
@@ -137,7 +133,7 @@ int main()
 ```
 Output:
 ```
-(1) 0x450x480x650x6c0x6c0x6f
+(1) 45,48,65,6c,6c,6f
 
 (2) "SGVsbG8"
 ```
@@ -153,17 +149,13 @@ using namespace jsoncons;
 int main()
 {
     // construct byte string value
-     json j1(byte_string({'H','e','l','l','o'}), semantic_tag::base64);
+    std::vector<uint8_t> v = {'H','e','l','l','o'};
+    json j1(byte_string_arg, v, semantic_tag::base64);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j1, buf);
 
-    std::cout << std::hex << std::showbase << "(1) ";
-    for (auto c : buf)
-    {
-        std::cout << (int)c;
-    }
-    std::cout << std::dec << "\n\n";
+    std::cout << "(1) " << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
     std::cout << "(2) " << j2 << std::endl;
@@ -171,7 +163,7 @@ int main()
 ```
 Output:
 ```
-(1) 0xd60x450x480x650x6c0x6c0x6f
+(1) d6,45,48,65,6c,6c,6f
 
 (2) "SGVsbG8="
 ```
@@ -217,12 +209,7 @@ int main()
 
     cbor::encode_cbor(j, buf, options);
 
-    for (auto c : buf)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n";
+    std::cout << byte_string_view(buf) << "\n\n";
 
 /*
     d90100 -- tag (256)
@@ -268,11 +255,11 @@ int main()
 ```
 Output:
 ```
-d9010083a3646e616d6568436f636b7461696c65636f756e741901a16472616e6b04a3d8190304d81902190138d819006442617468a3d819021902b3d8190064466f6f64d8190304
+d9,01,00,83,a3,64,6e,61,6d,65,68,43,6f,63,6b,74,61,69,6c,65,63,6f,75,6e,74,19,01,a1,64,72,61,6e,6b,04,a3,d8,19,03,04,d8,19,02,19,01,38,d8,19,00,64,42,61,74,68,a3,d8,19,02,19,02,b3,d8,19,00,64,46,6f,6f,64,d8,19,03,04
 ```
 
 ### See also
 
-- [byte_string](../byte_string.md)
+- [byte_string_view](../byte_string_view.md)
 - [decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
 

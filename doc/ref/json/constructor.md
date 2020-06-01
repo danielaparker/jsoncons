@@ -121,11 +121,11 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 
 (17) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
 
-(18) Constructs a `basic_json` value for a text string.
+(18) Constructs a `basic_json` value from a text string.
 
-(19) Constructs a `basic_json` value for a text string with supplied allocator.
+(19) Constructs a `basic_json` value from a text string with supplied allocator.
 
-(20) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
+(20) Constructs a `basic_json` value from a [byte_string_view](../byte_string_view.md).
 
 (21) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
 with a generic tag.

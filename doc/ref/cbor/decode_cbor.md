@@ -377,7 +377,7 @@ multi-dim-row-major
 
 ### See also
 
-- [byte_string](../byte_string.md)
+- [byte_string_view](../byte_string_view.md)
 - [encode_cbor](encode_cbor.md) encodes a json value to the [Concise Binary Object Representation](http://cbor.io/) data format.
 
 

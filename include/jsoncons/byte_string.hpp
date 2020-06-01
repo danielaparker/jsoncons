@@ -413,6 +413,29 @@ namespace jsoncons {
             return data_[pos]; 
         }
 
+        byte_string_view substr(size_type pos) const 
+        {
+            if (pos > size_)
+            {
+                JSONCONS_THROW(std::out_of_range("pos exceeds size"));
+            }
+            std::size_t n = size_ - pos;
+            return byte_string_view(data_ + pos, n);
+        }
+
+        byte_string_view substr(size_type pos, size_type n) const 
+        {
+            if (pos > size_)
+            {
+                JSONCONS_THROW(std::out_of_range("pos exceeds size"));
+            }
+            if (pos + n > size_)
+            {
+                n = size_ - pos;
+            }
+            return byte_string_view(data_ + pos, n);
+        }
+
         int compare(const byte_string_view& s) const 
         {
             const int rc = traits_type::compare(data_, s.data(), (std::min)(size_, s.size()));

@@ -411,13 +411,6 @@ TEST_CASE("encode stringref")
 
     cbor::encode_cbor(j, buf, options);
 
-    //for (auto c : buf)
-    //{
-    //    std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-    //              << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    //}
-    //std::cout << "\n";
-
     ojson j2 = cbor::decode_cbor<ojson>(buf);
     CHECK(j2 == j);
 }

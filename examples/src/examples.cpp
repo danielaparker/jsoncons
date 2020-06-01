@@ -440,6 +440,8 @@ int main()
         run_cbor_examples();
 
         json_reader_examples();
+
+        run_cbor_typed_array_examples();
     }
     catch (const std::exception& e)
     {
