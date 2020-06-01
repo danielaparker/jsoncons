@@ -2,13 +2,19 @@
 *.sdf
 *.VC.opendb
 *.VC.db
-*.vcxproj.user
-*.vcxproj.filters
+*.vcxproj.*
 **/x64/Debug/
 **/x64/Release/
+**/Debug/
+**/Release/
+*.vspx
+.vs
+*.vcxproj*
+*.psess
 **/build/
 **/examples/
 **/more_examples/
 **/test_suite/
 **/build/
+*.sln
 
