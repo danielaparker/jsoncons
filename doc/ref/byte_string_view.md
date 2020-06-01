@@ -75,16 +75,33 @@ Member type                         |Definition
 #### Display bytes
 
 ```c++
-std::vector<uint8_t> v = {'H','e','l','l','o'};
-std::string s = {'H','e','l','l','o'};
+std::vector<uint8_t> v = {'H','e','l','l','o',' ','W','o','r','l','d'};
 
 std::cout << "(1) " << byte_string_view(v) << "\n\n";
-std::cout << "(2) " << byte_string_view(s) << "\n\n";
+
+std::cout << "(2) " << byte_string_view(v).substr(0, 5) << "\n\n";
 ```
 
 Output:
 ```
-(1) 48,65,6c,6c,6f
+(1) 48,65,6c,6c,6f,20,57,6f,72,6c,64
+
+(2) 48,65,6c,6c,6f
+```
+
+#### Display bytes from std::string
+
+```c++
+std::string s = {'H','e','l','l','o',' ','W','o','r','l','d'};
+
+std::cout << "(1) " << byte_string_view(s) << "\n\n";
+
+std::cout << "(2) " << byte_string_view(s).substr(0, 5) << "\n\n";
+```
+
+Output:
+```
+(1) 48,65,6c,6c,6f,20,57,6f,72,6c,64
 
 (2) 48,65,6c,6c,6f
 ```
