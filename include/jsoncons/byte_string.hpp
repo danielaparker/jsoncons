@@ -87,7 +87,6 @@ namespace jsoncons {
         return count;
     }
 
-    // Hack to support vs2015
     template <class InputIt, class F, class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base64_generic(InputIt first, InputIt last, 
@@ -202,7 +201,6 @@ namespace jsoncons {
 
     // decode
 
-    // Hack to support vs2015
     template <class InputIt, class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base64url(InputIt first, InputIt last, Container& result)
@@ -232,7 +230,6 @@ namespace jsoncons {
                                                 result);
     }
 
-    // Hack to support vs2015
     template <class InputIt, class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base64(InputIt first, InputIt last, Container& result)
@@ -260,7 +257,6 @@ namespace jsoncons {
                                                 result);
     }
 
-    // Hack to support vs2015
     template <class InputIt,class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base16(InputIt first, InputIt last, Container& result)
