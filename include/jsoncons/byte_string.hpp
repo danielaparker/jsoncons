@@ -332,7 +332,7 @@ namespace jsoncons {
         using traits_type = byte_traits;
 
         using const_iterator = const uint8_t*;
-        using iterator = const uint8_t*;
+        using iterator = const_iterator;
         using size_type = std::size_t;
         using value_type = uint8_t;
         using reference = uint8_t&;
@@ -363,11 +363,16 @@ namespace jsoncons {
 
         constexpr byte_string_view(const byte_string_view&) noexcept = default;
 
-        byte_string_view(byte_string_view&& other) noexcept
+        JSONCONS_CPP14_CONSTEXPR byte_string_view(byte_string_view&& other) noexcept
             : data_(nullptr), size_(0)
         {
-            std::swap(data_, other.data_);
-            std::swap(size_, other.size_);
+            const_pointer temp_data = data_;
+            data_ = other.data_;
+            other.data_ = temp_data;
+
+            size_type temp_size = size_;
+            size_ = other.size_;
+            other.size_ = temp_size;
         }
 
         byte_string_view& operator=(const byte_string_view&) = default;
@@ -396,21 +401,29 @@ namespace jsoncons {
         }
 
         // iterator support 
-        const_iterator begin() const noexcept
+        constexpr const_iterator begin() const noexcept
         {
             return data_;
         }
-        const_iterator end() const noexcept
+        constexpr const_iterator end() const noexcept
+        {
+            return data_ + size_;
+        }
+        constexpr const_iterator cbegin() const noexcept
+        {
+            return data_;
+        }
+        constexpr const_iterator cend() const noexcept
         {
             return data_ + size_;
         }
 
-        uint8_t operator[](size_type pos) const 
+        constexpr uint8_t operator[](size_type pos) const 
         { 
             return data_[pos]; 
         }
 
-        byte_string_view substr(size_type pos) const 
+        JSONCONS_CPP14_CONSTEXPR byte_string_view substr(size_type pos) const 
         {
             if (pos > size_)
             {

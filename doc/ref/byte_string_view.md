@@ -31,9 +31,9 @@ Member type                         |Definition
     template <class Container>
     constexpr explicit byte_string_view(const Container& cont); 
 
-    byte_string_view(const byte_string_view&) noexcept = default;
+    constexpr byte_string_view(const byte_string_view&) noexcept = default;
 
-    byte_string_view(byte_string_view&& other) noexcept;
+    constexpr byte_string_view(byte_string_view&& other) noexcept;
 
 #### Assignment
 
@@ -43,19 +43,23 @@ Member type                         |Definition
 
 #### Iterators
 
-    const_iterator begin() const noexcept;
+    constexpr const_iterator begin() const noexcept;
 
-    const_iterator end() const noexcept;
+    constexpr const_iterator end() const noexcept;
+
+    constexpr const_iterator cbegin() const noexcept;
+
+    constexpr const_iterator cend() const noexcept;
 
 #### Element access
 
     constexpr const uint8_t* data() const noexcept;
 
-    uint8_t operator[](size_type pos) const; 
+    constexpr uint8_t operator[](size_type pos) const; 
 
-    byte_string_view substr(size_type pos) const;
+    constexpr byte_string_view substr(size_type pos) const;
 
-    byte_string_view substr(size_type pos, size_type n) const;
+    constexpr byte_string_view substr(size_type pos, size_type n) const;
 
 #### Capacity
 
