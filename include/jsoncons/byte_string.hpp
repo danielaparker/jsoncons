@@ -20,6 +20,7 @@
 #include <utility> // std::move
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
+#include <jsoncons/detail/more_type_traits.hpp>
 
 namespace jsoncons {
 
@@ -88,7 +89,7 @@ namespace jsoncons {
 
     // Hack to support vs2015
     template <class InputIt, class F, class Container>
-    typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base64_generic(InputIt first, InputIt last, 
                           const uint8_t reverse_alphabet[256],
                           F f,
@@ -203,7 +204,7 @@ namespace jsoncons {
 
     // Hack to support vs2015
     template <class InputIt, class Container>
-    typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base64url(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -233,7 +234,7 @@ namespace jsoncons {
 
     // Hack to support vs2015
     template <class InputIt, class Container>
-    typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base64(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -261,7 +262,7 @@ namespace jsoncons {
 
     // Hack to support vs2015
     template <class InputIt,class Container>
-    typename std::enable_if<std::true_type::value && sizeof(typename Container::value_type) == sizeof(uint8_t),void>::type 
+    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     decode_base16(InputIt first, InputIt last, Container& result)
     {
         std::size_t len = std::distance(first,last);
