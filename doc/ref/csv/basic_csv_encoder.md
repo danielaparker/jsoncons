@@ -452,3 +452,6 @@ Charles Bukowski,Women: A Novel,12.0
 Ivan Passer,Cutter's Way,
 ```
 
+### See also
+
+[byte_string_view](../byte_string_view.md)

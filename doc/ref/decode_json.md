@@ -81,5 +81,5 @@ John Smith: Software Engineer
 
 ### See also
 
-- [encode_json](encode_json.md)
+[encode_json](encode_json.md)
 

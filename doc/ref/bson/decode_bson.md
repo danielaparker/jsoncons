@@ -58,6 +58,6 @@ Throws [ser_error](../ser_error.md) if parsing fails.
 
 ### See also
 
-- [encode_bson](encode_bson.md) encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) data format.
+[encode_bson](encode_bson.md) encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) data format.
 
 

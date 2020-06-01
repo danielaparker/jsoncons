@@ -83,10 +83,6 @@ contains(key)  |`bool`                     |
 at(index)      |`reference` or `value_type`|
 at(key)        |`reference` or `value_type`|
 
-### See also
-
-[basic_json_ptr](basic_json_ptr.md)
-
 ### Examples
 
 #### Select author from second book
@@ -267,4 +263,7 @@ Output:
 (12) 8
 ```
 
+### See also
+
+[basic_json_ptr](basic_json_ptr.md)
 

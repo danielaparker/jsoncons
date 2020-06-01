@@ -518,10 +518,6 @@ and line and column from the `context`.
 
 The overloads that take a `std::error_code&` parameter set it to the error code and return `false` on parse errors.
 
-### See also
-
-- [basic_json_visitor](basic_json_visitor.md)
-
 ### Examples
 
 #### Rename object member names with the built in filter [rename_object_key_filter](rename_object_key_filter.md)
@@ -699,3 +695,8 @@ The output JSON file `address-book-new.json` with name fixes is
 }
 ```
 
+### See also
+
+[basic_json_visitor](basic_json_visitor.md)  
+
+[byte_string_view](byte_string_view.md)  

@@ -31,5 +31,5 @@ or support [json_type_traits](../json_type_traits.md).
 
 ### See also
 
-- [decode_ubjson](decode_ubjson) decodes a [Binary JSON](http://ubjsonspec.org/) data format to a json value.
+[decode_ubjson](decode_ubjson) decodes a [Binary JSON](http://ubjsonspec.org/) data format to a json value.
 

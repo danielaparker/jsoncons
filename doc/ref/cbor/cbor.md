@@ -642,3 +642,6 @@ Output:
 ]
 ```
 
+### See also
+
+[byte_string_view](../byte_string_view.md)

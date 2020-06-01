@@ -29,10 +29,6 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
-### See also
-
-- [decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) data format to a json value.
-
 ### Examples
 
 #### MessagePack example
@@ -110,4 +106,7 @@ Output:
 }
 ```
 
+### See also
+
+[decode_msgpack](decode_msgpack) decodes a [MessagePack](http://msgpack.org/index.html) data format to a json value.
 

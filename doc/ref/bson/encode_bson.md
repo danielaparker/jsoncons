@@ -30,5 +30,5 @@ or support [json_type_traits](../json_type_traits.md).
 
 ### See also
 
-- [decode_bson](decode_bson) decodes a [Bin­ary JSON](http://bsonspec.org/) data format to a json value.
+[decode_bson](decode_bson) decodes a [Bin­ary JSON](http://bsonspec.org/) data format to a json value.
 

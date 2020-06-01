@@ -115,7 +115,9 @@ Returns the current [context](../ser_context.md)
 
 ### See also
 
-- [basic_staj_event](../basic_staj_event.md) 
-- [staj_array_iterator](../staj_array_iterator.md) 
-- [staj_object_iterator](../staj_object_iterator.md)
+[basic_staj_event](../basic_staj_event.md)  
+
+[staj_array_iterator](../staj_array_iterator.md)  
+
+[staj_object_iterator](../staj_object_iterator.md)  
 

@@ -101,3 +101,6 @@ Output:
 (3) ext(128)
 ```
 
+### See also
+
+[byte_string_view](../byte_string_view.md)

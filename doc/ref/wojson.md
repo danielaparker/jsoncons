@@ -17,9 +17,9 @@ The `wojson` class is an instantiation of the [basic_json](basic_json.md) class 
 
 ### See also
 
-- [wjson](wjson.md) constructs a wide character json value that sorts name-value members alphabetically
+[wjson](wjson.md) constructs a wide character json value that sorts name-value members alphabetically  
 
-- [json](json.md) constructs a utf8 character json value that sorts name-value members alphabetically
+[json](json.md) constructs a utf8 character json value that sorts name-value members alphabetically  
 
-- [ojson](ojson.md) constructs a utf8 character json value that preserves the original insertion order of an object's name/value pairs
+[ojson](ojson.md) constructs a utf8 character json value that preserves the original insertion order of an object's name/value pairs  
 

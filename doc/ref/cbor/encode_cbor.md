@@ -28,10 +28,6 @@ Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::b
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
-### See also
-
-- [decode_cbor](decode_cbor) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
-
 ### Examples
 
 #### cbor example
@@ -260,6 +256,7 @@ d9,01,00,83,a3,64,6e,61,6d,65,68,43,6f,63,6b,74,61,69,6c,65,63,6f,75,6e,74,19,01
 
 ### See also
 
-- [byte_string_view](../byte_string_view.md)
-- [decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
+[byte_string_view](../byte_string_view.md)  
+
+[decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.  
 

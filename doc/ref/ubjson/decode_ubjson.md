@@ -58,6 +58,6 @@ Throws [ser_error](../ser_error.md) if parsing fails.
 
 ### See also
 
-- [encode_ubjson](encode_ubjson.md) encodes a json value to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
+[encode_ubjson](encode_ubjson.md) encodes a json value to the [Universal Binary JSON Specification](http://ubjson.org/) data format.
 
 

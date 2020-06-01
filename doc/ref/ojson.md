@@ -16,14 +16,6 @@ The `ojson` class is an instantiation of the [basic_json](basic_json.md) class t
 
 - In `ojson`, the `insert_or_assign` members that just take a name and a value always insert the member at the end.
 
-### See also
-
-- [json](json.md) constructs a json value that sorts name-value members alphabetically
-
-- [wjson](wjson.md) constructs a wide character json value that sorts name-value members alphabetically
-
-- [wojson](wojson.md) constructs a wide character json value that preserves the original insertion order of an object's name/value pairs
-
 ### Examples
 ```c++
 ojson o = ojson::parse(R"(
@@ -80,3 +72,12 @@ Output:
     "postal_code": "M5H 2N2"
 }
 ```
+
+### See also
+
+[json](json.md) constructs a json value that sorts name-value members alphabetically  
+
+[wjson](wjson.md) constructs a wide character json value that sorts name-value members alphabetically  
+
+[wojson](wojson.md) constructs a wide character json value that preserves the original insertion order of an object's name/value pairs  
+

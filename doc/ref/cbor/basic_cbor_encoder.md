@@ -595,3 +595,6 @@ d9 04 10 82 82 02 03 86 02 04 08 04 10 19 01 00
 ]
 ```
 
+### See also
+
+[byte_string_view](../byte_string_view.md)

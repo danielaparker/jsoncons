@@ -104,11 +104,6 @@ Functions (6)-(10) are the same except `temp_alloc` is used to allocate temporar
 #### Return value
 
 None 
-
-### See also
-
-- [basic_json_visitor](basic_json_visitor.md)
-- [basic_json_options](basic_json_options.md)
     
 ### Examples
 
@@ -225,7 +220,11 @@ Output:
 
 ### See also
 
-- [basic_json_encoder](basic_json_encoder.md)  
-- [decode_json](decode_json.md)
+[basic_json_visitor](basic_json_visitor.md)  
 
+[basic_json_options](basic_json_options.md)  
+
+[basic_json_encoder](basic_json_encoder.md)  
+
+[decode_json](decode_json.md)  
 
