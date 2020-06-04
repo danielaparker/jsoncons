@@ -57,7 +57,8 @@ TEST_CASE("serialize to bson")
         encoder.null_value();
         encoder.string_value("Pussy cat");
         std::vector<uint8_t> purr = {'h','i','s','s'};
-        encoder.byte_string_value(purr, 7);
+        encoder.byte_string_value(purr); // default subtype is user defined
+        // encoder.byte_string_value(purr, 0x80);
         encoder.end_array();
         encoder.flush();
 
@@ -95,7 +96,7 @@ TEST_CASE("serialize to bson")
                                      0x37, // '7'
                                      0x00, // terminator
                                      0x04,0x00,0x00,0x00, // byte string length
-                                     0x07, // subtype
+                                     0x80, // subtype
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };
@@ -164,7 +165,7 @@ TEST_CASE("serialize to bson")
                                      0x37, // '7'
                                      0x00, // terminator
                                      0x04,0x00,0x00,0x00, // byte string length
-                                     0x00, // default subtype
+                                     0x80, // default subtype
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };

@@ -162,7 +162,7 @@ TEST_CASE("bson c test suite")
         std::vector<uint8_t> bstr = {'1', '2', '3', '4'};
 
         json b;
-        b.try_emplace("binary", byte_string_arg, bstr); // default is user defined
+        b.try_emplace("binary", byte_string_arg, bstr); // default subtype is user defined
 
         REQUIRE_NOTHROW(bson::encode_bson(b, bytes2));
         //std::cout << byte_string_view(bytes2) << "\n\n";

@@ -19,7 +19,8 @@ namespace
                               // the bson document will be calculated
         encoder.string_value("cat");
         std::vector<uint8_t> purr = {'p','u','r','r'};
-        encoder.byte_string_value(purr,7);
+        encoder.byte_string_value(purr); // default subtype is user defined
+        // or encoder.byte_string_value(purr, 0x80);
         encoder.int64_value(1431027667, semantic_tag::timestamp);
         encoder.end_array();
         encoder.flush();
@@ -36,7 +37,7 @@ namespace
           05 -- binary
             3100 -- "1"
             04000000 -- number of bytes
-            07 -- subtype
+            80 -- subtype
             70757272 -- 'P','u','r','r'
           09 -- datetime
           3200 -- "2"
@@ -56,7 +57,8 @@ namespace
         encoder.string_value("World");
         encoder.key("Data");
         std::vector<uint8_t> bstr = {'f','o','o','b','a','r'};
-        encoder.byte_string_value(bstr, 0x80); // binary with subtype 0x80
+        encoder.byte_string_value(bstr); // default subtype is user defined
+        // or encoder.byte_string_value(bstr, 0x80); 
         encoder.end_object();
         encoder.flush();
 
@@ -151,7 +153,8 @@ namespace
     {
         json j;
         std::vector<uint8_t> bstr = {'1', '2', '3', '4'};
-        j.try_emplace("binary", byte_string_arg, bstr, 0x80); // user defined
+        j.try_emplace("binary", byte_string_arg, bstr); // default subtype is user defined
+        // or j.try_emplace("binary", byte_string_arg, bstr, 0x80);
 
         std::vector<char> buffer;
         bson::encode_bson(j, buffer);

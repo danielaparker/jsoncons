@@ -50,7 +50,8 @@ int main()
     encoder.string_value("World");
     encoder.key("Data");
     std::vector<uint8_t> bstr = {'f','o','o','b','a','r'};
-    encoder.byte_string_value(bstr, 0x80); // binary with subtype 0x80
+    encoder.byte_string_value(bstr); // default subtype is user defined
+    // or encoder.byte_string_value(bstr, 0x80); 
     encoder.end_object();
     encoder.flush();
 

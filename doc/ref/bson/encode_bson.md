@@ -144,7 +144,8 @@ int main()
 {
     json j;
     std::vector<uint8_t> bstr = {'1', '2', '3', '4'};
-    j.try_emplace("binary", byte_string_arg, bstr, 0x80); // user defined
+    j.try_emplace("binary", byte_string_arg, bstr); // default subtype is user defined
+    // or j.try_emplace("binary", byte_string_arg, bstr, 0x80);
 
     std::vector<char> buffer;
     bson::encode_bson(j, buffer);
