@@ -92,13 +92,107 @@ namespace
         bson::encode_bson(j, buffer2);
         assert(buffer2 == buffer);
     }
-}
+
+    void int32_example()
+    {
+        ojson j(json_object_arg);
+        j.try_emplace("a", -123); // int32
+        j.try_emplace("c", 0); // int32
+        j.try_emplace("b", 123); // int32
+
+        std::vector<char> buffer;
+        bson::encode_bson(j, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void int64_example()
+    {
+        std::map<std::string, int64_t> m{ {"a", 100000000000000ULL} };
+
+        std::vector<char> buffer;
+        bson::encode_bson(m, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void double_example()
+    {
+        std::map<std::string, double> m{ {"a", 123.4567} };
+
+        std::vector<char> buffer;
+        bson::encode_bson(m, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void bool_example()
+    {
+        std::map<std::string, bool> m{ {"a", true} };
+
+        std::vector<char> buffer;
+        bson::encode_bson(m, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void array_example()
+    {
+        json a(json_array_arg);
+        a.push_back("hello");
+        a.push_back("world");
+
+        json j(json_object_arg);
+        j["array"] = std::move(a);
+
+        std::vector<char> buffer;
+        bson::encode_bson(j, buffer);
+
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void binary_example()
+    {
+        json j;
+        std::vector<uint8_t> bstr = {'1', '2', '3', '4'};
+        j.try_emplace("binary", byte_string_arg, bstr, 0x80); // user defined
+
+        std::vector<char> buffer;
+        bson::encode_bson(j, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void utf8_string_example()
+    {
+        json j;
+        j.try_emplace("hello", "world");
+
+        std::vector<char> buffer;
+        bson::encode_bson(j, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void null_example()
+    {
+        json j;
+        j.try_emplace("hello", null_type()); 
+
+        std::vector<char> buffer;
+        bson::encode_bson(j, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+} // namespace
 
 void bson_examples()
 {
     std::cout << "\nbson examples\n\n";
     encode_to_bson();
     subtype_example();
+    null_example();
+    bool_example();
+    int32_example();
+    int64_example();
+    double_example();
+    utf8_string_example();
+    binary_example();
+    array_example();
     std::cout << std::endl;
 }
 

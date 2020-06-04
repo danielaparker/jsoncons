@@ -429,8 +429,6 @@ int main()
 
         data_model_examples();
 
-        bson_examples();
-
         json_cursor_examples();
 
         json_accessor_examples();
@@ -442,6 +440,8 @@ int main()
         json_reader_examples();
 
         run_cbor_typed_array_examples();
+
+        bson_examples();
     }
     catch (const std::exception& e)
     {

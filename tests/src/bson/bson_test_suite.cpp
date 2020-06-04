@@ -34,10 +34,24 @@ namespace
 
 TEST_CASE("bson c test suite")
 {
+    SECTION("int32")
+    {
+        std::string in_file = "./input/bson/test33.bson";
+        std::vector<char> bytes = read_bytes(in_file);
+
+        std::vector<char> bytes2;
+        ojson j(json_object_arg);
+        j.try_emplace("a", -123);
+        j.try_emplace("c", 0);
+        j.try_emplace("b", 123);
+        REQUIRE_NOTHROW(bson::encode_bson(j, bytes2));
+        CHECK(bytes2 == bytes);
+
+        auto j2 = bson::decode_bson<ojson>(bytes);
+        CHECK(j2 == j);
+    }
     SECTION("int64")
     {
-        std::error_code err;
-
         std::string in_file = "./input/bson/test34.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
@@ -77,8 +91,6 @@ TEST_CASE("bson c test suite")
     }
     SECTION("double")
     {
-        std::error_code err;
-
         std::string in_file = "./input/bson/test20.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
@@ -92,8 +104,6 @@ TEST_CASE("bson c test suite")
     }
     SECTION("bool")
     {
-        std::error_code err;
-
         std::string in_file = "./input/bson/test19.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
@@ -107,8 +117,6 @@ TEST_CASE("bson c test suite")
     }
     SECTION("array")
     {
-        std::error_code err;
-
         std::string in_file = "./input/bson/test23.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
@@ -126,17 +134,34 @@ TEST_CASE("bson c test suite")
         auto b2 = bson::decode_bson<ojson>(bytes);
         CHECK(b2 == b);
     }
-    SECTION("binary (jsoncons default)")
+    SECTION("binary")
     {
-        std::error_code err;
-
         std::string in_file = "./input/bson/test24.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         std::vector<char> bytes2;
         std::vector<uint8_t> bstr = {'1', '2', '3', '4'};
 
-        ojson b;
+        json b;
+        b.try_emplace("binary", byte_string_arg, bstr, 0x80);
+
+        REQUIRE_NOTHROW(bson::encode_bson(b, bytes2));
+        //std::cout << byte_string_view(bytes2) << "\n\n";
+        //std::cout << byte_string_view(bytes) << "\n\n";
+        CHECK(bytes2 == bytes);
+
+        auto b2 = bson::decode_bson<json>(bytes);
+        CHECK(b2 == b);
+    }
+    SECTION("binary (jsoncons default)")
+    {
+        std::string in_file = "./input/bson/test24.bson";
+        std::vector<char> bytes = read_bytes(in_file);
+
+        std::vector<char> bytes2;
+        std::vector<uint8_t> bstr = {'1', '2', '3', '4'};
+
+        json b;
         b.try_emplace("binary", byte_string_arg, bstr); // default is user defined
 
         REQUIRE_NOTHROW(bson::encode_bson(b, bytes2));
@@ -144,37 +169,50 @@ TEST_CASE("bson c test suite")
         //std::cout << byte_string_view(bytes) << "\n\n";
         CHECK(bytes2 == bytes);
 
-        auto b2 = bson::decode_bson<ojson>(bytes);
+        auto b2 = bson::decode_bson<json>(bytes);
         CHECK(b2 == b);
     }
-    SECTION("utf8")
+    SECTION("null")
     {
-        std::error_code err;
-
         std::string in_file = "./input/bson/test18.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
-        ojson b;
-        b.try_emplace("hello", null_type()); 
+        json j;
+        j.try_emplace("hello", null_type()); 
 
         std::vector<char> bytes2;
-        REQUIRE_NOTHROW(bson::encode_bson(b, bytes2));
+        REQUIRE_NOTHROW(bson::encode_bson(j, bytes2));
         //std::cout << byte_string_view(bytes2) << "\n\n";
         //std::cout << byte_string_view(bytes) << "\n\n";
         CHECK(bytes2 == bytes);
 
-        auto b2 = bson::decode_bson<ojson>(bytes);
-        CHECK(b2 == b);
+        auto b2 = bson::decode_bson<json>(bytes);
+        CHECK(b2 == j);
+    }
+    SECTION("utf8")
+    {
+        std::string in_file = "./input/bson/test11.bson";
+        std::vector<char> bytes = read_bytes(in_file);
+
+        json j;
+        j.try_emplace("hello", "world"); 
+
+        std::vector<char> bytes2;
+        REQUIRE_NOTHROW(bson::encode_bson(j, bytes2));
+        //std::cout << byte_string_view(bytes2) << "\n\n";
+        //std::cout << byte_string_view(bytes) << "\n\n";
+        CHECK(bytes2 == bytes);
+
+        auto b2 = bson::decode_bson<json>(bytes);
+        CHECK(b2 == j);
     }
     SECTION("document")
     {
-        std::error_code err;
-
         std::string in_file = "./input/bson/test21.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
-        ojson b;
-        b.try_emplace("document", ojson()); 
+        json b;
+        b.try_emplace("document", json()); 
 
         std::vector<char> bytes2;
         REQUIRE_NOTHROW(bson::encode_bson(b, bytes2));
@@ -182,7 +220,7 @@ TEST_CASE("bson c test suite")
         //std::cout << byte_string_view(bytes) << "\n\n";
         CHECK(bytes2 == bytes);
 
-        auto b2 = bson::decode_bson<ojson>(bytes);
+        auto b2 = bson::decode_bson<json>(bytes);
         CHECK(b2 == b);
     }
 }
