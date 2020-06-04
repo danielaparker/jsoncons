@@ -1,7 +1,7 @@
-master
-------
+v0.153.1
+--------
 
-Bug fixes:
+Bug fixes for BSON:
 
 - Fixed int32 encoding error in the BSON encoder [\#243](https://github.com/danielaparker/jsoncons/issues/243)
 - Fixed issue with default binary subtype when not specified, was 0, now 0x80 (user defined.)
