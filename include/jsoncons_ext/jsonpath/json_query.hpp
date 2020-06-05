@@ -152,7 +152,7 @@ enum class path_state
     dot,
     path,
     path2,
-    ,
+    path_single_quoted,
     path_double_quoted
 };
 
@@ -1342,7 +1342,7 @@ public:
                     {
                         case '\'':
                             buffer.push_back(*p_);
-                            state_stack_.emplace_back(path_state::, state_stack_.back());
+                            state_stack_.emplace_back(path_state::path_single_quoted, state_stack_.back());
                             ++p_;
                             ++column_;
                             break;
@@ -1395,7 +1395,7 @@ public:
                     ++p_;
                     ++column_;
                     break;
-                case path_state:::
+                case path_state::path_single_quoted:
                     switch (*p_)
                     {
                         case '\'': 
