@@ -24,6 +24,13 @@
 
 namespace jsoncons { namespace jmespath {
 
+
+enum class token_type  
+{
+    identifier = 1
+};
+
+
 JSONCONS_STRING_LITERAL(sort_by,'s','o','r','t','-','b','y')
 
 struct slice
@@ -174,13 +181,30 @@ class jmespath_evaluator : public ser_context
     };
 
     // selector
-class selector_base
+    class selector_base
     {
+        token_type type_;
         bool expression_type_;
     public:
-        selector_base()
-            : expression_type_(false)
+        selector_base(token_type type)
+            : type_(type), expression_type_(false)
         {
+        }
+
+        token_type type() const
+        {
+            return type_;
+        }
+
+        bool is_operand() const
+        {
+            switch(type_)
+            {
+                case token_type::identifier:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         bool expression_type() const
@@ -254,7 +278,7 @@ class selector_base
         std::vector<std::unique_ptr<selector_base>> selectors_;
     public:
         function_selector(function_type& f)
-            : f_(f)
+            : selector_base(token_type()), f_(f)
         {
         }
 
@@ -267,6 +291,11 @@ class selector_base
         {
             return f_(context, val, selectors_, ec);
         }
+
+        string_type to_string() const override
+        {
+            return string_type("function_selector\n");
+        }
     };
 
     class compound_expression final : public selector_base
@@ -275,6 +304,7 @@ class selector_base
         std::vector<std::unique_ptr<selector_base>> selectors_;
 
         compound_expression()
+            : selector_base(token_type())
         {
         }
 
@@ -292,6 +322,19 @@ class selector_base
             }
             return *ptr;
         }
+
+        string_type to_string() const override
+        {
+            string_type s("compound_expression\n");
+            for (auto& item : selectors_)
+            {
+                s.push_back(' ');
+                s.push_back(' ');
+                string_type ss = item->to_string();
+                s.insert(s.end(), ss.begin(), ss.end());
+            }
+            return s;
+        }
     };
 
     class name_expression_selector final : public selector_base
@@ -302,7 +345,7 @@ class selector_base
 
         name_expression_selector(std::basic_string<char_type>&& name,
                                  std::unique_ptr<selector_base>&& selector)
-            : name_(std::move(name), selector_(std::move(selector)))
+            : selector_base(token_type()), name_(std::move(name), selector_(std::move(selector)))
         {
         }
 
@@ -316,6 +359,11 @@ class selector_base
             key_valuep->try_emplace(name_,selector_->select(context, val, ec)        );
             return *key_valuep;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("name_expression_selector\n");
+        }
     };
 
     class list_projection final : public selector_base
@@ -325,7 +373,7 @@ class selector_base
         compound_expression rhs_selector_;
 
         list_projection(std::unique_ptr<selector_base>&& lhs_selector)
-            : lhs_selector_(std::move(lhs_selector))
+            : selector_base(token_type()), lhs_selector_(std::move(lhs_selector))
         {
         }
 
@@ -357,6 +405,11 @@ class selector_base
             }
             return *resultp;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("list_projection\n");
+        }
     };
 
     class list_projection2 final : public selector_base
@@ -365,6 +418,7 @@ class selector_base
         compound_expression rhs_selector_;
 
         list_projection2()
+            : selector_base(token_type())
         {
         }
 
@@ -395,6 +449,11 @@ class selector_base
             }
             return *resultp;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("list_projection2\n");
+        }
     };
 
     class pipe_selector final : public selector_base
@@ -404,7 +463,7 @@ class selector_base
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
         pipe_selector(std::unique_ptr<selector_base>&& lhs_selector)
-            : lhs_selector_(std::move(lhs_selector))
+            : selector_base(token_type()), lhs_selector_(std::move(lhs_selector))
         {
         }
 
@@ -428,6 +487,11 @@ class selector_base
             }
             return *ptr;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("pipe_selector\n");
+        }
     };
 
     class flatten_projection final : public selector_base
@@ -437,6 +501,7 @@ class selector_base
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
         flatten_projection(std::unique_ptr<selector_base>&& lhs_selector)
+            : selector_base(token_type())
         {
             lhs_selector_ = std::move(lhs_selector);
         }
@@ -486,6 +551,11 @@ class selector_base
             }
             return *resultp;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("flatten_projection\n");
+        }
     };
 
     class object_projection final : public selector_base
@@ -495,6 +565,7 @@ class selector_base
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
         object_projection(std::unique_ptr<selector_base>&& lhs_selector)
+            : selector_base(token_type())
         {
             lhs_selector_ = std::move(lhs_selector);
         }
@@ -527,6 +598,11 @@ class selector_base
             }
             return *resultp;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("object_projection\n");
+        }
     };
 
     class identifier_selector final : public selector_base
@@ -535,7 +611,7 @@ class selector_base
         string_type identifier_;
     public:
         identifier_selector(const string_view_type& name)
-            : identifier_(name)
+            : selector_base(token_type::identifier), identifier_(name)
         {
         }
 
@@ -555,6 +631,11 @@ class selector_base
                 return Json::null();
             }
         }
+
+        string_type to_string() const override
+        {
+            return string_type("identifier_selector ") + identifier_ + "\n";
+        }
     };
 
     class json_value_selector final : public selector_base
@@ -563,11 +644,11 @@ class selector_base
         Json j_;
     public:
         json_value_selector(const Json& j)
-            : j_(j)
+            : selector_base(token_type()), j_(j)
         {
         }
         json_value_selector(Json&& j)
-            : j_(std::move(j))
+            : selector_base(token_type()), j_(std::move(j))
         {
         }
 
@@ -580,6 +661,11 @@ class selector_base
         {
             return j_;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("json_value_selector\n");
+        }
     };
 
     class index_selector final : public selector_base
@@ -588,7 +674,7 @@ class selector_base
         int64_t index_;
     public:
         index_selector(int64_t index)
-            : index_(index)
+            : selector_base(token_type()), index_(index)
         {
         }
 
@@ -619,6 +705,11 @@ class selector_base
             }
             return Json::null();
         }
+
+        string_type to_string() const override
+        {
+            return string_type("index_selector\n");
+        }
     };
 
     class slice_projection final : public selector_base
@@ -630,7 +721,7 @@ class selector_base
     public:
         slice_projection(std::unique_ptr<selector_base>&& lhs_selector,
                          const slice& a_slice)
-            : lhs_selector_(std::move(lhs_selector)), slice_(a_slice)
+            : selector_base(token_type()), lhs_selector_(std::move(lhs_selector)), slice_(a_slice)
         {
         }
 
@@ -681,6 +772,11 @@ class selector_base
                 }
             }
             return *resultp;
+        }
+
+        string_type to_string() const override
+        {
+            return string_type("slice_projection\n");
         }
     };
 
@@ -741,7 +837,7 @@ class selector_base
 
         filter_expression(std::unique_ptr<selector_base>&& lhs_selector,
                           std::unique_ptr<selector_base>&& cmp_selector)
-            : lhs_selector_(std::move(lhs_selector)),
+            : selector_base(token_type()), lhs_selector_(std::move(lhs_selector)),
               cmp_selector_(std::move(cmp_selector))
         {
         }
@@ -780,6 +876,11 @@ class selector_base
             }
             return *resultp;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("filter_expression\n");
+        }
     };
 
     template <typename Comparator>
@@ -791,7 +892,7 @@ class selector_base
         Comparator cmp_;
 
         comparator_selector(std::unique_ptr<selector_base>&& lhs_selector)
-            : lhs_selector_(std::move(lhs_selector))
+            : selector_base(token_type()), lhs_selector_(std::move(lhs_selector))
         {
         }
 
@@ -818,6 +919,11 @@ class selector_base
             auto r = cmp_(lhs,rhs);
             return (r && r.value()) ? t : f;
         }
+
+        string_type to_string() const override
+        {
+            return string_type("comparator_selector\n");
+        }
     };
 
     class multi_select_list final : public selector_base
@@ -826,7 +932,7 @@ class selector_base
         std::vector<std::unique_ptr<selector_base>> selectors_;
 
         multi_select_list(std::vector<std::unique_ptr<selector_base>>&& selectors)
-            : selectors_(std::move(selectors))
+            : selector_base(token_type()), selectors_(std::move(selectors))
         {
         }
 
@@ -848,6 +954,11 @@ class selector_base
                 resultp->push_back(selector->select(context, val, ec)        );
             }
             return *resultp;
+        }
+
+        string_type to_string() const override
+        {
+            return string_type("multi_select_list\n");
         }
     };
 
@@ -878,7 +989,7 @@ class selector_base
         std::vector<key_selector> key_selectors_;
 
         multi_select_hash(std::vector<key_selector>&& key_selectors)
-            : key_selectors_(std::move(key_selectors))
+            : selector_base(token_type()), key_selectors_(std::move(key_selectors))
         {
         }
 
@@ -900,6 +1011,11 @@ class selector_base
                 resultp->try_emplace(key_selector.key,key_selector.selector->select(context, val, ec)        );
             }
             return *resultp;
+        }
+
+        string_type to_string() const override
+        {
+            return string_type("multi_select_hash\n");
         }
     };
 
@@ -1810,6 +1926,7 @@ public:
             state_stack_.pop_back(); // unquoted_string
             if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
             {
+                push_token(jsoncons::make_unique<identifier_selector>(buffer));
                 key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                 buffer.clear();
                 state_stack_.pop_back(); // val_expr
@@ -1827,8 +1944,43 @@ public:
                         state_stack_.back() == path_state::compound_expression);
         state_stack_.pop_back();
 
-        reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
+        auto expr = evaluate();
+        reference r = expr->select(temp_factory_, root, ec);
+
+        //std::cout << key_selector_stack_.back().selector->to_string() << "\n";
+        //reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
+
         return r;
+    }
+
+    void push_token(std::unique_ptr<selector_base>&& token)
+    {
+        switch (token->type())
+        {
+            case token_type::identifier:
+                output_stack_.push_back(std::move(token));
+                break;
+            default:
+                break;
+        }
+    }
+
+    std::unique_ptr<selector_base> evaluate()
+    {
+        std::vector<std::unique_ptr<selector_base>> stack;
+        for (auto&& t : output_stack_)
+        {
+            if (t->is_operand())
+            {
+                stack.push_back(std::move(t));
+            }
+        }
+        if (stack.size() != 1)
+        {
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Invalid jmespath expression"));
+        }
+
+        return std::move(stack.back());
     }
 
     void advance_past_space_character()
