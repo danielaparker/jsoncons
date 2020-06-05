@@ -125,18 +125,18 @@ public:
                     break;
                 case parse_mode::document:
                 {
-                    uint8_t t{};
-                    if (source_.get(t) == 0)
+                    auto t = source_.get_character();
+                    if (!t)
                     {
                         ec = bson_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    if (t != 0x00)
+                    if (t.value() != 0x00)
                     {
                         read_e_name(visitor,jsoncons::bson::detail::bson_container_type::document,ec);
                         state_stack_.back().mode = parse_mode::value;
-                        state_stack_.back().type = t;
+                        state_stack_.back().type = t.value();
                     }
                     else
                     {
@@ -146,17 +146,17 @@ public:
                 }
                 case parse_mode::array:
                 {
-                    uint8_t t{};
-                    if (source_.get(t) == 0)
+                    auto t = source_.get_character();
+                    if (!t)
                     {
                         ec = bson_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    if (t != 0x00)
+                    if (t.value() != 0x00)
                     {
                         read_e_name(visitor,jsoncons::bson::detail::bson_container_type::array,ec);
-                        read_value(visitor,t,ec);
+                        read_value(visitor, t.value(), ec);
                     }
                     else
                     {
@@ -245,10 +245,10 @@ private:
     void read_e_name(json_visitor& visitor, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
         text_buffer_.clear();
-        uint8_t c{};
-        while (source_.get(c) > 0 && c != 0)
+        character_result<typename Src::value_type> c;
+        while ((c = source_.get_character()) && c.value() != 0)
         {
-            text_buffer_.push_back(c);
+            text_buffer_.push_back(c.value());
         }
         if (type == jsoncons::bson::detail::bson_container_type::document)
         {
@@ -307,8 +307,8 @@ private:
                     more_ = false;
                     return;
                 }
-                uint8_t c{};
-                if (source_.get(c) == 0) // discard 0
+                auto c = source_.get_character();
+                if (!c) // discard 0
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -342,14 +342,14 @@ private:
             }
             case jsoncons::bson::detail::bson_format::bool_cd:
             {
-                uint8_t val{};
-                if (source_.get(val) == 0)
+                auto val = source_.get_character();
+                if (!val)
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                more_ = visitor.bool_value(val != 0, semantic_tag::none, *this, ec);
+                more_ = visitor.bool_value(val.value() != 0, semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::int32_cd: 
@@ -428,6 +428,14 @@ private:
                     more_ = false;
                     return;
                 }
+                auto subtype = source_.get_character();
+                if (!subtype)
+                {
+                    ec = bson_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+
                 std::vector<uint8_t> v;
                 if (source_reader<Src>::read(source_, v, len) != static_cast<std::size_t>(len))
                 {
@@ -436,8 +444,8 @@ private:
                     return;
                 }
 
-                more_ = visitor.byte_string_value(byte_string_view(v.data(),v.size()), 
-                                                  semantic_tag::none, 
+                more_ = visitor.byte_string_value(byte_string_view(v), 
+                                                  subtype.value(), 
                                                   *this,
                                                   ec);
                 break;

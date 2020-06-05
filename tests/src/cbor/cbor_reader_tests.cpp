@@ -115,16 +115,16 @@ TEST_CASE("test_cbor_parsing")
 
     // byte string
     std::vector<uint8_t> v;
-    check_parse_cbor({0x40},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x40},json(byte_string_view(v)));
     v = {' '};
-    check_parse_cbor({0x41,' '},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x41,' '},json(byte_string_view(v)));
     v = {0};
-    check_parse_cbor({0x41,0},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x41,0},json(byte_string_view(v)));
     v = {'H','e','l','l','o'};
-    check_parse_cbor({0x45,'H','e','l','l','o'},json(byte_string_view(v.data(),v.size())));
+    check_parse_cbor({0x45,'H','e','l','l','o'},json(byte_string_view(v)));
     v = {'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'};
     check_parse_cbor({0x58,0x18,'1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4'},
-                 json(byte_string_view(v.data(),v.size())));
+                 json(byte_string_view(v)));
 
     // string
     check_parse_cbor({0x60},json(""));
@@ -244,8 +244,9 @@ TEST_CASE("test_cbor_parsing")
     }
 
     // bignum
+    std::vector<uint8_t> data = { 0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00 };
     check_parse_cbor({0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00},
-                  json(bignum(1,{0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00})));
+                  json(bigint::from_bytes_be(1, data.data(),data.size())));
 
     // datetime
     check_parse_cbor({0xc0,0x78,0x19,'2','0','1','5','-','0','5','-','0','7',' ','1','2',':','4','1',':','0','7','-','0','7',':','0','0'},

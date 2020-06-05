@@ -29,6 +29,9 @@ void check_decode_ubjson(const std::vector<uint8_t>& v, const json& expected)
     std::istringstream is(s);
     json j2 = ubjson::decode_ubjson<json>(is);
     REQUIRE(j2 == expected);
+
+    json j3 = ubjson::decode_ubjson<json>(v.begin(), v.end());
+    REQUIRE(j3 == expected);
 }
 
 void check_decode_ubjson(const std::vector<uint8_t>& expected, const std::vector<uint8_t>& result)

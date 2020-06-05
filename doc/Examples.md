@@ -4,12 +4,12 @@
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
+[Parse JSON from an iterator range](#A10)  
 [Parse numbers without loosing precision](#A8)  
 [Validate JSON without incurring parse exceptions](#A3)  
 [How to allow comments? How not to?](#A4)  
 [Set a maximum nesting depth](#A5)  
 [Prevent the alphabetic sort of the outputted JSON, retaining the original insertion order](#A6)  
-[Parse a very large JSON file with json_cursor](#A7)  
 [Decode a JSON text using stateful result and work allocators](#A9)  
 
 ### Encode
@@ -18,6 +18,15 @@
 [Encode a json value to a stream](#B2)  
 [Escape all non-ascii characters](#B3)  
 [Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.](#B4)
+
+### Stream
+
+[Write some JSON (push)](#I6)  
+[Read some JSON (pull)](#I1)  
+[Filter the event stream](#I2)  
+[Pull nested objects into a basic_json](#I3)  
+[Iterate over basic_json items](#I4)  
+[Iterate over strongly typed items](#I5)  
 
 ### Decode JSON to C++ data structures, encode C++ data structures to JSON
 
@@ -91,6 +100,8 @@ json j = R"(
 )"_json;
 ```
 
+See [basic_json::parse](ref/json/parse.md). 
+
 <div id="A2"/> 
 
 #### Parse JSON from a file
@@ -100,6 +111,80 @@ std::ifstream is("myfile.json");
 
 json j = json::parse(is);
 ```
+
+See [basic_json::parse](ref/json/parse.md). 
+
+<div id="A10"/> 
+
+#### Parse JSON from an iterator range
+
+```c++
+#include <jsoncons/json.hpp>
+
+class MyIterator
+{
+    const char* p_;
+public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = char;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const char*; 
+    using reference = const char&;
+
+    MyIterator(const char* p)
+        : p_(p)
+    {
+    }
+
+    reference operator*() const
+    {
+        return *p_;
+    }
+
+    pointer operator->() const 
+    {
+        return p_;
+    }
+
+    MyIterator& operator++()
+    {
+        ++p_;
+        return *this;
+    }
+
+    MyIterator operator++(int) 
+    {
+        MyIterator temp(*this);
+        ++*this;
+        return temp;
+    }
+
+    bool operator!=(const MyIterator& rhs) const
+    {
+        return p_ != rhs.p_;
+    }
+};
+
+int main()
+{
+    char source[] = {'[','\"', 'f','o','o','\"',',','\"', 'b','a','r','\"',']'};
+
+    MyIterator first(source);
+    MyIterator last(source + sizeof(source));
+
+    json j = json::parse(first, last);
+
+    std::cout << j << "\n\n";
+}
+```
+
+Output:
+
+```json
+["foo","bar"]
+```
+
+See [basic_json::parse](ref/json/parse.md). 
 
 <div id="A8"/> 
 
@@ -299,123 +384,6 @@ Output:
 }
 ```
 
-<div id="A7"/> 
-
-### Parse a very large JSON file with json_cursor
-
-A typical pull parsing application will repeatedly process the `current()` 
-event and call `next()` to advance to the next event, until `done()` 
-returns `true`.
-
-Input JSON file `book_catalog.json`:
-
-```json
-[ 
-  { 
-      "author" : "Haruki Murakami",
-      "title" : "Hard-Boiled Wonderland and the End of the World",
-      "isbn" : "0679743464",
-      "publisher" : "Vintage",
-      "date" : "1993-03-02",
-      "price": 18.90
-  },
-  { 
-      "author" : "Graham Greene",
-      "title" : "The Comedians",
-      "isbn" : "0099478374",
-      "publisher" : "Vintage Classics",
-      "date" : "2005-09-21",
-      "price": 15.74
-  }
-]
-```
-
-#### Read JSON parse events
-```c++
-std::ifstream is("book_catalog.json");
-
-json_cursor cursor(is);
-
-for (; !cursor.done(); cursor.next())
-{
-    const auto& event = cursor.current();
-    switch (event.event_type())
-    {
-        case staj_event_type::begin_array:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::end_array:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::begin_object:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::end_object:
-            std::cout << event.event_type() << " " << "\n";
-            break;
-        case staj_event_type::key:
-            // Or std::string_view, if supported
-            std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
-            break;
-        case staj_event_type::string_value:
-            // Or std::string_view, if supported
-            std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
-            break;
-        case staj_event_type::null_value:
-            std::cout << event.event_type() << "\n";
-            break;
-        case staj_event_type::bool_value:
-            std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
-            break;
-        case staj_event_type::int64_value:
-            std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
-            break;
-        case staj_event_type::uint64_value:
-            std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
-            break;
-        case staj_event_type::double_value:
-            std::cout << event.event_type() << ": " << event.get<double>() << "\n";
-            break;
-        default:
-            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
-            break;
-    }
-}
-```
-Output:
-```
-begin_array
-begin_object
-key: author
-string_value: Haruki Murakami
-key: title
-string_value: Hard-Boiled Wonderland and the End of the World
-key: isbn
-string_value: 0679743464
-key: publisher
-string_value: Vintage
-key: date
-string_value: 1993-03-02
-key: price
-double_value: 19
-end_object
-begin_object
-key: author
-string_value: Graham Greene
-key: title
-string_value: The Comedians
-key: isbn
-string_value: 0099478374
-key: publisher
-string_value: Vintage Classics
-key: date
-string_value: 2005-09-21
-key: price
-double_value: 16
-end_object
-end_array
-```
-
 <div id="A9"/> 
 
 ### Decode a JSON text using stateful result and work allocators
@@ -438,53 +406,312 @@ my_json j = decoder.get_result();
 std::cout << pretty_print(j) << "\n";
 ```
 
-#### Filter JSON parse events
+### Encode
+
+<div id="B1"/>
+
+#### Encode a json value to a string
+
+```
+std::string s;
+
+j.dump(s); // compressed
+
+j.dump(s, indenting::indent); // pretty print
+```
+
+<div id="B2"/>
+
+#### Encode a json value to a stream
+
+```
+j.dump(std::cout); // compressed
+
+j.dump(std::cout, indenting::indent); // pretty print
+```
+or
+```
+std::cout << j << std::endl; // compressed
+
+std::cout << pretty_print(j) << std::endl; // pretty print
+```
+
+<div id="B3"/>
+
+#### Escape all non-ascii characters
+
+```
+json_options options;
+options.escape_all_non_ascii(true);
+
+j.dump(std::cout, options); // compressed
+
+j.dump(std::cout, options, indenting::indent); // pretty print
+```
+or
+```
+std::cout << print(j, options) << std::endl; // compressed
+
+std::cout << pretty_print(j, options) << std::endl; // pretty print
+```
+
+<div id="B4"/>
+
+#### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
+
+Set the serializing options for `nan` and `inf` to distinct string values.
 
 ```c++
-// A stream filter to filter out all events except name 
-// and restrict name to "author"
+json j;
+j["field1"] = std::sqrt(-1.0);
+j["field2"] = 1.79e308 * 1000;
+j["field3"] = -1.79e308 * 1000;
 
-struct author_filter 
+json_options options;
+options.nan_to_str("NaN")
+       .inf_to_str("Inf"); 
+
+std::ostringstream os;
+os << pretty_print(j, options);
+
+std::cout << "(1)\n" << os.str() << std::endl;
+
+json j2 = json::parse(os.str(),options);
+
+std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
+std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
+std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
+
+std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
+```
+
+Output:
+```json
+(1)
 {
-    bool accept_next_ = false;
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
 
-    bool operator()(const staj_event& event, const ser_context&) 
+(2) nan
+(3) inf
+(4) -inf
+
+(5)
+{
+    "field1": "NaN",
+    "field2": "Inf",
+    "field3": "-Inf"
+}
+```
+
+### Stream
+
+<div id="I6"/> 
+
+#### Write some JSON (push)
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json_encoder.hpp>
+#include <fstream>
+#include <cassert>
+
+int main()
+{
+    std::ofstream os("./output/book_catalog.json", 
+                     std::ios_base::out | std::ios_base::trunc);
+    assert(os);
+
+    compact_json_stream_encoder encoder(os); // no indent
+
+    encoder.begin_array();
+    encoder.begin_object();
+    encoder.key("author");
+    encoder.string_value("Haruki Murakami");
+    encoder.key("title");
+    encoder.string_value("Hard-Boiled Wonderland and the End of the World");
+    encoder.key("price");
+    encoder.double_value(18.9);
+    encoder.end_object();
+    encoder.begin_object();
+    encoder.key("author");
+    encoder.string_value("Graham Greene");
+    encoder.key("title");
+    encoder.string_value("The Comedians");
+    encoder.key("price");
+    encoder.double_value(15.74);
+    encoder.end_object();
+    encoder.end_array();
+    encoder.flush();
+
+    os.close();
+
+    // Read the JSON and write it prettified to std::cout
+    json_stream_encoder writer(std::cout); // indent
+
+    std::ifstream is("./output/book_catalog.json");
+    assert(is);
+
+    json_reader reader(is, writer);
+    reader.read();
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+[
     {
-        if (event.event_type()  == staj_event_type::key &&
-            event.get<jsoncons::string_view>() == "author")
+        "author": "Haruki Murakami",
+        "title": "Hard-Boiled Wonderland and the End of the World",
+        "price": 18.9
+    },
+    {
+        "author": "Graham Greene",
+        "title": "The Comedians",
+        "price": 15.74
+    }
+]
+```
+
+<div id="I1"/> 
+
+#### Read some JSON (pull)
+
+A typical pull parsing application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <fstream>
+
+int main()
+{
+    std::ifstream is("./output/book_catalog.json");
+
+    json_cursor cursor(is);
+
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
         {
-            accept_next_ = true;
-            return false;
-        }
-        else if (accept_next_)
-        {
-            accept_next_ = false;
-            return true;
-        }
-        else
-        {
-            accept_next_ = false;
-            return false;
+            case staj_event_type::begin_array:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::end_array:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::begin_object:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::end_object:
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            case staj_event_type::key:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::string_value:
+                // Or std::string_view, if supported
+                std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
+                break;
+            case staj_event_type::null_value:
+                std::cout << event.event_type() << "\n";
+                break;
+            case staj_event_type::bool_value:
+                std::cout << event.event_type() << ": " << std::boolalpha << event.get<bool>() << "\n";
+                break;
+            case staj_event_type::int64_value:
+                std::cout << event.event_type() << ": " << event.get<int64_t>() << "\n";
+                break;
+            case staj_event_type::uint64_value:
+                std::cout << event.event_type() << ": " << event.get<uint64_t>() << "\n";
+                break;
+            case staj_event_type::double_value:
+                std::cout << event.event_type() << ": " << event.get<double>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
         }
     }
-};
+}
 
-std::ifstream is("book_catalog.json");
+```
+Output:
+```
+begin_array
+begin_object
+key: author
+string_value: Haruki Murakami
+key: title
+string_value: Hard-Boiled Wonderland and the End of the World
+key: price
+double_value: 18.9
+end_object
+begin_object
+key: author
+string_value: Graham Greene
+key: title
+string_value: The Comedians
+key: price
+double_value: 15.74
+end_object
+end_array
+```
 
-author_filter filter;
-json_cursor cursor(is, filter);
+<div id="I2"/> 
 
-for (; !cursor.done(); cursor.next())
+#### Filter the event stream
+
+You can apply a filter to a cursor using the pipe syntax (e.g., `cursor | filter1 | filter2 | ...`)
+
+```c++
+
+#include <jsoncons/json_cursor.hpp>
+#include <fstream>
+
+// Filter out all events except names of authors
+
+int main()
 {
-    const auto& event = cursor.current();
-    switch (event.event_type())
+    bool author_next = false;
+    auto filter = [&](const staj_event& event, const ser_context&) -> bool
     {
-        case staj_event_type::string_value:
-            std::cout << event.get<jsoncons::string_view>() << "\n";
-            break;
-        default:
-            std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
-            break;
+        if (event.event_type() == staj_event_type::key &&
+            event.get<jsoncons::string_view>() == "author")
+        {
+            author_next = true;
+            return false;
+        }
+        if (author_next)
+        {
+            author_next = false;
+            return true;
+        }
+        return false;
+    };
+
+    std::ifstream is("./output/book_catalog.json");
+
+    json_cursor cursor(is);
+    auto filtered_c = cursor | filter;
+
+    for (; !filtered_c.done(); filtered_c.next())
+    {
+        const auto& event = filtered_c.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::string_value:
+                std::cout << event.get<jsoncons::string_view>() << "\n";
+                break;
+            default:
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
+        }
     }
 }
 ```
@@ -494,7 +721,155 @@ Haruki Murakami
 Graham Greene
 ```
 
-See [basic_json_cursor](doc/ref/basic_json_cursor.md) 
+<div id="I3"/> 
+
+#### Pull nested objects into a basic_json
+
+When positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` to `end_object`, 
+and when positioned on a `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
+
+```c++
+#include <jsoncons/json.hpp> // json_decoder and json
+#include <fstream>
+
+int main()
+{
+    std::ifstream is("./output/book_catalog.json");
+
+    json_cursor cursor(is);
+
+    json_decoder<json> decoder;
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::end_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::begin_object:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                cursor.read_to(decoder);
+                json j = decoder.get_result();
+                std::cout << pretty_print(j) << "\n";
+                break;
+            }
+            default:
+            {
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
+            }
+        }
+    }
+}
+```
+Output:
+```
+begin_array
+begin_object
+{
+    "author": "Haruki Murakami",
+    "price": 18.9,
+    "title": "Hard-Boiled Wonderland and the End of the World"
+}
+begin_object
+{
+    "author": "Graham Greene",
+    "price": 15.74,
+    "title": "The Comedians"
+}
+end_array
+```
+
+See [basic_json_cursor](ref/basic_json_cursor.md) 
+
+<div id="I4"/> 
+
+#### Iterate over basic_json items
+
+```c++
+#include <jsoncons/json.hpp> 
+#include <fstream>
+
+int main()
+{
+    std::ifstream is("./output/book_catalog.json");
+
+    json_cursor cursor(is);
+
+    auto view = staj_array<json>(cursor);
+    for (const auto& j : view)
+    {
+        std::cout << pretty_print(j) << "\n";
+    }
+}
+```
+Output:
+```
+{
+    "author": "Haruki Murakami",
+    "price": 18.9,
+    "title": "Hard-Boiled Wonderland and the End of the World"
+}
+{
+    "author": "Graham Greene",
+    "price": 15.74,
+    "title": "The Comedians"
+}
+```
+
+<div id="I5"/> 
+
+#### Iterate over strongly typed items
+
+```c++
+#include <jsoncons/json.hpp> 
+#include <fstream>
+
+namespace ns {
+
+    struct book
+    {
+        std::string author;
+        std::string title;
+        double price;
+    };
+
+} // namespace ns
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
+
+int main()
+{
+    std::ifstream is("./output/book_catalog.json");
+
+    json_cursor cursor(is);
+
+    auto view = staj_array<ns::book>(cursor);
+    for (const auto& book : view)
+    {
+        std::cout << book.author << ", " << book.title << "\n";
+    }
+}
+```
+Output:
+```
+Haruki Murakami, Hard-Boiled Wonderland and the End of the World
+Graham Greene, The Comedians
+```
+
+See [basic_json_cursor](ref/basic_json_cursor.md) 
 
 <div id="G0"/>
 
@@ -576,7 +951,7 @@ namespace ns {
         double price() const{return price_;}
     };
 
-    // #4 Class with gettors and setters
+    // #4 Class with getters and setters
     class Book4
     {
         BookCategory category_;
@@ -1043,8 +1418,8 @@ Key 'ssn' not found
 
 #### Specialize json_type_traits explicitly
 
-jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](doc/ref/decode_json.md) 
-and [encode_json](doc/ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
+jsoncons supports conversion between JSON text and C++ data structures. The functions [decode_json](ref/decode_json.md) 
+and [encode_json](ref/encode_json.md) convert JSON formatted strings or streams to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](ref/json_type_traits.md) 
 defined. The standard library containers are already supported, 
@@ -1830,106 +2205,6 @@ Output:
 (2) 100000000000000000000000000000000.1234
 ```
 
-### Encode
-
-<div id="B1"/>
-
-#### Encode a json value to a string
-
-```
-std::string s;
-
-j.dump(s); // compressed
-
-j.dump(s, indenting::indent); // pretty print
-```
-
-<div id="B2"/>
-
-#### Encode a json value to a stream
-
-```
-j.dump(std::cout); // compressed
-
-j.dump(std::cout, indenting::indent); // pretty print
-```
-or
-```
-std::cout << j << std::endl; // compressed
-
-std::cout << pretty_print(j) << std::endl; // pretty print
-```
-
-<div id="B3"/>
-
-#### Escape all non-ascii characters
-
-```
-json_options options;
-options.escape_all_non_ascii(true);
-
-j.dump(std::cout, options); // compressed
-
-j.dump(std::cout, options, indenting::indent); // pretty print
-```
-or
-```
-std::cout << print(j, options) << std::endl; // compressed
-
-std::cout << pretty_print(j, options) << std::endl; // pretty print
-```
-
-<div id="B4"/>
-
-#### Replace the representation of NaN, Inf and -Inf when serializing. And when reading in again.
-
-Set the serializing options for `nan` and `inf` to distinct string values.
-
-```c++
-json j;
-j["field1"] = std::sqrt(-1.0);
-j["field2"] = 1.79e308 * 1000;
-j["field3"] = -1.79e308 * 1000;
-
-json_options options;
-options.nan_to_str("NaN")
-       .inf_to_str("Inf"); 
-
-std::ostringstream os;
-os << pretty_print(j, options);
-
-std::cout << "(1)\n" << os.str() << std::endl;
-
-json j2 = json::parse(os.str(),options);
-
-std::cout << "\n(2) " << j2["field1"].as<double>() << std::endl;
-std::cout << "(3) " << j2["field2"].as<double>() << std::endl;
-std::cout << "(4) " << j2["field3"].as<double>() << std::endl;
-
-std::cout << "\n(5)\n" << pretty_print(j2,options) << std::endl;
-```
-
-Output:
-```json
-(1)
-{
-    "field1": "NaN",
-    "field2": "Inf",
-    "field3": "-Inf"
-}
-
-(2) nan
-(3) inf
-(4) -inf
-
-(5)
-{
-    "field1": "NaN",
-    "field2": "Inf",
-    "field3": "-Inf"
-}
-```
-
 ### Construct
 
 <div id="C1"/>
@@ -2205,8 +2480,8 @@ int main()
     double d = j.as<double>();
     std::cout << "(2) " << std::setprecision(17) << d << "\n\n";
 
-    // Access as jsoncons::bignum
-    jsoncons::bignum bn = j.as<jsoncons::bignum>();
+    // Access as jsoncons::bigint
+    jsoncons::bigint bn = j.as<jsoncons::bigint>();
     std::cout << "(3) " << bn << "\n\n";
 
     // If your compiler supports extended integral types for which std::numeric_limits is specialized 

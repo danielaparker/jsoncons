@@ -106,19 +106,27 @@ private:
     }
 
     bool visit_string(const string_view_type& value,
-                         semantic_tag tag,
-                         const ser_context& context,
-                         std::error_code& ec) override
+                      semantic_tag tag,
+                      const ser_context& context,
+                      std::error_code& ec) override
     {
         return destination_.string_value(value, tag, context, ec);
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                              semantic_tag tag,
-                              const ser_context& context,
-                              std::error_code& ec) override
+                           semantic_tag tag,
+                           const ser_context& context,
+                           std::error_code& ec) override
     {
         return destination_.byte_string_value(b, tag, context, ec);
+    }
+
+    bool visit_byte_string(const byte_string_view& b, 
+                           uint64_t ext_tag,
+                           const ser_context& context,
+                           std::error_code& ec) override
+    {
+        return destination_.byte_string_value(b, ext_tag, context, ec);
     }
 
     bool visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
@@ -380,9 +388,9 @@ private:
     }
 
     bool visit_string(const string_view_type& value,
-                         semantic_tag tag,
-                         const ser_context& context,
-                         std::error_code& ec) override
+                      semantic_tag tag,
+                      const ser_context& context,
+                      std::error_code& ec) override
     {
         std::basic_string<typename To::char_type> target;
         auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
@@ -394,11 +402,19 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                              semantic_tag tag,
-                              const ser_context& context,
-                              std::error_code& ec) override
+                           semantic_tag tag,
+                           const ser_context& context,
+                           std::error_code& ec) override
     {
         return destination_->byte_string_value(b, tag, context, ec);
+    }
+
+    bool visit_byte_string(const byte_string_view& b, 
+                           uint64_t ext_tag,
+                           const ser_context& context,
+                           std::error_code& ec) override
+    {
+        return destination_->byte_string_value(b, ext_tag, context, ec);
     }
 
     bool visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override

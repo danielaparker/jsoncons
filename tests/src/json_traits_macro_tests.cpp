@@ -15,8 +15,8 @@
 
 using namespace jsoncons;
 
-namespace json_type_traits_macro_tests
-{
+namespace {
+namespace ns {
 
     template <typename T1, typename T2>
     struct TemplatedStruct
@@ -473,9 +473,10 @@ namespace json_type_traits_macro_tests
         std::unique_ptr<std::string> field11;
         jsoncons::optional<std::string> field12;
     };
-} // namespace json_type_traits_macro_tests
+
+} // namespace ns
+} // namespace 
  
-namespace ns = json_type_traits_macro_tests;
 
 JSONCONS_ENUM_TRAITS(ns::float_format, scientific, fixed, hex, general)
 JSONCONS_ALL_MEMBER_TRAITS(ns::book1a,author,title,price)
@@ -561,8 +562,8 @@ TEST_CASE("JSONCONS_ALL_MEMBER_TRAITS tests")
 
     ns::book1a book{an_author, a_title, a_price};
 
-    CHECK(jsoncons::is_json_type_traits_declared<ns::book1a>::value);
-    test_is_json_type_traits_declared(jsoncons::is_json_type_traits_declared<ns::book1a>());
+    CHECK(is_json_type_traits_declared<ns::book1a>::value);
+    test_is_json_type_traits_declared(is_json_type_traits_declared<ns::book1a>());
 
     SECTION("book1a")
     {
@@ -602,7 +603,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
     {
         ns::book1c book{an_author, a_title, a_price, jsoncons::optional<std::string>{}};
 
-        CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
+        CHECK(is_json_type_traits_declared<ns::book1c>::value);
         std::string s;
 
         encode_json(book, s);
@@ -633,7 +634,7 @@ TEST_CASE("JSONCONS_N_MEMBER_TRAITS with optional tests")
     {
         ns::book1c book{an_author, a_title, a_price, an_isbn};
 
-        CHECK(jsoncons::is_json_type_traits_declared<ns::book1c>::value);
+        CHECK(is_json_type_traits_declared<ns::book1c>::value);
         std::string s;
 
         encode_json(book, s);

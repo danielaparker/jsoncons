@@ -4,12 +4,14 @@
 #include <jsoncons/staj_iterator.hpp>
 
 template<
-    class Json, 
-    class T=Json> class staj_object_iterator
+    class Key,
+    class T,
+    class Json
+    > class staj_object_iterator
 ```
 
 A `staj_object_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
-accesses the individual stream events from a [staj_reader](staj_reader.md) and, provided that when it is constructed
+accesses the individual stream events from a [staj_cursor](staj_cursor.md) and, provided that when it is constructed
 the current stream event has type `begin_object`, it returns the elements
 of the JSON object as items of type `std::pair<string_type,T>`. If when it is constructed the current stream event
 does not have type `begin_object`, it becomes equal to the default-constructed iterator.
@@ -19,8 +21,8 @@ does not have type `begin_object`, it becomes equal to the default-constructed i
 Member type                         |Definition
 ------------------------------------|------------------------------
 `char_type`|`Json::char_type`
-`key_type`|`std::basic_string<char_type>`
-`value_type`|`std::pair<string_type,T>`
+`key_type`|`Key`
+`value_type`|`std::pair<Key,T>`
 `difference_type`|`std::ptrdiff_t`
 `pointer`|`value_type*`
 `reference`|`value_type&`
@@ -30,9 +32,9 @@ Member type                         |Definition
 
     staj_object_iterator() noexcept; // (1)
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader); // (2)
+    staj_object_iterator(staj_object_view<Key, T, Json>& view); // (2)
 
-    staj_object_iterator(basic_staj_reader<char_type>& reader,
+    staj_object_iterator(staj_object_view<Key, T, Json>& view,
                          std::error_code& ec);  // (3)
 
 (1) Constructs the end iterator
@@ -60,23 +62,11 @@ Advances the iterator to the next object member.
 
 #### Non-member functions
 
-    template <class Json, class T>
-    bool operator==(const staj_object_iterator<Json, T>& a, const staj_object_iterator<Json, T>& b)
+    template <class Key, class T, class Json>
+    bool operator==(const staj_object_iterator<Key, T, Json>& a, const staj_object_iterator<Key, T, Json>& b)
 
     template <class Json, class T>
-    bool operator!=(const staj_object_iterator<Json, T>& a, const staj_object_iterator<Json, T>& b)
-
-    template <class Json, class T>
-    staj_object_iterator<Json, T> begin(staj_object_iterator<Json, T> iter) noexcept; // (1)
-
-    template <class Json, class T>
-    staj_object_iterator<Json, T> end(const staj_object_iterator<Json, T>&) noexcept; // (2)
-
-(1) Returns iter unchanged
-
-(2) Returns a default-constructed `stax_array_iterator`, which serves as an end iterator. The argument is ignored.
-
-The `begin` and `end` non-member functions enable the use of `stax_array_iterators` with range-based for loops.
+    bool operator!=(const staj_object_iterator<Key, T, Json>& a, const staj_object_iterator<Key, T, Json>& b)
 
 ### Examples
 
@@ -101,9 +91,9 @@ int main()
 {
     json_cursor cursor(example);
 
-    auto it = make_object_iterator<json>(cursor);
+    auto view = staj_object<std::string,json>(cursor);
 
-    for (const auto& kv : it)
+    for (const auto& kv : view)
     {
         std::cout << kv.first << ":\n" << pretty_print(kv.second) << "\n";
     }

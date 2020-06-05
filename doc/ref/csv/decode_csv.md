@@ -9,27 +9,35 @@ template <class T,class CharT>
 T decode_csv(const std::basic_string<CharT>& s, 
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (1)
 
-template <class T,class CharT,class TempAllocator>
+template <class T,class CharT>
 T decode_csv(std::basic_istream<CharT>& is, 
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (2)
+
+template <class T,class InputIt>
+T decode_csv(InputIt first, InputIt last,
+             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (3) (since v0.153.0)
 
 template <class T,class CharT,class TempAllocator>
 T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
              const std::basic_string<CharT>& s, 
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (3)
+             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (4)
 
 template <class T,class CharT>
 T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
              std::basic_istream<CharT>& is, 
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (4)
+             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (5)
 ```
 
-(1) Reads a CSV string value into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+(1) Reads CSV data from a string into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
-(2) Reads a CSV input stream into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+(2) Reads CSV data from an input stream into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
+
+(3) Reads CSV data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
 #### Return value

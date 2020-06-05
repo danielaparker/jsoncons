@@ -3,7 +3,7 @@
 #include <jsoncons/json_reader.hpp>
 
 using namespace jsoncons;
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
 {
         std::string input(reinterpret_cast<const char*>(data), size);
         json_decoder<ojson> decoder;

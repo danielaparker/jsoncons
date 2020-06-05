@@ -66,7 +66,7 @@ jsoncons allows you to work with the UBJSON data similarly to JSON data:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](../json_type_traits.md) 
 
-- As a stream of parse events
+- With [cursor-level access](doc/ref/ubjson/basic_ubjson_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -145,7 +145,7 @@ Output:
 23.8889
 ```
 
-#### As a stream of parse events
+#### With cursor-level access
 
 ```c++
 int main()
@@ -209,7 +209,7 @@ double_value: 23.8889 (n/a)
 end_array (n/a)
 ```
 
-You can apply a filter to the stream, for example,
+You can apply a filter to a cursor using the pipe syntax, for example,
 
 ```c++
 int main()
@@ -219,10 +219,12 @@ int main()
         return (ev.event_type() == staj_event_type::double_value) && (ev.get<double>() < 30.0);  
     };
 
-    ubjson::ubjson_bytes_cursor cursor(data, filter);
-    for (; !cursor.done(); cursor.next())
+    ubjson::ubjson_bytes_cursor cursor(data);
+
+    auto filtered_c = cursor | filter;
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::double_value:

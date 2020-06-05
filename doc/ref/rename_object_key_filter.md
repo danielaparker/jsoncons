@@ -21,10 +21,6 @@ Renames object member names.
                              const std::string& new_name,
                              json_visitor& visitor)
 
-### See also
-
-- [basic_json_filter](basic_json_filter.md)
-
 ### Examples
 
 #### Rename object member names
@@ -49,4 +45,8 @@ Output:
 ```json
 {"first":1,"second":2,"third":3}
 ```
+
+### See also
+
+[basic_json_filter](basic_json_filter.md)
 

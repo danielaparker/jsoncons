@@ -18,8 +18,8 @@
 #include <utility> // std::declval
 #include <jsoncons/config/compiler_support.hpp>
 
-namespace jsoncons
-{
+namespace jsoncons {
+namespace detail {
 
     #ifndef JSONCONS_HAS_VOID_T
     // follows https://en.cppreference.com/w/cpp/types/void_t
@@ -90,53 +90,12 @@ namespace jsoncons
     using
     is_detected_convertible = std::is_convertible< is_detected_t<Op, Args...>, To >;
 
-    // static_max
-
-    template <std::size_t arg1, std::size_t ... argn>
-    struct static_max;
-
-    template <std::size_t arg>
-    struct static_max<arg>
-    {
-        static constexpr size_t value = arg;
-    };
-
-    template <std::size_t arg1, std::size_t arg2, std::size_t ... argn>
-    struct static_max<arg1,arg2,argn ...>
-    {
-        static constexpr size_t value = arg1 >= arg2 ? 
-            static_max<arg1,argn...>::value :
-            static_max<arg2,argn...>::value; 
-    };
-
-    inline
-    char to_hex_character(uint8_t c)
-    {
-        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
-    }
-
-    inline
-    bool is_control_character(uint32_t c)
-    {
-        return c <= 0x1F || c == 0x7f;
-    }
-
-    inline
-    bool is_non_ascii_codepoint(uint32_t cp)
-    {
-        return cp >= 0x80;
-    }
-
     template <typename T>
     struct is_stateless
      : public std::integral_constant<bool,  
           (std::is_default_constructible<T>::value &&
           std::is_empty<T>::value)>
     {};
-
-// type traits extensions
-
-namespace detail {
 
     // to_plain_pointer
 
@@ -172,6 +131,26 @@ namespace detail {
     struct is_character<T, 
            typename std::enable_if<std::is_same<T,char>::value ||
                                    std::is_same<T,wchar_t>::value
+    >::type> : std::true_type {};
+
+    // is_narrow_character
+
+    template <class T, class Enable=void>
+    struct is_narrow_character : std::false_type {};
+
+    template <class T>
+    struct is_narrow_character<T, 
+           typename std::enable_if<is_character<T>::value && (sizeof(T) == sizeof(char))
+    >::type> : std::true_type {};
+
+    // is_wide_character
+
+    template <class T, class Enable=void>
+    struct is_wide_character : std::false_type {};
+
+    template <class T>
+    struct is_wide_character<T, 
+           typename std::enable_if<is_character<T>::value && (sizeof(T) != sizeof(char))
     >::type> : std::true_type {};
 
     // is_int
@@ -221,36 +200,35 @@ namespace detail {
                                                       std::is_same<T,double>::value
     >::type> : std::true_type {};
 
-    // is_integer_like
+    // is_integer
 
     template <class T, class Enable=void>
-    struct is_integer_like : std::false_type {};
+    struct is_integer : std::false_type {};
 
     template <class T>
-    struct is_integer_like<T, 
-                           typename std::enable_if<std::is_integral<T>::value && 
-                           std::is_signed<T>::value && 
-                           !std::is_same<T,bool>::value>::type> : std::true_type {};
+    struct is_integer<T, 
+                      typename std::enable_if<std::is_integral<T>::value && 
+                      !std::is_same<T,bool>::value>::type> : std::true_type {};
 
-    // is_uinteger_like
+    // is_signed_integer
 
     template <class T, class Enable=void>
-    struct is_uinteger_like : std::false_type {};
+    struct is_signed_integer : std::false_type {};
 
     template <class T>
-    struct is_uinteger_like<T, 
-                            typename std::enable_if<std::is_integral<T>::value && 
-                            !std::is_signed<T>::value && 
-                            !std::is_same<T,bool>::value>::type> : std::true_type {};
+    struct is_signed_integer<T, 
+                           typename std::enable_if<is_integer<T>::value && 
+                           std::is_signed<T>::value>::type> : std::true_type {};
 
-    // is_floating_point_like
+    // is_unsigned_integer
 
     template <class T, class Enable=void>
-    struct is_floating_point_like : std::false_type {};
+    struct is_unsigned_integer : std::false_type {};
 
     template <class T>
-    struct is_floating_point_like<T, 
-                                  typename std::enable_if<std::is_floating_point<T>::value>::type> : std::true_type {};
+    struct is_unsigned_integer<T, 
+                            typename std::enable_if<is_integer<T>::value && 
+                            !std::is_signed<T>::value>::type> : std::true_type {};
 
     // Containers
 
@@ -280,7 +258,15 @@ namespace detail {
 
     template<class Container>
     using
-    container_push_back_t = decltype(std::declval<Container>().push_back(typename Container::value_type()));
+    container_push_back_t = decltype(std::declval<Container>().push_back(std::declval<typename Container::value_type>()));
+
+    template<class Container>
+    using
+    container_push_front_t = decltype(std::declval<Container>().push_front(std::declval<typename Container::value_type>()));
+
+    template<class Container>
+    using
+    container_insert_t = decltype(std::declval<Container>().insert(std::declval<typename Container::value_type>()));
 
     template<class Container>
     using
@@ -294,29 +280,37 @@ namespace detail {
     using
     container_size_t = decltype(std::declval<Container>().size());
 
-    // is_string
+    // is_string_or_string_view
 
     template <class T, class Enable=void>
-    struct is_string : std::false_type {};
+    struct is_string_or_string_view : std::false_type {};
 
     template <class T>
-    struct is_string<T, 
+    struct is_string_or_string_view<T, 
                      typename std::enable_if<is_character<typename T::value_type>::value &&
                                              is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
-                                             is_detected<container_npos_t,T>::value &&
+                                             is_detected<container_npos_t,T>::value
+    >::type> : std::true_type {};
+
+    // is_basic_string
+
+    template <class T, class Enable=void>
+    struct is_basic_string : std::false_type {};
+
+    template <class T>
+    struct is_basic_string<T, 
+                     typename std::enable_if<is_string_or_string_view<T>::value &&
                                              is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
 
-    // is_string_view
+    // is_basic_string_view
 
     template <class T, class Enable=void>
-    struct is_string_view : std::false_type {};
+    struct is_basic_string_view : std::false_type {};
 
     template <class T>
-    struct is_string_view<T, 
-                          typename std::enable_if<is_character<typename T::value_type>::value &&
-                                                  is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
-                                                  is_detected<container_npos_t,T>::value &&
+    struct is_basic_string_view<T, 
+                          typename std::enable_if<is_string_or_string_view<T>::value &&
                                                   !is_detected<container_allocator_type_t,T>::value
     >::type> : std::true_type {};
 
@@ -328,6 +322,7 @@ namespace detail {
     template <class T>
     struct is_map_like<T, 
                        typename std::enable_if<is_detected<container_mapped_type_t,T>::value &&
+                                               is_detected<container_allocator_type_t,T>::value &&
                                                is_detected<container_key_type_t,T>::value &&
                                                is_detected<container_value_type_t,T>::value 
         >::type> 
@@ -348,6 +343,7 @@ namespace detail {
     template <class T>
     struct is_list_like<T, 
                           typename std::enable_if<is_detected<container_value_type_t,T>::value &&
+                                                  is_detected<container_allocator_type_t,T>::value &&
                                                   !is_std_array<T>::value && 
                                                   !is_detected_exact<typename T::value_type,container_char_traits_t,T>::value &&
                                                   !is_map_like<T>::value 
@@ -371,11 +367,23 @@ namespace detail {
     using
     has_reserve = is_detected<container_reserve_t, Container>;
 
-    // has_push_back
+    // is_back_insertable
 
     template<class Container>
     using
-    has_push_back = is_detected<container_push_back_t, Container>;
+    is_back_insertable = is_detected<container_push_back_t, Container>;
+
+    // is_front_insertable
+
+    template<class Container>
+    using
+    is_front_insertable = is_detected<container_push_front_t, Container>;
+
+    // is_insertable
+
+    template<class Container>
+    using
+    is_insertable = is_detected<container_insert_t, Container>;
 
     // has_data, has_data_exact
 
@@ -401,6 +409,29 @@ namespace detail {
         static constexpr bool value = has_data<Container>::value && has_size<Container>::value;
     };
 
+    // is_byte_sequence
+
+    template <class Container, class Enable=void>
+    struct is_byte_sequence : std::false_type {};
+
+    template <class Container>
+    struct is_byte_sequence<Container, 
+           typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
+                                   has_size<Container>::value &&
+                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
+    >::type> : std::true_type {};
+
+    // is_back_insertable_byte_container
+
+    template <class Container, class Enable=void>
+    struct is_back_insertable_byte_container : std::false_type {};
+
+    template <class Container>
+    struct is_back_insertable_byte_container<Container, 
+           typename std::enable_if<is_back_insertable<Container>::value &&
+                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
+    >::type> : std::true_type {};
+
     // is_c_array
 
     template<class T>
@@ -412,6 +443,8 @@ namespace detail {
     template<class T, std::size_t N>
     struct is_c_array<T[N]> : std::true_type {};
 
+namespace impl {
+
     template<class C, class Enable=void>
     struct is_typed_array : std::false_type {};
 
@@ -420,17 +453,22 @@ namespace detail {
     <
         T, 
         typename std::enable_if<jsoncons::detail::is_list_like<T>::value && 
-                                (std::is_same<typename T::value_type,uint8_t>::value ||  
-                                 std::is_same<typename T::value_type,uint16_t>::value ||
-                                 std::is_same<typename T::value_type,uint32_t>::value ||
-                                 std::is_same<typename T::value_type,uint64_t>::value ||
-                                 std::is_same<typename T::value_type,int8_t>::value ||  
-                                 std::is_same<typename T::value_type,int16_t>::value ||
-                                 std::is_same<typename T::value_type,int32_t>::value ||
-                                 std::is_same<typename T::value_type,int64_t>::value ||
-                                 std::is_same<typename T::value_type,float_t>::value ||
-                                 std::is_same<typename T::value_type,double_t>::value)>::type
+                                (std::is_same<typename std::decay<typename T::value_type>::type,uint8_t>::value ||  
+                                 std::is_same<typename std::decay<typename T::value_type>::type,uint16_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,uint32_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,uint64_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int8_t>::value ||  
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int16_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int32_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,int64_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,float_t>::value ||
+                                 std::is_same<typename std::decay<typename T::value_type>::type,double_t>::value)>::type
     > : std::true_type{};
+
+} // namespace impl
+    
+    template <typename T>
+    using is_typed_array = impl::is_typed_array<typename std::decay<T>::type>;
 
     // is_compatible_element
 

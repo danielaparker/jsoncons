@@ -88,8 +88,8 @@
 #endif
 
 #if defined(ANDROID) || defined(__ANDROID__)
-#define JSONCONS_HAS_STRTOLD_L
 #if __ANDROID_API__ >= 21
+#define JSONCONS_HAS_STRTOLD_L
 #else
 #define JSONCONS_NO_LOCALECONV
 #endif
@@ -208,6 +208,23 @@
       #endif
    #endif
 #endif // !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
+
+#ifndef JSONCONS_HAS_CP14_CONSTEXPR
+    #if defined(_MSC_VER) 
+        #if _MSC_VER >= 1910 
+            #define JSONCONS_HAS_CP14_CONSTEXPR
+        #endif
+   #elif defined(__GNUC__)
+      #if (__GNUC__ * 100 + __GNUC_MINOR__) >= 600 && __cplusplus >= 201402L
+         #define JSONCONS_HAS_CP14_CONSTEXPR
+      #endif
+   #endif
+#endif
+#if defined(JSONCONS_HAS_CP14_CONSTEXPR)
+#  define JSONCONS_CPP14_CONSTEXPR constexpr
+#else
+#  define JSONCONS_CPP14_CONSTEXPR
+#endif
 
 #endif // JSONCONS_COMPILER_SUPPORT_HPP
 

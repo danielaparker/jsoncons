@@ -10,7 +10,7 @@
 
 using namespace jsoncons;
 
-namespace csv_examples {
+namespace {
 
 void encode_n_objects()
 {
@@ -614,8 +614,9 @@ void grouped_into_basic_json_records()
 
     csv::csv_cursor cursor(data, options);
 
-    auto it = make_array_iterator<ojson>(cursor);
-    auto end = jsoncons::end(it);
+    auto view = staj_array<ojson>(cursor);
+    auto it = view.begin();
+    auto end = view.end();
 
     json_options print_options;
     print_options.float_format(float_chars_format::fixed);
@@ -634,56 +635,55 @@ void grouped_into_strongly_typed_records()
     options.assume_header(true);
     csv::csv_cursor cursor(data, options);
 
-    auto it = make_array_iterator<record_type>(cursor);
+    auto view = staj_array<record_type>(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
-    for (const auto& record : it)
+    for (const auto& record : view)
     {
         std::cout << std::get<0>(record) << ", " << std::get<1>(record) << ", " << std::get<2>(record) << "\n";
     }
 }
 
-
-} // csv_examples
+} // namespace
 
 void run_csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
-    csv_examples::read_write_csv_tasks();
-    csv_examples::encode_to_tab_delimited_file();
-    csv_examples::serialize_array_of_arrays_to_comma_delimited();
-    csv_examples::serialize_books_to_csv_file();
-    csv_examples::serialize_books_to_csv_file_with_reorder();
-    csv_examples::last_column_repeats();
-    csv_examples::last_two_columns_repeat();
-    csv_examples::decode_csv_string();
-    csv_examples::decode_csv_stream();
-    csv_examples::encode_csv_file_from_books();
-    csv_examples::decode_encode_csv_tasks();
+    read_write_csv_tasks();
+    encode_to_tab_delimited_file();
+    serialize_array_of_arrays_to_comma_delimited();
+    serialize_books_to_csv_file();
+    serialize_books_to_csv_file_with_reorder();
+    last_column_repeats();
+    last_two_columns_repeat();
+    decode_csv_string();
+    decode_csv_stream();
+    encode_csv_file_from_books();
+    decode_encode_csv_tasks();
 
-    csv_examples::csv_decode_without_type_inference();
-    csv_examples::csv_parser_type_inference();
+    csv_decode_without_type_inference();
+    csv_parser_type_inference();
 
-    csv_examples::decode_csv_with_subfields();
-    csv_examples::csv_source_to_json_value();
-    csv_examples::csv_source_to_cpp_object();
+    decode_csv_with_subfields();
+    csv_source_to_json_value();
+    csv_source_to_cpp_object();
 
     std::cout << "\n";
-    csv_examples::as_a_variant_like_structure();
+    as_a_variant_like_structure();
     std::cout << "\n";
-    csv_examples::as_a_strongly_typed_cpp_structure();
+    as_a_strongly_typed_cpp_structure();
     std::cout << "\n";
-    csv_examples::as_a_stream_of_json_events();
+    as_a_stream_of_json_events();
     std::cout << "\n";
-    csv_examples::grouped_into_basic_json_records();
+    grouped_into_basic_json_records();
     std::cout << "\n";
-    csv_examples::grouped_into_strongly_typed_records();
+    grouped_into_strongly_typed_records();
     std::cout << "\n";
-    csv_examples::encode_n_objects();
+    encode_n_objects();
     std::cout << "\n";
-    csv_examples::encode_n_rows();
+    encode_n_rows();
     std::cout << "\n";
-    csv_examples::encode_m_columns();
+    encode_m_columns();
     std::cout << "\n";
 
     std::cout << std::endl;

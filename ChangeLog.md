@@ -1,3 +1,98 @@
+v0.153.1
+--------
+
+Bug fixes for BSON:
+
+- Fixed int32 encoding error in the BSON encoder [\#243](https://github.com/danielaparker/jsoncons/issues/243)
+- Fixed issue with default binary subtype when not specified, was 0, now 0x80 (user defined.)
+
+v0.153.0
+--------
+
+Bug fixes:
+
+- Fixed decode issue with `json_type_traits` defined for `set`, `unordered_set`, `multiset`, 
+`unordered_multiset` and `forward_list` [\#242](https://github.com/danielaparker/jsoncons/issues/242)
+
+- Fixed issue with preserving original CBOR semantic tag for CBOR byte strings  
+associated with an unknown (to jsoncons) tag.
+
+Enhancements:
+
+- `basic_json::parse`, `decode_json`, `decode_csv`, `decode_bson`, `decode_cbor`,
+`decode_msgpack`, and `decode_ubjson` now support reading data from a pair of 
+LegacyInputIterators that specify a character or byte sequence.
+
+- `byte_string_view` now has an explicit constructor that allows any contiguous
+byte sequence container. 
+
+v0.152.0
+--------
+
+Bug fixes:
+
+- Fixed compile error when building with Android SDK level less than 21 [\#240](https://github.com/danielaparker/jsoncons/pull/240)
+
+- Fixed bson encode/decode of binary type (wasn't reading/writing subtype.)
+
+Changes:
+
+- `basic_json_compressed_encoder` has been deprecated and renamed to
+`basic_compact_json_encoder`. Rationale: consistency with other names.
+The typedefs `json_compressed_stream_encoder`, `wjson_compressed_stream_encoder`,
+`json_compressed_string_encoder`, and `wjson_compressed_string_encoder` have
+been deprecated and renamed to `compact_json_stream_encoder`, 
+`compact_wjson_stream_encoder`, `compact_json_string_encoder`, and
+`compact_wjson_string_encoder`. 
+
+- The factory function `make_array_iterator()` has been replaced by `staj_array()`.
+
+- The factory function `make_object_iterator()` has been replaced by `staj_object()`.
+
+- The constructors for `json_cursor`, `csv_cursor`, `bson_cursor`, `cbor_cursor`, `msgpack_cursor`, and `ubjson_cursor`
+that take a filter argument have been deprecated. Instead filters may be applied to a cursor using the pipe syntax, e.g.
+
+    json_cursor cursor(is);
+    auto filtered_c = cursor | filter1 | filter2;
+
+Enhancements:
+
+- Generalized `basic_json(byte_string_arg_t, ...` constructor to accomodate any contiguous byte sequence container,
+which is a contiguous container that has member functions `data()` and `size()`, and member type `value_type` with size exactly 8 bits.
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
+
+- Generalized the functions `decode_bson`, `decode_cbor`, `decode_msgpack` and `decode_ubjson`
+to read from any contiguous byte sequence.
+
+- Generalized the `json_visitor` member function `byte_string_value`
+to accept any contiguous byte sequence argument. In particular this means that `byte_string_value`
+can be called on an encoder with any bytes sequence argument.
+
+- Generalized the functions `encode_bson`, `encode_cbor`, `encode_msgpack` and `encode_ubjson`
+to write to any back insertable byte container.
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
+
+- Generalized the `json_type_traits` for maps to accomodate all key types 
+that themselves have json_type_traits defined [\#241](https://github.com/danielaparker/jsoncons/issues/241)
+
+- Unknown CBOR tags preceding a byte string (unknown to jsoncons), 
+MessagePack types associated with the MessagePack ext family,
+and bson binary subtypes associated with a binary value are now captured. 
+
+- If in `basic_json` `tag()` == `semantic_tag::ext`, the function `ext_tag()` will return a format 
+specific tag associated with a byte string value. 
+
+- The `basic_json` constructor with parameter `byte_string_arg_t` now allows constructing a byte string
+associated with a format specific tag.  
+
+v0.151.1
+--------
+
+Bug fixes:
+
+- Fixed `jsoncons::semantic_tag::uri`, `jsoncons::semantic_tag::base64` and `jsoncons::semantic_tag::base64url`
+applied to text strings incorrectly encoded into CBOR [\238](https://github.com/danielaparker/jsoncons/issues/238)
+
 v0.151.0
 --------
 
@@ -21,12 +116,16 @@ Bug fixes:
 
 - OSS-Fuzz failed throw issue in CBOR parser [\#235](https://github.com/danielaparker/jsoncons/issues/235)
 
+- Msg pack bin8 wrong format [\#237](https://github.com/danielaparker/jsoncons/issues/237)
+
 Changes:
 
 - The cbor_option name `enable_typed_arrays` has been deprecated and
 renamed to `use_typed_arrays`. 
 
 - `jsonpointer::unflatten_method` has been deprecated and replaced with `jsonpointer::unflatten_options`.
+
+- The cursor functions named `read` have been deprecated and renamed to `read_to`.
 
 Enhancements:
 

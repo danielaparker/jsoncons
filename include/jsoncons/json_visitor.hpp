@@ -9,7 +9,7 @@
 
 #include <string>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/bignum.hpp>
+#include <jsoncons/bigint.hpp>
 #include <jsoncons/ser_context.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
@@ -161,12 +161,14 @@ namespace jsoncons {
             return more;
         }
 
-        bool byte_string_value(const byte_string_view& b, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
                                semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
+                               const ser_context& context=ser_context(),
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
             std::error_code ec;
-            bool more = visit_byte_string(b, tag, context, ec);
+            bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -174,11 +176,19 @@ namespace jsoncons {
             return more;
         }
 
-        bool byte_string_value(const uint8_t* p, std::size_t size, 
-                               semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
+        template <class Source>
+        bool byte_string_value(const Source& b, 
+                               uint64_t ext_tag, 
+                               const ser_context& context=ser_context(),
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return byte_string_value(byte_string(p, size), tag, context);
+            std::error_code ec;
+            bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            if (ec)
+            {
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+            }
+            return more;
         }
 
         bool uint64_value(uint64_t value, 
@@ -296,20 +306,24 @@ namespace jsoncons {
             return visit_string(value, tag, context, ec);
         }
 
-        bool byte_string_value(const byte_string_view& b, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
                                semantic_tag tag, 
                                const ser_context& context,
-                               std::error_code& ec)
+                               std::error_code& ec,
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return visit_byte_string(b, tag, context, ec);
+            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
         }
 
-        bool byte_string_value(const uint8_t* p, std::size_t size, 
-                               semantic_tag tag, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
+                               uint64_t ext_tag, 
                                const ser_context& context,
-                               std::error_code& ec)
+                               std::error_code& ec,
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return byte_string_value(byte_string(p, size), tag, context, ec);
+            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
         }
 
         bool uint64_value(uint64_t value, 
@@ -427,6 +441,23 @@ namespace jsoncons {
         }
 
     #if !defined(JSONCONS_NO_DEPRECATED)
+
+        JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const Source&,semantic_tag=semantic_tag::none, const ser_context&=ser_context()") 
+        bool byte_string_value(const uint8_t* p, std::size_t size, 
+                               semantic_tag tag=semantic_tag::none, 
+                               const ser_context& context=ser_context())
+        {
+            return byte_string_value(byte_string(p, size), tag, context);
+        }
+
+        JSONCONS_DEPRECATED_MSG("Instead, use byte_string_value(const Source&, semantic_tag, const ser_context&, std::error_code&") 
+        bool byte_string_value(const uint8_t* p, std::size_t size, 
+                               semantic_tag tag, 
+                               const ser_context& context,
+                               std::error_code& ec)
+        {
+            return byte_string_value(byte_string(p, size), tag, context, ec);
+        }
 
         JSONCONS_DEPRECATED_MSG("Instead, use key(const string_view_type&, const ser_context&=ser_context())") 
         bool name(const string_view_type& name, const ser_context& context=ser_context())
@@ -636,9 +667,17 @@ namespace jsoncons {
                                std::error_code& ec) = 0;
 
         virtual bool visit_byte_string(const byte_string_view& value, 
-                                    semantic_tag tag, 
-                                    const ser_context& context,
-                                    std::error_code& ec) = 0;
+                                       semantic_tag tag, 
+                                       const ser_context& context,
+                                       std::error_code& ec) = 0;
+
+        virtual bool visit_byte_string(const byte_string_view& value, 
+                                       uint64_t /* ext_tag */, 
+                                       const ser_context& context,
+                                       std::error_code& ec) 
+        {
+            return visit_byte_string(value, semantic_tag::none, context, ec);
+        }
 
         virtual bool visit_uint64(uint64_t value, 
                                semantic_tag tag, 
@@ -1326,6 +1365,87 @@ namespace jsoncons {
 
     };
 
+    template <class CharT>
+    class basic_json_diagnostics_visitor : public basic_default_json_visitor<CharT>
+    {
+        using supertype = basic_default_json_visitor<CharT>;
+        using string_view_type = typename supertype::string_view_type;
+
+        static constexpr CharT visit_begin_array_name[] = {'v','i','s','i','t','_','b','e','g','i','n','_','a','r','r','a','y', 0};
+        static constexpr CharT visit_end_array_name[] =  {'v','i','s','i','t','_','e','n','d','_','a','r','r','a','y', 0};
+        static constexpr CharT visit_begin_object_name[] =  {'v','i','s','i','t','_','b','e','g','i','n','_','o','b','j','e','c','t', 0};
+        static constexpr CharT visit_end_object_name[] =  {'v','i','s','i','t','_','e','n','d','_','o','b','j','e','c','t', 0};
+        static constexpr CharT visit_key_name[] =  {'v','i','s','i','t','_','k','e','y', 0};
+        static constexpr CharT visit_string_name[] =  {'v','i','s','i','t','_','s','t','r','i','n','g', 0};
+        static constexpr CharT visit_byte_string_name[] =  {'v','i','s','i','t','_','b','y','t','e','_','s','t','r','i','n','g', 0};
+        static constexpr CharT visit_null_name[] =  {'v','i','s','i','t','_','n','u','l','l', 0};
+        static constexpr CharT visit_bool_name[] =  {'v','i','s','i','t','_','b','o','o','l', 0};
+        static constexpr CharT visit_uint64_name[] =  {'v','i','s','i','t','_','u','i','n','t','6','4', 0};
+        static constexpr CharT visit_int64_name[] =  {'v','i','s','i','t','_','i','n','t','6','4', 0};
+        static constexpr CharT visit_half_name[] =  {'v','i','s','i','t','_','h','a','l','f', 0};
+        static constexpr CharT visit_double_name[] =  {'v','i','s','i','t','_','d','o','u','b','l','e', 0};
+
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_begin_object_name << std::endl; 
+            return true;
+        }
+
+        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_begin_object_name << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_object(const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_end_object_name << std::endl; 
+            return true;
+        }
+        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_begin_array_name << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_array(const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_end_array_name << std::endl; 
+            return true;
+        }
+
+        bool visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_key_name << s << std::endl; 
+            return true;
+        }
+        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_string_name << s << std::endl; 
+            return true;
+        }
+        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_int64_name << val << std::endl; 
+            return true;
+        }
+        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_uint64_name << val << std::endl; 
+            return true;
+        }
+        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_bool_name << val << std::endl; 
+            return true;
+        }
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << visit_null_name << std::endl; 
+            return true;
+        }
+    };
+
     using json_visitor = basic_json_visitor<char>;
     using wjson_visitor = basic_json_visitor<wchar_t>;
 
@@ -1334,6 +1454,9 @@ namespace jsoncons {
 
     using default_json_visitor = basic_default_json_visitor<char>;
     using wdefault_json_visitor = basic_default_json_visitor<wchar_t>;
+
+    using json_diagnostics_visitor = basic_json_diagnostics_visitor<char>;
+    using wjson_diagnostics_visitor = basic_json_diagnostics_visitor<wchar_t>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class CharT>

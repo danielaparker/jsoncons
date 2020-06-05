@@ -65,7 +65,12 @@ TEST_CASE("test_read_write_read_nan_replacement")
     expected["field2"] = std::numeric_limits<double>::infinity();
     expected["field3"] = -std::numeric_limits<double>::infinity();
 
-    CHECK(expected.to_string(options) == j.to_string(options));
+    std::string output1;
+    std::string output2;
+    j.dump(output1, options);
+    expected.dump(output2, options);
+
+    CHECK(output1 == output2);
     CHECK(expected.to_string() == j.to_string());
 }
 

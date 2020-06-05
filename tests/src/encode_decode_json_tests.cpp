@@ -51,8 +51,51 @@ namespace
         using const_reference = const T&;
         using difference_type = std::ptrdiff_t;
     };
-    //template <class U>
-    //using MyAlloc = std::allocator<U>;
+
+    class MyIterator
+    {
+        const char* p_;
+    public:
+        using iterator_category = std::input_iterator_tag;
+        using value_type = char;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const char*; 
+        using reference = const char&;
+
+        MyIterator(const char* p)
+            : p_(p)
+        {
+        }
+
+        reference operator*() const
+        {
+            return *p_;
+        }
+
+        pointer operator->() const 
+        {
+            return p_;
+        }
+
+        MyIterator& operator++()
+        {
+            ++p_;
+            return *this;
+        }
+
+        MyIterator operator++(int) 
+        {
+            MyIterator temp(*this);
+            ++*this;
+            return temp;
+        }
+
+        bool operator!=(const MyIterator& rhs) const
+        {
+            return p_ != rhs.p_;
+        }
+    };
+
 } // namespace
 
 using namespace jsoncons;
@@ -61,7 +104,7 @@ TEST_CASE("encode and decode json")
 {
     json j(std::make_pair(false,std::string("foo")));
 
-    SECTION("string test")
+    SECTION("string source")
     {
         std::string s;
         encode_json(j, s);
@@ -69,11 +112,19 @@ TEST_CASE("encode and decode json")
         CHECK(result == j);
     }
 
-    SECTION("stream test")
+    SECTION("stream source")
     {
         std::stringstream ss;
         encode_json(j, ss);
         json result = decode_json<json>(ss);
+        CHECK(result == j);
+    }
+
+    SECTION("iterator source")
+    {
+        std::string s;
+        encode_json(j, s);
+        json result = decode_json<json>(s.begin(), s.end());
         CHECK(result == j);
     }
 }
@@ -82,7 +133,7 @@ TEST_CASE("encode and decode wjson")
 {
     wjson j(std::make_pair(false,std::wstring(L"foo")));
 
-    SECTION("string test")
+    SECTION("string source")
     {
         std::wstring s;
         encode_json(j, s);
@@ -90,11 +141,19 @@ TEST_CASE("encode and decode wjson")
         CHECK(result == j);
     }
 
-    SECTION("stream test")
+    SECTION("stream source")
     {
         std::wstringstream ss;
         encode_json(j, ss);
         wjson result = decode_json<wjson>(ss);
+        CHECK(result == j);
+    }
+
+    SECTION("iterator source")
+    {
+        std::wstring s;
+        encode_json(j, s);
+        wjson result = decode_json<wjson>(s.begin(), s.end());
         CHECK(result == j);
     }
 }
@@ -202,7 +261,6 @@ TEST_CASE("convert vector of vector test")
         CHECK(item[3] == 4);
     }
 }
-
 TEST_CASE("convert vector of vector test, temp_allocator")
 {
     std::vector<double> u{1,2,3,4};
@@ -272,12 +330,55 @@ TEST_CASE("encode/decode map with integer key")
 {
     std::map<int,double> m = {{1,1},{2,2}};
 
-    std::string s;
-    jsoncons::encode_json(m,s);
-    auto result = jsoncons::decode_json<std::map<int,double>>(s);
+    SECTION("string source")
+    {
+        std::string s;
+        jsoncons::encode_json(m,s);
+        auto result = jsoncons::decode_json<std::map<int,double>>(s);
 
-    REQUIRE(result.size() == m.size());
-    CHECK(m[1] == result[1]);
-    CHECK(m[2] == result[2]);
+        REQUIRE(result.size() == m.size());
+        CHECK(m[1] == result[1]);
+        CHECK(m[2] == result[2]);
+    }
+
+    SECTION("stream source")
+    {
+        std::string s;
+        jsoncons::encode_json(m,s);
+        std::stringstream is(s);
+
+        auto result = jsoncons::decode_json<std::map<int,double>>(is);
+
+        REQUIRE(result.size() == m.size());
+        CHECK(m[1] == result[1]);
+        CHECK(m[2] == result[2]);
+    }
+
+    SECTION("iterator source")
+    {
+        std::string s;
+        jsoncons::encode_json(m,s);
+
+        auto result = jsoncons::decode_json<std::map<int,double>>(s.begin(), s.end());
+
+        REQUIRE(result.size() == m.size());
+        CHECK(m[1] == result[1]);
+        CHECK(m[2] == result[2]);
+    }
+
+    SECTION("custom iterator source")
+    {
+        std::string s;
+        jsoncons::encode_json(m,s);
+
+        MyIterator it(s.data());
+        MyIterator end(s.data() + s.length());
+
+        auto result = jsoncons::decode_json<std::map<int,double>>(it, end);
+
+        REQUIRE(result.size() == m.size());
+        CHECK(m[1] == result[1]);
+        CHECK(m[2] == result[2]);
+    }
 }
 

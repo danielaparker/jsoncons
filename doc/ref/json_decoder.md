@@ -37,10 +37,6 @@ Checks if the `deserializer` contains a valid `basic_json` value. Initially `is_
     Json get_result()
 Returns the json value `v` stored in the `deserializer` as `std::move(v)`. If before calling this function `is_valid()` is false, the behavior is undefined. After `get_result()` is called, 'is_valid()' becomes false.
 
-### See also
-
-- [basic_json_visitor](basic_json_visitor.md)
-
 ### Examples
 
 #### Decode a JSON text using stateful result and work allocators
@@ -168,4 +164,8 @@ Output:
     }
 ]
 ```
+
+### See also
+
+[basic_json_visitor](basic_json_visitor.md)
 

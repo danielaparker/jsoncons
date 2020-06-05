@@ -77,6 +77,7 @@ Output:
     "$['reputons'][1]['rating']": 0.75
 }
 ```
+
 ### See also
 
 [jsoncons::jsonpointer::flatten](../jsonpointer/flatten.md)

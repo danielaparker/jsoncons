@@ -10,30 +10,50 @@ Decodes a [Concise Binary Object Representation](http://cbor.io/) data format in
 
 ```c++
 template<class T>
-T decode_cbor(const std::vector<uint8_t>& v,
-              const cbor_decode_options& options = cbor_decode_options()); // (1)
+T decode_cbor(const std::vector<uint8_t>& source,
+              const cbor_decode_options& options = cbor_decode_options()); // (1) (until v0.152.0)
+
+template<class T, class Source>
+T decode_cbor(const Source& source,
+              const cbor_decode_options& options = cbor_decode_options()); // (1) (since v0.152.0)
 
 template<class T>
 T decode_cbor(std::istream& is,
               const cbor_decode_options& options = cbor_decode_options()); // (2)
 
+template<class T, class InputIt>
+T decode_cbor(InputIt first, InputIt last,
+              const cbor_decode_options& options = cbor_decode_options()); // (3) (since v0.153.0)
+
 template<class T,class TempAllocator>
 T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-              const std::vector<uint8_t>& v,
-              const cbor_decode_options& options = cbor_decode_options()); // (3)
+              const std::vector<uint8_t>& source,
+              const cbor_decode_options& options = cbor_decode_options()); // (4) (until 0.152.0)
+
+template<class T, class Source, class TempAllocator>
+T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
+              const Source& source,
+              const cbor_decode_options& options = cbor_decode_options()); // (4) (since 0.152.0)
 
 template<class T,class TempAllocator>
 T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
               std::istream& is,
-              const cbor_decode_options& options = cbor_decode_options()); // (4)
+              const cbor_decode_options& options = cbor_decode_options()); // (5)
 ```
 
-(1) Reads a CBOR bytes buffer into a type T, using the specified (or defaulted) [options](cbor_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+(1) Reads CBOR data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+Type `Source` must be a container that has member functions `data()` and `size()`, 
+and member type `value_type` with size exactly 8 bits (since v0.152.0.)
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
-(2) Reads a CBOR binary stream into a type T, using the specified (or defaulted) [options](cbor_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+(2) Reads CBOR data from a binary stream into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
+or support [json_type_traits](../json_type_traits.md).
+
+(3) Reads CBOR data from the range [`first`,`last`) into a type T, using the specified (or defaulted) [options](cbor_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 
 #### Exceptions
@@ -154,10 +174,10 @@ int main()
     std::vector<uint8_t> buf = {0x45,'H','e','l','l','o'};
     json j = cbor::decode_cbor<json>(buf);
 
-    auto bs = j.as<byte_string>();
+    auto bstr = j.as<std::vector<uint8_t>>();
 
-    // byte_string to ostream displays as hex
-    std::cout << "(1) "<< bs << "\n\n";
+    // use byte_string_view to display as hex
+    std::cout << "(1) "<< byte_string_view(bstr) << "\n\n";
 
     // byte string value to JSON text becomes base64url
     std::cout << "(2) " << j << std::endl;
@@ -165,7 +185,7 @@ int main()
 ```
 Output:
 ```
-(1) 48 65 6c 6c 6f
+(1) 48,65,6c,6c,6f
 
 (2) "SGVsbG8"
 ```
@@ -283,7 +303,7 @@ int main()
     cbor::encode_cbor(v, output1);
 
     // output1 contains a classical CBOR array
-    std::cout << "(3)\n" << byte_string_view(output1.data(), output1.size()) << "\n\n";
+    std::cout << "(3)\n" << byte_string_view(output1) << "\n\n";
 
     std::vector<uint8_t> output2;
     cbor::cbor_options options;
@@ -291,7 +311,7 @@ int main()
     cbor::encode_cbor(v, output2, options);
 
     // output2 contains a float64, native endian, Typed Array 
-    std::cout << "(4)\n" << byte_string_view(output2.data(), output2.size()) << "\n\n";
+    std::cout << "(4)\n" << byte_string_view(output2) << "\n\n";
 }
 ```
 
@@ -357,7 +377,8 @@ multi-dim-row-major
 
 ### See also
 
-- [byte_string](../byte_string.md)
-- [encode_cbor](encode_cbor.md) encodes a json value to the [Concise Binary Object Representation](http://cbor.io/) data format.
+[byte_string_view](../byte_string_view.md)  
+
+[encode_cbor](encode_cbor.md) encodes a json value to the [Concise Binary Object Representation](http://cbor.io/) data format.  
 
 

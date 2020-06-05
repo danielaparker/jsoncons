@@ -4,8 +4,12 @@
 #include <jsoncons_ext/cbor/cbor.hpp>
 
 template<class T>
-void encode_cbor(const T& val, std::vector<uint8_t>& buffer, 
-                 const cbor_encode_options& options = cbor_encode_options()); // (1)
+void encode_cbor(const T& jval, std::vector<uint8_t>& v,
+                 const cbor_decode_options& options = cbor_decode_options()); // (1) (until v0.152.0)
+
+template<class T, class Container>
+void encode_cbor(const T& jval, Container& v,
+                 const cbor_decode_options& options = cbor_decode_options()); // (1) (since v0.152.0)
 
 template<class T>
 void encode_cbor(const T& val, std::ostream& os, 
@@ -14,17 +18,15 @@ void encode_cbor(const T& val, std::ostream& os,
 
 Encodes a C++ data structure to the [Concise Binary Object Representation](http://cbor.io/) data format.
 
-(1) Writes a value of type T into a bytes buffer in the CBOR data format, using the specified (or defaulted) [options](cbor_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+(1) Writes a value of type T into a byte container in the CBOR data format, using the specified (or defaulted) [options](cbor_options.md). 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
+Type `Container` must be back insertable and have member type `value_type` with size exactly 8 bits (since v0.152.0.)
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 (2) Writes a value of type T into a binary stream in the CBOR data format, using the specified (or defaulted) [options](cbor_options.md). 
-Type T must be an instantiation of [basic_json](../basic_json.md) 
+Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
-
-### See also
-
-- [decode_cbor](decode_cbor) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
 
 ### Examples
 
@@ -113,17 +115,13 @@ using namespace jsoncons;
 int main()
 {
     // construct byte string value
-    json j(byte_string{'H','e','l','l','o'});
+    std::vector<uint8_t> v = {'H','e','l','l','o'};
+    json j(byte_string_arg, v);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j, buf);
 
-    std::cout << std::hex << std::showbase << "(1) ";
-    for (auto c : buf)
-    {
-        std::cout << (int)c;
-    }
-    std::cout << std::dec << "\n\n";
+    std::cout << "(1) " << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
     std::cout << "(2) " << j2 << std::endl;
@@ -131,7 +129,7 @@ int main()
 ```
 Output:
 ```
-(1) 0x450x480x650x6c0x6c0x6f
+(1) 45,48,65,6c,6c,6f
 
 (2) "SGVsbG8"
 ```
@@ -147,17 +145,13 @@ using namespace jsoncons;
 int main()
 {
     // construct byte string value
-     json j1(byte_string({'H','e','l','l','o'}), semantic_tag::base64);
+    std::vector<uint8_t> v = {'H','e','l','l','o'};
+    json j1(byte_string_arg, v, semantic_tag::base64);
 
     std::vector<uint8_t> buf;
     cbor::encode_cbor(j1, buf);
 
-    std::cout << std::hex << std::showbase << "(1) ";
-    for (auto c : buf)
-    {
-        std::cout << (int)c;
-    }
-    std::cout << std::dec << "\n\n";
+    std::cout << "(1) " << byte_string_view(buf) << "\n\n";
 
     json j2 = cbor::decode_cbor<json>(buf);
     std::cout << "(2) " << j2 << std::endl;
@@ -165,7 +159,7 @@ int main()
 ```
 Output:
 ```
-(1) 0xd60x450x480x650x6c0x6c0x6f
+(1) d6,45,48,65,6c,6c,6f
 
 (2) "SGVsbG8="
 ```
@@ -211,12 +205,7 @@ int main()
 
     cbor::encode_cbor(j, buf, options);
 
-    for (auto c : buf)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n";
+    std::cout << byte_string_view(buf) << "\n\n";
 
 /*
     d90100 -- tag (256)
@@ -262,11 +251,12 @@ int main()
 ```
 Output:
 ```
-d9010083a3646e616d6568436f636b7461696c65636f756e741901a16472616e6b04a3d8190304d81902190138d819006442617468a3d819021902b3d8190064466f6f64d8190304
+d9,01,00,83,a3,64,6e,61,6d,65,68,43,6f,63,6b,74,61,69,6c,65,63,6f,75,6e,74,19,01,a1,64,72,61,6e,6b,04,a3,d8,19,03,04,d8,19,02,19,01,38,d8,19,00,64,42,61,74,68,a3,d8,19,02,19,02,b3,d8,19,00,64,46,6f,6f,64,d8,19,03,04
 ```
 
 ### See also
 
-- [byte_string](../byte_string.md)
-- [decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.
+[byte_string_view](../byte_string_view.md)  
+
+[decode_cbor](decode_cbor.md) decodes a [Concise Binary Object Representation](http://cbor.io/) data format to a json value.  
 

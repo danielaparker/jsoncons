@@ -8,12 +8,13 @@ to work with the data in a number of ways:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
 
-- As a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
+- With cursor-level access to a stream of parse events, somewhat analogous to StAX pull parsing and push serializing
   in the XML world.
 
 Compared to other JSON libraries, jsoncons has been designed to handle very large JSON texts. At its heart are
-SAX style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
-But it also supports incremental parsing into a user's preferred form, using
+SAX-style parsers and serializers. It supports reading an entire JSON text in memory in a variant-like structure.
+But it also supports efficient access to the underlying data using StAX-style pull parsing and push serializing.
+And it supports incremental parsing into a user's preferred form, using
 information about user types provided by specializations of [json_type_traits](doc/ref/json_type_traits.md).
 
 The [jsoncons data model](doc/ref/data-model.md) supports the familiar JSON types - nulls,
@@ -42,6 +43,8 @@ _"I am so happy I have come across your json c++ library!"_
 
 _"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript ... it's a great library"_
 
+_"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
+
 _"this software is great and the ability to have an xpath like facility is so useful"_
 
 _"I think this is the closest
@@ -66,9 +69,10 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 
 The library requires a C++ Compiler with C++11 support. In addition the library defines `jsoncons::endian`,
 `jsoncons::basic_string_view`, `jsoncons::optional`, and `jsoncons::span`, which will be typedefed to
-their standard library equivalents if detected. Otherwise they will be proxied with internal implementations.
+their standard library equivalents if detected. Otherwise they will be typedefed to internal, C++11 compatible, implementations.
 
-The library uses exceptions and in some cases `std::error_code`'s to report errors.
+The library uses exceptions and in some cases [std::error_code](https://en.cppreference.com/w/cpp/error/error_code)'s to report errors. Apart from `jsoncons::assertion_error`,
+all jsoncons exception classes implement the [jsoncons::json_error](doc/ref/json_error.md) interface.
 If exceptions are disabled or if the compile time macro `JSONCONS_NO_EXCEPTIONS` is defined, throws become calls to `std::terminate`.
 
 ## Benchmarks
@@ -128,7 +132,7 @@ jsoncons allows you to work with the data in a number of ways:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
 
-- As a stream of parse events
+- With [cursor-level access](doc/ref/basic_json_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -308,7 +312,11 @@ These macro declarations must be placed outside any namespace blocks.
 
 See [examples](doc/Examples.md#G0) for other ways of specializing `json_type_traits`.
 
-#### As a stream of parse events
+#### With cursor-level access
+
+A typical pull parsing application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
 
 ```c++
 int main()
@@ -385,7 +393,7 @@ end_array
 end_object
 ```
 
-You can apply a filter to the stream, for example,
+You can apply a filter to a cursor using the pipe syntax (e.g., `cursor | filter1 | filter2 | ...`)
 
 ```c++
 int main()
@@ -398,25 +406,24 @@ int main()
             name = ev.get<std::string>();
             return false;
         }
-        else if (name == "rated")
+        if (name == "rated")
         {
             name.clear();
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
     };
 
-    json_cursor cursor(data, filter);
-    for (; !cursor.done(); cursor.next())
+    json_cursor cursor(data);
+    auto filtered_c = cursor | filter;
+
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:
-                // Or std::string_view, if supported
+                // Or std::string_view, if C++17
                 std::cout << event.event_type() << ": " << event.get<jsoncons::string_view>() << "\n";
                 break;
             default:
@@ -480,7 +487,7 @@ jsoncons allows you to work with the CBOR data similarly to JSON data:
 
 - As a strongly typed C++ data structure that implements [json_type_traits](doc/ref/json_type_traits.md)
 
-- As a stream of parse events
+- With [cursor-level access](doc/ref/cbor/basic_cbor_cursor.md) to a stream of parse events
 
 #### As a variant-like data structure
 
@@ -507,15 +514,9 @@ int main()
     std::cout << pretty_print(result) << "\n\n";
 
     // Serialize back to CBOR
-    std::cout << "(4)\n";
     std::vector<uint8_t> buffer;
     cbor::encode_cbor(j, buffer);
-    for (auto c : buffer) 
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
-    }
-    std::cout << "\n\n";
+    std::cout << "(4)\n" << byte_string_view(buffer) << "\n\n";
 }
 ```
 Output:
@@ -527,8 +528,8 @@ Output:
 ]
 
 (2)
-50 75 73 73 (n/a)
-50 75 73 73 (base64)
+50,75,73,73 (n/a)
+50,75,73,73 (base64)
 
 (3)
 [
@@ -537,7 +538,7 @@ Output:
 ]
 
 (4)
-82 83 63 66 6f 6f 44 50 75 73 73 c5 82 20 03 83 63 62 61 72 d6 44 50 75 73 73 c4 82 38 1c c2 4d 01 8e e9 0f f6 c3 73 e0 ee 4e 3f 0a d2
+82,83,63,66,6f,6f,44,50,75,73,73,c5,82,20,03,83,63,62,61,72,d6,44,50,75,73,73,c4,82,38,1c,c2,4d,01,8e,e9,0f,f6,c3,73,e0,ee,4e,3f,0a,d2
 ```
 
 #### As a strongly typed C++ data structure
@@ -556,31 +557,29 @@ int main()
     std::cout << "\n";
 
     // Serialize back to CBOR
-    std::cout << "(2)\n";
     std::vector<uint8_t> buffer;
     cbor::encode_cbor(val, buffer);
-    for (auto c : buffer) 
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c) << ' ';
-    }
-    std::cout << "\n\n";
+    std::cout << "(2)\n" << byte_string_view(buffer) << "\n\n";
 }
 ```
 Output:
 ```
 (1)
-foo, 50 75 73 73, 0x3p-1
-bar, 50 75 73 73, 1.23456789012345678901234567890
+foo, 50,75,73,73, 0x3p-1
+bar, 50,75,73,73, 1.23456789012345678901234567890
 
 (2)
-82 83 63 66 6f 6f 44 50 75 73 73 66 30 78 33 70 2d 31 83 63 62 61 72 44 50 75 73 73 78 1f 31 2e 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30 31 32 33 34 35 36 37 38 39 30
+82,9f,63,66,6f,6f,44,50,75,73,73,66,30,78,33,70,2d,31,ff,9f,63,62,61,72,44,50,75,73,73,78,1f,31,2e,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30,31,32,33,34,35,36,37,38,39,30,ff
 ```
 
 Note that when decoding the bigfloat and decimal fraction into a `std::string`, we lose the semantic information
 that the variant like data structure preserved with a tag, so serializing back to CBOR produces a text string.
 
-#### As a stream of parse events
+#### With cursor-level access
+
+A typical pull parsing application will repeatedly process the `current()` 
+event and call `next()` to advance to the next event, until `done()` 
+returns `true`.
 
 ```c++
 int main()
@@ -642,18 +641,18 @@ Output:
 begin_array (n/a)
 begin_array (n/a)
 string_value: foo (n/a)
-byte_string_value: 50 75 73 73 (n/a)
+byte_string_value: 50,75,73,73 (n/a)
 string_value: 0x3p-1 (bigfloat)
 end_array (n/a)
 begin_array (n/a)
 string_value: bar (n/a)
-byte_string_value: 50 75 73 73 (base64)
+byte_string_value: 50,75,73,73 (base64)
 string_value: 1.23456789012345678901234567890 (bigdec)
 end_array (n/a)
 end_array (n/a)
 ```
 
-You can apply a filter to the stream, for example,
+You can apply a filter to a cursor using the pipe syntax, 
 
 ```c++
 int main()
@@ -663,10 +662,12 @@ int main()
         return (ev.tag() == semantic_tag::bigdec) || (ev.tag() == semantic_tag::bigfloat);  
     };
 
-    cbor::cbor_bytes_cursor cursor(data, filter);
-    for (; !cursor.done(); cursor.next())
+    cbor::cbor_bytes_cursor cursor(data);
+    auto filtered_c = cursor | filter;
+
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:
@@ -759,26 +760,20 @@ using namespace jsoncons;
 
 int main()
 {
-    // Construct some CBOR using the push serializer
-    std::vector<uint8_t> b;
-    cbor::cbor_bytes_encoder encoder(b);
+    // Construct some CBOR using the streaming API
+    std::vector<uint8_t> bytes_in;
+    cbor::cbor_bytes_encoder encoder(bytes_in);
     encoder.begin_array(); // indefinite length outer array
     encoder.begin_array(3); // a fixed length array
     encoder.string_value("foo");
-    encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
+    encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'}); // no suggested conversion
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);
     encoder.end_array();
     encoder.end_array();
     encoder.flush();
 
     // Print bytes
-    std::cout << "(1) ";
-    for (auto c : b)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(bytes_in) << "\n\n";
 /*
     9f -- Start indefinte length array
       83 -- Array of length 3
@@ -792,7 +787,7 @@ int main()
       ff -- "break" 
 */
     // Unpack bytes into a json variant value, and add some more elements
-    json j = cbor::decode_cbor<json>(b);
+    json j = cbor::decode_cbor<json>(bytes_in);
 
     // Loop over the rows
     std::cout << "(2)\n";
@@ -820,7 +815,7 @@ int main()
     // Add some more elements
 
     json another_array(json_array_arg); 
-    another_array.emplace_back(byte_string({'P','u','s','s'}),
+    another_array.emplace_back(byte_string_arg, std::vector<uint8_t>({'P','u','s','s'}),
                                semantic_tag::base64); // suggested conversion to base64
     another_array.emplace_back("273.15", semantic_tag::bigdec);
     another_array.emplace(another_array.array_range().begin(),"bar"); // place at front
@@ -838,25 +833,16 @@ int main()
     __int128 i = j[1][2].as<__int128>();
 #endif
 
-    // Get byte string value at position /1/1 as a byte_string
-    byte_string bytes = j[1][1].as<byte_string>();
-    std::cout << "(8) " << bytes << "\n\n";
-
-    // or alternatively as a std::vector<uint8_t>
-    std::vector<uint8_t> u = j[1][1].as<std::vector<uint8_t>>();
+    // Get byte string value at position /1/1 as a std::vector<uint8_t>
+    auto bstr = j[1][1].as<std::vector<uint8_t>>();
+    std::cout << "(8) " << byte_string_view(bstr) << "\n\n";
 
     // Repack bytes
-    std::vector<uint8_t> b2;
-    cbor::encode_cbor(j, b2);
+    std::vector<uint8_t> bytes_out;
+    cbor::encode_cbor(j, bytes_out);
 
     // Print the repacked bytes
-    std::cout << "(9) ";
-    for (auto c : b2)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(9)\n" << byte_string_view(bytes_out) << "\n\n";
 /*
     82 -- Array of length 2
       83 -- Array of length 3
@@ -883,13 +869,14 @@ int main()
     csv_options.column_names("Column 1,Column 2,Column 3");
 
     std::cout << "(10)\n";
-    csv::encode_csv(j, std::cout, csv_options);
+    csv::encode_csv(j, std::cout, csv_options);    
 }
 
 ```
 Output:
 ```
-(1) 9f8363666f6f4450757373c349010000000000000000ff
+(1)
+9f,83,63,66,6f,6f,44,50,75,73,73,c3,49,01,00,00,00,00,00,00,00,00,ff
 
 (2)
 ["foo","UHVzcw","-18446744073709551617"]
@@ -914,9 +901,10 @@ Output:
 
 (7) 273.15
 
-(8) 50 75 73 73
+(8) 50,75,73,73
 
-(9) 828363666f6f4450757373c3490100000000000000008363626172d64450757373c48221196ab3
+(9)
+82,83,63,66,6f,6f,44,50,75,73,73,c3,49,01,00,00,00,00,00,00,00,00,83,63,62,61,72,d6,44,50,75,73,73,c4,82,21,19,6a,b3
 
 (10)
 Column 1,Column 2,Column 3

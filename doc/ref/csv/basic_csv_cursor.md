@@ -12,6 +12,11 @@ template<
 A pull parser for reporting CSV parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
+In addition, when positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` to `end_object`, 
+and when positioned on a `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
 
 `basic_csv_cursor` is noncopyable and nonmoveable.
 
@@ -24,7 +29,7 @@ wcsv_cursor    |basic_csv_cursor<wchar_t>
 
 ### Implemented interfaces
 
-[basic_staj_reader](../staj_reader.md)
+[basic_staj_cursor](../staj_cursor.md)
 
 #### Constructors
 
@@ -36,55 +41,30 @@ wcsv_cursor    |basic_csv_cursor<wchar_t>
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
-                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
-                     std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
-                     const Allocator& alloc = Allocator()); // (2)
-
-Constructors (1)-(2) read from a character sequence or stream and throw a 
-[ser_error](../ser_error.md) if a parsing error is encountered while processing the initial event.
-
-    template <class Source>
-    basic_csv_cursor(Source&& source, std::error_code& ec); // (3)
+                     std::error_code& ec); // (2)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      const basic_csv_decode_options<CharT>& options,
-                     std::error_code& ec); // (4)
-
-    template <class Source>
-    basic_csv_cursor(Source&& source,
-                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     std::error_code& ec); // (5)
+                     std::error_code& ec); // (3)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
-                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_decode_options<CharT>& options,
-                     std::error_code& ec); // (6)
-
-    template <class Source>
-    basic_csv_cursor(Source&& source, 
-                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                     const basic_csv_decode_options<CharT>& options,
-                     std::error_code& ec); // (7)
-
-    template <class Source>
-    basic_csv_cursor(Source&& source, 
-                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec); // (8)
+                     std::error_code& ec); // (4)
 
     template <class Source>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
                      Source&& source, 
-                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec); // (9)
+                     std::error_code& ec); // (5)
 
-Constructors (3)-(9) read from a character sequence or stream and set `ec`
+Constructors (1) reads from a character sequence or stream and throws a 
+[ser_error](../ser_error.md) if a parsing error is encountered while processing the initial event.
+
+Constructors (2)-(5) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_csv_cursor` does not outlive the source  
@@ -104,14 +84,14 @@ Checks if there are no more events.
     const basic_staj_event& current() const override;
 Returns the current [basic_staj_event](../staj_event.md).
 
-    void read(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+    void read_to(json_visitor& visitor) override
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](../ser_error.md).
 
-    void read(basic_json_visitor<char_type>& visitor,
+    void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
@@ -125,11 +105,19 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
     const ser_context& context() const override;
 Returns the current [context](../ser_context.md)
 
+#### Non-member functions
+
+   template <class CharT, class Src, class Allocator>
+   basic_staj_filter_view<CharT> operator|(basic_csv_cursor<CharT,Src,Allocator>& cursor, 
+                                    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
+
 ### Examples
 
 ### See also
 
-- [staj_reader](../staj_reader.md) 
-- [staj_array_iterator](../staj_array_iterator.md) 
-- [staj_object_iterator](../staj_object_iterator.md)
+[basic_staj_event](../basic_staj_event.md)  
+
+[staj_array_iterator](../staj_array_iterator.md)  
+
+[staj_object_iterator](../staj_object_iterator.md)  
 

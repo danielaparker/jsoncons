@@ -32,7 +32,7 @@ namespace jsoncons {
                               const Json& context_j, 
                               std::error_code& ec)
         {
-            serialize(std::integral_constant<bool, is_stateless<typename Json::allocator_type>::value>(),
+            serialize(std::integral_constant<bool, jsoncons::detail::is_stateless<typename Json::allocator_type>::value>(),
                       val, encoder, context_j, ec);
         }
     private:
@@ -63,7 +63,7 @@ namespace jsoncons {
     // bool
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_bool<T>::value 
+        typename std::enable_if<detail::is_bool<T>::value 
     >::type>
     {
         template <class Json>
@@ -79,7 +79,7 @@ namespace jsoncons {
     // uint
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_u8_u16_u32_or_u64<T>::value 
+        typename std::enable_if<detail::is_u8_u16_u32_or_u64<T>::value 
     >::type>
     {
         template <class Json>
@@ -95,7 +95,7 @@ namespace jsoncons {
     // int
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_i8_i16_i32_or_i64<T>::value 
+        typename std::enable_if<detail::is_i8_i16_i32_or_i64<T>::value 
     >::type>
     {
         template <class Json>
@@ -111,7 +111,7 @@ namespace jsoncons {
     // float or double
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_float_or_double<T>::value 
+        typename std::enable_if<detail::is_float_or_double<T>::value 
     >::type>
     {
         template <class Json>
@@ -127,7 +127,7 @@ namespace jsoncons {
     // string
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+        typename std::enable_if<detail::is_basic_string<T>::value &&
                                 std::is_same<typename T::value_type,CharT>::value 
     >::type>
     {
@@ -142,7 +142,7 @@ namespace jsoncons {
     };
     template <class T, class CharT>
     struct ser_traits<T,CharT,
-        typename std::enable_if<jsoncons::detail::is_string<T>::value &&
+        typename std::enable_if<detail::is_basic_string<T>::value &&
                                 !std::is_same<typename T::value_type,CharT>::value 
     >::type>
     {
@@ -185,7 +185,7 @@ namespace jsoncons {
 
     namespace detail
     {
-        template<size_t Pos, size_t Size, class Json, class Tuple>
+        template<size_t Pos, std::size_t Size, class Json, class Tuple>
         struct json_serialize_tuple_helper
         {
             using char_type = typename Json::char_type;
@@ -243,7 +243,7 @@ namespace jsoncons {
     struct ser_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
                  jsoncons::detail::is_list_like<T>::value &&
-                 !jsoncons::detail::is_typed_array<T>::value 
+                 !detail::is_typed_array<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;

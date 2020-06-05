@@ -12,7 +12,8 @@ void data_model_example1()
     json j(json_array_arg);
 
     j.emplace_back("foo");
-    j.emplace_back(byte_string{ 'b','a','r' });
+    std::vector<uint8_t> bstr = {'b','a','r'};
+    j.emplace_back(byte_string_arg, bstr);
     j.emplace_back("-18446744073709551617", semantic_tag::bigint);
     j.emplace_back("273.15", semantic_tag::bigdec);
     j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
@@ -24,13 +25,7 @@ void data_model_example1()
 
     std::vector<uint8_t> bytes;
     cbor::encode_cbor(j, bytes);
-    std::cout << "(2)\n";
-    for (auto c : bytes)
-    {
-        std::cout << std::hex << std::noshowbase << std::setprecision(2) << std::setw(2)
-                  << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(2)\n" << byte_string_view(bytes) << "\n\n";
 /*
 88 -- Array of length 8
   63 -- String value of length 3 
@@ -75,13 +70,7 @@ void data_model_example2()
     encoder.end_array();
     encoder.flush();
 
-    std::cout << "(1)\n";
-    for (auto c : bytes)
-    {
-        std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-                  << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    }
-    std::cout << "\n\n";
+    std::cout << "(1)\n" << byte_string_view(bytes) << "\n\n";
 
 /*
 9f -- Start indefinite length array 
@@ -119,8 +108,8 @@ void data_model_example2()
 void data_model_examples()
 {
     std::cout << "\ndata model examples\n\n";
-    data_model_example1();
     data_model_example2();
+    data_model_example1();
     std::cout << std::endl;
 }
 

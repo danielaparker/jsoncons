@@ -251,9 +251,9 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                              semantic_tag, 
-                              const ser_context&,
-                              std::error_code&) override
+                           semantic_tag, 
+                           const ser_context&,
+                           std::error_code&) override
     {
         before_value(jsoncons::bson::detail::bson_format::binary_cd);
 
@@ -261,74 +261,96 @@ private:
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         std::size_t string_offset = buffer_.size();
 
+        buffer_.push_back(0x80); // default subtype
+
         for (auto c : b)
         {
             buffer_.push_back(c);
         }
-        std::size_t length = buffer_.size() - string_offset;
+        std::size_t length = buffer_.size() - string_offset - 1;
         jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
     }
 
-    bool visit_int64(int64_t val, 
-                        semantic_tag tag, 
-                        const ser_context&,
-                        std::error_code&) override
+    bool visit_byte_string(const byte_string_view& b, 
+                           uint64_t ext_tag, 
+                           const ser_context&,
+                           std::error_code&) override
     {
-        switch (tag)
+        before_value(jsoncons::bson::detail::bson_format::binary_cd);
+
+        std::size_t offset = buffer_.size();
+        buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
+        std::size_t string_offset = buffer_.size();
+
+        buffer_.push_back(static_cast<uint8_t>(ext_tag)); // default subtype
+
+        for (auto c : b)
         {
-            case semantic_tag::timestamp:
-                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                break;
-            default:
-                before_value(jsoncons::bson::detail::bson_format::int64_cd);
-                break;
+            buffer_.push_back(c);
         }
-        if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
+        std::size_t length = buffer_.size() - string_offset - 1;
+        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
+
+        return true;
+    }
+
+
+    bool visit_int64(int64_t val, 
+                     semantic_tag tag, 
+                     const ser_context&,
+                     std::error_code&) override
+    {
+        if (tag == semantic_tag::timestamp)
         {
-            jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
-        }
-        else if (val >= (std::numeric_limits<int64_t>::lowest)() && val <= (std::numeric_limits<int64_t>::max)())
-        {
+            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
             jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
         }
-        else
+        else if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
         {
-            // error
+            before_value(jsoncons::bson::detail::bson_format::int32_cd);
+            jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+        }
+        else if (val >= (std::numeric_limits<int64_t>::lowest)())
+        {
+            before_value(jsoncons::bson::detail::bson_format::int64_cd);
+            jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
         }
 
         return true;
     }
 
     bool visit_uint64(uint64_t val, 
-                         semantic_tag tag, 
-                         const ser_context&,
-                         std::error_code&) override
+                      semantic_tag tag, 
+                      const ser_context&,
+                      std::error_code& ec) override
     {
-        switch (tag)
+        bool more;
+        if (tag == semantic_tag::timestamp)
         {
-            case semantic_tag::timestamp:
-                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                break;
-            default:
-                before_value(jsoncons::bson::detail::bson_format::int64_cd);
-                break;
+            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+            more = true;
         }
-        if (val <= (std::numeric_limits<int32_t>::max)())
+        else if (val <= (std::numeric_limits<int32_t>::max)())
         {
+            before_value(jsoncons::bson::detail::bson_format::int32_cd);
             jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+            more = true;
         }
         else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
         {
+            before_value(jsoncons::bson::detail::bson_format::int64_cd);
             jsoncons::detail::native_to_little(static_cast<uint64_t>(val),std::back_inserter(buffer_));
+            more = true;
         }
         else
         {
-            // error
+            ec = bson_errc::number_too_large;
+            more = false;
         }
 
-        return true;
+        return more;
     }
 
     bool visit_double(double val, 
@@ -360,7 +382,7 @@ private:
 };
 
 using bson_stream_encoder = basic_bson_encoder<jsoncons::binary_stream_sink>;
-using bson_bytes_encoder = basic_bson_encoder<jsoncons::bytes_sink>;
+using bson_bytes_encoder = basic_bson_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 template<class Sink=jsoncons::binary_stream_sink>

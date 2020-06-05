@@ -68,7 +68,17 @@ basic_json(const byte_string_view& bytes,
 
 basic_json(byte_string_arg_t, const jsoncons::span<const uint8_t>& bytes, 
            semantic_tag tag = semantic_tag::none,
-           const Allocator& alloc = Allocator()); // (21)
+           const Allocator& alloc = Allocator()); // (21) (until v0.152)
+
+template <class Source>
+basic_json(byte_string_arg_t, const Source& source, 
+           semantic_tag tag = semantic_tag::none,
+           const Allocator& alloc = Allocator()); // (21) (since v0.152)
+
+template <class Source>
+basic_json(byte_string_arg_t, const Source& source, 
+           uint64_t ext_tag,
+           const Allocator& alloc = Allocator()); // (22) (since v0.152)
 ```
 
 (1) Constructs an empty json object. 
@@ -111,13 +121,26 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 
 (17) Constructs a `basic_json` value for types supported in [json_type_traits](json_type_traits.md) with allocator.
 
-(18) Constructs a `basic_json` value for a text string.
+(18) Constructs a `basic_json` value from a text string.
 
-(19) Constructs a `basic_json` value for a text string with supplied allocator.
+(19) Constructs a `basic_json` value from a text string with supplied allocator.
 
-(20) Constructs a `basic_json` value for a [byte_string](../byte_string.md).
+(20) Constructs a `basic_json` value from a [byte_string_view](../byte_string_view.md).
 
-(21) Constructs a `basic_json` value for a byte string from any container of `utf8_t` values.
+(21) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
+with a generic tag.
+Type `Source` must be a contiguous container that has member functions `data()` and `size()`, and member type `value_type` 
+with width of exactly 8 bits (since v0.152.0.)
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
+
+Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
+
+(22) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
+with a format specific tag.
+Type `Source` must be a contiguous container that has member functions `data()` and `size()`, and member type `value_type` 
+with width of exactly 8 bits (since v0.152.0.)
+Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
+
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
 
 ### Helpers

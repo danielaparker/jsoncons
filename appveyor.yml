@@ -42,10 +42,10 @@ environment:
       FLAGS: "/permissive- /std:c++latest /utf-8"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
-    - platform: vs
-      vsversion: 2017
-      arch: ARM
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
+    # - platform: vs
+    #  vsversion: 2017
+    #  arch: ARM
+    #  APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017 
 
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       vsversion: 2019

@@ -23,7 +23,7 @@ namespace jsoncons {
         single_quote,
         illegal_character_in_string,
         extra_comma,
-        expected_name,
+        expected_key,
         expected_value,
         invalid_value,
         expected_colon,
@@ -74,8 +74,8 @@ namespace jsoncons {
                     return "Illegal character in string";
                 case json_errc::extra_comma:
                     return "Extra comma";
-                case json_errc::expected_name:
-                    return "Expected object member name";
+                case json_errc::expected_key:
+                    return "Expected object member key";
                 case json_errc::expected_value:
                     return "Expected value";
                 case json_errc::invalid_value:

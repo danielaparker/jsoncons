@@ -25,10 +25,6 @@ void insert(InputIt first, InputIt last); // (3)
     iterator type that iterates over elements of type `key_value_type`,
     or alternatively over elements of type `std::pair<T1,T2>` where `T1` is convertible to `key_type` and `T2` is convertible to `basic_json`. 
 
-### See also
-
-- [push_back](json/push_back.md)
-
 ### Examples
 
 #### Creating an array of elements 
@@ -121,5 +117,8 @@ Output:
 {"a":1.0,"b":2.0,"c":3.0,"d":4.0,"e":5.0,"f":6.0}
 ```
 
+### See also
+
+[push_back](push_back.md)
 
 

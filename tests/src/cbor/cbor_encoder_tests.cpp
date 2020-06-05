@@ -35,7 +35,7 @@ TEST_CASE("cbor encode multi dim array test")
     encoder.end_array();
     encoder.end_multi_dim();
 
-    byte_string_view bstr(v.data(), v.size());
+    byte_string_view bstr(v);
     std::cout << "bstr: " << bstr << "\n\n";
 
     for (auto ch : bstr)
@@ -135,9 +135,8 @@ TEST_CASE("test_serialize_bignum")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -160,9 +159,9 @@ TEST_CASE("test_serialize_negative_bignum1")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    n = -1 - n;
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -185,9 +184,9 @@ TEST_CASE("test_serialize_negative_bignum2")
     encoder.begin_array();
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    n = -1 - n;
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -215,9 +214,9 @@ TEST_CASE("test_serialize_negative_bignum3")
 
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 
-    bignum n(-1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    n = -1 - n;
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -375,7 +374,7 @@ TEST_CASE("Too many and too few items in CBOR map or array")
     {
         CHECK(encoder.begin_array(4)); // a fixed length array
         CHECK(encoder.string_value("foo"));
-        CHECK(encoder.byte_string_value(byte_string{'P','u','s','s'})); // no suggested conversion
+        CHECK(encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'})); // no suggested conversion
         CHECK(encoder.string_value("-18446744073709551617", semantic_tag::bigint));
         CHECK(encoder.string_value("273.15", semantic_tag::bigdec));
         CHECK(encoder.end_array());
@@ -412,14 +411,41 @@ TEST_CASE("encode stringref")
 
     cbor::encode_cbor(j, buf, options);
 
-    //for (auto c : buf)
-    //{
-    //    std::cout << std::hex << std::setprecision(2) << std::setw(2) 
-    //              << std::noshowbase << std::setfill('0') << static_cast<int>(c);
-    //}
-    //std::cout << "\n";
-
     ojson j2 = cbor::decode_cbor<ojson>(buf);
     CHECK(j2 == j);
+}
+
+TEST_CASE("cbor encode with semantic_tags")
+{
+    SECTION("string")
+    {
+        json original;
+        original["uri"] = json("https://gmail.com/", semantic_tag::uri);
+        original["base64url"] = json("Zm9vYmFy", semantic_tag::base64url);
+        original["base64"] = json("Zm9vYmE=", semantic_tag::base64);
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(original, buffer);
+        json j = cbor::decode_cbor<json>(buffer);
+
+        CHECK(j == original);
+    }
+    SECTION("byte_string")
+    {
+        const std::vector<uint8_t> s1 = {'f','o'};
+        const std::vector<uint8_t> s2 = {'f','o','o','b','a'};
+        const std::vector<uint8_t> s3 = {'f','o','o','b','a','r'};
+
+        json original;
+        original["base64url"] = json(byte_string_arg, s1, semantic_tag::base64url);
+        original["base64"] = json(byte_string_arg, s2, semantic_tag::base64);
+        original["base16"] = json(byte_string_arg, s3, semantic_tag::base16);
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(original, buffer);
+        json j = cbor::decode_cbor<json>(buffer);
+
+        CHECK(j == original);
+    }
 }
 

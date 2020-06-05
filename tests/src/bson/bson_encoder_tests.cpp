@@ -12,29 +12,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("serialize object to bson")
-{
-    std::vector<uint8_t> v;
-    bson::bson_bytes_encoder encoder(v);
-
-    encoder.begin_object();
-    encoder.key("null");
-    encoder.null_value();
-    encoder.end_object();
-    encoder.flush();
-
-    JSONCONS_TRY
-    {
-        json result = bson::decode_bson<json>(v);
-        std::cout << result << std::endl;
-    }
-    JSONCONS_CATCH (const std::exception& e)
-    {
-        std::cout << e.what() << std::endl;
-    }
-} 
-
-namespace jsoncons { namespace bson {
+namespace {
 
     void test_equal(const std::vector<uint8_t>& v, const std::vector<uint8_t>& expected)
     {
@@ -61,7 +39,7 @@ namespace jsoncons { namespace bson {
             std::cout << e.what() << std::endl;
         }
     }
-}}
+}
 
 TEST_CASE("serialize to bson")
 {
@@ -78,11 +56,13 @@ TEST_CASE("serialize to bson")
         encoder.bool_value(false);
         encoder.null_value();
         encoder.string_value("Pussy cat");
-        encoder.byte_string_value(byte_string({'h','i','s','s'}));
+        std::vector<uint8_t> purr = {'h','i','s','s'};
+        encoder.byte_string_value(purr); // default subtype is user defined
+        // encoder.byte_string_value(purr, 0x80);
         encoder.end_array();
         encoder.flush();
 
-        std::vector<uint8_t> bson = {0x4d,0x00,0x00,0x00,
+        std::vector<uint8_t> bson = {0x4e,0x00,0x00,0x00,
                                      0x12, // int64
                                      0x30, // '0'
                                      0x00, // terminator
@@ -116,12 +96,15 @@ TEST_CASE("serialize to bson")
                                      0x37, // '7'
                                      0x00, // terminator
                                      0x04,0x00,0x00,0x00, // byte string length
+                                     0x80, // subtype
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+
+        check_equal(v,bson);
 
     }
+
     SECTION("object")
     {
         std::vector<uint8_t> v;
@@ -143,11 +126,12 @@ TEST_CASE("serialize to bson")
         encoder.key("6");
         encoder.string_value("Pussy cat");
         encoder.key("7");
-        encoder.byte_string_value(byte_string({'h','i','s','s'}));
+        std::vector<uint8_t> hiss = {'h','i','s','s'};
+        encoder.byte_string_value(hiss);
         encoder.end_object();
         encoder.flush();
 
-        std::vector<uint8_t> bson = {0x4d,0x00,0x00,0x00,
+        std::vector<uint8_t> bson = {0x4e,0x00,0x00,0x00,
                                      0x12, // int64
                                      0x30, // '0'
                                      0x00, // terminator
@@ -181,10 +165,11 @@ TEST_CASE("serialize to bson")
                                      0x37, // '7'
                                      0x00, // terminator
                                      0x04,0x00,0x00,0x00, // byte string length
+                                     0x80, // default subtype
                                      'h','i','s','s',
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+        check_equal(v,bson);
     }
 
     SECTION("outer object")
@@ -213,7 +198,7 @@ TEST_CASE("serialize to bson")
                                      0x00, // terminator
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+        check_equal(v,bson);
     }
 
     SECTION("outer array")
@@ -241,7 +226,28 @@ TEST_CASE("serialize to bson")
                                      0x00, // terminator
                                      0x00 // terminator
                                      };
-        jsoncons::bson::check_equal(v,bson);
+        check_equal(v,bson);
     }
 }
+
+TEST_CASE("serialize object to bson")
+{
+    std::vector<uint8_t> v;
+    bson::bson_bytes_encoder encoder(v);
+
+    encoder.begin_object();
+    encoder.key("null");
+    encoder.null_value();
+    encoder.end_object();
+    encoder.flush();
+
+    JSONCONS_TRY
+    {
+        json result = bson::decode_bson<json>(v);
+    }
+    JSONCONS_CATCH (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+} 
 

@@ -4,13 +4,14 @@
 #include <jsoncons/staj_iterator.hpp>
 
 template<
-    class Json, 
-    class T=Json>
+    class T,
+    class Json
+    >
 class staj_array_iterator
 ```
 
 A `staj_array_iterator` is an [InputIterator](https://en.cppreference.com/w/cpp/named_req/InputIterator) that
-accesses the individual stream events from a [staj_reader](staj_reader.md) and, provided that when it is constructed
+accesses the individual stream events from a [staj_cursor](staj_cursor.md) and, provided that when it is constructed
 the current stream event has type `staj_event_type::begin_array`, it retrieves the elements of the JSON array
 as items of type `T`. If when it is constructed the current stream event does not have type `staj_event_type::begin_array`,
 it becomes equal to the default-constructed iterator.
@@ -30,9 +31,9 @@ Member type                         |Definition
 
     staj_array_iterator() noexcept; // (1)
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader); // (2)
+    staj_array_iterator(staj_array_view<T, Json>& view); // (2)
 
-    staj_array_iterator(basic_staj_reader<char_type>& reader,
+    staj_array_iterator(staj_array_view<T, Json>& view,
                         std::error_code& ec); // (3)
 
 (1) Constructs the end iterator
@@ -60,33 +61,11 @@ Advances the iterator to the next array element.
 
 #### Non-member functions
 
-Range-based for loop support
+    template <class class T, class Json>
+    bool operator==(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
 
     template <class Json, class T>
-    staj_array_iterator<Json, T> begin(staj_array_iterator<Json, T> iter) noexcept; // (1)
-
-    template <class Json, class T>
-    staj_array_iterator<Json, T> end(const staj_array_iterator<Json, T>&) noexcept; // (2)
-
-(1) Returns iter unchanged (range-based for loop support.)
-
-(2) Returns a default-constructed `stax_array_iterator`, which serves as an end iterator. The argument is ignored.
-
-    template <class T, class CharT>
-    staj_array_iterator<Json, T> make_array_iterator(basic_staj_reader<CharT>& reader); // (1)
-
-    template <class T, class CharT>
-    staj_array_iterator<Json, T> make_array_iterator(basic_staj_reader<CharT>& reader, std::error_code& ec); // (1)
-
-(1) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
-
-(2) Makes a `staj_array_iterator` that iterates over the items retrieved from a pull reader.
-
-    template <class Json, class T>
-    bool operator==(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
-
-    template <class Json, class T>
-    bool operator!=(const staj_array_iterator<Json, T>& a, const staj_array_iterator<Json, T>& b)
+    bool operator!=(const staj_array_iterator<T, Json>& a, const staj_array_iterator<T, Json>& b);
 
 ### Examples
 
@@ -114,9 +93,9 @@ int main()
 
     json_cursor cursor(is);
 
-    auto it = make_array_iterator<json>(cursor);
+    auto view = staj_array<json>(cursor);
 
-    for (const auto& j : it)
+    for (const auto& j : view)
     {
         std::cout << pretty_print(j) << "\n";
     }
@@ -159,9 +138,9 @@ int main()
 
     json_cursor cursor(is);
 
-    auto it = make_array_iterator<ns::employee>(cursor);
+    auto view = staj_array<ns::employee>(cursor);
 
-    for (const auto& val : it)
+    for (const auto& val : view)
     {
         std::cout << val.employeeNo << ", " << val.name << ", " << val.title << "\n";
     }

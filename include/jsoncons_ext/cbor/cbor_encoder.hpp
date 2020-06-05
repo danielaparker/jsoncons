@@ -407,14 +407,20 @@ private:
         }
     }
 
-    void write_bignum(const bignum& n)
+    void write_bignum(bigint& n)
     {
+        bool is_neg = n < 0;
+        if (is_neg)
+        {
+            n = - n -1;
+        }
+
         int signum;
         std::vector<uint8_t> data;
-        n.dump(signum, data);
+        n.write_bytes_be(signum, data);
         std::size_t length = data.size();
 
-        if (signum == -1)
+        if (is_neg)
         {
             write_tag(3);
         }
@@ -599,7 +605,7 @@ private:
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
-            bignum n(s.data(), s.length());
+            bigint n = bigint::from_string(s.data(), s.length());
             write_bignum(n);
             end_value();
         }
@@ -780,7 +786,7 @@ private:
         }
         else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
-            bignum n(s.data(), s.length(), 16);
+            bigint n = bigint::from_string_radix(s.data(), s.length(), 16);
             write_bignum(n);
             end_value();
         }
@@ -797,7 +803,7 @@ private:
         {
             case semantic_tag::bigint:
             {
-                bignum n(sv.data(), sv.length());
+                bigint n = bigint::from_string(sv.data(), sv.length());
                 write_bignum(n);
                 end_value();
                 break;
@@ -820,21 +826,21 @@ private:
             }
             case semantic_tag::uri:
             {
-                sink_.push_back(32);
+                write_tag(32);
                 write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64url:
             {
-                sink_.push_back(33);
+                write_tag(33);
                 write_string(sv);
                 end_value();
                 break;
             }
             case semantic_tag::base64:
             {
-                sink_.push_back(34);
+                write_tag(34);
                 write_string(sv);
                 end_value();
                 break;
@@ -850,9 +856,9 @@ private:
     }
 
     bool visit_byte_string(const byte_string_view& b, 
-                              semantic_tag tag, 
-                              const ser_context&,
-                              std::error_code&) override
+                           semantic_tag tag, 
+                           const ser_context&,
+                           std::error_code&) override
     {
         byte_string_chars_format encoding_hint;
         switch (tag)
@@ -873,13 +879,13 @@ private:
         switch (encoding_hint)
         {
             case byte_string_chars_format::base64url:
-                sink_.push_back(0xd5);
+                write_tag(21);
                 break;
             case byte_string_chars_format::base64:
-                sink_.push_back(0xd6);
+                write_tag(22);
                 break;
             case byte_string_chars_format::base16:
-                sink_.push_back(0xd7);
+                write_tag(23);
                 break;
             default:
                 break;
@@ -901,6 +907,37 @@ private:
         }
         else
         {
+            write_byte_string_value(b);
+        }
+
+        end_value();
+        return true;
+    }
+
+    bool visit_byte_string(const byte_string_view& b, 
+                           uint64_t ext_tag, 
+                           const ser_context&,
+                           std::error_code&) override
+    {
+        if (options_.pack_strings() && b.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))
+        {
+            byte_string_type bs(b.data(), b.size(), alloc_);
+            auto it = bytestringref_map_.find(bs);
+            if (it == bytestringref_map_.end())
+            {
+                bytestringref_map_.emplace(std::make_pair(bs, next_stringref_++));
+                write_tag(ext_tag);
+                write_byte_string_value(bs);
+            }
+            else
+            {
+                write_tag(25);
+                write_uint64_value(it->second);
+            }
+        }
+        else
+        {
+            write_tag(ext_tag);
             write_byte_string_value(b);
         }
 
@@ -1174,7 +1211,7 @@ private:
                     write_tag(0x40);
                     break;
             }
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1204,7 +1241,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
             memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1234,7 +1271,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint32_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(uint32_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1264,7 +1301,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint64_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(uint64_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1292,7 +1329,7 @@ private:
             write_tag(0x48);
             std::vector<uint8_t> v(data.size()*sizeof(int8_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int8_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1322,7 +1359,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int16_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int16_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1352,7 +1389,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int32_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int32_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1382,7 +1419,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(int64_t));
             memcpy(v.data(), data.data(), data.size()*sizeof(int64_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1412,7 +1449,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(uint16_t));
             memcpy(v.data(),data.data(),data.size()*sizeof(uint16_t));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1442,7 +1479,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(float));
             memcpy(v.data(), data.data(), data.size()*sizeof(float));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1472,7 +1509,7 @@ private:
                                   tag);
             std::vector<uint8_t> v(data.size()*sizeof(double));
             memcpy(v.data(), data.data(), data.size()*sizeof(double));
-            write_byte_string_value(byte_string_view(v.data(),v.size()));
+            write_byte_string_value(byte_string_view(v));
             return true;
         }
         else
@@ -1661,7 +1698,7 @@ private:
 };
 
 using cbor_stream_encoder = basic_cbor_encoder<jsoncons::binary_stream_sink>;
-using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink>;
+using cbor_bytes_encoder = basic_cbor_encoder<jsoncons::bytes_sink<std::vector<uint8_t>>>;
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 JSONCONS_DEPRECATED_MSG("Instead, use cbor_bytes_encoder") typedef cbor_bytes_encoder cbor_bytes_serializer;

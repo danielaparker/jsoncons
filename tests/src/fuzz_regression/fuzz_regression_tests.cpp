@@ -15,186 +15,6 @@
 
 using namespace jsoncons;
 
-namespace {
-
-    class diagnostics_visitor : public default_json_visitor
-    {
-        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_begin_object" << std::endl; 
-            return true;
-        }
-
-        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_begin_object " << length << std::endl; 
-            return true;
-        }
-
-        bool visit_end_object(const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_end_object" << std::endl; 
-            return true;
-        }
-        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_begin_array " << length << std::endl; 
-            return true;
-        }
-
-        bool visit_end_array(const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_end_array" << std::endl; 
-            return true;
-        }
-
-        bool visit_key(const string_view_type& s, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_key " << s << std::endl; 
-            return true;
-        }
-        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_string " << s << std::endl; 
-            return true;
-        }
-        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_int64 " << val << std::endl; 
-            return true;
-        }
-        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_uint64 " << val << std::endl; 
-            return true;
-        }
-        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_bool " << val << std::endl; 
-            return true;
-        }
-        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_null " << std::endl; 
-            return true;
-        }
-
-        bool visit_typed_array(const span<const uint16_t>& s, 
-                                    semantic_tag tag, 
-                                    const ser_context&, 
-                                    std::error_code&) override  
-        {
-            std::cout << "visit_typed_array uint16_t " << tag << std::endl; 
-            for (auto val : s)
-            {
-                std::cout << val << "" << std::endl;
-            }
-            std::cout << "" << std::endl;
-            return true;
-        }
-
-        bool visit_typed_array(half_arg_t, const span<const uint16_t>& s,
-            semantic_tag tag,
-            const ser_context&,
-            std::error_code&) override
-        {
-            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << std::endl;
-            for (auto val : s)
-            {
-                std::cout << val << "" << std::endl;
-            }
-            std::cout << "" << std::endl;
-            return true;
-        }
-    };
-
-    class diagnostics_visitor2 : public default_json_visitor2
-    {
-        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_begin_object" << std::endl; 
-            return true;
-        }
-
-        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_begin_object " << length << std::endl; 
-            return true;
-        }
-
-        bool visit_end_object(const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_end_object" << std::endl; 
-            return true;
-        }
-        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_begin_array " << length << std::endl; 
-            return true;
-        }
-
-        bool visit_end_array(const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_end_array" << std::endl; 
-            return true;
-        }
-
-        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_string " << s << std::endl; 
-            return true;
-        }
-        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_int64 " << val << std::endl; 
-            return true;
-        }
-        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_uint64 " << val << std::endl; 
-            return true;
-        }
-        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_bool " << val << std::endl; 
-            return true;
-        }
-        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
-        {
-            std::cout << "visit_null " << std::endl; 
-            return true;
-        }
-
-        bool visit_typed_array(const span<const uint16_t>& s, 
-                                    semantic_tag tag, 
-                                    const ser_context&, 
-                                    std::error_code&) override  
-        {
-            std::cout << "visit_typed_array uint16_t " << tag << std::endl; 
-            for (auto val : s)
-            {
-                std::cout << val << "" << std::endl;
-            }
-            std::cout << "" << std::endl;
-            return true;
-        }
-
-        bool visit_typed_array(half_arg_t, const span<const uint16_t>& s,
-            semantic_tag tag,
-            const ser_context&,
-            std::error_code&) override
-        {
-            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << std::endl;
-            for (auto val : s)
-            {
-                std::cout << val << "" << std::endl;
-            }
-            std::cout << "" << std::endl;
-            return true;
-        }
-    };
-} // namespace
-
 TEST_CASE("oss-fuzz issues")
 {
     // Fuzz target: fuzz_parse
@@ -580,7 +400,7 @@ TEST_CASE("oss-fuzz issues")
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == cbor::cbor_errc::illegal_chunked_string);
+        CHECK((ec == cbor::cbor_errc::illegal_chunked_string || ec == cbor::cbor_errc::invalid_decimal_fraction));
     }
     // Fuzz target: fuzz_cbor_encoder
     // Issue: Stack-overflow
@@ -619,7 +439,61 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
 
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == msgpack::msgpack_errc::unexpected_eof);
+        CHECK((ec == msgpack::msgpack_errc::unexpected_eof ||
+               ec == msgpack::msgpack_errc::unknown_type));
     }
+
+    // Fuzz target: jsoncons:fuzz_json_cursor
+    // Issue: failed_throw
+    SECTION("issue 22091")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_json_cursor-5686693027119104";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::error_code ec;
+        json_cursor reader(is, ec);
+        while (reader.done() == 0 && !ec)
+        {
+            const auto& event = reader.current();
+            std::string s2 = event.get<std::string>(ec); 
+            if (!ec)
+            {
+                reader.next(ec);
+            }
+        }
+        CHECK(ec == convert_errc::not_string);
+    }
+
+    // Fuzz target: fuzz_cbor_encoder
+    // Issue: TIMEOUT
+    // Resolution: 
+/*
+    SECTION("issue 22379")
+    {
+        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-6266427819687936";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::vector<uint8_t> buf;
+        cbor::cbor_bytes_encoder encoder(buf);
+
+        cbor::cbor_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        try
+        {
+            reader.read(ec);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
+        //REQUIRE_NOTHROW(reader.read(ec));
+        //CHECK(ec == cbor::cbor_errc::unexpected_eof);
+    }
+*/
 }
 

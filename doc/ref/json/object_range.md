@@ -1,10 +1,10 @@
 ### jsoncons::basic_json::object_range
 
 ```c++
-range<object_iterator> object_range();
-range<const_object_iterator> object_range() const;
+range<object_iterator,const_object_iterator> object_range();
+range<const_object_iterator,const_object_iterator> object_range() const;
 ```
-Returns a "range" that supports a range-based for loop over the key-value pairs of a `basic_json` object      
+Returns a [range](range.md) that supports a range-based for loop over the key-value pairs of a `basic_json` object      
 Throws `std::domain_error` if not an object.
 
 ### Examples
@@ -42,22 +42,23 @@ isbn => 1852272007
 price => 22.48
 title => Pulp
 ```
-#### Object iterator
+
+#### Reverse object iterator
 ```c++
-json j;
+ojson j;
 j["city"] = "Toronto";
 j["province"] = "Ontario";
 j["country"] = "Canada";
 
-for (auto it = j.object_range().begin(); it != j.object_range().end(); ++it)
+for (auto it = j.object_range().crbegin(); it != j.object_range().crend(); ++it)
 {
     std::cout << it->key() << " => " << it->value().as<std::string>() << std::endl;
 }
 ```
 Output:
 ```c++
-city => Toronto
 country => Canada
 province => Ontario
+city => Toronto
 ```
 

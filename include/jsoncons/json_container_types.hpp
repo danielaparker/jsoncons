@@ -192,21 +192,21 @@ namespace jsoncons {
         // push_back
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,void>::type 
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,void>::type 
         push_back(T&& value)
         {
             elements_.emplace_back(std::forward<T>(value));
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,void>::type 
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,void>::type 
         push_back(T&& value)
         {
             elements_.emplace_back(std::forward<T>(value),get_allocator());
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
@@ -217,7 +217,7 @@ namespace jsoncons {
     #endif
         }
         template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,iterator>::type 
         insert(const_iterator pos, T&& value)
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
@@ -241,7 +241,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,iterator>::type 
         emplace(const_iterator pos, Args&&... args)
         {
     #if defined(JSONCONS_NO_ERASE_TAKING_CONST_ITERATOR)
@@ -789,7 +789,7 @@ namespace jsoncons {
         // insert_or_assign
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             bool inserted;
@@ -818,7 +818,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             bool inserted;
@@ -849,7 +849,7 @@ namespace jsoncons {
         // try_emplace
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& name, Args&&... args)
         {
             bool inserted;
@@ -877,7 +877,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& name, Args&&... args)
         {
             bool inserted;
@@ -905,7 +905,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,iterator>::type 
         try_emplace(iterator hint, const string_view_type& name, Args&&... args)
         {
             iterator it = hint;
@@ -941,7 +941,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,iterator>::type 
         try_emplace(iterator hint, const string_view_type& name, Args&&... args)
         {
             iterator it = hint;
@@ -977,7 +977,7 @@ namespace jsoncons {
         // insert_or_assign
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& name, T&& value)
         {
             iterator it;
@@ -1012,7 +1012,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& name, T&& value)
         {
             iterator it;
@@ -1548,7 +1548,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             auto result = insert_index_entry(name,members_.size());
@@ -1567,7 +1567,7 @@ namespace jsoncons {
         }
 
         template <class T, class A=allocator_type>
-        typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         insert_or_assign(const string_view_type& name, T&& value)
         {
             auto result = insert_index_entry(name,members_.size());
@@ -1587,7 +1587,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class T>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& key, T&& value)
         {
             if (hint == members_.end())
@@ -1615,7 +1615,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class T>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type 
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,iterator>::type 
         insert_or_assign(iterator hint, const string_view_type& key, T&& value)
         {
             if (hint == members_.end())
@@ -1780,7 +1780,7 @@ namespace jsoncons {
         // try_emplace
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& name, Args&&... args)
         {
             auto result = insert_index_entry(name,members_.size());
@@ -1798,7 +1798,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class... Args>
-        typename std::enable_if<!is_stateless<A>::value,std::pair<iterator,bool>>::type
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,std::pair<iterator,bool>>::type
         try_emplace(const string_view_type& key, Args&&... args)
         {
             auto result = insert_index_entry(key,members_.size());
@@ -1817,7 +1817,7 @@ namespace jsoncons {
         }
      
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<is_stateless<A>::value,iterator>::type
+        typename std::enable_if<jsoncons::detail::is_stateless<A>::value,iterator>::type
         try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
             if (hint == members_.end())
@@ -1844,7 +1844,7 @@ namespace jsoncons {
         }
 
         template <class A=allocator_type, class ... Args>
-        typename std::enable_if<!is_stateless<A>::value,iterator>::type
+        typename std::enable_if<!jsoncons::detail::is_stateless<A>::value,iterator>::type
         try_emplace(iterator hint, const string_view_type& key, Args&&... args)
         {
             if (hint == members_.end())

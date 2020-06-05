@@ -21,6 +21,12 @@
 namespace jsoncons { 
 namespace detail {
 
+    inline
+    char to_hex_character(uint8_t c)
+    {
+        return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
+    }
+
     // write_integer
 
     template<class Integer,class Result>
@@ -68,11 +74,11 @@ namespace detail {
         return count;
     }
 
-    // integer_to_hex_string
+    // integer_to_string_hex
 
     template<class Integer,class Result>
     typename std::enable_if<std::is_integral<Integer>::value,std::size_t>::type
-    integer_to_hex_string(Integer value, Result& result)
+    integer_to_string_hex(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
 

@@ -373,8 +373,6 @@ int main()
 
         second_example_a();
 
-        array_examples();
-
         wjson_examples();
 
         unicode_examples();
@@ -382,8 +380,6 @@ int main()
         parse_error_example();
 
         json_filter_examples();
-
-        msgpack_examples();
 
         validation_example();
 
@@ -395,23 +391,13 @@ int main()
 
         json_parser_examples();
 
-        data_model_examples();
-
         staj_iterator_examples();
- 
-        bson_examples();
 
         serialization_examples();
 
-        json_cursor_examples();
- 
         run_ubjson_examples();
 
-        run_cbor_examples();
-
         type_extensibility_examples();
-
-        json_reader_examples();
 
         run_csv_examples();
 
@@ -423,13 +409,7 @@ int main()
 
         json_accessor_examples();
 
-        json_accessor_examples();
-
-        run_cbor_typed_array_examples();
-
         jsonpatch_examples();
-
-        readme_examples();
 
         jsonpath_examples();
 
@@ -438,6 +418,30 @@ int main()
         json_traits_macros_examples();
 
         json_traits_macros_named_examples();
+
+        msgpack_examples();
+
+        readme_examples();
+
+        run_cbor_typed_array_examples();
+
+        run_cbor_examples();
+
+        data_model_examples();
+
+        json_cursor_examples();
+
+        json_accessor_examples();
+
+        array_examples();
+
+        run_cbor_examples();
+
+        json_reader_examples();
+
+        run_cbor_typed_array_examples();
+
+        bson_examples();
     }
     catch (const std::exception& e)
     {

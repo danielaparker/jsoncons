@@ -12,6 +12,11 @@ class basic_bson_cursor;
 A pull parser for reporting BSON parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
+In addition, when positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` to `end_object`, 
+and when positioned on a `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
 
 `basic_bson_cursor` is noncopyable and nonmoveable.
 
@@ -24,37 +29,34 @@ bson_bytes_cursor   |basic_bson_cursor<jsoncons::bytes_source>
 
 ### Implemented interfaces
 
-[staj_reader](staj_reader.md)
+[staj_cursor](staj_cursor.md)
 
 #### Constructors
 
     template <class Source>
     basic_bson_cursor(Source&& source,
+                      const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator()); // (1)
 
     template <class Source>
-    basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
-                      const Allocator& alloc = Allocator()); // (2)
-
-    template <class Source>
-    basic_bson_cursor(Source&& source, std::error_code& ec); // (3)
+    basic_bson_cursor(Source&& source, 
+                      std::error_code& ec); // (2)
 
     template <class Source>
     basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
-                      std::error_code& ec); // (4)
+                      const bson_decode_options& options,
+                      std::error_code& ec); // (3)
 
     template <class Source>
     basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
-                      std::error_code& ec); // (5)
+                      const bson_decode_options& options,
+                      std::error_code& ec); // (4)
 
-Constructors (1)-(2) read from a buffer or stream source and throw a 
+Constructors (1) reads from a buffer or stream source and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
-Constructors (3)-(5) read from a buffer or stream source and set `ec`
+Constructors (2)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_bson_cursor` does not outlive any source passed in the constuctor, 
@@ -70,15 +72,15 @@ as `basic_bson_cursor` holds a pointer to but does not own this object.
 Checks if there are no more events.
 
     const staj_event& current() const override;
-Returns the current [staj_event](staj_event.md).
+Returns the current [staj_event](basic_staj_event.md).
 
-    void read(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+    void read_to(json_visitor& visitor) override
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read(json_visitor& visitor, std::error_code& ec) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+    void read_to(json_visitor& visitor, std::error_code& ec) override
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
@@ -91,6 +93,12 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const ser_context& context() const override;
 Returns the current [context](ser_context.md)
+
+#### Non-member functions
+
+   template <class Src, class Allocator>
+   staj_filter_view operator|(basic_bson_cursor<Src,Allocator>& cursor, 
+                              std::function<bool(const staj_event&, const ser_context&)> pred);
 
 ### Examples
 
@@ -222,45 +230,37 @@ end_array
 
 using namespace jsoncons;
 
-struct author_filter 
-{
-    bool accept_next_ = false;
-
-    bool operator()(const staj_event& event, const ser_context&) 
-    {
-        if (event.event_type()  == staj_event_type::key &&
-            event.get<jsoncons::string_view>() == "author")
-        {
-            accept_next_ = true;
-            return false;
-        }
-        else if (accept_next_)
-        {
-            accept_next_ = false;
-            return true;
-        }
-        else
-        {
-            accept_next_ = false;
-            return false;
-        }
-    }
-};
-
 int main()
 {
+    bool author_next = false;
+    auto filter = [&](const staj_event& event, const ser_context&) -> bool
+    {
+        if (event.event_type() == staj_event_type::key &&
+            event.get<jsoncons::string_view>() == "author")
+        {
+            author_next = true;
+            return false;
+        }
+        if (author_next)
+        {
+            author_next = false;
+            return true;
+        }
+        return false;
+    };
+
     std::ifstream is("book_catalog.json");
 
-    author_filter filter;
-    bson_cursor cursor(is, filter);
+    bson_cursor cursor(is);
+    auto filtered_c = cursor | filter;
 
-    for (; !cursor.done(); cursor.next())
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:
-                std::cout << event.as<jsoncons::string_view>() << "\n";
+                std::cout << event.get<jsoncons::string_view>() << "\n";
                 break;
         }
     }
@@ -274,7 +274,9 @@ Graham Greene
 
 ### See also
 
-- [staj_reader](staj_reader.md) 
-- [staj_array_iterator](staj_array_iterator.md) 
-- [staj_object_iterator](staj_object_iterator.md)
+[staj_event](../basic_staj_event.md)  
+
+[staj_array_iterator](../staj_array_iterator.md)  
+
+[staj_object_iterator](../staj_object_iterator.md)  
 

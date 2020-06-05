@@ -12,6 +12,11 @@ template<
 A pull parser for reporting JSON parse events. A typical application will 
 repeatedly process the `current()` event and call the `next()`
 function to advance to the next event, until `done()` returns `true`.
+In addition, when positioned on a `begin_object` event, 
+the `read_to` function can pull a complete object representing
+the events from `begin_object` to `end_object`, 
+and when positioned on a `begin_array` event, a complete array
+representing the events from `begin_array` ro `end_array`.
 
 `basic_json_cursor` is noncopyable and nonmoveable.
 
@@ -19,12 +24,12 @@ Typedefs for common character types are provided:
 
 Type                |Definition
 --------------------|------------------------------
-json_cursor     |basic_json_cursor<char>
-wjson_cursor    |basic_json_cursor<wchar_t>
+json_cursor     |`basic_json_cursor<char>`
+wjson_cursor    |`basic_json_cursor<wchar_t>`
 
 ### Implemented interfaces
 
-[basic_staj_reader](staj_reader.md)
+[basic_staj_cursor](staj_cursor.md)
 
 #### Constructors
 
@@ -36,54 +41,29 @@ wjson_cursor    |basic_json_cursor<wchar_t>
 
     template <class Source>
     basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
-                      const Allocator& alloc = Allocator()); // (2)
-
-    template <class Source>
-    basic_json_cursor(Source&& source, std::error_code& ec); // (3)
+                      std::error_code& ec); // (2)
 
     template <class Source>
     basic_json_cursor(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
+                      std::error_code& ec) // (3)
+
+    template <class Source>
+    basic_json_cursor(Source&& source, 
+                      const basic_json_decode_options<CharT>& options,
+                      std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec) // (4)
 
     template <class Source>
-    basic_json_cursor(Source&& source, 
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec) // (5)
-
-    template <class Source>
-    basic_json_cursor(Source&& source,
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      std::error_code& ec); // (6)
-
-    template <class Source>
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec) // (7)
-
-    template <class Source>
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec) // (8)
-
-    template <class Source>
-    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
+    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec); // (9)
+                      std::error_code& ec); // (5)
 
-Constructors (1)-(2) read from a character sequence or stream and throw a 
+Constructor (1) reads from a character sequence or stream and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
-Constructors (3)-(9) read from a character sequence or stream and set `ec`
+Constructors (2)-(5) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
 
 Note: It is the programmer's responsibility to ensure that `basic_json_cursor` does not outlive the source, 
@@ -101,16 +81,16 @@ from `source`, `source` is dispatched immediately to the parser. Otherwise, the 
 Checks if there are no more events.
 
     const basic_staj_event& current() const override;
-Returns the current [basic_staj_event](staj_event.md).
+Returns the current [basic_staj_event](basic_staj_event.md).
 
-    void read(json_visitor& visitor) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+    void read_to(json_visitor& visitor) override
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
-    void read(basic_json_visitor<char_type>& visitor,
+    void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
-Feeds the current and succeeding [staj events](staj_event.md) through the provided
+Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
 to stop. If a parsing error is encountered, sets `ec`.
 
@@ -123,6 +103,12 @@ Advances to the next event. If a parsing error is encountered, sets `ec`.
 
     const ser_context& context() const override;
 Returns the current [context](ser_context.md)
+
+#### Non-member functions
+
+   template <class CharT, class Src, class Allocator>
+   basic_staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Src,Allocator>& cursor, 
+                                    std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 
 ### Examples
 
@@ -245,7 +231,7 @@ end_object
 end_array
 ```
 
-#### Filter JSON parse events
+#### Filter the event stream
 
 ```c++
 #include <jsoncons/json_cursor.hpp>
@@ -254,45 +240,37 @@ end_array
 
 using namespace jsoncons;
 
-struct author_filter 
-{
-    bool accept_next_ = false;
-
-    bool operator()(const staj_event& event, const ser_context&) 
-    {
-        if (event.event_type()  == staj_event_type::key &&
-            event.get<jsoncons::string_view>() == "author")
-        {
-            accept_next_ = true;
-            return false;
-        }
-        else if (accept_next_)
-        {
-            accept_next_ = false;
-            return true;
-        }
-        else
-        {
-            accept_next_ = false;
-            return false;
-        }
-    }
-};
-
 int main()
 {
+    bool author_next = false;
+    auto filter = [&](const staj_event& event, const ser_context&) -> bool
+    {
+        if (event.event_type() == staj_event_type::key &&
+            event.get<jsoncons::string_view>() == "author")
+        {
+            author_next = true;
+            return false;
+        }
+        if (author_next)
+        {
+            author_next = false;
+            return true;
+        }
+        return false;
+    };
+
     std::ifstream is("book_catalog.json");
 
-    author_filter filter;
-    json_cursor cursor(is, filter);
+    json_cursor cursor(is);
+    auto filtered_c = cursor | filter;
 
-    for (; !cursor.done(); cursor.next())
+    for (; !filtered_c.done(); filtered_c.next())
     {
-        const auto& event = cursor.current();
+        const auto& event = filtered_c.current();
         switch (event.event_type())
         {
             case staj_event_type::string_value:
-                std::cout << event.as<jsoncons::string_view>() << "\n";
+                std::cout << event.get<jsoncons::string_view>() << "\n";
                 break;
         }
     }
@@ -304,9 +282,81 @@ Haruki Murakami
 Graham Greene
 ```
 
+#### Pull nested objects into a basic_json
+
+```c++
+#include <jsoncons/json_cursor.hpp>
+#include <jsoncons/json.hpp> // json_decoder and json
+#include <fstream>
+
+int main()
+{
+    std::ifstream is("book_catalog.json");
+
+    json_cursor cursor(is);
+
+    json_decoder<json> decoder;
+    for (; !cursor.done(); cursor.next())
+    {
+        const auto& event = cursor.current();
+        switch (event.event_type())
+        {
+            case staj_event_type::begin_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::end_array:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                break;
+            }
+            case staj_event_type::begin_object:
+            {
+                std::cout << event.event_type() << " " << "\n";
+                cursor.read_to(decoder);
+                json j = decoder.get_result();
+                std::cout << pretty_print(j) << "\n";
+                break;
+            }
+            default:
+            {
+                std::cout << "Unhandled event type: " << event.event_type() << " " << "\n";
+                break;
+            }
+        }
+    }
+}
+```
+Output:
+```
+begin_array
+begin_object
+{
+    "author": "Haruki Murakami",
+    "date": "1993-03-02",
+    "isbn": "0679743464",
+    "price": 18.9,
+    "publisher": "Vintage",
+    "title": "Hard-Boiled Wonderland and the End of the World"
+}
+begin_object
+{
+    "author": "Graham Greene",
+    "date": "2005-09-21",
+    "isbn": "0099478374",
+    "price": 15.74,
+    "publisher": "Vintage Classics",
+    "title": "The Comedians"
+}
+end_array
+```
+
 ### See also
 
-- [staj_reader](staj_reader.md) 
-- [staj_array_iterator](staj_array_iterator.md) 
-- [staj_object_iterator](staj_object_iterator.md)
+[basic_staj_event](basic_staj_event.md)  
+
+[staj_array_iterator](staj_array_iterator.md)  
+
+[staj_object_iterator](staj_object_iterator.md)  
 

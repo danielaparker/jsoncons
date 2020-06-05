@@ -16,6 +16,54 @@
 
 using namespace jsoncons;
 
+namespace 
+{
+    class MyIterator
+    {
+        const uint8_t* p_;
+    public:
+        using iterator_category = std::input_iterator_tag;
+        using value_type = uint8_t;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const uint8_t*; 
+        using reference = const uint8_t&;
+
+        MyIterator(const uint8_t* p)
+            : p_(p)
+        {
+        }
+
+        reference operator*() const
+        {
+            return *p_;
+        }
+
+        pointer operator->() const 
+        {
+            return p_;
+        }
+
+        MyIterator& operator++()
+        {
+            ++p_;
+            return *this;
+        }
+
+        MyIterator operator++(int) 
+        {
+            MyIterator temp(*this);
+            ++*this;
+            return temp;
+        }
+
+        bool operator!=(const MyIterator& rhs) const
+        {
+            return p_ != rhs.p_;
+        }
+    };
+
+} // namespace
+
 TEST_CASE("cbor_view_test")
 {
     ojson j1 = ojson::parse(R"(
@@ -195,9 +243,9 @@ TEST_CASE("dump cbor to string test")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    n = -1 - n;
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -237,9 +285,9 @@ TEST_CASE("test_dump_to_stream")
     cbor::cbor_bytes_encoder encoder(v);
     encoder.begin_array();
     std::vector<uint8_t> bytes = {0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    bignum n(-1, bytes.data(), bytes.size());
-    std::string s;
-    n.dump(s);
+    bigint n = bigint::from_bytes_be(1, bytes.data(), bytes.size());
+    n = -1 - n;
+    std::string s = n.to_string();
     encoder.string_value(s, semantic_tag::bigint);
     encoder.end_array();
     encoder.flush();
@@ -343,7 +391,7 @@ TEST_CASE("cbor array comparison test")
 
     SECTION("operator== test")
     {
-        CHECK(j1 == j2);
+        CHECK(j2 == j1);
         REQUIRE(j1.size() == 2);
         REQUIRE(j2.size() == 2);
         CHECK(j1[0] == j2[0]);
@@ -498,7 +546,7 @@ TEST_CASE("cbor conversion tests")
     encoder.begin_array(); // indefinite length outer array
     encoder.begin_array(4); // a fixed length array
     encoder.string_value("foo");
-    encoder.byte_string_value(byte_string{'P','u','s','s'}); // no suggested conversion
+    encoder.byte_string_value(std::vector<uint8_t>{'P','u','s','s'}); // no suggested conversion
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);
     encoder.string_value("273.15", semantic_tag::bigdec);
     encoder.end_array();
@@ -518,9 +566,9 @@ TEST_CASE("cbor conversion tests")
     auto it2 = range2.begin();
     CHECK(it2->as_string() == "foo");
     it2++;
-    CHECK(it2->as_byte_string() == byte_string{'P','u','s','s'});
+    CHECK(it2->as<std::vector<uint8_t>>() == std::vector<uint8_t>{'P','u','s','s'});
     it2++;
-    CHECK(bool(it2->as<bignum>() == bignum{"-18446744073709551617"}));
+    CHECK(bool(it2->as<bigint>() == bigint::from_string("-18446744073709551617")));
     it2++;
     CHECK(bool(it2->as_string() == std::string{"273.15"}));
     it2++;
@@ -588,7 +636,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[0].is<std::string>());
         CHECK(j[1].is<byte_string>());
         CHECK(j[1].is<byte_string_view>());
-        CHECK(j[2].is<bignum>());
+        CHECK(j[2].is<bigint>());
         CHECK(j[3].is_string());
         CHECK(j[3].tag() == semantic_tag::bigdec);
         CHECK(j[4].is<std::string>());
@@ -604,7 +652,7 @@ TEST_CASE("cbor array as<> test")
         CHECK(j[0].as<std::string>() == std::string("foo"));
         CHECK(j[1].as<jsoncons::byte_string>() == jsoncons::byte_string({'b','a','r'}));
         CHECK(j[2].as<std::string>() == std::string("-18446744073709551617"));
-        CHECK(bool(j[2].as<jsoncons::bignum>() == jsoncons::bignum("-18446744073709551617")));
+        CHECK(bool(j[2].as<jsoncons::bigint>() == jsoncons::bigint::from_string("-18446744073709551617")));
         CHECK(j[3].as<std::string>() == std::string("273.15"));
         CHECK(j[4].as<std::string>() == std::string("2015-05-07 12:41:07-07:00"));
         CHECK(j[5].as<int64_t>() == 1431027667);
@@ -618,7 +666,7 @@ TEST_CASE("cbor array as<> test")
         auto it = j.array_range().begin();
         CHECK(it++->is<std::string>());
         CHECK(it++->is<byte_string>());
-        CHECK(it++->is<bignum>());
+        CHECK(it++->is<bigint>());
         CHECK(it++->is<std::string>());
         CHECK(it++->is<std::string>());
         CHECK(it++->is<int>());
@@ -660,4 +708,76 @@ TEST_CASE("cbor bigfloat tests")
         CHECK(val == Approx(-1.5).epsilon(0.0000000001));
     }
 } 
+
+TEST_CASE("encode decode cbor source")
+{
+    std::vector<uint8_t> input = {
+0x88, // Array of length 8
+  0x63, // String value of length 3 
+    0x66,0x6f,0x6f, // "foo"
+  0x43, // Byte string value of length 3
+    0x62,0x61,0x72, // 'b''a''r'
+  0xc3, // Tag 3 (negative bignum)
+    0x49, // Byte string value of length 9
+      0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // Bytes content
+  0xc4, //Tag 4 (decimal fraction)
+    0x82, // Array of length 2
+      0x21, // -2
+      0x19,0x6a,0xb3, // 27315
+  0xc0, // Tag 0 (date-time)
+    0x78,0x19, // Length (25)
+      0x32,0x30,0x31,0x35,0x2d,0x30,0x35,0x2d,0x30,0x37,0x20,0x31,0x32,0x3a,0x34,0x31,0x3a,0x30,0x37,0x2d,0x30,0x37,0x3a,0x30,0x30, // "2015-05-07 12:41:07-07:00"
+  0xc1, // Tag 1 (epoch time)
+    0x1a, // uint32_t
+      0x55,0x4b,0xbf,0xd3, // 1431027667 
+  0xc1,
+    0x3a,
+      0x55,0x4b,0xbf,0xd2,
+  0xc1,
+    0xfb,
+      0x41,0xd5,0x52,0xef,0xf4,0xe0,0x00,0x00
+};
+
+    SECTION("from bytes")
+    {
+        ojson j = cbor::decode_cbor<ojson>(input);
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(j, buffer);
+        CHECK(buffer == input);
+    }
+
+    SECTION("from stream")
+    {
+        std::string s(reinterpret_cast<const char*>(input.data()), input.size());
+        std::stringstream is(std::move(s));
+
+        ojson j = cbor::decode_cbor<ojson>(is);
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(j, buffer);
+        CHECK(buffer == input);
+    }
+
+    SECTION("from iterator source")
+    {
+        ojson j = cbor::decode_cbor<ojson>(input.begin(), input.end());
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(j, buffer);
+        CHECK(buffer == input);
+    }
+
+    SECTION("from custom iterator source")
+    {
+        MyIterator it(input.data());
+        MyIterator end(input.data() + input.size());
+
+        ojson j = cbor::decode_cbor<ojson>(it, end);
+
+        std::vector<uint8_t> buffer;
+        cbor::encode_cbor(j, buffer);
+        CHECK(buffer == input);
+    }
+}
 

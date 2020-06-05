@@ -374,7 +374,7 @@ class jsonpath_evaluator : public ser_context
             }
             else if (val.is_array())
             {
-                auto r = jsoncons::detail::to_integer<int64_t>(name_.data(), name_.size());
+                auto r = jsoncons::detail::to_integer_decimal<int64_t>(name_.data(), name_.size());
                 if (r)
                 {
                     std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + r.value());
@@ -392,7 +392,7 @@ class jsonpath_evaluator : public ser_context
             else if (val.is_string())
             {
                 string_view_type sv = val.as_string_view();
-                auto r = jsoncons::detail::to_integer<int64_t>(name_.data(), name_.size());
+                auto r = jsoncons::detail::to_integer_decimal<int64_t>(name_.data(), name_.size());
                 if (r)
                 {
                     std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : 
@@ -1013,7 +1013,7 @@ public:
                             break;
                         case '[': 
                         case '.':
-                            ec = jsonpath_errc::expected_name;
+                            ec = jsonpath_errc::expected_key;
                             return;
                         default:
                             buffer.clear();
@@ -1080,7 +1080,7 @@ public:
                             state_stack_.pop_back();
                             break;
                         default:
-                            ec = jsonpath_errc::expected_name;
+                            ec = jsonpath_errc::expected_key;
                             return;
                     };
                     break;
@@ -1255,7 +1255,7 @@ public:
 
                         case ':':
                         {
-                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
                             if (!r)
                             {
                                 ec = jsonpath_errc::expected_slice_start;
@@ -1475,7 +1475,7 @@ public:
                     {
                         case ':':
                         {
-                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
                             if (!r || r.value() == 0)
                             {
                                 ec = jsonpath_errc::expected_slice_end;
@@ -1496,7 +1496,7 @@ public:
                         case ',':
                         case ']':
                         {
-                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
                             if (!r || r.value() == 0)
                             {
                                 ec = jsonpath_errc::expected_slice_end;
@@ -1539,7 +1539,7 @@ public:
                         case ',':
                         case ']':
                         {
-                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
                             if (!r || r.value() == 0)
                             {
                                 ec = jsonpath_errc::expected_slice_step;

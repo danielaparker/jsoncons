@@ -55,9 +55,9 @@ void retrieve_json_value_as_byte_string()
 
 void serialize_json_byte_string()
 {
-    byte_string bytes = {'H','e','l','l','o'};
+    std::vector<uint8_t> bytes = {'H','e','l','l','o'};
 
-    json j(bytes);
+    json j(byte_string_arg, bytes);
 
     // default
     std::cout << "(1) "<< j << "\n\n";

@@ -18,7 +18,7 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/staj_reader.hpp>
+#include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
 
@@ -26,7 +26,7 @@ namespace jsoncons {
 namespace bson {
 
 template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
-class basic_bson_cursor : public basic_staj_reader<char>, private virtual ser_context
+class basic_bson_cursor : public basic_staj_cursor<char>, private virtual ser_context
 {
 public:
     using source_type = Src;
@@ -34,7 +34,7 @@ public:
     using allocator_type = Allocator;
 private:
     basic_bson_parser<Src,Allocator> parser_;
-    basic_staj_visitor<char_type> event_handler_;
+    basic_staj_visitor<char_type> cursor_visitor_;
     bool eof_;
 
     // Noncopyable and nonmoveable
@@ -46,33 +46,11 @@ public:
 
     template <class Source>
     basic_bson_cursor(Source&& source,
-                      const Allocator& alloc = Allocator())
-       : basic_bson_cursor(std::forward<Source>(source), 
-                           accept_all,
-                           bson_decode_options(),
-                           alloc)
-    {
-    }
-
-    template <class Source>
-    basic_bson_cursor(Source&& source,
-                      const bson_decode_options& options,
-                      const Allocator& alloc = Allocator())
-       : basic_bson_cursor(std::forward<Source>(source), 
-                           accept_all,
-                           options,
-                           alloc)
-    {
-    }
-
-    template <class Source>
-    basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
                       const bson_decode_options& options = bson_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), options, alloc), 
-         event_handler_(filter), 
-         eof_(false)
+        : parser_(std::forward<Source>(source), options, alloc), 
+          cursor_visitor_(accept_all),
+          eof_(false)
     {
         if (!done())
         {
@@ -86,26 +64,30 @@ public:
     basic_bson_cursor(Source&& source,
                       std::error_code& ec)
         : basic_bson_cursor(std::allocator_arg, Allocator(),
-                            std::forward<Source>(source), accept_all, ec)
+                            std::forward<Source>(source), 
+                            bson_decode_options(), 
+                            ec)
     {
     }
 
     template <class Source>
     basic_bson_cursor(Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const bson_decode_options& options,
                       std::error_code& ec)
-       : basic_bson_cursor(std::allocator_arg, Allocator(), 
-                           std::forward<Source>(source), filter, ec)
+        : basic_bson_cursor(std::allocator_arg, Allocator(),
+                            std::forward<Source>(source), 
+                            options, 
+                            ec)
     {
     }
 
     template <class Source>
     basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
-                      std::function<bool(const staj_event&, const ser_context&)> filter, 
+                      const bson_decode_options& options,
                       std::error_code& ec)
-       : parser_(std::forward<Source>(source),alloc), 
-         event_handler_(filter),
+       : parser_(std::forward<Source>(source), alloc, options), 
+         cursor_visitor_(accept_all),
          eof_(false)
     {
         if (!done())
@@ -119,29 +101,28 @@ public:
         return parser_.done();
     }
 
-    const basic_staj_event<char_type>& current() const override
+    const staj_event& current() const override
     {
-        return event_handler_.event();
+        return cursor_visitor_.event();
     }
 
-    void read(basic_json_visitor<char_type>& visitor) override
+    void read_to(basic_json_visitor<char_type>& visitor) override
     {
         std::error_code ec;
-        read(visitor, ec);
+        read_to(visitor, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
         }
     }
 
-    void read(basic_json_visitor<char_type>& visitor,
+    void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
     {
-        if (!staj_to_saj_event(event_handler_.event(), visitor, *this, ec))
+        if (staj_to_saj_event(cursor_visitor_.event(), visitor, *this, ec))
         {
-            return;
+            read_next(visitor, ec);
         }
-        read_next(visitor, ec);
     }
 
     void next() override
@@ -157,21 +138,6 @@ public:
     void next(std::error_code& ec) override
     {
         read_next(ec);
-    }
-
-    void read_next(std::error_code& ec)
-    {
-        read_next(event_handler_, ec);
-    }
-
-    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
-    {
-        parser_.restart();
-        while (!parser_.stopped())
-        {
-            parser_.parse(visitor, ec);
-            if (ec) return;
-        }
     }
 
     const ser_context& context() const override
@@ -194,24 +160,94 @@ public:
         return parser_.column();
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&)")
-    void read_to(basic_json_visitor<char_type>& visitor)
+    friend
+    staj_filter_view operator|(basic_bson_cursor& cursor, 
+                               std::function<bool(const staj_event&, const ser_context&)> pred)
     {
-        read(visitor);
+        return staj_filter_view(cursor, pred);
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use read(basic_json_visitor<char_type>&, std::error_code&)")
-    void read_to(basic_json_visitor<char_type>& visitor,
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
+    basic_bson_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      std::error_code& ec)
+       : basic_bson_cursor(std::allocator_arg, Allocator(), 
+                           std::forward<Source>(source), filter, ec)
+    {
+    }
+
+    template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
+    basic_bson_cursor(Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter,
+                      const bson_decode_options& options = bson_decode_options(),
+                      const Allocator& alloc = Allocator())
+       : parser_(std::forward<Source>(source), options, alloc), 
+         cursor_visitor_(filter), 
+         eof_(false)
+    {
+        if (!done())
+        {
+            next();
+        }
+    }
+
+    template <class Source>
+    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
+    basic_bson_cursor(std::allocator_arg_t, const Allocator& alloc, 
+                      Source&& source,
+                      std::function<bool(const staj_event&, const ser_context&)> filter, 
+                      std::error_code& ec)
+       : parser_(std::forward<Source>(source),alloc), 
+         cursor_visitor_(filter),
+         eof_(false)
+    {
+        if (!done())
+        {
+            next(ec);
+        }
+    }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&)")
+    void read(basic_json_visitor<char_type>& visitor)
+    {
+        read_to(visitor);
+    }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<char_type>&, std::error_code&)")
+    void read(basic_json_visitor<char_type>& visitor,
                  std::error_code& ec) 
     {
-        read(visitor, ec);
+        read_to(visitor, ec);
     }
 #endif
 private:
-    static bool accept_all(const basic_staj_event<char_type>&, const ser_context&) 
+    static bool accept_all(const staj_event&, const ser_context&) 
     {
         return true;
+    }
+
+    void read_next(std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(cursor_visitor_, ec);
+            if (ec) return;
+        }
+    }
+
+    void read_next(basic_json_visitor<char_type>& visitor, std::error_code& ec)
+    {
+        parser_.restart();
+        while (!parser_.stopped())
+        {
+            parser_.parse(visitor, ec);
+            if (ec) return;
+        }
     }
 };
 

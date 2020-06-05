@@ -551,7 +551,7 @@ struct cmp_lt
             return false;
         }
         bool result = true;
-        size_t min_len = lhs.result().size() < rhs.result().size() ? lhs.result().size() : rhs.result().size();
+        std::size_t min_len = lhs.result().size() < rhs.result().size() ? lhs.result().size() : rhs.result().size();
         for (std::size_t i = 0; result && i < min_len; ++i)
         {
             result = (*this)(lhs.result()[i],rhs.result()[i]);
@@ -615,7 +615,7 @@ struct cmp_lte
             return false;
         }
         bool result = true;
-        size_t min_len = lhs.result().size() < rhs.result().size() ? lhs.result().size() : rhs.result().size();
+        std::size_t min_len = lhs.result().size() < rhs.result().size() ? lhs.result().size() : rhs.result().size();
         for (std::size_t i = 0; result && i < min_len; ++i)
         {
             result = (*this)(lhs.result()[i],rhs.result()[i]);

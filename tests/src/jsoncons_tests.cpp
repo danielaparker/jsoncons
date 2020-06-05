@@ -40,7 +40,7 @@ TEST_CASE("test_for_each_value")
     std::string input = "{\"A\":\"Jane\", \"B\":\"Roe\",\"C\":10}";
     json val = json::parse(input);
 
-    json::object_iterator it = val.object_range().begin();
+    auto it = val.object_range().begin();
 
     CHECK(it->value().is_string());
     ++it;

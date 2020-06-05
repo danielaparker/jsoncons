@@ -73,6 +73,39 @@ namespace csv {
         return val;
     }
 
+    template <class T, class InputIt>
+    typename std::enable_if<is_basic_json<T>::value,T>::type
+    decode_csv(InputIt first, InputIt last,
+                const basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
+                    basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>())
+    {
+        using char_type = typename std::iterator_traits<InputIt>::value_type;
+
+        jsoncons::json_decoder<T> decoder;
+        basic_csv_reader<char_type, iterator_source<InputIt>> reader(iterator_source<InputIt>(first,last), decoder, options);
+        reader.read();
+        return decoder.get_result();
+    }
+
+    template <class T, class InputIt>
+    typename std::enable_if<!is_basic_json<T>::value,T>::type
+    decode_csv(InputIt first, InputIt last,
+               const basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>& options = 
+                    basic_csv_decode_options<typename std::iterator_traits<InputIt>::value_type>())
+    {
+        using char_type = typename std::iterator_traits<InputIt>::value_type;
+
+        basic_csv_cursor<char_type,iterator_source<InputIt>> cursor(iterator_source<InputIt>(first, last), options);
+        jsoncons::json_decoder<basic_json<char_type>> decoder;
+        std::error_code ec;
+        T val = deser_traits<T,char_type>::deserialize(cursor, decoder, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+        }
+        return val;
+    }
+
     // With leading allocator parameter
 
     template <class T,class CharT,class TempAllocator>

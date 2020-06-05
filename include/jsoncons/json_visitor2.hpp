@@ -160,12 +160,14 @@ namespace jsoncons {
             return more;
         }
 
-        bool byte_string_value(const byte_string_view& b, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
                                semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
+                               const ser_context& context=ser_context(),
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
             std::error_code ec;
-            bool more = visit_byte_string(b, tag, context, ec);
+            bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
             if (ec)
             {
                 JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
@@ -173,11 +175,19 @@ namespace jsoncons {
             return more;
         }
 
-        bool byte_string_value(const uint8_t* p, std::size_t size, 
-                               semantic_tag tag=semantic_tag::none, 
-                               const ser_context& context=ser_context())
+        template <class Source>
+        bool byte_string_value(const Source& b, 
+                               uint64_t ext_tag, 
+                               const ser_context& context=ser_context(),
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return byte_string_value(byte_string(p, size), tag, context);
+            std::error_code ec;
+            bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
+            if (ec)
+            {
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
+            }
+            return more;
         }
 
         bool uint64_value(uint64_t value, 
@@ -295,20 +305,24 @@ namespace jsoncons {
             return visit_string(value, tag, context, ec);
         }
 
-        bool byte_string_value(const byte_string_view& b, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
                                semantic_tag tag, 
                                const ser_context& context,
-                               std::error_code& ec)
+                               std::error_code& ec,
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return visit_byte_string(b, tag, context, ec);
+            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
         }
 
-        bool byte_string_value(const uint8_t* p, std::size_t size, 
-                               semantic_tag tag, 
+        template <class Source>
+        bool byte_string_value(const Source& b, 
+                               uint64_t ext_tag, 
                                const ser_context& context,
-                               std::error_code& ec)
+                               std::error_code& ec,
+                               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
         {
-            return byte_string_value(byte_string(p, size), tag, context, ec);
+            return visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
         }
 
         bool uint64_value(uint64_t value, 
@@ -477,6 +491,14 @@ namespace jsoncons {
                                     semantic_tag tag, 
                                     const ser_context& context,
                                     std::error_code& ec) = 0;
+
+        virtual bool visit_byte_string(const byte_string_view& value, 
+                                       uint64_t /*ext_tag*/, 
+                                       const ser_context& context,
+                                       std::error_code& ec) 
+        {
+            return visit_byte_string(value, semantic_tag::none, context, ec);
+        }
 
         virtual bool visit_uint64(uint64_t value, 
                                semantic_tag tag, 
@@ -1119,6 +1141,63 @@ namespace jsoncons {
                         break;
                     default:
                         retval = destination_->byte_string_value(value, tag, context, ec);
+                        break;
+                }
+            }
+
+            level_stack_.back().advance();
+            return retval;
+        }
+
+        bool visit_byte_string(const byte_string_view& value, 
+                               uint64_t ext_tag,
+                               const ser_context& context,
+                               std::error_code& ec) override
+        {
+            bool retval = true;
+
+            if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
+            {
+                key_.clear();
+                encode_base64url(value.begin(), value.end(),key_);
+            }
+
+            if (level_stack_.back().is_key())
+            {
+                switch (level_stack_.back().target())
+                {
+                    case target_t::buffer:
+                        if (level_stack_.back().count() > 0)
+                        {
+                            key_buffer_.push_back(',');
+                        }
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back('\"');
+                        key_buffer_.push_back(':');
+                        retval = true; 
+                        break;
+                    default:
+                        retval = destination_->key(key_, context, ec);
+                        break;
+                }
+            }
+            else
+            {
+                switch (level_stack_.back().target())
+                {
+                    case target_t::buffer:
+                        if (!level_stack_.back().is_object() && level_stack_.back().count() > 0)
+                        {
+                            key_buffer_.push_back(',');
+                        }
+                        key_buffer_.push_back('\"');
+                        key_buffer_.insert(key_buffer_.end(), key_.begin(), key_.end());
+                        key_buffer_.push_back('\"');
+                        retval = true; 
+                        break;
+                    default:
+                        retval = destination_->byte_string_value(value, ext_tag, context, ec);
                         break;
                 }
             }
@@ -1869,6 +1948,92 @@ namespace jsoncons {
         bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
         {
             return destination_.null_value(tag, context, ec);
+        }
+    };
+
+    class diagnostics_visitor2 : public basic_default_json_visitor2<char>
+    {
+        bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object" << std::endl; 
+            return true;
+        }
+
+        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_object " << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_object(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_object" << std::endl; 
+            return true;
+        }
+        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_begin_array " << length << std::endl; 
+            return true;
+        }
+
+        bool visit_end_array(const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_end_array" << std::endl; 
+            return true;
+        }
+
+        bool visit_string(const string_view_type& s, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_string " << s << std::endl; 
+            return true;
+        }
+        bool visit_int64(int64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_int64 " << val << std::endl; 
+            return true;
+        }
+        bool visit_uint64(uint64_t val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_uint64 " << val << std::endl; 
+            return true;
+        }
+        bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_bool " << val << std::endl; 
+            return true;
+        }
+        bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+        {
+            std::cout << "visit_null " << std::endl; 
+            return true;
+        }
+
+        bool visit_typed_array(const span<const uint16_t>& s, 
+                                    semantic_tag tag, 
+                                    const ser_context&, 
+                                    std::error_code&) override  
+        {
+            std::cout << "visit_typed_array uint16_t " << tag << std::endl; 
+            for (auto val : s)
+            {
+                std::cout << val << "" << std::endl;
+            }
+            std::cout << "" << std::endl;
+            return true;
+        }
+
+        bool visit_typed_array(half_arg_t, const span<const uint16_t>& s,
+            semantic_tag tag,
+            const ser_context&,
+            std::error_code&) override
+        {
+            std::cout << "visit_typed_array half_arg_t uint16_t " << tag << "" << std::endl;
+            for (auto val : s)
+            {
+                std::cout << val << "" << std::endl;
+            }
+            std::cout << "" << std::endl;
+            return true;
         }
     };
 
