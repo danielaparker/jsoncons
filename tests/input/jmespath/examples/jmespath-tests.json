@@ -9,7 +9,7 @@
                 "result" : "foo"
             }
         ]
-    } /*,
+    }/*,
     {
         "given" : {"a": {"b": {"c": {"d": "value"}}}},
         "cases" : [
