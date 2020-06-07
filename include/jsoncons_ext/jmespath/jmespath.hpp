@@ -27,8 +27,7 @@ namespace jsoncons { namespace jmespath {
 
 enum class token_type  
 {
-    value,
-    identifier,
+    selector,
     evaluator,
     lparen,
     rparen
@@ -850,7 +849,83 @@ class jmespath_evaluator : public ser_context
 
         string_type to_string() const override
         {
-            return string_type("slice_projection\n");
+            string_type s("slice_projection\n");
+            s.push_back(' ');
+            s.push_back(' ');
+            string_type ss2 = lhs_selector_->to_string();
+            s.insert(s.end(), ss2.begin(), ss2.end());
+            s.append("\nslice\n");
+            for (auto& item : rhs_selectors_)
+            {
+                s.push_back(' ');
+                s.push_back(' ');
+                string_type ss = item->to_string();
+                s.insert(s.end(), ss.begin(), ss.end());
+            }
+            return s;
+        }
+    };
+
+    class slice_projection2 final : public evaluator_base
+    {
+    private:
+        slice slice_;
+    public:
+        slice_projection2(const slice& a_slice)
+            : slice_(a_slice)
+        {
+        }
+
+        reference select(jmespath_context& context, 
+                         reference val, 
+                         std::vector<std::unique_ptr<selector_base>>& selectors,
+                         std::error_code& ec) override
+        {
+            if (!val.is_array())
+            {
+                return Json::null();
+            }
+
+            auto tempp = context.new_instance(json_array_arg);
+
+            auto start = slice_.get_start(val.size());
+            auto end = slice_.get_end(val.size());
+            auto step = slice_.step();
+            if (step >= 0)
+            {
+                for (int64_t j = start; j < end; j += step)
+                {
+                    tempp->emplace_back(val[static_cast<std::size_t>(j)]);
+                }
+            }
+            else
+            {
+                for (int64_t j = end-1; j >= start; j += step)
+                {
+                    tempp->emplace_back(val[static_cast<std::size_t>(j)]);
+                }
+            }
+
+            auto resultp = context.new_instance(json_array_arg);
+            for (reference item : tempp->array_range())
+            {
+                pointer ptr = std::addressof(item);
+                for (auto& selector : selectors)
+                {
+                    ptr = std::addressof(selector->select(context, *ptr, ec));
+                }
+                if (!ptr->is_null())
+                {
+                    resultp->push_back(*ptr);
+                }
+            }
+            return *resultp;
+        }
+
+        string_type to_string() const override
+        {
+            string_type s("slice_projection\n");
+            return s;
         }
     };
 
@@ -1112,7 +1187,7 @@ class jmespath_evaluator : public ser_context
         }
 
         token(std::unique_ptr<selector_base>&& selector)
-            : type_(token_type::identifier), selector_(std::move(selector))
+            : type_(token_type::selector), selector_(std::move(selector))
         {
         }
 
@@ -1130,8 +1205,7 @@ class jmespath_evaluator : public ser_context
         {
             switch(type_)
             {
-                case token_type::value:
-                case token_type::identifier:
+                case token_type::selector:
                     return true;
                 default:
                     return false;
@@ -1705,6 +1779,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
+                            push_token(token(jsoncons::make_unique<slice_projection2>(a_slice)));
                             key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
                             a_slice = slice{};
                             state_stack_.pop_back(); // bracket_specifier2
@@ -1739,6 +1814,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
+                            push_token(token(jsoncons::make_unique<slice_projection2>(a_slice)));
                             key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
                             //key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<slice_projection>(a_slice));
                             buffer.clear();
@@ -2132,7 +2208,7 @@ public:
     {
         switch (token.type())
         {
-            case token_type::identifier:
+            case token_type::selector:
                 output_stack_.push_back(std::move(token));
                 break;
             case token_type::lparen:
