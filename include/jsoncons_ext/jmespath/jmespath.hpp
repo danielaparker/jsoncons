@@ -457,16 +457,21 @@ class jmespath_evaluator : public ser_context
 
         string_type to_string() const override
         {
-            return string_type("list_projection\n");
+            string_type s("list projection\n");
+            string_type ss = lhs_selector_->to_string();
+            s.insert(s.end(), ss.begin(), ss.end());
+            string_type sss = rhs_selector_.to_string();
+            s.insert(s.end(), sss.begin(), sss.end());
+            return s;
         }
     };
 
-    class list_projection2 final : public selector_base
+    class list_projectionB final : public selector_base
     {
     public:
         compound_expression rhs_selector_;
 
-        list_projection2()
+        list_projectionB()
         {
         }
 
@@ -500,7 +505,49 @@ class jmespath_evaluator : public ser_context
 
         string_type to_string() const override
         {
-            return string_type("list_projection2\n");
+            string_type s("list projectionB\n");
+            string_type ss = rhs_selector_.to_string();
+            s.insert(s.end(), ss.begin(), ss.end());
+            return s;
+        }
+    };
+
+    class list_projectionB2 final : public evaluator_base
+    {
+    public:
+        list_projectionB2()
+        {
+        }
+
+        reference select(jmespath_context& context, 
+                         reference val, 
+                         std::vector<std::unique_ptr<selector_base>>& selectors,
+                         std::error_code& ec) override
+        {
+            if (!val.is_array())
+            {
+                return Json::null();
+            }
+
+            auto resultp = context.new_instance(json_array_arg);
+            for (reference item : val.array_range())
+            {
+                pointer ptr = std::addressof(item);
+                for (auto& selector : selectors)
+                {
+                    ptr = std::addressof(selector->select(context, *ptr, ec));
+                }
+                if (!ptr->is_null())
+                {
+                    resultp->push_back(*ptr);
+                }
+            }
+            return *resultp;
+        }
+
+        string_type to_string() const override
+        {
+            return string_type("list_projectionB\n");
         }
     };
 
@@ -1653,7 +1700,8 @@ public:
                     switch(*p_)
                     {
                         case '*':
-                            key_selector_stack_.emplace_back(jsoncons::make_unique<list_projection2>());
+                            push_token(token(jsoncons::make_unique<list_projectionB2>()));
+                            key_selector_stack_.emplace_back(jsoncons::make_unique<list_projectionB>());
                             state_stack_.back() = path_state::bracket_specifier4;
                             ++p_;
                             ++column_;
@@ -2196,10 +2244,10 @@ public:
         state_stack_.pop_back();
 
         push_token(rparen_arg);
-        reference r = evaluate(root, ec);
+        //reference r = evaluate(root, ec);
 
-        //std::cout << key_selector_stack_.back().selector->to_string() << "\n";
-        //reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
+        std::cout << key_selector_stack_.back().selector->to_string() << "\n";
+        reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
 
         return r;
     }
