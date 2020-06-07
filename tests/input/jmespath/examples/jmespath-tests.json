@@ -1,6 +1,6 @@
 [
     // From jmespath.org tutorial
-    {
+    /*{
         "given" : {"a": "foo", "b": "bar", "c": "baz"},
         "cases" : [
             {
@@ -9,7 +9,7 @@
                 "result" : "foo"
             }
         ]
-    }/*,
+    },
     {
         "given" : {"a": {"b": {"c": {"d": "value"}}}},
         "cases" : [
@@ -29,7 +29,7 @@
                 "result" : null
             }
         ]
-    },
+    },*/
     {
         "given" : ["a", "b", "c", "d", "e", "f"],
         "cases" : [ 
@@ -39,7 +39,7 @@
                 "result" : "b"
             }
         ]
-    },
+    }/*,
     {
         "given" : ["a", "b", "c", "d", "e", "f"],
         "cases" : [ 

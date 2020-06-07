@@ -370,6 +370,8 @@ class jmespath_evaluator : public ser_context
                          std::vector<std::unique_ptr<selector_base>>& selectors,
                          std::error_code& ec) override
         {
+            std::cout << "(compound_expression2) " << pretty_print(val) << "\n";
+
             pointer ptr = std::addressof(val);
             for (auto& selector : selectors)
             {
@@ -667,6 +669,7 @@ class jmespath_evaluator : public ser_context
 
         reference select(jmespath_context&, reference val, std::error_code&) override
         {
+            std::cout << "(identifier_selector " << identifier_  << " ) " << pretty_print(val) << "\n";
             if (val.is_object() && val.contains(identifier_))
             {
                 return val.at(identifier_);
@@ -1108,7 +1111,7 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        token(std::unique_ptr<identifier_selector>&& selector)
+        token(std::unique_ptr<selector_base>&& selector)
             : type_(token_type::identifier), selector_(std::move(selector))
         {
         }
@@ -1344,11 +1347,13 @@ public:
                         case '\"':
                             ++p_;
                             ++column_;
+                            push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                             key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             buffer.clear();
                             state_stack_.pop_back(); 
                             break;
                         default:
+                            push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                             key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             buffer.clear();
                             state_stack_.pop_back(); 
@@ -1378,6 +1383,7 @@ public:
                         }
                         default:
                         {
+                            push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                             key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             buffer.clear();
                             state_stack_.pop_back(); 
@@ -1649,6 +1655,8 @@ public:
                                     ec = jmespath_errc::invalid_number;
                                     return Json::null();
                                 }
+
+                                push_token(token(jsoncons::make_unique<index_selector>(r.value())));
                                 key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<index_selector>(r.value()));
                                 buffer.clear();
                             }
@@ -2113,7 +2121,6 @@ public:
 
         push_token(rparen_arg);
         reference r = evaluate(root, ec);
-        //reference r = expr->select(temp_factory_, root, ec);
 
         //std::cout << key_selector_stack_.back().selector->to_string() << "\n";
         //reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
