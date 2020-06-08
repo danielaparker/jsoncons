@@ -2579,7 +2579,7 @@ private:
 
     void end_negative_value(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        auto result = jsoncons::detail::integer_from_json<int64_t>(string_buffer_.data(), string_buffer_.length());
+        auto result = jsoncons::detail::to_integer_unchecked<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (result)
         {
             more_ = visitor.int64_value(result.value(), semantic_tag::none, *this, ec);
@@ -2593,7 +2593,7 @@ private:
 
     void end_positive_value(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        auto result = jsoncons::detail::integer_from_json<uint64_t>(string_buffer_.data(), string_buffer_.length());
+        auto result = jsoncons::detail::to_integer_unchecked<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (result)
         {
             more_ = visitor.uint64_value(result.value(), semantic_tag::none, *this, ec);

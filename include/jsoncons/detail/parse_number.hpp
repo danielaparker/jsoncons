@@ -28,7 +28,7 @@ namespace jsoncons { namespace detail {
     public:
         const char* name() const noexcept override
         {
-            return "jsoncons/integer_from_json";
+            return "jsoncons/to_integer_unchecked";
         }
         std::string message(int ev) const override
         {
@@ -39,7 +39,7 @@ namespace jsoncons { namespace detail {
                 case to_integer_errc::invalid_digit:
                     return "Invalid digit";
                 default:
-                    return "Unknown integer_from_json error";
+                    return "Unknown to_integer_unchecked error";
             }
         }
     };
@@ -514,7 +514,7 @@ to_integer(const CharT* s, std::size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
-integer_from_json(const CharT* s, std::size_t length)
+to_integer_unchecked(const CharT* s, std::size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
@@ -575,7 +575,7 @@ integer_from_json(const CharT* s, std::size_t length)
 
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
-integer_from_json(const CharT* s, std::size_t length)
+to_integer_unchecked(const CharT* s, std::size_t length)
 {
     static_assert(std::numeric_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
