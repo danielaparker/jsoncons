@@ -847,7 +847,6 @@ private:
     uint64_t get_uint64_value(std::error_code& ec)
     {
         uint64_t val = 0;
-        const uint8_t* endp = nullptr;
 
         auto type = source_.get_character();
         if (!type)
@@ -882,7 +881,7 @@ private:
             {
                 uint8_t buf[sizeof(uint16_t)];
                 source_.read(buf, sizeof(uint16_t));
-                val = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<uint16_t>(buf, sizeof(buf));
                 break;
             }
 
@@ -890,7 +889,7 @@ private:
             {
                 uint8_t buf[sizeof(uint32_t)];
                 source_.read(buf, sizeof(uint32_t));
-                val = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<uint32_t>(buf, sizeof(buf));
                 break;
             }
 
@@ -898,7 +897,7 @@ private:
             {
                 uint8_t buf[sizeof(uint64_t)];
                 source_.read(buf, sizeof(uint64_t));
-                val = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<uint64_t>(buf, sizeof(buf));
                 break;
             }
             default:
@@ -910,7 +909,6 @@ private:
     int64_t get_int64_value(std::error_code& ec)
     {
         int64_t val = 0;
-        const uint8_t* endp = nullptr;
 
         auto ch = source_.peek_character();
         if (!ch)
@@ -955,7 +953,7 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = jsoncons::detail::big_to_native<uint16_t>(buf,buf+sizeof(buf),&endp);
+                            auto x = jsoncons::detail::big_to_native<uint16_t>(buf, sizeof(buf));
                             val = static_cast<int64_t>(-1)- x;
                             break;
                         }
@@ -969,7 +967,7 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = jsoncons::detail::big_to_native<uint32_t>(buf,buf+sizeof(buf),&endp);
+                            auto x = jsoncons::detail::big_to_native<uint32_t>(buf, sizeof(buf));
                             val = static_cast<int64_t>(-1)- x;
                             break;
                         }
@@ -983,7 +981,7 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = jsoncons::detail::big_to_native<uint64_t>(buf,buf+sizeof(buf),&endp);
+                            auto x = jsoncons::detail::big_to_native<uint64_t>(buf, sizeof(buf));
                             val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
                             break;
                         }
@@ -1019,7 +1017,6 @@ private:
     double get_double(std::error_code& ec)
     {
         double val = 0;
-        const uint8_t* endp = nullptr;
 
         auto type = source_.get_character();
         if (!type)
@@ -1040,7 +1037,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                val = jsoncons::detail::big_to_native<float>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<float>(buf, sizeof(buf));
                 break;
             }
 
@@ -1053,7 +1050,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                val = jsoncons::detail::big_to_native<double>(buf,buf+sizeof(buf),&endp);
+                val = jsoncons::detail::big_to_native<double>(buf, sizeof(buf));
                 break;
             }
             default:

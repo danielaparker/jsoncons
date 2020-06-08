@@ -57,11 +57,10 @@ TEST_CASE("bson c test suite")
 
         bytes_source source(bytes);
 
-        const uint8_t* endp;
         uint8_t buf[sizeof(int64_t)]; 
 
         source.read(buf, sizeof(int32_t));
-        auto doc_size = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
+        auto doc_size = jsoncons::detail::little_to_native<int32_t>(buf, sizeof(buf));
         REQUIRE(doc_size == 16);
         auto result = source.get_character();
         REQUIRE(result);
@@ -74,7 +73,7 @@ TEST_CASE("bson c test suite")
         }
         REQUIRE(s == std::string("a"));
         source.read(buf, sizeof(int64_t));
-        auto val = jsoncons::detail::little_to_native<int64_t>(buf, buf+sizeof(int64_t),&endp);
+        auto val = jsoncons::detail::little_to_native<int64_t>(buf, sizeof(int64_t));
         CHECK(val == 100000000000000ULL);
         result = source.get_character();
         REQUIRE(result);
