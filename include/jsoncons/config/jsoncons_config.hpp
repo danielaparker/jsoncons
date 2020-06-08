@@ -186,14 +186,12 @@ namespace detail {
 
     template<class T,class Endian=endian>
     typename std::enable_if<Endian::native == Endian::big,T>::type
-    big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    big_to_native(const uint8_t* first, std::size_t count)
     {
-        if (first + sizeof(T) > last)
+        if (sizeof(T) > count)
         {
-            *endp = first;
-            return 0;
+            return T();
         }
-        *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
         return val;
@@ -201,14 +199,12 @@ namespace detail {
 
     template<class T,class Endian=endian>
     typename std::enable_if<Endian::native == Endian::little,T>::type
-    big_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    big_to_native(const uint8_t* first, std::size_t count)
     {
-        if (first + sizeof(T) > last)
+        if (sizeof(T) > count)
         {
-            *endp = first;
-            return 0;
+            return T();
         }
-        *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
         return byte_swap(val);
@@ -218,14 +214,12 @@ namespace detail {
 
     template<class T,class Endian=endian>
     typename std::enable_if<Endian::native == Endian::little,T>::type
-    little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    little_to_native(const uint8_t* first, std::size_t count)
     {
-        if (first + sizeof(T) > last)
+        if (sizeof(T) > count)
         {
-            *endp = first;
-            return 0;
+            return T();
         }
-        *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
         return val;
@@ -233,14 +227,12 @@ namespace detail {
 
     template<class T,class Endian=endian>
     typename std::enable_if<Endian::native == Endian::big,T>::type
-    little_to_native(const uint8_t* first, const uint8_t* last, const uint8_t** endp)
+    little_to_native(const uint8_t* first, std::size_t count)
     {
-        if (first + sizeof(T) > last)
+        if (sizeof(T) > count)
         {
-            *endp = first;
-            return 0;
+            return T();
         }
-        *endp = first + sizeof(T);
         T val;
         std::memcpy(&val,first,sizeof(T));
         return byte_swap(val);

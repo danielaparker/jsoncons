@@ -198,8 +198,7 @@ private:
             more_ = false;
             return;
         }
-        const uint8_t* endp;
-        auto length = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
+        auto length = jsoncons::detail::little_to_native<int32_t>(buf, sizeof(buf));
 
         more_ = visitor.begin_object(semantic_tag::none, *this, ec);
         state_stack_.emplace_back(parse_mode::document,length);
@@ -227,8 +226,7 @@ private:
             more_ = false;
             return;
         }
-        const uint8_t* endp;
-        /* auto len = */ jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
+        /* auto len = */ jsoncons::detail::little_to_native<int32_t>(buf, sizeof(buf));
 
         more_ = visitor.begin_array(semantic_tag::none, *this, ec);
         state_stack_.emplace_back(parse_mode::array,0);
@@ -276,8 +274,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                double res = jsoncons::detail::little_to_native<double>(buf,buf+sizeof(buf),&endp);
+                double res = jsoncons::detail::little_to_native<double>(buf, sizeof(buf));
                 more_ = visitor.double_value(res, semantic_tag::none, *this, ec);
                 break;
             }
@@ -290,8 +287,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(buf),&endp);
+                auto len = jsoncons::detail::little_to_native<int32_t>(buf, sizeof(buf));
                 if (len < 1)
                 {
                     ec = bson_errc::string_length_is_non_positive;
@@ -361,8 +357,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                auto val = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
+                auto val = jsoncons::detail::little_to_native<int32_t>(buf, sizeof(buf));
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -376,8 +371,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                auto val = jsoncons::detail::little_to_native<uint64_t>(buf, buf+sizeof(uint64_t),&endp);
+                auto val = jsoncons::detail::little_to_native<uint64_t>(buf, sizeof(buf));
                 more_ = visitor.uint64_value(val, semantic_tag::timestamp, *this, ec);
                 break;
             }
@@ -391,8 +385,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                auto val = jsoncons::detail::little_to_native<int64_t>(buf, buf+sizeof(int64_t),&endp);
+                auto val = jsoncons::detail::little_to_native<int64_t>(buf, sizeof(buf));
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -406,8 +399,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                auto val = jsoncons::detail::little_to_native<int64_t>(buf, buf+sizeof(int64_t),&endp);
+                auto val = jsoncons::detail::little_to_native<int64_t>(buf, sizeof(buf));
                 more_ = visitor.int64_value(val, semantic_tag::timestamp, *this, ec);
                 break;
             }
@@ -420,8 +412,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                const auto len = jsoncons::detail::little_to_native<int32_t>(buf, buf+sizeof(int32_t),&endp);
+                const auto len = jsoncons::detail::little_to_native<int32_t>(buf, sizeof(buf));
                 if (len < 0)
                 {
                     ec = bson_errc::length_is_negative;

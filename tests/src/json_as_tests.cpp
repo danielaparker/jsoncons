@@ -102,7 +102,7 @@ TEST_CASE("json::as<__int128>()")
 {
     std::string s = "-18446744073709551617";
 
-    jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::integer_from_json<__int128>(s.data(),s.size());
+    jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer_unchecked<__int128>(s.data(),s.size());
     REQUIRE(result);
 
     jsoncons::json j(s);
@@ -115,7 +115,7 @@ TEST_CASE("json::as<unsigned __int128>()")
 {
     std::string s = "18446744073709551616";
 
-    jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::integer_from_json<unsigned __int128>(s.data(),s.size());
+    jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::to_integer_unchecked<unsigned __int128>(s.data(),s.size());
     REQUIRE(result);
 
     jsoncons::json j(s);

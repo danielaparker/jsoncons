@@ -353,8 +353,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                int8_t val = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                int8_t val = jsoncons::detail::big_to_native<int8_t>(buf, sizeof(buf));
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -379,8 +378,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                int16_t val = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                int16_t val = jsoncons::detail::big_to_native<int16_t>(buf, sizeof(buf));
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -393,8 +391,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                int32_t val = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                int32_t val = jsoncons::detail::big_to_native<int32_t>(buf, sizeof(buf));
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -407,8 +404,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
+                int64_t val = jsoncons::detail::big_to_native<int64_t>(buf, sizeof(buf));
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -421,8 +417,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                float val = jsoncons::detail::big_to_native<float>(buf,buf+sizeof(buf),&endp);
+                float val = jsoncons::detail::big_to_native<float>(buf, sizeof(buf));
                 more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -435,8 +430,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                double val = jsoncons::detail::big_to_native<double>(buf,buf+sizeof(buf),&endp);
+                double val = jsoncons::detail::big_to_native<double>(buf, sizeof(buf));
                 more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
                 break;
             }
@@ -449,8 +443,7 @@ private:
                     more_ = false;
                     return;
                 }
-                const uint8_t* endp;
-                char c = jsoncons::detail::big_to_native<char>(buf,buf+sizeof(buf),&endp);
+                char c = jsoncons::detail::big_to_native<char>(buf, sizeof(buf));
                 auto result = unicons::validate(&c,&c+1);
                 if (result.ec != unicons::conv_errc())
                 {
@@ -736,8 +729,7 @@ private:
                     more_ = false;
                     return length;
                 }
-                const uint8_t* endp;
-                int8_t val = jsoncons::detail::big_to_native<int8_t>(buf,buf+sizeof(buf),&endp);
+                int8_t val = jsoncons::detail::big_to_native<int8_t>(buf, sizeof(buf));
                 if (val >= 0)
                 {
                     length = val;
@@ -771,8 +763,7 @@ private:
                     more_ = false;
                     return length;
                 }
-                const uint8_t* endp;
-                int16_t val = jsoncons::detail::big_to_native<int16_t>(buf,buf+sizeof(buf),&endp);
+                int16_t val = jsoncons::detail::big_to_native<int16_t>(buf, sizeof(buf));
                 if (val >= 0)
                 {
                     length = val;
@@ -794,8 +785,7 @@ private:
                     more_ = false;
                     return length;
                 }
-                const uint8_t* endp;
-                int32_t val = jsoncons::detail::big_to_native<int32_t>(buf,buf+sizeof(buf),&endp);
+                int32_t val = jsoncons::detail::big_to_native<int32_t>(buf, sizeof(buf));
                 if (val >= 0)
                 {
                     length = val;
@@ -817,8 +807,7 @@ private:
                     more_ = false;
                     return length;
                 }
-                const uint8_t* endp;
-                int64_t val = jsoncons::detail::big_to_native<int64_t>(buf,buf+sizeof(buf),&endp);
+                int64_t val = jsoncons::detail::big_to_native<int64_t>(buf, sizeof(buf));
                 if (val >= 0)
                 {
                     length = (std::size_t)val;
