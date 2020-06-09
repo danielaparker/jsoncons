@@ -9,7 +9,7 @@
                 "result" : "foo"
             }
         ]
-    },
+    },*/
     {
         "given" : {"a": {"b": {"c": {"d": "value"}}}},
         "cases" : [
@@ -19,7 +19,7 @@
                 "result" : "value"
             }
         ]
-    },
+    }/*,
     {
         "given" : {"a": {"b": {"c": {"d": "value"}}}},
         "cases" : [
@@ -129,7 +129,7 @@
                 "result" : [9,8,7,6,5,4,3,2,1,0]
             }
         ]
-    },*/
+    },
     {
         "given" : {"people": [{"first": "James", "last": "d"},{"first": "Jacob", "last": "e"},{"first": "Jayden", "last": "f"},{"missing": "different"}],"foo": {"bar": "baz"}},
         "cases" : [ 
@@ -139,7 +139,7 @@
                 "result" : ["James","Jacob","Jayden"]
             }
         ]
-    }/*,
+    },
     {
         "given" : {"people": [{"first": "James", "last": "d"},{"first": "Jacob", "last": "e"},{"first": "Jayden", "last": "f"},{"missing": "different"}],"foo": {"bar": "baz"}},
         "cases" : [ 
