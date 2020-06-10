@@ -1705,6 +1705,7 @@ public:
                     switch(*p_)
                     {
                         case '*':
+                            key_selector_stack2_.emplace_back(jsoncons::make_unique<list_projectionB>());
                             push_token(token(jsoncons::make_unique<list_projectionB2>()));
                             key_selector_stack_.emplace_back(jsoncons::make_unique<list_projectionB>());
                             state_stack_.back() = path_state::bracket_specifier4;
@@ -1783,6 +1784,7 @@ public:
                                     return Json::null();
                                 }
 
+                                key_selector_stack2_.back().selector->add_selector(jsoncons::make_unique<index_selector>(r.value()));
                                 push_token(token(jsoncons::make_unique<index_selector>(r.value())));
                                 key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<index_selector>(r.value()));
                                 buffer.clear();
@@ -1832,6 +1834,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
+                            key_selector_stack2_.emplace_back(jsoncons::make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
                             push_token(token(jsoncons::make_unique<slice_projection2>(a_slice)));
                             key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
                             a_slice = slice{};
@@ -1867,6 +1870,7 @@ public:
                     switch(*p_)
                     {
                         case ']':
+                            key_selector_stack2_.emplace_back(jsoncons::make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
                             push_token(token(jsoncons::make_unique<slice_projection2>(a_slice)));
                             key_selector_stack_.back() = key_selector(jsoncons::make_unique<slice_projection>(std::move(key_selector_stack_.back().selector),a_slice));
                             //key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<slice_projection>(a_slice));
@@ -2255,8 +2259,8 @@ public:
         //std::cout << key_selector_stack_.back().selector->to_string() << "\n";
         //reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
 
-        std::cout << key_selector_stack2_.back().selector->to_string() << "\n";
-        reference r = key_selector_stack2_.back().selector->select(temp_factory_, root, ec);
+        //std::cout << key_selector_stack2_.back().selector->to_string() << "\n";
+        reference r = evaluate(root, ec);
 
         return r;
     }
@@ -2320,6 +2324,18 @@ public:
     }
 
     reference evaluate(reference root, std::error_code& ec)
+    {
+        pointer ptr = std::addressof(root);
+
+        for (auto&& t : key_selector_stack2_)
+        {
+            ptr = std::addressof(t.selector->select(temp_factory_, *ptr, ec));
+        }
+
+        return *ptr;
+    }
+
+    reference evaluate_old(reference root, std::error_code& ec)
     {
         pointer ptr = std::addressof(root);
 
