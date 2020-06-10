@@ -3749,12 +3749,7 @@ public:
     typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
     as() const
     {
-        std::error_code ec;
         T val = json_type_traits<basic_json,T>::as(*this);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec));
-        }
         return val;
     }
 
