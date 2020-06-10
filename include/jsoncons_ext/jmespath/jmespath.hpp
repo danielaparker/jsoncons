@@ -1315,6 +1315,7 @@ class jmespath_evaluator : public ser_context
     std::vector<path_state> state_stack_;
     std::vector<std::size_t> structure_offset_stack_;
     std::vector<key_selector> key_selector_stack_;
+    std::vector<key_selector> key_selector_stack2_;
     std::vector<token> output_stack_;
     std::vector<token> operator_stack_;
     jmespath_context temp_factory_;
@@ -1325,6 +1326,7 @@ public:
           begin_input_(nullptr), end_input_(nullptr),
           p_(nullptr)
     {
+        key_selector_stack2_.emplace_back(jsoncons::make_unique<compound_expression>());
         key_selector_stack_.emplace_back(jsoncons::make_unique<compound_expression>());
     }
 
@@ -1468,12 +1470,14 @@ public:
                         case '\"':
                             ++p_;
                             ++column_;
+                            key_selector_stack2_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                             key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             buffer.clear();
                             state_stack_.pop_back(); 
                             break;
                         default:
+                            key_selector_stack2_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                             key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             buffer.clear();
@@ -1504,6 +1508,7 @@ public:
                         }
                         default:
                         {
+                            key_selector_stack2_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                             key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                             buffer.clear();
@@ -2225,6 +2230,7 @@ public:
             state_stack_.pop_back(); // unquoted_string
             if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
             {
+                key_selector_stack2_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                 key_selector_stack_.back().selector->add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                 buffer.clear();
@@ -2246,8 +2252,11 @@ public:
         push_token(rparen_arg);
         //reference r = evaluate(root, ec);
 
-        std::cout << key_selector_stack_.back().selector->to_string() << "\n";
-        reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
+        //std::cout << key_selector_stack_.back().selector->to_string() << "\n";
+        //reference r = key_selector_stack_.back().selector->select(temp_factory_, root, ec);
+
+        std::cout << key_selector_stack2_.back().selector->to_string() << "\n";
+        reference r = key_selector_stack2_.back().selector->select(temp_factory_, root, ec);
 
         return r;
     }
