@@ -139,7 +139,7 @@
                 "result" : ["James","Jacob","Jayden"]
             }
         ]
-    },*/
+    },
     {
         "given" : {"people": [{"first": "James", "last": "d"},{"first": "Jacob", "last": "e"},{"first": "Jayden", "last": "f"},{"missing": "different"}],"foo": {"bar": "baz"}},
         "cases" : [ 
@@ -149,7 +149,7 @@
                 "result" : ["James","Jacob"]
             }
         ]
-    }/*,
+    },
     {
         "given" : {"ops": {"functionA": {"numArgs": 2},"functionB": {"numArgs": 3},"functionC": {"variadic": true}}},
         "cases" : [ 
@@ -159,7 +159,7 @@
                 "result" : [2,3]
             }
         ]
-    },
+    },*/
     {
         "given" : {"reservations": [{"instances": [{"state": "running"},{"state": "stopped"}]},{"instances": [{"state": "terminated"},{"state": "runnning"}]}]},
         "cases" : [ 
@@ -169,7 +169,7 @@
                 "result" : [["running","stopped"],["terminated","runnning"]]
             }
         ]
-    },
+    }/*,
     {
         "given" : {"reservations": [{"instances": [{"state": "running"},{"state": "stopped"}]},{"instances": [{"state": "terminated"},{"state": "runnning"}]}]},
         "cases" : [ 
