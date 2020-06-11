@@ -685,12 +685,12 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    class index_selector final : public selector_base
+    class index_selector_old final : public selector_base
     {
     private:
         int64_t index_;
     public:
-        index_selector(int64_t index)
+        index_selector_old(int64_t index)
             : index_(index)
         {
         }
@@ -725,7 +725,49 @@ class jmespath_evaluator : public ser_context
 
         string_type to_string() const override
         {
-            return string_type("index_selector\n");
+            return string_type("index_selector_old\n");
+        }
+    };
+
+    class index_evaluator final : public evaluator_base
+    {
+    private:
+        int64_t index_;
+    public:
+        index_evaluator(int64_t index)
+            : index_(index)
+        {
+        }
+
+        void evaluate(jmespath_context&, reference val, std::vector<pointer>& output, std::error_code&) override
+        {
+            if (!val.is_array())
+            {
+                output.push_back(std::addressof(Json::null()));
+            }
+            else 
+            {
+                int64_t slen = static_cast<int64_t>(val.size());
+                if (index_ >= 0 && index_ < slen)
+                {
+                    std::size_t index = static_cast<std::size_t>(index_);
+                    output.push_back(std::addressof(val.at(index)));
+                }
+                else if (index_ < 0 && (slen+index_) < slen)
+                {
+                    std::size_t index = static_cast<std::size_t>(slen + index_);
+                    output.push_back(std::addressof(val.at(index)));
+                }
+                else
+                {
+                    output.push_back(std::addressof(Json::null()));
+                }
+            }
+        }
+
+        string_type to_string() const override
+        {
+            return string_type("index_evaluator\n");
         }
     };
 
@@ -1516,7 +1558,8 @@ public:
                                     return Json::null();
                                 }
 
-                                key_selector_stack_old_.back().selector->add_selector(jsoncons::make_unique<index_selector>(r.value()));
+                                key_evaluator_stack_.emplace_back(jsoncons::make_unique<index_evaluator>(r.value()));
+                                key_selector_stack_old_.back().selector->add_selector(jsoncons::make_unique<index_selector_old>(r.value()));
                                 buffer.clear();
                             }
                             state_stack_.pop_back(); // bracket_specifier
