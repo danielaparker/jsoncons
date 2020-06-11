@@ -9,7 +9,7 @@
                 "result" : "foo"
             }
         ]
-    }/*,
+    },
     {
         "given" : {"a": {"b": {"c": {"d": "value"}}}},
         "cases" : [
@@ -29,7 +29,7 @@
                 "result" : null
             }
         ]
-    },
+    }/*,
     {
         "given" : ["a", "b", "c", "d", "e", "f"],
         "cases" : [ 
