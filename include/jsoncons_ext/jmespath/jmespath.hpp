@@ -517,12 +517,12 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    class flatten_projection final : public selector_base
+    class flatten_projection_old final : public selector_base
     {
     public:
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
-        flatten_projection()
+        flatten_projection_old()
         {
         }
 
@@ -533,7 +533,7 @@ class jmespath_evaluator : public ser_context
 
         reference select(jmespath_context& context, reference val, std::error_code& ec) override
         {
-            std::cout << "(flatten_projection)\n" << pretty_print(val) << "\n\n";
+            std::cout << "(flatten_projection_old)\n" << pretty_print(val) << "\n\n";
 
             auto currentp = context.new_instance(json_array_arg);
             for (reference item : val.array_range())
@@ -570,7 +570,7 @@ class jmespath_evaluator : public ser_context
 
         string_type to_string() const override
         {
-            string_type s("flatten_projection\n");
+            string_type s("flatten_projection_old\n");
             for (auto& selector : rhs_selectors_)
             {
                 s.push_back(' ');
@@ -578,6 +578,54 @@ class jmespath_evaluator : public ser_context
                 string_type sss = selector->to_string();
                 s.insert(s.end(), sss.begin(), sss.end());
             }
+            return s;
+        }
+    };
+
+    class flatten_projection final : public evaluator_base
+    {
+    public:
+        flatten_projection()
+        {
+        }
+
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
+        {
+            std::cout << "(flatten_projection)\n" << pretty_print(val) << "\n\n";
+
+            auto result = context.new_instance(json_array_arg);
+            for (reference item : val.array_range())
+            {
+                if (!item.is_null())
+                {
+                    auto j = this->apply_evaluators(context, item, ec);
+                    if (!j.is_null())
+                    {
+                        result->push_back(j);
+                    }
+                }
+            }
+            auto currentp = context.new_instance(json_array_arg);
+            for (reference item : result->array_range())
+            {
+                if (item.is_array())
+                {
+                    for (reference item_of_item : item.array_range())
+                    {
+                        currentp->push_back(item_of_item);
+                    }
+                }
+                else
+                {
+                    currentp->push_back(item);
+                }
+            }
+            return *currentp;
+        }
+
+        string_type to_string() const override
+        {
+            string_type s("flatten_projection\n");
             return s;
         }
     };
@@ -1630,7 +1678,8 @@ public:
                             ++column_;
                             break;
                         case ']':
-                            key_evaluator_stack_old_.emplace_back(jsoncons::make_unique<flatten_projection>());
+                            key_evaluator_stack_.emplace_back(jsoncons::make_unique<flatten_projection>());
+                            key_evaluator_stack_old_.emplace_back(jsoncons::make_unique<flatten_projection_old>());
                             state_stack_.pop_back(); // bracket_specifier
                             ++p_;
                             ++column_;
@@ -1694,7 +1743,8 @@ public:
                         {
                             if (buffer.empty())
                             {
-                                key_evaluator_stack_old_.emplace_back(jsoncons::make_unique<flatten_projection>());
+                                key_evaluator_stack_.emplace_back(jsoncons::make_unique<flatten_projection>());
+                                key_evaluator_stack_old_.emplace_back(jsoncons::make_unique<flatten_projection_old>());
                             }
                             else
                             {
