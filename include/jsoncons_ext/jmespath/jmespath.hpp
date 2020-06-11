@@ -222,11 +222,17 @@ class jmespath_evaluator : public ser_context
     // evaluator_base
     class evaluator_base
     {
+        std::vector<std::unique_ptr<evaluator_base>> evaluators_;
         bool expression_type_;
     public:
         evaluator_base()
             : expression_type_(false)
         {
+        }
+
+        void add_evaluator(std::unique_ptr<evaluator_base>&& evaluators)  
+        {
+            evaluators_.emplace_back(std::move(evaluators));
         }
 
         bool expression_type() const
@@ -243,7 +249,17 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        virtual void evaluate(jmespath_context&, reference val, std::vector<pointer>& output, std::error_code& ec) = 0;
+        virtual reference evaluate(jmespath_context&, reference val, std::error_code& ec) = 0;
+
+        reference apply_evaluators(jmespath_context& context, reference val, std::error_code& ec)
+        {
+            pointer ptr = std::addressof(val);
+            for (auto& evaluator : evaluators_)
+            {
+                ptr = std::addressof(evaluator->evaluate(context, *ptr, ec)        );
+            }
+            return *ptr;
+        }
 
         virtual string_type to_string() const
         {
@@ -440,19 +456,28 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void evaluate(jmespath_context&, reference val, std::vector<pointer>& output, std::error_code&) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
             std::cout << "list_projection\n" << pretty_print(val) << "\n\n";
 
             if (!val.is_array())
             {
-                output.push_back(std::addressof(Json::null()));
+                return Json::null();
             }
 
+            auto result = context.new_instance(json_array_arg);
             for (reference item : val.array_range())
             {
-                output.push_back(std::addressof(item));
+                if (!item.is_null())
+                {
+                    auto j = this->apply_evaluators(context, item, ec);
+                    if (!j.is_null())
+                    {
+                        result->push_back(j);
+                    }
+                }
             }
+            return *result;
         }
 
         string_type to_string() const override
@@ -557,12 +582,47 @@ class jmespath_evaluator : public ser_context
         }
     };
 
-    class object_projection final : public selector_base
+    class object_projection final : public evaluator_base
+    {
+    public:
+        object_projection()
+        {
+        }
+
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
+        {
+            if (!val.is_object())
+            {
+                return Json::null();
+            }
+
+            auto result = context.new_instance(json_array_arg);
+            for (auto item : val.object_range())
+            {
+                if (!item.value().is_null())
+                {
+                    auto j = this->apply_evaluators(context, item.value(), ec);
+                    if (!j.is_null())
+                    {
+                        result->push_back(j);
+                    }
+                }
+            }
+            return *result;
+        }
+
+        string_type to_string() const override
+        {
+            return string_type("object_projection\n");
+        }
+    };
+
+    class object_projection_old final : public selector_base
     {
     public:
         std::vector<std::unique_ptr<selector_base>> rhs_selectors_;
 
-        object_projection()
+        object_projection_old()
         {
         }
 
@@ -591,7 +651,7 @@ class jmespath_evaluator : public ser_context
 
         string_type to_string() const override
         {
-            return string_type("object_projection\n");
+            return string_type("object_projection_old\n");
         }
     };
 
@@ -639,12 +699,16 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void evaluate(jmespath_context&, reference val, std::vector<pointer>& output, std::error_code&) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
             std::cout << "(identifier_evaluator " << identifier_  << " ) " << pretty_print(val) << "\n";
             if (val.is_object() && val.contains(identifier_))
             {
-                output.push_back(std::addressof(val.at(identifier_)));
+                return this->apply_evaluators(context, val.at(identifier_), ec);
+            }
+            else
+            {
+                return Json::null();
             }
         }
 
@@ -764,11 +828,11 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void evaluate(jmespath_context&, reference val, std::vector<pointer>& output, std::error_code&) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
             if (!val.is_array())
             {
-                output.push_back(std::addressof(Json::null()));
+                return Json::null();
             }
             else 
             {
@@ -776,16 +840,16 @@ class jmespath_evaluator : public ser_context
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t index = static_cast<std::size_t>(index_);
-                    output.push_back(std::addressof(val.at(index)));
+                    return this->apply_evaluators(context, val.at(index), ec);
                 }
                 else if (index_ < 0 && (slen+index_) < slen)
                 {
                     std::size_t index = static_cast<std::size_t>(slen + index_);
-                    output.push_back(std::addressof(val.at(index)));
+                    return this->apply_evaluators(context, val.at(index), ec);
                 }
                 else
                 {
-                    output.push_back(std::addressof(Json::null()));
+                    return Json::null();
                 }
             }
         }
@@ -875,25 +939,41 @@ class jmespath_evaluator : public ser_context
         {
         }
 
-        void evaluate(jmespath_context&, reference val, std::vector<pointer>& output, std::error_code&) override
+        reference evaluate(jmespath_context& context, reference val, std::error_code& ec) override
         {
+            if (!val.is_array())
+            {
+                return Json::null();
+            }
+
             auto start = slice_.get_start(val.size());
             auto end = slice_.get_end(val.size());
             auto step = slice_.step();
+
+            auto result = context.new_instance(json_array_arg);
             if (step >= 0)
             {
-                for (int64_t j = start; j < end; j += step)
+                for (int64_t i = start; i < end; i += step)
                 {
-                    output.push_back(std::addressof(val[static_cast<std::size_t>(j)]));
+                    auto j = this->apply_evaluators(context, val.at(static_cast<std::size_t>(i)), ec);
+                    if (!j.is_null())
+                    {
+                        result->push_back(j);
+                    }
                 }
             }
             else
             {
-                for (int64_t j = end-1; j >= start; j += step)
+                for (int64_t i = end-1; i >= start; i += step)
                 {
-                    output.push_back(std::addressof(val[static_cast<std::size_t>(j)]));
+                    auto j = this->apply_evaluators(context, val.at(static_cast<std::size_t>(i)), ec);
+                    if (!j.is_null())
+                    {
+                        result->push_back(j);
+                    }
                 }
             }
+            return *result;
         }
 
         string_type to_string() const override
@@ -1265,7 +1345,8 @@ public:
                             ++column_;
                             break;
                         case '*':
-                            key_evaluator_stack_old_.emplace_back(jsoncons::make_unique<object_projection>());
+                            key_evaluator_stack_.emplace_back(jsoncons::make_unique<object_projection>());
+                            key_evaluator_stack_old_.emplace_back(jsoncons::make_unique<object_projection_old>());
                             state_stack_.emplace_back(path_state::expect_dot);
                             ++p_;
                             ++column_;
@@ -2122,44 +2203,16 @@ public:
 
     reference evaluate(reference root, std::error_code& ec)
     {
-        std::vector<pointer> input;
-        std::vector<pointer> output;
-
         if (key_evaluator_stack_.empty())
         {
             return Json::null();
         }
 
-        output.push_back(std::addressof(root));
-
-        for (auto& item : key_evaluator_stack_)
+        for (std::size_t i = key_evaluator_stack_.size() - 1; i >= 1; --i)
         {
-            output.swap(input);
-            output.clear();
-            for (auto& ptr : input)
-            {
-                item.evaluator->evaluate(temp_factory_, *ptr, output, ec);
-            }
+            key_evaluator_stack_[i-1].evaluator->add_evaluator(std::move(key_evaluator_stack_[i].evaluator));
         }
-
-        if (output.empty())
-        {
-            return Json::null();
-        }
-        else if (output.size() == 1)
-        {
-            return *output.back();
-        }
-        else
-        {
-            auto result = temp_factory_.new_instance(json_array_arg);
-            for (pointer p : output)
-            {
-                result->push_back(*p);
-            }
-            return *result;
-        }
-
+        return key_evaluator_stack_[0].evaluator->evaluate(temp_factory_, root, ec);
     }
 
     void advance_past_space_character()
