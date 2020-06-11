@@ -1,3 +1,10 @@
+master
+------
+
+Bug fixes:
+
+- Fixed a bug in the jsonpath array slice when the end argument is negative, [\#250](https://github.com/danielaparker/jsoncons/issues/250)
+
 v0.153.1
 --------
 
