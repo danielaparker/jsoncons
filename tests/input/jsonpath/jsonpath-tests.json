@@ -331,5 +331,25 @@
                 "result" : ["value"] // jsoncons allows unquoted names in square brackets
             }
         ]
+    },
+    {
+        "given" : [2, "a", 4, 5, 100, "nice"],
+        "cases" : [
+            {
+                "annotation" : "Array slice with negative start and end and range of -1",
+                "expression" : "$[-4:-5]",
+                "result" : [] 
+            },
+            {
+                "annotation" : "Array slice with negative start and end and range of 0",
+                "expression" : "$[-4:-4]",
+                "result" : [] 
+            },
+            {
+                "annotation" : "Array slice with negative start and end and range of 1",
+                "expression" : "$[-4:-3]",
+                "result" : [4] 
+            }
+        ]
     }
 ]

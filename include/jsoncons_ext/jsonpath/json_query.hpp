@@ -72,7 +72,7 @@ struct slice
     {
         if (end_)
         {
-            auto len = *end_ >= 0 ? *end_ : (static_cast<int64_t>(size) - *end_);
+            auto len = *end_ >= 0 ? *end_ : (static_cast<int64_t>(size) + *end_);
             return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
         }
         else
