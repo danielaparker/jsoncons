@@ -34,28 +34,6 @@ namespace jmespath {
         rparen
     };
 
-    template <class Json>
-    struct cmp_or
-    {
-        constexpr optional<bool> operator()(const Json& lhs, const Json& rhs) const
-        {
-            return lhs != rhs ? true : false;
-        }
-    };
-
-    template <class Json>
-    struct comparison_operator_t
-    {
-        typedef std::function<optional<bool>(const Json&, const Json&)> operator_type;
-
-        std::size_t precedence_level;
-        bool is_right_associative;
-        operator_type oper;
-    };
-
-    template <class Json>
-    constexpr comparison_operator_t or_operator{8,false,cmp_or<Json>()};
-
     struct lparen_arg_t
     {
         explicit lparen_arg_t() = default;
@@ -203,6 +181,25 @@ namespace jmespath {
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         typedef typename Json::const_pointer const_pointer;
 
+        constexpr struct cmp_or_t
+        {
+            JSONCONS_CPP14_CONSTEXPR optional<bool> operator()(const Json& lhs, const Json& rhs) const
+            {
+                return lhs != rhs ? true : false;
+            }
+        };
+
+        constexpr struct comparison_operator_t
+        {
+            typedef std::function<optional<bool>(const Json&, const Json&)> operator_type;
+
+            std::size_t precedence_level;
+            bool is_right_associative;
+            operator_type oper;
+        };
+
+        const comparison_operator_t or_operator{8,false,cmp_or_t()};
+
         // jmespath_context
 
         class jmespath_context
@@ -229,7 +226,7 @@ namespace jmespath {
 
             union
             {
-                comparison_operator_t<Json> comparison_operator_;
+                comparison_operator_t comparison_operator_;
                 int dummy;
             };
         public:
@@ -243,7 +240,7 @@ namespace jmespath {
             {
             }
 
-            token(const comparison_operator_t<Json>& comparison_operator)
+            token(const comparison_operator_t& comparison_operator)
                 : type_(token_type::comparison_operator), 
                   comparison_operator_(comparison_operator)
             {
