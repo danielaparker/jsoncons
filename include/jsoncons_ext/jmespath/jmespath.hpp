@@ -301,6 +301,24 @@ namespace jmespath {
             {
             }
 
+            token(token&& other)
+                : type_(other.type_)
+            {
+                switch(type_)
+                {
+                    case token_type::value:
+                        break;
+                    case token_type::expression:
+                        expression_ = std::move(other.expression_);
+                        break;
+                    case token_type::comparison_operator:
+                        comparison_operator_ = std::move(other.comparison_operator_);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             token& operator=(token&& other)
             {
                 if (&other != this)
