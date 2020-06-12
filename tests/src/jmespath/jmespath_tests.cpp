@@ -63,6 +63,7 @@ void jmespath_tests(const std::string& fpath)
                     std::cout << "input\n" << pretty_print(root) << "\n";
                     std::cout << "expression\n" << path << "\n";
                     std::cout << "expected: " << expected << "\n\n";
+                    CHECK(false);
                 }
             }
             else
@@ -78,12 +79,13 @@ TEST_CASE("jmespath-tests")
 {
     SECTION("Examples and tutorials")
     {
-        jmespath_tests("./input/jmespath/examples/jmespath-tests.json");
+        //jmespath_tests("./input/jmespath/examples/jmespath-tests.json");
     }
     SECTION("compliance")
     {
         //jmespath_tests("./input/jmespath/compliance-tests/basic.json");
         //jmespath_tests("./input/jmespath/compliance-tests/filters.json");
+        jmespath_tests("./input/jmespath/compliance-tests/boolean.json");
     }
 }
 

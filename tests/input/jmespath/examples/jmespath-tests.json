@@ -169,7 +169,7 @@
                 "result" : [["running","stopped"],["terminated","runnning"]]
             }
         ]
-    },*/
+    },
     {
         "given" : {"reservations": [{"instances": [{"state": "running"},{"state": "stopped"}]},{"instances": [{"state": "terminated"},{"state": "runnning"}]}]},
         "cases" : [ 
@@ -189,7 +189,7 @@
                 "result" : [0,1,2,3,4,5,[6,7]]
             }
         ]
-    }/*,
+    },
     {
         "given" : {"machines": [{"name": "a", "state": "running"},{"name": "b", "state": "stopped"},{"name": "b", "state": "running"}]},
         "cases" : [ 
