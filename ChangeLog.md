@@ -1,9 +1,15 @@
-master
-------
+v0.153.2
+--------
 
 Bug fixes:
 
 - Fixed a bug in the jsonpath array slice when the end argument is negative, [\#250](https://github.com/danielaparker/jsoncons/issues/250)
+
+Platform:
+
+- Support for QNX Neutrino (thanks to Oleh Derevenko for [\#244](https://github.com/danielaparker/jsoncons/issues/244) 
+and [\#245](https://github.com/danielaparker/jsoncons/pull/248)) 
+  
 
 v0.153.1
 --------

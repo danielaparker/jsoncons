@@ -85,3 +85,10 @@ convenience macros.
 - [dvzubarev](https://github.com/dvzubarev) for contributing suggestions for improving the `ser_traits` implementation.
 
 - [David Korczynski](https://github.com/DavidKorczynski) for integrating jsoncons into OSS-fuzz and contributing fuzzers 
+
+- [Sebi](https://github.com/PapeCoding) for [\#243](https://github.com/danielaparker/jsoncons/issues/243)
+to fix BSON encoding error
+
+- [Oleh Derevenko](https://github.com/oleh-derevenko) for [\#244](https://github.com/danielaparker/jsoncons/issues/244) 
+and [\#245](https://github.com/danielaparker/jsoncons/pull/248) 
+to make jsoncons work on QNX Neutrino target. 
