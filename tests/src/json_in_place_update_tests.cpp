@@ -77,7 +77,7 @@ TEST_CASE("json in-place update tests")
     }
     SECTION("test \r\n")
     {
-        std::string format = "{\"items\"\r\n:\r\n \r\n[\r\n{\"id\"\r\n:\r\n1\r\n,\r\n \"name\" \r\n:\r\n \"abc\"\r\n,\r\n \"expiry\" \r\n:\r\n \"0420\"\r\n}\r\n\r\n,\r\n { \"id\"\r\n:\r\n2\r\n,\r\n\"name\" \r\n:\r\n \"%s\"\r\n,\r\n\"expiry\" \r\n:\r\n \"0720\" \r\n}\r\n\r\n]\r\n \r\n}";
+        std::string format = "{\"items\"\r\n:\r\n \r\n[\r\n{\"id\"\r\n:\r\n1\r\n,\r\n \"name\" \r\n:\r\n \"abc\"\r\n,\r\n \"foo\" \r\n:\r\n 1000.0e-50\r\n,\r\n \"expiry\" \r\n:\r\n \"0420\"\r\n}\r\n\r\n,\r\n { \"id\"\r\n:\r\n2\r\n,\r\n\"name\" \r\n:\r\n \"%s\"\r\n,\r\n\"expiry\" \r\n:\r\n \"0720\" \r\n}\r\n\r\n]\r\n \r\n}";
 
         char input[500];
         int length = snprintf(input, 500, format.c_str(), "id");
