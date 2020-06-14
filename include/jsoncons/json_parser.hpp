@@ -146,6 +146,8 @@ private:
     uint32_t cp2_;
     std::size_t line_;
     std::size_t column_;
+    std::size_t position_;
+    std::size_t mark_position_;
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
@@ -192,6 +194,8 @@ public:
          cp2_(0),
          line_(1),
          column_(1),
+         position_(0),
+         mark_position_(0),
          begin_input_(nullptr),
          input_end_(nullptr),
          input_ptr_(nullptr),
@@ -260,17 +264,21 @@ public:
                 case ' ':
                 case '\t':
                     ++input_ptr_;
-                    ++column_;                     
+                    ++column_;
+                    ++position_;
                     break;
                 case '\r': 
                     push_state(state_);
                     ++input_ptr_;
                     ++column_;
+                    ++position_;
                     state_ = json_parse_state::cr;
                     return; 
                 case '\n': 
                     ++input_ptr_;
                     ++line_;
+                    ++position_;
+                    mark_position_ = position_;
                     column_ = 1;
                     return;   
                 default:
@@ -289,11 +297,14 @@ public:
             {
                 case json_parse_state::cr:
                     ++line_;
+                    ++position_;
+                    mark_position_ = position_;
                     column_ = 1;
                     switch (*input_ptr_)
                     {
                         case '\n':
                             ++input_ptr_;
+                            ++position_;
                             state_ = pop_state();
                             break;
                         default:
@@ -439,6 +450,8 @@ public:
         more_ = true;
         done_ = false;
         line_ = 1;
+        position_ = 0;
+        mark_position_ = 0;
         column_ = 1;
         nesting_depth_ = 0;
     }
@@ -593,11 +606,13 @@ public:
                     break;
                 case json_parse_state::cr:
                     ++line_;
+                    mark_position_ = position_;
                     column_ = 1;
                     switch (*input_ptr_)
                     {
                         case '\n':
                             ++input_ptr_;
+                            ++position_;
                             state_ = pop_state();
                             break;
                         default:
@@ -620,12 +635,14 @@ public:
                             case '\r': 
                                 push_state(state_);
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::cr;
                                 break; 
                             case '\n': 
                                 ++input_ptr_;
                                 ++line_;
+                                ++position_;
+                                mark_position_ = position_;
                                 column_ = 1;
                                 break;   
                             case ' ':case '\t':
@@ -633,7 +650,7 @@ public:
                                 break;
                             case '/': 
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_);
                                 state_ = json_parse_state::slash;
                                 break;
@@ -641,18 +658,18 @@ public:
                                 begin_object(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '[':
                                 begin_array(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\"':
                                 state_ = json_parse_state::string;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
                                 if (ec) return;
@@ -661,7 +678,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -671,7 +688,7 @@ public:
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 state_ = json_parse_state::zero;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
                                 break;
@@ -679,7 +696,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -727,17 +744,19 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\r': 
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_);
                                 state_ = json_parse_state::cr;
                                 break; 
                             case '\n': 
                                 ++input_ptr_;
                                 ++line_;
+                                ++position_;
+                                mark_position_ = position_;
                                 column_ = 1;
                                 break;   
                             case ' ':case '\t':
@@ -745,7 +764,7 @@ public:
                                 break;
                             case '/':
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_); 
                                 state_ = json_parse_state::slash;
                                 break;
@@ -753,19 +772,19 @@ public:
                                 end_object(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case ']':
                                 end_array(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case ',':
                                 begin_member_or_element(ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             default:
                                 if (parent() == json_parse_state::array)
@@ -787,7 +806,7 @@ public:
                                     }
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                         }
                     }
@@ -804,17 +823,19 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\r': 
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_);
                                 state_ = json_parse_state::cr;
                                 break; 
                             case '\n': 
                                 ++input_ptr_;
                                 ++line_;
+                                ++position_;
+                                mark_position_ = position_;
                                 column_ = 1;
                                 break;   
                             case ' ':case '\t':
@@ -822,7 +843,7 @@ public:
                                 break;
                             case '/':
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_); 
                                 state_ = json_parse_state::slash;
                                 break;
@@ -830,11 +851,11 @@ public:
                                 end_object(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\"':
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(json_parse_state::member_name);
                                 state_ = json_parse_state::string;
                                 string_buffer_.clear();
@@ -849,7 +870,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             default:
                                 more_ = err_handler_(json_errc::expected_key, *this);
@@ -859,7 +880,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                         }
                     }
@@ -876,17 +897,19 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\r': 
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_);
                                 state_ = json_parse_state::cr;
                                 break; 
                             case '\n': 
                                 ++input_ptr_;
                                 ++line_;
+                                ++position_;
+                                mark_position_ = position_;
                                 column_ = 1;
                                 break;   
                             case ' ':case '\t':
@@ -894,13 +917,13 @@ public:
                                 break;
                             case '/': 
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_);
                                 state_ = json_parse_state::slash;
                                 break;
                             case '\"':
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(json_parse_state::member_name);
                                 state_ = json_parse_state::string;
                                 string_buffer_.clear();
@@ -917,7 +940,7 @@ public:
                                 end_object(visitor, ec);  // Recover
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -927,7 +950,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             default:
                                 more_ = err_handler_(json_errc::expected_key, *this);
@@ -937,7 +960,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                         }
                     }
@@ -954,17 +977,19 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\r': 
                                 push_state(state_);
                                 state_ = json_parse_state::cr;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break; 
                             case '\n': 
                                 ++input_ptr_;
                                 ++line_;
+                                ++position_;
+                                mark_position_ = position_;
                                 column_ = 1;
                                 break;   
                             case ' ':case '\t':
@@ -974,12 +999,12 @@ public:
                                 push_state(state_);
                                 state_ = json_parse_state::slash;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case ':':
                                 state_ = json_parse_state::expect_value;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             default:
                                 more_ = err_handler_(json_errc::expected_colon, *this);
@@ -989,7 +1014,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                         }
                     }
@@ -1007,17 +1032,19 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\r': 
                                 push_state(state_);
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::cr;
                                 break; 
                             case '\n': 
                                 ++input_ptr_;
                                 ++line_;
+                                ++position_;
+                                mark_position_ = position_;
                                 column_ = 1;
                                 break;   
                             case ' ':case '\t':
@@ -1026,24 +1053,24 @@ public:
                             case '/': 
                                 push_state(state_);
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::slash;
                                 break;
                             case '{':
                                 begin_object(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '[':
                                 begin_array(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\"':
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::string;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
@@ -1053,7 +1080,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -1062,7 +1089,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::zero;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -1071,7 +1098,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -1110,7 +1137,7 @@ public:
                                     }
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\'':
                                 more_ = err_handler_(json_errc::single_quote, *this);
@@ -1120,7 +1147,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             default:
                                 more_ = err_handler_(json_errc::expected_value, *this);
@@ -1130,7 +1157,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                         }
                     }
@@ -1147,17 +1174,19 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\r': 
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_);
                                 state_ = json_parse_state::cr;
                                 break; 
                             case '\n': 
                                 ++input_ptr_;
                                 ++line_;
+                                ++position_;
+                                mark_position_ = position_;
                                 column_ = 1;
                                 break;   
                             case ' ':case '\t':
@@ -1165,7 +1194,7 @@ public:
                                 break;
                             case '/': 
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 push_state(state_);
                                 state_ = json_parse_state::slash;
                                 break;
@@ -1173,23 +1202,23 @@ public:
                                 begin_object(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '[':
                                 begin_array(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case ']':
                                 end_array(visitor, ec);
                                 if (ec) return;
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             case '\"':
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::string;
                                 string_buffer_.clear();
                                 parse_string(visitor, ec);
@@ -1199,7 +1228,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back('-');
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::minus;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -1208,7 +1237,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::zero;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -1217,7 +1246,7 @@ public:
                                 string_buffer_.clear();
                                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 state_ = json_parse_state::integer;
                                 parse_number(visitor, ec);
                                 if (ec) {return;}
@@ -1242,7 +1271,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             default:
                                 more_ = err_handler_(json_errc::expected_value, *this);
@@ -1252,7 +1281,7 @@ public:
                                     return;
                                 }
                                 ++input_ptr_;
-                                ++column_;
+                                ++column_; ++position_;
                                 break;
                             }
                         }
@@ -1288,7 +1317,7 @@ public:
                     {
                         case 'r':
                             ++input_ptr_;
-                            ++column_;
+                            ++column_; ++position_;
                             state_ = json_parse_state::tr;
                             break;
                         default:
@@ -1311,7 +1340,7 @@ public:
                             return;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 case json_parse_state::tru: 
                     switch (*input_ptr_)
@@ -1334,14 +1363,14 @@ public:
                             return;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 case json_parse_state::f: 
                     switch (*input_ptr_)
                     {
                         case 'a':
                             ++input_ptr_;
-                            ++column_;
+                            ++column_; ++position_;
                             state_ = json_parse_state::fa;
                             break;
                         default:
@@ -1364,7 +1393,7 @@ public:
                             return;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 case json_parse_state::fal: 
                     switch (*input_ptr_)
@@ -1379,7 +1408,7 @@ public:
                             return;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 case json_parse_state::fals: 
                     switch (*input_ptr_)
@@ -1402,14 +1431,14 @@ public:
                             return;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 case json_parse_state::n: 
                     switch (*input_ptr_)
                     {
                         case 'u':
                             ++input_ptr_;
-                            ++column_;
+                            ++column_; ++position_;
                             state_ = json_parse_state::nu;
                             break;
                         default:
@@ -1432,7 +1461,7 @@ public:
                             return;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 case json_parse_state::nul: 
                     switch (*input_ptr_)
@@ -1455,7 +1484,7 @@ public:
                         return;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 case json_parse_state::slash: 
                 {
@@ -1489,7 +1518,7 @@ public:
                         break;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 }
                 case json_parse_state::slash_star:  
@@ -1502,6 +1531,8 @@ public:
                         break;
                     case '\n':
                         ++line_;
+                        ++position_;
+                        mark_position_ = position_;
                         column_ = 1;
                         break;
                     case '*':
@@ -1509,7 +1540,7 @@ public:
                         break;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 }
                 case json_parse_state::slash_slash: 
@@ -1524,7 +1555,7 @@ public:
                         break;
                     default:
                         ++input_ptr_;
-                        ++column_;
+                        ++column_; ++position_;
                     }
                     break;
                 }
@@ -1540,7 +1571,7 @@ public:
                         break;
                     }
                     ++input_ptr_;
-                    ++column_;
+                    ++column_; ++position_;
                     break;
                 }
                 default:
@@ -1558,7 +1589,7 @@ public:
             {
                 more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
                 input_ptr_ += 4;
-                column_ += 4;
+                column_ += 4; position_ += 4;
                 if (parent() == json_parse_state::root)
                 {
                     state_ = json_parse_state::before_done;
@@ -1579,7 +1610,7 @@ public:
         else
         {
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             state_ = json_parse_state::t;
         }
     }
@@ -1592,7 +1623,7 @@ public:
             {
                 more_ = visitor.null_value(semantic_tag::none, *this, ec);
                 input_ptr_ += 4;
-                column_ += 4;
+                column_ += 4; position_ += 4;
                 if (parent() == json_parse_state::root)
                 {
                     state_ = json_parse_state::before_done;
@@ -1613,7 +1644,7 @@ public:
         else
         {
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             state_ = json_parse_state::n;
         }
     }
@@ -1626,7 +1657,7 @@ public:
             {
                 more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
                 input_ptr_ += 5;
-                column_ += 5;
+                column_ += 5;  position_ += 5;
                 if (parent() == json_parse_state::root)
                 {
                     state_ = json_parse_state::before_done;
@@ -1647,7 +1678,7 @@ public:
         else
         {
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             state_ = json_parse_state::f;
         }
     }
@@ -1688,12 +1719,12 @@ minus_sign:
             case '0': 
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto zero;
             case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto integer;
             default:
                 err_handler_(json_errc::expected_value, *this);
@@ -1713,7 +1744,7 @@ zero:
                 end_integer_value(visitor, ec);
                 if (ec) return;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 push_state(state_);
                 state_ = json_parse_state::cr;
                 return; 
@@ -1722,6 +1753,8 @@ zero:
                 if (ec) return;
                 ++input_ptr_;
                 ++line_;
+                ++position_;
+                mark_position_ = position_;
                 column_ = 1;
                 return;   
             case ' ':case '\t':
@@ -1733,7 +1766,7 @@ zero:
                 end_integer_value(visitor, ec);
                 if (ec) return;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 push_state(state_);
                 state_ = json_parse_state::slash;
                 return;
@@ -1750,12 +1783,12 @@ zero:
             case '.':
                 string_buffer_.push_back(to_double_.get_decimal_point());
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto fraction1;
             case 'e':case 'E':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp1;
             case ',':
                 end_integer_value(visitor, ec);
@@ -1763,7 +1796,7 @@ zero:
                 begin_member_or_element(ec);
                 if (ec) return;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 return;
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 err_handler_(json_errc::leading_zero, *this);
@@ -1791,7 +1824,7 @@ integer:
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 state_ = json_parse_state::cr;
                 return; 
             case '\n': 
@@ -1799,6 +1832,8 @@ integer:
                 if (ec) return;
                 ++input_ptr_;
                 ++line_;
+                ++position_;
+                mark_position_ = position_;
                 column_ = 1;
                 return;   
             case ' ':case '\t':
@@ -1811,7 +1846,7 @@ integer:
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 state_ = json_parse_state::slash;
                 return;
             case '}':
@@ -1827,17 +1862,17 @@ integer:
             case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto integer;
             case '.':
                 string_buffer_.push_back(to_double_.get_decimal_point());
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto fraction1;
             case 'e':case 'E':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp1;
             case ',':
                 end_integer_value(visitor, ec);
@@ -1845,7 +1880,7 @@ integer:
                 begin_member_or_element(ec);
                 if (ec) return;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 return;
             default:
                 err_handler_(json_errc::invalid_number, *this);
@@ -1865,7 +1900,7 @@ fraction1:
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto fraction2;
             default:
                 err_handler_(json_errc::invalid_number, *this);
@@ -1887,7 +1922,7 @@ fraction2:
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 state_ = json_parse_state::cr;
                 return; 
             case '\n': 
@@ -1895,6 +1930,8 @@ fraction2:
                 if (ec) return;
                 ++input_ptr_;
                 ++line_;
+                ++position_;
+                mark_position_ = position_;
                 column_ = 1;
                 return;   
             case ' ':case '\t':
@@ -1907,7 +1944,7 @@ fraction2:
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 state_ = json_parse_state::slash;
                 return;
             case '}':
@@ -1926,17 +1963,17 @@ fraction2:
                 begin_member_or_element(ec);
                 if (ec) return;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 return;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto fraction2;
             case 'e':case 'E':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp1;
             default:
                 err_handler_(json_errc::invalid_number, *this);
@@ -1955,17 +1992,17 @@ exp1:
         {
             case '+':
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp2;
             case '-':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp2;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp3;
             default:
                 err_handler_(json_errc::expected_value, *this);
@@ -1985,7 +2022,7 @@ exp2:
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp3;
             default:
                 err_handler_(json_errc::expected_value, *this);
@@ -2007,7 +2044,7 @@ exp3:
                 end_fraction_value(visitor, ec);
                 if (ec) return;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 push_state(state_);
                 state_ = json_parse_state::cr;
                 return; 
@@ -2016,6 +2053,8 @@ exp3:
                 if (ec) return;
                 ++input_ptr_;
                 ++line_;
+                ++position_;
+                mark_position_ = position_;
                 column_ = 1;
                 return;   
             case ' ':case '\t':
@@ -2028,7 +2067,7 @@ exp3:
                 if (ec) return;
                 push_state(state_);
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 state_ = json_parse_state::slash;
                 return;
             case '}':
@@ -2047,12 +2086,12 @@ exp3:
                 begin_member_or_element(ec);
                 if (ec) return;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 return;
             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                 string_buffer_.push_back(static_cast<char>(*input_ptr_));
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto exp3;
             default:
                 err_handler_(json_errc::invalid_number, *this);
@@ -2107,7 +2146,7 @@ string_u1:
             {
                 JSONCONS_ILLEGAL_CONTROL_CHARACTER:
                 {
-                    column_ += (input_ptr_ - sb + 1);
+                    column_ += (input_ptr_ - sb + 1);  position_ += (input_ptr_ - sb + 1);
                     more_ = err_handler_(json_errc::illegal_control_character, *this);
                     if (!more_)
                     {
@@ -2123,7 +2162,7 @@ string_u1:
                 }
                 case '\r':
                 {
-                    column_ += (input_ptr_ - sb + 1);
+                    column_ += (input_ptr_ - sb + 1); position_ += (input_ptr_ - sb + 1);
                     more_ = err_handler_(json_errc::illegal_character_in_string, *this);
                     if (!more_)
                     {
@@ -2141,6 +2180,8 @@ string_u1:
                 case '\n':
                 {
                     ++line_;
+                    ++position_;
+                    mark_position_ = position_;
                     column_ = 1;
                     more_ = err_handler_(json_errc::illegal_character_in_string, *this);
                     if (!more_)
@@ -2156,7 +2197,7 @@ string_u1:
                 }
                 case '\t':
                 {
-                    column_ += (input_ptr_ - sb + 1);
+                    column_ += (input_ptr_ - sb + 1); position_ += (input_ptr_ - sb + 1);
                     more_ = err_handler_(json_errc::illegal_character_in_string, *this);
                     if (!more_)
                     {
@@ -2173,7 +2214,7 @@ string_u1:
                 case '\\': 
                 {
                     string_buffer_.append(sb,input_ptr_-sb);
-                    column_ += (input_ptr_ - sb + 1);
+                    column_ += (input_ptr_ - sb + 1); position_ += (input_ptr_ - sb + 1);
                     ++input_ptr_;
                     goto escape;
                 }
@@ -2190,7 +2231,7 @@ string_u1:
                         end_string_value(string_buffer_.data(),string_buffer_.length(), visitor, ec);
                         if (ec) {return;}
                     }
-                    column_ += (input_ptr_ - sb + 1);
+                    column_ += (input_ptr_ - sb + 1);position_ += (input_ptr_ - sb + 1);
                     ++input_ptr_;
                     return;
                 }
@@ -2203,7 +2244,7 @@ string_u1:
         // Buffer exhausted               
         {
             string_buffer_.append(sb,input_ptr_-sb);
-            column_ += (input_ptr_ - sb + 1);
+            column_ += (input_ptr_ - sb + 1);position_ += (input_ptr_ - sb + 1);
             state_ = json_parse_state::string;
             return;
         }
@@ -2219,47 +2260,47 @@ escape:
         case '\"':
             string_buffer_.push_back('\"');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case '\\': 
             string_buffer_.push_back('\\');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case '/':
             string_buffer_.push_back('/');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case 'b':
             string_buffer_.push_back('\b');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case 'f':
             string_buffer_.push_back('\f');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case 'n':
             string_buffer_.push_back('\n');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case 'r':
             string_buffer_.push_back('\r');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case 't':
             string_buffer_.push_back('\t');
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         case 'u':
             cp_ = 0;
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto escape_u1;
         default:    
             err_handler_(json_errc::illegal_escaped_character, *this);
@@ -2283,7 +2324,7 @@ escape_u1:
                 return;
             }
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto escape_u2;
         }
 
@@ -2301,7 +2342,7 @@ escape_u2:
                 return;
             }
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto escape_u3;
         }
 
@@ -2319,7 +2360,7 @@ escape_u3:
                 return;
             }
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto escape_u4;
         }
 
@@ -2339,14 +2380,14 @@ escape_u4:
             if (unicons::is_high_surrogate(cp_))
             {
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto escape_expect_surrogate_pair1;
             }
             else
             {
                 unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
                 sb = ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 state_ = json_parse_state::string;
                 return;
             }
@@ -2364,7 +2405,7 @@ escape_expect_surrogate_pair1:
             case '\\': 
                 cp2_ = 0;
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto escape_expect_surrogate_pair2;
             default:
                 err_handler_(json_errc::expected_codepoint_surrogate_pair, *this);
@@ -2386,7 +2427,7 @@ escape_expect_surrogate_pair2:
             {
             case 'u':
                 ++input_ptr_;
-                ++column_;
+                ++column_; ++position_;
                 goto escape_u6;
             default:
                 err_handler_(json_errc::expected_codepoint_surrogate_pair, *this);
@@ -2412,7 +2453,7 @@ escape_u6:
             }
         }
         ++input_ptr_;
-        ++column_;
+        ++column_; ++position_;
         goto escape_u7;
 
 escape_u7:
@@ -2429,7 +2470,7 @@ escape_u7:
                 return;
             }
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto escape_u8;
         }
 
@@ -2447,7 +2488,7 @@ escape_u8:
                 return;
             }
             ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto escape_u9;
         }
 
@@ -2467,7 +2508,7 @@ escape_u9:
             uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
             unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
             sb = ++input_ptr_;
-            ++column_;
+            ++column_; ++position_;
             goto string_u1;
         }
 
@@ -2561,7 +2602,13 @@ escape_u9:
 
     std::size_t column() const override
     {
-        return column_;
+        //return column_;
+        return position_ - mark_position_;
+    }
+
+    std::size_t position() const override
+    {
+        return position_;
     }
 private:
 
@@ -2683,7 +2730,7 @@ private:
         if (result.ec != unicons::conv_errc())
         {
             translate_conv_errc(result.ec,ec);
-            column_ += (result.it - s);
+            column_ += (result.it - s); position_ += (result.it - s);
             return;
         }
         switch (parent())

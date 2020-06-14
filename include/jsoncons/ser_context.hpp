@@ -24,6 +24,11 @@ public:
         return 0;
     }
 
+    virtual size_t position() const
+    {
+        return 0;
+    }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
     JSONCONS_DEPRECATED_MSG("Instead, use line()")
     std::size_t line_number() const
