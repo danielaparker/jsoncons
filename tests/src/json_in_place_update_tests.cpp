@@ -35,8 +35,6 @@ namespace {
         {
             if (value == from_)
             {
-                std::cout << "column: " << context.column() << "\n";
-                std::cout << "position: " << context.position() << "\n";
                 std::copy(to_.begin(), to_.end(), data_ + context.position());
             }
             return true;
