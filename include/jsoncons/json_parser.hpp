@@ -2603,7 +2603,7 @@ escape_u9:
     std::size_t column() const override
     {
         //return column_;
-        return position_ - mark_position_;
+        return (position_ - mark_position_) + 1;
     }
 
     std::size_t position() const override
