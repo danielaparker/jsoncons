@@ -296,67 +296,62 @@ namespace jmespath {
             }
 
             token(std::unique_ptr<expression_base>&& expression)
-                : type_(token_type::expression), 
-                  expression_(std::move(expression))
+                : type_(token_type::expression)
             {
+                new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
             }
 
             token(token&& other)
-                : type_(other.type_)
+                : type_(token_type::lparen)
             {
-                switch(type_)
+                swap(other);
+            }
+
+            void swap(token& other) noexcept
+            {
+                if (type_ == other.type_)
                 {
-                    case token_type::value:
-                        break;
-                    case token_type::expression:
-                        set(other.expression_);
-                        break;
-                    case token_type::comparison_operator:
-                        comparison_operator_ = other.comparison_operator_;
-                        break;
-                    default:
-                        break;
+                    expression_.swap(other.expression_);
+                    std::swap(comparison_operator_,other.comparison_operator_);
                 }
+                else
+                {
+                    switch (type_)
+                    {
+                        case token_type::value:
+                            break;
+                        case token_type::expression:
+                            new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
+                            break;
+                        case token_type::comparison_operator:
+                            other.comparison_operator_ = comparison_operator_;
+                            break;
+                        default:
+                            break;
+                    }
+                    switch (other.type_)
+                    {
+                        case token_type::value:
+                            break;
+                        case token_type::expression:
+                            new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                            break;
+                        case token_type::comparison_operator:
+                            comparison_operator_ = other.comparison_operator_;
+                            break;
+                        default:
+                            break;
+                    }
+                    std::swap(type_,other.type_);
+                }
+
             }
 
             token& operator=(token&& other)
             {
                 if (&other != this)
                 {
-                    if (other.type_ == type_)
-                    {
-                        switch(type_)
-                        {
-                            case token_type::value:
-                                break;
-                            case token_type::expression:
-                                expression_ = std::move(other.expression_);
-                                break;
-                            case token_type::comparison_operator:
-                                comparison_operator_ = other.comparison_operator_;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        switch(other.type_)
-                        {
-                            case token_type::value:
-                                break;
-                            case token_type::expression:
-                                set(other.expression_);
-                                break;
-                            case token_type::comparison_operator:
-                                comparison_operator_ = other.comparison_operator_;
-                                break;
-                            default:
-                                break;
-                        }
-
-                        type_ = other.type_;
-                    }
+                    swap(other);
                 }
                 return *this;
             }
@@ -423,13 +418,6 @@ namespace jmespath {
                     default:
                         break;
                 }
-            }
-
-             void set(std::unique_ptr<expression_base> p)
-            {
-                destroy();
-                new (&expression_) std::unique_ptr<expression_base>{std::move(p)};
-                type_ = token_type::expression;
             }
 
             string_type to_string() const
