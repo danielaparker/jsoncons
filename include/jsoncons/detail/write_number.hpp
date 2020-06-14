@@ -13,7 +13,7 @@
 #include <locale>
 #include <limits> // std::numeric_limits
 #include <exception>
-#include <stdio.h> // issue #244
+#include <stdio.h> // snprintf
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/detail/grisu3.hpp>
