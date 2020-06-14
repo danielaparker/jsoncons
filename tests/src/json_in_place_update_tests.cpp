@@ -104,5 +104,89 @@ TEST_CASE("json in-place update tests")
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
+    SECTION("test /**/ \n")
+    {
+        std::string format = "/*\n       \n        \n*/\"%s\"";
+
+        char input[500];
+        int length = snprintf(input, 500, format.c_str(), "id");
+        char expected[500];
+        snprintf(expected, 500, format.c_str(), "ab");
+
+        my_in_place_updater updater(input, (size_t)length, "id", "ab");
+        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        reader.read();
+        CHECK(std::string(input) == std::string(expected));
+    }
+    SECTION("test /**/ \r")
+    {
+        std::string format = "/*\r       \r        \r*/\"%s\"";
+
+        char input[500];
+        int length = snprintf(input, 500, format.c_str(), "id");
+        char expected[500];
+        snprintf(expected, 500, format.c_str(), "ab");
+
+        my_in_place_updater updater(input, (size_t)length, "id", "ab");
+        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        reader.read();
+        CHECK(std::string(input) == std::string(expected));
+    }
+    SECTION("test /**/ \r\n")
+    {
+        std::string format = "/*\r\n       \r\n        \r\n*/\"%s\"";
+
+        char input[500];
+        int length = snprintf(input, 500, format.c_str(), "id");
+        char expected[500];
+        snprintf(expected, 500, format.c_str(), "ab");
+
+        my_in_place_updater updater(input, (size_t)length, "id", "ab");
+        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        reader.read();
+        CHECK(std::string(input) == std::string(expected));
+    }
+    SECTION("test // \n")
+    {
+        std::string format = "//               \n\"%s\"";
+
+        char input[500];
+        int length = snprintf(input, 500, format.c_str(), "id");
+        char expected[500];
+        snprintf(expected, 500, format.c_str(), "ab");
+
+        my_in_place_updater updater(input, (size_t)length, "id", "ab");
+        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        reader.read();
+        CHECK(std::string(input) == std::string(expected));
+    }
+    SECTION("test // \r")
+    {
+        std::string format = "//               \r\"%s\"";
+
+        char input[500];
+        int length = snprintf(input, 500, format.c_str(), "id");
+        char expected[500];
+        snprintf(expected, 500, format.c_str(), "ab");
+
+        my_in_place_updater updater(input, (size_t)length, "id", "ab");
+        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        reader.read();
+        CHECK(std::string(input) == std::string(expected));
+    }
+    SECTION("test // \r\n")
+    {
+        std::string format = "//               \r\n\"%s\"";
+
+        char input[500];
+        int length = snprintf(input, 500, format.c_str(), "id");
+        char expected[500];
+        snprintf(expected, 500, format.c_str(), "ab");
+
+        my_in_place_updater updater(input, (size_t)length, "id", "ab");
+        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        reader.read();
+        CHECK(std::string(input) == std::string(expected));
+    }
 }
 

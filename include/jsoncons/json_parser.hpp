@@ -1510,21 +1510,28 @@ public:
                 {
                     switch (*input_ptr_)
                     {
-                    case '\r':
-                        push_state(state_);
-                        state_ = json_parse_state::cr;
-                        break;
-                    case '\n':
-                        ++line_;
-                        ++position_;
-                        mark_position_ = position_;
-                        break;
-                    case '*':
-                        state_ = json_parse_state::slash_star_star;
-                        break;
+                        case '\r':
+                            push_state(state_);
+                            ++input_ptr_;
+                            ++position_;
+                            state_ = json_parse_state::cr;
+                            break;
+                        case '\n':
+                            ++input_ptr_;
+                            ++line_;
+                            ++position_;
+                            mark_position_ = position_;
+                            break;
+                        case '*':
+                            ++input_ptr_;
+                            ++position_;
+                            state_ = json_parse_state::slash_star_star;
+                            break;
+                        default:
+                            ++input_ptr_;
+                            ++position_;
+                            break;
                     }
-                    ++input_ptr_;
-                    ++position_;
                     break;
                 }
                 case json_parse_state::slash_slash: 
