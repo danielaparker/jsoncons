@@ -209,7 +209,7 @@ namespace jmespath {
 
         // jmespath_context
 
-        class jmespath_context
+        class jmespath_storage
         {
             std::vector<std::unique_ptr<Json>> temp_storage_;
         public:
@@ -228,7 +228,7 @@ namespace jmespath {
         {
         public:
             virtual std::size_t precedence_level() const = 0;
-            virtual reference evaluate(jmespath_context&, reference lhs, reference rhs, std::error_code& ec) = 0;
+            virtual reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code& ec) = 0;
 
             static bool is_false(reference ref)
             {
@@ -251,7 +251,7 @@ namespace jmespath {
             {
                 return 8;
             }
-            reference evaluate(jmespath_context&, reference lhs, reference rhs, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
             {
                 if (!this->is_false(lhs))
                 {
@@ -278,7 +278,7 @@ namespace jmespath {
             {
             }
 
-            virtual reference evaluate(jmespath_context&, reference val, std::error_code& ec) = 0;
+            virtual reference evaluate(reference val, jmespath_storage&, std::error_code& ec) = 0;
 
             virtual string_type to_string() const
             {
@@ -296,7 +296,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(jmespath_context&, reference val, std::error_code&) override
+            reference evaluate(reference val, jmespath_storage&, std::error_code&) override
             {
                 std::cout << "(identifier_expression " << identifier_  << " ) " << pretty_print(val) << "\n";
                 if (val.is_object() && val.contains(identifier_))
@@ -535,7 +535,7 @@ namespace jmespath {
         const char_type* p_;
 
         std::vector<path_state> state_stack_;
-        jmespath_context temp_factory_;
+        jmespath_storage storage_;
 
         std::vector<token> output_stack_;
         std::vector<token> operator_stack_;
@@ -1414,7 +1414,7 @@ namespace jmespath {
                         JSONCONS_ASSERT(!stack.empty());
                         auto ptr = stack.back();
                         stack.pop_back();
-                        auto& ref = t.expression_->evaluate(temp_factory_, *ptr, ec);
+                        auto& ref = t.expression_->evaluate(*ptr, storage_, ec);
                         stack.push_back(std::addressof(ref));
                         break;
                     }
@@ -1447,7 +1447,7 @@ namespace jmespath {
                         stack.pop_back();
                         auto lhs = stack.back();
                         stack.pop_back();
-                        reference r = t.binary_expression_->evaluate(temp_factory_, *lhs,*rhs, ec);
+                        reference r = t.binary_expression_->evaluate(*lhs,*rhs, storage_, ec);
                         stack.push_back(std::addressof(r));
                         break;
                     }
