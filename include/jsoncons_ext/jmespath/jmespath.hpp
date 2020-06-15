@@ -173,7 +173,8 @@ namespace jmespath {
         cmp_eq,
         cmp_gt_or_gte,
         cmp_ne,
-        expect_or
+        expect_or,
+        expect_and
     };
 
     template<class Json,
@@ -253,18 +254,39 @@ namespace jmespath {
             }
             reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
             {
+                if (lhs.is_null() && rhs.is_null())
+                {
+                    return Json::null();
+                }
                 if (!this->is_false(lhs))
                 {
                     return lhs;
                 }
-                if (!this->is_false(rhs))
+                else
                 {
                     return rhs;
                 }
-                return Json::null();
             }
         };
 
+        class and_expression : public binary_expression
+        {
+            std::size_t precedence_level() const 
+            {
+                return 9;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                if (this->is_true(lhs))
+                {
+                    return rhs;
+                }
+                else
+                {
+                    return lhs;
+                }
+            }
+        };
 
         // expression_base
         class expression_base
@@ -620,6 +642,7 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::expression_item);
                                 break;
                             case '|':
+                            case '&':
                             {
                                 ++p_;
                                 ++column_;
@@ -673,12 +696,11 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case '&':
-                                ++p_;
-                                ++column_;
-                                break;
                             case '|':
                                 state_stack_.emplace_back(path_state::expect_or);
+                                break;
+                            case '&':
+                                state_stack_.emplace_back(path_state::expect_and);
                                 break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
@@ -1236,6 +1258,24 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_or;
+                                return Json::null();
+                        }
+                        break;
+                    }
+                    case path_state::expect_and:
+                    {
+                        switch(*p_)
+                        {
+                            case '&':
+                                push_token(token(expression_begin_arg));
+                                push_token(token(jsoncons::make_unique<and_expression>()));
+                                state_stack_.pop_back(); // expect_and
+                                std::cout << "state (pop expect_and): " << (int) state_stack_.back() << "\n";
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jmespath_errc::expected_and;
                                 return Json::null();
                         }
                         break;

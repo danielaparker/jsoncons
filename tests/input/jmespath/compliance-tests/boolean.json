@@ -69,7 +69,7 @@
         "result": "foo"
       }
     ]
-  }/*,
+  },
   {
     "given": {
       "True": true,
@@ -150,7 +150,7 @@
       {
         "expression": "Number || True && False",
         "result": 5
-      },
+      }/*,
       {
         "expression": "(Number || True) && False",
         "result": false
@@ -198,9 +198,9 @@
       {
         "expression": "!!Zero",
         "result": true
-      }
+      }*/
     ]
-  },
+  }/*,
   {
     "given": {
       "one": 1,

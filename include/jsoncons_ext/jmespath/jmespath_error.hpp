@@ -92,6 +92,7 @@ enum class jmespath_errc
     expected_colon,
     expected_dot,
     expected_or,
+    expected_and,
     invalid_number,
     expected_comparator,
     expected_key,
@@ -130,6 +131,8 @@ public:
                 return "Expected \".\"";
             case jmespath_errc::expected_or:
                 return "Expected \"||\"";
+            case jmespath_errc::expected_and:
+                return "Expected \"&&\"";
             case jmespath_errc::invalid_number:
                 return "Invalid number";
             case jmespath_errc::expected_comparator:
