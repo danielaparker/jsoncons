@@ -520,7 +520,10 @@ namespace jmespath {
                 switch(type_)
                 {
                     case token_type::expression:
-                        expression_.~unique_ptr<expression_base>();
+                        expression_.~unique_ptr();
+                        break;
+                    case token_type::binary_expression:
+                        binary_expression_.~unique_ptr();
                         break;
                     default:
                         break;
