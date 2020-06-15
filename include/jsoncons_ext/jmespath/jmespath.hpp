@@ -1494,6 +1494,8 @@ namespace jmespath {
                         stack.push_back(std::addressof(r));
                         break;
                     }
+                    default:
+                        break;
                 }
             }
             JSONCONS_ASSERT(stack.size() == 1);
