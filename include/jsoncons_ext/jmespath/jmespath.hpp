@@ -29,6 +29,7 @@ namespace jmespath {
     {
         value,
         expression,
+        binary_expression,
         expression_begin,
         comparison_operator,
         lparen,
@@ -223,6 +224,48 @@ namespace jmespath {
             }
         };
 
+        class binary_expression
+        {
+        public:
+            virtual std::size_t precedence_level() const = 0;
+            virtual reference evaluate(jmespath_context&, reference lhs, reference rhs, std::error_code& ec) = 0;
+
+            static bool is_false(reference ref)
+            {
+                return (ref.is_array() && ref.empty()) ||
+                       (ref.is_object() && ref.empty()) ||
+                       (ref.is_string() && ref.as_string_view().size() == 0) ||
+                       (ref.is_bool() && !ref.as_bool()) ||
+                       ref.is_null();
+            }
+
+            static bool is_true(reference ref)
+            {
+                return !is_false(ref);
+            }
+        };
+
+        class or_expression : public binary_expression
+        {
+            std::size_t precedence_level() const 
+            {
+                return 8;
+            }
+            reference evaluate(jmespath_context&, reference lhs, reference rhs, std::error_code&) 
+            {
+                if (!this->is_false(lhs))
+                {
+                    return lhs;
+                }
+                if (!this->is_false(rhs))
+                {
+                    return rhs;
+                }
+                return Json::null();
+            }
+        };
+
+
         // expression_base
         class expression_base
         {
@@ -283,6 +326,7 @@ namespace jmespath {
             {
                 comparison_operator_t* comparison_operator_;
                 std::unique_ptr<expression_base> expression_;
+                std::unique_ptr<binary_expression> binary_expression_;
             };
         public:
 
@@ -313,6 +357,12 @@ namespace jmespath {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
             }
 
+            token(std::unique_ptr<binary_expression>&& expression)
+                : type_(token_type::binary_expression)
+            {
+                new (&binary_expression_) std::unique_ptr<binary_expression>(std::move(expression));
+            }
+
             token(token&& other)
                 : type_(token_type::lparen)
             {
@@ -323,8 +373,18 @@ namespace jmespath {
             {
                 if (type_ == other.type_)
                 {
-                    expression_.swap(other.expression_);
-                    std::swap(comparison_operator_,other.comparison_operator_);
+                    switch (type_)
+                    {
+                        case token_type::expression:
+                            expression_.swap(other.expression_);
+                            break;
+                        case token_type::binary_expression:
+                            binary_expression_.swap(other.binary_expression_);
+                            break;
+                        case token_type::comparison_operator:
+                            std::swap(comparison_operator_,other.comparison_operator_);
+                            break;
+                    }
                 }
                 else
                 {
@@ -334,6 +394,9 @@ namespace jmespath {
                             break;
                         case token_type::expression:
                             new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
+                            break;
+                        case token_type::binary_expression:
+                            new (&other.binary_expression_) std::unique_ptr<binary_expression>(std::move(binary_expression_));
                             break;
                         case token_type::comparison_operator:
                             other.comparison_operator_ = comparison_operator_;
@@ -347,6 +410,9 @@ namespace jmespath {
                             break;
                         case token_type::expression:
                             new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                            break;
+                        case token_type::binary_expression:
+                            new (&binary_expression_) std::unique_ptr<binary_expression>(std::move(other.binary_expression_));
                             break;
                         case token_type::comparison_operator:
                             comparison_operator_ = other.comparison_operator_;
@@ -409,6 +475,8 @@ namespace jmespath {
                 {
                     case token_type::comparison_operator:
                         return comparison_operator_->precedence_level;
+                    case token_type::binary_expression:
+                        return binary_expression_->precedence_level();
                     default:
                         return 0;
                 }
@@ -446,6 +514,9 @@ namespace jmespath {
                         break;
                     case token_type::comparison_operator:
                         return string_type("compare");
+                        break;
+                    case token_type::binary_expression:
+                        return string_type("binary_expression");
                         break;
                     case token_type::expression_begin:
                         return string_type("expression_begin");
@@ -1157,7 +1228,7 @@ namespace jmespath {
                         {
                             case '|':
                                 push_token(token(expression_begin_arg));
-                                push_token(token(&or_operator));
+                                push_token(token(jsoncons::make_unique<or_expression>()));
                                 state_stack_.pop_back(); // expect_or
                                 std::cout << "state (pop expect_or): " << (int) state_stack_.back() << "\n";
                                 ++p_;
@@ -1369,6 +1440,17 @@ namespace jmespath {
                         }
                         break;
                     }
+                    case token_type::binary_expression:
+                    {
+                        JSONCONS_ASSERT(stack.size() >= 2);
+                        auto rhs = stack.back();
+                        stack.pop_back();
+                        auto lhs = stack.back();
+                        stack.pop_back();
+                        reference r = t.binary_expression_->evaluate(temp_factory_, *lhs,*rhs, ec);
+                        stack.push_back(std::addressof(r));
+                        break;
+                    }
                 }
             }
             JSONCONS_ASSERT(stack.size() == 1);
@@ -1430,6 +1512,7 @@ namespace jmespath {
                         operator_stack_.pop_back();
                         break;
                     }
+                case token_type::binary_expression:
                 case token_type::comparison_operator:
                 {
                     if (operator_stack_.empty() || operator_stack_.back().is_lparen())

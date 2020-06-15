@@ -11,7 +11,7 @@
       {
         "expression": "outer.foo || outer.bar",
         "result": "foo"
-      }/*,
+      },
       {
         "expression": "outer.foo||outer.bar",
         "result": "foo"
@@ -47,7 +47,7 @@
       {
         "expression": "outer.bad||outer.alsobad",
         "result": null
-      }*/
+      }
     ]
   }/*,
   {
