@@ -29,6 +29,7 @@ namespace jmespath {
     {
         value,
         expression,
+        projection,
         binary_expression,
         expression_begin,
         unary_expression,
@@ -501,6 +502,67 @@ namespace jmespath {
             }
         };
 
+
+        // projection_base
+        class projection_base
+        {
+        public:
+            projection_base()
+            {
+            }
+
+            virtual ~projection_base()
+            {
+            }
+
+            virtual reference evaluate(reference val, std::vector<std::unique_ptr<expression_base>>& selectors, jmespath_storage&, std::error_code& ec) = 0;
+
+            virtual string_type to_string() const
+            {
+                return string_type("to_string not implemented");
+            }
+        };
+
+        class object_projection final : public projection_base
+        {
+        public:
+            object_projection()
+            {
+            }
+
+            reference evaluate(reference val, std::vector<std::unique_ptr<expression_base>>& selectors, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (!val.is_object())
+                {
+                    return Json::null();
+                }
+
+                auto result = storage.new_instance(json_array_arg);
+                for (auto& item : val.object_range())
+                {
+                    if (!item.value().is_null())
+                    {
+                        pointer ptr = std::addressof(item.value());
+                        for (auto& selector : selectors)
+                        {
+                            ptr = std::addressof(selector->evaluate(*ptr, storage, ec)        );
+                        }
+                        if (!ptr->is_null())
+                        {
+                            result->push_back(*ptr);
+                        }
+                    }
+                }
+                return *result;
+            }
+
+            string_type to_string() const override
+            {
+                return string_type("object_projection\n");
+            }
+        };
+
+
         // token
 
         class token
@@ -511,6 +573,7 @@ namespace jmespath {
             union
             {
                 std::unique_ptr<expression_base> expression_;
+                std::unique_ptr<projection_base> projection_;
                 std::unique_ptr<unary_expression> unary_expression_;
                 std::unique_ptr<binary_expression> binary_expression_;
             };
@@ -535,6 +598,12 @@ namespace jmespath {
                 : type_(token_type::expression)
             {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
+            }
+
+            token(std::unique_ptr<projection_base>&& projection)
+                : type_(token_type::projection)
+            {
+                new (&projection_) std::unique_ptr<projection_base>(std::move(projection));
             }
 
             token(std::unique_ptr<unary_expression>&& expression)
@@ -564,6 +633,9 @@ namespace jmespath {
                         case token_type::expression:
                             expression_.swap(other.expression_);
                             break;
+                        case token_type::projection:
+                            projection_.swap(other.projection_);
+                            break;
                         case token_type::unary_expression:
                             unary_expression_.swap(other.unary_expression_);
                             break;
@@ -581,6 +653,9 @@ namespace jmespath {
                         case token_type::expression:
                             new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
                             break;
+                        case token_type::projection:
+                            new (&other.projection_) std::unique_ptr<projection_base>(std::move(projection_));
+                            break;
                         case token_type::unary_expression:
                             new (&other.unary_expression_) std::unique_ptr<unary_expression>(std::move(unary_expression_));
                             break;
@@ -596,6 +671,9 @@ namespace jmespath {
                             break;
                         case token_type::expression:
                             new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                            break;
+                        case token_type::projection:
+                            new (&projection_) std::unique_ptr<projection_base>(std::move(other.projection_));
                             break;
                         case token_type::unary_expression:
                             new (&unary_expression_) std::unique_ptr<unary_expression>(std::move(other.unary_expression_));
@@ -650,6 +728,11 @@ namespace jmespath {
                 return type_ == token_type::expression; 
             }
 
+            bool is_projection() const
+            {
+                return type_ == token_type::projection; 
+            }
+
             bool is_operator() const
             {
                 return type_ == token_type::unary_expression || 
@@ -685,6 +768,9 @@ namespace jmespath {
                 switch(type_)
                 {
                     case token_type::expression:
+                        expression_.~unique_ptr();
+                        break;
+                    case token_type::projection:
                         expression_.~unique_ptr();
                         break;
                     case token_type::unary_expression:
@@ -910,6 +996,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case '*':
+                                push_token(token(jsoncons::make_unique<object_projection>()));
                                 state_stack_.emplace_back(path_state::expect_dot);
                                 ++p_;
                                 ++column_;
@@ -1736,8 +1823,9 @@ namespace jmespath {
         reference evaluate(reference root, std::error_code& ec)
         {
             std::vector<pointer> stack;
-            for (auto& t : output_stack_)
+            for (std::size_t i = 0; i < output_stack_.size(); ++i)
             {
+                auto& t = output_stack_[i];
                 switch (t.type())
                 {
                     case token_type::expression_begin:
@@ -1749,6 +1837,23 @@ namespace jmespath {
                         auto ptr = stack.back();
                         stack.pop_back();
                         auto& ref = t.expression_->evaluate(*ptr, storage_, ec);
+                        stack.push_back(std::addressof(ref));
+                        break;
+                    }
+                    case token_type::projection:
+                    {
+                        JSONCONS_ASSERT(!stack.empty());
+                        auto ptr = stack.back();
+                        stack.pop_back();
+                        auto p = std::move(t.projection_);
+                        std::vector<std::unique_ptr<expression_base>> selectors;
+
+                        while (i+1 < output_stack_.size() && output_stack_[i+1].is_expression())
+                        {
+                            ++i;
+                            selectors.push_back(std::move(output_stack_[i].expression_));
+                        }
+                        auto& ref = p->evaluate(*ptr, selectors, storage_, ec);
                         stack.push_back(std::addressof(ref));
                         break;
                     }
@@ -1810,9 +1915,8 @@ namespace jmespath {
             switch (token.type())
             {
                 case token_type::value:
-                    output_stack_.emplace_back(std::move(token));
-                    break;
                 case token_type::expression:
+                case token_type::projection:
                 case token_type::expression_begin:
                     output_stack_.emplace_back(std::move(token));
                     break;
