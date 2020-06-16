@@ -502,6 +502,44 @@ namespace jmespath {
             }
         };
 
+        class index_expression final : public expression_base
+        {
+            int64_t index_;
+        public:
+            index_expression(int64_t index)
+                : index_(index)
+            {
+            }
+
+            reference evaluate(reference val, jmespath_storage&, std::error_code&) override
+            {
+                if (!val.is_array())
+                {
+                    return Json::null();
+                }
+                int64_t slen = static_cast<int64_t>(val.size());
+                if (index_ >= 0 && index_ < slen)
+                {
+                    std::size_t index = static_cast<std::size_t>(index_);
+                    return val.at(index);
+                }
+                else if (index_ < 0 && (slen+index_) < slen)
+                {
+                    std::size_t index = static_cast<std::size_t>(slen + index_);
+                    return val.at(index);
+                }
+                else
+                {
+                    return Json::null();
+                }
+            }
+
+            string_type to_string() const override
+            {
+                return string_type("index_expression ") + std::to_string(index_) + "\n";
+            }
+        };
+
 
         // projection_base
         class projection_base
@@ -543,6 +581,45 @@ namespace jmespath {
                     if (!item.value().is_null())
                     {
                         pointer ptr = std::addressof(item.value());
+                        for (auto& selector : selectors)
+                        {
+                            ptr = std::addressof(selector->evaluate(*ptr, storage, ec)        );
+                        }
+                        if (!ptr->is_null())
+                        {
+                            result->push_back(*ptr);
+                        }
+                    }
+                }
+                return *result;
+            }
+
+            string_type to_string() const override
+            {
+                return string_type("object_projection\n");
+            }
+        };
+
+        class list_projection final : public projection_base
+        {
+        public:
+            list_projection()
+            {
+            }
+
+            reference evaluate(reference val, std::vector<std::unique_ptr<expression_base>>& selectors, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (!val.is_array())
+                {
+                    return Json::null();
+                }
+
+                auto result = storage.new_instance(json_array_arg);
+                for (auto& item : val.array_range())
+                {
+                    if (!item.is_null())
+                    {
+                        pointer ptr = std::addressof(item);
                         for (auto& selector : selectors)
                         {
                             ptr = std::addressof(selector->evaluate(*ptr, storage, ec)        );
@@ -1231,6 +1308,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '*':
+                                push_token(token(jsoncons::make_unique<list_projection>()));
                                 state_stack_.back() = path_state::bracket_specifier4;
                                 ++p_;
                                 ++column_;
@@ -1294,6 +1372,7 @@ namespace jmespath {
                                         ec = jmespath_errc::invalid_number;
                                         return Json::null();
                                     }
+                                    push_token(token(jsoncons::make_unique<index_expression>(r.value())));
 
                                     buffer.clear();
                                 }
@@ -1800,6 +1879,14 @@ namespace jmespath {
                 {
                     buffer.clear();
                     state_stack_.pop_back(); // val_expr
+                }
+            }
+            if (state_stack_.size() >= 3 && state_stack_.back() == path_state::expect_dot)
+            {
+                state_stack_.pop_back(); // path_state::expect_dot
+                if (state_stack_.back() == path_state::expression_item)
+                {
+                    state_stack_.pop_back(); // expression_item
                 }
             }
 

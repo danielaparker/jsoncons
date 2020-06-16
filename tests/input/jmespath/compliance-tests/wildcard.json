@@ -26,10 +26,10 @@
         }
     },
     "cases": [
-         {
+         /*{
             "expression": "foo.*.baz",
             "result": ["val", "val", "val"]
-         }/*,
+         },
          {
             "expression": "foo.bar.*",
             "result": ["val"]
@@ -37,7 +37,7 @@
          {
             "expression": "foo.*.notbaz",
             "result": [["a", "b", "c"], ["a", "b", "c"]]
-         },
+         },*/
          {
             "expression": "foo.*.notbaz[0]",
             "result": ["a", "a"]
@@ -45,7 +45,7 @@
          {
             "expression": "foo.*.notbaz[-1]",
             "result": ["c", "c"]
-         }*/
+         }
     ]
 }/*, {
     "given": {
