@@ -32,6 +32,7 @@ namespace jmespath {
         binary_expression,
         expression_begin,
         comparison_operator,
+        unary_expression,
         lparen,
         rparen
     };
@@ -225,25 +226,52 @@ namespace jmespath {
             }
         };
 
+        static bool is_false(reference ref)
+        {
+            return (ref.is_array() && ref.empty()) ||
+                   (ref.is_object() && ref.empty()) ||
+                   (ref.is_string() && ref.as_string_view().size() == 0) ||
+                   (ref.is_bool() && !ref.as_bool()) ||
+                   ref.is_null();
+        }
+
+        static bool is_true(reference ref)
+        {
+            return !is_false(ref);
+        }
+
+        class unary_expression
+        {
+        public:
+            virtual std::size_t precedence_level() const = 0;
+            virtual bool is_right_associative() const = 0;
+            virtual reference evaluate(reference val, jmespath_storage&, std::error_code& ec) = 0;
+        };
+
+        class not_expression : public unary_expression
+        {
+            std::size_t precedence_level() const override
+            {
+                return 1;
+            }
+            bool is_right_associative() const
+            {
+                return true;
+            }
+            reference evaluate(reference val, jmespath_storage&, std::error_code&) override
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                return is_false(val) ? t : f;
+            }
+        };
+
         class binary_expression
         {
         public:
             virtual std::size_t precedence_level() const = 0;
             virtual reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code& ec) = 0;
-
-            static bool is_false(reference ref)
-            {
-                return (ref.is_array() && ref.empty()) ||
-                       (ref.is_object() && ref.empty()) ||
-                       (ref.is_string() && ref.as_string_view().size() == 0) ||
-                       (ref.is_bool() && !ref.as_bool()) ||
-                       ref.is_null();
-            }
-
-            static bool is_true(reference ref)
-            {
-                return !is_false(ref);
-            }
         };
 
         class or_expression : public binary_expression
@@ -258,7 +286,7 @@ namespace jmespath {
                 {
                     return Json::null();
                 }
-                if (!this->is_false(lhs))
+                if (!is_false(lhs))
                 {
                     return lhs;
                 }
@@ -277,7 +305,7 @@ namespace jmespath {
             }
             reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
             {
-                if (this->is_true(lhs))
+                if (is_true(lhs))
                 {
                     return rhs;
                 }
@@ -348,6 +376,7 @@ namespace jmespath {
             {
                 comparison_operator_t* comparison_operator_;
                 std::unique_ptr<expression_base> expression_;
+                std::unique_ptr<unary_expression> unary_expression_;
                 std::unique_ptr<binary_expression> binary_expression_;
             };
         public:
@@ -379,6 +408,12 @@ namespace jmespath {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
             }
 
+            token(std::unique_ptr<unary_expression>&& expression)
+                : type_(token_type::unary_expression)
+            {
+                new (&unary_expression_) std::unique_ptr<unary_expression>(std::move(expression));
+            }
+
             token(std::unique_ptr<binary_expression>&& expression)
                 : type_(token_type::binary_expression)
             {
@@ -400,6 +435,9 @@ namespace jmespath {
                         case token_type::expression:
                             expression_.swap(other.expression_);
                             break;
+                        case token_type::unary_expression:
+                            unary_expression_.swap(other.unary_expression_);
+                            break;
                         case token_type::binary_expression:
                             binary_expression_.swap(other.binary_expression_);
                             break;
@@ -417,6 +455,9 @@ namespace jmespath {
                         case token_type::expression:
                             new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
                             break;
+                        case token_type::unary_expression:
+                            new (&other.unary_expression_) std::unique_ptr<unary_expression>(std::move(unary_expression_));
+                            break;
                         case token_type::binary_expression:
                             new (&other.binary_expression_) std::unique_ptr<binary_expression>(std::move(binary_expression_));
                             break;
@@ -432,6 +473,9 @@ namespace jmespath {
                             break;
                         case token_type::expression:
                             new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                            break;
+                        case token_type::unary_expression:
+                            new (&unary_expression_) std::unique_ptr<unary_expression>(std::move(other.unary_expression_));
                             break;
                         case token_type::binary_expression:
                             new (&binary_expression_) std::unique_ptr<binary_expression>(std::move(other.binary_expression_));
@@ -497,6 +541,8 @@ namespace jmespath {
                 {
                     case token_type::comparison_operator:
                         return comparison_operator_->precedence_level;
+                    case token_type::unary_expression:
+                        return unary_expression_->precedence_level();
                     case token_type::binary_expression:
                         return binary_expression_->precedence_level();
                     default:
@@ -508,6 +554,8 @@ namespace jmespath {
             {
                 switch(type_)
                 {
+                    case token_type::unary_expression:
+                        return unary_expression_->is_right_associative();
                     case token_type::comparison_operator:
                         return comparison_operator_->is_right_associative;
                     default:
@@ -521,6 +569,9 @@ namespace jmespath {
                 {
                     case token_type::expression:
                         expression_.~unique_ptr();
+                        break;
+                    case token_type::unary_expression:
+                        unary_expression_.~unique_ptr();
                         break;
                     case token_type::binary_expression:
                         binary_expression_.~unique_ptr();
@@ -539,6 +590,9 @@ namespace jmespath {
                         break;
                     case token_type::comparison_operator:
                         return string_type("compare");
+                        break;
+                    case token_type::unary_expression:
+                        return string_type("unary_expression");
                         break;
                     case token_type::binary_expression:
                         return string_type("binary_expression");
@@ -652,6 +706,27 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::expression_item);
                                 break;
                             }
+                            case '(':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(lparen_arg);
+                                break;
+                            }
+                            case '!':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(token(jsoncons::make_unique<not_expression>()));
+                                break;
+                            }
+                            case ')':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(rparen_arg);
+                                break;
+                            }
                             case '[':
                             case '{':
                                 state_stack_.emplace_back(path_state::expression_item);
@@ -705,6 +780,27 @@ namespace jmespath {
                             case '&':
                                 state_stack_.emplace_back(path_state::expect_and);
                                 break;
+                            case '(':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(lparen_arg);
+                                break;
+                            }
+                            case ')':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(rparen_arg);
+                                break;
+                            }
+                            case '!':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(token(jsoncons::make_unique<not_expression>()));
+                                break;
+                            }
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {
@@ -1483,6 +1579,15 @@ namespace jmespath {
                         }
                         break;
                     }
+                    case token_type::unary_expression:
+                    {
+                        JSONCONS_ASSERT(stack.size() >= 1);
+                        auto ptr = stack.back();
+                        stack.pop_back();
+                        reference r = t.unary_expression_->evaluate(*ptr, storage_, ec);
+                        stack.push_back(std::addressof(r));
+                        break;
+                    }
                     case token_type::binary_expression:
                     {
                         JSONCONS_ASSERT(stack.size() >= 2);
@@ -1557,8 +1662,9 @@ namespace jmespath {
                         operator_stack_.pop_back();
                         break;
                     }
-                case token_type::binary_expression:
+                case token_type::unary_expression:
                 case token_type::comparison_operator:
+                case token_type::binary_expression:
                 {
                     if (operator_stack_.empty() || operator_stack_.back().is_lparen())
                     {

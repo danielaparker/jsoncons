@@ -150,7 +150,7 @@
       {
         "expression": "Number || True && False",
         "result": 5
-      }/*,
+      },
       {
         "expression": "(Number || True) && False",
         "result": false
@@ -198,7 +198,7 @@
       {
         "expression": "!!Zero",
         "result": true
-      }*/
+      }
     ]
   }/*,
   {
