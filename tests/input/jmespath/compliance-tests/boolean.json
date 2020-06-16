@@ -200,7 +200,7 @@
         "result": true
       }
     ]
-  }/*,
+  },
   {
     "given": {
       "one": 1,
@@ -217,7 +217,7 @@
       {
         "expression": "one <= two",
         "result": true
-      },
+      }/*,
       {
         "expression": "one == one",
         "result": true
@@ -269,7 +269,7 @@
       {
         "expression": "two < one || three < one",
         "result": false
-      }
+      }*/
     ]
-  }*/
+  }
 ]
