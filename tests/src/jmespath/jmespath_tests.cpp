@@ -84,10 +84,10 @@ TEST_CASE("jmespath-tests")
     }
     SECTION("compliance")
     {
-        //jmespath_tests("./input/jmespath/compliance-tests/basic.json");
+        jmespath_tests("./input/jmespath/compliance-tests/basic.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/filters.json");
-        //jmespath_tests("./input/jmespath/compliance-tests/boolean.json");
-        jmespath_tests("./input/jmespath/compliance-tests/wildcard.json");
+        jmespath_tests("./input/jmespath/compliance-tests/boolean.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
     }
 }
 
