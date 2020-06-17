@@ -1,4 +1,4 @@
-[/*{
+[{
     "given": {
         "foo": {
             "bar": {
@@ -47,7 +47,7 @@
             "result": ["c", "c"]
          }
     ]
-},*/ {
+}, {
     "given": {
         "foo": {
             "first-1": {
@@ -62,15 +62,15 @@
         }
     },
     "cases": [
-         /*{
+         {
             "expression": "foo.*",
             "result": [{"second-1": "val"}, {"second-1": "val"},
                        {"second-1": "val"}]
-         },*/
+         },
          {
             "expression": "foo.*.*",
             "result": [["val"], ["val"], ["val"]]
-         }/*,
+         },
          {
             "expression": "foo.*.*.*",
             "result": [[], [], []]
@@ -78,9 +78,9 @@
          {
             "expression": "foo.*.*.*.*",
             "result": [[], [], []]
-         }*/
+         }
     ]
-}/*, {
+}, {
     "given": {
         "foo": {
             "bar": "one"
@@ -456,5 +456,5 @@
             "result": [0, 0]
          }
      ]
-}*/
+}
 ]

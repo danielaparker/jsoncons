@@ -260,7 +260,8 @@ namespace jmespath {
 
             virtual string_type to_string() const
             {
-                return string_type("to_string not implemented");
+                string_type s("to_string not implemented");
+                return s;
             }
         };
 
@@ -460,6 +461,11 @@ namespace jmespath {
             {
             }
 
+            virtual std::size_t precedence_level() const
+            {
+                return 1;
+            }
+
             virtual ~expression_base()
             {
             }
@@ -468,7 +474,7 @@ namespace jmespath {
 
             virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
 
-            virtual string_type to_string() const
+            virtual string_type to_string(std::size_t = 0) const
             {
                 return string_type("to_string not implemented");
             }
@@ -512,9 +518,16 @@ namespace jmespath {
                 }
             }
 
-            string_type to_string() const override
+            string_type to_string(std::size_t indent = 0) const override
             {
-                return string_type("identifier_selector ") + identifier_ + "\n";
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("identifier_selector ");
+                s.append(identifier_);
+                return s;
             }
         };
 
@@ -525,6 +538,11 @@ namespace jmespath {
             index_selector(int64_t index)
                 : index_(index)
             {
+            }
+
+            virtual std::size_t precedence_level() const
+            {
+                return 0;
             }
 
             reference evaluate(reference val, jmespath_storage&, std::error_code&) override
@@ -550,9 +568,16 @@ namespace jmespath {
                 }
             }
 
-            string_type to_string() const override
+            string_type to_string(std::size_t indent = 0) const override
             {
-                return string_type("index_selector ") + std::to_string(index_) + "\n";
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("index_selector ");
+                s.append(std::to_string(index_));
+                return s;
             }
         };
 
@@ -560,6 +585,7 @@ namespace jmespath {
         // projection_base
         class projection_base : public expression_base
         {
+        protected:
             std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
 
@@ -620,9 +646,21 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string() const override
+            string_type to_string(std::size_t indent = 0) const override
             {
-                return string_type("object_projection\n");
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("object_projection\n");
+                for (auto& expr : this->expressions_)
+                {
+                    string_type sss = expr->to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }
+                return s;
             }
         };
 
@@ -631,6 +669,11 @@ namespace jmespath {
         public:
             list_projection()
             {
+            }
+
+            virtual std::size_t precedence_level() const
+            {
+                return 11;
             }
 
             reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
@@ -655,9 +698,88 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string() const override
+            string_type to_string(std::size_t indent = 0) const override
             {
-                return string_type("object_projection\n");
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("list_projection\n");
+                for (auto& expr : this->expressions_)
+                {
+                    string_type sss = expr->to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }
+                return s;
+            }
+        };
+
+        class flatten_projection final : public projection_base
+        {
+        public:
+            flatten_projection()
+            {
+            }
+
+            virtual std::size_t precedence_level() const
+            {
+                return 11;
+            }
+
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (!val.is_array())
+                {
+                    return Json::null();
+                }
+
+                auto result = storage.new_instance(json_array_arg);
+                for (reference item : val.array_range())
+                {
+                    if (!item.is_null())
+                    {
+                        auto j = this->apply_expressions(item, storage, ec);
+                        if (!j.is_null())
+                        {
+                            result->push_back(j);
+                        }
+                    }
+                }
+                auto currentp = storage.new_instance(json_array_arg);
+                for (reference item : result->array_range())
+                {
+                    if (item.is_array())
+                    {
+                        for (reference item_of_item : item.array_range())
+                        {
+                            currentp->push_back(item_of_item);
+                        }
+                    }
+                    else
+                    {
+                        currentp->push_back(item);
+                    }
+                }
+                return *currentp;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("flatten_projection\n");
+                for (auto& expr : this->expressions_)
+                {
+                    string_type sss = expr->to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }
+                return s;
             }
         };
 
@@ -830,6 +952,8 @@ namespace jmespath {
                         return unary_operator_->precedence_level();
                     case token_type::binary_operator:
                         return binary_operator_->precedence_level();
+                    case token_type::expression:
+                        return expression_->precedence_level();
                     default:
                         return 0;
                 }
@@ -1077,7 +1201,8 @@ namespace jmespath {
                                 break;
                             case '*':
                                 push_token(token(jsoncons::make_unique<object_projection>()));
-                                state_stack_.emplace_back(path_state::expect_dot);
+                                //state_stack_.emplace_back(path_state::expect_dot);
+                                state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1317,6 +1442,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case ']':
+                                push_token(token(jsoncons::make_unique<flatten_projection>()));
                                 state_stack_.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
@@ -1366,6 +1492,7 @@ namespace jmespath {
                             {
                                 if (buffer.empty())
                                 {
+                                    push_token(token(jsoncons::make_unique<flatten_projection>()));
                                 }
                                 else
                                 {
@@ -1992,7 +2119,7 @@ namespace jmespath {
                     output_stack_.emplace_back(std::move(token));
                     break;
                 case token_type::expression:
-                    if (!output_stack_.empty() && output_stack_.back().is_projection())
+                    if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= token.precedence_level())
                     {
                         output_stack_.back().expression_->add_expression(std::move(token.expression_));
                     }
