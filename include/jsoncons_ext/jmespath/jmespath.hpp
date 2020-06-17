@@ -58,16 +58,16 @@ namespace jmespath {
 
     struct slice
     {
-        int64_t start_;
+        optional<int64_t> start_;
         optional<int64_t> end_;
         int64_t step_;
 
         slice()
-            : start_(0), end_(), step_(1)
+            : start_(), end_(), step_(1)
         {
         }
 
-        slice(int64_t start, const optional<int64_t>& end, int64_t step) 
+        slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
             : start_(start), end_(end), step_(step)
         {
         }
@@ -81,7 +81,14 @@ namespace jmespath {
         {
             if (this != &rhs)
             {
-                start_ = rhs.start_;
+                if (rhs.start_)
+                {
+                    start_ = rhs.start_;
+                }
+                else
+                {
+                    start_.reset();
+                }
                 if (rhs.end_)
                 {
                     end_ = rhs.end_;
@@ -97,7 +104,22 @@ namespace jmespath {
 
         int64_t get_start(std::size_t size) const
         {
-            return start_ >= 0 ? start_ : (static_cast<int64_t>(size) + start_);
+            if (start_)
+            {
+                auto len = start_.value() >= 0 ? start_.value() : (static_cast<int64_t>(size) + start_.value());
+                return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
+            }
+            else
+            {
+                if (step_ >= 0)
+                {
+                    return 0;
+                }
+                else 
+                {
+                    return static_cast<int64_t>(size);
+                }
+            }
         }
 
         int64_t get_end(std::size_t size) const
@@ -109,7 +131,7 @@ namespace jmespath {
             }
             else
             {
-                return static_cast<int64_t>(size);
+                return step_ >= 0 ? static_cast<int64_t>(size) : -1;
             }
         }
 
@@ -716,6 +738,90 @@ namespace jmespath {
             }
         };
 
+        class slice_projection final : public projection_base
+        {
+            slice slice_;
+        public:
+            slice_projection(const slice& s)
+                : slice_(s)
+            {
+            }
+
+            virtual std::size_t precedence_level() const
+            {
+                return 11;
+            }
+
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (!val.is_array())
+                {
+                    return Json::null();
+                }
+
+                auto start = slice_.get_start(val.size());
+                auto end = slice_.get_end(val.size());
+                auto step = slice_.step();
+
+                if (step == 0)
+                {
+                    ec = jmespath_errc::step_cannot_be_zero;
+                    return Json::null();
+                }
+
+                auto result = storage.new_instance(json_array_arg);
+                if (step > 0)
+                {
+                    for (int64_t i = start; i < end; i += step)
+                    {
+                        auto j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), storage, ec);
+                        if (!j.is_null())
+                        {
+                            result->push_back(j);
+                        }
+                    }
+                }
+                else
+                {
+                    if (start >= val.size())
+                    {
+                        start = static_cast<int64_t>(val.size()) - 1;
+                    }
+                    if (end < -1)
+                    {
+                        end = -1;
+                    }
+                    for (int64_t i = start; i > end; i += step)
+                    {
+                        auto j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), storage, ec);
+                        if (!j.is_null())
+                        {
+                            result->push_back(j);
+                        }
+                    }
+                }
+
+                return *result;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("slice_projection\n");
+                for (auto& expr : this->expressions_)
+                {
+                    string_type sss = expr->to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }
+                return s;
+            }
+        };
+
         class flatten_projection final : public projection_base
         {
         public:
@@ -772,7 +878,7 @@ namespace jmespath {
                 {
                     s.push_back(' ');
                 }
-                s.append("flatten_projection\n");
+                s.append("slice_projection\n");
                 for (auto& expr : this->expressions_)
                 {
                     string_type sss = expr->to_string(indent+2);
@@ -1201,7 +1307,6 @@ namespace jmespath {
                                 break;
                             case '*':
                                 push_token(token(jsoncons::make_unique<object_projection>()));
-                                //state_stack_.emplace_back(path_state::expect_dot);
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -1551,6 +1656,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ']':
+                                push_token(token(jsoncons::make_unique<slice_projection>(a_slice)));
                                 a_slice = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 ++p_;
@@ -1584,6 +1690,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case ']':
+                                push_token(token(jsoncons::make_unique<slice_projection>(a_slice)));
                                 buffer.clear();
                                 a_slice = slice{};
                                 state_stack_.pop_back(); // bracket_specifier3
