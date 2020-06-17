@@ -467,15 +467,27 @@ namespace jmespath {
 
             virtual reference evaluate(reference val, jmespath_storage&, std::error_code& ec) = 0;
 
+            virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
+
             virtual string_type to_string() const
             {
                 return string_type("to_string not implemented");
             }
+
+            virtual bool is_projection() const = 0;
         };
 
         // selector_base
         class selector_base :  public expression_base
         {
+            void add_expression(std::unique_ptr<expression_base>&&) override
+            {
+            }
+
+            bool is_projection() const override
+            {
+                return false;
+            }
         };
 
         class identifier_selector final : public selector_base
@@ -547,22 +559,36 @@ namespace jmespath {
 
 
         // projection_base
-        class projection_base
+        class projection_base : public expression_base
         {
+            std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
-            projection_base()
+
+            void add_expression(std::unique_ptr<expression_base>&& expression) override
             {
+                if (!expressions_.empty() && expressions_.back()->is_projection())
+                {
+                    expressions_.back()->add_expression(std::move(expression));
+                }
+                else
+                {
+                    expressions_.emplace_back(std::move(expression));
+                }
             }
 
-            virtual ~projection_base()
+            reference apply_expressions(reference val, jmespath_storage& storage, std::error_code& ec)
             {
+                pointer ptr = std::addressof(val);
+                for (auto& expression : expressions_)
+                {
+                    ptr = std::addressof(expression->evaluate(*ptr, storage, ec));
+                }
+                return *ptr;
             }
 
-            virtual reference evaluate(reference val, std::vector<std::unique_ptr<expression_base>>& selectors, jmespath_storage&, std::error_code& ec) = 0;
-
-            virtual string_type to_string() const
+            bool is_projection() const override
             {
-                return string_type("to_string not implemented");
+                return true;
             }
         };
 
@@ -573,7 +599,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, std::vector<std::unique_ptr<expression_base>>& selectors, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
             {
                 if (!val.is_object())
                 {
@@ -581,18 +607,14 @@ namespace jmespath {
                 }
 
                 auto result = storage.new_instance(json_array_arg);
-                for (auto& item : val.object_range())
+                for (auto item : val.object_range())
                 {
                     if (!item.value().is_null())
                     {
-                        pointer ptr = std::addressof(item.value());
-                        for (auto& selector : selectors)
+                        auto j = this->apply_expressions(item.value(), storage, ec);
+                        if (!j.is_null())
                         {
-                            ptr = std::addressof(selector->evaluate(*ptr, storage, ec)        );
-                        }
-                        if (!ptr->is_null())
-                        {
-                            result->push_back(*ptr);
+                            result->push_back(j);
                         }
                     }
                 }
@@ -612,7 +634,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, std::vector<std::unique_ptr<expression_base>>& selectors, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
             {
                 if (!val.is_array())
                 {
@@ -620,18 +642,14 @@ namespace jmespath {
                 }
 
                 auto result = storage.new_instance(json_array_arg);
-                for (auto& item : val.array_range())
+                for (reference item : val.array_range())
                 {
                     if (!item.is_null())
                     {
-                        pointer ptr = std::addressof(item);
-                        for (auto& selector : selectors)
+                        auto j = this->apply_expressions(item, storage, ec);
+                        if (!j.is_null())
                         {
-                            ptr = std::addressof(selector->evaluate(*ptr, storage, ec)        );
-                        }
-                        if (!ptr->is_null())
-                        {
-                            result->push_back(*ptr);
+                            result->push_back(j);
                         }
                     }
                 }
@@ -813,6 +831,11 @@ namespace jmespath {
             bool is_projection() const
             {
                 return type_ == token_type::projection; 
+            }
+
+            bool is_expression() const
+            {
+                return is_selector() || is_projection(); 
             }
 
             bool is_operator() const
@@ -1941,14 +1964,13 @@ namespace jmespath {
                         auto ptr = stack.back();
                         stack.pop_back();
                         auto p = std::move(t.projection_);
-                        std::vector<std::unique_ptr<expression_base>> selectors;
 
-                        while (i+1 < output_stack_.size() && output_stack_[i+1].is_selector())
+                        while (i+1 < output_stack_.size() && output_stack_[i+1].is_expression())
                         {
                             ++i;
-                            selectors.push_back(std::move(output_stack_[i].selector_));
+                            p->add_expression(std::move(output_stack_[i].selector_));
                         }
-                        auto& ref = p->evaluate(*ptr, selectors, storage_, ec);
+                        auto& ref = p->evaluate(*ptr, storage_, ec);
                         stack.push_back(std::addressof(ref));
                         break;
                     }
