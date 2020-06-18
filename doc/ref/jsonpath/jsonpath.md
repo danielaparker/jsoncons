@@ -111,8 +111,8 @@ JSONPath|       Description
 
 #### Slices
 
-Slices in jsoncons have the same semantics as Python slices
-(including for negative steps since v0.154.0)
+jsoncons jsonpath slices have the same semantics as Python slices
+(including for negative steps since v0.153.3)
 
 The syntax for a slice is
 ```

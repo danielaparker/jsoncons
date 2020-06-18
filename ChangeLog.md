@@ -1,9 +1,19 @@
+v0.153.3
+--------
+
+Bug fixes:
+
+- Fixed a bug in jsonpath array slice when the step component is negative
+and the start and stop components are omitted, [\#252](https://github.com/danielaparker/jsoncons/issues/250).
+jsoncons jsonpath slices now have the same semantics as Python slices
+including for negative steps.
+
 v0.153.2
 --------
 
 Bug fixes:
 
-- Fixed a bug in the jsonpath array slice when the end argument is negative, [\#250](https://github.com/danielaparker/jsoncons/issues/250)
+- Fixed a bug in jsonpath array slice when the end argument is negative, [\#250](https://github.com/danielaparker/jsoncons/issues/250)
 
 Platform:
 
