@@ -27,13 +27,13 @@ namespace jmespath {
 
     enum class token_type 
     {
+        expression_begin,
+        lparen,
+        rparen,
         literal,
         expression,
         binary_operator,
-        expression_begin,
-        unary_operator,
-        lparen,
-        rparen
+        unary_operator
     };
 
     struct literal_arg_t
@@ -968,6 +968,10 @@ namespace jmespath {
                 {
                     switch (type_)
                     {
+                        case token_type::expression_begin:
+                        case token_type::lparen:
+                        case token_type::rparen:
+                            break;
                         case token_type::expression:
                             expression_.swap(other.expression_);
                             break;
@@ -986,6 +990,10 @@ namespace jmespath {
                 {
                     switch (type_)
                     {
+                        case token_type::expression_begin:
+                        case token_type::lparen:
+                        case token_type::rparen:
+                            break;
                         case token_type::expression:
                             new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
                             break;
@@ -998,11 +1006,13 @@ namespace jmespath {
                         case token_type::literal:
                             new (&other.value_) Json(std::move(value_));
                             break;
-                        default:
-                            break;
                     }
                     switch (other.type_)
                     {
+                        case token_type::expression_begin:
+                        case token_type::lparen:
+                        case token_type::rparen:
+                            break;
                         case token_type::expression:
                             new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
                             break;
@@ -1014,8 +1024,6 @@ namespace jmespath {
                             break;
                         case token_type::literal:
                             new (&value_) Json(std::move(other.value_));
-                            break;
-                        default:
                             break;
                     }
                     std::swap(type_,other.type_);
