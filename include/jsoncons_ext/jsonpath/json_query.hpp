@@ -27,21 +27,21 @@ namespace jsoncons { namespace jsonpath {
     struct list_slice
     {
         optional<int64_t> start_;
-        optional<int64_t> end_;
+        optional<int64_t> stop_;
         int64_t step_;
 
         list_slice()
-            : start_(), end_(), step_(1)
+            : start_(), stop_(), step_(1)
         {
         }
 
         list_slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
-            : start_(start), end_(end), step_(step)
+            : start_(start), stop_(end), step_(step)
         {
         }
 
         list_slice(const list_slice& other)
-            : start_(other.start_), end_(other.end_), step_(other.step_)
+            : start_(other.start_), stop_(other.stop_), step_(other.step_)
         {
         }
 
@@ -57,13 +57,13 @@ namespace jsoncons { namespace jsonpath {
                 {
                     start_.reset();
                 }
-                if (rhs.end_)
+                if (rhs.stop_)
                 {
-                    end_ = rhs.end_;
+                    stop_ = rhs.stop_;
                 }
                 else
                 {
-                    end_.reset();
+                    stop_.reset();
                 }
                 step_ = rhs.step_;
             }
@@ -90,11 +90,11 @@ namespace jsoncons { namespace jsonpath {
             }
         }
 
-        int64_t get_end(std::size_t size) const
+        int64_t get_stop(std::size_t size) const
         {
-            if (end_)
+            if (stop_)
             {
-                auto len = end_.value() >= 0 ? end_.value() : (static_cast<int64_t>(size) + end_.value());
+                auto len = stop_.value() >= 0 ? stop_.value() : (static_cast<int64_t>(size) + stop_.value());
                 return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
             }
             else
@@ -453,7 +453,7 @@ namespace jsoncons { namespace jsonpath {
                 if (val.is_array())
                 {
                     auto start = slice_.get_start(val.size());
-                    auto end = slice_.get_end(val.size());
+                    auto end = slice_.get_stop(val.size());
                     auto step = slice_.step();
 
                     if (step > 0)
@@ -1517,7 +1517,7 @@ namespace jsoncons { namespace jsonpath {
                                     ec = jsonpath_errc::expected_slice_end;
                                     return;
                                 }
-                                slice.end_ = jsoncons::optional<int64_t>(r.value());
+                                slice.stop_ = jsoncons::optional<int64_t>(r.value());
                                 buffer.clear();
                                 state_stack_.back().state = path_state::slice_step;
                                 ++p_;
@@ -1538,7 +1538,7 @@ namespace jsoncons { namespace jsonpath {
                                     ec = jsonpath_errc::expected_slice_end;
                                     return;
                                 }
-                                slice.end_ = jsoncons::optional<int64_t>(r.value());
+                                slice.stop_ = jsoncons::optional<int64_t>(r.value());
                                 selectors_.push_back(jsoncons::make_unique<slice_selector>(slice));
                                 state_stack_.pop_back();
                                 break;

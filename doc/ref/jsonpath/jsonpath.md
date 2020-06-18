@@ -105,9 +105,48 @@ JSONPath|       Description
 `*` |   Wildcard. All objects/elements regardless their names.
 `[]`    |Subscript operator. 
 `[,]`   |Union.
-`[start:end:step]`      |Array slice operator borrowed from [ES4](https://github.com/tc39/proposal-slice-notation).
+`[start:end:step]`      |Array slice operator borrowed from ECMASCRIPT 4.
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
+
+#### Slices
+
+Slices in jsoncons have the same semantics as Python slices
+(including for negative steps since v0.154.0)
+
+The syntax for a slice is
+```
+[start:stop:step]
+```
+Each component is optional and may be omitted.
+
+- If `start` is omitted, it defaults to `0` if `step` is positive,
+or the end of the array if `step` is negative.
+
+- If `stop` is omitted, it defaults to the length of the array if `step` 
+is positive, or the beginning of the array if `step` is negative.
+
+- If `step` is omitted, it defaults to `1`.
+
+Slice expression|       Description
+--------|--------------------------------
+`[start:stop]`  | Items `start` through `stop-1`
+`[start:]`      | Items `start` to the end of the array
+`[:stop]`       | Items from the beginning of the array through `stop-1`
+`[:]`           | All items
+`[start:stop:step]`|Items `start` up to but not including `stop`, by `step` 
+
+A component `start`, `stop`, or `step` may be a negative number.
+
+Example | Description
+--------|------------
+$[-1]    | Last item 
+$[-2:]   | Last two items
+$[:-2]   | All items except the last two
+$[::-1]    | All items, reversed
+$[1::-1]   | First two items, reversed
+$[:-3:-1]  | Last two items, reversed
+$[-3::-1]  | All items except the last two, reversed
 
 #### Filter predicates
 

@@ -341,6 +341,41 @@
         "given" : ["first", "second", "third", "forth", "fifth"],
         "cases" : [
             {
+                "annotation" : "Last item",
+                "expression" : "$[-1]",
+                "result" : ["fifth"]
+            },
+            {
+                "annotation" : "Last two items",
+                "expression" : "$[-2:]",
+                "result" : ["forth", "fifth"]
+            },
+            {
+                "annotation" : "All items except the last two",
+                "expression" : "$[:-2]",
+                "result" : ["first", "second", "third"]
+            },
+            {
+                "annotation" : "All items, reversed",
+                "expression" : "$[::-1]",
+                "result" : ["fifth","forth","third","second","first"]
+            },
+            {
+                "annotation" : "First two items, reversed",
+                "expression" : "$[1::-1]",
+                "result" : ["second","first"]
+            },
+            {
+                "annotation" : "Last two items, reversed",
+                "expression" : "$[:-3:-1]",
+                "result" : ["fifth","forth"]
+            },
+            {
+                "annotation" : "All items except the last two, reversed",
+                "expression" : "$[-3::-1]",
+                "result" : ["third","second","first"]
+            },
+            {
                 "annotation" : "array index",
                 "expression" : "$[2]",
                 "result" : ["third"]
