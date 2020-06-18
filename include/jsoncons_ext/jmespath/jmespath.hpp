@@ -27,7 +27,7 @@ namespace jmespath {
 
     enum class token_type 
     {
-        value,
+        literal,
         expression,
         binary_operator,
         expression_begin,
@@ -35,6 +35,12 @@ namespace jmespath {
         lparen,
         rparen
     };
+
+    struct literal_arg_t
+    {
+        explicit literal_arg_t() = default;
+    };
+    constexpr literal_arg_t literal_arg{};
 
     struct lparen_arg_t
     {
@@ -169,7 +175,7 @@ namespace jmespath {
         sub_or_index_expression,
         quoted_string,
         raw_string,
-        json_value,
+        literal,
         key_expr,
         val_expr,
         identifier_or_function_expr,
@@ -603,7 +609,6 @@ namespace jmespath {
             }
         };
 
-
         // projection_base
         class projection_base : public expression_base
         {
@@ -783,7 +788,7 @@ namespace jmespath {
                 }
                 else
                 {
-                    if (start >= val.size())
+                    if (start >= static_cast<int64_t>(val.size()))
                     {
                         start = static_cast<int64_t>(val.size()) - 1;
                     }
@@ -902,6 +907,7 @@ namespace jmespath {
                 std::unique_ptr<expression_base> expression_;
                 std::unique_ptr<unary_operator> unary_operator_;
                 std::unique_ptr<binary_operator> binary_operator_;
+                Json value_;
             };
         public:
 
@@ -938,6 +944,11 @@ namespace jmespath {
                 new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(expression));
             }
 
+            token(literal_arg_t, Json&& value)
+                : type_(token_type::literal), value_(std::move(value))
+            {
+            }
+
             token(token&& other)
                 : type_(token_type::lparen)
             {
@@ -959,14 +970,15 @@ namespace jmespath {
                         case token_type::binary_operator:
                             binary_operator_.swap(other.binary_operator_);
                             break;
+                        case token_type::literal:
+                            value_.swap(other.value_);
+                            break;
                     }
                 }
                 else
                 {
                     switch (type_)
                     {
-                        case token_type::value:
-                            break;
                         case token_type::expression:
                             new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
                             break;
@@ -976,13 +988,14 @@ namespace jmespath {
                         case token_type::binary_operator:
                             new (&other.binary_operator_) std::unique_ptr<binary_operator>(std::move(binary_operator_));
                             break;
+                        case token_type::literal:
+                            new (&other.value_) Json(std::move(value_));
+                            break;
                         default:
                             break;
                     }
                     switch (other.type_)
                     {
-                        case token_type::value:
-                            break;
                         case token_type::expression:
                             new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
                             break;
@@ -991,6 +1004,9 @@ namespace jmespath {
                             break;
                         case token_type::binary_operator:
                             new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(other.binary_operator_));
+                            break;
+                        case token_type::literal:
+                            new (&value_) Json(std::move(other.value_));
                             break;
                         default:
                             break;
@@ -1089,6 +1105,9 @@ namespace jmespath {
                     case token_type::binary_operator:
                         binary_operator_.~unique_ptr();
                         break;
+                    case token_type::literal:
+                        value_.~Json();
+                        break;
                     default:
                         break;
                 }
@@ -1109,6 +1128,9 @@ namespace jmespath {
                         break;
                     case token_type::expression_begin:
                         return string_type("expression_begin");
+                        break;
+                    case token_type::literal:
+                        return string_type("value");
                         break;
                     default:
                         return string_type("default");
@@ -1291,7 +1313,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case '`':
-                                state_stack_.back() = path_state::json_value;
+                                state_stack_.back() = path_state::literal;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1471,6 +1493,7 @@ namespace jmespath {
                         {
                             case '\'':
                             {
+                                push_token(token(literal_arg, Json(buffer)));
                                 buffer.clear();
                                 state_stack_.pop_back(); // raw_string
                                 ++p_;
@@ -1488,12 +1511,14 @@ namespace jmespath {
                                 break;
                         };
                         break;
-                    case path_state::json_value: 
+                    case path_state::literal: 
                         switch (*p_)
                         {
                             case '`':
                             {
+                                std::cout << "json_value: " << buffer << "\n";
                                 auto j = Json::parse(buffer);
+                                push_token(token(literal_arg, std::move(j)));
                                 buffer.clear();
                                 state_stack_.pop_back(); // json_value
                                 ++p_;
@@ -2152,6 +2177,11 @@ namespace jmespath {
                 auto& t = output_stack_[i];
                 switch (t.type())
                 {
+                    case token_type::literal:
+                    {
+                        stack.push_back(&t.value_);
+                        break;
+                    }
                     case token_type::expression_begin:
                         stack.push_back(std::addressof(root));
                         break;
@@ -2221,7 +2251,7 @@ namespace jmespath {
         {
             switch (token.type())
             {
-                case token_type::value:
+                case token_type::literal:
                 case token_type::expression_begin:
                     output_stack_.emplace_back(std::move(token));
                     break;
