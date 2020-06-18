@@ -62,28 +62,28 @@ namespace jmespath {
 
     JSONCONS_STRING_LITERAL(sort_by,'s','o','r','t','-','b','y')
 
-    struct list_slice
+    struct slice
     {
         optional<int64_t> start_;
-        optional<int64_t> end_;
+        optional<int64_t> stop_;
         int64_t step_;
 
-        list_slice()
-            : start_(), end_(), step_(1)
+        slice()
+            : start_(), stop_(), step_(1)
         {
         }
 
-        list_slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
-            : start_(start), end_(end), step_(step)
+        slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
+            : start_(start), stop_(end), step_(step)
         {
         }
 
-        list_slice(const list_slice& other)
-            : start_(other.start_), end_(other.end_), step_(other.step_)
+        slice(const slice& other)
+            : start_(other.start_), stop_(other.stop_), step_(other.step_)
         {
         }
 
-        list_slice& operator=(const list_slice& rhs) 
+        slice& operator=(const slice& rhs) 
         {
             if (this != &rhs)
             {
@@ -95,13 +95,13 @@ namespace jmespath {
                 {
                     start_.reset();
                 }
-                if (rhs.end_)
+                if (rhs.stop_)
                 {
-                    end_ = rhs.end_;
+                    stop_ = rhs.stop_;
                 }
                 else
                 {
-                    end_.reset();
+                    stop_.reset();
                 }
                 step_ = rhs.step_;
             }
@@ -128,11 +128,11 @@ namespace jmespath {
             }
         }
 
-        int64_t get_end(std::size_t size) const
+        int64_t get_stop(std::size_t size) const
         {
-            if (end_)
+            if (stop_)
             {
-                auto len = end_.value() >= 0 ? end_.value() : (static_cast<int64_t>(size) + end_.value());
+                auto len = stop_.value() >= 0 ? stop_.value() : (static_cast<int64_t>(size) + stop_.value());
                 return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
             }
             else
@@ -745,9 +745,9 @@ namespace jmespath {
 
         class slice_projection final : public projection_base
         {
-            list_slice slice_;
+            slice slice_;
         public:
-            slice_projection(const list_slice& s)
+            slice_projection(const slice& s)
                 : slice_(s)
             {
             }
@@ -765,7 +765,7 @@ namespace jmespath {
                 }
 
                 auto start = slice_.get_start(val.size());
-                auto end = slice_.get_end(val.size());
+                auto end = slice_.get_stop(val.size());
                 auto step = slice_.step();
 
                 if (step == 0)
@@ -1215,7 +1215,7 @@ namespace jmespath {
             end_input_ = path + length;
             p_ = begin_input_;
 
-            list_slice slice{};
+            slice slic{};
 
             while (p_ < end_input_)
             {
@@ -1676,7 +1676,7 @@ namespace jmespath {
                                         ec = jmespath_errc::invalid_number;
                                         return Json::null();
                                     }
-                                    slice.start_ = r.value();
+                                    slic.start_ = r.value();
                                     buffer.clear();
                                 }
                                 state_stack_.back() = path_state::bracket_specifier2;
@@ -1700,14 +1700,14 @@ namespace jmespath {
                                 ec = jmespath_errc::invalid_number;
                                 return Json::null();
                             }
-                            slice.end_ = optional<int64_t>(r.value());
+                            slic.stop_ = optional<int64_t>(r.value());
                             buffer.clear();
                         }
                         switch(*p_)
                         {
                             case ']':
-                                push_token(token(jsoncons::make_unique<slice_projection>(slice)));
-                                slice = list_slice{};
+                                push_token(token(jsoncons::make_unique<slice_projection>(slic)));
+                                slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 ++p_;
                                 ++column_;
@@ -1739,15 +1739,15 @@ namespace jmespath {
                                 ec = jmespath_errc::step_cannot_be_zero;
                                 return Json::null();
                             }
-                            slice.step_ = r.value();
+                            slic.step_ = r.value();
                             buffer.clear();
                         }
                         switch(*p_)
                         {
                             case ']':
-                                push_token(token(jsoncons::make_unique<slice_projection>(slice)));
+                                push_token(token(jsoncons::make_unique<slice_projection>(slic)));
                                 buffer.clear();
-                                slice = list_slice{};
+                                slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier3
                                 ++p_;
                                 ++column_;
