@@ -777,6 +777,14 @@ namespace jmespath {
                 auto result = storage.new_instance(json_array_arg);
                 if (step > 0)
                 {
+                    if (start < 0)
+                    {
+                        start = 0;
+                    }
+                    if (end > static_cast<int64_t>(val.size()))
+                    {
+                        end = val.size();
+                    }
                     for (int64_t i = start; i < end; i += step)
                     {
                         auto j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), storage, ec);

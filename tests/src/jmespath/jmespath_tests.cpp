@@ -87,8 +87,8 @@ TEST_CASE("jmespath-tests")
         //jmespath_tests("./input/jmespath/compliance-tests/basic.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/boolean.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
-        //jmespath_tests("./input/jmespath/compliance-tests/slice.json"); // OK
-        jmespath_tests("./input/jmespath/compliance-tests/literal.json"); 
+        jmespath_tests("./input/jmespath/compliance-tests/slice.json"); // OK
+        //jmespath_tests("./input/jmespath/compliance-tests/literal.json"); 
     }
 }
 
