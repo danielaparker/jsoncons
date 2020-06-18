@@ -655,6 +655,8 @@ namespace jsoncons { namespace jsonpath {
             stack_.push_back(v);
 
             slice slic;
+            std::size_t save_line = 1;
+            std::size_t save_column = 1;
 
             while (p_ < end_input_)
             {
@@ -712,6 +714,8 @@ namespace jsoncons { namespace jsonpath {
                                 buffer.clear();
                                 ++p_;
                                 ++column_;
+                                save_line = line_;
+                                save_column = column_;
                                 break;
                             case '[':
                             {
@@ -805,10 +809,12 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ')':
                             {
-                                jsonpath_evaluator<Json,JsonReference,PathCons> evaluator;
+                                jsonpath_evaluator<Json,JsonReference,PathCons> evaluator(save_line, save_column);
                                 evaluator.evaluate(resources, root, buffer, ec);
                                 if (ec)
                                 {
+                                    line_ = evaluator.line();
+                                    column_ = evaluator.column();
                                     return;
                                 }
                                 function_stack_.push_back(evaluator.get_pointers());
