@@ -24,28 +24,28 @@
 
 namespace jsoncons { namespace jsonpath {
 
-    struct list_slice
+    struct slice
     {
         optional<int64_t> start_;
         optional<int64_t> stop_;
         int64_t step_;
 
-        list_slice()
+        slice()
             : start_(), stop_(), step_(1)
         {
         }
 
-        list_slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
+        slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
             : start_(start), stop_(end), step_(step)
         {
         }
 
-        list_slice(const list_slice& other)
+        slice(const slice& other)
             : start_(other.start_), stop_(other.stop_), step_(other.step_)
         {
         }
 
-        list_slice& operator=(const list_slice& rhs) 
+        slice& operator=(const slice& rhs) 
         {
             if (this != &rhs)
             {
@@ -439,10 +439,10 @@ namespace jsoncons { namespace jsonpath {
         class slice_selector final : public selector_base
         {
         private:
-            list_slice slice_;
+            slice slice_;
         public:
-            slice_selector(const list_slice& slice)
-                : slice_(slice) 
+            slice_selector(const slice& slic)
+                : slice_(slic) 
             {
             }
 
@@ -654,7 +654,7 @@ namespace jsoncons { namespace jsonpath {
             v.emplace_back(std::move(s),std::addressof(root));
             stack_.push_back(v);
 
-            list_slice slice;
+            slice slic;
 
             while (p_ < end_input_)
             {
@@ -721,7 +721,7 @@ namespace jsoncons { namespace jsonpath {
                                     apply_selectors(resources);
                                     buffer.clear();
                                 }
-                                slice.start_ = 0;
+                                slic.start_ = 0;
                                 buffer.clear();
 
                                 state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
@@ -1105,7 +1105,7 @@ namespace jsoncons { namespace jsonpath {
                                 selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                                 apply_selectors(resources);
                                 buffer.clear();
-                                slice.start_ = 0;
+                                slic.start_ = 0;
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1228,7 +1228,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;                   
                             }
                             case ':':
-                                slice = list_slice{};
+                                slic = slice{};
                                 buffer.clear();
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
                                 state_stack_.emplace_back(path_state::slice_end_or_end_step, state_stack_.back());
@@ -1254,7 +1254,7 @@ namespace jsoncons { namespace jsonpath {
                                 ++column_;
                                 break;
                             default:
-                                slice = list_slice();
+                                slic = slice();
                                 buffer.clear();
                                 buffer.push_back(*p_);
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
@@ -1297,7 +1297,7 @@ namespace jsoncons { namespace jsonpath {
                                     ec = jsonpath_errc::expected_slice_start;
                                     return;
                                 }
-                                slice.start_ = r.value();
+                                slic.start_ = r.value();
                                 state_stack_.back().state = path_state::slice_end_or_end_step;
                                 ++p_;
                                 ++column_;
@@ -1497,7 +1497,7 @@ namespace jsoncons { namespace jsonpath {
                             case ',':
                             case ']':
                             {
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slice));
+                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
                                 state_stack_.pop_back();
                                 break;
                             }
@@ -1517,7 +1517,7 @@ namespace jsoncons { namespace jsonpath {
                                     ec = jsonpath_errc::expected_slice_end;
                                     return;
                                 }
-                                slice.stop_ = jsoncons::optional<int64_t>(r.value());
+                                slic.stop_ = jsoncons::optional<int64_t>(r.value());
                                 buffer.clear();
                                 state_stack_.back().state = path_state::slice_step;
                                 ++p_;
@@ -1538,8 +1538,8 @@ namespace jsoncons { namespace jsonpath {
                                     ec = jsonpath_errc::expected_slice_end;
                                     return;
                                 }
-                                slice.stop_ = jsoncons::optional<int64_t>(r.value());
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slice));
+                                slic.stop_ = jsoncons::optional<int64_t>(r.value());
+                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
                                 state_stack_.pop_back();
                                 break;
                             }
@@ -1588,9 +1588,9 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::step_cannot_be_zero;
                                         return;
                                     }
-                                    slice.step_ = r.value();
+                                    slic.step_ = r.value();
                                 }
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slice));
+                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
                                 state_stack_.pop_back();
                                 break;
                             }
