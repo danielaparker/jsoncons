@@ -1562,9 +1562,14 @@ namespace jsoncons { namespace jsonpath {
                             case ']':
                             {
                                 auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
-                                if (!r || r.value() == 0)
+                                if (!r)
                                 {
                                     ec = jsonpath_errc::expected_slice_step;
+                                    return;
+                                }
+                                if (r.value() == 0)
+                                {
+                                    ec = jsonpath_errc::step_cannot_be_zero;
                                     return;
                                 }
                                 slice.step_ = r.value();

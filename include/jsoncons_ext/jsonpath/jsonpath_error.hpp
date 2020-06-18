@@ -44,7 +44,8 @@ namespace jsoncons { namespace jsonpath {
         unexpected_end_of_input,
         expected_colon_dot_left_bracket_comma_or_right_bracket,
         argument_to_unflatten_invalid,
-        invalid_flattened_key
+        invalid_flattened_key,
+        step_cannot_be_zero
     };
 
     class jsonpath_error_category_impl
@@ -117,6 +118,8 @@ namespace jsoncons { namespace jsonpath {
                     return "Argument to unflatten must be an object";
                 case jsonpath_errc::invalid_flattened_key:
                     return "Flattened key is invalid";
+                case jsonpath_errc::step_cannot_be_zero:
+                    return "Slice step cannot be zero";
                 default:
                     return "Unknown jsonpath parser error";
             }
