@@ -1726,6 +1726,11 @@ namespace jmespath {
                                 ec = jmespath_errc::invalid_number;
                                 return Json::null();
                             }
+                            if (r.value() == 0)
+                            {
+                                ec = jmespath_errc::step_cannot_be_zero;
+                                return Json::null();
+                            }
                             slice.step_ = r.value();
                             buffer.clear();
                         }
