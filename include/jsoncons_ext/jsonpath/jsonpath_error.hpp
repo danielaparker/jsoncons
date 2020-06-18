@@ -67,7 +67,7 @@ namespace jsoncons { namespace jsonpath {
                 case jsonpath_errc::expected_right_bracket:
                     return "Expected ]";
                 case jsonpath_errc::expected_key:
-                    return "Expected a name following a dot";
+                    return "Expected a name or index following the dot";
                 case jsonpath_errc::expected_slice_start:
                     return "Expected slice start";
                 case jsonpath_errc::expected_slice_end:
