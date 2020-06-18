@@ -118,7 +118,7 @@ The syntax for a slice is
 ```
 [start:stop:step]
 ```
-Each component is optional and may be omitted.
+Each component is optional.
 
 - If `start` is omitted, it defaults to `0` if `step` is positive,
 or the end of the array if `step` is negative.
