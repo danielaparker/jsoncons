@@ -208,32 +208,12 @@
         ]
     },
     {
-        "given" : ["first", "second", "third", "forth", "fifth"],
-        "cases" : [
-            {
-                "annotation" : "array index",
-                "expression" : "$[2]",
-                "result" : ["third"]
-            }
-        ]
-    },
-    {
         "given" : ["first", "second", "third"],
         "cases" : [
             {
                 "annotation" : "Array index last",
                 "expression" : "$[-1]",
                 "result" : ["third"]
-            }
-        ]
-    },
-    {
-        "given" : ["first", "second", "third", "forth", "fifth"],
-        "cases" : [
-            {
-                "annotation" : "Array index slice start end step 0",
-                "expression" : "$[0:3:0]",
-                "error" : "Expected slice step at line 1 and column 8"
             }
         ]
     },
@@ -349,6 +329,116 @@
                 "annotation" : "Array slice with negative start and end and range of 1",
                 "expression" : "$[-4:-3]",
                 "result" : [4] 
+            },
+            {
+                "annotation" : "Array slice with negative start and positive end and range of -1",
+                "expression" : "$[-4:1]",
+                "result" : [] 
+            }
+        ]
+    },
+    {
+        "given" : ["first", "second", "third", "forth", "fifth"],
+        "cases" : [
+            {
+                "annotation" : "Last item",
+                "expression" : "$[-1]",
+                "result" : ["fifth"]
+            },
+            {
+                "annotation" : "Last two items",
+                "expression" : "$[-2:]",
+                "result" : ["forth", "fifth"]
+            },
+            {
+                "annotation" : "All items except the last two",
+                "expression" : "$[:-2]",
+                "result" : ["first", "second", "third"]
+            },
+            {
+                "annotation" : "All items, reversed",
+                "expression" : "$[::-1]",
+                "result" : ["fifth","forth","third","second","first"]
+            },
+            {
+                "annotation" : "First two items, reversed",
+                "expression" : "$[1::-1]",
+                "result" : ["second","first"]
+            },
+            {
+                "annotation" : "Last two items, reversed",
+                "expression" : "$[:-3:-1]",
+                "result" : ["fifth","forth"]
+            },
+            {
+                "annotation" : "All items except the last two, reversed",
+                "expression" : "$[-3::-1]",
+                "result" : ["third","second","first"]
+            },
+            {
+                "annotation" : "array index",
+                "expression" : "$[2]",
+                "result" : ["third"]
+            },
+            {
+                "annotation" : "Array index slice start end step 0",
+                "expression" : "$[0:3:0]",
+                "error" : "Slice step cannot be zero at line 1 and column 8"
+            },
+            {
+                "annotation" : "Array slice with negative step",
+                "expression" : "$[3:0:-2]",
+                "result" : ["forth","second"] 
+            },
+            {
+                "annotation" : "Array slice with negative step on partially overlapping array",
+                "expression" : "$[7:3:-1]",
+                "result" : ["fifth"] 
+            },
+            {
+                "annotation" : "Array slice with negative step and start greater than end",
+                "expression" : "$[0:3:-2]",
+                "result" : [] 
+            },
+            {
+                "annotation" : "Array slice with negative step and start greater than end",
+                "expression" : "$[0:3:-2]",
+                "result" : [] 
+            },
+            {
+                "annotation" : "Array slice with negative step and start greater than end",
+                "expression" : "$[::-2]",
+                "result" : ["fifth","third","first"] 
+            },
+            {
+                "annotation" : "Array slice with open end",
+                "expression" : "$[1:]",
+                "result" : ["second", "third", "forth", "fifth"]
+            },
+            {
+                "annotation" : "Array slice with open end and negative step",
+                "expression" : "$[3::-1]",
+                "result" : ["forth","third","second","first"]
+            },
+            {
+                "annotation" : "Array slice with open start",
+                "expression" : "$[:2]",
+                "result" : ["first", "second"]
+            }
+        ]
+    },
+    {
+        "given" : ["first", "second"],
+        "cases" : [
+            {
+                "annotation" : "Array slice with open start and end",
+                "expression" : "$[:]",
+                "result" : ["first", "second"]
+            },
+            {
+                "annotation" : "Array slice with open start and end and step empty",
+                "expression" : "$[::]",
+                "result" : ["first", "second"]
             }
         ]
     }
