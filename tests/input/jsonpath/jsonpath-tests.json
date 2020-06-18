@@ -233,7 +233,7 @@
             {
                 "annotation" : "Array index slice start end step 0",
                 "expression" : "$[0:3:0]",
-                "error" : "Expected slice step at line 1 and column 8"
+                "error" : "Slice step cannot be zero at line 1 and column 8"
             }
         ]
     },

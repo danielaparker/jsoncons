@@ -455,25 +455,39 @@ namespace jsoncons { namespace jsonpath {
                     auto start = slice_.get_start(val.size());
                     auto end = slice_.get_end(val.size());
                     auto step = slice_.step();
-                    if (step >= 0)
+
+                    if (step > 0)
                     {
-                        for (int64_t j = start; j < end; j += step)
+                        if (start < 0)
                         {
-                            std::size_t uj = static_cast<std::size_t>(j);
-                            if (uj < val.size())
-                            {
-                                nodes.emplace_back(PathCons()(path,uj),std::addressof(val[uj]));
-                            }
+                            start = 0;
+                        }
+                        if (end > static_cast<int64_t>(val.size()))
+                        {
+                            end = val.size();
+                        }
+                        for (int64_t i = start; i < end; i += step)
+                        {
+                            std::size_t j = static_cast<std::size_t>(i);
+                            nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
                         }
                     }
-                    else
+                    else if (step < 0)
                     {
-                        for (int64_t j = end-1; j >= start; j += step)
+                        if (start >= static_cast<int64_t>(val.size()))
                         {
-                            std::size_t uj = static_cast<std::size_t>(j);
-                            if (uj < val.size())
+                            start = static_cast<int64_t>(val.size()) - 1;
+                        }
+                        if (end < -1)
+                        {
+                            end = -1;
+                        }
+                        for (int64_t i = start; i > end; i += step)
+                        {
+                            std::size_t j = static_cast<std::size_t>(i);
+                            if (j < val.size())
                             {
-                                nodes.emplace_back(PathCons()(path,uj),std::addressof(val[uj]));
+                                nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
                             }
                         }
                     }
@@ -1561,18 +1575,21 @@ namespace jsoncons { namespace jsonpath {
                             case ',':
                             case ']':
                             {
-                                auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
-                                if (!r)
+                                if (!buffer.empty())
                                 {
-                                    ec = jsonpath_errc::expected_slice_step;
-                                    return;
+                                    auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
+                                    if (!r)
+                                    {
+                                        ec = jsonpath_errc::expected_slice_step;
+                                        return;
+                                    }
+                                    if (r.value() == 0)
+                                    {
+                                        ec = jsonpath_errc::step_cannot_be_zero;
+                                        return;
+                                    }
+                                    slice.step_ = r.value();
                                 }
-                                if (r.value() == 0)
-                                {
-                                    ec = jsonpath_errc::step_cannot_be_zero;
-                                    return;
-                                }
-                                slice.step_ = r.value();
                                 selectors_.push_back(jsoncons::make_unique<slice_selector>(slice));
                                 state_stack_.pop_back();
                                 break;
