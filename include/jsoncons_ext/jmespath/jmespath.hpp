@@ -196,12 +196,11 @@ namespace jmespath {
         expect_right_bracket4,
         expect_right_brace,
         expect_colon,
-        comparator,
         cmp_lt_or_lte,
         cmp_eq,
         cmp_gt_or_gte,
         cmp_ne,
-        comparator_old,
+        comparator,
         cmp_lt_or_lte_old,
         cmp_eq_old,
         cmp_gt_or_gte_old,
@@ -1603,7 +1602,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case '?':
-                                state_stack_.back() = path_state::comparator_old;
+                                state_stack_.back() = path_state::comparator;
                                 state_stack_.emplace_back(path_state::expression_item);
                                 ++p_;
                                 ++column_;
@@ -1812,7 +1811,7 @@ namespace jmespath {
                         };
                         break;
                     }
-                    case path_state::comparator_old:
+                    case path_state::comparator:
                     {
                         switch(*p_)
                         {
