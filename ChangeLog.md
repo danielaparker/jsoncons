@@ -8,6 +8,8 @@ and the start and stop components are omitted, [\#252](https://github.com/daniel
 jsoncons jsonpath slices now have the same semantics as Python slices
 including for negative steps.
 
+- Fixed a bug in jsonpath line/column error reporting when using functions.
+
 v0.153.2
 --------
 
