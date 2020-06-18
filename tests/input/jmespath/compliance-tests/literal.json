@@ -5,10 +5,10 @@
             "bar": {"baz": "qux"}
         },
         "cases": [
-            {
+            /*{
                 "expression": "`\"foo\"`",
                 "result": "foo"
-            }/*,
+            },
             {
                 "comment": "Interpret escaped unicode.",
                 "expression": "`\"\\u03a6\"`",
@@ -91,12 +91,12 @@
             {
                 "expression": "`\"1\\`\"`",
                 "result": "1`"
-            },
+            },*/
             {
                 "comment": "Multiple literal expressions with escapes",
                 "expression": "`\"\\\\\"`.{a:`\"b\"`}",
                 "result": {"a": "b"}
-            },
+            }/*,
             {
                 "comment": "literal . identifier",
                 "expression": "`{\"a\": \"b\"}`.a",

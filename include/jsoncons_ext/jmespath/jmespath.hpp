@@ -1526,6 +1526,23 @@ namespace jmespath {
                                 break;
                             }
                             case '\\':
+                                if (p_+1 < end_input_)
+                                {
+                                    ++p_;
+                                    ++column_;
+                                    if (*p_ != '`')
+                                    {
+                                        buffer.push_back('\\');
+                                    }
+                                    buffer.push_back(*p_);
+                                }
+                                else
+                                {
+                                    ec = jmespath_errc::unexpected_end_of_input;
+                                    return Json::null();
+                                }
+                                ++p_;
+                                ++column_;
                                 break;
                             default:
                                 buffer.push_back(*p_);
@@ -2252,6 +2269,15 @@ namespace jmespath {
             switch (token.type())
             {
                 case token_type::literal:
+                    if (!output_stack_.empty() && output_stack_.back().type() == token_type::expression_begin)
+                    {
+                        output_stack_.back() = std::move(token);
+                    }
+                    else
+                    {
+                        output_stack_.emplace_back(std::move(token));
+                    }
+                    break;
                 case token_type::expression_begin:
                     output_stack_.emplace_back(std::move(token));
                     break;
