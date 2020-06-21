@@ -1,4 +1,4 @@
-// Copyright 2020 Daniel 
+// Copyright 2020 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -234,6 +234,7 @@ namespace jmespath {
              class JsonReference>
     class jmespath_evaluator : public ser_context
     {
+    public:
         typedef typename Json::char_type char_type;
         typedef typename Json::char_traits_type char_traits_type;
         typedef std::basic_string<char_type,char_traits_type> string_type;
@@ -276,6 +277,7 @@ namespace jmespath {
         class unary_operator
         {
         public:
+            virtual ~unary_operator() = default;
             virtual std::size_t precedence_level() const = 0;
             virtual bool is_right_associative() const = 0;
             virtual reference evaluate(reference val, jmespath_storage&, std::error_code& ec) = 0;
@@ -303,6 +305,7 @@ namespace jmespath {
         class binary_operator
         {
         public:
+            virtual ~binary_operator() = default;
             virtual std::size_t precedence_level() const = 0;
             virtual reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code& ec) = 0;
 
@@ -509,13 +512,11 @@ namespace jmespath {
             {
             }
 
+            virtual ~expression_base() = default;
+
             virtual std::size_t precedence_level() const
             {
                 return 1;
-            }
-
-            virtual ~expression_base()
-            {
             }
 
             virtual reference evaluate(reference val, jmespath_storage&, std::error_code& ec) = 0;
@@ -1060,7 +1061,7 @@ namespace jmespath {
                 new (&key_) string_type(key);
             }
 
-            token(std::unique_ptr<expression_base>&& expression)
+            token(std::unique_ptr<expression_base> expression)
                 : type_(token_type::expression)
             {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
@@ -1264,6 +1265,12 @@ namespace jmespath {
                 switch(type_)
                 {
                     case token_type::expression:
+                        if (expression_.get() != nullptr)
+                        {
+                            expression_.get_deleter()(expression_.get());
+                            expression_.reset(nullptr);
+                        }
+                        //uPtr.get_deleter()(uPtr.get());
                         //expression_.~unique_ptr();
                         break;
                     case token_type::key:
@@ -1314,7 +1321,7 @@ namespace jmespath {
                 }
             }
         };
-
+    private:
         std::size_t line_;
         std::size_t column_;
         const char_type* begin_input_;
