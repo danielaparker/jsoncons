@@ -27,9 +27,12 @@ namespace jmespath {
 
     enum class token_type 
     {
-        expression_begin,
+        source_placeholder,
         lparen,
         rparen,
+        lbrace,
+        rbrace,
+        key,
         literal,
         expression,
         binary_operator,
@@ -41,6 +44,12 @@ namespace jmespath {
         explicit literal_arg_t() = default;
     };
     constexpr literal_arg_t literal_arg{};
+
+    struct key_arg_t
+    {
+        explicit key_arg_t() = default;
+    };
+    constexpr key_arg_t key_arg{};
 
     struct lparen_arg_t
     {
@@ -54,11 +63,23 @@ namespace jmespath {
     };
     constexpr rparen_arg_t rparen_arg{};
 
-    struct expression_begin_arg_t
+    struct lbrace_arg_t
     {
-        explicit expression_begin_arg_t() = default;
+        explicit lbrace_arg_t() = default;
     };
-    constexpr expression_begin_arg_t expression_begin_arg{};
+    constexpr lbrace_arg_t lbrace_arg{};
+
+    struct rbrace_arg_t
+    {
+        explicit rbrace_arg_t() = default;
+    };
+    constexpr rbrace_arg_t rbrace_arg{};
+
+    struct source_placeholder_arg_t
+    {
+        explicit source_placeholder_arg_t() = default;
+    };
+    constexpr source_placeholder_arg_t source_placeholder_arg{};
 
     JSONCONS_STRING_LITERAL(sort_by,'s','o','r','t','-','b','y')
 
@@ -901,6 +922,95 @@ namespace jmespath {
             }
         };
 
+        class multi_select_list final : public projection_base
+        {
+        public:
+            multi_select_list()
+            {
+            }
+
+            virtual std::size_t precedence_level() const
+            {
+                return 1;
+            }
+
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (!val.is_object())
+                {
+                    return Json::null();
+                }
+
+                auto result = storage.new_instance(json_array_arg);
+                result->reserve(this->expressions_.size());
+                for (auto& selector : this->expressions_)
+                {
+                    result->push_back(selector->select(val, storage, ec));
+                }
+                return *result;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("multi_select_list\n");
+                for (auto& expr : this->expressions_)
+                {
+                    string_type sss = expr->to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }
+                return s;
+            }
+        };
+
+        struct key_expression
+        {
+            string_type key;
+            std::unique_ptr<expression_base> expression;
+
+            key_expression(string_type&& key, std::unique_ptr<expression_base>&& expression)
+                : key(std::move(key)), expression(std::move(expression))
+            {
+            }
+        };
+
+        class multi_select_hash final : public selector_base
+        {
+        public:
+            std::vector<key_expression> keyvals_;
+
+            multi_select_hash(std::vector<key_expression>&& keyvals)
+                : keyvals_(std::move(keyvals))
+            {
+            }
+
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (!val.is_object())
+                {
+                    return Json::null();
+                }
+
+                auto resultp = storage.new_instance(json_object_arg);
+                resultp->reserve(keyvals_.size());
+                for (auto& key_expression : keyvals_)
+                {
+                    resultp->try_emplace(key_expression.key,key_expression.expression->evaluate(val, storage, ec));
+                }
+
+                return *resultp;
+            }
+
+            string_type to_string(std::size_t = 0) const override
+            {
+                return string_type("multi_select_hash\n");
+            }
+        };
 
         // token
 
@@ -915,11 +1025,12 @@ namespace jmespath {
                 std::unique_ptr<unary_operator> unary_operator_;
                 std::unique_ptr<binary_operator> binary_operator_;
                 Json value_;
+                string_type key_;
             };
         public:
 
-            token(expression_begin_arg_t)
-                : type_(token_type::expression_begin)
+            token(source_placeholder_arg_t)
+                : type_(token_type::source_placeholder)
             {
             }
 
@@ -931,6 +1042,22 @@ namespace jmespath {
             token(rparen_arg_t)
                 : type_(token_type::rparen)
             {
+            }
+
+            token(lbrace_arg_t)
+                : type_(token_type::lbrace)
+            {
+            }
+
+            token(rbrace_arg_t)
+                : type_(token_type::rbrace)
+            {
+            }
+
+            token(key_arg_t, const string_type& key)
+                : type_(token_type::key)
+            {
+                new (&key_) string_type(key);
             }
 
             token(std::unique_ptr<expression_base>&& expression)
@@ -968,12 +1095,16 @@ namespace jmespath {
                 {
                     switch (type_)
                     {
-                        case token_type::expression_begin:
+                        case token_type::source_placeholder:
                         case token_type::lparen:
                         case token_type::rparen:
+                        case token_type::lbrace:
                             break;
                         case token_type::expression:
                             expression_.swap(other.expression_);
+                            break;
+                        case token_type::key:
+                            key_.swap(other.key_);
                             break;
                         case token_type::unary_operator:
                             unary_operator_.swap(other.unary_operator_);
@@ -990,12 +1121,16 @@ namespace jmespath {
                 {
                     switch (type_)
                     {
-                        case token_type::expression_begin:
+                        case token_type::source_placeholder:
                         case token_type::lparen:
                         case token_type::rparen:
+                        case token_type::lbrace:
                             break;
                         case token_type::expression:
                             new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
+                            break;
+                        case token_type::key:
+                            new (&other.key_) string_type(std::move(key_));
                             break;
                         case token_type::unary_operator:
                             new (&other.unary_operator_) std::unique_ptr<unary_operator>(std::move(unary_operator_));
@@ -1009,12 +1144,16 @@ namespace jmespath {
                     }
                     switch (other.type_)
                     {
-                        case token_type::expression_begin:
+                        case token_type::source_placeholder:
                         case token_type::lparen:
                         case token_type::rparen:
+                        case token_type::lbrace:
                             break;
                         case token_type::expression:
                             new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                            break;
+                        case token_type::key:
+                            new (&key_) string_type(std::move(other.key_));
                             break;
                         case token_type::unary_operator:
                             new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(other.unary_operator_));
@@ -1055,14 +1194,24 @@ namespace jmespath {
                 return type_ == token_type::lparen; 
             }
 
+            bool is_lbrace() const
+            {
+                return type_ == token_type::lbrace; 
+            }
+
+            bool is_key() const
+            {
+                return type_ == token_type::key; 
+            }
+
             bool is_rparen() const
             {
                 return type_ == token_type::rparen; 
             }
 
-            bool is_expression_begin() const
+            bool is_source_placeholder() const
             {
-                return type_ == token_type::expression_begin; 
+                return type_ == token_type::source_placeholder; 
             }
 
             bool is_projection() const
@@ -1112,7 +1261,10 @@ namespace jmespath {
                 switch(type_)
                 {
                     case token_type::expression:
-                        expression_.~unique_ptr();
+                        //expression_.~unique_ptr();
+                        break;
+                    case token_type::key:
+                        key_.~basic_string();
                         break;
                     case token_type::unary_operator:
                         unary_operator_.~unique_ptr();
@@ -1141,11 +1293,17 @@ namespace jmespath {
                     case token_type::binary_operator:
                         return binary_operator_->to_string();
                         break;
-                    case token_type::expression_begin:
-                        return string_type("expression_begin");
+                    case token_type::source_placeholder:
+                        return string_type("source_placeholder");
                         break;
                     case token_type::literal:
-                        return string_type("value");
+                        return string_type("literal");
+                        break;
+                    case token_type::key:
+                        return string_type("key") + key_;
+                        break;
+                    case token_type::lbrace:
+                        return string_type("lbrace");
                         break;
                     default:
                         return string_type("default");
@@ -1213,7 +1371,7 @@ namespace jmespath {
                            std::error_code& ec)
         {
             push_token(lparen_arg);
-            push_token(expression_begin_arg);
+            push_token(source_placeholder_arg);
             state_stack_.emplace_back(path_state::start);
 
             string_type buffer;
@@ -1338,6 +1496,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case '{':
+                                push_token(lbrace_arg);
                                 state_stack_.back() = path_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
@@ -1388,6 +1547,7 @@ namespace jmespath {
                         break;
                     }
                     case path_state::key_expr:
+                        push_token(token(key_arg, buffer));
                         buffer.clear(); 
                         state_stack_.pop_back(); 
                         break;
@@ -1860,14 +2020,14 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(jsoncons::make_unique<lte_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token(jsoncons::make_unique<lt_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back();
                                 break;
                         }
@@ -1879,14 +2039,14 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(jsoncons::make_unique<gte_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token(jsoncons::make_unique<gt_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -1898,7 +2058,7 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(jsoncons::make_unique<eq_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1915,7 +2075,7 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(jsoncons::make_unique<ne_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -2016,7 +2176,7 @@ namespace jmespath {
                         {
                             case '|':
                                 push_token(token(jsoncons::make_unique<or_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); // expect_or
                                 ++p_;
                                 ++column_;
@@ -2033,7 +2193,7 @@ namespace jmespath {
                         {
                             case '&':
                                 push_token(token(jsoncons::make_unique<and_operator>()));
-                                push_token(token(expression_begin_arg));
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
@@ -2136,7 +2296,7 @@ namespace jmespath {
                             case '}':
                             {
                                 state_stack_.pop_back();
-
+                                push_token(rbrace_arg);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2219,7 +2379,7 @@ namespace jmespath {
                         stack.push_back(&t.value_);
                         break;
                     }
-                    case token_type::expression_begin:
+                    case token_type::source_placeholder:
                         stack.push_back(std::addressof(root));
                         break;
                     case token_type::expression:
@@ -2284,35 +2444,66 @@ namespace jmespath {
             }
         }
 
-        void push_token(token&& token)
+        void push_token(token&& tok)
         {
-            switch (token.type())
+            switch (tok.type())
             {
-                case token_type::literal:
-                    if (!output_stack_.empty() && output_stack_.back().type() == token_type::expression_begin)
+                case token_type::rbrace:
+                {
+                    std::vector<key_expression> keyvals;
+                    auto it = output_stack_.rbegin();
+                    while (it != output_stack_.rend() && !it->is_lbrace())
                     {
-                        output_stack_.back() = std::move(token);
+                        JSONCONS_ASSERT(it->is_expression());
+                        auto val = std::move(output_stack_.back().expression_);
+                        ++it;
+                        JSONCONS_ASSERT(it->is_key());
+                        auto key = std::move(output_stack_.back().key_);
+                        keyvals.emplace_back(std::move(key),std::move(val));
+                        ++it;
+                    }
+                    if (it == output_stack_.rend())
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
+                    }
+                    output_stack_.erase(it.base(),output_stack_.end());
+                    output_stack_.pop_back();
+
+                    output_stack_.push_back(token(jsoncons::make_unique<multi_select_hash>(std::move(keyvals))));
+
+                    break;
+                }
+                case token_type::literal:
+                    if (!output_stack_.empty() && output_stack_.back().type() == token_type::source_placeholder)
+                    {
+                        output_stack_.back() = std::move(tok);
                     }
                     else
                     {
-                        output_stack_.emplace_back(std::move(token));
+                        output_stack_.emplace_back(std::move(tok));
                     }
                     break;
-                case token_type::expression_begin:
-                    output_stack_.emplace_back(std::move(token));
+                case token_type::source_placeholder:
+                    output_stack_.emplace_back(std::move(tok));
+                    break;
+                case token_type::lbrace:
+                    output_stack_.emplace_back(std::move(tok));
+                    break;
+                case token_type::key:
+                    output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::expression:
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= token.precedence_level())
+                    if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= tok.precedence_level())
                     {
-                        output_stack_.back().expression_->add_expression(std::move(token.expression_));
+                        output_stack_.back().expression_->add_expression(std::move(tok.expression_));
                     }
                     else
                     {
-                        output_stack_.emplace_back(std::move(token));
+                        output_stack_.emplace_back(std::move(tok));
                     }
                     break;
                 case token_type::lparen:
-                    operator_stack_.emplace_back(std::move(token));
+                    operator_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::rparen:
                     {
@@ -2335,26 +2526,26 @@ namespace jmespath {
                 {
                     if (operator_stack_.empty() || operator_stack_.back().is_lparen())
                     {
-                        operator_stack_.emplace_back(std::move(token));
+                        operator_stack_.emplace_back(std::move(tok));
                     }
-                    else if (token.precedence_level() < operator_stack_.back().precedence_level()
-                             || (token.precedence_level() == operator_stack_.back().precedence_level() && token.is_right_associative()))
+                    else if (tok.precedence_level() < operator_stack_.back().precedence_level()
+                             || (tok.precedence_level() == operator_stack_.back().precedence_level() && tok.is_right_associative()))
                     {
-                        operator_stack_.emplace_back(std::move(token));
+                        operator_stack_.emplace_back(std::move(tok));
                     }
                     else
                     {
                         auto it = operator_stack_.rbegin();
                         while (it != operator_stack_.rend() && it->is_operator()
-                               && (token.precedence_level() > it->precedence_level()
-                             || (token.precedence_level() == it->precedence_level() && token.is_right_associative())))
+                               && (tok.precedence_level() > it->precedence_level()
+                             || (tok.precedence_level() == it->precedence_level() && tok.is_right_associative())))
                         {
                             output_stack_.emplace_back(std::move(*it));
                             ++it;
                         }
 
                         operator_stack_.erase(it.base(),operator_stack_.end());
-                        operator_stack_.emplace_back(std::move(token));
+                        operator_stack_.emplace_back(std::move(tok));
                     }
                     break;
                 }
