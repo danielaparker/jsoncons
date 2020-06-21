@@ -1099,6 +1099,7 @@ namespace jmespath {
                         case token_type::lparen:
                         case token_type::rparen:
                         case token_type::lbrace:
+                        case token_type::rbrace:
                             break;
                         case token_type::expression:
                             expression_.swap(other.expression_);
@@ -1125,6 +1126,7 @@ namespace jmespath {
                         case token_type::lparen:
                         case token_type::rparen:
                         case token_type::lbrace:
+                        case token_type::rbrace:
                             break;
                         case token_type::expression:
                             new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
@@ -1148,6 +1150,7 @@ namespace jmespath {
                         case token_type::lparen:
                         case token_type::rparen:
                         case token_type::lbrace:
+                        case token_type::rbrace:
                             break;
                         case token_type::expression:
                             new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
