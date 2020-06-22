@@ -1085,100 +1085,46 @@ namespace jmespath {
             }
 
             token(token&& other)
-                : type_(token_type::lparen)
             {
-                swap(other);
-            }
-
-            void swap(token& other) noexcept
-            {
-                if (type_ == other.type_)
-                {
-                    switch (type_)
-                    {
-                        case token_type::source_placeholder:
-                        case token_type::lparen:
-                        case token_type::rparen:
-                        case token_type::lbrace:
-                        case token_type::rbrace:
-                            break;
-                        case token_type::expression:
-                            expression_.swap(other.expression_);
-                            break;
-                        case token_type::key:
-                            key_.swap(other.key_);
-                            break;
-                        case token_type::unary_operator:
-                            unary_operator_.swap(other.unary_operator_);
-                            break;
-                        case token_type::binary_operator:
-                            binary_operator_.swap(other.binary_operator_);
-                            break;
-                        case token_type::literal:
-                            value_.swap(other.value_);
-                            break;
-                    }
-                }
-                else
-                {
-                    switch (type_)
-                    {
-                        case token_type::source_placeholder:
-                        case token_type::lparen:
-                        case token_type::rparen:
-                        case token_type::lbrace:
-                        case token_type::rbrace:
-                            break;
-                        case token_type::expression:
-                            new (&other.expression_) std::unique_ptr<expression_base>(std::move(expression_));
-                            break;
-                        case token_type::key:
-                            new (&other.key_) string_type(std::move(key_));
-                            break;
-                        case token_type::unary_operator:
-                            new (&other.unary_operator_) std::unique_ptr<unary_operator>(std::move(unary_operator_));
-                            break;
-                        case token_type::binary_operator:
-                            new (&other.binary_operator_) std::unique_ptr<binary_operator>(std::move(binary_operator_));
-                            break;
-                        case token_type::literal:
-                            new (&other.value_) Json(std::move(value_));
-                            break;
-                    }
-                    switch (other.type_)
-                    {
-                        case token_type::source_placeholder:
-                        case token_type::lparen:
-                        case token_type::rparen:
-                        case token_type::lbrace:
-                        case token_type::rbrace:
-                            break;
-                        case token_type::expression:
-                            new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
-                            break;
-                        case token_type::key:
-                            new (&key_) string_type(std::move(other.key_));
-                            break;
-                        case token_type::unary_operator:
-                            new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(other.unary_operator_));
-                            break;
-                        case token_type::binary_operator:
-                            new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(other.binary_operator_));
-                            break;
-                        case token_type::literal:
-                            new (&value_) Json(std::move(other.value_));
-                            break;
-                    }
-                    std::swap(type_,other.type_);
-                }
-
+                construct(std::forward<token>(other));
             }
 
             token& operator=(token&& other)
             {
                 if (&other != this)
                 {
-                    swap(other);
+                    if (type_ == other.type_)
+                    {
+                        switch (type_)
+                        {
+                            case token_type::source_placeholder:
+                            case token_type::lparen:
+                            case token_type::rparen:
+                            case token_type::lbrace:
+                            case token_type::rbrace:
+                                break;
+                            case token_type::expression:
+                                expression_ = std::move(other.expression_);
+                                break;
+                            case token_type::key:
+                                key_ = std::move(other.key_);
+                                break;
+                            case token_type::unary_operator:
+                                unary_operator_ = std::move(other.unary_operator_);
+                                break;
+                            case token_type::binary_operator:
+                                binary_operator_ = std::move(binary_operator_);
+                                break;
+                            case token_type::literal:
+                                value_ = std::move(other.value_);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        destroy();
+                        construct(std::forward<token>(other));
+                    }
                 }
                 return *this;
             }
@@ -1260,18 +1206,41 @@ namespace jmespath {
                 }
             }
 
+            void construct(token&& other)
+            {
+                type_ = other.type_;
+                switch (type_)
+                {
+                    case token_type::source_placeholder:
+                    case token_type::lparen:
+                    case token_type::rparen:
+                    case token_type::lbrace:
+                    case token_type::rbrace:
+                        break;
+                    case token_type::expression:
+                        new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                        break;
+                    case token_type::key:
+                        new (&key_) string_type(std::move(other.key_));
+                        break;
+                    case token_type::unary_operator:
+                        new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(other.unary_operator_));
+                        break;
+                    case token_type::binary_operator:
+                        new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(other.binary_operator_));
+                        break;
+                    case token_type::literal:
+                        new (&value_) Json(std::move(other.value_));
+                        break;
+                }
+            }
+
             void destroy() noexcept 
             {
                 switch(type_)
                 {
                     case token_type::expression:
-                        if (expression_.get() != nullptr)
-                        {
-                            expression_.get_deleter()(expression_.get());
-                            expression_.reset(nullptr);
-                        }
-                        //uPtr.get_deleter()(uPtr.get());
-                        //expression_.~unique_ptr();
+                        expression_.~unique_ptr();
                         break;
                     case token_type::key:
                         key_.~basic_string();
@@ -2465,10 +2434,10 @@ namespace jmespath {
                     while (it != output_stack_.rend() && !it->is_lbrace())
                     {
                         JSONCONS_ASSERT(it->is_expression());
-                        auto val = std::move(output_stack_.back().expression_);
+                        auto val = std::move(it->expression_);
                         ++it;
                         JSONCONS_ASSERT(it->is_key());
-                        auto key = std::move(output_stack_.back().key_);
+                        auto key = std::move(it->key_);
                         keyvals.emplace_back(std::move(key),std::move(val));
                         ++it;
                     }
