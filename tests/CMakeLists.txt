@@ -79,7 +79,7 @@ target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 set(JSONCONS_TESTS_SOURCES
      ${JSONCONS_TESTS_SOURCE_DIR}/tests_main.cpp
-     ${JSONCONS_TESTS_SOURCE_DIR}/jmespath/jmespath_token_tests.cpp
+     ${JSONCONS_TESTS_SOURCE_DIR}/jmespath/jmespath_tests.cpp
  )
 set(JSONCONS_TARGET test_jsoncons)
 add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${JSONCONS_HEADERS})
