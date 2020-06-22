@@ -30,8 +30,10 @@ namespace jmespath {
         source_placeholder,
         lparen,
         rparen,
-        begin_multiselect_hash,
-        end_multiselect_hash,
+        begin_multi_select_hash,
+        end_multi_select_hash,
+        begin_multi_select_list,
+        end_multi_select_list,
         key,
         literal,
         expression,
@@ -63,17 +65,29 @@ namespace jmespath {
     };
     constexpr rparen_arg_t rparen_arg{};
 
-    struct begin_multiselect_hash_arg_t
+    struct begin_multi_select_hash_arg_t
     {
-        explicit begin_multiselect_hash_arg_t() = default;
+        explicit begin_multi_select_hash_arg_t() = default;
     };
-    constexpr begin_multiselect_hash_arg_t begin_multiselect_hash_arg{};
+    constexpr begin_multi_select_hash_arg_t begin_multi_select_hash_arg{};
 
-    struct end_multiselect_hash_arg_t
+    struct end_multi_select_hash_arg_t
     {
-        explicit end_multiselect_hash_arg_t() = default;
+        explicit end_multi_select_hash_arg_t() = default;
     };
-    constexpr end_multiselect_hash_arg_t end_multiselect_hash_arg{};
+    constexpr end_multi_select_hash_arg_t end_multi_select_hash_arg{};
+
+    struct begin_multi_select_list_arg_t
+    {
+        explicit begin_multi_select_list_arg_t() = default;
+    };
+    constexpr begin_multi_select_list_arg_t begin_multi_select_list_arg{};
+
+    struct end_multi_select_list_arg_t
+    {
+        explicit end_multi_select_list_arg_t() = default;
+    };
+    constexpr end_multi_select_list_arg_t end_multi_select_list_arg{};
 
     struct source_placeholder_arg_t
     {
@@ -957,10 +971,12 @@ namespace jmespath {
             }
         };
 
-        class multi_select_list final : public projection_base
+        class multi_select_list final : public selector_base
         {
+            std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
-            multi_select_list()
+            multi_select_list(std::vector<std::unique_ptr<expression_base>>&& expressions)
+                : expressions_(std::move(expressions))
             {
             }
 
@@ -977,10 +993,10 @@ namespace jmespath {
                 }
 
                 auto result = storage.new_instance(json_array_arg);
-                result->reserve(this->expressions_.size());
-                for (auto& selector : this->expressions_)
+                result->reserve(expressions_.size());
+                for (auto& expr : expressions_)
                 {
-                    result->push_back(selector->select(val, storage, ec));
+                    result->push_back(expr->evaluate(val, storage, ec));
                 }
                 return *result;
             }
@@ -993,7 +1009,7 @@ namespace jmespath {
                     s.push_back(' ');
                 }
                 s.append("multi_select_list\n");
-                for (auto& expr : this->expressions_)
+                for (auto& expr : expressions_)
                 {
                     string_type sss = expr->to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
@@ -1079,13 +1095,23 @@ namespace jmespath {
             {
             }
 
-            token(begin_multiselect_hash_arg_t)
-                : type_(token_type::begin_multiselect_hash)
+            token(begin_multi_select_hash_arg_t)
+                : type_(token_type::begin_multi_select_hash)
             {
             }
 
-            token(end_multiselect_hash_arg_t)
-                : type_(token_type::end_multiselect_hash)
+            token(end_multi_select_hash_arg_t)
+                : type_(token_type::end_multi_select_hash)
+            {
+            }
+
+            token(begin_multi_select_list_arg_t)
+                : type_(token_type::begin_multi_select_list)
+            {
+            }
+
+            token(end_multi_select_list_arg_t)
+                : type_(token_type::end_multi_select_list)
             {
             }
 
@@ -1134,8 +1160,8 @@ namespace jmespath {
                             case token_type::source_placeholder:
                             case token_type::lparen:
                             case token_type::rparen:
-                            case token_type::begin_multiselect_hash:
-                            case token_type::end_multiselect_hash:
+                            case token_type::begin_multi_select_hash:
+                            case token_type::end_multi_select_hash:
                                 break;
                             case token_type::expression:
                                 expression_ = std::move(other.expression_);
@@ -1180,7 +1206,7 @@ namespace jmespath {
 
             bool is_lbrace() const
             {
-                return type_ == token_type::begin_multiselect_hash; 
+                return type_ == token_type::begin_multi_select_hash; 
             }
 
             bool is_key() const
@@ -1248,8 +1274,8 @@ namespace jmespath {
                     case token_type::source_placeholder:
                     case token_type::lparen:
                     case token_type::rparen:
-                    case token_type::begin_multiselect_hash:
-                    case token_type::end_multiselect_hash:
+                    case token_type::begin_multi_select_hash:
+                    case token_type::end_multi_select_hash:
                         break;
                     case token_type::expression:
                         new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
@@ -1315,7 +1341,7 @@ namespace jmespath {
                     case token_type::key:
                         return string_type("key") + key_;
                         break;
-                    case token_type::begin_multiselect_hash:
+                    case token_type::begin_multi_select_hash:
                         return string_type("lbrace");
                         break;
                     default:
@@ -1509,7 +1535,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case '{':
-                                push_token(begin_multiselect_hash_arg);
+                                push_token(begin_multi_select_hash_arg);
                                 state_stack_.back() = path_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
@@ -1789,6 +1815,7 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::number);
                                 break;
                             default:
+                                push_token(token(begin_multi_select_list_arg));
                                 state_stack_.back() = path_state::expect_right_bracket4;
                                 state_stack_.emplace_back(path_state::expression_item);
                                 break;
@@ -2261,6 +2288,7 @@ namespace jmespath {
                             }
                             case ']':
                             {
+                                push_token(token(end_multi_select_list_arg));
                                 state_stack_.pop_back();
 
                                 ++p_;
@@ -2299,7 +2327,7 @@ namespace jmespath {
                             case '}':
                             {
                                 state_stack_.pop_back();
-                                push_token(end_multiselect_hash_arg);
+                                push_token(end_multi_select_hash_arg);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2451,11 +2479,42 @@ namespace jmespath {
         {
             switch (tok.type())
             {
-                case token_type::end_multiselect_hash:
+                case token_type::end_multi_select_list:
+                {
+                    std::vector<std::unique_ptr<expression_base>> expressions;
+                    auto it = output_stack_.rbegin();
+                    while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list)
+                    {
+                        std::cout << "type: " << (int)it->type() << std::endl;
+                        JSONCONS_ASSERT(it->is_expression());
+                        do
+                        {
+                            expressions.insert(expressions.begin(), std::move(it->expression_));
+                            ++it;
+                        } while (it->is_expression());
+                    }
+                    if (it == output_stack_.rend())
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
+                    }
+                    output_stack_.erase(it.base(),output_stack_.end());
+                    output_stack_.pop_back();
+
+                    if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= tok.precedence_level())
+                    {
+                        output_stack_.back().expression_->add_expression(jsoncons::make_unique<multi_select_list>(std::move(expressions)));
+                    }
+                    else
+                    {
+                        output_stack_.emplace_back(token(jsoncons::make_unique<multi_select_list>(std::move(expressions))));
+                    }
+                    break;
+                }
+                case token_type::end_multi_select_hash:
                 {
                     std::vector<key_expression> keyvals;
                     auto it = output_stack_.rbegin();
-                    while (it != output_stack_.rend() && !it->is_lbrace())
+                    while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_hash)
                     {
                         std::vector<std::unique_ptr<expression_base>> expressions;
                         JSONCONS_ASSERT(it->is_expression());
@@ -2503,15 +2562,6 @@ namespace jmespath {
                         output_stack_.emplace_back(std::move(tok));
                     }
                     break;
-                case token_type::source_placeholder:
-                    output_stack_.emplace_back(std::move(tok));
-                    break;
-                case token_type::begin_multiselect_hash:
-                    output_stack_.emplace_back(std::move(tok));
-                    break;
-                case token_type::key:
-                    output_stack_.emplace_back(std::move(tok));
-                    break;
                 case token_type::expression:
                     if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= tok.precedence_level())
                     {
@@ -2521,9 +2571,6 @@ namespace jmespath {
                     {
                         output_stack_.emplace_back(std::move(tok));
                     }
-                    break;
-                case token_type::lparen:
-                    operator_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::rparen:
                     {
@@ -2569,6 +2616,15 @@ namespace jmespath {
                     }
                     break;
                 }
+                case token_type::source_placeholder:
+                case token_type::begin_multi_select_hash:
+                case token_type::begin_multi_select_list:
+                case token_type::key:
+                    output_stack_.emplace_back(std::move(tok));
+                    break;
+                case token_type::lparen:
+                    operator_stack_.emplace_back(std::move(tok));
+                    break;
                 default:
                     break;
             }

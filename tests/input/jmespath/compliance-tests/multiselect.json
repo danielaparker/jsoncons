@@ -108,7 +108,7 @@
          {
             "expression": "foo.[bar]",
             "result": ["bar"]
-         }/*,
+         },
          {
             "expression": "foo.[bar,baz]",
             "result": ["bar", "baz"]
@@ -124,7 +124,7 @@
          {
             "expression": "foo.[noexist,alsonoexist]",
             "result": [null, null]
-         }*/
+         }
      ]
 }/*, {
     "given": {
