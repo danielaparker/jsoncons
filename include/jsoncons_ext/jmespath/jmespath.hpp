@@ -934,20 +934,8 @@ namespace jmespath {
                     return Json::null();
                 }
 
-                auto result = storage.new_instance(json_array_arg);
-                for (reference item : val.array_range())
-                {
-                    if (!item.is_null())
-                    {
-                        auto j = this->apply_expressions(item, storage, ec);
-                        if (!j.is_null())
-                        {
-                            result->push_back(j);
-                        }
-                    }
-                }
                 auto currentp = storage.new_instance(json_array_arg);
-                for (reference item : result->array_range())
+                for (reference item : val.array_range())
                 {
                     if (item.is_array())
                     {
@@ -961,6 +949,18 @@ namespace jmespath {
                         currentp->push_back(item);
                     }
                 }
+                auto result = storage.new_instance(json_array_arg);
+                for (reference item : currentp->array_range())
+                {
+                    if (!item.is_null())
+                    {
+                        auto j = this->apply_expressions(item, storage, ec);
+                        if (!j.is_null())
+                        {
+                            result->push_back(j);
+                        }
+                    }
+                }
                 return *currentp;
             }
 
@@ -971,7 +971,7 @@ namespace jmespath {
                 {
                     s.push_back(' ');
                 }
-                s.append("slice_projection\n");
+                s.append("flatten_projection\n");
                 for (auto& expr : this->expressions_)
                 {
                     string_type sss = expr->to_string(indent+2);
