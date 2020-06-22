@@ -30,11 +30,11 @@
          /*{
             "expression": "foo.{bar: bar}",
             "result": {"bar": "bar"}
-         },*/
+         },
          {
             "expression": "foo.{\"bar\": bar}",
             "result": {"bar": "bar"}
-         }/*,
+         },
          {
             "expression": "foo.{\"foo.bar\": bar}",
             "result": {"foo.bar": "bar"}
@@ -104,11 +104,11 @@
          {
             "expression": "{no: no, exist: exist}",
             "result": {"no": null, "exist": null}
-         },
+         },*/
          {
             "expression": "foo.[bar]",
             "result": ["bar"]
-         },
+         }/*,
          {
             "expression": "foo.[bar,baz]",
             "result": ["bar", "baz"]
