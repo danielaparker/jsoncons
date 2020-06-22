@@ -1531,21 +1531,9 @@ namespace jmespath {
                         state_stack_.pop_back(); 
                         break;
                     case path_state::val_expr:
-                        switch(*p_)
-                        {
-                            case '\"':
-                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
-                                ++p_;
-                                ++column_;
-                                buffer.clear();
-                                state_stack_.pop_back(); 
-                                break;
-                            default:
-                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
-                                buffer.clear();
-                                state_stack_.pop_back(); 
-                                break;
-                        }
+                        push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
+                        buffer.clear();
+                        state_stack_.pop_back(); 
                         break;
                     case path_state::identifier_or_function_expr:
                         switch(*p_)
@@ -1596,6 +1584,8 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case '\"':
+                                ++p_;
+                                ++column_;
                                 state_stack_.pop_back(); // quoted_string
                                 break;
                             case '\\':

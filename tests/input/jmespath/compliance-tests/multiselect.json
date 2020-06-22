@@ -27,14 +27,14 @@
       "qux\"": 3
     },
      "cases": [
-         {
+         /*{
             "expression": "foo.{bar: bar}",
             "result": {"bar": "bar"}
-         }/*,
+         },*/
          {
             "expression": "foo.{\"bar\": bar}",
             "result": {"bar": "bar"}
-         },
+         }/*,
          {
             "expression": "foo.{\"foo.bar\": bar}",
             "result": {"foo.bar": "bar"}
