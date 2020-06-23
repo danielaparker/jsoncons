@@ -48,7 +48,7 @@ void jmespath_tests(const std::string& fpath)
                         }
                         std::cout << "input\n" << pretty_print(root) << "\n";
                         std::cout << path << "\n\n";
-                        std::cout << "actual\n: " << pretty_print(result) << "\n\n";
+                        std::cout << "actual: " << pretty_print(result) << "\n\n";
                         std::cout << "expected: " << pretty_print(expected) << "\n\n";
                     }
                     CHECK(result == expected);
@@ -89,7 +89,9 @@ TEST_CASE("jmespath-tests")
         //jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/slice.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/literal.json"); 
-        jmespath_tests("./input/jmespath/compliance-tests/multiselect.json"); // OK
+        //jmespath_tests("./input/jmespath/compliance-tests/multiselect.json"); // OK
+
+        jmespath_tests("./input/jmespath/compliance-tests/flatten_trace.json"); 
     }
 }
 

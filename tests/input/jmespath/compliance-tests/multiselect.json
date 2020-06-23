@@ -201,7 +201,7 @@
             "result": [true, ["first", "second"]]
          }
     ]
-},*/ {
+}, {
     "given": {
       "reservations": [{
           "instances": [
@@ -218,7 +218,7 @@
           ]}
       ]},
     "cases": [
-         /*{
+         {
             "expression": "reservations[*].instances[*].{id: id, name: name}",
             "result": [[{"id": "id1", "name": "first"}, {"id": "id2", "name": "second"}],
                        [{"id": "id3", "name": "third"}, {"id": "id4", "name": "fourth"}]]
@@ -229,7 +229,7 @@
                        {"id": "id2", "name": "second"},
                        {"id": "id3", "name": "third"},
                        {"id": "id4", "name": "fourth"}]
-         },*/
+         },
          {
             "expression": "reservations[].instances[].[id, name]",
             "result": [["id1", "first"],
@@ -238,7 +238,7 @@
                        ["id4", "fourth"]]
          }
     ]
-}/*,
+},
 {
     "given": {
       "foo": [{
@@ -345,7 +345,7 @@
            "result": [[["a", "c" ], ["d", "f" ]], "zero"]
         }
     ]
-},
+},*/
 {
     "given": {
         "foo": {
@@ -369,7 +369,7 @@
            "result": [["a", "d"], "zero"]
         }
     ]
-},
+}/*,
 {
     "given": {"type": "object"},
     "cases": [
