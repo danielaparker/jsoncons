@@ -1,4 +1,4 @@
-[/*{
+[{
     "given": {
       "foo": {
         "bar": "bar",
@@ -30,7 +30,7 @@
          {
             "expression": "foo.{bar: bar}",
             "result": {"bar": "bar"}
-         },
+         }/*,
          {
             "expression": "foo.{\"bar\": bar}",
             "result": {"bar": "bar"}
@@ -124,9 +124,9 @@
          {
             "expression": "foo.[noexist,alsonoexist]",
             "result": [null, null]
-         }
+         }*/
      ]
-}, {
+}/*, {
     "given": {
       "foo": {"bar": 1, "baz": [2, 3, 4]}
     },
@@ -345,7 +345,7 @@
            "result": [[["a", "c" ], ["d", "f" ]], "zero"]
         }
     ]
-},*/
+},
 {
     "given": {
         "foo": {
@@ -369,7 +369,7 @@
            "result": [["a", "d"], "zero"]
         }
     ]
-}/*,
+},
 {
     "given": {"type": "object"},
     "cases": [

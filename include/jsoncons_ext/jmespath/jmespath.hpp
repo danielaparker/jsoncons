@@ -39,7 +39,8 @@ namespace jmespath {
         literal,
         expression,
         binary_operator,
-        unary_operator
+        unary_operator,
+        end_of_expression
     };
 
     struct literal_arg_t
@@ -47,6 +48,12 @@ namespace jmespath {
         explicit literal_arg_t() = default;
     };
     constexpr literal_arg_t literal_arg{};
+
+    struct end_of_expression_arg_t
+    {
+        explicit end_of_expression_arg_t() = default;
+    };
+    constexpr end_of_expression_arg_t end_of_expression_arg{};
 
     struct separator_arg_t
     {
@@ -1111,6 +1118,11 @@ namespace jmespath {
             {
             }
 
+            token(end_of_expression_arg_t)
+                : type_(token_type::end_of_expression)
+            {
+            }
+
             token(begin_multi_select_hash_arg_t)
                 : type_(token_type::begin_multi_select_hash)
             {
@@ -1430,7 +1442,6 @@ namespace jmespath {
                            std::size_t length,
                            std::error_code& ec)
         {
-            push_token(lparen_arg);
             push_token(source_placeholder_arg);
             state_stack_.emplace_back(path_state::start);
 
@@ -2302,6 +2313,7 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 state_stack_.emplace_back(path_state::expression_item);
+                                state_stack_.emplace_back(path_state::expect_or);
                                 break;
                             }
                             case ']':
@@ -2403,7 +2415,7 @@ namespace jmespath {
                             state_stack_.back() == path_state::sub_or_index_expression);
             state_stack_.pop_back();
 
-            push_token(rparen_arg);
+            push_token(end_of_expression_arg);
 
             for (auto& t : output_stack_)
             {
@@ -2504,6 +2516,7 @@ namespace jmespath {
                     while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list)
                     {
                         std::vector<std::unique_ptr<expression_base>> expressions;
+                        std::cout << "token_type " << (int)it->type() << std::endl;
                         JSONCONS_ASSERT(it->is_expression());
                         do
                         {
@@ -2616,6 +2629,17 @@ namespace jmespath {
                         }
                         operator_stack_.erase(it.base(),operator_stack_.end());
                         operator_stack_.pop_back();
+                        break;
+                    }
+                case token_type::end_of_expression:
+                    {
+                        auto it = operator_stack_.rbegin();
+                        while (it != operator_stack_.rend())
+                        {
+                            output_stack_.emplace_back(std::move(*it));
+                            ++it;
+                        }
+                        operator_stack_.clear();
                         break;
                     }
                 case token_type::unary_operator:
