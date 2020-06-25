@@ -557,7 +557,9 @@ namespace jmespath {
             }
 
             virtual bool is_projection() const = 0;
-        };
+
+            virtual bool is_right_associative() const = 0;
+        };  
 
         // selector_base
         class selector_base :  public expression_base
@@ -570,6 +572,11 @@ namespace jmespath {
             {
                 return false;
             }
+
+            bool is_right_associative() const override
+            {
+                return false;
+            }
         };
 
         class compound_expression final : public selector_base
@@ -577,9 +584,22 @@ namespace jmespath {
         public:
             std::vector<std::unique_ptr<expression_base>> expressions_;
 
-            compound_expression(std::vector<std::unique_ptr<expression_base>>&& expressions)
-                : expressions_(std::move(expressions))
+            compound_expression()
             {
+            }
+
+            void add_expression(std::unique_ptr<expression_base>&& expr) override
+            {
+                if (!expressions_.empty() && expressions_.back()->is_projection() && 
+                    (expr->precedence_level() < expressions_.back()->precedence_level() ||
+                     (expr->precedence_level() == expressions_.back()->precedence_level() && expr->is_right_associative())))
+                {
+                    expressions_.back()->add_expression(std::move(expr));
+                }
+                else
+                {
+                    expressions_.emplace_back(std::move(expr));
+                }
             }
 
             reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
@@ -602,7 +622,7 @@ namespace jmespath {
                 s.append("compound_expression\n");
                 for (auto& item : expressions_)
                 {
-                    string_type ss = item->to_string(indent);
+                    string_type ss = item->to_string(indent+2);
                     s.insert(s.end(), ss.begin(), ss.end());
                     s.push_back('\n');
                 }
@@ -703,15 +723,17 @@ namespace jmespath {
             std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
 
-            void add_expression(std::unique_ptr<expression_base>&& expression) override
+            void add_expression(std::unique_ptr<expression_base>&& expr) override
             {
-                if (!expressions_.empty() && expressions_.back()->is_projection())
+                if (!expressions_.empty() && expressions_.back()->is_projection() && 
+                    (expr->precedence_level() < expressions_.back()->precedence_level() ||
+                     (expr->precedence_level() == expressions_.back()->precedence_level() && expr->is_right_associative())))
                 {
-                    expressions_.back()->add_expression(std::move(expression));
+                    expressions_.back()->add_expression(std::move(expr));
                 }
                 else
                 {
-                    expressions_.emplace_back(std::move(expression));
+                    expressions_.emplace_back(std::move(expr));
                 }
             }
 
@@ -726,6 +748,11 @@ namespace jmespath {
             }
 
             bool is_projection() const override
+            {
+                return true;
+            }
+
+            bool is_right_associative() const override
             {
                 return true;
             }
@@ -934,6 +961,11 @@ namespace jmespath {
                 return 11;
             }
 
+            bool is_right_associative() const override
+            {
+                return true;
+            }
+
             reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
             {
                 if (!val.is_array())
@@ -968,7 +1000,7 @@ namespace jmespath {
                         }
                     }
                 }
-                return *currentp;
+                return *result;
             }
 
             string_type to_string(std::size_t indent = 0) const override
@@ -1290,6 +1322,8 @@ namespace jmespath {
                 {
                     case token_type::unary_operator:
                         return unary_operator_->is_right_associative();
+                    case token_type::expression:
+                        return expression_->is_right_associative();
                     default:
                         return false;
                 }
@@ -2533,7 +2567,12 @@ namespace jmespath {
                         }
                         else
                         {
-                            vals.insert(vals.begin(), make_unique<compound_expression>(std::move(expressions)));
+                            auto compound_expr = make_unique<compound_expression>();
+                            for (auto&& expr : expressions)
+                            {
+                                compound_expr->add_expression(std::move(expr));
+                            }
+                            vals.insert(vals.begin(), std::move(compound_expr));
                         }
                     }
                     if (it == output_stack_.rend())
@@ -2575,7 +2614,12 @@ namespace jmespath {
                         }
                         else
                         {
-                            keyvals.emplace_back(std::move(key),make_unique<compound_expression>(std::move(expressions)));
+                            auto compound_expr = make_unique<compound_expression>();
+                            for (auto&& expr : expressions)
+                            {
+                                compound_expr->add_expression(std::move(expr));
+                            }
+                            keyvals.emplace_back(std::move(key),std::move(compound_expr));
                         }
                     }
                     if (it == output_stack_.rend())

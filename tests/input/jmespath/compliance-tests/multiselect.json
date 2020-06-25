@@ -30,7 +30,7 @@
          {
             "expression": "foo.{bar: bar}",
             "result": {"bar": "bar"}
-         }/*,
+         },
          {
             "expression": "foo.{\"bar\": bar}",
             "result": {"bar": "bar"}
@@ -124,9 +124,9 @@
          {
             "expression": "foo.[noexist,alsonoexist]",
             "result": [null, null]
-         }*/
+         }
      ]
-}/*, {
+}, {
     "given": {
       "foo": {"bar": 1, "baz": [2, 3, 4]}
     },
@@ -394,5 +394,5 @@
           "result": null
         }
     ]
-}*/
+}
 ]

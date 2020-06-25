@@ -8,8 +8,9 @@
       }
     },
     "cases": [
+         
          {
-            "expression": "foo.[includeme, bar.baz[*].common]",
+            "expression": "foo.[includeme, bar.baz[].common]",
             "result": [true, ["first", "second"]]
          }
     ]
