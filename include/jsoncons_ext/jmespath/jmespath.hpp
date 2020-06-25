@@ -963,7 +963,7 @@ namespace jmespath {
 
             bool is_right_associative() const override
             {
-                return true;
+                return false;
             }
 
             reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
@@ -1107,9 +1107,26 @@ namespace jmespath {
                 return *resultp;
             }
 
-            string_type to_string(std::size_t = 0) const override
+            string_type to_string(std::size_t indent = 0) const override
             {
-                return string_type("multi_select_hash\n");
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("multi_select_list\n");
+                for (auto& key_expr : keyvals_)
+                {
+                    for (std::size_t i = 0; i <= indent+2; ++i)
+                    {
+                        s.push_back(' ');
+                    }
+                    s.append(key_expr.key);
+                    string_type sss = key_expr.expression->to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }
+                return s;
             }
         };
 
@@ -2582,7 +2599,9 @@ namespace jmespath {
                     output_stack_.erase(it.base(),output_stack_.end());
                     output_stack_.pop_back();
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= tok.precedence_level())
+                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
+                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
                     {
                         output_stack_.back().expression_->add_expression(jsoncons::make_unique<multi_select_list>(std::move(vals)));
                     }
@@ -2629,7 +2648,9 @@ namespace jmespath {
                     output_stack_.erase(it.base(),output_stack_.end());
                     output_stack_.pop_back();
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= tok.precedence_level())
+                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
+                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
                     {
                         output_stack_.back().expression_->add_expression(jsoncons::make_unique<multi_select_hash>(std::move(keyvals)));
                     }
@@ -2650,7 +2671,9 @@ namespace jmespath {
                     }
                     break;
                 case token_type::expression:
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && output_stack_.back().precedence_level() >= tok.precedence_level())
+                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
+                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
                     {
                         output_stack_.back().expression_->add_expression(std::move(tok.expression_));
                     }
