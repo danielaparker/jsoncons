@@ -337,198 +337,15 @@ namespace jmespath {
             virtual std::size_t precedence_level() const = 0;
             virtual reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code& ec) = 0;
 
-            virtual string_type to_string() const
+            virtual string_type to_string(size_t indent = 0) const
             {
-                string_type s("to_string not implemented");
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("to_string not implemented\n");
                 return s;
-            }
-        };
-
-        class or_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 9;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                if (lhs.is_null() && rhs.is_null())
-                {
-                    return Json::null();
-                }
-                if (!is_false(lhs))
-                {
-                    return lhs;
-                }
-                else
-                {
-                    return rhs;
-                }
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("or_operator");
-            }
-        };
-
-        class and_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 8;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                if (is_true(lhs))
-                {
-                    return rhs;
-                }
-                else
-                {
-                    return lhs;
-                }
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("and_operator");
-            }
-        };
-
-        class eq_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 6;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                return lhs == rhs ? t : f;
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("eq_operator");
-            }
-        };
-
-        class ne_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 6;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                return lhs != rhs ? t : f;
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("ne_operator");
-            }
-        };
-
-        class lt_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 5;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                if (!(lhs.is_number() && rhs.is_number()))
-                {
-                    return Json::null();
-                }
-                return lhs < rhs ? t : f;
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("lt_operator");
-            }
-        };
-
-        class lte_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 5;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                if (!(lhs.is_number() && rhs.is_number()))
-                {
-                    return Json::null();
-                }
-                return lhs <= rhs ? t : f;
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("lte_operator");
-            }
-        };
-
-        class gt_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 5;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                if (!(lhs.is_number() && rhs.is_number()))
-                {
-                    return Json::null();
-                }
-                return lhs > rhs ? t : f;
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("gt_operator");
-            }
-        };
-
-        class gte_operator : public binary_operator
-        {
-            std::size_t precedence_level() const 
-            {
-                return 5;
-            }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
-            {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                if (!(lhs.is_number() && rhs.is_number()))
-                {
-                    return Json::null();
-                }
-                return lhs >= rhs ? t : f;
-            }
-
-            string_type to_string() const override
-            {
-                return string_type("gte_operator");
             }
         };
 
@@ -560,6 +377,608 @@ namespace jmespath {
 
             virtual bool is_right_associative() const = 0;
         };  
+
+        // token
+
+        class token
+        {
+        public:
+            token_type type_;
+
+            union
+            {
+                std::unique_ptr<expression_base> expression_;
+                std::unique_ptr<unary_operator> unary_operator_;
+                std::unique_ptr<binary_operator> binary_operator_;
+                Json value_;
+                string_type key_;
+            };
+        public:
+
+            token(source_placeholder_arg_t)
+                : type_(token_type::source_placeholder)
+            {
+            }
+
+            token(separator_arg_t)
+                : type_(token_type::separator)
+            {
+            }
+
+            token(lparen_arg_t)
+                : type_(token_type::lparen)
+            {
+            }
+
+            token(rparen_arg_t)
+                : type_(token_type::rparen)
+            {
+            }
+
+            token(end_of_expression_arg_t)
+                : type_(token_type::end_of_expression)
+            {
+            }
+
+            token(begin_multi_select_hash_arg_t)
+                : type_(token_type::begin_multi_select_hash)
+            {
+            }
+
+            token(end_multi_select_hash_arg_t)
+                : type_(token_type::end_multi_select_hash)
+            {
+            }
+
+            token(begin_multi_select_list_arg_t)
+                : type_(token_type::begin_multi_select_list)
+            {
+            }
+
+            token(end_multi_select_list_arg_t)
+                : type_(token_type::end_multi_select_list)
+            {
+            }
+
+            token(key_arg_t, const string_type& key)
+                : type_(token_type::key)
+            {
+                new (&key_) string_type(key);
+            }
+
+            token(std::unique_ptr<expression_base> expression)
+                : type_(token_type::expression)
+            {
+                new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
+            }
+
+            token(std::unique_ptr<unary_operator>&& expression)
+                : type_(token_type::unary_operator)
+            {
+                new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(expression));
+            }
+
+            token(std::unique_ptr<binary_operator>&& expression)
+                : type_(token_type::binary_operator)
+            {
+                new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(expression));
+            }
+
+            token(literal_arg_t, Json&& value)
+                : type_(token_type::literal), value_(std::move(value))
+            {
+            }
+
+            token(token&& other)
+            {
+                construct(std::forward<token>(other));
+            }
+
+            token& operator=(token&& other)
+            {
+                if (&other != this)
+                {
+                    if (type_ == other.type_)
+                    {
+                        switch (type_)
+                        {
+                            case token_type::source_placeholder:
+                            case token_type::separator:
+                            case token_type::lparen:
+                            case token_type::rparen:
+                            case token_type::begin_multi_select_hash:
+                            case token_type::end_multi_select_hash:
+                                break;
+                            case token_type::expression:
+                                expression_ = std::move(other.expression_);
+                                break;
+                            case token_type::key:
+                                key_ = std::move(other.key_);
+                                break;
+                            case token_type::unary_operator:
+                                unary_operator_ = std::move(other.unary_operator_);
+                                break;
+                            case token_type::binary_operator:
+                                binary_operator_ = std::move(binary_operator_);
+                                break;
+                            case token_type::literal:
+                                value_ = std::move(other.value_);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        destroy();
+                        construct(std::forward<token>(other));
+                    }
+                }
+                return *this;
+            }
+
+            ~token() noexcept
+            {
+                destroy();
+            }
+
+            token_type type() const
+            {
+                return type_;
+            }
+
+            bool is_lparen() const
+            {
+                return type_ == token_type::lparen; 
+            }
+
+            bool is_lbrace() const
+            {
+                return type_ == token_type::begin_multi_select_hash; 
+            }
+
+            bool is_key() const
+            {
+                return type_ == token_type::key; 
+            }
+
+            bool is_rparen() const
+            {
+                return type_ == token_type::rparen; 
+            }
+
+            bool is_source_placeholder() const
+            {
+                return type_ == token_type::source_placeholder; 
+            }
+
+            bool is_projection() const
+            {
+                return type_ == token_type::expression && expression_->is_projection(); 
+            }
+
+            bool is_expression() const
+            {
+                return type_ == token_type::expression; 
+            }
+
+            bool is_operator() const
+            {
+                return type_ == token_type::unary_operator || 
+                       type_ == token_type::binary_operator; 
+            }
+
+            std::size_t precedence_level() const
+            {
+                switch(type_)
+                {
+                    case token_type::unary_operator:
+                        return unary_operator_->precedence_level();
+                    case token_type::binary_operator:
+                        return binary_operator_->precedence_level();
+                    case token_type::expression:
+                        return expression_->precedence_level();
+                    default:
+                        return 0;
+                }
+            }
+
+            bool is_right_associative() const
+            {
+                switch(type_)
+                {
+                    case token_type::unary_operator:
+                        return unary_operator_->is_right_associative();
+                    case token_type::expression:
+                        return expression_->is_right_associative();
+                    default:
+                        return false;
+                }
+            }
+
+            void construct(token&& other)
+            {
+                type_ = other.type_;
+                switch (type_)
+                {
+                    case token_type::source_placeholder:
+                    case token_type::separator:
+                    case token_type::lparen:
+                    case token_type::rparen:
+                    case token_type::begin_multi_select_hash:
+                    case token_type::end_multi_select_hash:
+                        break;
+                    case token_type::expression:
+                        new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
+                        break;
+                    case token_type::key:
+                        new (&key_) string_type(std::move(other.key_));
+                        break;
+                    case token_type::unary_operator:
+                        new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(other.unary_operator_));
+                        break;
+                    case token_type::binary_operator:
+                        new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(other.binary_operator_));
+                        break;
+                    case token_type::literal:
+                        new (&value_) Json(std::move(other.value_));
+                        break;
+                }
+            }
+
+            void destroy() noexcept 
+            {
+                switch(type_)
+                {
+                    case token_type::expression:
+                        expression_.~unique_ptr();
+                        break;
+                    case token_type::key:
+                        key_.~basic_string();
+                        break;
+                    case token_type::unary_operator:
+                        unary_operator_.~unique_ptr();
+                        break;
+                    case token_type::binary_operator:
+                        binary_operator_.~unique_ptr();
+                        break;
+                    case token_type::literal:
+                        value_.~Json();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            string_type to_string(std::size_t indent = 0) const
+            {
+                switch(type_)
+                {
+                    case token_type::expression:
+                        return expression_->to_string(indent);
+                        break;
+                    case token_type::unary_operator:
+                        return string_type("unary_operator");
+                        break;
+                    case token_type::binary_operator:
+                        return binary_operator_->to_string(indent);
+                        break;
+                    case token_type::source_placeholder:
+                        return string_type("source_placeholder");
+                        break;
+                    case token_type::separator:
+                        return string_type("separator");
+                        break;
+                    case token_type::literal:
+                        return string_type("literal");
+                        break;
+                    case token_type::key:
+                        return string_type("key") + key_;
+                        break;
+                    case token_type::begin_multi_select_hash:
+                        return string_type("begin_multi_select_hash");
+                        break;
+                    case token_type::begin_multi_select_list:
+                        return string_type("begin_multi_select_list");
+                        break;
+                    case token_type::lparen:
+                        return string_type("lparen");
+                        break;
+                    default:
+                        return string_type("default");
+                        break;
+                }
+            }
+        };
+
+        static reference evaluate_tokens(reference root, const std::vector<token>& output_stack, jmespath_storage& storage, std::error_code& ec)
+        {
+            std::vector<pointer> stack;
+            for (std::size_t i = 0; i < output_stack.size(); ++i)
+            {
+                auto& t = output_stack[i];
+                switch (t.type())
+                {
+                    case token_type::literal:
+                    {
+                        stack.push_back(&t.value_);
+                        break;
+                    }
+                    case token_type::source_placeholder:
+                        stack.push_back(std::addressof(root));
+                        break;
+                    case token_type::expression:
+                    {
+                        JSONCONS_ASSERT(!stack.empty());
+                        auto ptr = stack.back();
+                        stack.pop_back();
+                        auto& ref = t.expression_->evaluate(*ptr, storage, ec);
+                        stack.push_back(std::addressof(ref));
+                        break;
+                    }
+                    case token_type::unary_operator:
+                    {
+                        JSONCONS_ASSERT(stack.size() >= 1);
+                        auto ptr = stack.back();
+                        stack.pop_back();
+                        reference r = t.unary_operator_->evaluate(*ptr, storage, ec);
+                        stack.push_back(std::addressof(r));
+                        break;
+                    }
+                    case token_type::binary_operator:
+                    {
+                        JSONCONS_ASSERT(stack.size() >= 2);
+                        auto rhs = stack.back();
+                        stack.pop_back();
+                        auto lhs = stack.back();
+                        stack.pop_back();
+                        reference r = t.binary_operator_->evaluate(*lhs,*rhs, storage, ec);
+                        stack.push_back(std::addressof(r));
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+            JSONCONS_ASSERT(stack.size() == 1);
+            return *stack.back();
+        }
+
+        // Implementations
+
+        class or_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 9;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                if (lhs.is_null() && rhs.is_null())
+                {
+                    return Json::null();
+                }
+                if (!is_false(lhs))
+                {
+                    return lhs;
+                }
+                else
+                {
+                    return rhs;
+                }
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("or_operator\n");
+                return s;
+            }
+        };
+
+        class and_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 8;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                if (is_true(lhs))
+                {
+                    return rhs;
+                }
+                else
+                {
+                    return lhs;
+                }
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("and_operator\n");
+                return s;
+            }
+        };
+
+        class eq_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 6;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                return lhs == rhs ? t : f;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("eq_operator\n");
+                return s;
+            }
+        };
+
+        class ne_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 6;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                return lhs != rhs ? t : f;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("ne_operator\n");
+                return s;
+            }
+        };
+
+        class lt_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 5;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                if (!(lhs.is_number() && rhs.is_number()))
+                {
+                    return Json::null();
+                }
+                return lhs < rhs ? t : f;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("lt_operator\n");
+                return s;
+            }
+        };
+
+        class lte_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 5;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                if (!(lhs.is_number() && rhs.is_number()))
+                {
+                    return Json::null();
+                }
+                return lhs <= rhs ? t : f;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("lte_operator\n");
+                return s;
+            }
+        };
+
+        class gt_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 5;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                if (!(lhs.is_number() && rhs.is_number()))
+                {
+                    return Json::null();
+                }
+                return lhs > rhs ? t : f;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("gt_operator\n");
+                return s;
+            }
+        };
+
+        class gte_operator : public binary_operator
+        {
+            std::size_t precedence_level() const 
+            {
+                return 5;
+            }
+            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                if (!(lhs.is_number() && rhs.is_number()))
+                {
+                    return Json::null();
+                }
+                return lhs >= rhs ? t : f;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("gte_operator\n");
+                return s;
+            }
+        };
 
         // selector_base
         class selector_base :  public expression_base
@@ -1023,10 +1442,10 @@ namespace jmespath {
 
         class multi_select_list final : public selector_base
         {
-            std::vector<std::unique_ptr<expression_base>> expressions_;
+            std::vector<std::vector<token>> token_lists_;
         public:
-            multi_select_list(std::vector<std::unique_ptr<expression_base>>&& expressions)
-                : expressions_(std::move(expressions))
+            multi_select_list(std::vector<std::vector<token>>&& token_lists)
+                : token_lists_(std::move(token_lists))
             {
             }
 
@@ -1043,10 +1462,11 @@ namespace jmespath {
                 }
 
                 auto result = storage.new_instance(json_array_arg);
-                result->reserve(expressions_.size());
-                for (auto& expr : expressions_)
+                result->reserve(token_lists_.size());
+
+                for (auto& list : token_lists_)
                 {
-                    result->push_back(expr->evaluate(val, storage, ec));
+                    result->push_back(evaluate_tokens(val, list, storage, ec));
                 }
                 return *result;
             }
@@ -1059,11 +1479,15 @@ namespace jmespath {
                     s.push_back(' ');
                 }
                 s.append("multi_select_list\n");
-                for (auto& expr : expressions_)
+                for (auto& list : token_lists_)
                 {
-                    string_type sss = expr->to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
+                    for (auto& item : list)
+                    {
+                        string_type sss = item.to_string(indent+2);
+                        s.insert(s.end(), sss.begin(), sss.end());
+                        s.push_back('\n');
+                    }
+                    s.append("---\n");
                 }
                 return s;
             }
@@ -1127,314 +1551,6 @@ namespace jmespath {
                     s.push_back('\n');
                 }
                 return s;
-            }
-        };
-
-        // token
-
-        class token
-        {
-        public:
-            token_type type_;
-
-            union
-            {
-                std::unique_ptr<expression_base> expression_;
-                std::unique_ptr<unary_operator> unary_operator_;
-                std::unique_ptr<binary_operator> binary_operator_;
-                Json value_;
-                string_type key_;
-            };
-        public:
-
-            token(source_placeholder_arg_t)
-                : type_(token_type::source_placeholder)
-            {
-            }
-
-            token(separator_arg_t)
-                : type_(token_type::separator)
-            {
-            }
-
-            token(lparen_arg_t)
-                : type_(token_type::lparen)
-            {
-            }
-
-            token(rparen_arg_t)
-                : type_(token_type::rparen)
-            {
-            }
-
-            token(end_of_expression_arg_t)
-                : type_(token_type::end_of_expression)
-            {
-            }
-
-            token(begin_multi_select_hash_arg_t)
-                : type_(token_type::begin_multi_select_hash)
-            {
-            }
-
-            token(end_multi_select_hash_arg_t)
-                : type_(token_type::end_multi_select_hash)
-            {
-            }
-
-            token(begin_multi_select_list_arg_t)
-                : type_(token_type::begin_multi_select_list)
-            {
-            }
-
-            token(end_multi_select_list_arg_t)
-                : type_(token_type::end_multi_select_list)
-            {
-            }
-
-            token(key_arg_t, const string_type& key)
-                : type_(token_type::key)
-            {
-                new (&key_) string_type(key);
-            }
-
-            token(std::unique_ptr<expression_base> expression)
-                : type_(token_type::expression)
-            {
-                new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
-            }
-
-            token(std::unique_ptr<unary_operator>&& expression)
-                : type_(token_type::unary_operator)
-            {
-                new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(expression));
-            }
-
-            token(std::unique_ptr<binary_operator>&& expression)
-                : type_(token_type::binary_operator)
-            {
-                new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(expression));
-            }
-
-            token(literal_arg_t, Json&& value)
-                : type_(token_type::literal), value_(std::move(value))
-            {
-            }
-
-            token(token&& other)
-            {
-                construct(std::forward<token>(other));
-            }
-
-            token& operator=(token&& other)
-            {
-                if (&other != this)
-                {
-                    if (type_ == other.type_)
-                    {
-                        switch (type_)
-                        {
-                            case token_type::source_placeholder:
-                            case token_type::separator:
-                            case token_type::lparen:
-                            case token_type::rparen:
-                            case token_type::begin_multi_select_hash:
-                            case token_type::end_multi_select_hash:
-                                break;
-                            case token_type::expression:
-                                expression_ = std::move(other.expression_);
-                                break;
-                            case token_type::key:
-                                key_ = std::move(other.key_);
-                                break;
-                            case token_type::unary_operator:
-                                unary_operator_ = std::move(other.unary_operator_);
-                                break;
-                            case token_type::binary_operator:
-                                binary_operator_ = std::move(binary_operator_);
-                                break;
-                            case token_type::literal:
-                                value_ = std::move(other.value_);
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        destroy();
-                        construct(std::forward<token>(other));
-                    }
-                }
-                return *this;
-            }
-
-            ~token() noexcept
-            {
-                destroy();
-            }
-
-            token_type type() const
-            {
-                return type_;
-            }
-
-            bool is_lparen() const
-            {
-                return type_ == token_type::lparen; 
-            }
-
-            bool is_lbrace() const
-            {
-                return type_ == token_type::begin_multi_select_hash; 
-            }
-
-            bool is_key() const
-            {
-                return type_ == token_type::key; 
-            }
-
-            bool is_rparen() const
-            {
-                return type_ == token_type::rparen; 
-            }
-
-            bool is_source_placeholder() const
-            {
-                return type_ == token_type::source_placeholder; 
-            }
-
-            bool is_projection() const
-            {
-                return type_ == token_type::expression && expression_->is_projection(); 
-            }
-
-            bool is_expression() const
-            {
-                return type_ == token_type::expression; 
-            }
-
-            bool is_operator() const
-            {
-                return type_ == token_type::unary_operator || 
-                       type_ == token_type::binary_operator; 
-            }
-
-            std::size_t precedence_level() const
-            {
-                switch(type_)
-                {
-                    case token_type::unary_operator:
-                        return unary_operator_->precedence_level();
-                    case token_type::binary_operator:
-                        return binary_operator_->precedence_level();
-                    case token_type::expression:
-                        return expression_->precedence_level();
-                    default:
-                        return 0;
-                }
-            }
-
-            bool is_right_associative() const
-            {
-                switch(type_)
-                {
-                    case token_type::unary_operator:
-                        return unary_operator_->is_right_associative();
-                    case token_type::expression:
-                        return expression_->is_right_associative();
-                    default:
-                        return false;
-                }
-            }
-
-            void construct(token&& other)
-            {
-                type_ = other.type_;
-                switch (type_)
-                {
-                    case token_type::source_placeholder:
-                    case token_type::separator:
-                    case token_type::lparen:
-                    case token_type::rparen:
-                    case token_type::begin_multi_select_hash:
-                    case token_type::end_multi_select_hash:
-                        break;
-                    case token_type::expression:
-                        new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
-                        break;
-                    case token_type::key:
-                        new (&key_) string_type(std::move(other.key_));
-                        break;
-                    case token_type::unary_operator:
-                        new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(other.unary_operator_));
-                        break;
-                    case token_type::binary_operator:
-                        new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(other.binary_operator_));
-                        break;
-                    case token_type::literal:
-                        new (&value_) Json(std::move(other.value_));
-                        break;
-                }
-            }
-
-            void destroy() noexcept 
-            {
-                switch(type_)
-                {
-                    case token_type::expression:
-                        expression_.~unique_ptr();
-                        break;
-                    case token_type::key:
-                        key_.~basic_string();
-                        break;
-                    case token_type::unary_operator:
-                        unary_operator_.~unique_ptr();
-                        break;
-                    case token_type::binary_operator:
-                        binary_operator_.~unique_ptr();
-                        break;
-                    case token_type::literal:
-                        value_.~Json();
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            string_type to_string() const
-            {
-                switch(type_)
-                {
-                    case token_type::expression:
-                        return expression_->to_string();
-                        break;
-                    case token_type::unary_operator:
-                        return string_type("unary_operator");
-                        break;
-                    case token_type::binary_operator:
-                        return binary_operator_->to_string();
-                        break;
-                    case token_type::source_placeholder:
-                        return string_type("source_placeholder");
-                        break;
-                    case token_type::separator:
-                        return string_type("separator");
-                        break;
-                    case token_type::literal:
-                        return string_type("literal");
-                        break;
-                    case token_type::key:
-                        return string_type("key") + key_;
-                        break;
-                    case token_type::begin_multi_select_hash:
-                        return string_type("begin_multi_select_hash");
-                        break;
-                    case token_type::begin_multi_select_list:
-                        return string_type("begin_multi_select_list");
-                        break;
-                    default:
-                        return string_type("default");
-                        break;
-                }
             }
         };
     private:
@@ -2476,62 +2592,9 @@ namespace jmespath {
                 std::cout << t.to_string() << "\n";
             }
 
-            reference r = evaluate(root, ec);
+            reference r = evaluate_tokens(root, output_stack_, storage_, ec);
 
             return r;
-        }
-
-        reference evaluate(reference root, std::error_code& ec)
-        {
-            std::vector<pointer> stack;
-            for (std::size_t i = 0; i < output_stack_.size(); ++i)
-            {
-                auto& t = output_stack_[i];
-                switch (t.type())
-                {
-                    case token_type::literal:
-                    {
-                        stack.push_back(&t.value_);
-                        break;
-                    }
-                    case token_type::source_placeholder:
-                        stack.push_back(std::addressof(root));
-                        break;
-                    case token_type::expression:
-                    {
-                        JSONCONS_ASSERT(!stack.empty());
-                        auto ptr = stack.back();
-                        stack.pop_back();
-                        auto& ref = t.expression_->evaluate(*ptr, storage_, ec);
-                        stack.push_back(std::addressof(ref));
-                        break;
-                    }
-                    case token_type::unary_operator:
-                    {
-                        JSONCONS_ASSERT(stack.size() >= 1);
-                        auto ptr = stack.back();
-                        stack.pop_back();
-                        reference r = t.unary_operator_->evaluate(*ptr, storage_, ec);
-                        stack.push_back(std::addressof(r));
-                        break;
-                    }
-                    case token_type::binary_operator:
-                    {
-                        JSONCONS_ASSERT(stack.size() >= 2);
-                        auto rhs = stack.back();
-                        stack.pop_back();
-                        auto lhs = stack.back();
-                        stack.pop_back();
-                        reference r = t.binary_operator_->evaluate(*lhs,*rhs, storage_, ec);
-                        stack.push_back(std::addressof(r));
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-            JSONCONS_ASSERT(stack.size() == 1);
-            return *stack.back();
         }
 
         void advance_past_space_character()
@@ -2565,39 +2628,52 @@ namespace jmespath {
             {
                 case token_type::end_multi_select_list:
                 {
+                    std::cout << "operator_stack\n";
+                    for (auto& item : operator_stack_)
+                    {
+                        std::cout << item.to_string() << std::endl;
+                    }
+                    std::cout << "output_stack before\n";
                     for (auto& item : output_stack_)
                     {
                         std::cout << item.to_string() << std::endl;
                     }
-                    std::vector<std::unique_ptr<expression_base>> vals;
+
+                    auto it2 = operator_stack_.rbegin();
+                    while (it2 != operator_stack_.rend() && !it2->is_lparen())
+                    {
+                        output_stack_.emplace_back(std::move(*it2));
+                        ++it2;
+                    }
+                    if (it2 == operator_stack_.rend())
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
+                    }
+                    operator_stack_.erase(it2.base(),operator_stack_.end());
+                    operator_stack_.pop_back();
+                    std::cout << "output_stack after\n";
+                    for (auto& item : output_stack_)
+                    {
+                        std::cout << item.to_string() << std::endl;
+                    }
+                    std::cout << "------------\n";
+
+                    std::vector<std::vector<token>> vals;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list)
                     {
-                        std::vector<std::unique_ptr<expression_base>> expressions;
+                        std::vector<token> list;
                         std::cout << "token_type " << (int)it->type() << std::endl;
-                        JSONCONS_ASSERT(it->is_expression() || it->type() == token_type::source_placeholder);
                         do
                         {
-                            expressions.insert(expressions.begin(), std::move(it->expression_));
+                            list.insert(list.begin(), std::move(*it));
                             ++it;
-                        } while (it->is_expression());
+                        } while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list && it->type() != token_type::separator);
                         if (it->type() == token_type::separator)
                         {
                             ++it;
                         }
-                        if (expressions.size() == 1)
-                        {
-                            vals.insert(vals.begin(), std::move(expressions.back()));
-                        }
-                        else
-                        {
-                            auto compound_expr = make_unique<compound_expression>();
-                            for (auto&& expr : expressions)
-                            {
-                                compound_expr->add_expression(std::move(expr));
-                            }
-                            vals.insert(vals.begin(), std::move(compound_expr));
-                        }
+                        vals.insert(vals.begin(), std::move(list));
                     }
                     if (it == output_stack_.rend())
                     {
@@ -2744,10 +2820,13 @@ namespace jmespath {
                     }
                     break;
                 }
+                case token_type::begin_multi_select_list:
+                    output_stack_.emplace_back(std::move(tok));
+                    operator_stack_.emplace_back(token(lparen_arg));
+                    break;
                 case token_type::source_placeholder:
                 case token_type::separator:
                 case token_type::begin_multi_select_hash:
-                case token_type::begin_multi_select_list:
                 case token_type::key:
                     output_stack_.emplace_back(std::move(tok));
                     break;
