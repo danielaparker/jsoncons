@@ -1,55 +1,28 @@
 [{
     "given": {
-    "reservations": [
-        {
-            "instances": [
+        "foo": {
+            "baz": [
                 {
-                    "id": "id1",
-                    "name": "first"
-                },
-                {
-                    "id": "id2",
-                    "name": "second"
+                    "bar": "a",
+                    "bam": "b",
+                    "boo": "c"
+                }, {
+                    "bar": "d",
+                    "bam": "e",
+                    "boo": "f"
                 }
-            ]
-        },
-        {
-            "instances": [
-                {
-                    "id": "id3",
-                    "name": "third"
-                },
-                {
-                    "id": "id4",
-                    "name": "fourth"
-                }
-            ]
+            ],
+            "qux": ["zero"]
         }
-    ]
-}
-,
+    },
     "cases": [
-         
-         {
-            "expression": "reservations[].instances[].{id: id, name: name}",
-            "result": [
-    {
-        "id": "id1",
-        "name": "first"
-    },
-    {
-        "id": "id2",
-        "name": "second"
-    },
-    {
-        "id": "id3",
-        "name": "third"
-    },
-    {
-        "id": "id4",
-        "name": "fourth"
-    }
-]
-         }
+        /*{
+           "expression": "foo.baz[*].not_there || foo.baz[*].bar",
+           "result": ["a","d"]
+        },*/
+        {
+           "expression": "foo.[baz[*].not_there || baz[*].bar, qux[0]]",
+           "result": [["a", "d"], "zero"]
+        }
     ]
 }]

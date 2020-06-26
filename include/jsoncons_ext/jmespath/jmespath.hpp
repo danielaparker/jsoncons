@@ -1426,7 +1426,10 @@ namespace jmespath {
                         return string_type("key") + key_;
                         break;
                     case token_type::begin_multi_select_hash:
-                        return string_type("lbrace");
+                        return string_type("begin_multi_select_hash");
+                        break;
+                    case token_type::begin_multi_select_list:
+                        return string_type("begin_multi_select_list");
                         break;
                     default:
                         return string_type("default");
@@ -2562,13 +2565,17 @@ namespace jmespath {
             {
                 case token_type::end_multi_select_list:
                 {
+                    for (auto& item : output_stack_)
+                    {
+                        std::cout << item.to_string() << std::endl;
+                    }
                     std::vector<std::unique_ptr<expression_base>> vals;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list)
                     {
                         std::vector<std::unique_ptr<expression_base>> expressions;
                         std::cout << "token_type " << (int)it->type() << std::endl;
-                        JSONCONS_ASSERT(it->is_expression());
+                        JSONCONS_ASSERT(it->is_expression() || it->type() == token_type::source_placeholder);
                         do
                         {
                             expressions.insert(expressions.begin(), std::move(it->expression_));
