@@ -1,28 +1,21 @@
 [{
     "given": {
-        "foo": {
-            "baz": [
-                {
-                    "bar": "a",
-                    "bam": "b",
-                    "boo": "c"
-                }, {
-                    "bar": "d",
-                    "bam": "e",
-                    "boo": "f"
-                }
-            ],
-            "qux": ["zero"]
-        }
+    "bar": {
+        "baz": "qux"
     },
-    "cases": [
-        /*{
-           "expression": "foo.baz[*].not_there || foo.baz[*].bar",
-           "result": ["a","d"]
-        },*/
+    "foo": [
         {
-           "expression": "foo.[baz[*].not_there || baz[*].bar, qux[0]]",
-           "result": [["a", "d"], "zero"]
+            "name": "a"
+        },
+        {
+            "name": "b"
+        }
+    ]
+},
+    "cases": [
+        {
+                "expression": "`\"\\\\\"`.{a:`\"b\"`}",
+                "result": {"a": "b"}
         }
     ]
 }]
