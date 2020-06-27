@@ -486,6 +486,8 @@ namespace jmespath {
                             case token_type::separator:
                             case token_type::lparen:
                             case token_type::rparen:
+                            case token_type::begin_multi_select_list:
+                            case token_type::end_multi_select_list:
                             case token_type::begin_multi_select_hash:
                             case token_type::end_multi_select_hash:
                                 break;
@@ -603,6 +605,8 @@ namespace jmespath {
                     case token_type::separator:
                     case token_type::lparen:
                     case token_type::rparen:
+                    case token_type::begin_multi_select_list:
+                    case token_type::end_multi_select_list:
                     case token_type::begin_multi_select_hash:
                     case token_type::end_multi_select_hash:
                         break;
