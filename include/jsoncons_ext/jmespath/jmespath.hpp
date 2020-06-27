@@ -2681,17 +2681,21 @@ namespace jmespath {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list)
                     {
-                        std::vector<token> list;
+                        std::vector<token> toks;
                         do
                         {
-                            list.insert(list.begin(), std::move(*it));
+                            toks.insert(toks.begin(), std::move(*it));
                             ++it;
                         } while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list && it->type() != token_type::separator);
                         if (it->type() == token_type::separator)
                         {
                             ++it;
                         }
-                        vals.insert(vals.begin(), std::move(list));
+                        if (toks.front().type() != token_type::literal)
+                        {
+                            toks.emplace(toks.begin(), source_placeholder_arg);
+                        }
+                        vals.insert(vals.begin(), std::move(toks));
                     }
                     if (it == output_stack_.rend())
                     {
@@ -2823,18 +2827,15 @@ namespace jmespath {
                 {
                     unwind_rparen();
                     output_stack_.emplace_back(std::move(tok));
-                    output_stack_.emplace_back(token(source_placeholder_arg));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 }
                 case token_type::begin_multi_select_list:
                     output_stack_.emplace_back(std::move(tok));
-                    output_stack_.emplace_back(token(source_placeholder_arg));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 case token_type::begin_multi_select_hash:
                     output_stack_.emplace_back(std::move(tok));
-                    //output_stack_.emplace_back(token(source_placeholder_arg));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 case token_type::source_placeholder:
