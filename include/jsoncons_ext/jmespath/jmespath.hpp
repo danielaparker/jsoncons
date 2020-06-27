@@ -490,6 +490,7 @@ namespace jmespath {
                             case token_type::end_multi_select_list:
                             case token_type::begin_multi_select_hash:
                             case token_type::end_multi_select_hash:
+                            case token_type::end_of_expression:
                                 break;
                             case token_type::expression:
                                 expression_ = std::move(other.expression_);
@@ -609,6 +610,7 @@ namespace jmespath {
                     case token_type::end_multi_select_list:
                     case token_type::begin_multi_select_hash:
                     case token_type::end_multi_select_hash:
+                    case token_type::end_of_expression:
                         break;
                     case token_type::expression:
                         new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
@@ -1465,6 +1467,10 @@ namespace jmespath {
 
             reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
             {
+                if (val.is_null())
+                {
+                    return val;
+                }
                 auto result = storage.new_instance(json_array_arg);
                 result->reserve(token_lists_.size());
 
@@ -1497,13 +1503,13 @@ namespace jmespath {
             }
         };
 
-        struct key_expression
+        struct key_tokens
         {
             string_type key;
-            std::unique_ptr<expression_base> expression;
+            std::vector<token> tokens;
 
-            key_expression(string_type&& key, std::unique_ptr<expression_base>&& expression)
-                : key(std::move(key)), expression(std::move(expression))
+            key_tokens(string_type&& key, std::vector<token>&& tokens)
+                : key(std::move(key)), tokens(std::move(tokens))
             {
             }
         };
@@ -1511,25 +1517,24 @@ namespace jmespath {
         class multi_select_hash final : public selector_base
         {
         public:
-            std::vector<key_expression> keyvals_;
+            std::vector<key_tokens> key_toks_;
 
-            multi_select_hash(std::vector<key_expression>&& keyvals)
-                : keyvals_(std::move(keyvals))
+            multi_select_hash(std::vector<key_tokens>&& key_toks)
+                : key_toks_(std::move(key_toks))
             {
             }
 
             reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
             {
-                if (!val.is_object())
+                if (val.is_null())
                 {
-                    return Json::null();
+                    return val;
                 }
-
                 auto resultp = storage.new_instance(json_object_arg);
-                resultp->reserve(keyvals_.size());
-                for (auto& key_expression : keyvals_)
+                resultp->reserve(key_toks_.size());
+                for (auto& item : key_toks_)
                 {
-                    resultp->try_emplace(key_expression.key,key_expression.expression->evaluate(val, storage, ec));
+                    resultp->try_emplace(item.key, evaluate_tokens(val, item.tokens, storage, ec));
                 }
 
                 return *resultp;
@@ -1543,7 +1548,7 @@ namespace jmespath {
                     s.push_back(' ');
                 }
                 s.append("multi_select_list\n");
-                for (auto& key_expr : keyvals_)
+                /*for (auto& key_expr : key_toks_)
                 {
                     for (std::size_t i = 0; i <= indent+2; ++i)
                     {
@@ -1553,7 +1558,7 @@ namespace jmespath {
                     string_type sss = key_expr.expression->to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
-                }
+                }*/
                 return s;
             }
         };
@@ -2649,25 +2654,29 @@ namespace jmespath {
             }
         }
 
+        void unwind_rparen()
+        {
+            auto it = operator_stack_.rbegin();
+            while (it != operator_stack_.rend() && !it->is_lparen())
+            {
+                output_stack_.emplace_back(std::move(*it));
+                ++it;
+            }
+            if (it == operator_stack_.rend())
+            {
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
+            }
+            ++it;
+            operator_stack_.erase(it.base(),operator_stack_.end());
+        }
+
         void push_token(token&& tok)
         {
             switch (tok.type())
             {
                 case token_type::end_multi_select_list:
                 {
-                    auto it2 = operator_stack_.rbegin();
-                    while (it2 != operator_stack_.rend() && !it2->is_lparen())
-                    {
-                        output_stack_.emplace_back(std::move(*it2));
-                        ++it2;
-                    }
-                    if (it2 == operator_stack_.rend())
-                    {
-                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
-                    }
-                    ++it2;
-                    operator_stack_.erase(it2.base(),operator_stack_.end());
-
+                    unwind_rparen();
                     std::vector<std::vector<token>> vals;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_list)
@@ -2705,33 +2714,25 @@ namespace jmespath {
                 }
                 case token_type::end_multi_select_hash:
                 {
-                    std::vector<key_expression> keyvals;
+                    unwind_rparen();
+                    std::vector<key_tokens> key_toks;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_type::begin_multi_select_hash)
                     {
-                        std::vector<std::unique_ptr<expression_base>> expressions;
-                        JSONCONS_ASSERT(it->is_expression());
+                        std::vector<token> toks;
                         do
                         {
-                            expressions.insert(expressions.begin(), std::move(it->expression_));
+                            toks.emplace(toks.begin(), std::move(*it));
                             ++it;
-                        } while (it->is_expression());
+                        } while (it->type() != token_type::key);
                         JSONCONS_ASSERT(it->is_key());
                         auto key = std::move(it->key_);
                         ++it;
-                        if (expressions.size() == 1)
+                        if (toks.front().type() != token_type::literal)
                         {
-                            keyvals.emplace_back(std::move(key),std::move(expressions.back()));
+                            toks.emplace(toks.begin(), source_placeholder_arg);
                         }
-                        else
-                        {
-                            auto compound_expr = make_unique<compound_expression>();
-                            for (auto&& expr : expressions)
-                            {
-                                compound_expr->add_expression(std::move(expr));
-                            }
-                            keyvals.emplace_back(std::move(key),std::move(compound_expr));
-                        }
+                        key_toks.emplace(key_toks.begin(), std::move(key), std::move(toks));
                     }
                     if (it == output_stack_.rend())
                     {
@@ -2744,11 +2745,11 @@ namespace jmespath {
                         (tok.precedence_level() < output_stack_.back().precedence_level() ||
                         (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
                     {
-                        output_stack_.back().expression_->add_expression(jsoncons::make_unique<multi_select_hash>(std::move(keyvals)));
+                        output_stack_.back().expression_->add_expression(jsoncons::make_unique<multi_select_hash>(std::move(key_toks)));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token(jsoncons::make_unique<multi_select_hash>(std::move(keyvals))));
+                        output_stack_.emplace_back(token(jsoncons::make_unique<multi_select_hash>(std::move(key_toks))));
                     }
                     break;
                 }
@@ -2776,18 +2777,7 @@ namespace jmespath {
                     break;
                 case token_type::rparen:
                     {
-                        auto it = operator_stack_.rbegin();
-                        while (it != operator_stack_.rend() && !it->is_lparen())
-                        {
-                            output_stack_.emplace_back(std::move(*it));
-                            ++it;
-                        }
-                        if (it == operator_stack_.rend())
-                        {
-                            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
-                        }
-                        ++it;
-                        operator_stack_.erase(it.base(),operator_stack_.end());
+                        unwind_rparen();
                         break;
                     }
                 case token_type::end_of_expression:
@@ -2831,18 +2821,7 @@ namespace jmespath {
                 }
                 case token_type::separator:
                 {
-                    auto it = operator_stack_.rbegin();
-                    while (it != operator_stack_.rend() && !it->is_lparen())
-                    {
-                        output_stack_.emplace_back(std::move(*it));
-                        ++it;
-                    }
-                    if (it == operator_stack_.rend())
-                    {
-                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
-                    }
-                    ++it;
-                    operator_stack_.erase(it.base(),operator_stack_.end());
+                    unwind_rparen();
                     output_stack_.emplace_back(std::move(tok));
                     output_stack_.emplace_back(token(source_placeholder_arg));
                     operator_stack_.emplace_back(token(lparen_arg));
@@ -2853,8 +2832,12 @@ namespace jmespath {
                     output_stack_.emplace_back(token(source_placeholder_arg));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
-                case token_type::source_placeholder:
                 case token_type::begin_multi_select_hash:
+                    output_stack_.emplace_back(std::move(tok));
+                    //output_stack_.emplace_back(token(source_placeholder_arg));
+                    operator_stack_.emplace_back(token(lparen_arg));
+                    break;
+                case token_type::source_placeholder:
                 case token_type::key:
                     output_stack_.emplace_back(std::move(tok));
                     break;
