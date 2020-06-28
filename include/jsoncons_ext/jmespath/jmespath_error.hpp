@@ -94,6 +94,7 @@ enum class jmespath_errc
     expected_or,
     expected_and,
     invalid_number,
+    invalid_literal,
     expected_comparator,
     expected_key,
     invalid_argument,
@@ -101,6 +102,7 @@ enum class jmespath_errc
     invalid_type,
     unexpected_end_of_input,
     step_cannot_be_zero,
+    invalid_expression,
     unknown_error 
 };
 
@@ -136,6 +138,8 @@ public:
                 return "Expected \"&&\"";
             case jmespath_errc::invalid_number:
                 return "Invalid number";
+            case jmespath_errc::invalid_literal:
+                return "Invalid literal";
             case jmespath_errc::expected_comparator:
                 return "Expected <, <=, ==, >=, > or !=";
             case jmespath_errc::expected_key:
@@ -150,6 +154,8 @@ public:
                 return "Unexpected end of jmespath input";
             case jmespath_errc::step_cannot_be_zero:
                 return "Slice step cannot be zero";
+            case jmespath_errc::invalid_expression:
+                return "Invalid expression";
             case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";

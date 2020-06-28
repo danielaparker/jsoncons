@@ -224,6 +224,7 @@ namespace jmespath {
         sub_or_index_expression,
         quoted_string,
         raw_string,
+        escape_raw_string,
         literal,
         key_expr,
         val_expr,
@@ -1713,7 +1714,7 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::expression_item);
                                 break;
                             default:
-                                ec = jmespath_errc::expected_index;
+                                ec = jmespath_errc::invalid_expression;
                                 return Json::null();
                         }
                         break;
@@ -1879,8 +1880,6 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case '\"':
-                                //++p_;
-                                //++column_;
                                 state_stack_.pop_back(); // quoted_string
                                 break;
                             case '\\':
@@ -1927,6 +1926,24 @@ namespace jmespath {
                                 break;
                         };
                         break;
+                    case path_state::escape_raw_string:
+                        switch (*p_)
+                        {
+                            case '\'':
+                                buffer.push_back(*p_);
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                buffer.push_back('\\');
+                                buffer.push_back(*p_);
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                        }
+                        break;
                     case path_state::raw_string: 
                         switch (*p_)
                         {
@@ -1940,6 +1957,7 @@ namespace jmespath {
                                 break;
                             }
                             case '\\':
+                                state_stack_.emplace_back(path_state::escape_raw_string);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1955,7 +1973,17 @@ namespace jmespath {
                         {
                             case '`':
                             {
-                                auto j = Json::parse(buffer);
+                                json_decoder<Json> decoder;
+                                basic_json_reader<char_type,string_source<char_type>> reader(buffer, decoder);
+                                std::error_code parse_ec;
+                                reader.read(parse_ec);
+                                if (parse_ec)
+                                {
+                                    ec = jmespath_errc::invalid_literal;
+                                    return Json::null();
+                                }
+                                auto j = decoder.get_result();
+
                                 push_token(token(literal_arg, std::move(j)));
                                 buffer.clear();
                                 state_stack_.pop_back(); // json_value
@@ -2541,6 +2569,7 @@ namespace jmespath {
                                 advance_past_space_character();
                                 break;
                             case ',':
+                                push_token(token(separator_arg));
                                 state_stack_.back() = path_state::key_val_expr; 
                                 ++p_;
                                 ++column_;
@@ -2732,6 +2761,10 @@ namespace jmespath {
                         JSONCONS_ASSERT(it->is_key());
                         auto key = std::move(it->key_);
                         ++it;
+                        if (it->type() == token_type::separator)
+                        {
+                            ++it;
+                        }
                         if (toks.front().type() != token_type::literal)
                         {
                             toks.emplace(toks.begin(), source_placeholder_arg);

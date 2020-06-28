@@ -1,21 +1,10 @@
 [{
-    "given": {
-    "bar": {
-        "baz": "qux"
-    },
-    "foo": [
-        {
-            "name": "a"
-        },
-        {
-            "name": "b"
-        }
-    ]
-},
+    "given": {},
     "cases": [
         {
-                "expression": "`\"\\\\\"`.{a:`\"b\"`}",
-                "result": {"a": "b"}
+          "comment": "Backslash not followed by single quote is treated as any other character",
+          "expression": "'\\\\'",
+          "result": "\\\\"
         }
     ]
 }]

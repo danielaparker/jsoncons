@@ -58,7 +58,7 @@ void jmespath_tests(const std::string& fpath)
                     std::cout << e.what() << "\n";
                     if (item.contains("annotation"))
                     {
-                        std::cout << "\n" << item["annotation"] << "\n";
+                        std::cout << "\n" << item["comment"] << "\n";
                     }
                     std::cout << "input\n" << pretty_print(root) << "\n";
                     std::cout << "expression\n" << path << "\n";
@@ -84,12 +84,12 @@ TEST_CASE("jmespath-tests")
     }
     SECTION("compliance")
     {
-        //jmespath_tests("./input/jmespath/compliance-tests/basic.json"); // OK
-        //jmespath_tests("./input/jmespath/compliance-tests/boolean.json"); // OK
-        //jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
-        //jmespath_tests("./input/jmespath/compliance-tests/slice.json"); // OK
-        jmespath_tests("./input/jmespath/compliance-tests/literal.json"); 
-        //jmespath_tests("./input/jmespath/compliance-tests/multiselect.json"); // OK 
+        jmespath_tests("./input/jmespath/compliance-tests/basic.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/boolean.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/slice.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/literal.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/multiselect.json"); // OK 
 
         //jmespath_tests("./input/jmespath/compliance-tests/test.json"); 
     }
