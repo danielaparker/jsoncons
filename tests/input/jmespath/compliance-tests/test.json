@@ -1,10 +1,10 @@
 [{
-    "given": {},
+    "given": {"foo": [{"name": "a"}, {"name": "b"}]},
     "cases": [
-        {
-          "comment": "Backslash not followed by single quote is treated as any other character",
-          "expression": "'\\\\'",
-          "result": "\\\\"
-        }
+      {
+        "comment": "Matching a literal",
+        "expression": "foo[?name == 'a']",
+        "result": [{"name": "a"}]
+      }
     ]
 }]
