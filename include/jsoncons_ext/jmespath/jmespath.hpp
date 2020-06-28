@@ -529,7 +529,7 @@ namespace jmespath {
                                 unary_operator_ = std::move(other.unary_operator_);
                                 break;
                             case token_type::binary_operator:
-                                binary_operator_ = std::move(binary_operator_);
+                                binary_operator_ = std::move(other.binary_operator_);
                                 break;
                             case token_type::literal:
                                 value_ = std::move(other.value_);
@@ -1036,57 +1036,6 @@ namespace jmespath {
             }
         };
 
-        class compound_expression final : public selector_base
-        {
-        public:
-            std::vector<std::unique_ptr<expression_base>> expressions_;
-
-            compound_expression()
-            {
-            }
-
-            void add_expression(std::unique_ptr<expression_base>&& expr) override
-            {
-                if (!expressions_.empty() && expressions_.back()->is_projection() && 
-                    (expr->precedence_level() < expressions_.back()->precedence_level() ||
-                     (expr->precedence_level() == expressions_.back()->precedence_level() && expr->is_right_associative())))
-                {
-                    expressions_.back()->add_expression(std::move(expr));
-                }
-                else
-                {
-                    expressions_.emplace_back(std::move(expr));
-                }
-            }
-
-            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
-            {
-                pointer ptr = std::addressof(val);
-                for (auto& expression : expressions_)
-                {
-                    ptr = std::addressof(expression->evaluate(*ptr, storage, ec));
-                }
-                return *ptr;
-            }
-
-            string_type to_string(std::size_t indent = 0) const override
-            {
-                string_type s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("compound_expression\n");
-                for (auto& item : expressions_)
-                {
-                    string_type ss = item->to_string(indent+2);
-                    s.insert(s.end(), ss.begin(), ss.end());
-                    s.push_back('\n');
-                }
-                return s;
-            }
-        };
-
         class identifier_selector final : public selector_base
         {
         private:
@@ -1119,6 +1068,30 @@ namespace jmespath {
                 }
                 s.append("identifier_selector ");
                 s.append(identifier_);
+                return s;
+            }
+        };
+
+        class current_node final : public selector_base
+        {
+        public:
+            current_node()
+            {
+            }
+
+            reference evaluate(reference val, jmespath_storage&, std::error_code&) override
+            {
+                return val;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("current_node ");
                 return s;
             }
         };
@@ -1411,6 +1384,61 @@ namespace jmespath {
             }
         };
 
+        class filter_expression final : public projection_base
+        {
+            std::vector<token> token_list_;
+        public:
+            filter_expression(std::vector<token>&& token_list)
+                : token_list_(std::move(token_list))
+            {
+            }
+
+            virtual std::size_t precedence_level() const
+            {
+                return 11;
+            }
+
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (!val.is_array())
+                {
+                    return val;
+                }
+                auto result = storage.new_instance(json_array_arg);
+
+                for (auto& item : val.array_range())
+                {
+                    reference j = evaluate_tokens(item, token_list_, storage, ec);
+                    if (is_true(j))
+                    {
+                        auto jj = this->apply_expressions(item, storage, ec);
+                        if (!jj.is_null())
+                        {
+                            result->push_back(jj);
+                        }
+                    }
+                }
+                return *result;
+            }
+
+            string_type to_string(std::size_t indent = 0) const override
+            {
+                string_type s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("filter_expression\n");
+                for (auto& item : token_list_)
+                {
+                    string_type sss = item.to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }
+                return s;
+            }
+        };
+
         class flatten_projection final : public projection_base
         {
         public:
@@ -1530,57 +1558,6 @@ namespace jmespath {
                         s.push_back('\n');
                     }
                     s.append("---\n");
-                }
-                return s;
-            }
-        };
-
-        class filter_expression final : public selector_base
-        {
-            std::vector<token> token_list_;
-        public:
-            filter_expression(std::vector<token>&& token_list)
-                : token_list_(std::move(token_list))
-            {
-            }
-
-            virtual std::size_t precedence_level() const
-            {
-                return 1;
-            }
-
-            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
-            {
-                if (!val.is_array())
-                {
-                    return val;
-                }
-                auto result = storage.new_instance(json_array_arg);
-
-                for (auto& item : val.array_range())
-                {
-                    reference j = evaluate_tokens(item, token_list_, storage, ec);
-                    if (is_true(j))
-                    {
-                        result->push_back(std::move(item));
-                    }
-                }
-                return *result;
-            }
-
-            string_type to_string(std::size_t indent = 0) const override
-            {
-                string_type s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("filter_expression\n");
-                for (auto& item : token_list_)
-                {
-                    string_type sss = item.to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
                 }
                 return s;
             }
@@ -1748,7 +1725,6 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::expression_item);
                                 state_stack_.emplace_back(path_state::expect_and);
                                 break;
-
                             case '<':
                                 ++p_;
                                 ++column_;
@@ -1792,6 +1768,11 @@ namespace jmespath {
                                 break;
                             }
                             case '[':
+                                state_stack_.emplace_back(path_state::expression_item);
+                                state_stack_.back() = path_state::bracket_specifier;
+                                ++p_;
+                                ++column_;
+                                break;
                             case '{':
                                 state_stack_.emplace_back(path_state::expression_item);
                                 break;
@@ -1831,11 +1812,6 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case '[':
-                                state_stack_.back() = path_state::bracket_specifier;
-                                ++p_;
-                                ++column_;
-                                break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg);
                                 state_stack_.back() = path_state::multi_select_hash;
@@ -1869,6 +1845,17 @@ namespace jmespath {
                                 push_token(token(jsoncons::make_unique<not_expression>()));
                                 break;
                             }
+                            case '@':
+                                ++p_;
+                                ++column_;
+                                push_token(token(jsoncons::make_unique<current_node>()));
+                                state_stack_.pop_back();
+                                break;
+                            case '[': // index
+                                state_stack_.back() = path_state::bracket_specifier;
+                                ++p_;
+                                ++column_;
+                                break;
                             default:
                                 if ((*p_ >= 'A' && *p_ <= 'Z') || (*p_ >= 'a' && *p_ <= 'z') || (*p_ == '_'))
                                 {

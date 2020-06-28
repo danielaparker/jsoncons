@@ -1,10 +1,12 @@
 [{
-    "given": {"foo": [{"name": "a"}, {"name": "b"}]},
+    "given": {
+      "foo": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    },
     "cases": [
       {
-        "comment": "Matching a literal",
-        "expression": "foo[?name == 'a']",
-        "result": [{"name": "a"}]
+        "comment": "Using @ in a filter expression",
+        "expression": "foo[?@ < `5`]",
+        "result": [0, 1, 2, 3, 4]
       }
     ]
 }]
