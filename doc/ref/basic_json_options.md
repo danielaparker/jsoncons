@@ -16,6 +16,7 @@ Specifies options for reading and writing JSON text.
 
 Option|Reading|Writing
 ------|-------|----------
+decode_escaped_unicode|Interpret escaped unicode in JSON strings|
 nan_to_str|Substitute string with `NaN`, if enabled|Sets a string replacement for `NaN` when writing JSON
 inf_to_str|Substitute string with `infinity`, if enabled|Sets a string replacement for infinity when writing JSON
 neginf_to_str|Substitute string with `negative infinity`, if enabled|Sets a string replacement for negative infinity when writing JSON
@@ -84,6 +85,9 @@ The maximum nesting depth allowed when decoding and encoding JSON.
 Default is 1024. Parsing can have an arbitrarily large depth
 limited only by available memory. Serializing a [basic_json](../basic_json.md) to
 JSON is limited by stack size.
+
+    basic_json_options& decode_escaped_unicode(bool value); 
+Indicates whether to interpret escaped unicode in JSON strings. Defaults to true. 
 
     basic_json_options& nan_to_str(const string_type& value, bool enable_inverse = true); 
 Sets a string replacement for `NaN` when writing JSON, and indicate whether it is also
