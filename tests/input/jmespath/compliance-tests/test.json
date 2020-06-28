@@ -1,12 +1,18 @@
 [{
     "given": {
-      "foo": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    },
+        "foo.bar": "dot",
+        "foo bar": "space",
+        "foo\nbar": "newline",
+        "foo\"bar": "doublequote",
+        "c:\\\\windows\\path": "windows",
+        "/unix/path": "unix",
+        "\"\"\"": "threequotes",
+        "bar": {"baz": "qux"}
+     },
     "cases": [
       {
-        "comment": "Using @ in a filter expression",
-        "expression": "foo[?@ < `5`]",
-        "result": [0, 1, 2, 3, 4]
+        "expression": "\"foo\\nbar\"",
+        "result": "newline"
       }
     ]
 }]

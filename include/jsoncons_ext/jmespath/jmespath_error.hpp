@@ -103,6 +103,8 @@ enum class jmespath_errc
     unexpected_end_of_input,
     step_cannot_be_zero,
     invalid_expression,
+    invalid_codepoint,
+    illegal_escaped_character,
     unknown_error 
 };
 
@@ -156,6 +158,10 @@ public:
                 return "Slice step cannot be zero";
             case jmespath_errc::invalid_expression:
                 return "Invalid expression";
+            case jmespath_errc::invalid_codepoint:
+                return "Invalid codepoint";
+            case jmespath_errc::illegal_escaped_character:
+                return "Illegal escaped character";
             case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";

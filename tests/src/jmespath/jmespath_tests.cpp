@@ -91,6 +91,7 @@ TEST_CASE("jmespath-tests")
         jmespath_tests("./input/jmespath/compliance-tests/literal.json"); // OK
         jmespath_tests("./input/jmespath/compliance-tests/multiselect.json"); // OK 
         jmespath_tests("./input/jmespath/compliance-tests/filters.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/escape.json"); // OK
 
         //jmespath_tests("./input/jmespath/compliance-tests/test.json"); 
     }

@@ -238,7 +238,18 @@ namespace jmespath {
         sub_or_index_expression,
         quoted_string,
         raw_string,
-        escape_raw_string,
+        raw_string_escape_char,
+        quoted_string_escape_char,
+        escape_u1, 
+        escape_u2, 
+        escape_u3, 
+        escape_u4, 
+        escape_expect_surrogate_pair1, 
+        escape_expect_surrogate_pair2, 
+        escape_u5, 
+        escape_u6, 
+        escape_u7, 
+        escape_u8, 
         literal,
         key_expr,
         val_expr,
@@ -1685,6 +1696,8 @@ namespace jmespath {
             state_stack_.emplace_back(path_state::start);
 
             string_type buffer;
+            uint32_t cp = 0;
+            uint32_t cp2 = 0;
      
             begin_input_ = path;
             end_input_ = path + length;
@@ -1960,17 +1973,7 @@ namespace jmespath {
                                 state_stack_.pop_back(); // quoted_string
                                 break;
                             case '\\':
-                                if (p_+1 < end_input_)
-                                {
-                                    ++p_;
-                                    ++column_;
-                                    buffer.push_back(*p_);
-                                }
-                                else
-                                {
-                                    ec = jmespath_errc::unexpected_end_of_input;
-                                    return Json::null();
-                                }
+                                state_stack_.emplace_back(path_state::quoted_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2003,7 +2006,7 @@ namespace jmespath {
                                 break;
                         };
                         break;
-                    case path_state::escape_raw_string:
+                    case path_state::raw_string_escape_char:
                         switch (*p_)
                         {
                             case '\'':
@@ -2021,6 +2024,184 @@ namespace jmespath {
                                 break;
                         }
                         break;
+                    case path_state::quoted_string_escape_char:
+                        switch (*p_)
+                        {
+                            case '\"':
+                                buffer.push_back('\"');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case '\\': 
+                                buffer.push_back('\\');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case '/':
+                                buffer.push_back('/');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case 'b':
+                                buffer.push_back('\b');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case 'f':
+                                buffer.push_back('\f');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case 'n':
+                                buffer.push_back('\n');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case 'r':
+                                buffer.push_back('\r');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case 't':
+                                buffer.push_back('\t');
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case 'u':
+                                cp = 0;
+                                ++p_;
+                                ++column_;
+                                state_stack_.back() = path_state::escape_u1;
+                                break;
+                            default:
+                                ec = jmespath_errc::illegal_escaped_character;
+                                return Json::null();
+                        }
+                        break;
+                    case path_state::escape_u1:
+                        append_to_codepoint(cp, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
+                        ++p_;
+                        ++column_;
+                        state_stack_.back() = path_state::escape_u2;
+                        break;
+                    case path_state::escape_u2:
+                        append_to_codepoint(cp, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
+                        ++p_;
+                        ++column_;
+                        state_stack_.back() = path_state::escape_u3;
+                        break;
+                    case path_state::escape_u3:
+                        append_to_codepoint(cp, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
+                        ++p_;
+                        ++column_;
+                        state_stack_.back() = path_state::escape_u4;
+                        break;
+                    case path_state::escape_u4:
+                        if (unicons::is_high_surrogate(cp))
+                        {
+                            ++p_;
+                            ++column_;
+                            state_stack_.back() = path_state::escape_expect_surrogate_pair1;
+                        }
+                        else
+                        {
+                            unicons::convert(&cp, &cp + 1, std::back_inserter(buffer));
+                            ++p_;
+                            ++column_;
+                            state_stack_.pop_back();
+                        }
+                        break;
+                    case path_state::escape_expect_surrogate_pair1:
+                        switch (*p_)
+                        {
+                            case '\\': 
+                                cp2 = 0;
+                                ++p_;
+                                ++column_;
+                                state_stack_.back() = path_state::escape_expect_surrogate_pair2;
+                                break;
+                            default:
+                                ec = jmespath_errc::invalid_codepoint;
+                                return Json::null();
+                        }
+                        break;
+                    case path_state::escape_expect_surrogate_pair2:
+                        switch (*p_)
+                        {
+                            case 'u': 
+                                ++p_;
+                                ++column_;
+                                state_stack_.back() = path_state::escape_u5;
+                                break;
+                            default:
+                                ec = jmespath_errc::invalid_codepoint;
+                                return Json::null();
+                        }
+                        break;
+                    case path_state::escape_u5:
+                        append_to_codepoint(cp2, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
+                        ++p_;
+                        ++column_;
+                        state_stack_.back() = path_state::escape_u6;
+                        break;
+                    case path_state::escape_u6:
+                        append_to_codepoint(cp2, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
+                        ++p_;
+                        ++column_;
+                        state_stack_.back() = path_state::escape_u7;
+                        break;
+                    case path_state::escape_u7:
+                        append_to_codepoint(cp2, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
+                        ++p_;
+                        ++column_;
+                        state_stack_.back() = path_state::escape_u8;
+                        break;
+                    case path_state::escape_u8:
+                    {
+                        append_to_codepoint(cp2, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
+                        uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
+                        unicons::convert(&codepoint, &codepoint + 1, std::back_inserter(buffer));
+                        state_stack_.pop_back();
+                        ++p_;
+                        ++column_;
+                        break;
+                    }
                     case path_state::raw_string: 
                         switch (*p_)
                         {
@@ -2034,7 +2215,7 @@ namespace jmespath {
                                 break;
                             }
                             case '\\':
-                                state_stack_.emplace_back(path_state::escape_raw_string);
+                                state_stack_.emplace_back(path_state::raw_string_escape_char);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2983,6 +3164,28 @@ namespace jmespath {
                 default:
                     break;
             }
+        }
+
+        uint32_t append_to_codepoint(uint32_t cp, int c, std::error_code& ec)
+        {
+            cp *= 16;
+            if (c >= '0'  &&  c <= '9')
+            {
+                cp += c - '0';
+            }
+            else if (c >= 'a'  &&  c <= 'f')
+            {
+                cp += c - 'a' + 10;
+            }
+            else if (c >= 'A'  &&  c <= 'F')
+            {
+                cp += c - 'A' + 10;
+            }
+            else
+            {
+                ec = jmespath_errc::invalid_codepoint;
+            }
+            return cp;
         }
     };
 
