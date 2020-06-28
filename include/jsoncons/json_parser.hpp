@@ -2284,10 +2284,22 @@ escape:
             ++position_;
             goto string_u1;
         case 'u':
-            cp_ = 0;
-            ++input_ptr_;
-            ++position_;
-            goto escape_u1;
+            if (options_.decode_escaped_unicode())
+            {
+                cp_ = 0;
+                ++input_ptr_;
+                ++position_;
+                goto escape_u1;
+            }
+            else
+            {
+                string_buffer_.push_back('\\');
+                string_buffer_.push_back('\\');
+                string_buffer_.push_back('u');
+                sb = ++input_ptr_;
+                ++position_;
+                goto string_u1;
+            }
         default:    
             err_handler_(json_errc::illegal_escaped_character, *this);
             ec = json_errc::illegal_escaped_character;
