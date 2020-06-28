@@ -5,7 +5,7 @@
             "bar": {"baz": "qux"}
         },
         "cases": [
-            /*{
+            {
                 "expression": "`\"foo\"`",
                 "result": "foo"
             },
@@ -91,12 +91,12 @@
             {
                 "expression": "`\"1\\`\"`",
                 "result": "1`"
-            },*/
+            },
             {
                 "comment": "Multiple literal expressions with escapes",
                 "expression": "`\"\\\\\"`.{a:`\"b\"`}",
                 "result": {"a": "b"}
-            }/*,
+            },
             {
                 "comment": "literal . identifier",
                 "expression": "`{\"a\": \"b\"}`.a",
@@ -111,9 +111,9 @@
                 "comment": "literal . identifier bracket-expr",
                 "expression": "`[0, 1, 2]`[1]",
                 "result": 1
-            }*/
+            }
         ]
-    }/*,
+    },
     {
       "comment": "Literals",
       "given": {"type": "object"},
@@ -196,5 +196,5 @@
           "result": "\\\\"
         }
       ]
-    }*/
+    }
 ]
