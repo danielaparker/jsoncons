@@ -1133,7 +1133,7 @@ namespace jmespath {
                     std::size_t index = static_cast<std::size_t>(index_);
                     return val.at(index);
                 }
-                else if (index_ < 0 && (slen+index_) < slen)
+                else if ((slen + index_) >= 0 && (slen+index_) < slen)
                 {
                     std::size_t index = static_cast<std::size_t>(slen + index_);
                     return val.at(index);

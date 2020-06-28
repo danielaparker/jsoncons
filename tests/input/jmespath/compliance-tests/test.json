@@ -1,11 +1,10 @@
 [{
-    "given": {
-        "\tF\uCebb": true
-    },
+    "given":
+        {"foo": {"bar": ["zero", "one", "two"]}},
     "cases": [
-        {
-            "expression": "\"\\tF\\uCebb\"",
-            "result": true
-        }
-    ]
+         {
+            "expression": "foo.bar[-4]",
+            "result": null
+         }
+     ]
 }]
