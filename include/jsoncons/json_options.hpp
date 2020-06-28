@@ -87,7 +87,6 @@ protected:
           can_read_pos_inf_replacement_(false),
           can_read_neg_inf_replacement_(false),
 #endif
-        decode_escaped_unicode_(true),
         enable_nan_to_num_(false),
         enable_inf_to_num_(false),
         enable_neginf_to_num_(false),
@@ -97,6 +96,7 @@ protected:
         enable_str_to_nan_(false),
         enable_str_to_inf_(false),
         enable_str_to_neginf_(false),
+        decode_escaped_unicode_(true),
         max_nesting_depth_(1024)
     {}
 
