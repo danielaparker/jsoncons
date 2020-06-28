@@ -1,18 +1,11 @@
 [{
     "given": {
-        "foo.bar": "dot",
-        "foo bar": "space",
-        "foo\nbar": "newline",
-        "foo\"bar": "doublequote",
-        "c:\\\\windows\\path": "windows",
-        "/unix/path": "unix",
-        "\"\"\"": "threequotes",
-        "bar": {"baz": "qux"}
-     },
+        "\tF\uCebb": true
+    },
     "cases": [
-      {
-        "expression": "\"foo\\nbar\"",
-        "result": "newline"
-      }
+        {
+            "expression": "\"\\tF\\uCebb\"",
+            "result": true
+        }
     ]
 }]

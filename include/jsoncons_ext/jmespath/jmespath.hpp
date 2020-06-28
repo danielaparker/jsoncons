@@ -2076,7 +2076,6 @@ namespace jmespath {
                                 state_stack_.pop_back();
                                 break;
                             case 'u':
-                                cp = 0;
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = path_state::escape_u1;
@@ -2087,7 +2086,7 @@ namespace jmespath {
                         }
                         break;
                     case path_state::escape_u1:
-                        append_to_codepoint(cp, *p_, ec);
+                        cp = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
                             return Json::null();
@@ -2097,7 +2096,7 @@ namespace jmespath {
                         state_stack_.back() = path_state::escape_u2;
                         break;
                     case path_state::escape_u2:
-                        append_to_codepoint(cp, *p_, ec);
+                        cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
                             return Json::null();
@@ -2107,7 +2106,7 @@ namespace jmespath {
                         state_stack_.back() = path_state::escape_u3;
                         break;
                     case path_state::escape_u3:
-                        append_to_codepoint(cp, *p_, ec);
+                        cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
                             return Json::null();
@@ -2117,6 +2116,11 @@ namespace jmespath {
                         state_stack_.back() = path_state::escape_u4;
                         break;
                     case path_state::escape_u4:
+                        cp = append_to_codepoint(cp, *p_, ec);
+                        if (ec)
+                        {
+                            return Json::null();
+                        }
                         if (unicons::is_high_surrogate(cp))
                         {
                             ++p_;
@@ -2135,7 +2139,6 @@ namespace jmespath {
                         switch (*p_)
                         {
                             case '\\': 
-                                cp2 = 0;
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = path_state::escape_expect_surrogate_pair2;
@@ -2159,7 +2162,7 @@ namespace jmespath {
                         }
                         break;
                     case path_state::escape_u5:
-                        append_to_codepoint(cp2, *p_, ec);
+                        cp2 = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
                             return Json::null();
@@ -2169,7 +2172,7 @@ namespace jmespath {
                         state_stack_.back() = path_state::escape_u6;
                         break;
                     case path_state::escape_u6:
-                        append_to_codepoint(cp2, *p_, ec);
+                        cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
                             return Json::null();
@@ -2179,7 +2182,7 @@ namespace jmespath {
                         state_stack_.back() = path_state::escape_u7;
                         break;
                     case path_state::escape_u7:
-                        append_to_codepoint(cp2, *p_, ec);
+                        cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
                             return Json::null();
@@ -2190,7 +2193,7 @@ namespace jmespath {
                         break;
                     case path_state::escape_u8:
                     {
-                        append_to_codepoint(cp2, *p_, ec);
+                        cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
                             return Json::null();
