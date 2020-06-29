@@ -31,45 +31,54 @@ void jmespath_tests(const std::string& fpath)
 
         for (const auto& item : test["cases"].array_range())
         {
-            std::string path = item["expression"].as<std::string>();
-            if (item.contains("result"))
+            std::string expr = item["expression"].as<std::string>();
+            try
             {
-                const json& expected = item["result"];
-
-                std::error_code ec;
-                try
+                json actual = jmespath::search(root, expr);
+                if (item.contains("result"))
                 {
-                    json result = jmespath::search(root, path);
-                    if (result != expected)
+                    const json& expected = item["result"];
+                    if (actual != expected)
                     {
-                        if (item.contains("annotation"))
+                        if (item.contains("comment"))
                         {
-                            std::cout << "\n" << item["annotation"] << "\n";
+                            std::cout << "\n" << item["comment"] << "\n";
                         }
                         std::cout << "input\n" << pretty_print(root) << "\n";
-                        std::cout << path << "\n\n";
-                        std::cout << "actual: " << pretty_print(result) << "\n\n";
+                        std::cout << expr << "\n\n";
+                        std::cout << "actual: " << pretty_print(actual) << "\n\n";
                         std::cout << "expected: " << pretty_print(expected) << "\n\n";
                     }
-                    CHECK(result == expected);
+                    CHECK(actual == expected);
                 }
-                catch (const std::exception& e)
+                else if (item.contains("error"))
                 {
-                    std::cout << e.what() << "\n";
-                    if (item.contains("annotation"))
+                    if (item.contains("comment"))
                     {
                         std::cout << "\n" << item["comment"] << "\n";
                     }
                     std::cout << "input\n" << pretty_print(root) << "\n";
-                    std::cout << "expression\n" << path << "\n";
+                    std::cout << expr << "\n\n";
+                    std::cout << "actual: " << pretty_print(actual) << "\n\n";
+                    CHECK(false);
+                }
+
+            }
+            catch (const std::exception& e)
+            {
+                if (item.contains("result"))
+                {
+                    const json& expected = item["result"];
+                    std::cout << e.what() << "\n";
+                    if (item.contains("comment"))
+                    {
+                        std::cout << "\n" << item["comment"] << "\n";
+                    }
+                    std::cout << "input\n" << pretty_print(root) << "\n";
+                    std::cout << "expression: " << expr << "\n";
                     std::cout << "expected: " << expected << "\n\n";
                     CHECK(false);
                 }
-            }
-            else
-            {
-                std::string error = item["error"].as<std::string>();
-                //REQUIRE_THROWS_WITH(jmespath::search(root, path), error);
             }
         }
     }
@@ -94,14 +103,14 @@ TEST_CASE("jmespath-tests")
         //jmespath_tests("./input/jmespath/compliance-tests/indices.json");  // OK
         //jmespath_tests("./input/jmespath/compliance-tests/literal.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/multiselect.json"); // OK 
+        //jmespath_tests("./input/jmespath/compliance-tests/pipe.json");
         //jmespath_tests("./input/jmespath/compliance-tests/slice.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/syntax.json"); //
-        jmespath_tests("./input/jmespath/compliance-tests/unicode.json"); // OK
+        //jmespath_tests("./input/jmespath/compliance-tests/unicode.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
+        //jmespath_tests("./input/jmespath/compliance-tests/benchmarks.json"); // 
 
-        //jmespath_tests("./input/jmespath/compliance-tests/pipe.json");
-
-        //jmespath_tests("./input/jmespath/compliance-tests/test.json"); 
+        jmespath_tests("./input/jmespath/compliance-tests/test.json"); 
     }
 }
 

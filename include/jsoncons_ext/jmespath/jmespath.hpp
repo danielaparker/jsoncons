@@ -36,6 +36,7 @@ namespace jmespath {
         end_multi_select_list,
         begin_filter,
         end_filter,
+        pipe,
         separator,
         key,
         literal,
@@ -116,6 +117,12 @@ namespace jmespath {
         explicit end_filter_arg_t() = default;
     };
     constexpr end_filter_arg_t end_filter_arg{};
+
+    struct pipe_arg_t
+    {
+        explicit pipe_arg_t() = default;
+    };
+    constexpr pipe_arg_t pipe_arg{};
 
     struct source_placeholder_arg_t
     {
@@ -280,7 +287,7 @@ namespace jmespath {
         cmp_eq_old,
         cmp_gt_or_gte_old,
         cmp_ne_old,
-        expect_or,
+        expect_pipe_or_or,
         expect_and
     };
 
@@ -363,9 +370,9 @@ namespace jmespath {
             virtual std::size_t precedence_level() const = 0;
             virtual reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code& ec) = 0;
 
-            virtual string_type to_string(size_t indent = 0) const
+            virtual std::string to_string(size_t indent = 0) const
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -394,9 +401,9 @@ namespace jmespath {
 
             virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
 
-            virtual string_type to_string(std::size_t = 0) const
+            virtual std::string to_string(std::size_t = 0) const
             {
-                return string_type("to_string not implemented");
+                return std::string("to_string not implemented");
             }
 
             virtual bool is_projection() const = 0;
@@ -476,6 +483,11 @@ namespace jmespath {
             {
             }
 
+            token(pipe_arg_t)
+                : type_(token_type::pipe)
+            {
+            }
+
             token(key_arg_t, const string_type& key)
                 : type_(token_type::key)
             {
@@ -526,6 +538,7 @@ namespace jmespath {
                             case token_type::end_multi_select_list:
                             case token_type::begin_filter:
                             case token_type::end_filter:
+                            case token_type::pipe:
                             case token_type::begin_multi_select_hash:
                             case token_type::end_multi_select_hash:
                             case token_type::end_of_expression:
@@ -648,6 +661,7 @@ namespace jmespath {
                     case token_type::end_multi_select_list:
                     case token_type::begin_filter:
                     case token_type::end_filter:
+                    case token_type::pipe:
                     case token_type::begin_multi_select_hash:
                     case token_type::end_multi_select_hash:
                     case token_type::end_of_expression:
@@ -694,7 +708,7 @@ namespace jmespath {
                 }
             }
 
-            string_type to_string(std::size_t indent = 0) const
+            std::string to_string(std::size_t indent = 0) const
             {
                 switch(type_)
                 {
@@ -702,37 +716,40 @@ namespace jmespath {
                         return expression_->to_string(indent);
                         break;
                     case token_type::unary_operator:
-                        return string_type("unary_operator");
+                        return std::string("unary_operator");
                         break;
                     case token_type::binary_operator:
                         return binary_operator_->to_string(indent);
                         break;
                     case token_type::source_placeholder:
-                        return string_type("source_placeholder");
+                        return std::string("source_placeholder");
                         break;
                     case token_type::separator:
-                        return string_type("separator");
+                        return std::string("separator");
                         break;
                     case token_type::literal:
-                        return string_type("literal");
+                        return std::string("literal");
                         break;
                     case token_type::key:
-                        return string_type("key") + key_;
+                        return std::string("key") + key_;
                         break;
                     case token_type::begin_multi_select_hash:
-                        return string_type("begin_multi_select_hash");
+                        return std::string("begin_multi_select_hash");
                         break;
                     case token_type::begin_multi_select_list:
-                        return string_type("begin_multi_select_list");
+                        return std::string("begin_multi_select_list");
                         break;
                     case token_type::begin_filter:
-                        return string_type("begin_filter");
+                        return std::string("begin_filter");
+                        break;
+                    case token_type::pipe:
+                        return std::string("pipe");
                         break;
                     case token_type::lparen:
-                        return string_type("lparen");
+                        return std::string("lparen");
                         break;
                     default:
-                        return string_type("default");
+                        return std::string("default");
                         break;
                 }
             }
@@ -740,6 +757,7 @@ namespace jmespath {
 
         static reference evaluate_tokens(reference root, const std::vector<token>& output_stack, jmespath_storage& storage, std::error_code& ec)
         {
+            pointer root_ptr = std::addressof(root);
             std::vector<pointer> stack;
             for (std::size_t i = 0; i < output_stack.size(); ++i)
             {
@@ -751,8 +769,14 @@ namespace jmespath {
                         stack.push_back(&t.value_);
                         break;
                     }
+                    case token_type::pipe:
+                    {
+                        JSONCONS_ASSERT(!stack.empty());
+                        root_ptr = stack.back();
+                        break;
+                    }
                     case token_type::source_placeholder:
-                        stack.push_back(std::addressof(root));
+                        stack.push_back(root_ptr);
                         break;
                     case token_type::expression:
                     {
@@ -815,9 +839,9 @@ namespace jmespath {
                 }
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -845,9 +869,9 @@ namespace jmespath {
                 }
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -871,9 +895,9 @@ namespace jmespath {
                 return lhs == rhs ? t : f;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -897,9 +921,9 @@ namespace jmespath {
                 return lhs != rhs ? t : f;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -927,9 +951,9 @@ namespace jmespath {
                 return lhs < rhs ? t : f;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -957,9 +981,9 @@ namespace jmespath {
                 return lhs <= rhs ? t : f;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -987,9 +1011,9 @@ namespace jmespath {
                 return lhs > rhs ? t : f;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1017,9 +1041,9 @@ namespace jmespath {
                 return lhs >= rhs ? t : f;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1070,9 +1094,9 @@ namespace jmespath {
                 }
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1095,9 +1119,9 @@ namespace jmespath {
                 return val;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1144,9 +1168,9 @@ namespace jmespath {
                 }
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1233,9 +1257,9 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1243,7 +1267,7 @@ namespace jmespath {
                 s.append("object_projection\n");
                 for (auto& expr : this->expressions_)
                 {
-                    string_type sss = expr->to_string(indent+2);
+                    std::string sss = expr->to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
                 }
@@ -1285,9 +1309,9 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1295,7 +1319,7 @@ namespace jmespath {
                 s.append("list_projection\n");
                 for (auto& expr : this->expressions_)
                 {
-                    string_type sss = expr->to_string(indent+2);
+                    std::string sss = expr->to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
                 }
@@ -1377,9 +1401,9 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1387,7 +1411,7 @@ namespace jmespath {
                 s.append("slice_projection\n");
                 for (auto& expr : this->expressions_)
                 {
-                    string_type sss = expr->to_string(indent+2);
+                    std::string sss = expr->to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
                 }
@@ -1413,7 +1437,7 @@ namespace jmespath {
             {
                 if (!val.is_array())
                 {
-                    return val;
+                    return Json::null();
                 }
                 auto result = storage.new_instance(json_array_arg);
 
@@ -1432,9 +1456,9 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1442,7 +1466,7 @@ namespace jmespath {
                 s.append("filter_expression\n");
                 for (auto& item : token_list_)
                 {
-                    string_type sss = item.to_string(indent+2);
+                    std::string sss = item.to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
                 }
@@ -1504,9 +1528,9 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1514,7 +1538,7 @@ namespace jmespath {
                 s.append("flatten_projection\n");
                 for (auto& expr : this->expressions_)
                 {
-                    string_type sss = expr->to_string(indent+2);
+                    std::string sss = expr->to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
                 }
@@ -1552,9 +1576,9 @@ namespace jmespath {
                 return *result;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1564,7 +1588,7 @@ namespace jmespath {
                 {
                     for (auto& item : list)
                     {
-                        string_type sss = item.to_string(indent+2);
+                        std::string sss = item.to_string(indent+2);
                         s.insert(s.end(), sss.begin(), sss.end());
                         s.push_back('\n');
                     }
@@ -1611,9 +1635,9 @@ namespace jmespath {
                 return *resultp;
             }
 
-            string_type to_string(std::size_t indent = 0) const override
+            std::string to_string(std::size_t indent = 0) const override
             {
-                string_type s;
+                std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
                 {
                     s.push_back(' ');
@@ -1626,7 +1650,7 @@ namespace jmespath {
                         s.push_back(' ');
                     }
                     s.append(key_expr.key);
-                    string_type sss = key_expr.expression->to_string(indent+2);
+                    std::string sss = key_expr.expression->to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
                 }*/
@@ -1730,7 +1754,7 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 state_stack_.emplace_back(path_state::expression_item);
-                                state_stack_.emplace_back(path_state::expect_or);
+                                state_stack_.emplace_back(path_state::expect_pipe_or_or);
                                 break;
                             case '&':
                                 ++p_;
@@ -2690,20 +2714,21 @@ namespace jmespath {
                         }
                         break;
                     }
-                    case path_state::expect_or:
+                    case path_state::expect_pipe_or_or:
                     {
                         switch(*p_)
                         {
                             case '|':
                                 push_token(token(jsoncons::make_unique<or_operator>()));
                                 push_token(token(source_placeholder_arg));
-                                state_stack_.pop_back(); // expect_or
+                                state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                ec = jmespath_errc::expected_or;
-                                return Json::null();
+                                push_token(token(pipe_arg));
+                                state_stack_.pop_back(); 
+                                break;
                         }
                         break;
                     }
@@ -2771,7 +2796,7 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 state_stack_.emplace_back(path_state::expression_item);
-                                state_stack_.emplace_back(path_state::expect_or);
+                                state_stack_.emplace_back(path_state::expect_pipe_or_or);
                                 break;
                             }
                             case ']':
@@ -3159,6 +3184,7 @@ namespace jmespath {
                     break;
                 case token_type::source_placeholder:
                 case token_type::key:
+                case token_type::pipe:
                     output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::lparen:

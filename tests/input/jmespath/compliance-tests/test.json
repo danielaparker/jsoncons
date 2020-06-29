@@ -1,10 +1,11 @@
 [{
-    "given":
-        {"foo": {"bar": ["zero", "one", "two"]}},
-    "cases": [
-         {
-            "expression": "foo.bar[-4]",
-            "result": null
-         }
-     ]
-}]
+  "given": {},
+
+  "cases": [{
+        "comment": "missing closing paren",
+        "expression": "(@",
+        "error": "syntax"
+        }
+    ]
+  }
+]
