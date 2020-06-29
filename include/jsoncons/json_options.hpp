@@ -69,7 +69,6 @@ private:
     bool enable_str_to_nan_:1;
     bool enable_str_to_inf_:1;
     bool enable_str_to_neginf_:1;
-    bool decode_escaped_unicode_:1;
 
     string_type nan_to_num_;
     string_type inf_to_num_;
@@ -96,7 +95,6 @@ protected:
         enable_str_to_nan_(false),
         enable_str_to_inf_(false),
         enable_str_to_neginf_(false),
-        decode_escaped_unicode_(true),
         max_nesting_depth_(1024)
     {}
 
@@ -108,11 +106,6 @@ protected:
     basic_json_options_common& operator=(basic_json_options_common&&) = default;
 
 public:
-
-    bool decode_escaped_unicode() const
-    {
-        return decode_escaped_unicode_;
-    }
 
     bool enable_nan_to_num() const
     {
@@ -705,12 +698,6 @@ public:
     basic_json_options& spaces_around_comma(spaces_option value)
     {
         this->spaces_around_comma_ = value;
-        return *this;
-    }
-
-    basic_json_options& decode_escaped_unicode(bool value)
-    {
-        this->decode_escaped_unicode_ = value;
         return *this;
     }
 
