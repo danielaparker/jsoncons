@@ -1667,8 +1667,8 @@ namespace jmespath {
         const char_type* end_input_;
         const char_type* p_;
 
-        std::vector<expr_state> state_stack_;
         jmespath_storage storage_;
+        std::vector<expr_state> state_stack_;
 
         std::vector<token> output_stack_;
         std::vector<token> operator_stack_;
