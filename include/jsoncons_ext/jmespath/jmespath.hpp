@@ -409,7 +409,7 @@ namespace jmespath {
             union
             {
                 std::unique_ptr<expression_base> expression_;
-                std::unique_ptr<unary_operator> unary_operator_;
+                unary_operator* unary_operator_;
                 std::unique_ptr<binary_operator> binary_operator_;
                 Json value_;
                 string_type key_;
@@ -488,10 +488,10 @@ namespace jmespath {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
             }
 
-            token(std::unique_ptr<unary_operator>&& expression)
-                : type_(token_type::unary_operator)
+            token(unary_operator* expression)
+                : type_(token_type::unary_operator),
+                  unary_operator_(expression)
             {
-                new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(expression));
             }
 
             token(std::unique_ptr<binary_operator>&& expression)
@@ -538,7 +538,7 @@ namespace jmespath {
                                 key_ = std::move(other.key_);
                                 break;
                             case token_type::unary_operator:
-                                unary_operator_ = std::move(other.unary_operator_);
+                                unary_operator_ = other.unary_operator_;
                                 break;
                             case token_type::binary_operator:
                                 binary_operator_ = std::move(other.binary_operator_);
@@ -661,7 +661,7 @@ namespace jmespath {
                         new (&key_) string_type(std::move(other.key_));
                         break;
                     case token_type::unary_operator:
-                        new (&unary_operator_) std::unique_ptr<unary_operator>(std::move(other.unary_operator_));
+                        unary_operator_ = other.unary_operator_;
                         break;
                     case token_type::binary_operator:
                         new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(other.binary_operator_));
@@ -681,9 +681,6 @@ namespace jmespath {
                         break;
                     case token_type::key:
                         key_.~basic_string();
-                        break;
-                    case token_type::unary_operator:
-                        unary_operator_.~unique_ptr();
                         break;
                     case token_type::binary_operator:
                         binary_operator_.~unique_ptr();
@@ -1649,7 +1646,18 @@ namespace jmespath {
         class jmespath_storage
         {
             std::vector<std::unique_ptr<Json>> temp_storage_;
+            not_expression not_expr_;
         public:
+
+            jmespath_storage()
+                : not_expr_()
+            {
+            }
+
+            unary_operator* get_not_expression()
+            {
+                return &not_expr_;
+            }
 
             template <typename... Args>
             Json* new_instance(Args&& ... args)
@@ -1887,7 +1895,7 @@ namespace jmespath {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token(jsoncons::make_unique<not_expression>()));
+                                push_token(token(storage_.get_not_expression()));
                                 break;
                             }
                             case '@':
@@ -3001,10 +3009,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            for (auto& t : output_stack_)
-            {
-                std::cout << t.to_string() << "\n";
-            }
+            //for (auto& t : output_stack_)
+            //{
+            //    std::cout << t.to_string() << "\n";
+            //}
 
             if (paren_level != 0)
             {
