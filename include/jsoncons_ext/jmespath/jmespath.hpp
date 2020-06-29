@@ -410,7 +410,7 @@ namespace jmespath {
             {
                 std::unique_ptr<expression_base> expression_;
                 unary_operator* unary_operator_;
-                std::unique_ptr<binary_operator> binary_operator_;
+                binary_operator* binary_operator_;
                 Json value_;
                 string_type key_;
             };
@@ -494,10 +494,10 @@ namespace jmespath {
             {
             }
 
-            token(std::unique_ptr<binary_operator>&& expression)
-                : type_(token_type::binary_operator)
+            token(binary_operator* expression)
+                : type_(token_type::binary_operator),
+                  binary_operator_(expression)
             {
-                new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(expression));
             }
 
             token(literal_arg_t, Json&& value)
@@ -541,7 +541,7 @@ namespace jmespath {
                                 unary_operator_ = other.unary_operator_;
                                 break;
                             case token_type::binary_operator:
-                                binary_operator_ = std::move(other.binary_operator_);
+                                binary_operator_ = other.binary_operator_;
                                 break;
                             case token_type::literal:
                                 value_ = std::move(other.value_);
@@ -664,7 +664,7 @@ namespace jmespath {
                         unary_operator_ = other.unary_operator_;
                         break;
                     case token_type::binary_operator:
-                        new (&binary_operator_) std::unique_ptr<binary_operator>(std::move(other.binary_operator_));
+                        binary_operator_ = other.binary_operator_;
                         break;
                     case token_type::literal:
                         new (&value_) Json(std::move(other.value_));
@@ -681,9 +681,6 @@ namespace jmespath {
                         break;
                     case token_type::key:
                         key_.~basic_string();
-                        break;
-                    case token_type::binary_operator:
-                        binary_operator_.~unique_ptr();
                         break;
                     case token_type::literal:
                         value_.~Json();
@@ -1227,7 +1224,7 @@ namespace jmespath {
                     return Json::null();
                 }
 
-                auto result = storage.new_instance(json_array_arg);
+                auto result = storage.create_json(json_array_arg);
                 for (auto item : val.object_range())
                 {
                     if (!item.value().is_null())
@@ -1279,7 +1276,7 @@ namespace jmespath {
                     return Json::null();
                 }
 
-                auto result = storage.new_instance(json_array_arg);
+                auto result = storage.create_json(json_array_arg);
                 for (reference item : val.array_range())
                 {
                     if (!item.is_null())
@@ -1343,7 +1340,7 @@ namespace jmespath {
                     return Json::null();
                 }
 
-                auto result = storage.new_instance(json_array_arg);
+                auto result = storage.create_json(json_array_arg);
                 if (step > 0)
                 {
                     if (start < 0)
@@ -1424,7 +1421,7 @@ namespace jmespath {
                 {
                     return Json::null();
                 }
-                auto result = storage.new_instance(json_array_arg);
+                auto result = storage.create_json(json_array_arg);
 
                 for (auto& item : val.array_range())
                 {
@@ -1483,7 +1480,7 @@ namespace jmespath {
                     return Json::null();
                 }
 
-                auto currentp = storage.new_instance(json_array_arg);
+                auto currentp = storage.create_json(json_array_arg);
                 for (reference item : val.array_range())
                 {
                     if (item.is_array())
@@ -1498,7 +1495,7 @@ namespace jmespath {
                         currentp->push_back(item);
                     }
                 }
-                auto result = storage.new_instance(json_array_arg);
+                auto result = storage.create_json(json_array_arg);
                 for (reference item : currentp->array_range())
                 {
                     if (!item.is_null())
@@ -1551,7 +1548,7 @@ namespace jmespath {
                 {
                     return val;
                 }
-                auto result = storage.new_instance(json_array_arg);
+                auto result = storage.create_json(json_array_arg);
                 result->reserve(token_lists_.size());
 
                 for (auto& list : token_lists_)
@@ -1610,7 +1607,7 @@ namespace jmespath {
                 {
                     return val;
                 }
-                auto resultp = storage.new_instance(json_object_arg);
+                auto resultp = storage.create_json(json_object_arg);
                 resultp->reserve(key_toks_.size());
                 for (auto& item : key_toks_)
                 {
@@ -1646,21 +1643,69 @@ namespace jmespath {
         class jmespath_storage
         {
             std::vector<std::unique_ptr<Json>> temp_storage_;
-            not_expression not_expr_;
+            not_expression not_oper_;
+            or_operator or_oper_;
+            and_operator and_oper_;
+            eq_operator eq_oper_;
+            ne_operator ne_oper_;
+            lt_operator lt_oper_;
+            lte_operator lte_oper_;
+            gt_operator gt_oper_;
+            gte_operator gte_oper_;
         public:
 
             jmespath_storage()
-                : not_expr_()
+                : not_oper_()
             {
             }
 
-            unary_operator* get_not_expression()
+            unary_operator* get_not_operator()
             {
-                return &not_expr_;
+                return &not_oper_;
+            }
+
+            binary_operator* get_or_operator()
+            {
+                return &or_oper_;
+            }
+
+            binary_operator* get_and_operator()
+            {
+                return &and_oper_;
+            }
+
+            binary_operator* get_eq_operator()
+            {
+                return &eq_oper_;
+            }
+
+            binary_operator* get_ne_operator()
+            {
+                return &ne_oper_;
+            }
+
+            binary_operator* get_lt_operator()
+            {
+                return &lt_oper_;
+            }
+
+            binary_operator* get_lte_operator()
+            {
+                return &lte_oper_;
+            }
+
+            binary_operator* get_gt_operator()
+            {
+                return &gt_oper_;
+            }
+
+            binary_operator* get_gte_operator()
+            {
+                return &gte_oper_;
             }
 
             template <typename... Args>
-            Json* new_instance(Args&& ... args)
+            Json* create_json(Args&& ... args)
             {
                 auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
                 Json* ptr = temp.get();
@@ -1895,7 +1940,7 @@ namespace jmespath {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token(storage_.get_not_expression()));
+                                push_token(token(storage_.get_not_operator()));
                                 break;
                             }
                             case '@':
@@ -2650,14 +2695,14 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(jsoncons::make_unique<lte_operator>()));
+                                push_token(token(storage_.get_lte_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(jsoncons::make_unique<lt_operator>()));
+                                push_token(token(storage_.get_lt_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back();
                                 break;
@@ -2669,14 +2714,14 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(jsoncons::make_unique<gte_operator>()));
+                                push_token(token(storage_.get_gte_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(jsoncons::make_unique<gt_operator>()));
+                                push_token(token(storage_.get_gt_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 break;
@@ -2688,7 +2733,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(jsoncons::make_unique<eq_operator>()));
+                                push_token(token(storage_.get_eq_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -2705,7 +2750,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(jsoncons::make_unique<ne_operator>()));
+                                push_token(token(storage_.get_ne_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -2806,7 +2851,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '|':
-                                push_token(token(jsoncons::make_unique<or_operator>()));
+                                push_token(token(storage_.get_or_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -2824,7 +2869,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '&':
-                                push_token(token(jsoncons::make_unique<and_operator>()));
+                                push_token(token(storage_.get_and_operator()));
                                 push_token(token(source_placeholder_arg));
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
