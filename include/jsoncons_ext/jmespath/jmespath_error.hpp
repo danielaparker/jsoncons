@@ -93,6 +93,7 @@ enum class jmespath_errc
     expected_dot,
     expected_or,
     expected_and,
+    expected_multi_select_list,
     invalid_number,
     invalid_literal,
     expected_comparator,
@@ -105,6 +106,7 @@ enum class jmespath_errc
     invalid_expression,
     invalid_codepoint,
     illegal_escaped_character,
+    unbalanced_parentheses,
     unknown_error 
 };
 
@@ -138,6 +140,8 @@ public:
                 return "Expected \"||\"";
             case jmespath_errc::expected_and:
                 return "Expected \"&&\"";
+            case jmespath_errc::expected_multi_select_list:
+                return "Expected multi-select-list";
             case jmespath_errc::invalid_number:
                 return "Invalid number";
             case jmespath_errc::invalid_literal:
@@ -162,6 +166,8 @@ public:
                 return "Invalid codepoint";
             case jmespath_errc::illegal_escaped_character:
                 return "Illegal escaped character";
+            case jmespath_errc::unbalanced_parentheses:
+                return "Unbalanced parentheses";
             case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";

@@ -1,11 +1,11 @@
 [{
-  "given": {},
+  "given": {"type": "object"},
 
-  "cases": [{
-        "comment": "missing closing paren",
-        "expression": "(@",
+  "cases": [      {
+        "comment": "Multi-select of a list using an identifier index",
+        "expression": "foo[abc]",
         "error": "syntax"
-        }
+      }
     ]
   }
 ]
