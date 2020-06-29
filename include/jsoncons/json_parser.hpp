@@ -59,10 +59,10 @@ enum class json_parse_state : uint8_t
     escape_u4, 
     escape_expect_surrogate_pair1, 
     escape_expect_surrogate_pair2, 
+    escape_u5, 
     escape_u6, 
     escape_u7, 
     escape_u8, 
-    escape_u9, 
     minus, 
     zero,  
     integer,
@@ -1279,10 +1279,10 @@ public:
                 case json_parse_state::escape_u4: 
                 case json_parse_state::escape_expect_surrogate_pair1: 
                 case json_parse_state::escape_expect_surrogate_pair2: 
+                case json_parse_state::escape_u5: 
                 case json_parse_state::escape_u6: 
                 case json_parse_state::escape_u7: 
                 case json_parse_state::escape_u8: 
-                case json_parse_state::escape_u9: 
                     parse_string(visitor, ec);
                     if (ec) return;
                     break;
@@ -2114,14 +2114,14 @@ exp3:
                 goto escape_expect_surrogate_pair1;
             case json_parse_state::escape_expect_surrogate_pair2:
                 goto escape_expect_surrogate_pair2;
+            case json_parse_state::escape_u5:
+                goto escape_u5;
             case json_parse_state::escape_u6:
                 goto escape_u6;
             case json_parse_state::escape_u7:
                 goto escape_u7;
             case json_parse_state::escape_u8:
                 goto escape_u8;
-            case json_parse_state::escape_u9:
-                goto escape_u9;
             default:
                 JSONCONS_UNREACHABLE();               
         }
@@ -2284,22 +2284,10 @@ escape:
             ++position_;
             goto string_u1;
         case 'u':
-            if (options_.decode_escaped_unicode())
-            {
-                cp_ = 0;
-                ++input_ptr_;
-                ++position_;
-                goto escape_u1;
-            }
-            else
-            {
-                string_buffer_.push_back('\\');
-                string_buffer_.push_back('\\');
-                string_buffer_.push_back('u');
-                sb = ++input_ptr_;
-                ++position_;
-                goto string_u1;
-            }
+             cp_ = 0;
+             ++input_ptr_;
+             ++position_;
+             goto escape_u1;
         default:    
             err_handler_(json_errc::illegal_escaped_character, *this);
             ec = json_errc::illegal_escaped_character;
@@ -2315,7 +2303,7 @@ escape_u1:
             return;
         }
         {
-            append_codepoint(*input_ptr_,ec);
+            cp_ = append_to_codepoint(0, *input_ptr_, ec);
             if (ec)
             {
                 state_ = json_parse_state::escape_u1;
@@ -2333,7 +2321,7 @@ escape_u2:
             return;
         }
         {
-            append_codepoint(*input_ptr_, ec);
+            cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
             if (ec)
             {
                 state_ = json_parse_state::escape_u2;
@@ -2351,7 +2339,7 @@ escape_u3:
             return;
         }
         {
-            append_codepoint(*input_ptr_, ec);
+            cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
             if (ec)
             {
                 state_ = json_parse_state::escape_u3;
@@ -2369,7 +2357,7 @@ escape_u4:
             return;
         }
         {
-            append_codepoint(*input_ptr_, ec);
+            cp_ = append_to_codepoint(cp_, *input_ptr_, ec);
             if (ec)
             {
                 state_ = json_parse_state::escape_u4;
@@ -2426,7 +2414,7 @@ escape_expect_surrogate_pair2:
             case 'u':
                 ++input_ptr_;
                 ++position_;
-                goto escape_u6;
+                goto escape_u5;
             default:
                 err_handler_(json_errc::expected_codepoint_surrogate_pair, *this);
                 ec = json_errc::expected_codepoint_surrogate_pair;
@@ -2436,6 +2424,24 @@ escape_expect_surrogate_pair2:
             }
         }
 
+escape_u5:
+        if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
+        {
+            state_ = json_parse_state::escape_u5;
+            return;
+        }
+        {
+            cp2_ = append_to_codepoint(0, *input_ptr_, ec);
+            if (ec)
+            {
+                state_ = json_parse_state::escape_u5;
+                return;
+            }
+        }
+        ++input_ptr_;
+        ++position_;
+        goto escape_u6;
+
 escape_u6:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
         {
@@ -2443,16 +2449,16 @@ escape_u6:
             return;
         }
         {
-            append_second_codepoint(*input_ptr_, ec);
+            cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
             if (ec)
             {
                 state_ = json_parse_state::escape_u6;
                 return;
             }
+            ++input_ptr_;
+            ++position_;
+            goto escape_u7;
         }
-        ++input_ptr_;
-        ++position_;
-        goto escape_u7;
 
 escape_u7:
         if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
@@ -2461,7 +2467,7 @@ escape_u7:
             return;
         }
         {
-            append_second_codepoint(*input_ptr_, ec);
+            cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
             if (ec)
             {
                 state_ = json_parse_state::escape_u7;
@@ -2479,28 +2485,10 @@ escape_u8:
             return;
         }
         {
-            append_second_codepoint(*input_ptr_, ec);
+            cp2_ = append_to_codepoint(cp2_, *input_ptr_, ec);
             if (ec)
             {
                 state_ = json_parse_state::escape_u8;
-                return;
-            }
-            ++input_ptr_;
-            ++position_;
-            goto escape_u9;
-        }
-
-escape_u9:
-        if (JSONCONS_UNLIKELY(input_ptr_ >= local_input_end)) // Buffer exhausted               
-        {
-            state_ = json_parse_state::escape_u9;
-            return;
-        }
-        {
-            append_second_codepoint(*input_ptr_, ec);
-            if (ec)
-            {
-                state_ = json_parse_state::escape_u9;
                 return;
             }
             uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
@@ -2677,49 +2665,6 @@ private:
         after_value(ec);
     }
 
-    void append_codepoint(int c, std::error_code& ec)
-    {
-        switch (c)
-        {
-        case '0': case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-        case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-        case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-            cp_ = append_to_codepoint(cp_, c, ec);
-            if (ec) return;
-            break;
-        default:
-            more_ = err_handler_(json_errc::expected_value, *this);
-            if (!more_)
-            {
-                ec = json_errc::expected_value;
-                return;
-            }
-            break;
-        }
-    }
-
-    void append_second_codepoint(int c, std::error_code& ec)
-    {
-        switch (c)
-        {
-        case '0': 
-        case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-        case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':
-        case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
-            cp2_ = append_to_codepoint(cp2_, c, ec);
-            if (ec) return;
-            break;
-        default:
-            more_ = err_handler_(json_errc::expected_value, *this);
-            if (!more_)
-            {
-                ec = json_errc::expected_value;
-                return;
-            }
-            break;
-        }
-    }
-
     void end_string_value(const CharT* s, std::size_t length, basic_json_visitor<CharT>& visitor, std::error_code& ec) 
     {
         string_view_type sv(s, length);
@@ -2852,10 +2797,10 @@ private:
         }
         else
         {
-            more_ = err_handler_(json_errc::invalid_hex_escape_sequence, *this);
+            more_ = err_handler_(json_errc::invalid_unicode_escape_sequence, *this);
             if (!more_)
             {
-                ec = json_errc::invalid_hex_escape_sequence;
+                ec = json_errc::invalid_unicode_escape_sequence;
                 return cp;
             }
         }

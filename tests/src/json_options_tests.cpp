@@ -441,19 +441,5 @@ TEST_CASE("json_options tests")
         j.dump(os, options, indenting::indent);
         CHECK(os.str() == s);
     }
-    SECTION("do not decode escaped unicode")
-    {
-        std::string input = R"("\\u03a6")";
-
-        json_options options;
-        options.decode_escaped_unicode(false);
-
-        json j = json::parse(input, options);
-
-        std::string output;
-        j.dump(output, options, indenting::indent);
-
-        CHECK(output == input);
-    }
 }
 
