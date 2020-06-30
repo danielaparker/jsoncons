@@ -504,6 +504,53 @@ namespace jmespath {
             }
         };
 
+        class contains_function : public function_base
+        {
+        public:
+            contains_function()
+                : function_base(2)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                auto ptr0 = args[0];
+                auto ptr1 = args[1];
+
+                switch (ptr0->type())
+                {
+                    case json_type::array_value:
+                        for (auto& j : ptr0->array_range())
+                        {
+                            if (j == *ptr1)
+                            {
+                                return t;
+                            }
+                        }
+                        return f;
+                    case json_type::string_value:
+                    {
+                        if (!ptr1->is_string())
+                        {
+                            ec = jmespath_errc::invalid_type;
+                            return Json::null();
+                        }
+                        auto sv0 = ptr0->as<string_view_type>();
+                        auto sv1 = ptr1->as<string_view_type>();
+                        return sv0.find(sv1) != string_view_type::npos ? t : f;
+                    }
+                    default:
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                }
+            }
+        };
+
         // token
 
         class token
@@ -1760,13 +1807,15 @@ namespace jmespath {
             abs_function abs_func_;
             avg_function avg_func_;
             ceil_function ceil_func_;
+            contains_function contains_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
             const function_dictionary functions_ =
             {
                 {string_type{'a','b','s'}, &abs_func_},
                 {string_type{'a','v','g'}, &avg_func_},
-                {string_type{'c','e','i', 'l'}, &ceil_func_}
+                {string_type{'c','e','i', 'l'}, &ceil_func_},
+                {string_type{'c','o','n', 't', 'a', 'i', 'n', 's'}, &contains_func_}
 
             };
 
@@ -2337,6 +2386,7 @@ namespace jmespath {
                                 advance_past_space_character();
                                 break;
                             case ',':
+                                push_token(token(source_placeholder_arg));
                                 state_stack_.emplace_back(expr_state::expression_item);
                                 ++p_;
                                 ++column_;

@@ -16,24 +16,28 @@
   },
   "cases": [
     {
-      "expression": "ceil(`1.2`)",
-      "result": 2
+      "expression": "contains('abc', 'a')",
+      "result": true
     },
     {
-      "expression": "ceil(decimals[0])",
-      "result": 2
+      "expression": "contains('abc', 'd')",
+      "result": false
     },
     {
-      "expression": "ceil(decimals[1])",
-      "result": 2
-    },
-    {
-      "expression": "ceil(decimals[2])",
-      "result": -1
-    },
-    {
-      "expression": "ceil('string')",
+      "expression": "contains(`false`, 'd')",
       "error": "invalid-type"
+    },
+    {
+      "expression": "contains(strings, 'a')",
+      "result": true
+    },
+    {
+      "expression": "contains(decimals, `1.2`)",
+      "result": true
+    },
+    {
+      "expression": "contains(decimals, `false`)",
+      "result": false
     }
   ]
 }
