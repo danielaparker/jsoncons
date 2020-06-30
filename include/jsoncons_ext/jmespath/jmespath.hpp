@@ -2022,7 +2022,6 @@ namespace jmespath {
                                 break;
                             }
                             case '[':
-                                //state_stack_.emplace_back(expr_state::expression_item);
                                 state_stack_.emplace_back(expr_state::bracket_specifier);
                                 ++p_;
                                 ++column_;
@@ -3309,10 +3308,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            for (auto& t : output_stack_)
-            {
-                std::cout << t.to_string() << "\n";
-            }
+            //for (auto& t : output_stack_)
+            //{
+            //    std::cout << t.to_string() << "\n";
+            //}
 
             if (paren_level != 0)
             {
