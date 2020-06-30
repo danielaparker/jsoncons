@@ -218,26 +218,6 @@ namespace jmespath {
     };
 
     namespace detail {
-    template <class Json,
-        class JsonReference>
-        class jmespath_evaluator;
-    }
-
-    template<class Json>
-    Json search(const Json& root, const typename Json::string_view_type& path)
-    {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-        return evaluator.evaluate(root, path);
-    }
-
-    template<class Json>
-    Json search(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
-    {
-        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-        return evaluator.evaluate(root, path, ec);
-    }
-
-    namespace detail {
      
     enum class expr_state 
     {
@@ -1655,7 +1635,11 @@ namespace jmespath {
         public:
 
             jmespath_storage()
-                : not_oper_()
+            {
+            }
+
+            jmespath_storage(std::vector<std::unique_ptr<Json>>&& temp_storage)
+                : temp_storage_(std::move(temp_storage))
             {
             }
 
@@ -1713,6 +1697,44 @@ namespace jmespath {
                 return ptr;
             }
         };
+
+        class jmespath_expression
+        {
+            jmespath_storage storage_;
+            std::vector<token> output_stack_;
+        public:
+            jmespath_expression()
+            {
+            }
+
+            jmespath_expression(jmespath_expression&& expr)
+                : storage_(std::move(expr.storage_)),
+                  output_stack_(std::move(expr.output_stack_))
+            {
+            }
+
+            jmespath_expression(jmespath_storage&& storage,
+                                std::vector<token>&& output_stack)
+                : storage_(std::move(storage)), output_stack_(std::move(output_stack))
+            {
+            }
+
+            reference evaluate(reference root, std::error_code& ec)
+            {
+                if (output_stack_.empty())
+                {
+                    return Json::null();
+                }
+                return evaluate_tokens(root, output_stack_, storage_, ec);
+            }
+
+            static jmespath_expression compile(const string_view_type& expr,
+                                               std::error_code& ec)
+            {
+                jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+                return evaluator.compile(expr, ec);
+            }
+        };
     private:
         std::size_t line_;
         std::size_t column_;
@@ -1744,33 +1766,9 @@ namespace jmespath {
             return column_;
         }
 
-        reference evaluate(reference root, const string_view_type& path)
-        {
-            std::error_code ec;
-            reference j = evaluate(root, path.data(), path.length(), ec);
-            if (ec)
-            {
-                JSONCONS_THROW(jmespath_error(ec, line_, column_));
-            }
-            return j;
-        }
-
-        reference evaluate(reference root, const string_view_type& path, std::error_code& ec)
-        {
-            JSONCONS_TRY
-            {
-                return evaluate(root, path.data(), path.length(), ec);
-            }
-            JSONCONS_CATCH(...)
-            {
-                ec = jmespath_errc::unknown_error;
-            }
-        }
-     
-        reference evaluate(reference root, 
-                           const char_type* path, 
-                           std::size_t length,
-                           std::error_code& ec)
+        jmespath_expression compile(const char_type* path, 
+                                    std::size_t length,
+                                    std::error_code& ec)
         {
             push_token(source_placeholder_arg);
             state_stack_.emplace_back(expr_state::start);
@@ -1880,7 +1878,7 @@ namespace jmespath {
                                 else
                                 {
                                     ec = jmespath_errc::invalid_expression;
-                                    return Json::null();
+                                    return jmespath_expression();
                                 }
                                 break;
                         }
@@ -1966,7 +1964,7 @@ namespace jmespath {
                                 else
                                 {
                                     ec = jmespath_errc::expected_identifier;
-                                    return Json::null();
+                                    return jmespath_expression();
                                 }
                                 break;
                         };
@@ -2014,7 +2012,7 @@ namespace jmespath {
                                 else
                                 {
                                     ec = jmespath_errc::expected_identifier;
-                                    return Json::null();
+                                    return jmespath_expression();
                                 }
                                 break;
                         };
@@ -2215,14 +2213,14 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::illegal_escaped_character;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     case expr_state::escape_u1:
                         cp = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         ++p_;
                         ++column_;
@@ -2232,7 +2230,7 @@ namespace jmespath {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         ++p_;
                         ++column_;
@@ -2242,7 +2240,7 @@ namespace jmespath {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         ++p_;
                         ++column_;
@@ -2252,7 +2250,7 @@ namespace jmespath {
                         cp = append_to_codepoint(cp, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         if (unicons::is_high_surrogate(cp))
                         {
@@ -2278,7 +2276,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     case expr_state::escape_expect_surrogate_pair2:
@@ -2291,14 +2289,14 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::invalid_codepoint;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     case expr_state::escape_u5:
                         cp2 = append_to_codepoint(0, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         ++p_;
                         ++column_;
@@ -2308,7 +2306,7 @@ namespace jmespath {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         ++p_;
                         ++column_;
@@ -2318,7 +2316,7 @@ namespace jmespath {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         ++p_;
                         ++column_;
@@ -2329,7 +2327,7 @@ namespace jmespath {
                         cp2 = append_to_codepoint(cp2, *p_, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return jmespath_expression();
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
                         unicons::convert(&codepoint, &codepoint + 1, std::back_inserter(buffer));
@@ -2374,7 +2372,7 @@ namespace jmespath {
                                 if (parse_ec)
                                 {
                                     ec = jmespath_errc::invalid_literal;
-                                    return Json::null();
+                                    return jmespath_expression();
                                 }
                                 auto j = decoder.get_result();
 
@@ -2399,7 +2397,7 @@ namespace jmespath {
                                 else
                                 {
                                     ec = jmespath_errc::unexpected_end_of_input;
-                                    return Json::null();
+                                    return jmespath_expression();
                                 }
                                 ++p_;
                                 ++column_;
@@ -2488,7 +2486,7 @@ namespace jmespath {
                             case ':':
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 ec = jmespath_errc::expected_multi_select_list;
-                                return Json::null();
+                                return jmespath_expression();
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()));
                                 state_stack_.back() = expr_state::bracket_specifier4;
@@ -2533,7 +2531,7 @@ namespace jmespath {
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
-                                        return Json::null();
+                                        return jmespath_expression();
                                     }
                                     push_token(token(jsoncons::make_unique<index_selector>(r.value())));
 
@@ -2552,7 +2550,7 @@ namespace jmespath {
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
-                                        return Json::null();
+                                        return jmespath_expression();
                                     }
                                     slic.start_ = r.value();
                                     buffer.clear();
@@ -2565,7 +2563,7 @@ namespace jmespath {
                             }
                             default:
                                 ec = jmespath_errc::expected_right_bracket;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     case expr_state::bracket_specifier2:
@@ -2576,7 +2574,7 @@ namespace jmespath {
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
-                                return Json::null();
+                                return jmespath_expression();
                             }
                             slic.stop_ = optional<int64_t>(r.value());
                             buffer.clear();
@@ -2598,7 +2596,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_right_bracket;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2610,12 +2608,12 @@ namespace jmespath {
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
-                                return Json::null();
+                                return jmespath_expression();
                             }
                             if (r.value() == 0)
                             {
                                 ec = jmespath_errc::step_cannot_be_zero;
-                                return Json::null();
+                                return jmespath_expression();
                             }
                             slic.step_ = r.value();
                             buffer.clear();
@@ -2632,7 +2630,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_right_bracket;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2647,7 +2645,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_right_bracket;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2684,7 +2682,7 @@ namespace jmespath {
                                 else
                                 {
                                     ec = jmespath_errc::expected_key;
-                                    return Json::null();
+                                    return jmespath_expression();
                                 }
                                 break;
                         };
@@ -2741,7 +2739,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_comparator;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2758,7 +2756,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_comparator;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2791,7 +2789,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_comparator;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2824,7 +2822,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_comparator;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2842,7 +2840,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_dot;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2877,7 +2875,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_and;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2898,7 +2896,7 @@ namespace jmespath {
                             }
                             default:
                                 ec = jmespath_errc::expected_right_bracket;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2942,7 +2940,7 @@ namespace jmespath {
                             }
                             default:
                                 ec = jmespath_errc::expected_right_bracket;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -2963,7 +2961,7 @@ namespace jmespath {
                             }
                             default:
                                 ec = jmespath_errc::expected_right_bracket;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -3001,7 +2999,7 @@ namespace jmespath {
                             }
                             default:
                                 ec = jmespath_errc::expected_right_brace;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -3020,7 +3018,7 @@ namespace jmespath {
                                 break;
                             default:
                                 ec = jmespath_errc::expected_colon;
-                                return Json::null();
+                                return jmespath_expression();
                         }
                         break;
                     }
@@ -3062,12 +3060,10 @@ namespace jmespath {
             if (paren_level != 0)
             {
                 ec = jmespath_errc::unbalanced_parentheses;
-                return Json::null();
+                return jmespath_expression();
             }
 
-            reference r = evaluate_tokens(root, output_stack_, storage_, ec);
-
-            return r;
+            return jmespath_expression(std::move(storage_), std::move(output_stack_));
         }
 
         void advance_past_space_character()
@@ -3356,6 +3352,45 @@ namespace jmespath {
         }
     };
 
+    } // detail
+
+    template <class Json>
+    using jmespath_expression = typename jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&>::jmespath_expression;
+
+    template<class Json>
+    Json search(const Json& root, const typename Json::string_view_type& path)
+    {
+        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+        std::error_code ec;
+        auto expr = evaluator.compile(path.data(), path.size(), ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
+        }
+        auto result = expr.evaluate(root, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(jmespath_error(ec));
+        }
+        return result;
+    }
+
+    template<class Json>
+    Json search(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+    {
+        jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+        std::error_code ec;
+        auto expr = evaluator.compile(path.data(), path.size(), ec);
+        if (ec)
+        {
+            return Json::null();
+        }
+        auto result = expr.evaluate(root, ec);
+        if (ec)
+        {
+            return Json::null();
+        }
+        return result;
     }
 
 } // namespace jmespath
