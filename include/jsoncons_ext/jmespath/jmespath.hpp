@@ -1719,13 +1719,14 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference root, std::error_code& ec)
+            Json evaluate(reference root, std::error_code& ec)
             {
                 if (output_stack_.empty())
                 {
                     return Json::null();
                 }
-                return evaluate_tokens(root, output_stack_, storage_, ec);
+                jmespath_storage dynamic_storage;
+                return evaluate_tokens(root, output_stack_, dynamic_storage, ec);
             }
 
             static jmespath_expression compile(const string_view_type& expr,
