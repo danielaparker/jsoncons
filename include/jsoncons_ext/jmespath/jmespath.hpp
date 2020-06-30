@@ -551,6 +551,152 @@ namespace jmespath {
             }
         };
 
+        class ends_with_function : public function_base
+        {
+        public:
+            ends_with_function()
+                : function_base(2)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                auto ptr0 = args[0];
+                if (!ptr0->is_string())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                auto ptr1 = args[1];
+                if (!ptr1->is_string())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                auto sv0 = ptr0->as<string_view_type>();
+                auto sv1 = ptr1->as<string_view_type>();
+
+                if (sv1.length() <= sv0.length() && sv1 == sv0.substr(sv0.length() - sv1.length()))
+                {
+                    return t;
+                }
+                else
+                {
+                    return f;
+                }
+            }
+        };
+
+        class floor_function : public function_base
+        {
+        public:
+            floor_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto val = args[0];
+                switch (val->type())
+                {
+                    case json_type::uint64_value:
+                    case json_type::int64_value:
+                    {
+                        return *storage.create_json(val->as<double>());
+                    }
+                    case json_type::double_value:
+                    {
+                        return *storage.create_json(std::floor(val->as<double>()));
+                    }
+                    default:
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                }
+            }
+        };
+
+        class join_function : public function_base
+        {
+        public:
+            join_function()
+                : function_base(2)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr0 = args[0];
+                auto ptr1 = args[1];
+
+                if (!ptr0->is_string())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+                if (!ptr1->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                string_type sep = ptr1->as<string_type>();
+                string_type buf;
+                for (auto& j : ptr1->array_range())
+                {
+                    if (!j.is_string())
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                    if (!buf.empty())
+                    {
+                        buf.append(sep);
+                    }
+                    auto sv = j.as<string_view_type>();
+                    buf.append(sv.begin(), sv.end());
+                }
+                return *storage.create_json(buf);
+            }
+        };
+
+        class length_function : public function_base
+        {
+        public:
+            length_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr0 = args[0];
+
+                switch (ptr0->type())
+                {
+                    case json_type::object_value:
+                    case json_type::array_value:
+                        return *storage.create_json(ptr0->size());
+                    case json_type::string_value:
+                    {
+                        auto sv0 = ptr0->as<string_view_type>();
+                        auto length = unicons::u32_length(sv0.begin(), sv0.end());
+                        return *storage.create_json(length);
+                    }
+                    default:
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                }
+            }
+        };
+
         // token
 
         class token
@@ -1808,6 +1954,10 @@ namespace jmespath {
             avg_function avg_func_;
             ceil_function ceil_func_;
             contains_function contains_func_;
+            ends_with_function ends_with_func_;
+            floor_function floor_func_;
+            join_function join_func_;
+            length_function length_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
             const function_dictionary functions_ =
@@ -1815,7 +1965,11 @@ namespace jmespath {
                 {string_type{'a','b','s'}, &abs_func_},
                 {string_type{'a','v','g'}, &avg_func_},
                 {string_type{'c','e','i', 'l'}, &ceil_func_},
-                {string_type{'c','o','n', 't', 'a', 'i', 'n', 's'}, &contains_func_}
+                {string_type{'c','o','n', 't', 'a', 'i', 'n', 's'}, &contains_func_},
+                {string_type{'e','n','d', 's', '_', 'w', 'i', 't', 'h'}, &ends_with_func_},
+                {string_type{'f','l','o', 'o', 'r'}, &floor_func_},
+                {string_type{'j','o','i', 'n'}, &join_func_},
+                {string_type{'l','e','n', 'g', 't', 'h'}, &length_func_}
 
             };
 
@@ -2354,7 +2508,6 @@ namespace jmespath {
                         {
                             case '(':
                             {
-                                std::cout << "Function: " << buffer << "\n";
                                 auto f = storage_.get_function(buffer, ec);
                                 if (ec)
                                 {

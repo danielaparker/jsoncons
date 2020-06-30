@@ -16,28 +16,68 @@
   },
   "cases": [
     {
-      "expression": "contains('abc', 'a')",
-      "result": true
+      "expression": "floor(`1.2`)",
+      "result": 1
     },
     {
-      "expression": "contains('abc', 'd')",
-      "result": false
-    },
-    {
-      "expression": "contains(`false`, 'd')",
+      "expression": "floor('string')",
       "error": "invalid-type"
     },
     {
-      "expression": "contains(strings, 'a')",
-      "result": true
+      "expression": "floor(decimals[0])",
+      "result": 1
     },
     {
-      "expression": "contains(decimals, `1.2`)",
-      "result": true
+      "expression": "floor(foo)",
+      "result": -1
     },
     {
-      "expression": "contains(decimals, `false`)",
-      "result": false
+      "expression": "floor(str)",
+      "error": "invalid-type"
+    },
+    {
+      "expression": "length('abc')",
+      "result": 3
+    },
+    {
+      "expression": "length('✓foo')",
+      "result": 4
+    },
+    {
+      "expression": "length('')",
+      "result": 0
+    },
+    {
+      "expression": "length(@)",
+      "result": 12
+    },
+    {
+      "expression": "length(strings[0])",
+      "result": 1
+    },
+    {
+      "expression": "length(str)",
+      "result": 3
+    },
+    {
+      "expression": "length(array)",
+      "result": 6
+    },
+    {
+      "expression": "length(objects)",
+      "result": 2
+    },
+    {
+      "expression": "length(`false`)",
+      "error": "invalid-type"
+    },
+    {
+      "expression": "length(foo)",
+      "error": "invalid-type"
+    },
+    {
+      "expression": "length(strings[0])",
+      "result": 1
     }
   ]
 }
