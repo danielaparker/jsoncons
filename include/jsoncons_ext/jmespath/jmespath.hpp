@@ -225,6 +225,7 @@ namespace jmespath {
     {
         start,
         sub_or_index_expression,
+        sub_or_index_expression2,
         quoted_string,
         raw_string,
         raw_string_escape_char,
@@ -432,7 +433,72 @@ namespace jmespath {
                         return *j;
                     }
                     default:
-                        ec = jmespath_errc::not_a_number;
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                }
+            }
+        };
+
+        class avg_function : public function_base
+        {
+        public:
+            avg_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+                if (ptr->empty())
+                {
+                    return Json::null();
+                }
+
+                double sum = 0;
+                for (auto& j : ptr->array_range())
+                {
+                    if (!j.is_number())
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                    sum += j.as<double>();
+                }
+
+                return sum == 0 ? Json::null() : *storage.create_json(sum/ptr->size());
+            }
+        };
+
+        class ceil_function : public function_base
+        {
+        public:
+            ceil_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto val = args[0];
+                switch (val->type())
+                {
+                    case json_type::uint64_value:
+                    case json_type::int64_value:
+                    {
+                        return *storage.create_json(val->as<double>());
+                    }
+                    case json_type::double_value:
+                    {
+                        return *storage.create_json(std::ceil(val->as<double>()));
+                    }
+                    default:
+                        ec = jmespath_errc::invalid_type;
                         return Json::null();
                 }
             }
@@ -1692,11 +1758,16 @@ namespace jmespath {
         class jmespath_storage
         {
             abs_function abs_func_;
+            avg_function avg_func_;
+            ceil_function ceil_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
             const function_dictionary functions_ =
             {
-                {string_type{'a','b','s'}, &abs_func_}
+                {string_type{'a','b','s'}, &abs_func_},
+                {string_type{'a','v','g'}, &avg_func_},
+                {string_type{'c','e','i', 'l'}, &ceil_func_}
+
             };
 
             std::vector<std::unique_ptr<Json>> temp_storage_;
@@ -1725,7 +1796,7 @@ namespace jmespath {
                 auto it = functions_.find(name);
                 if (it == functions_.end())
                 {
-                    ec = jmespath_errc::function_name_not_found;
+                    ec = jmespath_errc::unknown_function;
                     return nullptr;
                 }
                 return it->second;
@@ -1972,6 +2043,95 @@ namespace jmespath {
                                 break;
                         }
                         break;
+                    case expr_state::sub_or_index_expression2:
+                        switch(*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '.': 
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(expr_state::id_or_multiselectlist_or_multiselecthash_or_star);
+                                break;
+                            case '|':
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(expr_state::expression_item);
+                                state_stack_.emplace_back(expr_state::expect_pipe_or_or);
+                                break;
+                            case '&':
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(expr_state::expression_item);
+                                state_stack_.emplace_back(expr_state::expect_and);
+                                break;
+                            case '<':
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(expr_state::expression_item);
+                                state_stack_.emplace_back(expr_state::cmp_lt_or_lte);
+                                break;
+                            case '>':
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(expr_state::expression_item);
+                                state_stack_.emplace_back(expr_state::cmp_gt_or_gte);
+                                break;
+                            case '(':
+                            {
+                                ++p_;
+                                ++column_;
+                                ++paren_level;
+                                push_token(lparen_arg);
+                                break;
+                            }
+                            case '=':
+                            {
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(expr_state::expression_item);
+                                state_stack_.emplace_back(expr_state::cmp_eq);
+                                break;
+                            }
+                            case '!':
+                            {
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(expr_state::expression_item);
+                                state_stack_.emplace_back(expr_state::cmp_ne);
+                                break;
+                            }
+                            /* case ')':
+                            {
+                                ++p_;
+                                ++column_;
+                                --paren_level;
+                                push_token(rparen_arg);
+                                break;
+                            }*/
+                            case '[':
+                                //state_stack_.emplace_back(expr_state::expression_item);
+                                state_stack_.emplace_back(expr_state::bracket_specifier);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '{':
+                                state_stack_.emplace_back(expr_state::expression_item);
+                                break;
+                            default:
+                                if (state_stack_.size() > 1)
+                                {
+                                    state_stack_.pop_back();
+                                }
+                                else
+                                {
+                                    ec = jmespath_errc::invalid_expression;
+                                    return jmespath_expression();
+                                }
+                                break;
+                        }
+                        break;
                     case expr_state::expression_item: 
                     {
                         switch (*p_)
@@ -2155,6 +2315,7 @@ namespace jmespath {
                                 buffer.clear();
                                 push_token(token(f));
                                 state_stack_.back() = expr_state::arg_or_right_paren;
+                                state_stack_.emplace_back(expr_state::sub_or_index_expression2);
                                 state_stack_.emplace_back(expr_state::expression_item);
                                 ++p_;
                                 ++column_;

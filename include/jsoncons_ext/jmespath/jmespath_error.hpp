@@ -99,7 +99,7 @@ enum class jmespath_errc
     expected_comparator,
     expected_key,
     invalid_argument,
-    function_name_not_found,
+    unknown_function,
     invalid_type,
     unexpected_end_of_input,
     step_cannot_be_zero,
@@ -154,8 +154,8 @@ public:
                 return "Expected key";
             case jmespath_errc::invalid_argument:
                 return "Invalid argument type";
-            case jmespath_errc::function_name_not_found:
-                return "Function name not found";
+            case jmespath_errc::unknown_function:
+                return "Unknown function";
             case jmespath_errc::invalid_type:
                 return "Invalid type";
             case jmespath_errc::unexpected_end_of_input:

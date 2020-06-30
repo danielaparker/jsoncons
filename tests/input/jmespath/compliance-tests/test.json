@@ -16,8 +16,24 @@
   },
   "cases": [
     {
-      "expression": "abs(foo)",
-      "result": 1
+      "expression": "ceil(`1.2`)",
+      "result": 2
+    },
+    {
+      "expression": "ceil(decimals[0])",
+      "result": 2
+    },
+    {
+      "expression": "ceil(decimals[1])",
+      "result": 2
+    },
+    {
+      "expression": "ceil(decimals[2])",
+      "result": -1
+    },
+    {
+      "expression": "ceil('string')",
+      "error": "invalid-type"
     }
   ]
 }
