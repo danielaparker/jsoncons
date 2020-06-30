@@ -5,6 +5,7 @@
 #include <memory> // std::addressof
 #include <type_traits> // std::enable_if, std::true_type, std::false_type
 #include <jsoncons/config/compiler_support.hpp>
+#include <jsoncons/json_exception.hpp> // JSONCONS_ASSERT
 #include <jsoncons/detail/more_type_traits.hpp>
 #include <iterator>
 #include <limits>
@@ -175,7 +176,7 @@ namespace detail
         span<element_type, dynamic_extent>
         subspan(std::size_t offset, std::size_t count = dynamic_extent) const
         {
-            JSONCONS_ASSERT(offset <= size() && (count == dynamic_extent || (offset + count <= size())));
+            //JSONCONS_ASSERT((offset <= size() && (count == dynamic_extent || (offset + count <= size()))));
 
             return span<element_type, dynamic_extent>(
                 data() + offset, count == dynamic_extent ? size() - offset : count );
