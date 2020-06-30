@@ -1,0 +1,67 @@
+// function
+
+    static reference sort_by(jmespath_context& context,
+                             reference val,
+                             const std::vector<std::unique_ptr<selector_base>>& selectors,
+                             std::error_code& ec)
+    {
+        if (selectors.size() != 2)
+        {
+            ec = jmespath_errc::invalid_argument;
+            return Json::null();
+        }
+
+        reference u = selectors[0]->select(context, val, ec);
+
+        if (!u.is_array())
+        {
+            ec = jmespath_errc::invalid_argument;
+            return Json::null();
+        }
+        auto& key_selector = selectors[1];
+
+        auto v = context.new_instance(u);
+        std::sort((v->array_range()).begin(), (v->array_range()).end(),
+            [&context,&key_selector,&ec](reference lhs, reference rhs) -> bool
+        {
+            reference key1 = key_selector->select(context, lhs, ec);
+            reference key2 = key_selector->select(context, rhs, ec);
+
+            return key1 < key2;
+        });
+        return *v;
+    }
+
+    typedef std::function<reference(jmespath_context& context, reference, const std::vector<std::unique_ptr<selector_base>>&, std::error_code&)> function_type;
+
+    std::unordered_map<string_type,function_type> functions_ =
+    {
+        {string_type("sort_by"),sort_by}
+    };
+
+    class function_selector : public selector_base
+    {
+        function_type& f_;
+        std::vector<std::unique_ptr<selector_base>> selectors_;
+    public:
+        function_selector(function_type& f)
+            : f_(f)
+        {
+        }
+
+        void add_selector(std::unique_ptr<selector_base>&& selector) override 
+        {
+            selectors_.emplace_back(std::move(selector));
+        }
+
+        reference select(jmespath_context& context, reference val, std::error_code& ec) override
+        {
+            return f_(context, val, selectors_, ec);
+        }
+
+        string_type to_string() const override
+        {
+            return string_type("function_selector\n");
+        }
+    };
+
