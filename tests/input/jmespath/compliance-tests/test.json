@@ -16,13 +16,9 @@
   },
     "cases": [
     {
-      "expression": "abs(foo)",
-      "result": 1
-    }/*,
-    {
-      "expression": "merge(`{}`)",
-      "result": {}
-    }*/
+      "expression": "min(numbers)",
+      "result": -1
+    }   
   ]
 }
 ]

@@ -1461,7 +1461,7 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return rhs.cast<int64_storage>().value() >= 0 ? cast<uint64_storage>().value() < static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : true;
+                            return rhs.cast<int64_storage>().value() >= 0 ? cast<uint64_storage>().value() < static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : false;
                         case storage_kind::uint64_value:
                             return cast<uint64_storage>().value() < rhs.cast<uint64_storage>().value();
                         case storage_kind::double_value:

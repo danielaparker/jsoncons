@@ -246,7 +246,7 @@
     {
       "expression": "max(empty_list)",
       "result": null
-    }/*,
+    },
     {
       "expression": "merge(`{}`)",
       "result": {}
@@ -294,7 +294,7 @@
     {
       "expression": "min(strings)",
       "result": "a"
-    },
+    }/*,
     {
       "expression": "type('abc')",
       "result": "string"

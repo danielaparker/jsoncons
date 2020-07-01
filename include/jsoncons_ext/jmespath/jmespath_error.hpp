@@ -173,7 +173,7 @@ public:
             case jmespath_errc::not_a_number:
                 return "Not a number";
             case jmespath_errc::invalid_arity:
-                return "Wrong number of arguments to function";
+                return "Function called with wrong number of arguments";
             case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";

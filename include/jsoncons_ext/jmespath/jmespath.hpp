@@ -393,14 +393,14 @@ namespace jmespath {
         // function_base
         class function_base
         {
-            std::size_t arg_count_;
+            optional<std::size_t> arg_count_;
         public:
-            function_base(std::size_t arg_count)
+            function_base(optional<std::size_t> arg_count)
                 : arg_count_(arg_count)
             {
             }
 
-            std::size_t arg_count() const
+            optional<std::size_t> arg_count() const
             {
                 return arg_count_;
             }
@@ -796,6 +796,51 @@ namespace jmespath {
                 }
 
                 return ptr->at(index);
+            }
+        };
+
+        class merge_function : public function_base
+        {
+        public:
+            merge_function()
+                : function_base(optional<std::size_t>())
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                if (args.empty())
+                {
+                    ec = jmespath_errc::invalid_arity;
+                    return Json::null();
+                }
+                auto ptr0 = args[0];
+                if (!ptr0->is_object())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+                if (args.size() == 1)
+                {
+                    return *ptr0;
+                }
+
+                auto result = storage.create_json(*ptr0);
+                for (std::size_t i = 1; i < args.size(); ++i)
+                {
+                    auto ptr = args[i];
+                    if (!ptr->is_object())
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                    for (auto& item : ptr->object_range())
+                    {
+                        result->insert_or_assign(item.key(),item.value());
+                    }
+                }
+
+                return *result;
             }
         };
 
@@ -1200,7 +1245,7 @@ namespace jmespath {
                     }
                     case token_type::function:
                     {
-                        if (t.function_->arg_count() != arg_stack.size())
+                        if (t.function_->arg_count() && t.function_->arg_count().value() != arg_stack.size())
                         {
                             ec = jmespath_errc::invalid_arity;
                             return Json::null();
@@ -2077,6 +2122,7 @@ namespace jmespath {
             join_function join_func_;
             length_function length_func_;
             max_function max_func_;
+            merge_function merge_func_;
             min_function min_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
@@ -2091,7 +2137,8 @@ namespace jmespath {
                 {string_type{'j','o','i', 'n'}, &join_func_},
                 {string_type{'l','e','n', 'g', 't', 'h'}, &length_func_},
                 {string_type{'m','a','x'}, &max_func_},
-                {string_type{'m','i','n'}, &min_func_}
+                {string_type{'m','i','n'}, &min_func_},
+                {string_type{'m','e','r', 'g', 'e'}, &merge_func_}
 
             };
 
