@@ -86,7 +86,7 @@
     {
       "expression": "avg(empty_list)",
       "result": null
-    }/*,
+    },
     {
       "expression": "ceil(`1.2`)",
       "result": 2
@@ -218,7 +218,7 @@
     {
       "expression": "length(strings[0])",
       "result": 1
-    },
+    }/*,
     {
       "expression": "max(numbers)",
       "result": 5

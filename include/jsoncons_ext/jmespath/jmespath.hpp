@@ -226,8 +226,8 @@ namespace jmespath {
         start,
         rhs_expression,
         sub_expression,
-        sub_or_index_expression2,
         comparator_expression,
+        function_expression,
         quoted_string,
         raw_string,
         raw_string_escape_char,
@@ -246,7 +246,6 @@ namespace jmespath {
         key_expr,
         val_expr,
         identifier_or_function_expr,
-        arg_or_right_paren,
         unquoted_string,
         lhs_expression,
         key_val_expr,
@@ -2198,10 +2197,17 @@ namespace jmespath {
                             }
                             case ')':
                             {
-                                ++p_;
-                                ++column_;
-                                --paren_level;
-                                push_token(rparen_arg);
+                                if (state_stack_.size() > 1 && *(state_stack_.rbegin()+1) == path_state::function_expression)
+                                {
+                                    state_stack_.pop_back();
+                                }
+                                else
+                                {
+                                    ++p_;
+                                    ++column_;
+                                    --paren_level;
+                                    push_token(rparen_arg);
+                                }
                                 break;
                             }
                             case '[':
@@ -2251,95 +2257,6 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::cmp_eq);
                                 break;
                             }
-                            default:
-                                if (state_stack_.size() > 1)
-                                {
-                                    state_stack_.pop_back();
-                                }
-                                else
-                                {
-                                    ec = jmespath_errc::invalid_expression;
-                                    return jmespath_expression();
-                                }
-                                break;
-                        }
-                        break;
-                    case path_state::sub_or_index_expression2:
-                        switch(*p_)
-                        {
-                            case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character();
-                                break;
-                            case '.': 
-                                ++p_;
-                                ++column_;
-                                state_stack_.emplace_back(path_state::sub_expression);
-                                break;
-                            case '|':
-                                ++p_;
-                                ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::expect_pipe_or_or);
-                                break;
-                            case '&':
-                                ++p_;
-                                ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::expect_and);
-                                break;
-                            case '<':
-                                ++p_;
-                                ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::cmp_lt_or_lte);
-                                break;
-                            case '>':
-                                ++p_;
-                                ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::cmp_gt_or_gte);
-                                break;
-                            case '(':
-                            {
-                                ++p_;
-                                ++column_;
-                                ++paren_level;
-                                push_token(lparen_arg);
-                                break;
-                            }
-                            case '=':
-                            {
-                                ++p_;
-                                ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::cmp_eq);
-                                break;
-                            }
-                            case '!':
-                            {
-                                ++p_;
-                                ++column_;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::cmp_ne);
-                                break;
-                            }
-                            /* case ')':
-                            {
-                                ++p_;
-                                ++column_;
-                                --paren_level;
-                                push_token(rparen_arg);
-                                break;
-                            }*/
-                            case '[':
-                                //state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::index_expression);
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '{':
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                break;
                             default:
                                 if (state_stack_.size() > 1)
                                 {
@@ -2526,8 +2443,8 @@ namespace jmespath {
                                 }
                                 buffer.clear();
                                 push_token(token(f));
-                                state_stack_.back() = path_state::arg_or_right_paren;
-                                state_stack_.emplace_back(path_state::sub_or_index_expression2);
+                                state_stack_.back() = path_state::function_expression;
+                                state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;
@@ -2543,7 +2460,7 @@ namespace jmespath {
                         }
                         break;
 
-                    case path_state::arg_or_right_paren:
+                    case path_state::function_expression:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
