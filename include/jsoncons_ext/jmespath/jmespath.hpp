@@ -2181,14 +2181,6 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 state_stack_.emplace_back(path_state::expect_and);
                                 break;
-                            case '(':
-                            {
-                                ++p_;
-                                ++column_;
-                                ++paren_level;
-                                push_token(lparen_arg);
-                                break;
-                            }
                             case '<':
                             case '>':
                             case '=':
