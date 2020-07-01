@@ -218,7 +218,7 @@
     {
       "expression": "length(strings[0])",
       "result": 1
-    }/*,
+    },
     {
       "expression": "max(numbers)",
       "result": 5
@@ -246,7 +246,7 @@
     {
       "expression": "max(empty_list)",
       "result": null
-    },
+    }/*,
     {
       "expression": "merge(`{}`)",
       "result": {}

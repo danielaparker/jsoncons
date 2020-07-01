@@ -697,6 +697,100 @@ namespace jmespath {
             }
         };
 
+        class max_function : public function_base
+        {
+        public:
+            max_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+                if (ptr->empty())
+                {
+                    return Json::null();
+                }
+
+                bool is_number = ptr->at(0).is_number();
+                bool is_string = ptr->at(0).is_string();
+                if (!is_number && !is_string)
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                std::size_t index = 0;
+                for (std::size_t i = 1; i < ptr->size(); ++i)
+                {
+                    if (!(ptr->at(i).is_number() == is_number && ptr->at(i).is_string() == is_string))
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                    if (ptr->at(i) > ptr->at(index))
+                    {
+                        index = i;
+                    }
+                }
+
+                return ptr->at(index);
+            }
+        };
+
+        class min_function : public function_base
+        {
+        public:
+            min_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+                if (ptr->empty())
+                {
+                    return Json::null();
+                }
+
+                bool is_number = ptr->at(0).is_number();
+                bool is_string = ptr->at(0).is_string();
+                if (!is_number && !is_string)
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                std::size_t index = 0;
+                for (std::size_t i = 1; i < ptr->size(); ++i)
+                {
+                    if (!(ptr->at(i).is_number() == is_number && ptr->at(i).is_string() == is_string))
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                    if (ptr->at(i) < ptr->at(index))
+                    {
+                        index = i;
+                    }
+                }
+
+                return ptr->at(index);
+            }
+        };
+
         // token
 
         class token
@@ -1958,6 +2052,8 @@ namespace jmespath {
             floor_function floor_func_;
             join_function join_func_;
             length_function length_func_;
+            max_function max_func_;
+            min_function min_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
             const function_dictionary functions_ =
@@ -1969,7 +2065,9 @@ namespace jmespath {
                 {string_type{'e','n','d', 's', '_', 'w', 'i', 't', 'h'}, &ends_with_func_},
                 {string_type{'f','l','o', 'o', 'r'}, &floor_func_},
                 {string_type{'j','o','i', 'n'}, &join_func_},
-                {string_type{'l','e','n', 'g', 't', 'h'}, &length_func_}
+                {string_type{'l','e','n', 'g', 't', 'h'}, &length_func_},
+                {string_type{'m','a','x'}, &max_func_},
+                {string_type{'m','i','n'}, &min_func_}
 
             };
 
