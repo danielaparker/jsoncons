@@ -111,9 +111,9 @@ TEST_CASE("jmespath-tests")
         //jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
         //jmespath_tests("./input/jmespath/compliance-tests/benchmarks.json"); // 
 
-        jmespath_tests("./input/jmespath/compliance-tests/functions.json"); 
+        //jmespath_tests("./input/jmespath/compliance-tests/functions.json"); 
 
-        //jmespath_tests("./input/jmespath/compliance-tests/test.json"); 
+        jmespath_tests("./input/jmespath/compliance-tests/test.json"); 
     }
 }
 
