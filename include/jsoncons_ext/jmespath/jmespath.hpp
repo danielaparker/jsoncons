@@ -45,6 +45,7 @@ namespace jmespath {
         binary_operator,
         unary_operator,
         function,
+        argument,
         end_of_expression
     };
 
@@ -131,6 +132,12 @@ namespace jmespath {
         explicit source_placeholder_arg_t() = default;
     };
     constexpr source_placeholder_arg_t source_placeholder_arg{};
+
+    struct argument_arg_t
+    {
+        explicit argument_arg_t() = default;
+    };
+    constexpr argument_arg_t argument_arg{};
 
     JSONCONS_STRING_LITERAL(sort_by,'s','o','r','t','-','b','y')
 
@@ -228,6 +235,7 @@ namespace jmespath {
         sub_expression,
         comparator_expression,
         function_expression,
+        argument,
         quoted_string,
         raw_string,
         raw_string_escape_char,
@@ -399,7 +407,7 @@ namespace jmespath {
 
             virtual ~function_base() = default;
 
-            virtual reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) = 0;
+            virtual reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) = 0;
 
             virtual std::string to_string(std::size_t = 0) const
             {
@@ -415,7 +423,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto val = args[0];
                 switch (val->type())
@@ -447,7 +455,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto ptr = args[0];
                 if (!ptr->is_array())
@@ -483,7 +491,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto val = args[0];
                 switch (val->type())
@@ -512,7 +520,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
             {
                 static const Json t(true, semantic_tag::none);
                 static const Json f(false, semantic_tag::none);
@@ -559,7 +567,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
             {
                 static const Json t(true, semantic_tag::none);
                 static const Json f(false, semantic_tag::none);
@@ -600,7 +608,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto val = args[0];
                 switch (val->type())
@@ -629,7 +637,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto ptr0 = args[0];
                 auto ptr1 = args[1];
@@ -673,7 +681,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage& storage, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto ptr0 = args[0];
 
@@ -705,7 +713,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
             {
                 auto ptr = args[0];
                 if (!ptr->is_array())
@@ -752,7 +760,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(span<pointer> args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
             {
                 auto ptr = args[0];
                 if (!ptr->is_array())
@@ -896,6 +904,11 @@ namespace jmespath {
             token(function_base* function)
                 : type_(token_type::function),
                   function_(function)
+            {
+            }
+
+            token(argument_arg_t)
+                : type_(token_type::argument)
             {
             }
 
@@ -1115,6 +1128,9 @@ namespace jmespath {
                         break;
                     case token_type::function:
                         return function_->to_string();
+                    case token_type::argument:
+                        return std::string("argument");
+                        break;
                     default:
                         return std::string("default");
                         break;
@@ -1126,6 +1142,7 @@ namespace jmespath {
         {
             pointer root_ptr = std::addressof(root);
             std::vector<pointer> stack;
+            std::vector<pointer> arg_stack;
             for (std::size_t i = 0; i < output_stack.size(); ++i)
             {
                 auto& t = output_stack[i];
@@ -1174,20 +1191,27 @@ namespace jmespath {
                         stack.push_back(std::addressof(r));
                         break;
                     }
+                    case token_type::argument:
+                    {
+                        JSONCONS_ASSERT(!stack.empty());
+                        arg_stack.push_back(stack.back());
+                        stack.pop_back();
+                        break;
+                    }
                     case token_type::function:
                     {
-                        if (t.function_->arg_count() > stack.size())
+                        if (t.function_->arg_count() != arg_stack.size())
                         {
-                            ec = jmespath_errc::too_few_parameters;
+                            ec = jmespath_errc::invalid_arity;
                             return Json::null();
                         }
-                        reference r = t.function_->evaluate(span<pointer>(stack).subspan(stack.size() - t.function_->arg_count(), t.function_->arg_count()), storage, ec);
+
+                        reference r = t.function_->evaluate(arg_stack, storage, ec);
                         if (ec)
                         {
                             return Json::null();
                         }
-                        auto it = stack.rbegin() + t.function_->arg_count();
-                        stack.erase(it.base(), stack.end());
+                        arg_stack.clear();
                         stack.push_back(std::addressof(r));
                         break;
                     }
@@ -2295,7 +2319,7 @@ namespace jmespath {
                             }
                             case ')':
                             {
-                                if (state_stack_.size() > 1 && *(state_stack_.rbegin()+1) == path_state::function_expression)
+                                if (state_stack_.size() > 1 && *(state_stack_.rbegin()+1) == path_state::argument)
                                 {
                                     state_stack_.pop_back();
                                 }
@@ -2542,6 +2566,7 @@ namespace jmespath {
                                 buffer.clear();
                                 push_token(token(f));
                                 state_stack_.back() = path_state::function_expression;
+                                state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
@@ -2566,6 +2591,8 @@ namespace jmespath {
                                 break;
                             case ',':
                                 push_token(token(source_placeholder_arg));
+                                state_stack_.emplace_back(path_state::argument);
+                                state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;
@@ -2580,6 +2607,11 @@ namespace jmespath {
                             default:
                                 break;
                         }
+                        break;
+
+                    case path_state::argument:
+                        push_token(argument_arg);
+                        state_stack_.pop_back();
                         break;
 
                     case path_state::quoted_string: 
@@ -3804,6 +3836,7 @@ namespace jmespath {
                 case token_type::source_placeholder:
                 case token_type::key:
                 case token_type::pipe:
+                case token_type::argument:
                     output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::lparen:

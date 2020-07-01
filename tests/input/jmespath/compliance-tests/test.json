@@ -16,9 +16,13 @@
   },
     "cases": [
     {
+      "expression": "abs(foo)",
+      "result": 1
+    }/*,
+    {
       "expression": "merge(`{}`)",
       "result": {}
-    }
+    }*/
   ]
 }
 ]

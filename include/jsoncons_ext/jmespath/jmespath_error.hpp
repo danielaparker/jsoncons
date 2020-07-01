@@ -108,7 +108,7 @@ enum class jmespath_errc
     illegal_escaped_character,
     unbalanced_parentheses,
     not_a_number,
-    too_few_parameters,
+    invalid_arity,
     unknown_error 
 };
 
@@ -172,8 +172,8 @@ public:
                 return "Unbalanced parentheses";
             case jmespath_errc::not_a_number:
                 return "Not a number";
-            case jmespath_errc::too_few_parameters:
-                return "Too few parameters";
+            case jmespath_errc::invalid_arity:
+                return "Wrong number of arguments to function";
             case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";
