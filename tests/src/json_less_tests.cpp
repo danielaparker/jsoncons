@@ -83,9 +83,28 @@ TEST_CASE("json bool less")
     }
 }
 
-TEST_CASE("json int64 less")
+TEST_CASE("json integer less")
 {
-    json j1 = -100;
+    SECTION("-1 < 3")
+    {
+        json lhs(-1);
+        json rhs(3);
+
+        CHECK(lhs < rhs);
+        CHECK(lhs <= rhs);
+        CHECK_FALSE(rhs < lhs);
+        CHECK_FALSE(rhs <= lhs);
+    }
+    SECTION("-1 < uint64_t(3)")
+    {
+        json lhs(-1);
+        json rhs(uint64_t(3));
+
+        CHECK(lhs < rhs);
+        CHECK(lhs <= rhs);
+        CHECK_FALSE(rhs < lhs);
+        CHECK_FALSE(rhs <= lhs);
+    }
 }
 
 TEST_CASE("json short string less")
