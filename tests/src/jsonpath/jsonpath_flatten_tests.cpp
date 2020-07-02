@@ -101,8 +101,55 @@ TEST_CASE("jsonpath flatten with single quote test")
         json result = jsonpath::flatten(input);
 
         json original = jsonpath::unflatten(result);
-        //std::cout << pretty_print(original) << "\n";
         CHECK(original == input);
     }
+}
 
+namespace {
+
+    void compare_match(jsoncons::json& doc,
+                       const std::string& path, 
+                       const std::string& value)
+    {
+    	auto result = jsoncons::jsonpath::json_query(doc, path);
+    	CHECK_FALSE(result.empty()); // must match
+        CHECK_FALSE(result.size() > 1); // too many matches
+
+        auto matched_value = result[0].as<std::string>();
+        CHECK(value == matched_value);
+    }
+
+    void compare_paths(jsoncons::json& flat_doc, jsoncons::json& doc)
+    {
+    	for (const auto& member : flat_doc.object_range())
+    	{
+    		const auto& path = member.key();
+    		const auto& value = member.value().as<std::string>();
+    		compare_match(doc, path, value);
+    	}
+    }
+
+} // namespace
+
+TEST_CASE("jsonpath flatten escape")
+{
+    std::string json
+    {
+        R"({)"
+            R"("data":)"
+            R"({)"
+                R"("a\"bc": "abc",)"
+                R"("d'ef": "def",)"
+                R"("g.hi": "ghi",)"
+                R"("j\\kl": "jkl",)"
+                R"("m/no": "mno",)"
+                R"("x\"y'z": "xyz")"
+            R"(})"
+        R"(})" };
+
+    jsoncons::json doc = jsoncons::json::parse(json);
+
+    auto flat_doc = jsoncons::jsonpath::flatten(doc);
+
+    compare_paths(flat_doc, doc);
 }
