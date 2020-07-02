@@ -19,6 +19,62 @@
 
 namespace jsoncons { namespace jsonpath {
 
+    template <class CharT, class Sink>
+    std::size_t escape_string(const CharT* s, std::size_t length,
+                              Sink& sink)
+    {
+        std::size_t count = 0;
+        const CharT* begin = s;
+        const CharT* end = s + length;
+        for (const CharT* it = begin; it != end; ++it)
+        {
+            CharT c = *it;
+            switch (c)
+            {
+                case '\\':
+                    sink.push_back('\\');
+                    sink.push_back('\\');
+                    count += 2;
+                    break;
+                case '\'':
+                    sink.push_back('\\');
+                    sink.push_back('\'');
+                    count += 2;
+                    break;
+                case '\b':
+                    sink.push_back('\\');
+                    sink.push_back('b');
+                    count += 2;
+                    break;
+                case '\f':
+                    sink.push_back('\\');
+                    sink.push_back('f');
+                    count += 2;
+                    break;
+                case '\n':
+                    sink.push_back('\\');
+                    sink.push_back('n');
+                    count += 2;
+                    break;
+                case '\r':
+                    sink.push_back('\\');
+                    sink.push_back('r');
+                    count += 2;
+                    break;
+                case '\t':
+                    sink.push_back('\\');
+                    sink.push_back('t');
+                    count += 2;
+                    break;
+                default:
+                    sink.push_back(c);
+                    ++count;
+                    break;
+            }
+        }
+        return count;
+    }
+
     template<class Json>
     void flatten_(const std::basic_string<typename Json::char_type>& parent_key,
                   const Json& parent_value,
@@ -60,11 +116,10 @@ namespace jsoncons { namespace jsonpath {
                     for (const auto& item : parent_value.object_range())
                     {
                         string_type key(parent_key);
-                        bool no_single_quote = item.key().find('\'') == string_type::npos;
                         key.push_back('[');
-                        key.push_back(no_single_quote ? '\'' : '\"');
-                        std::copy(item.key().begin(),item.key().end(), std::back_inserter(key));
-                        key.push_back(no_single_quote ? '\'' : '\"');
+                        key.push_back('\'');
+                        escape_string(item.key().data(), item.key().length(), key);
+                        key.push_back('\'');
                         key.push_back(']');
                         flatten_(key, item.value(), result);
                     }
@@ -97,7 +152,9 @@ namespace jsoncons { namespace jsonpath {
         single_quoted_name_state,
         double_quoted_name_state,
         index_state,
-        expect_right_bracket
+        expect_right_bracket,
+        double_quoted_string_escape_char,
+        single_quoted_string_escape_char
     };
 
     template<class Json>
@@ -189,6 +246,9 @@ namespace jsoncons { namespace jsonpath {
                                 buffer.clear();
                                 state = unflatten_state::expect_right_bracket;
                                 break;
+                            case '\\':
+                                state = unflatten_state::single_quoted_string_escape_char;
+                                break;
                             default:
                                 buffer.push_back(*it);
                                 break;
@@ -213,12 +273,93 @@ namespace jsoncons { namespace jsonpath {
                                 buffer.clear();
                                 state = unflatten_state::expect_right_bracket;
                                 break;
+                            case '\\':
+                                state = unflatten_state::double_quoted_string_escape_char;
+                                break;
                             default:
                                 buffer.push_back(*it);
                                 break;
                         }
                         break;
                     }
+                    case unflatten_state::double_quoted_string_escape_char:
+                        switch (*it)
+                        {
+                            case '\"':
+                                buffer.push_back('\"');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case '\\': 
+                                buffer.push_back('\\');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case '/':
+                                buffer.push_back('/');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'b':
+                                buffer.push_back('\b');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'f':
+                                buffer.push_back('\f');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'n':
+                                buffer.push_back('\n');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'r':
+                                buffer.push_back('\r');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 't':
+                                buffer.push_back('\t');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case unflatten_state::single_quoted_string_escape_char:
+                        switch (*it)
+                        {
+                            case '\'':
+                                buffer.push_back('\'');
+                                state = unflatten_state::single_quoted_name_state;
+                                break;
+                            case '\\': 
+                                buffer.push_back('\\');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case '/':
+                                buffer.push_back('/');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'b':
+                                buffer.push_back('\b');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'f':
+                                buffer.push_back('\f');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'n':
+                                buffer.push_back('\n');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 'r':
+                                buffer.push_back('\r');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            case 't':
+                                buffer.push_back('\t');
+                                state = unflatten_state::double_quoted_name_state;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
                     case unflatten_state::index_state:
                     {
                         switch (*it)
