@@ -20,6 +20,7 @@
 #include <iterator> // std::make_move_iterator
 #include <functional> // 
 #include <algorithm> // std::sort
+#include <cmath> // std::abs
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
 
@@ -432,12 +433,12 @@ namespace jmespath {
                         return *val;
                     case json_type::int64_value:
                     {
-                        auto j = val->as<int64_t>() >= 0 ? val : storage.create_json(abs(val->as<int64_t>()));
+                        auto j = val->as<int64_t>() >= 0 ? val : storage.create_json(std::abs(val->as<int64_t>()));
                         return *j;
                     }
                     case json_type::double_value:
                     {
-                        auto j = val->as<double>() >= 0 ? val : storage.create_json(abs(val->as<double>()));
+                        auto j = val->as<double>() >= 0 ? val : storage.create_json(std::abs(val->as<double>()));
                         return *j;
                     }
                     default:
@@ -653,7 +654,7 @@ namespace jmespath {
                     return Json::null();
                 }
 
-                string_type sep = ptr1->as<string_type>();
+                string_type sep = ptr0->as<string_type>();
                 string_type buf;
                 for (auto& j : ptr1->array_range())
                 {
@@ -875,6 +876,153 @@ namespace jmespath {
                         break;
 
                 }
+            }
+        };
+
+        class sort_function : public function_base
+        {
+        public:
+            sort_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+                if (ptr->size() <= 1)
+                {
+                    return *ptr;
+                }
+
+                bool is_number = ptr->at(0).is_number();
+                bool is_string = ptr->at(0).is_string();
+                if (!is_number && !is_string)
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                auto v = storage.create_json(*ptr);
+                std::sort((v->array_range()).begin(), (v->array_range()).end());
+                return *v;
+            }
+        };
+
+        class keys_function final : public function_base
+        {
+        public:
+            keys_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                if (!ptr->is_object())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                auto result = storage.create_json(json_array_arg);
+                result->reserve(args.size());
+
+                for (auto& item : ptr->object_range())
+                {
+                    result->emplace_back(item.key());
+                }
+                return *result;
+            }
+        };
+
+        class values_function final : public function_base
+        {
+        public:
+            values_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                if (!ptr->is_object())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                auto result = storage.create_json(json_array_arg);
+                result->reserve(args.size());
+
+                for (auto& item : ptr->object_range())
+                {
+                    result->emplace_back(item.value());
+                }
+                return *result;
+            }
+        };
+
+        class reverse_function final : public function_base
+        {
+        public:
+            reverse_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                switch (ptr->type())
+                {
+                    case json_type::string_value:
+                    {
+                        string_view_type sv = ptr->as_string_view();
+                        std::basic_string<char32_t> buf;
+                        unicons::convert(sv.begin(), sv.end(), std::back_inserter(buf));
+                        std::reverse(buf.begin(), buf.end());
+                        string_type s;
+                        unicons::convert(buf.begin(), buf.end(), std::back_inserter(s));
+                        return *storage.create_json(s);
+                    }
+                    case json_type::array_value:
+                    {
+                        auto result = storage.create_json(*ptr);
+                        std::reverse(result->array_range().begin(),result->array_range().end());
+                        return *result;
+                    }
+                    default:
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                }
+            }
+        };
+
+        class to_string_function final : public function_base
+        {
+        public:
+            to_string_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code&) override
+            {
+                auto ptr = args[0];
+                return *storage.create_json(ptr->as<string_type>());
+            }
+
+            std::string to_string(std::size_t = 0) const override
+            {
+                return std::string("to_string_function\n");
             }
         };
 
@@ -2159,6 +2307,11 @@ namespace jmespath {
             merge_function merge_func_;
             min_function min_func_;
             type_function type_func_;
+            sort_function sort_func_;
+            keys_function keys_func_;
+            values_function values_func_;
+            reverse_function reverse_func_;
+            to_string_function to_string_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
             const function_dictionary functions_ =
@@ -2174,7 +2327,12 @@ namespace jmespath {
                 {string_type{'m','a','x'}, &max_func_},
                 {string_type{'m','i','n'}, &min_func_},
                 {string_type{'m','e','r', 'g', 'e'}, &merge_func_},
-                {string_type{'t','y','p', 'e'}, &type_func_}
+                {string_type{'t','y','p', 'e'}, &type_func_},
+                {string_type{'s','o','r', 't'}, &sort_func_},
+                {string_type{'k','e','y', 's'}, &keys_func_},
+                {string_type{'v','a','l', 'u','e','s'}, &values_func_},
+                {string_type{'r','e','v', 'e', 'r', 's','e'}, &reverse_func_},
+                {string_type{'t','o','_', 's', 't', 'r','i','n','g'}, &to_string_func_}
 
             };
 
@@ -2685,6 +2843,8 @@ namespace jmespath {
                                     return jmespath_expression();
                                 }
                                 buffer.clear();
+                                ++paren_level;
+                                push_token(token(lparen_arg));
                                 push_token(token(f));
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
@@ -2720,6 +2880,8 @@ namespace jmespath {
                                 break;
                             case ')':
                             {
+                                --paren_level;
+                                push_token(token(rparen_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -3690,10 +3852,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            //for (auto& t : output_stack_)
-            //{
-            //    std::cout << t.to_string() << "\n";
-            //}
+            for (auto& t : output_stack_)
+            {
+                std::cout << t.to_string() << "\n";
+            }
 
             if (paren_level != 0)
             {

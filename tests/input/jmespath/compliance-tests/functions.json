@@ -330,7 +330,7 @@
     {
       "expression": "type(@)",
       "result": "object"
-    }/*,
+    },
     {
       "expression": "sort(keys(objects))",
       "result": ["bar", "foo"]
@@ -418,7 +418,7 @@
     {
       "expression": "reverse('hello world')",
       "result": "dlrow olleh"
-    },
+    }/*,
     {
       "expression": "starts_with(str, 'S')",
       "result": true
