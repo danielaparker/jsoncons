@@ -119,16 +119,6 @@ namespace {
         CHECK(value == matched_value);
     }
 
-    void compare_paths(jsoncons::json& flat_doc, jsoncons::json& doc)
-    {
-    	for (const auto& member : flat_doc.object_range())
-    	{
-    		const auto& path = member.key();
-    		const auto& value = member.value().as<std::string>();
-    		compare_match(doc, path, value);
-    	}
-    }
-
 } // namespace
 
 TEST_CASE("jsonpath flatten escape")
@@ -151,5 +141,10 @@ TEST_CASE("jsonpath flatten escape")
 
     auto flat_doc = jsoncons::jsonpath::flatten(doc);
 
-    compare_paths(flat_doc, doc);
+    for (const auto& member : flat_doc.object_range())
+    {
+        const auto& path = member.key();
+        const auto& value = member.value().as<std::string>();
+        compare_match(doc, path, value);
+    }
 }
