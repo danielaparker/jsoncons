@@ -844,6 +844,40 @@ namespace jmespath {
             }
         };
 
+        class type_function : public function_base
+        {
+        public:
+            type_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code&) override
+            {
+                auto ptr = args[0];
+
+                switch (ptr->type())
+                {
+                    case json_type::int64_value:
+                    case json_type::uint64_value:
+                    case json_type::double_value:
+                        return storage.number_type_name();
+                    case json_type::bool_value:
+                        return storage.boolean_type_name();
+                    case json_type::string_value:
+                        return storage.string_type_name();
+                    case json_type::object_value:
+                        return storage.object_type_name();
+                    case json_type::array_value:
+                        return storage.array_type_name();
+                    default:
+                        return storage.null_type_name();
+                        break;
+
+                }
+            }
+        };
+
         // token
 
         class token
@@ -2124,6 +2158,7 @@ namespace jmespath {
             max_function max_func_;
             merge_function merge_func_;
             min_function min_func_;
+            type_function type_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
             const function_dictionary functions_ =
@@ -2138,7 +2173,8 @@ namespace jmespath {
                 {string_type{'l','e','n', 'g', 't', 'h'}, &length_func_},
                 {string_type{'m','a','x'}, &max_func_},
                 {string_type{'m','i','n'}, &min_func_},
-                {string_type{'m','e','r', 'g', 'e'}, &merge_func_}
+                {string_type{'m','e','r', 'g', 'e'}, &merge_func_},
+                {string_type{'t','y','p', 'e'}, &type_func_}
 
             };
 
@@ -2152,14 +2188,22 @@ namespace jmespath {
             lte_operator lte_oper_;
             gt_operator gt_oper_;
             gte_operator gte_oper_;
+
+            Json number_type_name_;
+            Json boolean_type_name_;
+            Json string_type_name_;
+            Json object_type_name_;
+            Json array_type_name_;
+            Json null_type_name_;
         public:
 
             jmespath_storage()
-            {
-            }
-
-            jmespath_storage(std::vector<std::unique_ptr<Json>>&& temp_storage)
-                : temp_storage_(std::move(temp_storage))
+                : number_type_name_(string_type({'n','u','m','b','e','r'})),
+                  boolean_type_name_(string_type({'b','o','o','l','e','a','n'})),
+                  string_type_name_(string_type({'s','t','r','i','n','g'})),
+                  object_type_name_(string_type({'o','b','j','e','c','t'})),
+                  array_type_name_(string_type({'a','r','r','a','y'})),
+                  null_type_name_(string_type({'n','u','l','l'}))
             {
             }
 
@@ -2217,6 +2261,36 @@ namespace jmespath {
             binary_operator* get_gte_operator()
             {
                 return &gte_oper_;
+            }
+
+            reference number_type_name()
+            {
+                return number_type_name_;
+            }
+
+            reference boolean_type_name()
+            {
+                return boolean_type_name_;
+            }
+
+            reference string_type_name()
+            {
+                return string_type_name_;
+            }
+
+            reference object_type_name()
+            {
+                return object_type_name_;
+            }
+
+            reference array_type_name()
+            {
+                return array_type_name_;
+            }
+
+            reference null_type_name()
+            {
+                return null_type_name_;
             }
 
             template <typename... Args>

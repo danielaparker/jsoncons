@@ -294,7 +294,7 @@
     {
       "expression": "min(strings)",
       "result": "a"
-    }/*,
+    },
     {
       "expression": "type('abc')",
       "result": "string"
@@ -330,7 +330,7 @@
     {
       "expression": "type(@)",
       "result": "object"
-    },
+    }/*,
     {
       "expression": "sort(keys(objects))",
       "result": ["bar", "foo"]
