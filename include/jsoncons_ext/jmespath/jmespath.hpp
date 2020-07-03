@@ -4474,7 +4474,6 @@ namespace jmespath {
     Json search(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-        std::error_code ec;
         auto expr = evaluator.compile(path.data(), path.size(), ec);
         if (ec)
         {
