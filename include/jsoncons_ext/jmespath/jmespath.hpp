@@ -672,7 +672,7 @@ namespace jmespath {
                     {
                         buf.append(sep);
                     }
-                    auto sv = j.as<string_view_type>();
+                    auto sv = j.template as<string_view_type>();
                     buf.append(sv.begin(), sv.end());
                 }
                 return *storage.create_json(buf);
