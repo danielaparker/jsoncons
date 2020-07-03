@@ -447,12 +447,12 @@ namespace jmespath {
                         return *val;
                     case json_type::int64_value:
                     {
-                        auto j = val->as<int64_t>() >= 0 ? val : storage.create_json(std::abs(val->as<int64_t>()));
+                        auto j = val->template as<int64_t>() >= 0 ? val : storage.create_json(std::abs(val->as<int64_t>()));
                         return *j;
                     }
                     case json_type::double_value:
                     {
-                        auto j = val->as<double>() >= 0 ? val : storage.create_json(std::abs(val->as<double>()));
+                        auto j = val->template as<double>() >= 0 ? val : storage.create_json(std::abs(val->as<double>()));
                         return *j;
                     }
                     default:
@@ -1195,6 +1195,32 @@ namespace jmespath {
             {
                 auto ptr = args[0];
                 return *storage.create_json(ptr->as<string_type>());
+            }
+
+            std::string to_string(std::size_t = 0) const override
+            {
+                return std::string("to_string_function\n");
+            }
+        };
+
+        class not_null_function final : public function_base
+        {
+        public:
+            not_null_function()
+                : function_base(optional<std::size_t>())
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code&) override
+            {
+                for (auto ptr : args)
+                {
+                    if (!ptr->is_null())
+                    {
+                        return *ptr;
+                    }
+                }
+                return Json::null();
             }
 
             std::string to_string(std::size_t = 0) const override
@@ -2547,6 +2573,7 @@ namespace jmespath {
             to_array_function to_array_func_;
             to_number_function to_number_func_;
             to_string_function to_string_func_;
+            not_null_function not_null_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
             const function_dictionary functions_ =
@@ -2571,8 +2598,8 @@ namespace jmespath {
                 {string_type{'s','u','m'}, &sum_func_},
                 {string_type{'t','o','_','a','r','r','a','y',}, &to_array_func_},
                 {string_type{'t','o','_', 'n', 'u', 'm','b','e','r'}, &to_number_func_},
-                {string_type{'t','o','_', 's', 't', 'r','i','n','g'}, &to_string_func_}
-
+                {string_type{'t','o','_', 's', 't', 'r','i','n','g'}, &to_string_func_},
+                {string_type{'n','o','t', '_', 'n', 'u','l','l'}, &not_null_func_}
             };
 
             std::vector<std::unique_ptr<Json>> temp_storage_;
@@ -4091,10 +4118,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            for (auto& t : output_stack_)
-            {
-                std::cout << t.to_string() << "\n";
-            }
+            //for (auto& t : output_stack_)
+            //{
+            //    std::cout << t.to_string() << "\n";
+            //}
 
             if (paren_level != 0)
             {
