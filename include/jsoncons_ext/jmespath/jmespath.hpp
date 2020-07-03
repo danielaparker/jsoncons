@@ -2323,6 +2323,44 @@ namespace jmespath {
             }
         };
 
+        class function_expression final : public selector_base
+        {
+        public:
+            std::vector<token> toks_;
+
+            function_expression(std::vector<token>&& toks)
+                : toks_(std::move(toks))
+            {
+            }
+
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code& ec) override
+            {
+                return evaluate_tokens(val, toks_, storage, ec);
+            }
+
+            std::string to_string(std::size_t indent = 0) const override
+            {
+                std::string s;
+                for (std::size_t i = 0; i <= indent; ++i)
+                {
+                    s.push_back(' ');
+                }
+                s.append("function_expression\n");
+                /*for (auto& key_expr : toks_)
+                {
+                    for (std::size_t i = 0; i <= indent+2; ++i)
+                    {
+                        s.push_back(' ');
+                    }
+                    s.append(key_expr.key);
+                    std::string sss = key_expr.expression->to_string(indent+2);
+                    s.insert(s.end(), sss.begin(), sss.end());
+                    s.push_back('\n');
+                }*/
+                return s;
+            }
+        };
+
         class jmespath_storage
         {
             abs_function abs_func_;
@@ -3937,22 +3975,6 @@ namespace jmespath {
             operator_stack_.erase(it.base(),operator_stack_.end());
         }
 
-        void unwind_begin_function()
-        {
-            auto it = operator_stack_.rbegin();
-            while (it != operator_stack_.rend() && it->type() != token_type::begin_function)
-            {
-                output_stack_.emplace_back(std::move(*it));
-                ++it;
-            }
-            if (it == operator_stack_.rend())
-            {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
-            }
-            ++it;
-            operator_stack_.erase(it.base(),operator_stack_.end());
-        }
-
         void push_token(token&& tok)
         {
             switch (tok.type())
@@ -4106,7 +4128,35 @@ namespace jmespath {
                     }
                 case token_type::end_function:
                     {
-                        unwind_begin_function();
+                        unwind_rparen();
+                        std::vector<token> toks;
+                        auto it = output_stack_.rbegin();
+                        while (it != output_stack_.rend() && it->type() != token_type::begin_function)
+                        {
+                            toks.insert(toks.begin(), std::move(*it));
+                            ++it;
+                        }
+                        if (it == output_stack_.rend())
+                        {
+                            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
+                        }
+                        ++it;
+                        if (toks.front().type() != token_type::literal)
+                        {
+                            toks.emplace(toks.begin(), current_node_arg);
+                        }
+                        output_stack_.erase(it.base(),output_stack_.end());
+
+                        if (!output_stack_.empty() && output_stack_.back().is_projection() && 
+                            (tok.precedence_level() < output_stack_.back().precedence_level() ||
+                            (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                        {
+                            output_stack_.back().expression_->add_expression(jsoncons::make_unique<function_expression>(std::move(toks)));
+                        }
+                        else
+                        {
+                            output_stack_.emplace_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                        }
                         break;
                     }
                 case token_type::end_of_expression:
@@ -4167,6 +4217,10 @@ namespace jmespath {
                     output_stack_.emplace_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
+                case token_type::begin_function:
+                    output_stack_.emplace_back(std::move(tok));
+                    operator_stack_.emplace_back(token(lparen_arg));
+                    break;
                 case token_type::current_node:
                 case token_type::key:
                 case token_type::pipe:
@@ -4174,7 +4228,6 @@ namespace jmespath {
                     output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::lparen:
-                case token_type::begin_function:
                     operator_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::function:
