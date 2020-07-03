@@ -29,7 +29,7 @@ namespace jmespath {
 
     enum class token_type 
     {
-        source_placeholder,
+        current_node,
         lparen,
         rparen,
         begin_multi_select_hash,
@@ -46,6 +46,8 @@ namespace jmespath {
         binary_operator,
         unary_operator,
         function,
+        begin_function,
+        end_function,
         argument,
         end_of_expression
     };
@@ -128,11 +130,23 @@ namespace jmespath {
     };
     constexpr pipe_arg_t pipe_arg{};
 
-    struct source_placeholder_arg_t
+    struct current_node_arg_t
     {
-        explicit source_placeholder_arg_t() = default;
+        explicit current_node_arg_t() = default;
     };
-    constexpr source_placeholder_arg_t source_placeholder_arg{};
+    constexpr current_node_arg_t current_node_arg{};
+
+    struct end_function_arg_t
+    {
+        explicit end_function_arg_t() = default;
+    };
+    constexpr end_function_arg_t end_function_arg{};
+
+    struct begin_function_arg_t
+    {
+        explicit begin_function_arg_t() = default;
+    };
+    constexpr begin_function_arg_t begin_function_arg{};
 
     struct argument_arg_t
     {
@@ -1044,8 +1058,18 @@ namespace jmespath {
             };
         public:
 
-            token(source_placeholder_arg_t)
-                : type_(token_type::source_placeholder)
+            token(current_node_arg_t)
+                : type_(token_type::current_node)
+            {
+            }
+
+            token(begin_function_arg_t)
+                : type_(token_type::begin_function)
+            {
+            }
+
+            token(end_function_arg_t)
+                : type_(token_type::end_function)
             {
             }
 
@@ -1218,9 +1242,9 @@ namespace jmespath {
                 return type_ == token_type::rparen; 
             }
 
-            bool is_source_placeholder() const
+            bool is_current_node() const
             {
-                return type_ == token_type::source_placeholder; 
+                return type_ == token_type::current_node; 
             }
 
             bool is_projection() const
@@ -1326,8 +1350,14 @@ namespace jmespath {
                     case token_type::binary_operator:
                         return binary_operator_->to_string(indent);
                         break;
-                    case token_type::source_placeholder:
-                        return std::string("source_placeholder");
+                    case token_type::current_node:
+                        return std::string("current_node");
+                        break;
+                    case token_type::begin_function:
+                        return std::string("begin_function");
+                        break;
+                    case token_type::end_function:
+                        return std::string("end_function");
                         break;
                     case token_type::separator:
                         return std::string("separator");
@@ -1386,7 +1416,7 @@ namespace jmespath {
                         root_ptr = stack.back();
                         break;
                     }
-                    case token_type::source_placeholder:
+                    case token_type::current_node:
                         stack.push_back(root_ptr);
                         break;
                     case token_type::expression:
@@ -2534,7 +2564,7 @@ namespace jmespath {
                                     std::size_t length,
                                     std::error_code& ec)
         {
-            push_token(source_placeholder_arg);
+            push_token(current_node_arg);
             state_stack_.emplace_back(path_state::start);
 
             string_type buffer;
@@ -2844,7 +2874,7 @@ namespace jmespath {
                                 }
                                 buffer.clear();
                                 ++paren_level;
-                                push_token(token(lparen_arg));
+                                push_token(token(begin_function_arg));
                                 push_token(token(f));
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
@@ -2871,7 +2901,7 @@ namespace jmespath {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
@@ -2881,7 +2911,7 @@ namespace jmespath {
                             case ')':
                             {
                                 --paren_level;
-                                push_token(token(rparen_arg));
+                                push_token(token(end_function_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -3494,14 +3524,14 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(storage_.get_lte_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token(storage_.get_lt_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back();
                                 break;
                         }
@@ -3513,14 +3543,14 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(storage_.get_gte_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token(storage_.get_gt_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -3532,7 +3562,7 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(storage_.get_eq_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -3549,7 +3579,7 @@ namespace jmespath {
                         {
                             case '=':
                                 push_token(token(storage_.get_ne_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -3650,7 +3680,7 @@ namespace jmespath {
                         {
                             case '|':
                                 push_token(token(storage_.get_or_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -3668,7 +3698,7 @@ namespace jmespath {
                         {
                             case '&':
                                 push_token(token(storage_.get_and_operator()));
-                                push_token(token(source_placeholder_arg));
+                                push_token(token(current_node_arg));
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
@@ -3907,6 +3937,22 @@ namespace jmespath {
             operator_stack_.erase(it.base(),operator_stack_.end());
         }
 
+        void unwind_begin_function()
+        {
+            auto it = operator_stack_.rbegin();
+            while (it != operator_stack_.rend() && it->type() != token_type::begin_function)
+            {
+                output_stack_.emplace_back(std::move(*it));
+                ++it;
+            }
+            if (it == operator_stack_.rend())
+            {
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
+            }
+            ++it;
+            operator_stack_.erase(it.base(),operator_stack_.end());
+        }
+
         void push_token(token&& tok)
         {
             switch (tok.type())
@@ -3930,7 +3976,7 @@ namespace jmespath {
 
                     if (toks.front().type() != token_type::literal)
                     {
-                        toks.emplace(toks.begin(), source_placeholder_arg);
+                        toks.emplace(toks.begin(), current_node_arg);
                     }
                     if (!output_stack_.empty() && output_stack_.back().is_projection() && 
                         (tok.precedence_level() < output_stack_.back().precedence_level() ||
@@ -3963,7 +4009,7 @@ namespace jmespath {
                         }
                         if (toks.front().type() != token_type::literal)
                         {
-                            toks.emplace(toks.begin(), source_placeholder_arg);
+                            toks.emplace(toks.begin(), current_node_arg);
                         }
                         vals.insert(vals.begin(), std::move(toks));
                     }
@@ -4008,7 +4054,7 @@ namespace jmespath {
                         }
                         if (toks.front().type() != token_type::literal)
                         {
-                            toks.emplace(toks.begin(), source_placeholder_arg);
+                            toks.emplace(toks.begin(), current_node_arg);
                         }
                         key_toks.emplace(key_toks.begin(), std::move(key), std::move(toks));
                     }
@@ -4032,7 +4078,7 @@ namespace jmespath {
                     break;
                 }
                 case token_type::literal:
-                    if (!output_stack_.empty() && output_stack_.back().type() == token_type::source_placeholder)
+                    if (!output_stack_.empty() && output_stack_.back().type() == token_type::current_node)
                     {
                         output_stack_.back() = std::move(tok);
                     }
@@ -4056,6 +4102,11 @@ namespace jmespath {
                 case token_type::rparen:
                     {
                         unwind_rparen();
+                        break;
+                    }
+                case token_type::end_function:
+                    {
+                        unwind_begin_function();
                         break;
                     }
                 case token_type::end_of_expression:
@@ -4116,13 +4167,14 @@ namespace jmespath {
                     output_stack_.emplace_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
-                case token_type::source_placeholder:
+                case token_type::current_node:
                 case token_type::key:
                 case token_type::pipe:
                 case token_type::argument:
                     output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::lparen:
+                case token_type::begin_function:
                     operator_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::function:

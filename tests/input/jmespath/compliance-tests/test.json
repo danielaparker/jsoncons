@@ -16,14 +16,18 @@
   },
     "cases": [
     {
+      "expression": "to_string('foo')",
+      "result": "foo"
+    }/*,
+    {
       "expression": "decimals[].to_string(@)",
       "result": [
         "1.01",
         "1.2",
         "-1.5"
       ]
-    }
-    /*{
+    },
+    {
       "expression": "join('|', decimals[].to_string(@))",
       "result": "1.01|1.2|-1.5"
     }*/
