@@ -922,6 +922,15 @@ namespace jmespath {
                     return Json::null();
                 }
 
+                for (std::size_t i = 1; i < ptr->size(); ++i)
+                {
+                    if (ptr->at(i).is_number() != is_number || ptr->at(i).is_string() != is_string)
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                }
+
                 auto v = storage.create_json(*ptr);
                 std::sort((v->array_range()).begin(), (v->array_range()).end());
                 return *v;
@@ -1017,6 +1026,160 @@ namespace jmespath {
                         ec = jmespath_errc::invalid_type;
                         return Json::null();
                 }
+            }
+        };
+
+        class starts_with_function : public function_base
+        {
+        public:
+            starts_with_function()
+                : function_base(2)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
+            {
+                static const Json t(true, semantic_tag::none);
+                static const Json f(false, semantic_tag::none);
+
+                auto ptr0 = args[0];
+                if (!ptr0->is_string())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                auto ptr1 = args[1];
+                if (!ptr1->is_string())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+
+                auto sv0 = ptr0->as<string_view_type>();
+                auto sv1 = ptr1->as<string_view_type>();
+
+                if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
+                {
+                    return t;
+                }
+                else
+                {
+                    return f;
+                }
+            }
+        };
+
+        class sum_function : public function_base
+        {
+        public:
+            sum_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
+            {
+                auto ptr = args[0];
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return Json::null();
+                }
+                double sum = 0;
+                for (auto& j : ptr->array_range())
+                {
+                    if (!j.is_number())
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return Json::null();
+                    }
+                    sum += j.as<double>();
+                }
+
+                return *storage.create_json(sum);
+            }
+        };
+
+        class to_array_function final : public function_base
+        {
+        public:
+            to_array_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code&) override
+            {
+                auto ptr = args[0];
+                if (ptr->is_array())
+                {
+                    return *ptr;
+                }
+                else
+                {
+                    auto result = storage.create_json(json_array_arg);
+                    result->push_back(*ptr);
+                    return *result;
+                }
+            }
+
+            std::string to_string(std::size_t = 0) const override
+            {
+                return std::string("to_array_function\n");
+            }
+        };
+
+        class to_number_function final : public function_base
+        {
+        public:
+            to_number_function()
+                : function_base(1)
+            {
+            }
+
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code&) override
+            {
+                auto ptr = args[0];
+                switch (ptr->type())
+                {
+                    case json_type::int64_value:
+                    case json_type::uint64_value:
+                    case json_type::double_value:
+                        return *ptr;
+                    case json_type::string_value:
+                    {
+                        auto sv = ptr->as_string_view();
+                        auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
+                        if (result1)
+                        {
+                            return *storage.create_json(result1.value());
+                        }
+                        auto result2 = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
+                        if (result2)
+                        {
+                            return *storage.create_json(result2.value());
+                        }
+                        jsoncons::detail::to_double_t to_double;
+                        try
+                        {
+                            auto s = ptr->as_string();
+                            double d = to_double(s.c_str(), s.length());
+                            return *storage.create_json(d);
+                        }
+                        catch (const std::exception&)
+                        {
+                            return Json::null();
+                        }
+                    }
+                    default:
+                        return Json::null();
+                }
+            }
+
+            std::string to_string(std::size_t = 0) const override
+            {
+                return std::string("to_array_function\n");
             }
         };
 
@@ -2379,6 +2542,10 @@ namespace jmespath {
             keys_function keys_func_;
             values_function values_func_;
             reverse_function reverse_func_;
+            starts_with_function starts_with_func_;
+            sum_function sum_func_;
+            to_array_function to_array_func_;
+            to_number_function to_number_func_;
             to_string_function to_string_func_;
 
             using function_dictionary = std::map<string_type,function_base*>;
@@ -2400,6 +2567,10 @@ namespace jmespath {
                 {string_type{'k','e','y', 's'}, &keys_func_},
                 {string_type{'v','a','l', 'u','e','s'}, &values_func_},
                 {string_type{'r','e','v', 'e', 'r', 's','e'}, &reverse_func_},
+                {string_type{'s','t','a', 'r','t','s','_','w','i','t','h'}, &starts_with_func_},
+                {string_type{'s','u','m'}, &sum_func_},
+                {string_type{'t','o','_','a','r','r','a','y',}, &to_array_func_},
+                {string_type{'t','o','_', 'n', 'u', 'm','b','e','r'}, &to_number_func_},
                 {string_type{'t','o','_', 's', 't', 'r','i','n','g'}, &to_string_func_}
 
             };

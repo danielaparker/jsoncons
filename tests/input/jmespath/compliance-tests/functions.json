@@ -418,7 +418,7 @@
     {
       "expression": "reverse('hello world')",
       "result": "dlrow olleh"
-    }/*,
+    },
     {
       "expression": "starts_with(str, 'S')",
       "result": true
@@ -554,7 +554,7 @@
     {
       "expression": "sort(@)",
       "error": "invalid-type"
-    },
+    }/*,
     {
       "expression": "not_null(unknown_key, str)",
       "result": "Str"
