@@ -447,12 +447,12 @@ namespace jmespath {
                         return *val;
                     case json_type::int64_value:
                     {
-                        auto j = val->template as<int64_t>() >= 0 ? val : storage.create_json(std::abs(val->as<int64_t>()));
+                        auto j = val->template as<int64_t>() >= 0 ? val : storage.create_json(std::abs(val->template as<int64_t>()));
                         return *j;
                     }
                     case json_type::double_value:
                     {
-                        auto j = val->template as<double>() >= 0 ? val : storage.create_json(std::abs(val->as<double>()));
+                        auto j = val->template as<double>() >= 0 ? val : storage.create_json(std::abs(val->template as<double>()));
                         return *j;
                     }
                     default:
