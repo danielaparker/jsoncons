@@ -206,7 +206,7 @@ namespace jmespath {
         {
             if (start_)
             {
-                auto len = start_.value() >= 0 ? start_.value() : (static_cast<int64_t>(size) + start_.value());
+                auto len = *start_ >= 0 ? *start_ : (static_cast<int64_t>(size) + *start_);
                 return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
             }
             else
@@ -348,12 +348,9 @@ namespace jmespath {
             {
                 return true;
             }
-            reference evaluate(reference val, jmespath_storage&, std::error_code&) override
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code&) override
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                return is_false(val) ? t : f;
+                return is_false(val) ? storage.true_value() : storage.false_value();
             }
         };
 
@@ -457,7 +454,7 @@ namespace jmespath {
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                 }
             }
         };
@@ -476,11 +473,11 @@ namespace jmespath {
                 if (!ptr->is_array())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 if (ptr->empty())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 double sum = 0;
@@ -489,12 +486,12 @@ namespace jmespath {
                     if (!j.is_number())
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
-                    sum += j.as<double>();
+                    sum += j.template as<double>();
                 }
 
-                return sum == 0 ? Json::null() : *storage.create_json(sum/ptr->size());
+                return sum == 0 ? storage.null_value() : *storage.create_json(sum/ptr->size());
             }
         };
 
@@ -514,15 +511,15 @@ namespace jmespath {
                     case json_type::uint64_value:
                     case json_type::int64_value:
                     {
-                        return *storage.create_json(val->as<double>());
+                        return *storage.create_json(val->template as<double>());
                     }
                     case json_type::double_value:
                     {
-                        return *storage.create_json(std::ceil(val->as<double>()));
+                        return *storage.create_json(std::ceil(val->template as<double>()));
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                 }
             }
         };
@@ -535,11 +532,8 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
                 auto ptr0 = args[0];
                 auto ptr1 = args[1];
 
@@ -550,25 +544,25 @@ namespace jmespath {
                         {
                             if (j == *ptr1)
                             {
-                                return t;
+                                return storage.true_value();
                             }
                         }
-                        return f;
+                        return storage.false_value();
                     case json_type::string_value:
                     {
                         if (!ptr1->is_string())
                         {
                             ec = jmespath_errc::invalid_type;
-                            return Json::null();
+                            return storage.null_value();
                         }
                         auto sv0 = ptr0->as<string_view_type>();
                         auto sv1 = ptr1->as<string_view_type>();
-                        return sv0.find(sv1) != string_view_type::npos ? t : f;
+                        return sv0.find(sv1) != string_view_type::npos ? storage.true_value() : storage.false_value();
                     }
                     default:
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
                 }
             }
@@ -582,23 +576,20 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
                 auto ptr0 = args[0];
                 if (!ptr0->is_string())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto ptr1 = args[1];
                 if (!ptr1->is_string())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto sv0 = ptr0->as<string_view_type>();
@@ -606,11 +597,11 @@ namespace jmespath {
 
                 if (sv1.length() <= sv0.length() && sv1 == sv0.substr(sv0.length() - sv1.length()))
                 {
-                    return t;
+                    return storage.true_value();
                 }
                 else
                 {
-                    return f;
+                    return storage.false_value();
                 }
             }
         };
@@ -631,15 +622,15 @@ namespace jmespath {
                     case json_type::uint64_value:
                     case json_type::int64_value:
                     {
-                        return *storage.create_json(val->as<double>());
+                        return *storage.create_json(val->template as<double>());
                     }
                     case json_type::double_value:
                     {
-                        return *storage.create_json(std::floor(val->as<double>()));
+                        return *storage.create_json(std::floor(val->template as<double>()));
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                 }
             }
         };
@@ -660,12 +651,12 @@ namespace jmespath {
                 if (!ptr0->is_string())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 if (!ptr1->is_array())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 string_type sep = ptr0->as<string_type>();
@@ -675,7 +666,7 @@ namespace jmespath {
                     if (!j.is_string())
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
                     if (!buf.empty())
                     {
@@ -714,7 +705,7 @@ namespace jmespath {
                     default:
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
                 }
             }
@@ -728,17 +719,17 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto ptr = args[0];
                 if (!ptr->is_array())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 if (ptr->empty())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 bool is_number = ptr->at(0).is_number();
@@ -746,7 +737,7 @@ namespace jmespath {
                 if (!is_number && !is_string)
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 std::size_t index = 0;
@@ -755,7 +746,7 @@ namespace jmespath {
                     if (!(ptr->at(i).is_number() == is_number && ptr->at(i).is_string() == is_string))
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
                     if (ptr->at(i) > ptr->at(index))
                     {
@@ -775,17 +766,17 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
                 auto ptr = args[0];
                 if (!ptr->is_array())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 if (ptr->empty())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 bool is_number = ptr->at(0).is_number();
@@ -793,7 +784,7 @@ namespace jmespath {
                 if (!is_number && !is_string)
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 std::size_t index = 0;
@@ -802,7 +793,7 @@ namespace jmespath {
                     if (!(ptr->at(i).is_number() == is_number && ptr->at(i).is_string() == is_string))
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
                     if (ptr->at(i) < ptr->at(index))
                     {
@@ -827,13 +818,13 @@ namespace jmespath {
                 if (args.empty())
                 {
                     ec = jmespath_errc::invalid_arity;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 auto ptr0 = args[0];
                 if (!ptr0->is_object())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 if (args.size() == 1)
                 {
@@ -847,7 +838,7 @@ namespace jmespath {
                     if (!ptr->is_object())
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
                     for (auto& item : ptr->object_range())
                     {
@@ -907,7 +898,7 @@ namespace jmespath {
                 if (!ptr->is_array())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 if (ptr->size() <= 1)
                 {
@@ -919,7 +910,7 @@ namespace jmespath {
                 if (!is_number && !is_string)
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 for (std::size_t i = 1; i < ptr->size(); ++i)
@@ -927,7 +918,7 @@ namespace jmespath {
                     if (ptr->at(i).is_number() != is_number || ptr->at(i).is_string() != is_string)
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
                 }
 
@@ -951,7 +942,7 @@ namespace jmespath {
                 if (!ptr->is_object())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto result = storage.create_json(json_array_arg);
@@ -979,7 +970,7 @@ namespace jmespath {
                 if (!ptr->is_object())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto result = storage.create_json(json_array_arg);
@@ -1024,7 +1015,7 @@ namespace jmespath {
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                 }
             }
         };
@@ -1037,23 +1028,20 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code& ec) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code& ec) override
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
                 auto ptr0 = args[0];
                 if (!ptr0->is_string())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto ptr1 = args[1];
                 if (!ptr1->is_string())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto sv0 = ptr0->as<string_view_type>();
@@ -1061,11 +1049,11 @@ namespace jmespath {
 
                 if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
                 {
-                    return t;
+                    return storage.true_value();
                 }
                 else
                 {
-                    return f;
+                    return storage.false_value();
                 }
             }
         };
@@ -1084,7 +1072,7 @@ namespace jmespath {
                 if (!ptr->is_array())
                 {
                     ec = jmespath_errc::invalid_type;
-                    return Json::null();
+                    return storage.null_value();
                 }
                 double sum = 0;
                 for (auto& j : ptr->array_range())
@@ -1092,9 +1080,9 @@ namespace jmespath {
                     if (!j.is_number())
                     {
                         ec = jmespath_errc::invalid_type;
-                        return Json::null();
+                        return storage.null_value();
                     }
-                    sum += j.as<double>();
+                    sum += j.template as<double>();
                 }
 
                 return *storage.create_json(sum);
@@ -1169,11 +1157,11 @@ namespace jmespath {
                         }
                         catch (const std::exception&)
                         {
-                            return Json::null();
+                            return storage.null_value();
                         }
                     }
                     default:
-                        return Json::null();
+                        return storage.null_value();
                 }
             }
 
@@ -1211,7 +1199,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<pointer>& args, jmespath_storage&, std::error_code&) override
+            reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code&) override
             {
                 for (auto ptr : args)
                 {
@@ -1220,7 +1208,7 @@ namespace jmespath {
                         return *ptr;
                     }
                 }
-                return Json::null();
+                return storage.null_value();
             }
 
             std::string to_string(std::size_t = 0) const override
@@ -1649,13 +1637,13 @@ namespace jmespath {
                         if (t.function_->arg_count() && t.function_->arg_count().value() != arg_stack.size())
                         {
                             ec = jmespath_errc::invalid_arity;
-                            return Json::null();
+                            return storage.null_value();
                         }
 
                         reference r = t.function_->evaluate(arg_stack, storage, ec);
                         if (ec)
                         {
-                            return Json::null();
+                            return storage.null_value();
                         }
                         arg_stack.clear();
                         stack.push_back(std::addressof(r));
@@ -1677,11 +1665,11 @@ namespace jmespath {
             {
                 return 9;
             }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage& storage, std::error_code&) 
             {
                 if (lhs.is_null() && rhs.is_null())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
                 if (!is_false(lhs))
                 {
@@ -1741,12 +1729,9 @@ namespace jmespath {
             {
                 return 6;
             }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage& storage, std::error_code&) 
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                return lhs == rhs ? t : f;
+                return lhs == rhs ? storage.true_value() : storage.false_value();
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -1767,12 +1752,9 @@ namespace jmespath {
             {
                 return 6;
             }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage& storage, std::error_code&) 
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
-                return lhs != rhs ? t : f;
+                return lhs != rhs ? storage.true_value() : storage.false_value();
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -1793,16 +1775,13 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage& storage, std::error_code&) 
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
-                return lhs < rhs ? t : f;
+                return lhs < rhs ? storage.true_value() : storage.false_value();
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -1823,16 +1802,13 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage& storage, std::error_code&) 
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
-                return lhs <= rhs ? t : f;
+                return lhs <= rhs ? storage.true_value() : storage.false_value();
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -1853,16 +1829,13 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage& storage, std::error_code&) 
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
-                return lhs > rhs ? t : f;
+                return lhs > rhs ? storage.true_value() : storage.false_value();
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -1883,16 +1856,13 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, jmespath_storage&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, jmespath_storage& storage, std::error_code&) 
             {
-                static const Json t(true, semantic_tag::none);
-                static const Json f(false, semantic_tag::none);
-
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
-                return lhs >= rhs ? t : f;
+                return lhs >= rhs ? storage.true_value() : storage.false_value();
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -1935,7 +1905,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, jmespath_storage&, std::error_code&) override
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code&) override
             {
                 //std::cout << "(identifier_selector " << identifier_  << " ) " << pretty_print(val) << "\n";
                 if (val.is_object() && val.contains(identifier_))
@@ -1944,7 +1914,7 @@ namespace jmespath {
                 }
                 else 
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
             }
 
@@ -1999,11 +1969,11 @@ namespace jmespath {
                 return 0;
             }
 
-            reference evaluate(reference val, jmespath_storage&, std::error_code&) override
+            reference evaluate(reference val, jmespath_storage& storage, std::error_code&) override
             {
                 if (!val.is_array())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
                 int64_t slen = static_cast<int64_t>(val.size());
                 if (index_ >= 0 && index_ < slen)
@@ -2018,7 +1988,7 @@ namespace jmespath {
                 }
                 else
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
             }
 
@@ -2093,7 +2063,7 @@ namespace jmespath {
             {
                 if (!val.is_object())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto result = storage.create_json(json_array_arg);
@@ -2145,7 +2115,7 @@ namespace jmespath {
             {
                 if (!val.is_array())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto result = storage.create_json(json_array_arg);
@@ -2199,7 +2169,7 @@ namespace jmespath {
             {
                 if (!val.is_array())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto start = slice_.get_start(val.size());
@@ -2209,7 +2179,7 @@ namespace jmespath {
                 if (step == 0)
                 {
                     ec = jmespath_errc::step_cannot_be_zero;
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto result = storage.create_json(json_array_arg);
@@ -2291,7 +2261,7 @@ namespace jmespath {
             {
                 if (!val.is_array())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
                 auto result = storage.create_json(json_array_arg);
 
@@ -2349,7 +2319,7 @@ namespace jmespath {
             {
                 if (!val.is_array())
                 {
-                    return Json::null();
+                    return storage.null_value();
                 }
 
                 auto currentp = storage.create_json(json_array_arg);
@@ -2715,6 +2685,24 @@ namespace jmespath {
             reference null_type_name()
             {
                 return null_type_name_;
+            }
+
+            reference true_value() const
+            {
+                static const Json true_value(true, semantic_tag::none);
+                return true_value;
+            }
+
+            reference false_value() const
+            {
+                static const Json false_value(false, semantic_tag::none);
+                return false_value;
+            }
+
+            reference null_value() const
+            {
+                static const Json null_value(null_type(), semantic_tag::none);
+                return null_value;
             }
 
             template <typename... Args>
