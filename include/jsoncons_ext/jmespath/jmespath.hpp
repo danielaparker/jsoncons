@@ -555,8 +555,8 @@ namespace jmespath {
                             ec = jmespath_errc::invalid_type;
                             return storage.null_value();
                         }
-                        auto sv0 = ptr0->as<string_view_type>();
-                        auto sv1 = ptr1->as<string_view_type>();
+                        auto sv0 = ptr0->template as<string_view_type>();
+                        auto sv1 = ptr1->template as<string_view_type>();
                         return sv0.find(sv1) != string_view_type::npos ? storage.true_value() : storage.false_value();
                     }
                     default:
@@ -592,8 +592,8 @@ namespace jmespath {
                     return storage.null_value();
                 }
 
-                auto sv0 = ptr0->as<string_view_type>();
-                auto sv1 = ptr1->as<string_view_type>();
+                auto sv0 = ptr0->template as<string_view_type>();
+                auto sv1 = ptr1->template as<string_view_type>();
 
                 if (sv1.length() <= sv0.length() && sv1 == sv0.substr(sv0.length() - sv1.length()))
                 {
@@ -659,7 +659,7 @@ namespace jmespath {
                     return storage.null_value();
                 }
 
-                string_type sep = ptr0->as<string_type>();
+                string_type sep = ptr0->template as<string_type>();
                 string_type buf;
                 for (auto& j : ptr1->array_range())
                 {
@@ -698,7 +698,7 @@ namespace jmespath {
                         return *storage.create_json(ptr0->size());
                     case json_type::string_value:
                     {
-                        auto sv0 = ptr0->as<string_view_type>();
+                        auto sv0 = ptr0->template as<string_view_type>();
                         auto length = unicons::u32_length(sv0.begin(), sv0.end());
                         return *storage.create_json(length);
                     }
@@ -1044,8 +1044,8 @@ namespace jmespath {
                     return storage.null_value();
                 }
 
-                auto sv0 = ptr0->as<string_view_type>();
-                auto sv1 = ptr1->as<string_view_type>();
+                auto sv0 = ptr0->template as<string_view_type>();
+                auto sv1 = ptr1->template as<string_view_type>();
 
                 if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
                 {
@@ -1182,7 +1182,7 @@ namespace jmespath {
             reference evaluate(std::vector<pointer>& args, jmespath_storage& storage, std::error_code&) override
             {
                 auto ptr = args[0];
-                return *storage.create_json(ptr->as<string_type>());
+                return *storage.create_json(ptr->template as<string_type>());
             }
 
             std::string to_string(std::size_t = 0) const override
