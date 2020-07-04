@@ -313,8 +313,82 @@ namespace jmespath {
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         typedef typename Json::const_pointer const_pointer;
 
-        // jmespath_context
-        class eval_context;
+        // eval_context
+
+        class eval_context
+        {
+            std::vector<std::unique_ptr<Json>> temp_storage_;
+
+        public:
+            reference number_type_name() 
+            {
+                static Json number_type_name(string_type({'n','u','m','b','e','r'}));
+
+                return number_type_name;
+            }
+
+            reference boolean_type_name()
+            {
+                static Json boolean_type_name(string_type({'b','o','o','l','e','a','n'}));
+
+                return boolean_type_name;
+            }
+
+            reference string_type_name()
+            {
+                static Json string_type_name(string_type({'s','t','r','i','n','g'}));
+
+                return string_type_name;
+            }
+
+            reference object_type_name()
+            {
+                static Json object_type_name(string_type({'o','b','j','e','c','t'}));
+
+                return object_type_name;
+            }
+
+            reference array_type_name()
+            {
+                static Json array_type_name(string_type({'a','r','r','a','y'}));
+
+                return array_type_name;
+            }
+
+            reference null_type_name()
+            {
+                static Json null_type_name(string_type({'n','u','l','l'}));
+
+                return null_type_name;
+            }
+
+            reference true_value() const
+            {
+                static const Json true_value(true, semantic_tag::none);
+                return true_value;
+            }
+
+            reference false_value() const
+            {
+                static const Json false_value(false, semantic_tag::none);
+                return false_value;
+            }
+
+            reference null_value() const
+            {
+                static const Json null_value(null_type(), semantic_tag::none);
+                return null_value;
+            }
+
+            template <typename... Args>
+            Json* create_json(Args&& ... args)
+            {
+                auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+                Json* ptr = temp.get();
+                temp_storage_.emplace_back(std::move(temp));
+                return ptr;
+            }
+        };
 
         static bool is_false(reference ref)
         {
@@ -2658,7 +2732,7 @@ namespace jmespath {
             }
         };
 
-        class eval_context
+        class static_context
         {
             abs_function abs_func_;
             avg_function avg_func_;
@@ -2715,10 +2789,6 @@ namespace jmespath {
             std::vector<std::unique_ptr<Json>> temp_storage_;
 
         public:
-
-            eval_context()
-            {
-            }
 
             function_base* get_function(const string_type& name, std::error_code& ec) const
             {
@@ -2787,80 +2857,11 @@ namespace jmespath {
                 static gte_operator gte_oper;
                 return &gte_oper;
             }
-
-            reference number_type_name() 
-            {
-                static Json number_type_name(string_type({'n','u','m','b','e','r'}));
-
-                return number_type_name;
-            }
-
-            reference boolean_type_name()
-            {
-                static Json boolean_type_name(string_type({'b','o','o','l','e','a','n'}));
-
-                return boolean_type_name;
-            }
-
-            reference string_type_name()
-            {
-                static Json string_type_name(string_type({'s','t','r','i','n','g'}));
-
-                return string_type_name;
-            }
-
-            reference object_type_name()
-            {
-                static Json object_type_name(string_type({'o','b','j','e','c','t'}));
-
-                return object_type_name;
-            }
-
-            reference array_type_name()
-            {
-                static Json array_type_name(string_type({'a','r','r','a','y'}));
-
-                return array_type_name;
-            }
-
-            reference null_type_name()
-            {
-                static Json null_type_name(string_type({'n','u','l','l'}));
-
-                return null_type_name;
-            }
-
-            reference true_value() const
-            {
-                static const Json true_value(true, semantic_tag::none);
-                return true_value;
-            }
-
-            reference false_value() const
-            {
-                static const Json false_value(false, semantic_tag::none);
-                return false_value;
-            }
-
-            reference null_value() const
-            {
-                static const Json null_value(null_type(), semantic_tag::none);
-                return null_value;
-            }
-
-            template <typename... Args>
-            Json* create_json(Args&& ... args)
-            {
-                auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-                Json* ptr = temp.get();
-                temp_storage_.emplace_back(std::move(temp));
-                return ptr;
-            }
         };
 
         class jmespath_expression
         {
-            eval_context context_;
+            static_context context_;
             std::vector<token> output_stack_;
         public:
             jmespath_expression()
@@ -2873,7 +2874,7 @@ namespace jmespath {
             {
             }
 
-            jmespath_expression(eval_context&& context,
+            jmespath_expression(static_context&& context,
                                 std::vector<token>&& output_stack)
                 : context_(std::move(context)), output_stack_(std::move(output_stack))
             {
@@ -2903,7 +2904,7 @@ namespace jmespath {
         const char_type* end_input_;
         const char_type* p_;
 
-        eval_context context_;
+        static_context context_;
         std::vector<path_state> state_stack_;
 
         std::vector<token> output_stack_;
