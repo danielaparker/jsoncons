@@ -1,35 +1,25 @@
 [{
   "given":
   {
-    "foo": -1,
-    "zero": 0,
-    "numbers": [-1, 3, 4, 5],
-    "array": [-1, 3, 4, 5, "a", "100"],
-    "strings": ["a", "b", "c"],
-    "decimals": [1.01, 1.2, -1.5],
-    "str": "Str",
-    "false": false,
-    "empty_list": [],
-    "empty_hash": {},
-    "objects": {"foo": "bar", "bar": "baz"},
-    "null_key": null
+    "people": [
+         {"age": 20, "age_str": "20", "bool": true, "name": "a", "extra": "foo"},
+         {"age": 40, "age_str": "40", "bool": false, "name": "b", "extra": "bar"},
+         {"age": 30, "age_str": "30", "bool": true, "name": "c"},
+         {"age": 50, "age_str": "50", "bool": false, "name": "d"},
+         {"age": 10, "age_str": "10", "bool": true, "name": 3}
+    ]
   },
     "cases": [
     {
-      "expression": "to_string('foo')",
-      "result": "foo"
-    },
-    {
-      "expression": "decimals[].to_string(@)",
+      "comment": "sort by field expression",
+      "expression": "sort_by(people, &age)",
       "result": [
-        "1.01",
-        "1.2",
-        "-1.5"
+         {"age": 10, "age_str": "10", "bool": true, "name": 3},
+         {"age": 20, "age_str": "20", "bool": true, "name": "a", "extra": "foo"},
+         {"age": 30, "age_str": "30", "bool": true, "name": "c"},
+         {"age": 40, "age_str": "40", "bool": false, "name": "b", "extra": "bar"},
+         {"age": 50, "age_str": "50", "bool": false, "name": "d"}
       ]
-    },
-    {
-      "expression": "join('|', decimals[].to_string(@))",
-      "result": "1.01|1.2|-1.5"
     }
   ]
 }
