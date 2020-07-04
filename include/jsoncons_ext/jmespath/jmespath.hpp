@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
@@ -19,7 +20,7 @@
 #include <set> // std::set
 #include <iterator> // std::make_move_iterator
 #include <functional> // 
-#include <algorithm> // std::sort
+#include <algorithm> // std::stable_sort
 #include <cmath> // std::abs
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
@@ -992,6 +993,111 @@ namespace jmespath {
             }
         };
 
+        class max_by_function : public function_base
+        {
+        public:
+            max_by_function()
+                : function_base(2)
+            {
+            }
+
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
+            {
+                JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!(args[0].is_value() && args[1].is_expression()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+
+                auto ptr = args[0].value_;
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+                if (ptr->empty())
+                {
+                    return context.null_value();
+                }
+
+                auto& expr = args[1].expression_;
+
+                std::error_code ec2;
+                Json key1 = expr->evaluate(ptr->at(0), context, ec2); 
+
+                bool is_number = key1.is_number();
+                bool is_string = key1.is_string();
+                if (!(is_number || is_string))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+
+                std::size_t index = 0;
+                for (std::size_t i = 1; i < ptr->size(); ++i)
+                {
+                    auto key2 = expr->evaluate(ptr->at(i), context, ec2); 
+                    if (!(key2.is_number() == is_number && key2.is_string() == is_string))
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return context.null_value();
+                    }
+                    if (key2 > key1)
+                    {
+                        key1 = key2;
+                        index = i;
+                    }
+                }
+
+                return ptr->at(index);
+            }
+        };
+
+        class map_function : public function_base
+        {
+        public:
+            map_function()
+                : function_base(2)
+            {
+            }
+
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
+            {
+                JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!(args[0].is_expression() && args[1].is_value()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+                auto& expr = args[0].expression_;
+
+                auto ptr = args[1].value_;
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+
+                auto result = context.create_json(json_array_arg);
+
+                for (auto& item : ptr->array_range())
+                {
+                    auto& j = expr->evaluate(item, context, ec);
+                    if (ec)
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return context.null_value();
+                    }
+                    result->push_back(j);
+                }
+
+                return *result;
+            }
+        };
+
         class min_function : public function_base
         {
         public:
@@ -1039,6 +1145,68 @@ namespace jmespath {
                     }
                     if (ptr->at(i) < ptr->at(index))
                     {
+                        index = i;
+                    }
+                }
+
+                return ptr->at(index);
+            }
+        };
+
+        class min_by_function : public function_base
+        {
+        public:
+            min_by_function()
+                : function_base(2)
+            {
+            }
+
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
+            {
+                JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!(args[0].is_value() && args[1].is_expression()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+
+                auto ptr = args[0].value_;
+                if (!ptr->is_array())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+                if (ptr->empty())
+                {
+                    return context.null_value();
+                }
+
+                auto& expr = args[1].expression_;
+
+                std::error_code ec2;
+                Json key1 = expr->evaluate(ptr->at(0), context, ec2); 
+
+                bool is_number = key1.is_number();
+                bool is_string = key1.is_string();
+                if (!(is_number || is_string))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+
+                std::size_t index = 0;
+                for (std::size_t i = 1; i < ptr->size(); ++i)
+                {
+                    auto key2 = expr->evaluate(ptr->at(i), context, ec2); 
+                    if (!(key2.is_number() == is_number && key2.is_string() == is_string))
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return context.null_value();
+                    }
+                    if (key2 < key1)
+                    {
+                        key1 = key2;
                         index = i;
                     }
                 }
@@ -1191,7 +1359,7 @@ namespace jmespath {
                 }
 
                 auto v = context.create_json(*ptr);
-                std::sort((v->array_range()).begin(), (v->array_range()).end());
+                std::stable_sort((v->array_range()).begin(), (v->array_range()).end());
                 return *v;
             }
         };
@@ -1228,7 +1396,7 @@ namespace jmespath {
                 auto& expr = args[1].expression_;
 
                 auto v = context.create_json(*ptr);
-                std::sort((v->array_range()).begin(), (v->array_range()).end(),
+                std::stable_sort((v->array_range()).begin(), (v->array_range()).end(),
                     [&expr,&context,&ec](reference lhs, reference rhs) -> bool
                 {
                     std::error_code ec2;
@@ -2964,8 +3132,11 @@ namespace jmespath {
             join_function join_func_;
             length_function length_func_;
             max_function max_func_;
+            max_by_function max_by_func_;
+            map_function map_func_;
             merge_function merge_func_;
             min_function min_func_;
+            min_by_function min_by_func_;
             type_function type_func_;
             sort_function sort_func_;
             sort_by_function sort_by_func_;
@@ -2979,7 +3150,7 @@ namespace jmespath {
             to_string_function to_string_func_;
             not_null_function not_null_func_;
 
-            using function_dictionary = std::map<string_type,function_base*>;
+            using function_dictionary = std::unordered_map<string_type,function_base*>;
             const function_dictionary functions_ =
             {
                 {string_type{'a','b','s'}, &abs_func_},
@@ -2991,7 +3162,10 @@ namespace jmespath {
                 {string_type{'j','o','i', 'n'}, &join_func_},
                 {string_type{'l','e','n', 'g', 't', 'h'}, &length_func_},
                 {string_type{'m','a','x'}, &max_func_},
+                {string_type{'m','a','x','_','b','y'}, &max_by_func_},
+                {string_type{'m','a','p'}, &map_func_},
                 {string_type{'m','i','n'}, &min_func_},
+                {string_type{'m','i','n','_','b','y'}, &min_by_func_},
                 {string_type{'m','e','r', 'g', 'e'}, &merge_func_},
                 {string_type{'t','y','p', 'e'}, &type_func_},
                 {string_type{'s','o','r', 't'}, &sort_func_},
@@ -4490,10 +4664,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            //for (auto& t : output_stack_)
-            //{
-            //    std::cout << t.to_string() << "\n";
-            //}
+            for (auto& t : output_stack_)
+            {
+                std::cout << t.to_string() << "\n";
+            }
 
             if (paren_level != 0)
             {
