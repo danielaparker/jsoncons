@@ -1096,6 +1096,11 @@ namespace jmespath {
 
                 return *result;
             }
+
+            std::string to_string(std::size_t = 0) const override
+            {
+                return std::string("map_function\n");
+            }
         };
 
         class min_function : public function_base
@@ -3106,17 +3111,16 @@ namespace jmespath {
                     s.push_back(' ');
                 }
                 s.append("function_expression\n");
-                /*for (auto& key_expr : toks_)
+                for (auto& tok : toks_)
                 {
                     for (std::size_t i = 0; i <= indent+2; ++i)
                     {
                         s.push_back(' ');
                     }
-                    s.append(key_expr.key);
-                    std::string sss = key_expr.expression->to_string(indent+2);
+                    std::string sss = tok.to_string(indent+2);
                     s.insert(s.end(), sss.begin(), sss.end());
                     s.push_back('\n');
-                }*/
+                }
                 return s;
             }
         };
