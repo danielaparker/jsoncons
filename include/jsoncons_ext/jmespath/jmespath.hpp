@@ -975,7 +975,7 @@ namespace jmespath {
                 }
 
                 auto expr = args[1];
-                bool is_integer = expr->is<uint64_t>();
+                bool is_integer = expr->template is<uint64_t>();
                 bool is_string = expr->is_string();
                 if (!is_integer && !is_string)
                 {
