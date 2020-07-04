@@ -261,7 +261,6 @@ namespace jmespath {
         function_expression,
         argument,
         expect_expr_or_expr_type,
-        expect_expr_or_expr_type2,
         quoted_string,
         raw_string,
         raw_string_escape_char,
@@ -419,7 +418,7 @@ namespace jmespath {
             virtual ~unary_operator() = default;
             virtual std::size_t precedence_level() const = 0;
             virtual bool is_right_associative() const = 0;
-            virtual reference evaluate(reference val, eval_context&, std::error_code& ec) = 0;
+            virtual reference evaluate(reference val, eval_context&, std::error_code& ec) const = 0;
         };
 
         class not_expression : public unary_operator
@@ -432,7 +431,7 @@ namespace jmespath {
             {
                 return true;
             }
-            reference evaluate(reference val, eval_context& context, std::error_code&) override
+            reference evaluate(reference val, eval_context& context, std::error_code&) const override
             {
                 return is_false(val) ? context.true_value() : context.false_value();
             }
@@ -443,7 +442,7 @@ namespace jmespath {
         public:
             virtual ~binary_operator() = default;
             virtual std::size_t precedence_level() const = 0;
-            virtual reference evaluate(reference lhs, reference rhs, eval_context&, std::error_code& ec) = 0;
+            virtual reference evaluate(reference lhs, reference rhs, eval_context&, std::error_code& ec) const = 0;
 
             virtual std::string to_string(size_t indent = 0) const
             {
@@ -472,7 +471,7 @@ namespace jmespath {
                 return 1;
             }
 
-            virtual reference evaluate(reference val, eval_context&, std::error_code& ec) = 0;
+            virtual reference evaluate(reference val, eval_context&, std::error_code& ec) const = 0;
 
             virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
 
@@ -579,7 +578,7 @@ namespace jmespath {
 
             virtual ~function_base() = default;
 
-            virtual reference evaluate(std::vector<parameter>& args, eval_context&, std::error_code& ec) = 0;
+            virtual reference evaluate(std::vector<parameter>& args, eval_context&, std::error_code& ec) const = 0;
 
             virtual std::string to_string(std::size_t = 0) const
             {
@@ -595,8 +594,16 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
+                JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+
                 auto val = args[0].value_;
                 switch (val->type())
                 {
@@ -613,8 +620,10 @@ namespace jmespath {
                         return *j;
                     }
                     default:
+                    {
                         ec = jmespath_errc::invalid_type;
                         return context.null_value();
+                    }
                 }
             }
         };
@@ -627,9 +636,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_array())
@@ -665,9 +680,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto val = args[0].value_;
                 switch (val->type())
@@ -696,9 +717,16 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!(args[0].is_value() && args[1].is_value()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
+
 
                 auto ptr0 = args[0].value_;
                 auto ptr1 = args[1].value_;
@@ -742,9 +770,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!(args[0].is_value() && args[1].is_value()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr0 = args[0].value_;
                 if (!ptr0->is_string())
@@ -782,9 +816,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto val = args[0].value_;
                 switch (val->type())
@@ -813,12 +853,18 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
 
                 auto ptr0 = args[0].value_;
                 auto ptr1 = args[1].value_;
+
+                if (!(args[0].is_value() && args[1].is_value()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 if (!ptr0->is_string())
                 {
@@ -859,9 +905,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr0 = args[0].value_;
 
@@ -893,9 +945,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_array())
@@ -942,9 +1000,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_array())
@@ -991,13 +1055,23 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 if (args.empty())
                 {
                     ec = jmespath_errc::invalid_arity;
                     return context.null_value();
                 }
+
+                for (auto& param : args)
+                {
+                    if (!param.is_value())
+                    {
+                        ec = jmespath_errc::invalid_type;
+                        return context.null_value();
+                    }
+                }
+
                 auto ptr0 = args[0].value_;
                 if (!ptr0->is_object())
                 {
@@ -1036,9 +1110,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code&) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
 
@@ -1072,9 +1152,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_array())
@@ -1118,9 +1204,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!(args[0].is_value() && args[1].is_expression()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_array())
@@ -1172,9 +1264,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_object())
@@ -1202,9 +1300,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_object())
@@ -1232,9 +1336,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 switch (ptr->type())
@@ -1270,9 +1380,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!(args[0].is_value() && args[1].is_value()))
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr0 = args[0].value_;
                 if (!ptr0->is_string())
@@ -1310,9 +1426,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (!ptr->is_array())
@@ -1343,9 +1465,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code&) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 if (ptr->is_array())
@@ -1374,9 +1502,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code&) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 switch (ptr->type())
@@ -1429,9 +1563,15 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code&) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code& ec) const override
             {
                 JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+                if (!args[0].is_value())
+                {
+                    ec = jmespath_errc::invalid_type;
+                    return context.null_value();
+                }
 
                 auto ptr = args[0].value_;
                 return *context.create_json(ptr->template as<string_type>());
@@ -1451,11 +1591,11 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code&) override
+            reference evaluate(std::vector<parameter>& args, eval_context& context, std::error_code&) const override
             {
                 for (auto& param : args)
                 {
-                    if (!param.value_->is_null())
+                    if (param.is_value() && !param.value_->is_null())
                     {
                         return *(param.value_);
                     }
@@ -1852,6 +1992,8 @@ namespace jmespath {
                         JSONCONS_ASSERT(i+1 < output_stack.size());
                         ++i;
                         JSONCONS_ASSERT(output_stack[i].is_expression());
+                        JSONCONS_ASSERT(!stack.empty());
+                        stack.pop_back();
                         stack.push_back(parameter(output_stack[i].expression_.get()));
                         break;
                     }
@@ -1933,7 +2075,7 @@ namespace jmespath {
             {
                 return 9;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override
             {
                 if (lhs.is_null() && rhs.is_null())
                 {
@@ -1967,7 +2109,7 @@ namespace jmespath {
             {
                 return 8;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context&, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context&, std::error_code&) const override
             {
                 if (is_true(lhs))
                 {
@@ -1997,7 +2139,7 @@ namespace jmespath {
             {
                 return 6;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 return lhs == rhs ? context.true_value() : context.false_value();
             }
@@ -2020,7 +2162,7 @@ namespace jmespath {
             {
                 return 6;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 return lhs != rhs ? context.true_value() : context.false_value();
             }
@@ -2043,7 +2185,7 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
@@ -2070,7 +2212,7 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
@@ -2097,7 +2239,7 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override
             {
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
@@ -2124,7 +2266,7 @@ namespace jmespath {
             {
                 return 5;
             }
-            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) 
+            reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override
             {
                 if (!(lhs.is_number() && rhs.is_number()))
                 {
@@ -2173,7 +2315,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code&) override
+            reference evaluate(reference val, eval_context& context, std::error_code&) const override
             {
                 //std::cout << "(identifier_selector " << identifier_  << " ) " << pretty_print(val) << "\n";
                 if (val.is_object() && val.contains(identifier_))
@@ -2209,7 +2351,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code&) override
+            reference evaluate(reference val, eval_context& context, std::error_code&) const override
             {
                 return val;
             }
@@ -2233,7 +2375,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, eval_context&, std::error_code&) override
+            reference evaluate(reference val, eval_context&, std::error_code&) const override
             {
                 return val;
             }
@@ -2264,7 +2406,7 @@ namespace jmespath {
                 return 0;
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code&) override
+            reference evaluate(reference val, eval_context& context, std::error_code&) const override
             {
                 if (!val.is_array())
                 {
@@ -2321,7 +2463,7 @@ namespace jmespath {
                 }
             }
 
-            reference apply_expressions(reference val, eval_context& context, std::error_code& ec)
+            reference apply_expressions(reference val, eval_context& context, std::error_code& ec) const
             {
                 pointer ptr = std::addressof(val);
                 for (auto& expression : expressions_)
@@ -2354,7 +2496,7 @@ namespace jmespath {
                 return 11;
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 if (!val.is_object())
                 {
@@ -2406,7 +2548,7 @@ namespace jmespath {
                 return 11;
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 if (!val.is_array())
                 {
@@ -2460,7 +2602,7 @@ namespace jmespath {
                 return 11;
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 if (!val.is_array())
                 {
@@ -2552,7 +2694,7 @@ namespace jmespath {
                 return 11;
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 if (!val.is_array())
                 {
@@ -2610,7 +2752,7 @@ namespace jmespath {
                 return false;
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 if (!val.is_array())
                 {
@@ -2679,7 +2821,7 @@ namespace jmespath {
                 return 1;
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 if (val.is_null())
                 {
@@ -2738,7 +2880,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 if (val.is_null())
                 {
@@ -2787,7 +2929,7 @@ namespace jmespath {
             {
             }
 
-            reference evaluate(reference val, eval_context& context, std::error_code& ec) override
+            reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
                 return evaluate_tokens(val, toks_, context, ec);
             }
@@ -3330,24 +3472,6 @@ namespace jmespath {
                                 break;
                         }
                         break;
-                    case path_state::expect_expr_or_expr_type2:
-                        switch (*p_)
-                        {
-                            case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character();
-                                break;
-                            case '&':
-                                push_token(token(expression_type_arg));
-                                state_stack_.pop_back();
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                push_token(token(current_node_arg));
-                                state_stack_.pop_back();
-                                break;
-                        }
-                        break;
                     case path_state::identifier_or_function_expr:
                         switch(*p_)
                         {
@@ -3388,10 +3512,11 @@ namespace jmespath {
                                 advance_past_space_character();
                                 break;
                             case ',':
+                                push_token(token(current_node_arg));
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
-                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type2);
+                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4369,10 +4494,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            for (auto& t : output_stack_)
-            {
-                std::cout << t.to_string() << "\n";
-            }
+            //for (auto& t : output_stack_)
+            //{
+            //    std::cout << t.to_string() << "\n";
+            //}
 
             if (paren_level != 0)
             {
