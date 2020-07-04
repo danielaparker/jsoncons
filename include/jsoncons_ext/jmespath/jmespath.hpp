@@ -49,6 +49,7 @@ namespace jmespath {
         begin_function,
         end_function,
         argument,
+        expression_type,
         end_of_expression
     };
 
@@ -57,6 +58,12 @@ namespace jmespath {
         explicit literal_arg_t() = default;
     };
     constexpr literal_arg_t literal_arg{};
+
+    struct expression_type_arg_t
+    {
+        explicit expression_type_arg_t() = default;
+    };
+    constexpr expression_type_arg_t expression_type_arg{};
 
     struct end_of_expression_arg_t
     {
@@ -253,6 +260,8 @@ namespace jmespath {
         comparator_expression,
         function_expression,
         argument,
+        expect_expr_or_expr_type,
+        expect_expr_or_expr_type2,
         quoted_string,
         raw_string,
         raw_string_escape_char,
@@ -487,19 +496,24 @@ namespace jmespath {
 
             union
             {
-                std::unique_ptr<expression_base> expression_;
+                expression_base* expression_;
                 pointer value_;
             };
 
-            parameter(parameter&& other)
+            parameter(const parameter& other)
+                : type_(other.type_)
             {
-                construct(std::forward<parameter>(other));
-            }
-
-            parameter(std::unique_ptr<expression_base> expression)
-                : type_(parameter_type::expression)
-            {
-                new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
+                switch (type_)
+                {
+                    case parameter_type::expression:
+                        expression_ = other.expression_;
+                        break;
+                    case parameter_type::value:
+                        value_ = other.value_;
+                        break;
+                    default:
+                        break;
+                }
             }
 
             parameter(pointer value)
@@ -507,36 +521,29 @@ namespace jmespath {
             {
             }
 
-            parameter& operator=(parameter&& other)
+            parameter(expression_base* expression)
+                : type_(parameter_type::expression), expression_(expression)
+            {
+            }
+
+            parameter& operator=(const parameter& other)
             {
                 if (&other != this)
                 {
-                    if (type_ == other.type_)
+                    type_ = other.type_;
+                    switch (type_)
                     {
-                        switch (type_)
-                        {
-                            case parameter_type::expression:
-                                expression_ = std::move(other.expression_);
-                                break;
-                            case parameter_type::value:
-                                value_ = other.value_;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        destroy();
-                        construct(std::forward<parameter>(other));
+                        case parameter_type::expression:
+                            expression_ = other.expression_;
+                            break;
+                        case parameter_type::value:
+                            value_ = other.value_;
+                            break;
+                        default:
+                            break;
                     }
                 }
                 return *this;
-            }
-
-            ~parameter() noexcept
-            {
-                destroy();
             }
 
             bool is_value() const
@@ -552,34 +559,6 @@ namespace jmespath {
             parameter_type type() const
             {
                 return type_;
-            }
-
-            void construct(parameter&& other)
-            {
-                type_ = other.type_;
-                switch (type_)
-                {
-                    case parameter_type::expression:
-                        new (&expression_) std::unique_ptr<expression_base>(std::move(other.expression_));
-                        break;
-                    case parameter_type::value:
-                        value_ = other.value_;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            void destroy() noexcept 
-            {
-                switch(type_)
-                {
-                    case parameter_type::expression:
-                        expression_.~unique_ptr();
-                        break;
-                    case parameter_type::value:
-                        break;
-                }
             }
         };
 
@@ -1584,7 +1563,7 @@ namespace jmespath {
                 new (&key_) string_type(key);
             }
 
-            token(std::unique_ptr<expression_base> expression)
+            token(std::unique_ptr<expression_base>&& expression)
                 : type_(token_type::expression)
             {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
@@ -1610,6 +1589,11 @@ namespace jmespath {
 
             token(argument_arg_t)
                 : type_(token_type::argument)
+            {
+            }
+
+            token(expression_type_arg_t)
+                : type_(token_type::expression_type)
             {
             }
 
@@ -1838,6 +1822,9 @@ namespace jmespath {
                     case token_type::argument:
                         return std::string("argument");
                         break;
+                    case token_type::expression_type:
+                        return std::string("expression_type");
+                        break;
                     default:
                         return std::string("default");
                         break;
@@ -1858,6 +1845,14 @@ namespace jmespath {
                     case token_type::literal:
                     {
                         stack.push_back(parameter(&t.value_));
+                        break;
+                    }
+                    case token_type::expression_type:
+                    {
+                        JSONCONS_ASSERT(i+1 < output_stack.size());
+                        ++i;
+                        JSONCONS_ASSERT(output_stack[i].is_expression());
+                        stack.push_back(parameter(output_stack[i].expression_.get()));
                         break;
                     }
                     case token_type::pipe:
@@ -3318,6 +3313,41 @@ namespace jmespath {
                                 break;
                         }
                         break;
+                    case path_state::expect_expr_or_expr_type:
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '&':
+                                push_token(token(expression_type_arg));
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                state_stack_.pop_back();
+                                break;
+                        }
+                        break;
+                    case path_state::expect_expr_or_expr_type2:
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '&':
+                                push_token(token(expression_type_arg));
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                push_token(token(current_node_arg));
+                                state_stack_.pop_back();
+                                break;
+                        }
+                        break;
                     case path_state::identifier_or_function_expr:
                         switch(*p_)
                         {
@@ -3336,6 +3366,7 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3357,10 +3388,10 @@ namespace jmespath {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token(current_node_arg));
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type2);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4338,10 +4369,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            //for (auto& t : output_stack_)
-            //{
-            //    std::cout << t.to_string() << "\n";
-            //}
+            for (auto& t : output_stack_)
+            {
+                std::cout << t.to_string() << "\n";
+            }
 
             if (paren_level != 0)
             {
@@ -4643,6 +4674,7 @@ namespace jmespath {
                 case token_type::key:
                 case token_type::pipe:
                 case token_type::argument:
+                case token_type::expression_type:
                     output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::lparen:
