@@ -2713,31 +2713,10 @@ namespace jmespath {
             };
 
             std::vector<std::unique_ptr<Json>> temp_storage_;
-            not_expression not_oper_;
-            or_operator or_oper_;
-            and_operator and_oper_;
-            eq_operator eq_oper_;
-            ne_operator ne_oper_;
-            lt_operator lt_oper_;
-            lte_operator lte_oper_;
-            gt_operator gt_oper_;
-            gte_operator gte_oper_;
 
-            Json number_type_name_;
-            Json boolean_type_name_;
-            Json string_type_name_;
-            Json object_type_name_;
-            Json array_type_name_;
-            Json null_type_name_;
         public:
 
             jmespath_storage()
-                : number_type_name_(string_type({'n','u','m','b','e','r'})),
-                  boolean_type_name_(string_type({'b','o','o','l','e','a','n'})),
-                  string_type_name_(string_type({'s','t','r','i','n','g'})),
-                  object_type_name_(string_type({'o','b','j','e','c','t'})),
-                  array_type_name_(string_type({'a','r','r','a','y'})),
-                  null_type_name_(string_type({'n','u','l','l'}))
             {
             }
 
@@ -2754,77 +2733,101 @@ namespace jmespath {
 
             unary_operator* get_not_operator()
             {
-                return &not_oper_;
+                static not_expression not_oper;
+
+                return &not_oper;
             }
 
             binary_operator* get_or_operator()
             {
-                return &or_oper_;
+                static or_operator or_oper;
+
+                return &or_oper;
             }
 
             binary_operator* get_and_operator()
             {
-                return &and_oper_;
+                static and_operator and_oper;
+
+                return &and_oper;
             }
 
             binary_operator* get_eq_operator()
             {
-                return &eq_oper_;
+                static eq_operator eq_oper;
+                return &eq_oper;
             }
 
             binary_operator* get_ne_operator()
             {
-                return &ne_oper_;
+                static ne_operator ne_oper;
+                return &ne_oper;
             }
 
             binary_operator* get_lt_operator()
             {
-                return &lt_oper_;
+                static lt_operator lt_oper;
+                return &lt_oper;
             }
 
             binary_operator* get_lte_operator()
             {
-                return &lte_oper_;
+                static lte_operator lte_oper;
+                return &lte_oper;
             }
 
             binary_operator* get_gt_operator()
             {
-                return &gt_oper_;
+                static gt_operator gt_oper;
+                return &gt_oper;
             }
 
             binary_operator* get_gte_operator()
             {
-                return &gte_oper_;
+                static gte_operator gte_oper;
+                return &gte_oper;
             }
 
             reference number_type_name()
             {
-                return number_type_name_;
+                static Json number_type_name(string_type({'n','u','m','b','e','r'}));
+
+                return number_type_name;
             }
 
             reference boolean_type_name()
             {
-                return boolean_type_name_;
+                static Json boolean_type_name(string_type({'b','o','o','l','e','a','n'}));
+
+                return boolean_type_name;
             }
 
             reference string_type_name()
             {
-                return string_type_name_;
+                static Json string_type_name(string_type({'s','t','r','i','n','g'}));
+
+                return string_type_name;
             }
 
             reference object_type_name()
             {
-                return object_type_name_;
+                static Json object_type_name(string_type({'o','b','j','e','c','t'}));
+
+                return object_type_name;
             }
 
             reference array_type_name()
             {
-                return array_type_name_;
+                static Json array_type_name(string_type({'a','r','r','a','y'}));
+
+                return array_type_name;
             }
 
             reference null_type_name()
             {
-                return null_type_name_;
+                static Json null_type_name(string_type({'n','u','l','l'}));
+
+                return null_type_name;
             }
 
             reference true_value() const
