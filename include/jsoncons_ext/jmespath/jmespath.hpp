@@ -50,7 +50,8 @@ namespace jmespath {
         begin_function,
         end_function,
         argument,
-        expression_type,
+        begin_expression_type,
+        end_expression_type,
         end_of_expression
     };
 
@@ -60,11 +61,17 @@ namespace jmespath {
     };
     constexpr literal_arg_t literal_arg{};
 
-    struct expression_type_arg_t
+    struct begin_expression_type_arg_t
     {
-        explicit expression_type_arg_t() = default;
+        explicit begin_expression_type_arg_t() = default;
     };
-    constexpr expression_type_arg_t expression_type_arg{};
+    constexpr begin_expression_type_arg_t begin_expression_type_arg{};
+
+    struct end_expression_type_arg_t
+    {
+        explicit end_expression_type_arg_t() = default;
+    };
+    constexpr end_expression_type_arg_t end_expression_type_arg{};
 
     struct end_of_expression_arg_t
     {
@@ -1423,6 +1430,11 @@ namespace jmespath {
                 });
                 return ec ? context.null_value() : *v;
             }
+
+            std::string to_string(std::size_t = 0) const override
+            {
+                return std::string("sort_by_function\n");
+            }
         };
 
         class keys_function final : public function_base
@@ -1720,7 +1732,7 @@ namespace jmespath {
 
             std::string to_string(std::size_t = 0) const override
             {
-                return std::string("to_array_function\n");
+                return std::string("to_number_function\n");
             }
         };
 
@@ -1901,8 +1913,13 @@ namespace jmespath {
             {
             }
 
-            token(expression_type_arg_t)
-                : type_(token_type::expression_type)
+            token(begin_expression_type_arg_t)
+                : type_(token_type::begin_expression_type)
+            {
+            }
+
+            token(end_expression_type_arg_t)
+                : type_(token_type::end_expression_type)
             {
             }
 
@@ -2131,8 +2148,11 @@ namespace jmespath {
                     case token_type::argument:
                         return std::string("argument");
                         break;
-                    case token_type::expression_type:
-                        return std::string("expression_type");
+                    case token_type::begin_expression_type:
+                        return std::string("begin_expression_type");
+                        break;
+                    case token_type::end_expression_type:
+                        return std::string("end_expression_type");
                         break;
                     default:
                         return std::string("default");
@@ -2156,7 +2176,7 @@ namespace jmespath {
                         stack.push_back(parameter(&t.value_));
                         break;
                     }
-                    case token_type::expression_type:
+                    case token_type::begin_expression_type:
                     {
                         JSONCONS_ASSERT(i+1 < output_stack.size());
                         ++i;
@@ -2506,33 +2526,6 @@ namespace jmespath {
                 }
                 s.append("identifier_selector ");
                 s.append(identifier_);
-                return s;
-            }
-        };
-
-        class expression_type final : public expression_base
-        {
-        private:
-            std::unique_ptr<expression_base> expression_;
-        public:
-            expression_type(std::unique_ptr<expression_base>&& expression)
-                : expression_(std::move(expression))
-            {
-            }
-
-            reference evaluate(reference val, eval_context& context, std::error_code&) const override
-            {
-                return val;
-            }
-
-            std::string to_string(std::size_t indent = 0) const override
-            {
-                std::string s;
-                for (std::size_t i = 0; i <= indent; ++i)
-                {
-                    s.push_back(' ');
-                }
-                s.append("expression_type\n");
                 return s;
             }
         };
@@ -3395,7 +3388,7 @@ namespace jmespath {
                             }
                             case ')':
                             {
-                                if (state_stack_.size() > 1 && *(state_stack_.rbegin()+1) == path_state::argument)
+                                if (state_stack_.size() > 1 && *(state_stack_.rbegin()+1) == path_state::argument || *(state_stack_.rbegin() + 1) == path_state::expression_type)
                                 {
                                     state_stack_.pop_back();
                                 }
@@ -3636,13 +3629,19 @@ namespace jmespath {
                                 advance_past_space_character();
                                 break;
                             case '&':
-                                push_token(token(expression_type_arg));
-                                state_stack_.pop_back();
+                                push_token(token(begin_expression_type_arg));
+                                push_token(token(current_node_arg));
+                                state_stack_.back() = path_state::expression_type;
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                state_stack_.pop_back();
+                                state_stack_.back() = path_state::argument;
+                                push_token(token(current_node_arg));
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
                         }
                         break;
@@ -3661,9 +3660,6 @@ namespace jmespath {
                                 push_token(token(begin_function_arg));
                                 push_token(token(f));
                                 state_stack_.back() = path_state::function_expression;
-                                state_stack_.emplace_back(path_state::argument);
-                                state_stack_.emplace_back(path_state::rhs_expression);
-                                state_stack_.emplace_back(path_state::lhs_expression);
                                 state_stack_.emplace_back(path_state::expect_expr_or_expr_type);
                                 ++p_;
                                 ++column_;
@@ -3686,10 +3682,7 @@ namespace jmespath {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token(current_node_arg));
-                                state_stack_.emplace_back(path_state::argument);
-                                state_stack_.emplace_back(path_state::rhs_expression);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                //push_token(token(current_node_arg));
                                 state_stack_.emplace_back(path_state::expect_expr_or_expr_type);
                                 ++p_;
                                 ++column_;
@@ -3709,6 +3702,12 @@ namespace jmespath {
                         break;
 
                     case path_state::argument:
+                        push_token(argument_arg);
+                        state_stack_.pop_back();
+                        break;
+
+                    case path_state::expression_type:
+                        push_token(end_expression_type_arg);
                         push_token(argument_arg);
                         state_stack_.pop_back();
                         break;
@@ -4670,7 +4669,7 @@ namespace jmespath {
 
             for (auto& t : output_stack_)
             {
-                std::cout << t.to_string() << "\n";
+                std::cout << t.to_string() << std::endl;
             }
 
             if (paren_level != 0)
@@ -4847,6 +4846,23 @@ namespace jmespath {
                     }
                     break;
                 }
+                case token_type::end_expression_type:
+                {
+                    std::vector<token> toks;
+                    auto it = output_stack_.rbegin();
+                    while (it != output_stack_.rend() && it->type() != token_type::begin_expression_type)
+                    {
+                        toks.insert(toks.begin(), std::move(*it));
+                        ++it;
+                    }
+                    if (it == output_stack_.rend())
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
+                    }
+                    output_stack_.erase(it.base(),output_stack_.end());
+                    output_stack_.emplace_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
+                    break;
+                }
                 case token_type::literal:
                     if (!output_stack_.empty() && output_stack_.back().type() == token_type::current_node)
                     {
@@ -4970,10 +4986,12 @@ namespace jmespath {
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
                 case token_type::current_node:
+                    output_stack_.emplace_back(std::move(tok));
+                    break;
                 case token_type::key:
                 case token_type::pipe:
                 case token_type::argument:
-                case token_type::expression_type:
+                case token_type::begin_expression_type:
                     output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_type::lparen:
