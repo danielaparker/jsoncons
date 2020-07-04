@@ -471,7 +471,7 @@ namespace jmespath {
                 return 1;
             }
 
-            virtual reference evaluate(reference val, eval_context&, std::error_code& ec) const = 0;
+            virtual reference evaluate(reference val, eval_context& context, std::error_code& ec) const = 0;
 
             virtual void add_expression(std::unique_ptr<expression_base>&& expressions) = 0;
 
@@ -1226,33 +1226,29 @@ namespace jmespath {
                 }
 
                 auto& expr = args[1].expression_;
-                //bool is_integer = expr->template is<uint64_t>();
-                //bool is_string = expr->is_string();
-                //if (!is_integer && !is_string)
-                //{
-                //    ec = jmespath_errc::invalid_type;
-                //    return context.null_value();
-                //}
-
-                //for (auto& j : ptr->array_range())
-                //{
-                //    if (j.is_array() != is_integer || j.is_object() != is_string)
-                //    {
-                //        ec = jmespath_errc::invalid_type;
-                //        return context.null_value();
-                //    }
-                //}
 
                 auto v = context.create_json(*ptr);
                 std::sort((v->array_range()).begin(), (v->array_range()).end(),
                     [&expr,&context,&ec](reference lhs, reference rhs) -> bool
                 {
-                    reference key1 = expr->evaluate(lhs, context, ec);
-                    reference key2 = expr->evaluate(rhs, context, ec);
+                    std::error_code ec2;
+                    reference key1 = expr->evaluate(lhs, context, ec2);
+                    bool is_number = key1.is_number();
+                    bool is_string = key1.is_string();
+                    if (!(is_number || is_string))
+                    {
+                        ec = jmespath_errc::invalid_type;
+                    }
 
+                    reference key2 = expr->evaluate(rhs, context, ec2);
+                    if (!(key2.is_number() == is_number && key2.is_string() == is_string))
+                    {
+                        ec = jmespath_errc::invalid_type;
+                    }
+                    
                     return key1 < key2;
                 });
-                return *v;
+                return ec ? context.null_value() : *v;
             }
         };
 

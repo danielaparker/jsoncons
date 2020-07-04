@@ -1,4 +1,4 @@
-[{
+[/*{
   "given":
   {
     "foo": -1,
@@ -586,7 +586,7 @@
       "result": [-1, 3, 4, 5, 100]
     }
   ]
-}/*, {
+}, {
   "given":
   {
     "foo": [
@@ -604,7 +604,7 @@
       "result": ["b", "c", "d", "e", "f"]
     }
   ]
-}, {
+},*/ {
   "given":
   {
     "people": [
@@ -676,7 +676,7 @@
     {
       "expression": "sort_by(`[]`, &age)",
       "result": []
-    },
+    }/*,
     {
       "expression": "max_by(people, &age)",
       "result": {"age": 50, "age_str": "50", "bool": false, "name": "d"}
@@ -716,9 +716,9 @@
     {
       "expression": "min_by(people, &to_number(age_str))",
       "result": {"age": 10, "age_str": "10", "bool": true, "name": 3}
-    }
+    }*/
   ]
-}, {
+}/*, {
   "given":
   {
     "people": [
