@@ -3388,7 +3388,7 @@ namespace jmespath {
                             }
                             case ')':
                             {
-                                if (state_stack_.size() > 1 && *(state_stack_.rbegin()+1) == path_state::argument || *(state_stack_.rbegin() + 1) == path_state::expression_type)
+                                if (state_stack_.size() > 1 && (*(state_stack_.rbegin()+1) == path_state::argument || *(state_stack_.rbegin() + 1) == path_state::expression_type))
                                 {
                                     state_stack_.pop_back();
                                 }
@@ -4665,10 +4665,10 @@ namespace jmespath {
 
             push_token(end_of_expression_arg);
 
-            for (auto& t : output_stack_)
-            {
-                std::cout << t.to_string() << std::endl;
-            }
+            //for (auto& t : output_stack_)
+            //{
+            //    std::cout << t.to_string() << std::endl;
+            //}
 
             if (paren_level != 0)
             {
