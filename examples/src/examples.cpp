@@ -12,37 +12,37 @@
 
 using namespace jsoncons;
 
-void json_reader_examples();
-void readme_examples();
+void array_examples();
 void basics_examples();
 void basics_wexamples();
-void json_filter_examples();
-void array_examples();
-void container_examples();
-void wjson_examples();
-void serialization_examples();
-void type_extensibility_examples();
-void ojson_examples();
-void unicode_examples();
-void run_csv_examples();
-void jsonpath_examples();
-void json_accessor_examples();
-void msgpack_examples();
-void jsonpatch_examples();
-void run_cbor_examples();
-void run_ubjson_examples();
-void json_parser_examples();
-void json_cursor_examples();
-void data_model_examples();
-void staj_iterator_examples();
 void bson_examples();
+void byte_string_examples();
+void container_examples();
+void data_model_examples();
+void jmespath_examples();
+void json_accessor_examples();
+void json_constructor_examples();
+void json_cursor_examples();
+void json_filter_examples();
+void json_parser_examples();
+void json_reader_examples();
 void json_traits_macros_examples();
 void json_traits_macros_named_examples();
-void run_cbor_typed_array_examples();
-void byte_string_examples();
-void json_constructor_examples();
+void jsonpatch_examples();
+void jsonpath_examples();
 void jsonpointer_examples();
-
+void msgpack_examples();
+void ojson_examples();
+void readme_examples();
+void run_cbor_examples();
+void run_cbor_typed_array_examples();
+void run_csv_examples();
+void run_ubjson_examples();
+void serialization_examples();
+void staj_iterator_examples();
+void type_extensibility_examples();
+void unicode_examples();
+void wjson_examples();
 void comment_example()
 {
     std::string s = R"(
@@ -442,6 +442,8 @@ int main()
         run_cbor_typed_array_examples();
 
         bson_examples();
+
+        jmespath_examples();
     }
     catch (const std::exception& e)
     {

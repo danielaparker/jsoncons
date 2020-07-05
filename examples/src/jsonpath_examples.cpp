@@ -274,7 +274,6 @@ namespace {
 void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
-    std::cout << "Here\n";
     json_replace_example1();
     json_replace_example2();
     jsonpath_complex_examples();
