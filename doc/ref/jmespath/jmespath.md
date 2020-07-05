@@ -2,6 +2,7 @@
 
 The jmespath extension implements [JMESPath](https://jmespath.org/). JMESPath is a query language 
 for transforming JSON documents into other JSON documents.
+It's supported in both the AWS and Azure CLI and has libraries available in a number of languages.
 
 ### Classes
 <table border="0">
