@@ -269,6 +269,7 @@ namespace jmespath {
         function_expression,
         argument,
         expect_expr_or_expr_type,
+        expect_expr_or_expr_type2,
         quoted_string,
         raw_string,
         raw_string_escape_char,
@@ -3639,6 +3640,28 @@ namespace jmespath {
                                 break;
                             default:
                                 state_stack_.back() = path_state::argument;
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::lhs_expression);
+                                break;
+                        }
+                        break;
+                    case path_state::expect_expr_or_expr_type2:
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '&':
+                                push_token(token(begin_expression_type_arg));
+                                push_token(token(current_node_arg));
+                                state_stack_.back() = path_state::expression_type;
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::lhs_expression);
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                state_stack_.back() = path_state::argument;
                                 push_token(token(current_node_arg));
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
@@ -3683,7 +3706,7 @@ namespace jmespath {
                                 break;
                             case ',':
                                 //push_token(token(current_node_arg));
-                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type);
+                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type2);
                                 ++p_;
                                 ++column_;
                                 break;
