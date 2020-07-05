@@ -23,6 +23,8 @@ It's supported in both the AWS and Azure CLI and has libraries available in a nu
     
 ### Examples
 
+The examples below are from the the [JMESPath front page](https://jmespath.org/) and the [JMESPath Tutorial](https://jmespath.org/tutorial.html).
+
 #### search function
 
 [jsoncons::jmespath::search](search.md) takes two arguments, a [basic_json](../basic_json.md) 
