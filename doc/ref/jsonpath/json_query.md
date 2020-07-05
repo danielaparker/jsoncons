@@ -7,7 +7,7 @@ enum class result_type {value,path};
 
 template<Json>
 Json json_query(const Json& root, 
-                const typename Json::string_view_type& path,
+                const typename Json::string_view_type& expr,
                 result_type result_t = result_type::value);
 ```
 
@@ -18,11 +18,11 @@ Returns a `json` array of values or normalized path expressions selected from a 
 <table>
   <tr>
     <td>root</td>
-    <td>JSON value</td> 
+    <td>Json value</td> 
   </tr>
   <tr>
     <td>path</td>
-    <td>JSONPath expression string</td> 
+    <td>JSONPath expression</td> 
   </tr>
   <tr>
     <td>result_t</td>
