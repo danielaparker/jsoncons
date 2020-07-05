@@ -22,7 +22,7 @@ None
 
 (1) Throws a [jsonpointer_error](jsonpointer_error.md) if `replace` fails.
  
-(2) Sets the `std::error_code&` to the [jsonpointer_error_category](jsonpointer_errc.md) if `replace` fails. 
+(2) Sets the out-parameter `ec` to the [jsonpointer_error_category](jsonpointer_errc.md) if `replace` fails. 
 
 ### Examples
 

@@ -37,7 +37,7 @@ Returns an empty array if there is no match.
 
 #### Exceptions
 
-Throws [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
+Throws a [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
 
 #### Note
 Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.

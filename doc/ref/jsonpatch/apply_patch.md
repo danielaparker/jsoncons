@@ -20,7 +20,7 @@ None
 
 (1) Throws a [jsonpatch_error](jsonpatch_error.md) if `apply_patch` fails.
   
-(2) Sets the `std::error_code&` to the [jsonpatch_error_category](jsonpatch_errc.md) if `apply_patch` fails. 
+(2) Sets the out-parameter `ec` to the [jsonpatch_error_category](jsonpatch_errc.md) if `apply_patch` fails. 
 
 ### Examples
 

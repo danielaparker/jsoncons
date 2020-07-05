@@ -30,7 +30,7 @@ Searches for all values that match a JSONPath expression and replaces them with 
 
 #### Exceptions
 
-Throws [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
+Throws a [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
 
 ### Examples
 

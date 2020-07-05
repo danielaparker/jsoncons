@@ -25,13 +25,13 @@ static basic_json parse(InputIt first, InputIt last,
                         std::function<bool(json_errc,const ser_context&)> err_handler); // (6)
 ```
 (1) - (2) Parses JSON data from a string and returns a `basic_json` value. 
-Throws [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 (3) - (4) Parses JSON data from an input stream and returns a `basic_json` value. 
-Throws [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 (5) - (6) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
-Throws [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 #### Parameters
 
