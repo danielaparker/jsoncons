@@ -94,8 +94,9 @@ TEST_CASE("jmespath-tests")
     }
     SECTION("compliance")
     {
-        //jmespath_tests("./input/jmespath/compliance-tests/syntax.json"); //
-/*
+        // 4 syntax tests don't pass, appear to require extra grammatical checks 
+        //jmespath_tests("./input/jmespath/compliance-tests/syntax.json"); 
+
         jmespath_tests("./input/jmespath/compliance-tests/basic.json"); // OK
         jmespath_tests("./input/jmespath/compliance-tests/boolean.json"); // OK
         jmespath_tests("./input/jmespath/compliance-tests/current.json"); // OK
@@ -105,14 +106,13 @@ TEST_CASE("jmespath-tests")
         jmespath_tests("./input/jmespath/compliance-tests/indices.json");  // OK
         jmespath_tests("./input/jmespath/compliance-tests/literal.json"); // OK
         jmespath_tests("./input/jmespath/compliance-tests/multiselect.json"); // OK 
-        jmespath_tests("./input/jmespath/compliance-tests/pipe.json");
+        jmespath_tests("./input/jmespath/compliance-tests/pipe.json"); // OK
         jmespath_tests("./input/jmespath/compliance-tests/slice.json"); // OK
         jmespath_tests("./input/jmespath/compliance-tests/unicode.json"); // OK
         jmespath_tests("./input/jmespath/compliance-tests/wildcard.json"); // OK
-        jmespath_tests("./input/jmespath/compliance-tests/benchmarks.json"); 
+        jmespath_tests("./input/jmespath/compliance-tests/benchmarks.json"); // OK
+        jmespath_tests("./input/jmespath/compliance-tests/functions.json"); // OK
 
-        jmespath_tests("./input/jmespath/compliance-tests/functions.json"); 
-*/
         //jmespath_tests("./input/jmespath/compliance-tests/test.json"); 
 
         jmespath_tests("./input/jmespath/examples/jmespath-examples.json"); 
