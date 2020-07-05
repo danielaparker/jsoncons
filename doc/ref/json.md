@@ -59,9 +59,9 @@ Output:
 ```
 #### Constructing json structures
 ```c++
-json root;
+json doc;
 
-root["persons"] = json(json_array_arg);
+doc["persons"] = json(json_array_arg);
 
 json person;
 person["first_name"] = "John";
@@ -74,9 +74,9 @@ address["country"] = "Canada";
 
 person["address"] = std::move(address);
 
-root["persons"].push_back(std::move(person));
+doc["persons"].push_back(std::move(person));
 
-std::cout << pretty_print(root) << std::endl;
+std::cout << pretty_print(doc) << std::endl;
 ```
 Output:
 ```c++
