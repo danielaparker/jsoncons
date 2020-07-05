@@ -38,7 +38,6 @@ namespace {
     void jmespath_expression_example()
     { 
         std::string doc = R"(
-        {
             {
               "people": [
                 {
@@ -58,14 +57,13 @@ namespace {
                 }
               ]
             }        
-        }        
         )";
 
         auto expr = jmespath::jmespath_expression<json>::compile("people[?age > `20`].[name, age]");
 
-        auto jdoc = json::parse(doc);
+        json jdoc = json::parse(doc);
 
-        auto result = expr.evaluate(jdoc);
+        json result = expr.evaluate(jdoc);
 
         std::cout << pretty_print(result) << "\n\n";
     }
