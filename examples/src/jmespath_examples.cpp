@@ -15,7 +15,7 @@ namespace {
 
     void search_example() 
     {
-        std::string doc = R"(
+        std::string jtext = R"(
         {
           "locations": [
             {"name": "Seattle", "state": "WA"},
@@ -28,16 +28,16 @@ namespace {
 
         std::string expr = "locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}";
 
-        json jdoc = json::parse(doc);
+        json doc = json::parse(jtext);
 
-        json result = jmespath::search(jdoc, expr);
+        json result = jmespath::search(doc, expr);
 
         std::cout << pretty_print(result) << "\n\n";
     }
 
     void jmespath_expression_example()
     { 
-        std::string doc = R"(
+        std::string jtext = R"(
             {
               "people": [
                 {
@@ -61,9 +61,9 @@ namespace {
 
         auto expr = jmespath::jmespath_expression<json>::compile("people[?age > `20`].[name, age]");
 
-        json jdoc = json::parse(doc);
+        json doc = json::parse(jtext);
 
-        json result = expr.evaluate(jdoc);
+        json result = expr.evaluate(doc);
 
         std::cout << pretty_print(result) << "\n\n";
     }
