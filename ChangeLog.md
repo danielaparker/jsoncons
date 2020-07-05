@@ -1,3 +1,14 @@
+master
+-----
+
+Bugs fixed:
+
+- Fixed issue with escaping special characters in the `jsonpath::flatten` function [\#255](https://github.com/danielaparker/jsoncons/issues/255)
+
+Enhancements
+
+- Added jmespath extension for [JMESPath](https://jmespath.org/) support, [\#204](https://github.com/danielaparker/jsoncons/issues/204)
+
 v0.153.3
 --------
 
