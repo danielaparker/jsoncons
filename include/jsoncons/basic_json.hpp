@@ -1531,6 +1531,7 @@ public:
                     break;
             }
         }
+
         template <class TypeA, class TypeB>
         void swap_a_b(variant& other)
         {
