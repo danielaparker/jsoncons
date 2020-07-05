@@ -4659,8 +4659,7 @@ namespace jmespath {
             }
 
             JSONCONS_ASSERT(state_stack_.size() == 1);
-            JSONCONS_ASSERT(state_stack_.back() == path_state::lhs_expression ||
-                            state_stack_.back() == path_state::rhs_expression);
+            JSONCONS_ASSERT(state_stack_.back() == path_state::rhs_expression);
             state_stack_.pop_back();
 
             push_token(end_of_expression_arg);
