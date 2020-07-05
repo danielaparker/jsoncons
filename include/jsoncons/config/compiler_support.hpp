@@ -226,5 +226,35 @@
 #  define JSONCONS_CPP14_CONSTEXPR
 #endif
 
+namespace jsoncons {
+
+    class assertion_error : public std::runtime_error
+    {
+    public:
+        assertion_error(const std::string& s) noexcept
+            : std::runtime_error(s)
+        {
+        }
+        const char* what() const noexcept override
+        {
+            return std::runtime_error::what();
+        }
+    };
+
+} // namespace jsoncons
+
+#define JSONCONS_STR2(x)  #x
+#define JSONCONS_STR(x)  JSONCONS_STR2(x)
+
+#ifdef _DEBUG
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
+            JSONCONS_STR(__LINE__))); }
+#else
+#define JSONCONS_ASSERT(x) if (!(x)) { \
+    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at  <> :" \
+            JSONCONS_STR( 0 ))); }
+#endif // _DEBUG
+
 #endif // JSONCONS_COMPILER_SUPPORT_HPP
 

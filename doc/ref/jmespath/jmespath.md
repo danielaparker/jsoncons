@@ -21,6 +21,21 @@ It's supported in both the AWS and Azure CLI and has libraries available in a nu
   </tr>
 </table>
     
-### JMESPath
+### Examples
 
+#### search
+
+```c++
+```
+Output:
+```
+```
+
+#### jmespath_expression
+
+```c++
+```
+Output:
+```
+```
 

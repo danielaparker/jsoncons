@@ -176,34 +176,6 @@ JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_except
 JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_error;
 #endif
 
-#define JSONCONS_STR2(x)  #x
-#define JSONCONS_STR(x)  JSONCONS_STR2(x)
-
-
-    class assertion_error : public std::runtime_error, public virtual json_exception
-    {
-    public:
-        assertion_error(const std::string& s) noexcept
-            : std::runtime_error(s)
-        {
-        }
-        const char* what() const noexcept override
-        {
-            return std::runtime_error::what();
-        }
-    };
-
-
-#ifdef _DEBUG
-#define JSONCONS_ASSERT(x) if (!(x)) { \
-    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at " __FILE__ ":" \
-            JSONCONS_STR(__LINE__))); }
-#else
-#define JSONCONS_ASSERT(x) if (!(x)) { \
-    JSONCONS_THROW(jsoncons::assertion_error("assertion '" #x "' failed at  <> :" \
-            JSONCONS_STR( 0 ))); }
-#endif // _DEBUG
-
 } // namespace jsoncons
 
 #endif

@@ -19,5 +19,11 @@ class jmespath_expression
 Compiles the JMESPath expression and returns a `jmespath_expression` object 
 that represents the JMESPath expression.
 
+#### Exceptions
+
+(1) Sets the `std::error_code&` to the [jmespath_error_category](jmespath_errc.md) if JMESPath compilation fails. 
+
+(2) Throws [jmespath_error](jmespath_error.md) if JMESPath compilation fails.
+
 ### Examples
 

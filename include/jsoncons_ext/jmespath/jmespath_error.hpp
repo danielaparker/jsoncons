@@ -107,7 +107,6 @@ enum class jmespath_errc
     invalid_codepoint,
     illegal_escaped_character,
     unbalanced_parentheses,
-    not_a_number,
     invalid_arity,
     identifier_not_found,
     unknown_error 
@@ -171,8 +170,6 @@ public:
                 return "Illegal escaped character";
             case jmespath_errc::unbalanced_parentheses:
                 return "Unbalanced parentheses";
-            case jmespath_errc::not_a_number:
-                return "Not a number";
             case jmespath_errc::invalid_arity:
                 return "Function called with wrong number of arguments";
             case jmespath_errc::identifier_not_found:

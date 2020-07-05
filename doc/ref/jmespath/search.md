@@ -38,6 +38,8 @@ Returns a Json value.
 
 #### Exceptions
 
+(1) Sets the `std::error_code&` to the [jmespath_error_category](jmespath_errc.md) if JMESPath evaluation fails. 
+
 (2) Throws [jmespath_error](jmespath_error.md) if JMESPath evaluation fails.
 
 

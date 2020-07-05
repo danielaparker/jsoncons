@@ -26,9 +26,7 @@ namespace {
         }        
         )";
 
-        std::string expr = R"(
-          locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}
-        )";
+        std::string expr = "locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}";
 
         json jdoc = json::parse(doc);
 
@@ -41,20 +39,29 @@ namespace {
     { 
         std::string doc = R"(
         {
-          "locations": [
-            {"name": "Seattle", "state": "WA"},
-            {"name": "New York", "state": "NY"},
-            {"name": "Bellevue", "state": "WA"},
-            {"name": "Olympia", "state": "WA"}
-          ]
+            {
+              "people": [
+                {
+                  "age": 20,
+                  "other": "foo",
+                  "name": "Bob"
+                },
+                {
+                  "age": 25,
+                  "other": "bar",
+                  "name": "Fred"
+                },
+                {
+                  "age": 30,
+                  "other": "baz",
+                  "name": "George"
+                }
+              ]
+            }        
         }        
         )";
 
-        std::string s = R"(
-          locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}
-        )";
-
-        auto expr = jmespath::jmespath_expression::compile(s);
+        auto expr = jmespath::jmespath_expression<json>::compile("people[?age > `20`].[name, age]");
 
         auto jdoc = json::parse(doc);
 

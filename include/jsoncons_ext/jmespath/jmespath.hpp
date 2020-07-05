@@ -3302,7 +3302,7 @@ namespace jmespath {
             {
                 jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
                 std::error_code ec;
-                jmespath_expression result = evaluator.compile(expr, ec);
+                jmespath_expression result = evaluator.compile(expr.data(), expr.size(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
@@ -3314,7 +3314,7 @@ namespace jmespath {
                                                std::error_code& ec)
             {
                 jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
-                return evaluator.compile(expr, ec);
+                return evaluator.compile(expr.data(), expr.size(), ec);
             }
         };
     private:
