@@ -4,6 +4,8 @@ master
 Bugs fixed:
 
 - Fixed issue with escaping special characters in the `jsonpath::flatten` function [\#255](https://github.com/danielaparker/jsoncons/issues/255)
+- Added workaround for clang xcode 10 bug in `std::optional` implementation
+- Fixed bug in `basic_json` less operator with left hand side `uint64_value` and right hand side `int64_value`
 
 Enhancements
 
