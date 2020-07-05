@@ -9,7 +9,7 @@ class jmespath_expression
 
 #### Member functions
 
-    Json evaluate(reference doc, std::error_code& ec); // (1)
+    Json evaluate(reference doc); // (1)
 
     Json evaluate(reference doc, std::error_code& ec); // (2)
 
