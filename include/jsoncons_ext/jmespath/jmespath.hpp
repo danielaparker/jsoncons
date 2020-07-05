@@ -318,7 +318,7 @@ namespace jmespath {
 
     template<class Json,
              class JsonReference>
-    class jmespath_evaluator : public ser_context
+    class jmespath_evaluator 
     {
     public:
         typedef typename Json::char_type char_type;
@@ -3272,6 +3272,22 @@ namespace jmespath {
             {
             }
 
+            Json evaluate(reference root)
+            {
+                if (output_stack_.empty())
+                {
+                    return Json::null();
+                }
+                eval_context dynamic_storage;
+                std::error_code ec;
+                Json result = evaluate_tokens(root, output_stack_, dynamic_storage, ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(jmespath_error(ec));
+                }
+                return result;
+            }
+
             Json evaluate(reference root, std::error_code& ec)
             {
                 if (output_stack_.empty())
@@ -3280,6 +3296,18 @@ namespace jmespath {
                 }
                 eval_context dynamic_storage;
                 return evaluate_tokens(root, output_stack_, dynamic_storage, ec);
+            }
+
+            static jmespath_expression compile(const string_view_type& expr)
+            {
+                jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
+                std::error_code ec;
+                jmespath_expression expr = evaluator.compile(expr, ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
+                }
+                return expr;
             }
 
             static jmespath_expression compile(const string_view_type& expr,
