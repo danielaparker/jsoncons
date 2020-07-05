@@ -1,15 +1,10 @@
 [{
-    "given": {
-      "True": true,
-      "False": false,
-      "Number": 5,
-      "EmptyList": [],
-      "Zero": 0
-    },
+    "given": {"type": "object"},
   "cases": [
       {
-        "expression": "!(True && False)",
-        "result": true
+        "comment": "Multi-select of a list using an identifier index",
+        "expression": "foo[abc]",
+        "error": "syntax"
       }
   ]
 }
