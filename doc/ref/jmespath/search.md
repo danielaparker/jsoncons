@@ -4,11 +4,11 @@
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
 template<Json>
-Json search(const Json& document, 
-            const typename Json::string_view_type& path); // (1)
+Json search(const Json& doc, 
+            const typename Json::string_view_type& expr); // (1)
 
 template<Json>
-Json search(const Json& document, 
+Json search(const Json& doc, 
             const typename Json::string_view_type& expr,
             std::error_code& ec); // (2)
 ```
@@ -19,7 +19,7 @@ Returns a Json value.
 
 <table>
   <tr>
-    <td>document</td>
+    <td>doc</td>
     <td>Json value</td> 
   </tr>
   <tr>

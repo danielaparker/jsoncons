@@ -9,6 +9,16 @@ class jmespath_expression
 
 #### Member functions
 
+    Json evaluate(reference doc, std::error_code& ec); // (1)
+
+    Json evaluate(reference doc, std::error_code& ec); // (2)
+
+#### Exceptions
+
+(1) Sets the `std::error_code&` to the [jmespath_error_category](jmespath_errc.md) if JMESPath compilation fails. 
+
+(2) Throws [jmespath_error](jmespath_error.md) if JMESPath evaluation fails.
+
 #### Static functions
 
     static jmespath_expression compile(const string_view_type& expr); // (1)
@@ -24,6 +34,4 @@ that represents the JMESPath expression.
 (1) Sets the `std::error_code&` to the [jmespath_error_category](jmespath_errc.md) if JMESPath compilation fails. 
 
 (2) Throws [jmespath_error](jmespath_error.md) if JMESPath compilation fails.
-
-### Examples
 

@@ -2161,9 +2161,9 @@ namespace jmespath {
             }
         };
 
-        static reference evaluate_tokens(reference root, const std::vector<token>& output_stack, eval_context& context, std::error_code& ec)
+        static reference evaluate_tokens(reference doc, const std::vector<token>& output_stack, eval_context& context, std::error_code& ec)
         {
-            pointer root_ptr = std::addressof(root);
+            pointer root_ptr = std::addressof(doc);
             std::vector<parameter> stack;
             std::vector<parameter> arg_stack;
             for (std::size_t i = 0; i < output_stack.size(); ++i)
@@ -3272,7 +3272,7 @@ namespace jmespath {
             {
             }
 
-            Json evaluate(reference root)
+            Json evaluate(reference doc)
             {
                 if (output_stack_.empty())
                 {
@@ -3280,7 +3280,7 @@ namespace jmespath {
                 }
                 eval_context dynamic_storage;
                 std::error_code ec;
-                Json result = evaluate_tokens(root, output_stack_, dynamic_storage, ec);
+                Json result = evaluate_tokens(doc, output_stack_, dynamic_storage, ec);
                 if (ec)
                 {
                     JSONCONS_THROW(jmespath_error(ec));
@@ -3288,14 +3288,14 @@ namespace jmespath {
                 return result;
             }
 
-            Json evaluate(reference root, std::error_code& ec)
+            Json evaluate(reference doc, std::error_code& ec)
             {
                 if (output_stack_.empty())
                 {
                     return Json::null();
                 }
                 eval_context dynamic_storage;
-                return evaluate_tokens(root, output_stack_, dynamic_storage, ec);
+                return evaluate_tokens(doc, output_stack_, dynamic_storage, ec);
             }
 
             static jmespath_expression compile(const string_view_type& expr)
@@ -5063,7 +5063,7 @@ namespace jmespath {
     using jmespath_expression = typename jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&>::jmespath_expression;
 
     template<class Json>
-    Json search(const Json& root, const typename Json::string_view_type& path)
+    Json search(const Json& doc, const typename Json::string_view_type& path)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
         std::error_code ec;
@@ -5072,7 +5072,7 @@ namespace jmespath {
         {
             JSONCONS_THROW(jmespath_error(ec, evaluator.line(), evaluator.column()));
         }
-        auto result = expr.evaluate(root, ec);
+        auto result = expr.evaluate(doc, ec);
         if (ec)
         {
             JSONCONS_THROW(jmespath_error(ec));
@@ -5081,7 +5081,7 @@ namespace jmespath {
     }
 
     template<class Json>
-    Json search(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+    Json search(const Json& doc, const typename Json::string_view_type& path, std::error_code& ec)
     {
         jsoncons::jmespath::detail::jmespath_evaluator<Json,const Json&> evaluator;
         auto expr = evaluator.compile(path.data(), path.size(), ec);
@@ -5089,7 +5089,7 @@ namespace jmespath {
         {
             return Json::null();
         }
-        auto result = expr.evaluate(root, ec);
+        auto result = expr.evaluate(doc, ec);
         if (ec)
         {
             return Json::null();
