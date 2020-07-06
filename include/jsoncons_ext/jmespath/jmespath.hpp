@@ -2233,7 +2233,7 @@ namespace jmespath {
                     }
                     case token_type::function:
                     {
-                        if (t.function_->arg_count() && t.function_->arg_count().value() != arg_stack.size())
+                        if (t.function_->arg_count() && *(t.function_->arg_count()) != arg_stack.size())
                         {
                             ec = jmespath_errc::invalid_arity;
                             return context.null_value();
@@ -2653,7 +2653,7 @@ namespace jmespath {
             {
             }
 
-            virtual std::size_t precedence_level() const
+            std::size_t precedence_level() const override
             {
                 return 11;
             }
@@ -2705,7 +2705,7 @@ namespace jmespath {
             {
             }
 
-            virtual std::size_t precedence_level() const
+            std::size_t precedence_level() const override
             {
                 return 11;
             }
@@ -2759,7 +2759,7 @@ namespace jmespath {
             {
             }
 
-            virtual std::size_t precedence_level() const
+            std::size_t precedence_level() const override
             {
                 return 11;
             }
@@ -2851,7 +2851,7 @@ namespace jmespath {
             {
             }
 
-            virtual std::size_t precedence_level() const
+            std::size_t precedence_level() const override
             {
                 return 11;
             }
@@ -2904,7 +2904,7 @@ namespace jmespath {
             {
             }
 
-            virtual std::size_t precedence_level() const
+            std::size_t precedence_level() const override
             {
                 return 11;
             }
@@ -2978,7 +2978,7 @@ namespace jmespath {
             {
             }
 
-            virtual std::size_t precedence_level() const
+            std::size_t precedence_level() const override
             {
                 return 1;
             }
