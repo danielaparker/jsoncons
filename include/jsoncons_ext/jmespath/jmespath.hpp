@@ -422,23 +422,35 @@ namespace jmespath {
 
         class unary_operator
         {
+            std::size_t precedence_level_;
+            bool is_right_associative_;
         public:
+            unary_operator(std::size_t precedence_level, bool is_right_associative)
+                : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
+            {
+            }
+
             virtual ~unary_operator() = default;
-            virtual std::size_t precedence_level() const = 0;
-            virtual bool is_right_associative() const = 0;
+
+            std::size_t precedence_level() const 
+            {
+                return precedence_level_;
+            }
+            bool is_right_associative() const
+            {
+                return is_right_associative_;
+            }
+
             virtual reference evaluate(reference val, eval_context&, std::error_code& ec) const = 0;
         };
 
-        class not_expression : public unary_operator
+        class not_expression final : public unary_operator
         {
-            std::size_t precedence_level() const override
-            {
-                return 1;
-            }
-            bool is_right_associative() const override
-            {
-                return true;
-            }
+        public:
+            not_expression()
+                : unary_operator(1, true)
+            {}
+
             reference evaluate(reference val, eval_context& context, std::error_code&) const override
             {
                 return is_false(val) ? context.true_value() : context.false_value();
@@ -447,9 +459,25 @@ namespace jmespath {
 
         class binary_operator
         {
+            std::size_t precedence_level_;
+            bool is_right_associative_;
         public:
+            binary_operator(std::size_t precedence_level, bool is_right_associative = false)
+                : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
+            {
+            }
+
             virtual ~binary_operator() = default;
-            virtual std::size_t precedence_level() const = 0;
+
+            std::size_t precedence_level() const 
+            {
+                return precedence_level_;
+            }
+            bool is_right_associative() const
+            {
+                return is_right_associative_;
+            }
+
             virtual reference evaluate(reference lhs, reference rhs, eval_context&, std::error_code& ec) const = 0;
 
             virtual std::string to_string(size_t indent = 0) const
@@ -2054,6 +2082,8 @@ namespace jmespath {
                 {
                     case token_type::unary_operator:
                         return unary_operator_->is_right_associative();
+                    case token_type::binary_operator:
+                        return binary_operator_->is_right_associative();
                     case token_type::expression:
                         return expression_->is_right_associative();
                     default:
@@ -2268,12 +2298,14 @@ namespace jmespath {
 
         // Implementations
 
-        class or_operator : public binary_operator
+        class or_operator final : public binary_operator
         {
-            std::size_t precedence_level() const 
+        public:
+            or_operator()
+                : binary_operator(9)
             {
-                return 9;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override
             {
                 if (lhs.is_null() && rhs.is_null())
@@ -2302,12 +2334,14 @@ namespace jmespath {
             }
         };
 
-        class and_operator : public binary_operator
+        class and_operator final : public binary_operator
         {
-            std::size_t precedence_level() const 
+        public:
+            and_operator()
+                : binary_operator(8)
             {
-                return 8;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context&, std::error_code&) const override
             {
                 if (is_true(lhs))
@@ -2332,12 +2366,14 @@ namespace jmespath {
             }
         };
 
-        class eq_operator : public binary_operator
+        class eq_operator final : public binary_operator
         {
-            std::size_t precedence_level() const 
+        public:
+            eq_operator()
+                : binary_operator(6)
             {
-                return 6;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 return lhs == rhs ? context.true_value() : context.false_value();
@@ -2355,12 +2391,14 @@ namespace jmespath {
             }
         };
 
-        class ne_operator : public binary_operator
+        class ne_operator final : public binary_operator
         {
-            std::size_t precedence_level() const 
+        public:
+            ne_operator()
+                : binary_operator(6)
             {
-                return 6;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 return lhs != rhs ? context.true_value() : context.false_value();
@@ -2378,12 +2416,14 @@ namespace jmespath {
             }
         };
 
-        class lt_operator : public binary_operator
+        class lt_operator final : public binary_operator
         {
-            std::size_t precedence_level() const 
+        public:
+            lt_operator()
+                : binary_operator(5)
             {
-                return 5;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 if (!(lhs.is_number() && rhs.is_number()))
@@ -2405,12 +2445,14 @@ namespace jmespath {
             }
         };
 
-        class lte_operator : public binary_operator
+        class lte_operator final : public binary_operator
         {
-            std::size_t precedence_level() const override
+        public:
+            lte_operator()
+                : binary_operator(5)
             {
-                return 5;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override 
             {
                 if (!(lhs.is_number() && rhs.is_number()))
@@ -2432,12 +2474,14 @@ namespace jmespath {
             }
         };
 
-        class gt_operator : public binary_operator
+        class gt_operator final : public binary_operator
         {
-            std::size_t precedence_level() const override 
+        public:
+            gt_operator()
+                : binary_operator(5)
             {
-                return 5;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override
             {
                 if (!(lhs.is_number() && rhs.is_number()))
@@ -2459,12 +2503,14 @@ namespace jmespath {
             }
         };
 
-        class gte_operator : public binary_operator
+        class gte_operator final : public binary_operator
         {
-            std::size_t precedence_level() const override 
+        public:
+            gte_operator()
+                : binary_operator(5)
             {
-                return 5;
             }
+
             reference evaluate(reference lhs, reference rhs, eval_context& context, std::error_code&) const override
             {
                 if (!(lhs.is_number() && rhs.is_number()))
