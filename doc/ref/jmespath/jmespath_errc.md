@@ -19,7 +19,7 @@ constant                            |Description
 `expected_right_brace`              | Expected }                                    
 `expected_colon`                    | Expected :                                    
 `expected_dot`                      | Expected \".\"                                
-`expected_or`                       | Expected \"||\"                               
+`expected_or`                       | Expected \"\|\|\"                               
 `expected_and`                      | Expected \"&&\"                               
 `expected_multi_select_list`        | Expected multi-select-list                    
 `invalid_number`                    | Invalid number                                
