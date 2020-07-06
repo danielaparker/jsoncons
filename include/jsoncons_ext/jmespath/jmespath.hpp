@@ -7,18 +7,13 @@
 #ifndef JSONCONS_JMESPATH_JMESPATH_HPP
 #define JSONCONS_JMESPATH_JMESPATH_HPP
 
-#include <array> // std::array
 #include <string>
 #include <vector>
-#include <map>
-#include <unordered_map>
+#include <unordered_map> // std::unordered_map
 #include <memory>
 #include <type_traits> // std::is_const
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
-#include <regex>
-#include <set> // std::set
-#include <iterator> // std::make_move_iterator
 #include <functional> // 
 #include <algorithm> // std::stable_sort
 #include <cmath> // std::abs
