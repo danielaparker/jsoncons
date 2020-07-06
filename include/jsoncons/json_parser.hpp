@@ -141,12 +141,12 @@ private:
 
     std::function<bool(json_errc,const ser_context&)> err_handler_;
     int initial_stack_capacity_;
-    int nesting_depth_;
     uint32_t cp_;
     uint32_t cp2_;
     std::size_t line_;
     std::size_t position_;
     std::size_t mark_position_;
+    std::size_t saved_position_;
     const CharT* begin_input_;
     const CharT* input_end_;
     const CharT* input_ptr_;
@@ -159,6 +159,7 @@ private:
 
     std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
     std::vector<std::pair<string_view_type,double>> string_double_map_;
+    std::vector<std::size_t> position_stack_;
 
     // Noncopyable and nonmoveable
     basic_json_parser(const basic_json_parser&) = delete;
@@ -188,7 +189,6 @@ public:
        : options_(options),
          err_handler_(err_handler),
          initial_stack_capacity_(default_initial_stack_capacity_),
-         nesting_depth_(0), 
          cp_(0),
          cp2_(0),
          line_(1),
@@ -201,7 +201,8 @@ public:
          more_(true),
          done_(false),
          string_buffer_(alloc),
-         state_stack_(alloc)
+         state_stack_(alloc),
+         position_stack_(1,0)
     {
         string_buffer_.reserve(initial_string_buffer_capacity_);
 
@@ -326,7 +327,7 @@ public:
 
     void begin_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(position_stack_.size() > options_.max_nesting_depth()))
         {
             more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
@@ -335,6 +336,8 @@ public:
                 return;
             }
         } 
+        position_stack_.push_back(position_);
+
         push_state(json_parse_state::object);
         state_ = json_parse_state::expect_member_name_or_end;
         more_ = visitor.begin_object(semantic_tag::none, *this, ec);
@@ -342,14 +345,14 @@ public:
 
     void end_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(nesting_depth_ < 1))
+        if (position_stack_.size() <= 1)
         {
             err_handler_(json_errc::unexpected_right_brace, *this);
             ec = json_errc::unexpected_right_brace;
             more_ = false;
             return;
         }
-        --nesting_depth_;
+        position_stack_.pop_back();
         state_ = pop_state();
         if (state_ == json_parse_state::object)
         {
@@ -382,7 +385,7 @@ public:
 
     void begin_array(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (++nesting_depth_ > options_.max_nesting_depth())
+        if (JSONCONS_UNLIKELY(position_stack_.size() > options_.max_nesting_depth()))
         {
             more_ = err_handler_(json_errc::max_nesting_depth_exceeded, *this);
             if (!more_)
@@ -390,7 +393,9 @@ public:
                 ec = json_errc::max_nesting_depth_exceeded;
                 return;
             }
-        }
+        } 
+        position_stack_.push_back(position_);
+
         push_state(json_parse_state::array);
         state_ = json_parse_state::expect_value_or_end;
         more_ = visitor.begin_array(semantic_tag::none, *this, ec);
@@ -398,14 +403,14 @@ public:
 
     void end_array(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
-        if (nesting_depth_ < 1)
+        if (position_stack_.size() <= 1)
         {
             err_handler_(json_errc::unexpected_right_bracket, *this);
             ec = json_errc::unexpected_right_bracket;
             more_ = false;
             return;
         }
-        --nesting_depth_;
+        position_stack_.pop_back();
         state_ = pop_state();
         if (state_ == json_parse_state::array)
         {
@@ -446,7 +451,7 @@ public:
         line_ = 1;
         position_ = 0;
         mark_position_ = 0;
-        nesting_depth_ = 0;
+        position_stack_.resize(1,0);
     }
 
     void restart()
@@ -1574,6 +1579,7 @@ public:
 
     void parse_true(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
+        position_stack_.back() = position_; 
         if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 4))
         {
             if (*(input_ptr_+1) == 'r' && *(input_ptr_+2) == 'u' && *(input_ptr_+3) == 'e')
@@ -1608,6 +1614,7 @@ public:
 
     void parse_null(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
+        position_stack_.back() = position_; 
         if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 4))
         {
             if (*(input_ptr_+1) == 'u' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 'l')
@@ -1642,6 +1649,7 @@ public:
 
     void parse_false(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
+        position_stack_.back() = position_; 
         if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 5))
         {
             if (*(input_ptr_+1) == 'a' && *(input_ptr_+2) == 'l' && *(input_ptr_+3) == 's' && *(input_ptr_+4) == 'e')
@@ -1676,6 +1684,7 @@ public:
 
     void parse_number(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
+        position_stack_.back() = position_ - 1;
         const CharT* local_input_end = input_end_;
 
         switch (state_)
@@ -2093,6 +2102,7 @@ exp3:
 
     void parse_string(basic_json_visitor<CharT>& visitor, std::error_code& ec)
     {
+        position_stack_.back() = position_ - 1;
         const CharT* local_input_end = input_end_;
         const CharT* sb = input_ptr_;
 
@@ -2593,7 +2603,8 @@ escape_u8:
 
     std::size_t position() const override
     {
-        return position_;
+        JSONCONS_ASSERT(!position_stack_.empty());
+        return position_stack_.back();
     }
 private:
 
