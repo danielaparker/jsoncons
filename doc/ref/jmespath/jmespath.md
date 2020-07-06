@@ -70,8 +70,9 @@ Output:
 #### jmespath_expression
 
 A [jsoncons::jmespath::jmespath_expression](jmespath_expression.md) 
-stores a compiled JMESPath expression, which allows you to 
+represents the compiled form of a JMESPath expression. It allows you to 
 evaluate the same expression on multiple JSON documents.
+A `jmespath_expression` is immutable and thread-safe. 
 
 ```c++
 #include <jsoncons/json.hpp>
