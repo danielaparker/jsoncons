@@ -76,7 +76,7 @@ private:
     string_type nan_to_str_;
     string_type inf_to_str_;
     string_type neginf_to_str_;
-    int max_nesting_depth_;
+    std::size_t max_nesting_depth_;
 
 protected:
     basic_json_options_common()
@@ -274,7 +274,7 @@ public:
         }
     }
 
-    int max_nesting_depth() const 
+    std::size_t max_nesting_depth() const 
     {
         return max_nesting_depth_;
     }
@@ -755,7 +755,7 @@ public:
         return *this;
     }
 
-    basic_json_options& max_nesting_depth(int value)
+    basic_json_options& max_nesting_depth(std::size_t value)
     {
         this->max_nesting_depth_ = value;
         return *this;

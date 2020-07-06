@@ -72,7 +72,7 @@ namespace {
             {
                 aNormPath = buildNormalizedPath(current_);
             }
-            std::cout << aNormPath << std::endl;
+            //std::cout << aNormPath << std::endl;
             if (path_ == aNormPath)
             {
                 positions_.push_back(context.position());
@@ -163,18 +163,11 @@ namespace {
         }
     };
 
-    void update_in_place(std::string& input,
-        const std::string& path)
+    void update_in_place(std::string& input, const std::string& path, std::vector<std::size_t>& positions)
     {
-        std::vector<std::size_t> positions;
         string_locator updater(&input[0], input.size(), path, "", positions);
         jsoncons::json_reader reader(jsoncons::string_view(input), updater);
         reader.read();
-
-        for (auto it = positions.rbegin(); it != positions.rend(); ++it)
-        {
-            std::cout << "Position : " << *it << std::endl;
-        }
     }
 }
 
@@ -202,8 +195,16 @@ TEST_CASE("json_parser position")
       )";
         try
         {
-            update_in_place(input1, "$['Parent']['Child']['Test']");
-            update_in_place(input2, "$['Parent']['Child']['Test']");
+            std::vector<std::size_t> positions;
+
+            update_in_place(input1, "$['Parent']['Child']['Test']", positions);
+            REQUIRE(positions.size() == 1);
+            CHECK(input1.substr(positions.back(),16) == std::string("4444333322221111"));
+
+            positions.clear();
+            update_in_place(input2, "$['Parent']['Child']['Test']", positions);
+            REQUIRE(positions.size() == 1);
+            CHECK(input2.substr(positions.back(),18) == std::string("\"4444333322221111\""));
         }
         catch (std::exception& e)
         {
