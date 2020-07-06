@@ -1093,7 +1093,7 @@ namespace detail {
         basic_json_encode_options<CharT> options_;
         jsoncons::detail::write_double fp_;
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
-        int nesting_depth_;
+        std::size_t nesting_depth_;
 
         // Noncopyable
         basic_compact_json_encoder(const basic_compact_json_encoder&) = delete;
