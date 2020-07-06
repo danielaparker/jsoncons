@@ -94,7 +94,7 @@ namespace jsoncons { namespace jsonpath {
         {
             if (stop_)
             {
-                auto len = stop_.value() >= 0 ? stop_.value() : (static_cast<int64_t>(size) + stop_.value());
+                auto len = *stop_ >= 0 ? *stop_ : (static_cast<int64_t>(size) + *stop_);
                 return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
             }
             else

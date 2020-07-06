@@ -435,7 +435,7 @@ namespace jmespath {
             {
                 return 1;
             }
-            bool is_right_associative() const
+            bool is_right_associative() const override
             {
                 return true;
             }
@@ -467,17 +467,31 @@ namespace jmespath {
         // expression_base
         class expression_base
         {
+            std::size_t precedence_level_;
+            bool is_right_associative_;
+            bool is_projection_;
         public:
-            expression_base()
+            expression_base(std::size_t precedence_level, bool is_right_associative, bool is_projection)
+                : precedence_level_(precedence_level), is_right_associative_(is_right_associative), is_projection_(is_projection)
             {
+            }
+
+            std::size_t precedence_level() const
+            {
+                return precedence_level_;
+            }
+
+            bool is_right_associative() const
+            {
+                return is_right_associative_;
+            }
+
+            bool is_projection() const 
+            {
+                return is_projection_;
             }
 
             virtual ~expression_base() = default;
-
-            virtual std::size_t precedence_level() const
-            {
-                return 1;
-            }
 
             virtual reference evaluate(reference val, eval_context& context, std::error_code& ec) const = 0;
 
@@ -487,10 +501,6 @@ namespace jmespath {
             {
                 return std::string("to_string not implemented");
             }
-
-            virtual bool is_projection() const = 0;
-
-            virtual bool is_right_associative() const = 0;
         };  
 
         // parameter
@@ -2397,7 +2407,7 @@ namespace jmespath {
 
         class lte_operator : public binary_operator
         {
-            std::size_t precedence_level() const 
+            std::size_t precedence_level() const override
             {
                 return 5;
             }
@@ -2424,7 +2434,7 @@ namespace jmespath {
 
         class gt_operator : public binary_operator
         {
-            std::size_t precedence_level() const 
+            std::size_t precedence_level() const override 
             {
                 return 5;
             }
@@ -2451,7 +2461,7 @@ namespace jmespath {
 
         class gte_operator : public binary_operator
         {
-            std::size_t precedence_level() const 
+            std::size_t precedence_level() const override 
             {
                 return 5;
             }
@@ -2479,18 +2489,14 @@ namespace jmespath {
         // selector_base
         class selector_base :  public expression_base
         {
+        public:
+            selector_base()
+                : expression_base(1, false, false)
+            {
+            }
+
             void add_expression(std::unique_ptr<expression_base>&&) override
             {
-            }
-
-            bool is_projection() const override
-            {
-                return false;
-            }
-
-            bool is_right_associative() const override
-            {
-                return false;
             }
         };
 
@@ -2563,11 +2569,6 @@ namespace jmespath {
             {
             }
 
-            virtual std::size_t precedence_level() const
-            {
-                return 0;
-            }
-
             reference evaluate(reference val, eval_context& context, std::error_code&) const override
             {
                 if (!val.is_array())
@@ -2610,6 +2611,10 @@ namespace jmespath {
         protected:
             std::vector<std::unique_ptr<expression_base>> expressions_;
         public:
+            projection_base(std::size_t precedence_level, bool is_right_associative = true)
+                : expression_base(precedence_level, is_right_associative, true)
+            {
+            }
 
             void add_expression(std::unique_ptr<expression_base>&& expr) override
             {
@@ -2634,28 +2639,14 @@ namespace jmespath {
                 }
                 return *ptr;
             }
-
-            bool is_projection() const override
-            {
-                return true;
-            }
-
-            bool is_right_associative() const override
-            {
-                return true;
-            }
         };
 
         class object_projection final : public projection_base
         {
         public:
             object_projection()
+                : projection_base(11, true)
             {
-            }
-
-            std::size_t precedence_level() const override
-            {
-                return 11;
             }
 
             reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
@@ -2702,12 +2693,8 @@ namespace jmespath {
         {
         public:
             list_projection()
+                : projection_base(11, true)
             {
-            }
-
-            std::size_t precedence_level() const override
-            {
-                return 11;
             }
 
             reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
@@ -2755,13 +2742,8 @@ namespace jmespath {
             slice slice_;
         public:
             slice_projection(const slice& s)
-                : slice_(s)
+                : projection_base(11, true), slice_(s)
             {
-            }
-
-            std::size_t precedence_level() const override
-            {
-                return 11;
             }
 
             reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
@@ -2847,13 +2829,8 @@ namespace jmespath {
             std::vector<token> token_list_;
         public:
             filter_expression(std::vector<token>&& token_list)
-                : token_list_(std::move(token_list))
+                : projection_base(11, true), token_list_(std::move(token_list))
             {
-            }
-
-            std::size_t precedence_level() const override
-            {
-                return 11;
             }
 
             reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
@@ -2901,17 +2878,8 @@ namespace jmespath {
         {
         public:
             flatten_projection()
+                : projection_base(11, false)
             {
-            }
-
-            std::size_t precedence_level() const override
-            {
-                return 11;
-            }
-
-            bool is_right_associative() const override
-            {
-                return false;
             }
 
             reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
@@ -2976,11 +2944,6 @@ namespace jmespath {
             multi_select_list(std::vector<std::vector<token>>&& token_lists)
                 : token_lists_(std::move(token_lists))
             {
-            }
-
-            std::size_t precedence_level() const override
-            {
-                return 1;
             }
 
             reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
