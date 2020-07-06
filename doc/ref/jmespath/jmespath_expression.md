@@ -39,7 +39,7 @@ class jmespath_expression
     static jmespath_expression compile(const string_view_type& expr,
                                        std::error_code& ec); //(2)
 
-Compiles the JMESPath expression and returns a `jmespath_expression` object 
+Compiles the JMESPath expression for later evaluation. Returns a `jmespath_expression` object 
 that represents the JMESPath expression.
 
 #### Parameters
