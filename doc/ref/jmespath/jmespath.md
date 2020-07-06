@@ -8,7 +8,7 @@ It's supported in both the AWS and Azure CLI and has libraries available in a nu
 <table border="0">
   <tr>
     <td><a href="jmespath_expression.md">jmespath_expression</a></td>
-    <td>Represents a compiled JMESPath expression.</td> 
+    <td>Represents the compiled form of a JMESPath expression.</td> 
   </tr>
 </table>
 
