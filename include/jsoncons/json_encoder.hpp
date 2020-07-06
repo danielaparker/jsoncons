@@ -317,7 +317,7 @@ namespace detail {
         std::basic_string<CharT> close_object_brace_str_;
         std::basic_string<CharT> open_array_bracket_str_;
         std::basic_string<CharT> close_array_bracket_str_;
-        int nesting_depth_;
+        std::size_t nesting_depth_;
 
         // Noncopyable and nonmoveable
         basic_json_encoder(const basic_json_encoder&) = delete;
