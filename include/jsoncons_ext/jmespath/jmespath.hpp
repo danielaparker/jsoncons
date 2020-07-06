@@ -430,7 +430,7 @@ namespace jmespath {
             {
             }
 
-            virtual ~unary_operator() = default;
+            // virtual destructor not needed
 
             std::size_t precedence_level() const 
             {
@@ -467,7 +467,7 @@ namespace jmespath {
             {
             }
 
-            virtual ~binary_operator() = default;
+            // virtual destructor not needed
 
             std::size_t precedence_level() const 
             {
