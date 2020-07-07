@@ -32,7 +32,7 @@ The examples below are from the [JMESPath front page](https://jmespath.org/) and
 #### search function
 
 [jsoncons::jmespath::search](search.md) takes two arguments, a [basic_json](../basic_json.md) 
-and a JMESPath expression, and returns a `basic_json` result. This is the simplest way to
+and a JMESPath expression string, and returns a `basic_json` result. This is the simplest way to
 compile and evaluate a JMESPath expression.
 
 ```c++
