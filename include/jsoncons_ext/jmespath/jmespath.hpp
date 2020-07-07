@@ -4562,7 +4562,7 @@ namespace jmespath {
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4625,12 +4625,10 @@ namespace jmespath {
                                 break;
                             case '[':
                             case '{':
-                                state_stack_.back() = path_state::expect_right_brace;
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
                             case '.':
-                                state_stack_.back() = path_state::expect_right_brace;
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::sub_expression);
                                 ++p_;
                                 ++column_;
                                 break;
