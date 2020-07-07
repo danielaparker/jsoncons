@@ -1,10 +1,10 @@
 [{
-    "given": {"type": "object"},
+    "given": [],
   "cases": [
       {
-          "comment": "Nested multiselect",
-          "expression": "a{foo: bar}",
-          "error": "syntax"
+          "comment": "",
+          "expression": "[*.*]",
+          "result": [null]
       }
   ]
 }
