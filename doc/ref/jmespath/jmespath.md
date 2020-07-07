@@ -4,6 +4,10 @@ The jmespath extension implements [JMESPath](https://jmespath.org/). JMESPath is
 for transforming JSON documents into other JSON documents.
 It's supported in both the AWS and Azure CLI and has libraries available in a number of languages.
 
+### Compliance level
+
+Fully compliant. The jsoncons implementation passes all [compliance tests](https://github.com/jmespath/jmespath.test).
+
 ### Classes
 <table border="0">
   <tr>
