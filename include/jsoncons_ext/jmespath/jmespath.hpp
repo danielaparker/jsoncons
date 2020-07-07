@@ -3439,9 +3439,9 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case '{':
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                break;
+                            //case '{':
+                            //    state_stack_.emplace_back(path_state::lhs_expression);
+                            //    break;
                             default:
                                 if (state_stack_.size() > 1)
                                 {
@@ -3449,7 +3449,7 @@ namespace jmespath {
                                 }
                                 else
                                 {
-                                    ec = jmespath_errc::invalid_expression;
+                                    ec = jmespath_errc::syntax_error;
                                     return jmespath_expression();
                                 }
                                 break;
@@ -3488,7 +3488,7 @@ namespace jmespath {
                                 }
                                 else
                                 {
-                                    ec = jmespath_errc::invalid_expression;
+                                    ec = jmespath_errc::syntax_error;
                                     return jmespath_expression();
                                 }
                                 break;

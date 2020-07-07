@@ -31,7 +31,7 @@ constant                            |Description
 `invalid_type`                      | Invalid type                                  
 `unexpected_end_of_input`           | Unexpected end of jmespath input              
 `step_cannot_be_zero`               | Slice step cannot be zero                     
-`invalid_expression`                | Invalid expression                            
+`syntax_error`                      | Syntax error                           
 `invalid_codepoint`                 | Invalid codepoint                             
 `illegal_escaped_character`         | Illegal escaped character                     
 `unbalanced_parentheses`            | Unbalanced parentheses                        

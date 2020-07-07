@@ -103,7 +103,7 @@ enum class jmespath_errc
     invalid_type,
     unexpected_end_of_input,
     step_cannot_be_zero,
-    invalid_expression,
+    syntax_error,
     invalid_codepoint,
     illegal_escaped_character,
     unbalanced_parentheses,
@@ -163,8 +163,8 @@ public:
                 return "Unexpected end of jmespath input";
             case jmespath_errc::step_cannot_be_zero:
                 return "Slice step cannot be zero";
-            case jmespath_errc::invalid_expression:
-                return "Invalid expression";
+            case jmespath_errc::syntax_error:
+                return "Syntax error";
             case jmespath_errc::invalid_codepoint:
                 return "Invalid codepoint";
             case jmespath_errc::illegal_escaped_character:

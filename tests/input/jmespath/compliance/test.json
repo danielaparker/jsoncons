@@ -3,8 +3,8 @@
   "cases": [
       {
           "comment": "Nested multiselect",
-          "expression": "[[*],*]",
-          "result": [null, ["object"]]
+          "expression": "a{foo: bar}",
+          "error": "syntax"
       }
   ]
 }
