@@ -75,7 +75,7 @@ Output:
 
 A [jsoncons::jmespath::jmespath_expression](jmespath_expression.md) 
 represents the compiled form of a JMESPath expression. It allows you to 
-evaluate a compiled expression on multiple JSON documents.
+evaluate a single compiled expression on multiple JSON documents.
 A `jmespath_expression` is immutable and thread-safe. 
 
 ```c++
