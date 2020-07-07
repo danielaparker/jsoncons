@@ -95,7 +95,7 @@ TEST_CASE("jmespath-tests")
     SECTION("compliance")
     {
         // 4 syntax tests don't pass, appear to require extra grammatical checks 
-        //jmespath_tests("./input/jmespath/compliance/syntax.json"); 
+        jmespath_tests("./input/jmespath/compliance/syntax.json"); 
 
         jmespath_tests("./input/jmespath/compliance/basic.json"); // OK
         jmespath_tests("./input/jmespath/compliance/boolean.json"); // OK
@@ -113,9 +113,9 @@ TEST_CASE("jmespath-tests")
         jmespath_tests("./input/jmespath/compliance/benchmarks.json"); // OK
         jmespath_tests("./input/jmespath/compliance/functions.json"); // OK
 
-        //jmespath_tests("./input/jmespath/compliance/test.json"); 
+        jmespath_tests("./input/jmespath/compliance/test.json"); 
 
-        jmespath_tests("./input/jmespath/examples/jmespath-examples.json"); 
+        //jmespath_tests("./input/jmespath/examples/jmespath-examples.json"); 
     }
 }
 

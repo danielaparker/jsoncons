@@ -263,7 +263,7 @@ namespace jmespath {
         comparator_expression,
         function_expression,
         argument,
-        expect_expr_or_expr_type,
+        expression_or_expression_type,
         quoted_string,
         raw_string,
         raw_string_escape_char,
@@ -286,14 +286,15 @@ namespace jmespath {
         key_val_expr,
         number,
         digit,
-        bracket_specifier9,
-        index_expression,
+        right_bracket_or_slice_expression,
+        bracket_specifier,
+        bracket_specifier_or_multi_select_list,
         filter,
         multi_select_list,
         multi_select_hash,
-        bracket_specifier2,
-        bracket_specifier3,
-        bracket_specifier4,
+        rhs_slice_expression_start,
+        rhs_slice_expression_stop,
+        expect_right_bracket,
         expect_dot,
         expect_filter_right_bracket,
         expect_right_brace,
@@ -3434,7 +3435,7 @@ namespace jmespath {
                                 break;
                             }
                             case '[':
-                                state_stack_.emplace_back(path_state::index_expression);
+                                state_stack_.emplace_back(path_state::bracket_specifier);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3522,7 +3523,7 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case '*':
+                            case '*': // wildcard
                                 push_token(token(jsoncons::make_unique<object_projection>()));
                                 state_stack_.pop_back();
                                 ++p_;
@@ -3549,8 +3550,8 @@ namespace jmespath {
                                 push_token(token(jsoncons::make_unique<current_node>()));
                                 state_stack_.pop_back();
                                 break;
-                            case '[': // index
-                                state_stack_.back() = path_state::index_expression;
+                            case '[': 
+                                state_stack_.back() = path_state::bracket_specifier_or_multi_select_list;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3654,7 +3655,7 @@ namespace jmespath {
                                 break;
                         }
                         break;
-                    case path_state::expect_expr_or_expr_type:
+                    case path_state::expression_or_expression_type:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -3690,7 +3691,7 @@ namespace jmespath {
                                 push_token(token(begin_function_arg));
                                 push_token(token(f));
                                 state_stack_.back() = path_state::function_expression;
-                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type);
+                                state_stack_.emplace_back(path_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3713,7 +3714,7 @@ namespace jmespath {
                                 break;
                             case ',':
                                 push_token(token(current_node_arg));
-                                state_stack_.emplace_back(path_state::expect_expr_or_expr_type);
+                                state_stack_.emplace_back(path_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4082,18 +4083,18 @@ namespace jmespath {
                         }
                         break;
 
-                    case path_state::index_expression:
+                    case path_state::bracket_specifier:
                         switch(*p_)
                         {
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()));
-                                state_stack_.back() = path_state::bracket_specifier4;
+                                state_stack_.back() = path_state::expect_right_bracket;
                                 ++p_;
                                 ++column_;
                                 break;
-                            case ']':
+                            case ']': // []
                                 push_token(token(jsoncons::make_unique<flatten_projection>()));
-                                state_stack_.pop_back(); // index_expression
+                                state_stack_.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4105,21 +4106,36 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case ':':
-                                state_stack_.back() = path_state::bracket_specifier2;
+                            case ':': // slice_expression
+                                state_stack_.back() = path_state::rhs_slice_expression_start ;
                                 state_stack_.emplace_back(path_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
+                            // number
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = path_state::bracket_specifier9;
+                                state_stack_.back() = path_state::right_bracket_or_slice_expression;
                                 state_stack_.emplace_back(path_state::number);
+                                break;
+                            default:
+                                ec = jmespath_errc::expected_index_expression;
+                                return jmespath_expression();
+                        }
+                        break;
+                    case path_state::bracket_specifier_or_multi_select_list:
+                        switch(*p_)
+                        {
+                            case '*':
+                            case ']': // []
+                            case '?':
+                            case ':': // slice_expression
+                            case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                                state_stack_.back() = path_state::bracket_specifier;
                                 break;
                             default:
                                 push_token(token(begin_multi_select_list_arg));
                                 state_stack_.back() = path_state::multi_select_list;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                break;
+                                state_stack_.emplace_back(path_state::lhs_expression);                                break;
                         }
                         break;
 
@@ -4134,7 +4150,7 @@ namespace jmespath {
                                 return jmespath_expression();
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()));
-                                state_stack_.back() = path_state::bracket_specifier4;
+                                state_stack_.back() = path_state::expect_right_bracket;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4161,7 +4177,7 @@ namespace jmespath {
                         }
                         break;
 
-                    case path_state::bracket_specifier9:
+                    case path_state::right_bracket_or_slice_expression:
                         switch(*p_)
                         {
                             case ']':
@@ -4182,7 +4198,7 @@ namespace jmespath {
 
                                     buffer.clear();
                                 }
-                                state_stack_.pop_back(); // index_expression
+                                state_stack_.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4200,7 +4216,7 @@ namespace jmespath {
                                     slic.start_ = r.value();
                                     buffer.clear();
                                 }
-                                state_stack_.back() = path_state::bracket_specifier2;
+                                state_stack_.back() = path_state::rhs_slice_expression_start;
                                 state_stack_.emplace_back(path_state::number);
                                 ++p_;
                                 ++column_;
@@ -4211,7 +4227,7 @@ namespace jmespath {
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::bracket_specifier2:
+                    case path_state::rhs_slice_expression_start :
                     {
                         if (!buffer.empty())
                         {
@@ -4234,7 +4250,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case ':':
-                                state_stack_.back() = path_state::bracket_specifier3;
+                                state_stack_.back() = path_state::rhs_slice_expression_stop;
                                 state_stack_.emplace_back(path_state::number);
                                 ++p_;
                                 ++column_;
@@ -4245,7 +4261,7 @@ namespace jmespath {
                         }
                         break;
                     }
-                    case path_state::bracket_specifier3:
+                    case path_state::rhs_slice_expression_stop:
                     {
                         if (!buffer.empty())
                         {
@@ -4269,7 +4285,7 @@ namespace jmespath {
                                 push_token(token(jsoncons::make_unique<slice_projection>(slic)));
                                 buffer.clear();
                                 slic = slice{};
-                                state_stack_.pop_back(); // bracket_specifier3
+                                state_stack_.pop_back(); // rhs_slice_expression_stop
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4279,12 +4295,12 @@ namespace jmespath {
                         }
                         break;
                     }
-                    case path_state::bracket_specifier4:
+                    case path_state::expect_right_bracket:
                     {
                         switch(*p_)
                         {
                             case ']':
-                                state_stack_.pop_back(); // bracket_specifier4
+                                state_stack_.pop_back(); // expect_right_bracket
                                 ++p_;
                                 ++column_;
                                 break;

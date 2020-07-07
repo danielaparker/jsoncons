@@ -109,6 +109,7 @@ enum class jmespath_errc
     unbalanced_parentheses,
     invalid_arity,
     identifier_not_found,
+    expected_index_expression,
     unknown_error 
 };
 
@@ -174,6 +175,8 @@ public:
                 return "Function called with wrong number of arguments";
             case jmespath_errc::identifier_not_found:
                 return "Identifier not found";
+            case jmespath_errc::expected_index_expression:
+                return "Expected index expression";
             case jmespath_errc::unknown_error:
             default:
                 return "Unknown jmespath parser error";

@@ -2,9 +2,9 @@
     "given": {"type": "object"},
   "cases": [
       {
-        "comment": "Multi-select of a list using an identifier index",
-        "expression": "foo[abc]",
-        "error": "syntax"
+          "comment": "Nested multiselect",
+          "expression": "[[*],*]",
+          "result": [null, ["object"]]
       }
   ]
 }
