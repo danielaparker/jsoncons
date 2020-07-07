@@ -4753,6 +4753,7 @@ namespace jmespath {
                     if (p_+1 >= end_input_)
                     {
                         ec = jmespath_errc::unexpected_end_of_input;
+                        return;
                     }
                     if (*(p_+1) == '\n')
                         ++p_;
