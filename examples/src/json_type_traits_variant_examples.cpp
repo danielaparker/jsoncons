@@ -111,12 +111,13 @@ void variant_example()
       "material": "cotton"
     }
   ]
-}}
+}
     )";
 
     ns::Basket basket = jsoncons::decode_json<ns::Basket>(input);
     std::cout << basket.owner() << "\n\n";
 
+    std::cout << "(1)\n";
     for (const auto& var : basket.items()) 
     {
         std::visit([](auto&& arg) {
@@ -130,8 +131,29 @@ void variant_example()
 
     std::string output;
     jsoncons::encode_json(basket, output, jsoncons::indenting::indent);
-    std::cout << output << "\n\n";
+    std::cout << "(2)\n" << output << "\n\n";
 }
+
+
+void variant_example2()
+{
+    using variant_type  = std::variant<int, double, bool, std::string>;
+
+    variant_type var(false);
+
+    std::string buffer;
+    jsoncons::encode_json(var,buffer);
+
+    std::cout << "(1) " << buffer << "\n\n";
+
+    auto var2 = jsoncons::decode_json<variant_type>(buffer);
+    bool val = std::get<bool>(var2);
+
+    std::cout << "(2) " << val << "\n\n";
+
+
+}
+
 #endif // defined(JSONCONS_HAS_STD_VARIANT)
 
 void json_type_traits_variant_examples()
@@ -140,6 +162,7 @@ void json_type_traits_variant_examples()
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
     variant_example();
+    variant_example2();
 #endif
 
     std::cout << std::endl;

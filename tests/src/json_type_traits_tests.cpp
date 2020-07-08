@@ -300,32 +300,33 @@ TEST_CASE("json_type_traits for std::variant")
       "material": "cotton"
     }
   ]
-}}
+}
     )";
 
-    SECTION("test decode")
+    SECTION("test decode and encode")
     {
         ns::Basket basket = decode_json<ns::Basket>(input);
-        /*std::cout << basket.owner() << "\n\n";
-
-        for (const auto& var : basket.items()) 
-        {
-            std::visit([](auto&& arg) {
-                using T = std::decay_t<decltype(arg)>;
-                if constexpr (std::is_same_v<T, ns::Fruit>)
-                    std::cout << "Fruit " << arg << '\n';
-                else if constexpr (std::is_same_v<T, ns::Fabric>)
-                    std::cout << "Fabric " << arg << '\n';
-            }, var);
-        }*/
 
         std::string output;
         encode_json(basket, output, indenting::indent);
-        std::cout << output << "\n\n";
 
         json j1 = json::parse(input);
         json j2 = json::parse(output);
         CHECK(j1 == j2);
+    }
+
+    SECTION("test bool")
+    {
+        using variant_type  = std::variant<int, double, bool, std::string>;
+
+        variant_type var(false);
+
+        std::string buffer;
+        jsoncons::encode_json(var,buffer);
+
+        auto var2 = jsoncons::decode_json<variant_type>(buffer);
+        bool val = std::get<bool>(var2);
+        CHECK_FALSE(val);
     }
 }
 
