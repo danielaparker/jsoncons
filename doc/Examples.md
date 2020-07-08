@@ -40,7 +40,8 @@
 [An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS](#G8)  
 [Serialize a polymorphic type based on the presence of members](#G9)  
 [Ensuring type selection is possible](#G10)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G11)
+[An example with std::variant](#G11)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G12)
 
 ### Construct
 
@@ -2142,6 +2143,176 @@ A baz
 ```
 
 <div id="G11"/>
+
+#### An example with std::variant
+
+This example assumes C++17 language support and jsoncons v0.154.0 or later.
+
+```c++
+#if defined(JSONCONS_HAS_STD_VARIANT)
+
+namespace { namespace ns {
+
+    enum class Color {yellow, red, green, blue};
+
+    inline
+    std::ostream& operator<<(std::ostream& os, Color val)
+    {
+        switch (val)
+        {
+            case Color::yellow: os << "yellow"; break;
+            case Color::red: os << "red"; break;
+            case Color::green: os << "green"; break;
+            case Color::blue: os << "blue"; break;
+        }
+        return os;
+    }
+
+    class Fruit 
+    {
+    private:
+        JSONCONS_TYPE_TRAITS_FRIEND
+        std::string name_;
+        Color color_;
+    public:
+        friend std::ostream& operator<<(std::ostream& os, const Fruit& val)
+        {
+            os << "name: " << val.name_ << ", color: " << val.color_ << "\n";
+            return os;
+        }
+    };
+
+    class Fabric 
+    {
+    private:
+      JSONCONS_TYPE_TRAITS_FRIEND
+      int size_;
+      std::string material_;
+    public:
+        friend std::ostream& operator<<(std::ostream& os, const Fabric& val)
+        {
+            os << "size: " << val.size_ << ", material: " << val.material_ << "\n";
+            return os;
+        }
+    };
+
+    class Basket {
+     private:
+      JSONCONS_TYPE_TRAITS_FRIEND
+      std::string owner_;
+      std::vector<std::variant<Fruit, Fabric>> items_;
+
+    public:
+        std::string owner() const
+        {
+            return owner_;
+        }
+
+        std::vector<std::variant<Fruit, Fabric>> items() const
+        {
+            return items_;
+        }
+    };
+
+} // ns
+} // namespace
+
+JSONCONS_ENUM_NAME_TRAITS(ns::Color, (yellow, "YELLOW"), (red, "RED"), (green, "GREEN"), (blue, "BLUE"))
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fruit,
+                                (name_, "name"),
+                                (color_, "color"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fabric,
+                                (size_, "size"),
+                                (material_, "material"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Basket,
+                                (owner_, "owner"),
+                                (items_, "items"))
+
+void variant_example()
+{
+    std::string input = R"(
+{
+  "owner": "Rodrigo",
+  "items": [
+    {
+      "name": "banana",
+      "color": "YELLOW"
+    },
+    {
+      "size": 40,
+      "material": "wool"
+    },
+    {
+      "name": "apple",
+      "color": "RED"
+    },
+    {
+      "size": 40,
+      "material": "cotton"
+    }
+  ]
+}
+    )";
+
+    ns::Basket basket = jsoncons::decode_json<ns::Basket>(input);
+    std::cout << basket.owner() << "\n\n";
+
+    std::cout << "(1)\n";
+    for (const auto& var : basket.items()) 
+    {
+        std::visit([](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, ns::Fruit>)
+                std::cout << "Fruit " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Fabric>)
+                std::cout << "Fabric " << arg << '\n';
+        }, var);
+    }
+
+    std::string output;
+    jsoncons::encode_json(basket, output, jsoncons::indenting::indent);
+    std::cout << "(2)\n" << output << "\n\n";
+}
+```
+Output:
+```
+Rodrigo
+
+(1)
+Fruit name: banana, color: yellow
+
+Fabric size: 28, material: wool
+
+Fruit name: apple, color: red
+
+Fabric size: 28, material: cotton
+
+(2)
+{
+    "items": [
+        {
+            "color": "YELLOW",
+            "name": "banana"
+        },
+        {
+            "material": "wool",
+            "size": 40
+        },
+        {
+            "color": "RED",
+            "name": "apple"
+        },
+        {
+            "material": "cotton",
+            "size": 40
+        }
+    ],
+    "owner": "Rodrigo"
+}
+```
+
+<div id="G12"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 
