@@ -30,7 +30,7 @@ namespace { namespace ns {
     class Fruit 
     {
     private:
-        JSONCONS_TYPE_TRAITS_FRIEND;
+        JSONCONS_TYPE_TRAITS_FRIEND
         std::string name_;
         Color color_;
     public:
@@ -44,7 +44,7 @@ namespace { namespace ns {
     class Fabric 
     {
     private:
-      JSONCONS_TYPE_TRAITS_FRIEND;
+      JSONCONS_TYPE_TRAITS_FRIEND
       int size_;
       std::string material_;
     public:
@@ -57,7 +57,7 @@ namespace { namespace ns {
 
     class Basket {
      private:
-      JSONCONS_TYPE_TRAITS_FRIEND;
+      JSONCONS_TYPE_TRAITS_FRIEND
       std::string owner_;
       std::vector<std::variant<Fruit, Fabric>> items_;
 
@@ -76,17 +76,17 @@ namespace { namespace ns {
 } // ns
 } // namespace
 
-JSONCONS_ENUM_NAME_TRAITS(ns::Color, (yellow, "YELLOW"), (red, "RED"), (green, "GREEN"), (blue, "BLUE"));
+JSONCONS_ENUM_NAME_TRAITS(ns::Color, (yellow, "YELLOW"), (red, "RED"), (green, "GREEN"), (blue, "BLUE"))
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fruit,
                                 (name_, "name"),
-                                (color_, "color"));
+                                (color_, "color"))
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fabric,
                                 (size_, "size"),
-                                (material_, "material"));
+                                (material_, "material"))
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Basket,
                                 (owner_, "owner"),
-                                (items_, "items"));
+                                (items_, "items"))
 
 void variant_example()
 {

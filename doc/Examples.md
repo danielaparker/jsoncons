@@ -1581,7 +1581,7 @@ namespace ns
             return description;
         }
     private:
-        JSONCONS_TYPE_TRAITS_FRIEND;
+        JSONCONS_TYPE_TRAITS_FRIEND
         std::string status;
         std::string payload;
         std::optional<std::string> description;
