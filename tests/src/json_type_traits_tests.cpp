@@ -15,7 +15,7 @@
 
 using namespace jsoncons;
 // own vector will always be of an even length 
-struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
+struct own_vector : std::vector<std::int64_t> { using  std::vector<int64_t>::vector; };
 
 namespace jsoncons {
 template<class Json>
@@ -201,67 +201,131 @@ TEST_CASE("test_own_vector")
 
 namespace { namespace ns {
 
-    class ItemTypeOne {
-     public:
-      const std::string& GetId() const {
-        return id_;
-      }
-      const std::string& GetContent() const {
-        return content_;
-      }
+    enum class Color {yellow, red, green, blue};
 
-     private:
-      JSONCONS_TYPE_TRAITS_FRIEND;
-      std::string id_;
-      std::string content_;
+    inline
+    std::ostream& operator<<(std::ostream& os, Color val)
+    {
+        switch (val)
+        {
+            case Color::yellow: os << "yellow"; break;
+            case Color::red: os << "red"; break;
+            case Color::green: os << "green"; break;
+            case Color::blue: os << "blue"; break;
+        }
+        return os;
+    }
+
+    class Fruit 
+    {
+    private:
+        JSONCONS_TYPE_TRAITS_FRIEND;
+        std::string name_;
+        Color color_;
+    public:
+        friend std::ostream& operator<<(std::ostream& os, const Fruit& val)
+        {
+            os << "name: " << val.name_ << ", color: " << val.color_ << "\n";
+            return os;
+        }
     };
 
-    class ItemTypeTwo {
-     public:
-      const std::string& GetName() const {
-        return name_;
-      }
-
-     private:
+    class Fabric 
+    {
+    private:
       JSONCONS_TYPE_TRAITS_FRIEND;
-      std::string name_;
+      int size_;
+      std::string material_;
+    public:
+        friend std::ostream& operator<<(std::ostream& os, const Fabric& val)
+        {
+            os << "size: " << val.size_ << ", material: " << val.material_ << "\n";
+            return os;
+        }
     };
 
-    class Request {
-     public:
-      const std::optional<std::string>& GetDomain() const {
-        return domain_;
-      }
-      const std::vector<std::variant<ItemTypeOne, ItemTypeTwo>>& GetItems() const {
-        return items_;
-      }
-
+    class Basket {
      private:
       JSONCONS_TYPE_TRAITS_FRIEND;
-      std::optional<std::string> domain_;
-      std::vector<std::variant<ItemTypeOne, ItemTypeTwo>> items_;
-    };
-}
+      std::string owner_;
+      std::vector<std::variant<Fruit, Fabric>> items_;
 
-JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::ItemTypeOne, (id_, "id"), (content_, "content"));
-JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::ItemTypeTwo, (name_, "name"));
-JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Request, (items_, "item"), (domain_, "domain") );
+    public:
+        std::string owner() const
+        {
+            return owner_;
+        }
+
+        std::vector<std::variant<Fruit, Fabric>> items() const
+        {
+            return items_;
+        }
+    };
+
+} // ns
+} // namespace
+
+JSONCONS_ENUM_NAME_TRAITS(ns::Color, (yellow, "YELLOW"), (red, "RED"), (green, "GREEN"), (blue, "BLUE"));
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fruit,
+                                (name_, "name"),
+                                (color_, "color"));
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fabric,
+                                (size_, "size"),
+                                (material_, "material"));
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Basket,
+                                (owner_, "owner"),
+                                (items_, "items"));
 
 TEST_CASE("json_type_traits for std::variant")
 {
     std::string input = R"(
+{
+  "owner": "Rodrigo",
+  "items": [
     {
-        "domain" : "DOMAIN",
-        "item" : [
-            {"id" : "100", "content" : "Hello World"},
-            {"name" : "foo"}
-        ]
+      "name": "banana",
+      "color": "YELLOW"
+    },
+    {
+      "size": 40,
+      "material": "wool"
+    },
+    {
+      "name": "apple",
+      "color": "RED"
+    },
+    {
+      "size": 40,
+      "material": "cotton"
     }
+  ]
+}}
     )";
 
     SECTION("test decode")
     {
-        ns::Request request = decode_json<ns::Request>(input);
+        ns::Basket basket = decode_json<ns::Basket>(input);
+        /*std::cout << basket.owner() << "\n\n";
+
+        for (const auto& var : basket.items()) 
+        {
+            std::visit([](auto&& arg) {
+                using T = std::decay_t<decltype(arg)>;
+                if constexpr (std::is_same_v<T, ns::Fruit>)
+                    std::cout << "Fruit " << arg << '\n';
+                else if constexpr (std::is_same_v<T, ns::Fabric>)
+                    std::cout << "Fabric " << arg << '\n';
+            }, var);
+        }*/
+
+        std::string output;
+        encode_json(basket, output, indenting::indent);
+        std::cout << output << "\n\n";
+
+        json j1 = json::parse(input);
+        json j2 = json::parse(output);
+        CHECK(j1 == j2);
     }
 }
 

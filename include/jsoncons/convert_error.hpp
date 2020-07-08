@@ -28,7 +28,8 @@ namespace jsoncons {
         not_signed_integer,
         not_unsigned_integer,
         not_double,
-        not_bool
+        not_bool,
+        not_variant
     };
 }
 
@@ -82,6 +83,8 @@ namespace detail {
                     return "Cannot convert to double";
                 case convert_errc::not_bool:
                     return "Cannot convert to bool";
+                case convert_errc::not_variant:
+                    return "Cannot convert to std::variant";
                 default:
                     return "Unknown convert error";
             }

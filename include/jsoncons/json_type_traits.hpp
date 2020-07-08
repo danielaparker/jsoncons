@@ -30,6 +30,10 @@
 #include <jsoncons/convert_error.hpp>
 #include <jsoncons/converter.hpp>
 
+#if defined(JSONCONS_HAS_STD_VARIANT)
+  #include <variant>
+#endif
+
 namespace jsoncons {
 
     template <class T>
@@ -1199,94 +1203,98 @@ namespace detail {
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
 
-    #include <variant>
-
-    namespace detail
+namespace variant_detail
+{
+    template<int N, class Json, class Variant, class ... Args>
+    typename std::enable_if<N == std::variant_size_v<Variant>, bool>::type
+    is_variant(const Json& /*j*/)
     {
-        template<size_t Pos, std::size_t Size, class Json, class Tuple>
-        struct json_tuple_helper
-        {
-            using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
-            using next = json_tuple_helper<Pos-1, Size, Json, Tuple>;
+        return false;
+    }
 
-            static bool is(const Json& j) noexcept
-            {
-                if(j[Size-Pos].template is<element_type>())
-                {
-                    return next::is(j);
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            static void as(Tuple& tuple, const Json& j)
-            {
-                std::get<Size-Pos>(tuple) = j[Size-Pos].template as<element_type>();
-                next::as(tuple, j);
-            }
-
-            static void to_json(const Tuple& tuple, Json& j)
-            {
-                j.push_back(json_type_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple)));
-                next::to_json(tuple, j);
-            }
-        };
-
-        template<size_t Size, class Json, class Tuple>
-        struct json_tuple_helper<0, Size, Json, Tuple>
-        {
-            static bool is(const Json&) noexcept
-            {
-                return true;
-            }
-
-            static void as(Tuple&, const Json&)
-            {
-            }
-
-            static void to_json(const Tuple&, Json&)
-            {
-            }
-        };
-    } // namespace detail
-
-    template<class Json, typename... E>
-    struct json_type_traits<Json, std::tuple<E...>>
+    template<std::size_t N, class Json, class Variant, class T, class ... U>
+    typename std::enable_if<N < std::variant_size_v<Variant>, bool>::type
+    is_variant(const Json& j)
     {
-    private:
-        using helper = jsoncons::detail::json_tuple_helper<sizeof...(E), sizeof...(E), Json, std::tuple<E...>>;
+      if(j.template is<T>())
+      {
+          return true;
+      }
+      else
+      {
+          return is_variant<N+1, Json, Variant, U...>(j);
+      }
+    }
 
+    template<int N, class Json, class Variant, class ... Args>
+    typename std::enable_if<N == std::variant_size_v<Variant>, Variant>::type
+    as_variant(const Json& /*j*/)
+    {
+        JSONCONS_THROW(ser_error(convert_errc::not_variant));
+    }
+
+    template<std::size_t N, class Json, class Variant, class T, class ... U>
+    typename std::enable_if<N < std::variant_size_v<Variant>, Variant>::type
+    as_variant(const Json& j)
+    {
+      if(j.template is<T>())
+      {
+        Variant var(j.template as<T>());
+        return var;
+      }
+      else
+      {
+          return as_variant<N+1, Json, Variant, U...>(j);
+      }
+    }
+
+    template <class Json>
+    struct variant_to_json_visitor
+    {
+        Json& j_;
+
+        variant_to_json_visitor(Json& j) : j_(j) {}
+
+        template<class T>
+        void operator()(const T& value) const
+        {
+            j_ = value;
+        }
+    };
+
+} // namespace variant_detail
+
+    template<class Json, typename... VariantTypes>
+    struct json_type_traits<Json, std::variant<VariantTypes...>>
+    {
     public:
+        using variant_type = typename std::variant<VariantTypes...>;
         using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
-            return helper::is(j);
+            return variant_detail::is_variant<0,Json,variant_type, VariantTypes...>(j); 
         }
 
-        static std::tuple<E...> as(const Json& j)
+        static std::variant<VariantTypes...> as(const Json& j)
         {
-            std::tuple<E...> buff;
-            helper::as(buff, j);
-            return buff;
+            return variant_detail::as_variant<0,Json,variant_type, VariantTypes...>(j); 
         }
 
-        static Json to_json(const std::tuple<E...>& val)
+        static Json to_json(const std::variant<VariantTypes...>& var)
         {
             Json j(json_array_arg);
-            j.reserve(sizeof...(E));
-            helper::to_json(val, j);
+            variant_detail::variant_to_json_visitor<Json> visitor(j);
+            std::visit(visitor, var);
             return j;
         }
 
-        static Json to_json(const std::tuple<E...>& val,
+        static Json to_json(const std::variant<VariantTypes...>& var,
                             const allocator_type& alloc)
         {
             Json j(json_array_arg, alloc);
-            j.reserve(sizeof...(E));
-            helper::to_json(val, j);
+            variant_detail::variant_to_json_visitor<Json> visitor(j);
+            std::visit(visitor, var);
             return j;
         }
     };

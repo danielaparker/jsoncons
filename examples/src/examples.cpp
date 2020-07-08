@@ -43,6 +43,8 @@ void staj_iterator_examples();
 void type_extensibility_examples();
 void unicode_examples();
 void wjson_examples();
+void json_type_traits_variant_examples();
+
 void comment_example()
 {
     std::string s = R"(
@@ -444,6 +446,8 @@ int main()
         bson_examples();
 
         jmespath_examples();
+
+        json_type_traits_variant_examples();
     }
     catch (const std::exception& e)
     {
