@@ -10,6 +10,7 @@ Bugs fixed:
 Enhancements
 
 - Added jmespath extension for [JMESPath](https://jmespath.org/) support, [\#204](https://github.com/danielaparker/jsoncons/issues/204)
+- Added `json_type_traits` support for `std::variant`, [\#257](https://github.com/danielaparker/jsoncons/issues/257)
 
 v0.153.3
 --------

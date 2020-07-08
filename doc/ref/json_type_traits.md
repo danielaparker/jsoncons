@@ -63,7 +63,8 @@ STL associative container e.g. `std::map<K,U>`|`true` if object and each `mapped
 `std::pair<U,V>`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
 `std::shared_ptr<U>`<sup>3</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty shared_ptr if `j.is_null()`, otherwise `make_shared(j.as<U>())`|<em>&#x2713;</em>
 `std::unique_ptr<U>`<sup>4</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty unique_ptr if `j.is_null()`, otherwise `make_unique(j.as<U>())`|<em>&#x2713;</em>
-`jsoncons::optional<U>`<sup>5</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `std::optional<U>` if `j.is_null()`, otherwise `std::optional<U>(j.as<U>())`|<em>&#x2713;</em>
+`jsoncons::optional<U>`<sup>5</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `jsoncons::optional<U>` if `j.is_null()`, otherwise `jsoncons::optional<U>(j.as<U>())`|<em>&#x2713;</em>
+`std::variant<Types...>`<sup>6</sup>|&nbsp;|<em>&#x2713;</em>
   
 1. For `CharT` `char` or `wchar_t`.
 2. `jsoncons::basic_string_view<CharT>` is aliased to [std::basic_string_view<CharT>](https://en.cppreference.com/w/cpp/utility/optional) if 
@@ -71,7 +72,8 @@ jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_STRING_VIEW` is 
 3. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.  
 4. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.   
 5. `jsoncons::optional<U>` is aliased to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
-jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.  
+jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.
+6. Since v0.154.0  
 
 ### Convenience Macros
 
