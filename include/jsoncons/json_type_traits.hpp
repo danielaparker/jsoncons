@@ -823,56 +823,56 @@ namespace detail {
         }
     };
 
-namespace detail
-{
-    template<size_t Pos, std::size_t Size, class Json, class Tuple>
-    struct json_tuple_helper
+    namespace detail
     {
-        using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
-        using next = json_tuple_helper<Pos-1, Size, Json, Tuple>;
-        
-        static bool is(const Json& j) noexcept
+        template<size_t Pos, std::size_t Size, class Json, class Tuple>
+        struct json_tuple_helper
         {
-            if(j[Size-Pos].template is<element_type>())
+            using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
+            using next = json_tuple_helper<Pos-1, Size, Json, Tuple>;
+            
+            static bool is(const Json& j) noexcept
             {
-                return next::is(j);
+                if(j[Size-Pos].template is<element_type>())
+                {
+                    return next::is(j);
+                }
+                else
+                {
+                    return false;
+                }
             }
-            else
+
+            static void as(Tuple& tuple, const Json& j)
             {
-                return false;
+                std::get<Size-Pos>(tuple) = j[Size-Pos].template as<element_type>();
+                next::as(tuple, j);
             }
-        }
 
-        static void as(Tuple& tuple, const Json& j)
-        {
-            std::get<Size-Pos>(tuple) = j[Size-Pos].template as<element_type>();
-            next::as(tuple, j);
-        }
+            static void to_json(const Tuple& tuple, Json& j)
+            {
+                j.push_back(json_type_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple)));
+                next::to_json(tuple, j);
+            }
+        };
 
-        static void to_json(const Tuple& tuple, Json& j)
+        template<size_t Size, class Json, class Tuple>
+        struct json_tuple_helper<0, Size, Json, Tuple>
         {
-            j.push_back(json_type_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple)));
-            next::to_json(tuple, j);
-        }
-    };
+            static bool is(const Json&) noexcept
+            {
+                return true;
+            }
 
-    template<size_t Size, class Json, class Tuple>
-    struct json_tuple_helper<0, Size, Json, Tuple>
-    {
-        static bool is(const Json&) noexcept
-        {
-            return true;
-        }
+            static void as(Tuple&, const Json&)
+            {
+            }
 
-        static void as(Tuple&, const Json&)
-        {
-        }
-
-        static void to_json(const Tuple&, Json&)
-        {
-        }
-    };
-} // namespace detail
+            static void to_json(const Tuple&, Json&)
+            {
+            }
+        };
+    } // namespace detail
 
     template<class Json, typename... E>
     struct json_type_traits<Json, std::tuple<E...>>
@@ -1196,6 +1196,102 @@ namespace detail
             return j;
         }
     };
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+
+    #include <variant>
+
+    namespace detail
+    {
+        template<size_t Pos, std::size_t Size, class Json, class Tuple>
+        struct json_tuple_helper
+        {
+            using element_type = typename std::tuple_element<Size-Pos, Tuple>::type;
+            using next = json_tuple_helper<Pos-1, Size, Json, Tuple>;
+
+            static bool is(const Json& j) noexcept
+            {
+                if(j[Size-Pos].template is<element_type>())
+                {
+                    return next::is(j);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            static void as(Tuple& tuple, const Json& j)
+            {
+                std::get<Size-Pos>(tuple) = j[Size-Pos].template as<element_type>();
+                next::as(tuple, j);
+            }
+
+            static void to_json(const Tuple& tuple, Json& j)
+            {
+                j.push_back(json_type_traits<Json, element_type>::to_json(std::get<Size-Pos>(tuple)));
+                next::to_json(tuple, j);
+            }
+        };
+
+        template<size_t Size, class Json, class Tuple>
+        struct json_tuple_helper<0, Size, Json, Tuple>
+        {
+            static bool is(const Json&) noexcept
+            {
+                return true;
+            }
+
+            static void as(Tuple&, const Json&)
+            {
+            }
+
+            static void to_json(const Tuple&, Json&)
+            {
+            }
+        };
+    } // namespace detail
+
+    template<class Json, typename... E>
+    struct json_type_traits<Json, std::tuple<E...>>
+    {
+    private:
+        using helper = jsoncons::detail::json_tuple_helper<sizeof...(E), sizeof...(E), Json, std::tuple<E...>>;
+
+    public:
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return helper::is(j);
+        }
+
+        static std::tuple<E...> as(const Json& j)
+        {
+            std::tuple<E...> buff;
+            helper::as(buff, j);
+            return buff;
+        }
+
+        static Json to_json(const std::tuple<E...>& val)
+        {
+            Json j(json_array_arg);
+            j.reserve(sizeof...(E));
+            helper::to_json(val, j);
+            return j;
+        }
+
+        static Json to_json(const std::tuple<E...>& val,
+                            const allocator_type& alloc)
+        {
+            Json j(json_array_arg, alloc);
+            j.reserve(sizeof...(E));
+            helper::to_json(val, j);
+            return j;
+        }
+    };
+
+#endif
 
 } // jsoncons
 

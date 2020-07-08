@@ -197,3 +197,72 @@ TEST_CASE("test_own_vector")
 }
 */
 
+#if defined(JSONCONS_HAS_STD_VARIANT)
+
+namespace { namespace ns {
+
+    class ItemTypeOne {
+     public:
+      const std::string& GetId() const {
+        return id_;
+      }
+      const std::string& GetContent() const {
+        return content_;
+      }
+
+     private:
+      JSONCONS_TYPE_TRAITS_FRIEND;
+      std::string id_;
+      std::string content_;
+    };
+
+    class ItemTypeTwo {
+     public:
+      const std::string& GetName() const {
+        return name_;
+      }
+
+     private:
+      JSONCONS_TYPE_TRAITS_FRIEND;
+      std::string name_;
+    };
+
+    class Request {
+     public:
+      const std::optional<std::string>& GetDomain() const {
+        return domain_;
+      }
+      const std::vector<std::variant<ItemTypeOne, ItemTypeTwo>>& GetItems() const {
+        return items_;
+      }
+
+     private:
+      JSONCONS_TYPE_TRAITS_FRIEND;
+      std::optional<std::string> domain_;
+      std::vector<std::variant<ItemTypeOne, ItemTypeTwo>> items_;
+    };
+}
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::ItemTypeOne, (id_, "id"), (content_, "content"));
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::ItemTypeTwo, (name_, "name"));
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Request, (items_, "item"), (domain_, "domain") );
+
+TEST_CASE("json_type_traits for std::variant")
+{
+    std::string input = R"(
+    {
+        "domain" : "DOMAIN",
+        "item" : [
+            {"id" : "100", "content" : "Hello World"},
+            {"name" : "foo"}
+        ]
+    }
+    )";
+
+    SECTION("test decode")
+    {
+        ns::Request request = decode_json<ns::Request>(input);
+    }
+}
+
+#endif
