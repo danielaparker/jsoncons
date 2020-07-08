@@ -827,7 +827,7 @@ namespace detail {
         }
     };
 
-    namespace detail
+    namespace tuple_detail
     {
         template<size_t Pos, std::size_t Size, class Json, class Tuple>
         struct json_tuple_helper
@@ -882,7 +882,7 @@ namespace detail {
     struct json_type_traits<Json, std::tuple<E...>>
     {
     private:
-        using helper = jsoncons::detail::json_tuple_helper<sizeof...(E), sizeof...(E), Json, std::tuple<E...>>;
+        using helper = tuple_detail::json_tuple_helper<sizeof...(E), sizeof...(E), Json, std::tuple<E...>>;
 
     public:
         using allocator_type = typename Json::allocator_type;
