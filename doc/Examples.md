@@ -2149,7 +2149,7 @@ A baz
 This example assumes C++17 language support and jsoncons v0.154.0 or later.
 
 ```c++
-#if defined(JSONCONS_HAS_STD_VARIANT)
+#include <jsoncons/json.hpp>
 
 namespace { namespace ns {
 
@@ -2229,7 +2229,7 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Basket,
                                 (owner_, "owner"),
                                 (items_, "items"))
 
-void variant_example()
+int main()
 {
     std::string input = R"(
 {
