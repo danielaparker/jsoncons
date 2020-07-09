@@ -36,7 +36,7 @@ void check_contains(const json& example, const std::string& pointer, bool expect
 void check_insert_or_assign(json& example, const std::string& path, const json& value, const json& expected)
 {
     std::error_code ec;
-    jsonpointer::insert_or_assign(example, path, value, ec);
+    jsonpointer::add(example, path, value, ec);
     CHECK_FALSE(ec);
     CHECK(example == expected);
 }
@@ -324,13 +324,13 @@ TEST_CASE("[jsonpointer] Inserting object after deleting it")
 
     std::error_code ec;
 
-    jsonpointer::insert_or_assign( oj, "/test", ojson(), ec );
+    jsonpointer::add( oj, "/test", ojson(), ec );
     CHECK(oj.size() == 1);
 
     jsonpointer::remove( oj, "/test", ec );
     CHECK(oj.size() == 0);
 
-    jsonpointer::insert_or_assign( oj, "/t", ojson(), ec );
+    jsonpointer::add( oj, "/t", ojson(), ec );
     CHECK(oj.size() == 1);
 }
 

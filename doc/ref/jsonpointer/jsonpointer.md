@@ -31,12 +31,12 @@ When applied to a JSON array, the character `-` indicates one past the last elem
     <td>Get a value from a JSON document using JSON Pointer path notation.</td> 
   </tr>
   <tr>
-    <td><a href="insert.md">insert</a></td>
-    <td>Inserts a value in a JSON document using JSON Pointer path notation, if the path doesn't specify an object member that already has the same key.</td> 
+    <td><a href="add.md">add</a></td>
+    <td>Inserts a value in a JSON document using JSON Pointer path notation, or if the path specifies an object member that already has the same key, assigns the new value to that member.</td> 
   </tr>
   <tr>
-    <td><a href="insert_or_assign.md">insert_or_assign</a></td>
-    <td>Inserts a value in a JSON document using JSON Pointer path notation, or if the path specifies an object member that already has the same key, assigns the new value to that member.</td> 
+    <td><a href="insert.md">insert</a></td>
+    <td>Inserts a value in a JSON document using JSON Pointer path notation, if the path doesn't specify an object member that already has the same key.</td> 
   </tr>
   <tr>
     <td><a href="remove.md">remove</a></td>

@@ -413,7 +413,7 @@ enum class pointer_state
             }
         }
 
-        void insert_or_assign(reference root, const string_view_type& path, const J& value, std::error_code& ec)
+        void add(reference root, const string_view_type& path, const J& value, std::error_code& ec)
         {
             evaluate(root, path, ec);
             if (ec)
@@ -783,12 +783,12 @@ enum class pointer_state
     }
 
     template<class J>
-    void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value)
+    void add(J& root, const typename J::string_view_type& path, const J& value)
     {
         jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
         std::error_code ec;
-        evaluator.insert_or_assign(root, path, value, ec);
+        evaluator.add(root, path, value, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -796,13 +796,29 @@ enum class pointer_state
     }
 
     template<class J>
-    void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
+    void add(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
     {
         jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
 
-        evaluator.insert_or_assign(root, path, value, ec);
+        evaluator.add(root, path, value, ec);
     }
 
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    template<class J>
+    JSONCONS_DEPRECATED_MSG("Instead, use add(J&, const typename J::string_view_type&, const J&)")
+    void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value)
+    {
+        add(root, path, value);
+    }
+
+    template<class J>
+    JSONCONS_DEPRECATED_MSG("Instead, use add(J&, const typename J::string_view_type&, const J&, std::error_code&)")
+    void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
+    {
+        add(root, path, value, ec);
+    }
+#endif
     template<class J>
     void insert(J& root, const typename J::string_view_type& path, const J& value)
     {

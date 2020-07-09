@@ -175,7 +175,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/foo/3", json("qux"), ec);
+    jsonpointer::add(target, "/foo/3", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;

@@ -67,7 +67,7 @@ namespace detail {
                 {
                     if (it->op == op_type::add)
                     {
-                        jsonpointer::insert_or_assign(target,it->path,it->value,ec);
+                        jsonpointer::add(target,it->path,it->value,ec);
                         if (ec)
                         {
                             //std::cout << "add: " << it->path << std::endl;

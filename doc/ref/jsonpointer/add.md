@@ -1,13 +1,13 @@
-### jsoncons::jsonpointer::insert_or_assign
+### jsoncons::jsonpointer::add
 
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-void insert_or_assign(J& target, const typename J::string_view_type& path, const J& value); // (1)
+void add(J& target, const typename J::string_view_type& path, const J& value); // (1)
 
 template<class J>
-void insert_or_assign(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); // (2)
+void add(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); // (2)
 ```
 
 Inserts a value into the target at the specified path, or if the path specifies an object member that already has the same key, assigns the new value to that member
@@ -24,9 +24,9 @@ None
 
 ### Exceptions
 
-(1) Throws a [jsonpointer_error](jsonpointer_error.md) if `insert_or_assign` fails.
+(1) Throws a [jsonpointer_error](jsonpointer_error.md) if `add` fails.
  
-(2) Sets the out-parameter `ec` to the [jsonpointer_error_category](jsonpointer_errc.md) if `insert_or_assign` fails. 
+(2) Sets the out-parameter `ec` to the [jsonpointer_error_category](jsonpointer_errc.md) if `add` fails. 
 
 ### Examples
 
@@ -46,7 +46,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::insert_or_assign(target, "/baz", json("qux"), ec);
+    jsonpointer::add(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;

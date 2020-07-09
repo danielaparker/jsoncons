@@ -7,6 +7,11 @@ Bugs fixed:
 - Added workaround for clang xcode 10 bug in `std::optional` implementation
 - Fixed bug in `basic_json` less operator with left hand side `uint64_value` and right hand side `int64_value`
 
+Changes:
+
+- The function name `jsonpointer::insert_or_assign` has been deprecated and renamed to `jsonpointer::add`.
+Rationale: consistency with JSON Patch names. 
+
 Enhancements
 
 - Added jmespath extension for [JMESPath](https://jmespath.org/) support, [\#204](https://github.com/danielaparker/jsoncons/issues/204)
