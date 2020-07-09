@@ -2419,7 +2419,7 @@ But if we switch the order of `ns::Color` and `std::string` in the variant defin
 ```c++
  using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
 ```
-strings containing  the text "YELLOW", "RED", "GREEN", or "BLUE" are detected to be `ns::Color`,and the others `std::string`.  
+strings containing  the text "YELLOW", "RED", "GREEN", or "BLUE" are detected to be `ns::Color`, and the others `std::string`.  
 
 And the output becomes
 ```
