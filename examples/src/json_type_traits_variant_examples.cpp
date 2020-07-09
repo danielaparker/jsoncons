@@ -134,24 +134,84 @@ void variant_example()
     std::cout << "(2)\n" << output << "\n\n";
 }
 
-
 void variant_example2()
 {
-    using variant_type  = std::variant<int, double, bool, std::string>;
+    using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
 
-    variant_type var(false);
+    variant_type var1(100);
+    variant_type var2(10.1);
+    variant_type var3(false);
+    variant_type var4(ns::Color::yellow);
+    variant_type var5(std::string("Hello"));
 
-    std::string buffer;
-    jsoncons::encode_json(var,buffer);
+    std::string buffer1;
+    jsoncons::encode_json(var1,buffer1);
+    std::string buffer2;
+    jsoncons::encode_json(var2,buffer2);
+    std::string buffer3;
+    jsoncons::encode_json(var3,buffer3);
+    std::string buffer4;
+    jsoncons::encode_json(var4,buffer4);
+    std::string buffer5;
+    jsoncons::encode_json(var5,buffer5);
 
-    std::cout << "(1) " << buffer << "\n\n";
+    std::cout << "(1) " << buffer1 << "\n";
+    std::cout << "(2) " << buffer2 << "\n";
+    std::cout << "(3) " << buffer3 << "\n";
+    std::cout << "(4) " << buffer4 << "\n";
+    std::cout << "(5) " << buffer5 << "\n";
 
-    auto var2 = jsoncons::decode_json<variant_type>(buffer);
-    bool val = std::get<bool>(var2);
+    auto v1 = jsoncons::decode_json<variant_type>(buffer1);
+    auto v2 = jsoncons::decode_json<variant_type>(buffer2);
+    auto v3 = jsoncons::decode_json<variant_type>(buffer3);
+    auto v4 = jsoncons::decode_json<variant_type>(buffer4);
+    auto v5 = jsoncons::decode_json<variant_type>(buffer5);
 
-    std::cout << "(2) " << val << "\n\n";
+    std::cout << "(6) " << v1.index() << "\n";
+    std::cout << "(7) " << v2.index() << "\n";
+    std::cout << "(8) " << v3.index() << "\n";
+    std::cout << "(9) " << v4.index() << "\n";
+    std::cout << "(10) " << v5.index() << "\n";
+}
 
+void variant_example3()
+{
+    using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
 
+    variant_type var1(100);
+    variant_type var2(10.1);
+    variant_type var3(false);
+    variant_type var4(ns::Color::yellow);
+    variant_type var5(std::string("Hello"));
+
+    std::string buffer1;
+    jsoncons::encode_json(var1,buffer1);
+    std::string buffer2;
+    jsoncons::encode_json(var2,buffer2);
+    std::string buffer3;
+    jsoncons::encode_json(var3,buffer3);
+    std::string buffer4;
+    jsoncons::encode_json(var4,buffer4);
+    std::string buffer5;
+    jsoncons::encode_json(var5,buffer5);
+
+    std::cout << "(1) " << buffer1 << "\n";
+    std::cout << "(2) " << buffer2 << "\n";
+    std::cout << "(3) " << buffer3 << "\n";
+    std::cout << "(4) " << buffer4 << "\n";
+    std::cout << "(5) " << buffer5 << "\n";
+
+    auto v1 = jsoncons::decode_json<variant_type>(buffer1);
+    auto v2 = jsoncons::decode_json<variant_type>(buffer2);
+    auto v3 = jsoncons::decode_json<variant_type>(buffer3);
+    auto v4 = jsoncons::decode_json<variant_type>(buffer4);
+    auto v5 = jsoncons::decode_json<variant_type>(buffer5);
+
+    std::cout << "(6) " << v1.index() << "\n";
+    std::cout << "(7) " << v2.index() << "\n";
+    std::cout << "(8) " << v3.index() << "\n";
+    std::cout << "(9) " << v4.index() << "\n";
+    std::cout << "(10) " << v5.index() << "\n";
 }
 
 #endif // defined(JSONCONS_HAS_STD_VARIANT)
@@ -163,6 +223,7 @@ void json_type_traits_variant_examples()
 #if defined(JSONCONS_HAS_STD_VARIANT)
     variant_example();
     variant_example2();
+    variant_example3();
 #endif
 
     std::cout << std::endl;

@@ -131,6 +131,8 @@ void encode_mult_dim_array()
 
 void encode_half_array()
 {
+    std::ios_base::fmtflags f( std::cout.flags() );
+
     std::vector<uint8_t> buffer;
 
     cbor::cbor_options options;
@@ -155,6 +157,8 @@ void encode_half_array()
     std::cout << "\n";
 
     std::cout << "(3)\n" << pretty_print(j) << "\n\n";
+
+    std::cout.flags( f );
 }
 
 void cursor_example_multi_dim_row_major_typed_array()
