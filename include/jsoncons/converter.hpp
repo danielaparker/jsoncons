@@ -174,50 +174,24 @@ namespace jsoncons {
 
         template <class ChT = char_type>
         JSONCONS_CPP14_CONSTEXPR
-        typename std::enable_if<sizeof(ChT) == sizeof(uint8_t),Into>::type
-        from(const byte_string_view& bytes, 
-                  semantic_tag tag,
-                  std::error_code&) const
+        Into from(const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
         {
-            Into s(alloc_);
-            switch (tag)
-            {
-                case semantic_tag::base64:
-                    encode_base64(bytes.begin(), bytes.end(), s);
-                    break;
-                case semantic_tag::base16:
-                    encode_base16(bytes.begin(), bytes.end(), s);
-                    break;
-                default:
-                    encode_base64url(bytes.begin(), bytes.end(), s);
-                    break;
-            }
+            Into s;
+            from_(s, bytes, tag, ec);
             return s;
         }
 
         template <class ChT = char_type>
         JSONCONS_CPP14_CONSTEXPR
-        typename std::enable_if<sizeof(ChT) != sizeof(uint8_t),Into>::type
-        from(const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
+        Into from(const byte_string_view& bytes, semantic_tag tag, const allocator_type& alloc, std::error_code& ec) const
         {
-            converter<std::string> convert(alloc_);
-            std::string u = convert.from(bytes, tag, ec);
-
-            Into s(alloc_);
-            auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));
-            if (retval.ec != unicons::conv_errc())
-            {
-                ec = convert_errc::not_wide_char;
-                return s;
-            }
-
+            Into s(alloc);
+            from_(s, bytes, tag, ec);
             return s;
         }
 
         constexpr 
-        Into from(const jsoncons::basic_string_view<char_type>& s, 
-                  semantic_tag,
-                  std::error_code&) const
+        Into from(const jsoncons::basic_string_view<char_type>& s, semantic_tag, std::error_code&) const
         {
             return Into(s.data(), s.size(), alloc_);
         }
@@ -238,6 +212,42 @@ namespace jsoncons {
 
             return Into(null_literal,4,alloc_);
         }
+    private:
+
+        template <class ChT = char_type>
+        JSONCONS_CPP14_CONSTEXPR
+        typename std::enable_if<sizeof(ChT) == sizeof(uint8_t)>::type
+        from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code&) const
+        {
+            switch (tag)
+            {
+                case semantic_tag::base64:
+                    encode_base64(bytes.begin(), bytes.end(), s);
+                    break;
+                case semantic_tag::base16:
+                    encode_base16(bytes.begin(), bytes.end(), s);
+                    break;
+                default:
+                    encode_base64url(bytes.begin(), bytes.end(), s);
+                    break;
+            }
+        }
+
+        template <class ChT = char_type>
+        JSONCONS_CPP14_CONSTEXPR
+        typename std::enable_if<sizeof(ChT) != sizeof(uint8_t)>::type
+        from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
+        {
+            converter<std::string> convert(alloc_);
+            std::string u = convert.from(bytes, tag, ec);
+
+            auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));
+            if (retval.ec != unicons::conv_errc())
+            {
+                ec = convert_errc::not_wide_char;
+            }
+        }
+
     };
 
 } // namespace jsoncons
