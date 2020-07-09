@@ -17,7 +17,7 @@ namespace jsoncons {
         success = 0,
         unexpected_eof = 1,
         source_error,
-        invalid_json_text,
+        syntax_error,
         extra_character,
         max_nesting_depth_exceeded,
         single_quote,
@@ -62,8 +62,8 @@ namespace jsoncons {
                     return "Unexpected end of file";
                 case json_errc::source_error:
                     return "Source error";
-                case json_errc::invalid_json_text:
-                    return "Invalid JSON text";
+                case json_errc::syntax_error:
+                    return "JSON syntax_error";
                 case json_errc::extra_character:
                     return "Unexpected non-whitespace character after JSON text";
                 case json_errc::max_nesting_depth_exceeded:

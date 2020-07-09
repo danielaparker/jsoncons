@@ -1247,8 +1247,8 @@ public:
                             ++input_ptr_;
                             break;
                         default:
-                            err_handler_(csv_errc::invalid_csv_text, *this);
-                            ec = csv_errc::invalid_csv_text;
+                            err_handler_(csv_errc::syntax_error, *this);
+                            ec = csv_errc::syntax_error;
                             more_ = false;
                             return;
                         }

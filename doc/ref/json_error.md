@@ -13,7 +13,7 @@ The constant integer values scoped by `jsoncons::json_errc` define the values fo
 constant                            |Description
 ------------------------------------|------------------------------
 `unexpected_eof`                    |Unexpected end of file
-`invalid_json_text`                    |Invalid JSON text
+`syntax_error`                    |JSON syntax_error
 `extra_character`          |Unexpected non-whitespace character after JSON text
 `json_nesting_too_deep`         |Maximum JSON depth exceeded
 `single_quote`        |JSON strings cannot be quoted with single quotes

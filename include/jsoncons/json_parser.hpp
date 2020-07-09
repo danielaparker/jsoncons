@@ -720,8 +720,8 @@ public:
                                 more_ = false;
                                 return;
                             default:
-                                err_handler_(json_errc::invalid_json_text, *this);
-                                ec = json_errc::invalid_json_text;
+                                err_handler_(json_errc::syntax_error, *this);
+                                ec = json_errc::syntax_error;
                                 more_ = false;
                                 return;
                         }
@@ -1499,10 +1499,10 @@ public:
                         }
                         break;
                     default:    
-                        more_ = err_handler_(json_errc::invalid_json_text, *this);
+                        more_ = err_handler_(json_errc::syntax_error, *this);
                         if (!more_)
                         {
-                            ec = json_errc::invalid_json_text;
+                            ec = json_errc::syntax_error;
                             return;
                         }
                         break;
@@ -2723,10 +2723,10 @@ private:
             break;
         }
         default:
-            more_ = err_handler_(json_errc::invalid_json_text, *this);
+            more_ = err_handler_(json_errc::syntax_error, *this);
             if (!more_)
             {
-                ec = json_errc::invalid_json_text;
+                ec = json_errc::syntax_error;
                 return;
             }
             break;
@@ -2746,10 +2746,10 @@ private:
         case json_parse_state::root:
             break;
         default:
-            more_ = err_handler_(json_errc::invalid_json_text, *this);
+            more_ = err_handler_(json_errc::syntax_error, *this);
             if (!more_)
             {
-                ec = json_errc::invalid_json_text;
+                ec = json_errc::syntax_error;
                 return;
             }
             break;
@@ -2768,10 +2768,10 @@ private:
             state_ = json_parse_state::before_done;
             break;
         default:
-            more_ = err_handler_(json_errc::invalid_json_text, *this);
+            more_ = err_handler_(json_errc::syntax_error, *this);
             if (!more_)
             {
-                ec = json_errc::invalid_json_text;
+                ec = json_errc::syntax_error;
                 return;
             }
             break;
