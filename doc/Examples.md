@@ -2317,7 +2317,7 @@ Fabric size: 28, material: cotton
 
 #### Type selection and std::variant
 
-For classes supported through the convenience macros, e.g. `Fruit` and `Fabric`, 
+For classes supported through the convenience macros, e.g. `Fruit` and `Fabric` from the previous example, 
 the type selection strategy is the same as for polymorphic types, and is based 
 on the presence of mandatory members in the classes. More generally, 
 the type selection strategy is based on the `json_type_traits<Json,T>::is(const Json& j)` 
