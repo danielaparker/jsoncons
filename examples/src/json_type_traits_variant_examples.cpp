@@ -44,9 +44,9 @@ namespace { namespace ns {
     class Fabric 
     {
     private:
-      JSONCONS_TYPE_TRAITS_FRIEND
-      int size_;
-      std::string material_;
+        JSONCONS_TYPE_TRAITS_FRIEND
+        int size_;
+        std::string material_;
     public:
         friend std::ostream& operator<<(std::ostream& os, const Fabric& val)
         {
@@ -55,11 +55,12 @@ namespace { namespace ns {
         }
     };
 
-    class Basket {
-     private:
-      JSONCONS_TYPE_TRAITS_FRIEND
-      std::string owner_;
-      std::vector<std::variant<Fruit, Fabric>> items_;
+    class Basket 
+    {
+    private:
+        JSONCONS_TYPE_TRAITS_FRIEND
+        std::string owner_;
+        std::vector<std::variant<Fruit, Fabric>> items_;
 
     public:
         std::string owner() const
@@ -141,8 +142,8 @@ void variant_example2()
     variant_type var1(100);
     variant_type var2(10.1);
     variant_type var3(false);
-    variant_type var4(ns::Color::yellow);
-    variant_type var5(std::string("Hello"));
+    variant_type var4(std::string("Hello World"));
+    variant_type var5(ns::Color::yellow);
 
     std::string buffer1;
     jsoncons::encode_json(var1,buffer1);
@@ -167,11 +168,32 @@ void variant_example2()
     auto v4 = jsoncons::decode_json<variant_type>(buffer4);
     auto v5 = jsoncons::decode_json<variant_type>(buffer5);
 
-    std::cout << "(6) " << v1.index() << "\n";
-    std::cout << "(7) " << v2.index() << "\n";
-    std::cout << "(8) " << v3.index() << "\n";
-    std::cout << "(9) " << v4.index() << "\n";
-    std::cout << "(10) " << v5.index() << "\n";
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Color>)
+                std::cout << "ns::Color " << arg << '\n';
+        };
+
+    std::cout << "\n";
+    std::cout << "(6) ";
+    std::visit(visitor, v1);
+    std::cout << "(7) ";
+    std::visit(visitor, v2);
+    std::cout << "(8) ";
+    std::visit(visitor, v3);
+    std::cout << "(9) ";
+    std::visit(visitor, v4);
+    std::cout << "(10) ";
+    std::visit(visitor, v5);
+    std::cout << "\n\n";
 }
 
 void variant_example3()
@@ -181,19 +203,19 @@ void variant_example3()
     variant_type var1(100);
     variant_type var2(10.1);
     variant_type var3(false);
-    variant_type var4(ns::Color::yellow);
-    variant_type var5(std::string("Hello"));
+    variant_type var4(std::string("Hello World"));
+    variant_type var5(ns::Color::yellow);
 
     std::string buffer1;
-    jsoncons::encode_json(var1,buffer1);
+    jsoncons::encode_json(var1, buffer1);
     std::string buffer2;
-    jsoncons::encode_json(var2,buffer2);
+    jsoncons::encode_json(var2, buffer2);
     std::string buffer3;
-    jsoncons::encode_json(var3,buffer3);
+    jsoncons::encode_json(var3, buffer3);
     std::string buffer4;
-    jsoncons::encode_json(var4,buffer4);
+    jsoncons::encode_json(var4, buffer4);
     std::string buffer5;
-    jsoncons::encode_json(var5,buffer5);
+    jsoncons::encode_json(var5, buffer5);
 
     std::cout << "(1) " << buffer1 << "\n";
     std::cout << "(2) " << buffer2 << "\n";
@@ -207,11 +229,32 @@ void variant_example3()
     auto v4 = jsoncons::decode_json<variant_type>(buffer4);
     auto v5 = jsoncons::decode_json<variant_type>(buffer5);
 
-    std::cout << "(6) " << v1.index() << "\n";
-    std::cout << "(7) " << v2.index() << "\n";
-    std::cout << "(8) " << v3.index() << "\n";
-    std::cout << "(9) " << v4.index() << "\n";
-    std::cout << "(10) " << v5.index() << "\n";
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Color>)
+                std::cout << "ns::Color " << arg << '\n';
+        };
+
+    std::cout << "\n";
+    std::cout << "(6) ";
+    std::visit(visitor, v1);
+    std::cout << "(7) ";
+    std::visit(visitor, v2);
+    std::cout << "(8) ";
+    std::visit(visitor, v3);
+    std::cout << "(9) ";
+    std::visit(visitor, v4);
+    std::cout << "(10) ";
+    std::visit(visitor, v5);
+    std::cout << "\n\n";
 }
 
 #endif // defined(JSONCONS_HAS_STD_VARIANT)

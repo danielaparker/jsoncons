@@ -41,7 +41,8 @@
 [Serialize a polymorphic type based on the presence of members](#G9)  
 [Ensuring type selection is possible](#G10)  
 [An example with std::variant](#G11)  
-[Convert JSON numbers to/from boost multiprecision numbers](#G12)
+[Type selection and std::variant](#G12)  
+[Convert JSON numbers to/from boost multiprecision numbers](#G13)
 
 ### Construct
 
@@ -2151,7 +2152,7 @@ This example assumes C++17 language support and jsoncons v0.154.0 or later.
 ```c++
 #include <jsoncons/json.hpp>
 
-namespace { namespace ns {
+namespace ns {
 
     enum class Color {yellow, red, green, blue};
 
@@ -2313,6 +2314,130 @@ Fabric size: 28, material: cotton
 ```
 
 <div id="G12"/>
+
+#### Type selection and std::variant
+
+For classes supported through the convenience macros, e.g. `Fruit` and `Fabric`, 
+the type selection strategy is the same as for polymorphic types, and is based 
+on the presence of mandatory members in the classes. More generally, 
+the type selection strategy is based on the `json_type_traits<Json,T>::is(const Json& j)` 
+function, checking each type in the variant from left to right, and stopping when 
+`json_type_traits<Json,T>::is(j)` returns `true`. 
+
+Now consider 
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    enum class Color {yellow, red, green, blue};
+
+} // ns
+
+JSONCONS_ENUM_NAME_TRAITS(ns::Color, (yellow, "YELLOW"), (red, "RED"), (green, "GREEN"), (blue, "BLUE"))
+
+int main()
+{
+    using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
+
+    variant_type var1(100);
+    variant_type var2(10.1);
+    variant_type var3(false);
+    variant_type var4(std::string("Hello World"));
+    variant_type var5(ns::Color::yellow);
+
+    std::string buffer1;
+    jsoncons::encode_json(var1,buffer1);
+    std::string buffer2;
+    jsoncons::encode_json(var2,buffer2);
+    std::string buffer3;
+    jsoncons::encode_json(var3,buffer3);
+    std::string buffer4;
+    jsoncons::encode_json(var4,buffer4);
+    std::string buffer5;
+    jsoncons::encode_json(var5,buffer5);
+
+    std::cout << "(1) " << buffer1 << "\n";
+    std::cout << "(2) " << buffer2 << "\n";
+    std::cout << "(3) " << buffer3 << "\n";
+    std::cout << "(4) " << buffer4 << "\n";
+    std::cout << "(5) " << buffer5 << "\n";
+
+    auto v1 = jsoncons::decode_json<variant_type>(buffer1);
+    auto v2 = jsoncons::decode_json<variant_type>(buffer2);
+    auto v3 = jsoncons::decode_json<variant_type>(buffer3);
+    auto v4 = jsoncons::decode_json<variant_type>(buffer4);
+    auto v5 = jsoncons::decode_json<variant_type>(buffer5);
+
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Color>)
+                std::cout << "ns::Color " << arg << '\n';
+        };
+
+    std::cout << "\n";
+    std::cout << "(6) ";
+    std::visit(visitor, v1);
+    std::cout << "(7) ";
+    std::visit(visitor, v2);
+    std::cout << "(8) ";
+    std::visit(visitor, v3);
+    std::cout << "(9) ";
+    std::visit(visitor, v4);
+    std::cout << "(10) ";
+    std::visit(visitor, v5);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+(1) 100
+(2) 10.1
+(3) false
+(4) "Hello World"
+(5) "YELLOW"
+
+(6) int 100
+(7) double 10.1
+(8) bool false
+(9) std::string Hello World
+(10) std::string YELLOW
+```
+Encode is fine. But when decoding, jsoncons checks  if the JSON string "YELLOW" is a `std::string` before it checks whether it is an `ns::Color`, and since the answer is yes, it goes into the variant as a `std::string`.
+
+But if we switch the order of `ns::Color` and `std::string` in the variant definition, viz.
+
+```c++
+ using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
+```
+strings containing  the text "YELLOW", "RED", "GREEN", or "BLUE" are detected to be `ns::Color`,and the others `std::string`.  
+
+And the output becomes
+```
+(1) 100
+(2) 10.1
+(3) false
+(4) "Hello World"
+(5) "YELLOW"
+
+(6) int 100
+(7) double 10.1
+(8) bool false
+(9) std::string Hello World
+(10) ns::Color yellow
+```
+So: types that are more constrained should appear to the left of types that are less constrained.
+
+<div id="G13"/>
 
 #### Convert JSON numbers to/from boost multiprecision numbers
 
