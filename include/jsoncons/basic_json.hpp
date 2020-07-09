@@ -3900,7 +3900,7 @@ public:
     {
         using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
 
-        converter<string_type> convert(alloc);
+        converter<string_type> convert;
         std::error_code ec;
         switch (var_.storage())
         {
@@ -3911,7 +3911,7 @@ public:
             }
             case storage_kind::byte_string_value:
             {
-                auto s = convert.from(as_byte_string_view(), tag(), ec);
+                auto s = convert.from(as_byte_string_view(), tag(), alloc, ec);
                 if (ec)
                 {
                     JSONCONS_THROW(ser_error(ec));

@@ -29,14 +29,8 @@ namespace jsoncons {
     {
         using value_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
-        allocator_type alloc_;
 
     public:
-
-        explicit converter(const allocator_type& alloc = allocator_type())
-            : alloc_(alloc)
-        {
-        }
 
         JSONCONS_CPP14_CONSTEXPR 
         Into from(const byte_string_view& bstr, semantic_tag tag, std::error_code& ec) const
@@ -135,20 +129,24 @@ namespace jsoncons {
         using char_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
 
-        allocator_type alloc_;
     public:
-
-        explicit converter(const allocator_type& alloc = allocator_type())
-            : alloc_(alloc)
-        {
-        }
 
         template<class Integer>
         JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<detail::is_integer<Integer>::value,Into>::type
         from(Integer val, semantic_tag, std::error_code&) const
         {
-            Into s(alloc_);
+            Into s;
+            jsoncons::detail::write_integer(val, s);
+            return s;
+        }
+
+        template<class Integer>
+        JSONCONS_CPP14_CONSTEXPR 
+        typename std::enable_if<detail::is_integer<Integer>::value,Into>::type
+        from(Integer val, semantic_tag, const allocator_type& alloc, std::error_code&) const
+        {
+            Into s(alloc);
             jsoncons::detail::write_integer(val, s);
             return s;
         }
@@ -156,7 +154,16 @@ namespace jsoncons {
         JSONCONS_CPP14_CONSTEXPR 
         Into from(double val, semantic_tag, std::error_code&) const
         {
-            Into s(alloc_);
+            Into s;
+            jsoncons::detail::write_double f{float_chars_format::general,0};
+            f(val, s);
+            return s;
+        }
+
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(double val, semantic_tag, const allocator_type& alloc, std::error_code&) const
+        {
+            Into s(alloc);
             jsoncons::detail::write_double f{float_chars_format::general,0};
             f(val, s);
             return s;
@@ -165,7 +172,17 @@ namespace jsoncons {
         JSONCONS_CPP14_CONSTEXPR 
         Into from(half_arg_t, uint16_t val, semantic_tag, std::error_code&) const
         {
-            Into s(alloc_);
+            Into s;
+            jsoncons::detail::write_double f{float_chars_format::general,0};
+            double x = jsoncons::detail::decode_half(val);
+            f(x, s);
+            return s;
+        }
+
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(half_arg_t, uint16_t val, semantic_tag, const allocator_type& alloc, std::error_code&) const
+        {
+            Into s(alloc);
             jsoncons::detail::write_double f{float_chars_format::general,0};
             double x = jsoncons::detail::decode_half(val);
             f(x, s);
@@ -193,7 +210,13 @@ namespace jsoncons {
         constexpr 
         Into from(const jsoncons::basic_string_view<char_type>& s, semantic_tag, std::error_code&) const
         {
-            return Into(s.data(), s.size(), alloc_);
+            return Into(s.data(), s.size());
+        }
+
+        constexpr 
+        Into from(const jsoncons::basic_string_view<char_type>& s, semantic_tag, const allocator_type& alloc, std::error_code&) const
+        {
+            return Into(s.data(), s.size(), alloc);
         }
 
         JSONCONS_CPP14_CONSTEXPR 
@@ -202,7 +225,16 @@ namespace jsoncons {
             constexpr char_type true_literal[] = {'t','r','u','e'}; 
             constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
 
-            return val ? Into(true_literal,4,alloc_) : Into(false_literal,5,alloc_);
+            return val ? Into(true_literal,4) : Into(false_literal,5);
+        }
+
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(bool val, semantic_tag, const allocator_type& alloc, std::error_code&) const
+        {
+            constexpr char_type true_literal[] = {'t','r','u','e'}; 
+            constexpr char_type false_literal[] = {'f','a','l','s','e'}; 
+
+            return val ? Into(true_literal,4,alloc) : Into(false_literal,5,alloc);
         }
 
         JSONCONS_CPP14_CONSTEXPR 
@@ -210,7 +242,15 @@ namespace jsoncons {
         {
             constexpr char_type null_literal[] = {'n','u','l','l'}; 
 
-            return Into(null_literal,4,alloc_);
+            return Into(null_literal,4);
+        }
+
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(null_type, semantic_tag, const allocator_type& alloc, std::error_code&) const
+        {
+            constexpr char_type null_literal[] = {'n','u','l','l'}; 
+
+            return Into(null_literal,4,alloc);
         }
     private:
 
@@ -238,7 +278,7 @@ namespace jsoncons {
         typename std::enable_if<sizeof(ChT) != sizeof(uint8_t)>::type
         from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
         {
-            converter<std::string> convert(alloc_);
+            converter<std::string> convert;
             std::string u = convert.from(bytes, tag, ec);
 
             auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));

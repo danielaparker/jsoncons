@@ -513,7 +513,7 @@ namespace detail {
         static typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,T>::type
         as(const Json& j)
         {
-            converter<T> convert{};
+            converter<T> convert;
             std::error_code ec;
             if (j.is_array())
             {
