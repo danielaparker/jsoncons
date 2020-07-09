@@ -10,7 +10,14 @@ Bugs fixed:
 Changes:
 
 - The function name `jsonpointer::insert_or_assign` has been deprecated and renamed to `jsonpointer::add`.
-Rationale: consistency with JSON Patch names. 
+Rationale: consistency with JSON Patch names.
+ 
+- Until v0.154.0, the `position()` member function of `ser_context` was defined for JSON 
+name and string events only, and indicated the position of the first character of the 
+name or string in the input. Since v0.154.0, the `position()` member function of `ser_context` 
+is defined for all JSON parse events, and indicates the position of the character at the beginning
+of the event, e.g. '[' for an array, '{' for an object, and '"' for a string. 
+[\#256](https://github.com/danielaparker/jsoncons/issues/256)
 
 Enhancements
 
