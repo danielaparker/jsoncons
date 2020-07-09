@@ -18,7 +18,7 @@ namespace jsoncons { namespace csv {
         unexpected_eof = 1,
         source_error,
         expected_quote,
-        invalid_csv_text,
+        syntax_error,
         invalid_parse_state,
         invalid_escaped_char,
         unexpected_char_between_fields
@@ -46,8 +46,8 @@ public:
                 return "Source error";
             case csv_errc::expected_quote:
                 return "Expected quote character";
-            case csv_errc::invalid_csv_text:
-                return "Invalid CSV text";
+            case csv_errc::syntax_error:
+                return "CSV syntax error";
             case csv_errc::invalid_parse_state:
                 return "Invalid CSV parser state";
             case csv_errc::invalid_escaped_char:
