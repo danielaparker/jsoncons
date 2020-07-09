@@ -315,18 +315,84 @@ TEST_CASE("json_type_traits for std::variant")
         CHECK(j1 == j2);
     }
 
-    SECTION("test bool")
+    SECTION("std::variant<int, double, bool, std::string, ns::Color> test")
     {
-        using variant_type  = std::variant<int, double, bool, std::string>;
+        using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
 
-        variant_type var(false);
+        variant_type var1(100);
+        variant_type var2(10.1);
+        variant_type var3(false);
+        variant_type var4(std::string("Hello World"));
+        variant_type var5(ns::Color::yellow);
 
-        std::string buffer;
-        jsoncons::encode_json(var,buffer);
+        std::string buffer1;
+        jsoncons::encode_json(var1,buffer1);
+        std::string buffer2;
+        jsoncons::encode_json(var2,buffer2);
+        std::string buffer3;
+        jsoncons::encode_json(var3,buffer3);
+        std::string buffer4;
+        jsoncons::encode_json(var4,buffer4);
+        std::string buffer5;
+        jsoncons::encode_json(var5,buffer5);
 
-        auto var2 = jsoncons::decode_json<variant_type>(buffer);
-        bool val = std::get<bool>(var2);
-        CHECK_FALSE(val);
+        auto v1 = jsoncons::decode_json<variant_type>(buffer1);
+        auto v2 = jsoncons::decode_json<variant_type>(buffer2);
+        auto v3 = jsoncons::decode_json<variant_type>(buffer3);
+        auto v4 = jsoncons::decode_json<variant_type>(buffer4);
+        auto v5 = jsoncons::decode_json<variant_type>(buffer5);
+
+        CHECK(v1.index() == 0);
+        CHECK(v2.index() == 1);
+        CHECK(v3.index() == 2);
+        CHECK(v4.index() == 3);
+        CHECK(v5.index() == 3);
+
+        CHECK(std::get<0>(v1) == 100);
+        CHECK(std::get<1>(v2) == 10.1);
+        CHECK(std::get<2>(v3) == false);
+        CHECK(std::get<3>(v4) == std::string("Hello World"));
+        CHECK(std::get<3>(v5) == std::string("YELLOW"));
+    }
+
+    SECTION("std::variant<int, double, bool, ns::Color, std::string> test")
+    {
+        using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
+
+        variant_type var1(100);
+        variant_type var2(10.1);
+        variant_type var3(false);
+        variant_type var4(std::string("Hello World"));
+        variant_type var5(ns::Color::yellow);
+
+        std::string buffer1;
+        jsoncons::encode_json(var1,buffer1);
+        std::string buffer2;
+        jsoncons::encode_json(var2,buffer2);
+        std::string buffer3;
+        jsoncons::encode_json(var3,buffer3);
+        std::string buffer4;
+        jsoncons::encode_json(var4,buffer4);
+        std::string buffer5;
+        jsoncons::encode_json(var5,buffer5);
+
+        auto v1 = jsoncons::decode_json<variant_type>(buffer1);
+        auto v2 = jsoncons::decode_json<variant_type>(buffer2);
+        auto v3 = jsoncons::decode_json<variant_type>(buffer3);
+        auto v4 = jsoncons::decode_json<variant_type>(buffer4);
+        auto v5 = jsoncons::decode_json<variant_type>(buffer5);
+
+        CHECK(v1.index() == 0);
+        CHECK(v2.index() == 1);
+        CHECK(v3.index() == 2);
+        CHECK(v4.index() == 4);
+        CHECK(v5.index() == 3);
+
+        CHECK(std::get<0>(v1) == 100);
+        CHECK(std::get<1>(v2) == 10.1);
+        CHECK(std::get<2>(v3) == false);
+        CHECK(std::get<4>(v4) == std::string("Hello World"));
+        CHECK(std::get<3>(v5) == ns::Color::yellow);
     }
 }
 
