@@ -39,63 +39,92 @@ namespace jsoncons {
         }
 
         JSONCONS_CPP14_CONSTEXPR 
-        Into from(const byte_string_view& bstr, semantic_tag, std::error_code&) const
+        Into from(const byte_string_view& bstr, semantic_tag tag, std::error_code& ec) const
         {
-            Into bytes(alloc_);
-            for (auto ch : bstr)
-            {
-                bytes.push_back(static_cast<value_type>(ch));
-            }
+            Into bytes;
+            from_(bytes, bstr, tag, ec);
+            return bytes;
+        }
 
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(const byte_string_view& bstr, semantic_tag tag, const allocator_type& alloc, std::error_code& ec) const
+        {
+            Into bytes(alloc);
+            from_(bytes, bstr, tag, ec);
             return bytes;
         }
 
         template <class CharT>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<detail::is_narrow_character<CharT>::value,Into>::type
-        from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
+        Into from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
+        {
+            Into bytes;
+            from_(bytes, s, tag, ec);
+            return bytes;
+        }
+
+        template <class CharT>
+        JSONCONS_CPP14_CONSTEXPR 
+        Into from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, const allocator_type& alloc, std::error_code& ec) const
+        {
+            Into bytes(alloc);
+            from_(bytes, s, tag, ec);
+            return bytes;
+        }
+
+    private:
+        JSONCONS_CPP14_CONSTEXPR 
+        void from_(Into& bytes, const byte_string_view& bstr, semantic_tag, std::error_code&) const
+        {
+            for (auto ch : bstr)
+            {
+                bytes.push_back(static_cast<value_type>(ch));
+            }
+        }
+
+        template <class CharT>
+        JSONCONS_CPP14_CONSTEXPR 
+        typename std::enable_if<detail::is_narrow_character<CharT>::value>::type
+        from_(Into& bytes, const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             switch (tag)
             {
                 case semantic_tag::base16:
                 {
-                    Into bytes(alloc_);
                     decode_base16(s.begin(), s.end(), bytes);
-                    return bytes;
+                    break;
                 }
                 case semantic_tag::base64:
                 {
-                    Into bytes(alloc_);
                     decode_base64(s.begin(), s.end(), bytes);
-                    return bytes;
+                    break;
                 }
                 case semantic_tag::base64url:
                 {
-                    Into bytes(alloc_);
                     decode_base64url(s.begin(), s.end(), bytes);
-                    return bytes;
+                    break;
                 }
                 default:
                 {
                     ec = convert_errc::not_byte_string;
-                    return Into(alloc_);
+                    break;
                 }
             }
         }
 
         template <class CharT>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<detail::is_wide_character<CharT>::value, Into>::type
-        from(const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
+        typename std::enable_if<detail::is_wide_character<CharT>::value>::type
+        from_(Into& bytes, const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             std::string u;
             auto retval = unicons::convert(s.begin(), s.end(), std::back_inserter(u));
             if (retval.ec != unicons::conv_errc())
             {
                 ec = convert_errc::not_utf8;
-                return Into(alloc_);
+                return;
             }
-            return from(jsoncons::string_view(u), tag, ec);
+            from_(bytes, jsoncons::string_view(u), tag, ec);
         }
     };
 
