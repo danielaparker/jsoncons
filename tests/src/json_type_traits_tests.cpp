@@ -403,7 +403,12 @@ std::cout << "apple "  << "\n";
 #if defined(__cpp_lib_variant)
 std::cout << "variant " << __cpp_lib_variant << "\n";
 #endif
-
+#if defined(_LIBCPP_VERSION)
+std::cout << "_LIBCPP_VERSION " << _LIBCPP_VERSION << "\n";
+#endif
+#if defined(__cplusplus)
+std::cout << "__cplusplus " << __cplusplus << "\n";
+#endif
     }
 }
 
