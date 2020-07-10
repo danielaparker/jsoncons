@@ -395,11 +395,14 @@ TEST_CASE("json_type_traits for std::variant")
         CHECK(std::get<3>(v5) == ns::Color::yellow);
 
 #if defined(__clang__)
-std::cout << "clang " << __clang_major__ << ", " << __clang_minor__ << ", " << __clang_patch__ << "\n";
+std::cout << "clang " << __clang_major__ << ", " << __clang_minor__ << ", " << __clang_patchlevel__ << "\n";
 #endif // defined(__clang__)
 #if defined(__APPLE__)
 std::cout << "apple "  << "\n";
 #endif // defined(__APPLE__)
+#if defined(__cpp_lib_variant)
+std::cout << "variant " << __cpp_lib_variant << "\n";
+#endif
 
     }
 }
