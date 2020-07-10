@@ -396,6 +396,7 @@ TEST_CASE("json_type_traits for std::variant")
 
 #if defined(__clang__)
 std::cout << "clang " << __clang_major__ << ", " << __clang_minor__ << ", " << __clang_patchlevel__ << "\n";
+std::cout << "JSONCONS_CLANG_VERSION " << JSONCONS_CLANG_VERSION << "\n";
 #endif // defined(__clang__)
 #if defined(__APPLE__)
 std::cout << "apple "  << "\n";

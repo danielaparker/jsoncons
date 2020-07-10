@@ -13,6 +13,10 @@
 #include <exception>
 #include <ostream>
 
+#if defined (__clang__)
+#define JSONCONS_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+#endif
+
 // Uncomment the following line to suppress deprecated names (recommended for new code)
 //#define JSONCONS_NO_DEPRECATED
 
@@ -148,7 +152,7 @@
 #  if (defined JSONCONS_HAS_2017)
 #    if defined(__clang__)
 #      if defined(__APPLE__)
-#        if __clang_major__*100 + __clang_minor__ >=  1014
+#        if JSONCONS_CLANG_VERSION >=  100001
 #        define JSONCONS_HAS_STD_VARIANT 1
 #        endif
 #      elif __has_include(<variant>)
