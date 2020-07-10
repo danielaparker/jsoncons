@@ -128,9 +128,11 @@ namespace jsoncons {
     {
         using char_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
-
+        int dummy_;
     public:
-
+        explicit converter(int dummy = int())
+            : dummy_(dummy)
+        {}
         template<class Integer>
         JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<detail::is_integer<Integer>::value,Into>::type
@@ -278,7 +280,7 @@ namespace jsoncons {
         typename std::enable_if<sizeof(ChT) != sizeof(uint8_t)>::type
         from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
         {
-            converter<std::string> convert;
+            converter<std::string> convert{ dummy_ };
             std::string u = convert.from(bytes, tag, ec);
 
             auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));
