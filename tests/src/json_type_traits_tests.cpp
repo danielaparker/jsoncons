@@ -394,12 +394,10 @@ TEST_CASE("json_type_traits for std::variant")
         CHECK(std::get<4>(v4) == std::string("Hello World"));
         CHECK(std::get<3>(v5) == ns::Color::yellow);
 
-        #if !defined(JSONCONS_HAS_STD_VARIANT)
 #  if (defined JSONCONS_HAS_2017)
 #    if defined(__clang__)
 #      if defined(__APPLE__)
 std::cout << __clang_major__ << ", " << __clang_minor__ << ", " << __clang_patch__ << "\n";
-#endif // !defined(JSONCONS_HAS_STD_VARIANT)
 #endif // !defined(JSONCONS_HAS_STD_VARIANT)
 #endif // !defined(JSONCONS_HAS_STD_VARIANT)
 #endif // !defined(JSONCONS_HAS_STD_VARIANT)
