@@ -150,9 +150,9 @@
 #      if defined(__APPLE__)
 #        if __clang_major__*100 + __clang_minor__ >=  1014
 #          define JSONCONS_HAS_STD_MAKE_UNIQUE
-#        elif __has_include(<variant>)
-#          define JSONCONS_HAS_STD_VARIANT 1
 #        endif
+#      elif __has_include(<variant>)
+#        define JSONCONS_HAS_STD_VARIANT 1
 #     endif // __has_include(<variant>)
 #   else
 #      define JSONCONS_HAS_STD_VARIANT 1
