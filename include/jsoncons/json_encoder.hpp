@@ -1547,8 +1547,8 @@ namespace detail {
     JSONCONS_DEPRECATED_MSG("Instead, use json_stream_encoder") typedef basic_json_encoder<char,jsoncons::stream_sink<char>> json_serializer;
     JSONCONS_DEPRECATED_MSG("Instead, use wjson_stream_encoder") typedef basic_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_serializer;
 
-    JSONCONS_DEPRECATED_MSG("Instead, use json_compressed_stream_encoder")  typedef basic_compact_json_encoder<char,jsoncons::stream_sink<char>> json_compressed_serializer;
-    JSONCONS_DEPRECATED_MSG("Instead, use wjson_compressed_stream_encoder") typedef basic_compact_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_compressed_serializer;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_json_stream_encoder")  typedef basic_compact_json_encoder<char,jsoncons::stream_sink<char>> json_compressed_serializer;
+    JSONCONS_DEPRECATED_MSG("Instead, use compact_wjson_stream_encoder") typedef basic_compact_json_encoder<wchar_t,jsoncons::stream_sink<wchar_t>> wjson_compressed_serializer;
 
     JSONCONS_DEPRECATED_MSG("Instead, use json_string_encoder")  typedef basic_json_encoder<char,jsoncons::string_sink<std::string>> json_string_serializer;
     JSONCONS_DEPRECATED_MSG("Instead, use wjson_string_encoder") typedef basic_json_encoder<wchar_t,jsoncons::string_sink<std::wstring>> wjson_string_serializer;
