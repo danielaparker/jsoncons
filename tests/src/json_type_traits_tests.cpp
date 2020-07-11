@@ -393,23 +393,6 @@ TEST_CASE("json_type_traits for std::variant")
         CHECK(std::get<2>(v3) == false);
         CHECK(std::get<4>(v4) == std::string("Hello World"));
         CHECK(std::get<3>(v5) == ns::Color::yellow);
-
-#if defined(__clang__)
-std::cout << "clang " << __clang_major__ << ", " << __clang_minor__ << ", " << __clang_patchlevel__ << "\n";
-std::cout << "JSONCONS_CLANG_VERSION " << JSONCONS_CLANG_VERSION << "\n";
-#endif // defined(__clang__)
-#if defined(__APPLE__)
-std::cout << "apple "  << "\n";
-#endif // defined(__APPLE__)
-#if defined(__cpp_lib_variant)
-std::cout << "variant " << __cpp_lib_variant << "\n";
-#endif
-#if defined(_LIBCPP_VERSION)
-std::cout << "_LIBCPP_VERSION " << _LIBCPP_VERSION << "\n";
-#endif
-#if defined(__cplusplus)
-std::cout << "__cplusplus " << __cplusplus << "\n";
-#endif
     }
 }
 
