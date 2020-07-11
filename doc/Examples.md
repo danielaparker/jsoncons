@@ -2412,7 +2412,9 @@ Output:
 (9) std::string Hello World
 (10) std::string YELLOW
 ```
-Encode is fine. But when decoding, jsoncons checks  if the JSON string "YELLOW" is a `std::string` before it checks whether it is an `ns::Color`, and since the answer is yes, it goes into the variant as a `std::string`.
+Encode is fine. But when decoding, jsoncons checks if the JSON string "YELLOW" is a `std::string` 
+before it checks whether it is an `ns::Color`, and since the answer is yes, 
+it is stored in the variant as a `std::string`.
 
 But if we switch the order of `ns::Color` and `std::string` in the variant definition, viz.
 
