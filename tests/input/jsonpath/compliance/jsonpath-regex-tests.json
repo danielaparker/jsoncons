@@ -9,7 +9,7 @@
         ],
         "cases" : [
             {
-                "annotation" : "Filter expression with regular expression",
+                "comment" : "Filter expression with regular expression",
                 "expression" : "$[?(@.name=~/hello.*/)]",
                 "result" : [
                     {

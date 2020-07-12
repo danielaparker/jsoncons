@@ -1,11 +1,11 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 #include <sstream>
@@ -19,71 +19,92 @@
 
 using namespace jsoncons;
 
-namespace {
-
-    void run_jsonpath_test_suite(std::string fpath)
+void jsonpath_tests(const std::string& fpath)
+{
+    std::fstream is(fpath);
+    if (!is)
     {
-        std::fstream is(fpath);
-        REQUIRE(is);
+        std::cerr << "Cannot open " << fpath << "\n";
+        exit(1);
+    }
 
-        ojson tests = ojson::parse(is);
-        for (const auto& test : tests.array_range())
+    ojson tests = ojson::parse(is);
+    for (const auto& test : tests.array_range())
+    {
+        const ojson& root = test["given"];
+
+        for (const auto& item : test["cases"].array_range())
         {
-            const ojson& root = test["given"];
-
-            for (const auto& item : test["cases"].array_range())
+            std::string expr = item["expression"].as<std::string>();
+            try
             {
-                std::string path = item["expression"].as<std::string>();
+                ojson actual = jsonpath::json_query(root, expr);
                 if (item.contains("result"))
                 {
                     const ojson& expected = item["result"];
-
-                    std::error_code ec;
-                    try
+                    if (actual != expected)
                     {
-                        ojson result = jsonpath::json_query(root, path);
-                        if (result != expected)
+                        if (item.contains("comment"))
                         {
-                            if (item.contains("annotation"))
-                            {
-                                std::cout << "\n" << item["annotation"] << "\n";
-                            }
-                            std::cout << "input\n" << pretty_print(root) << "\n";
-                            std::cout << path << "\n\n";
-                            std::cout << "actual\n: " << pretty_print(result) << "\n\n";
-                            std::cout << "expected: " << pretty_print(expected) << "\n\n";
+                            std::cout << "\n" << item["comment"] << "\n";
                         }
-                        CHECK(result == expected);
+                        std::cout << "Input:\n" << pretty_print(root) << "\n\n";
+                        std::cout << "Expression: " << expr << "\n\n";
+                        std::cout << "Actual: " << pretty_print(actual) << "\n\n";
+                        std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                     }
-                    catch (const std::exception& e)
-                    {
-                        std::cout << e.what() << "\n";
-                        if (item.contains("annotation"))
-                        {
-                            std::cout << "\n" << item["annotation"] << "\n";
-                        }
-                        std::cout << "input\n" << pretty_print(root) << "\n";
-                        std::cout << "expression\n" << path << "\n";
-                        std::cout << "expected: " << expected << "\n\n";
-                    }
+                    CHECK(actual == expected);
                 }
-                else
+                else if (item.contains("error"))
                 {
-                    std::string error = item["error"].as<std::string>();
-                    REQUIRE_THROWS_WITH(jsonpath::json_query(root, path), error);
+                    if (item.contains("comment"))
+                    {
+                        std::cout << "Comment: " << item["comment"] << "\n";
+                    }
+                    std::cout << "Error: " << item["error"] << "\n\n";
+                    std::cout << "Input:\n" << pretty_print(root) << "\n\n";
+                    std::cout << "Expression: " << expr << "\n\n";
+                    std::cout << "Actual: " << pretty_print(actual) << "\n\n";
+                    CHECK(false);
+                }
+
+            }
+            catch (const std::exception& e)
+            {
+                if (item.contains("result"))
+                {
+                    const ojson& expected = item["result"];
+                    std::cout << e.what() << "\n";
+                    if (item.contains("comment"))
+                    {
+                        std::cout << "Comment: " << item["comment"] << "\n\n";
+                    }
+                    std::cout << "Input\n" << pretty_print(root) << "\n\n";
+                    std::cout << "Expression: " << expr << "\n\n";
+                    std::cout << "Expected: " << expected << "\n\n";
+                    CHECK(false);
                 }
             }
         }
     }
 }
 
-TEST_CASE("jsonpath-test-suite")
+TEST_CASE("jsonpath-tests")
 {
-    run_jsonpath_test_suite("./input/jsonpath/jsonpath-tests.json");
+    SECTION("Examples and tutorials")
+    {
+        //jsonpath_tests("./input/jsonpath/examples/jsonpath-tests.json");
 
+    }
+    SECTION("compliance")
+    {
     #if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
     // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
-    run_jsonpath_test_suite("./input/jsonpath/jsonpath-regex-tests.json");
+        jsonpath_tests("./input/jsonpath/compliance/jsonpath-regex-tests.json");
     #endif
+        jsonpath_tests("./input/jsonpath/compliance/basic.json"); 
+        jsonpath_tests("./input/jsonpath/compliance/slice.json");
+        jsonpath_tests("./input/jsonpath/compliance/jsonpath-tests.json");
+    }
 }
 
