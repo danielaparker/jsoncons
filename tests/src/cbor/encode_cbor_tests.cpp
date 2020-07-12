@@ -147,3 +147,39 @@ TEST_CASE("cbor_arrays_and_maps")
     check_encode_cbor({ 0xa1,0x62,'o','c',0x84,'\0','\1','\2','\3' }, json::parse("{\"oc\": [0, 1, 2, 3]}"));
 }
 
+namespace { namespace ns {
+
+    struct Person
+    {
+        std::string name;
+    };
+
+}}
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
+
+TEST_CASE("encode_cbor overloads")
+{
+    SECTION("json, stream")
+    {
+        json person;
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        cbor::encode_cbor(person, ss);
+        json other = cbor::decode_cbor<json>(ss);
+        CHECK(other == person);
+    }
+    SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        cbor::encode_cbor(person, ss);
+        ns::Person other = cbor::decode_cbor<ns::Person>(ss);
+        CHECK(other.name == person.name);
+    }
+}
+

@@ -71,8 +71,9 @@ namespace cbor {
                 std::ostream& os, 
                 const cbor_encode_options& options = cbor_encode_options())
     {
+        cbor_stream_encoder encoder(os, options);
         std::error_code ec;
-        encode_cbor(val, os, options, ec);
+        ser_traits<T,char>::serialize(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));

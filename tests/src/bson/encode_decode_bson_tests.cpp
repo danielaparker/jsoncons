@@ -120,4 +120,41 @@ TEST_CASE("encode decode bson source uint8_t")
     }
 }
 
+namespace { namespace ns {
+
+    struct Person
+    {
+        std::string name;
+    };
+
+}}
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
+
+TEST_CASE("encode_bson overloads")
+{
+    SECTION("json, stream")
+    {
+        json person;
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        bson::encode_bson(person, ss);
+        json other = bson::decode_bson<json>(ss);
+        CHECK(other == person);
+    }
+    SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        bson::encode_bson(person, ss);
+        ns::Person other = bson::decode_bson<ns::Person>(ss);
+        CHECK(other.name == person.name);
+    }
+}
+
+
 

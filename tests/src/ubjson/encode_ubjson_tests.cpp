@@ -175,3 +175,39 @@ TEST_CASE("encode indefinite length ubjson arrays and maps")
     }
 }
 
+namespace { namespace ns {
+
+    struct Person
+    {
+        std::string name;
+    };
+
+}}
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
+    
+TEST_CASE("encode_ubjson overloads")
+{
+    SECTION("json, stream")
+    {
+        json person;
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        ubjson::encode_ubjson(person, ss);
+        json other = ubjson::decode_ubjson<json>(ss);
+        CHECK(other == person);
+    }
+    SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        ubjson::encode_ubjson(person, ss);
+        ns::Person other = ubjson::decode_ubjson<ns::Person>(ss);
+        CHECK(other.name == person.name);
+    }
+}
+

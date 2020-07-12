@@ -415,3 +415,39 @@ TEST_CASE("msgpack timestamp tests")
     }
 }
 
+namespace { namespace ns {
+
+    struct Person
+    {
+        std::string name;
+    };
+
+}}
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name)
+
+TEST_CASE("encode_msgpack overloads")
+{
+    SECTION("json, stream")
+    {
+        json person;
+        person.try_emplace("name", "John Smith");
+
+        std::string s;
+        std::stringstream ss(s);
+        msgpack::encode_msgpack(person, ss);
+        json other = msgpack::decode_msgpack<json>(ss);
+        CHECK(other == person);
+    }
+    SECTION("custom, stream")
+    {
+        ns::Person person{"John Smith"};
+
+        std::string s;
+        std::stringstream ss(s);
+        msgpack::encode_msgpack(person, ss);
+        ns::Person other = msgpack::decode_msgpack<ns::Person>(ss);
+        CHECK(other.name == person.name);
+    }
+}
+
