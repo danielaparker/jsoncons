@@ -1,3 +1,11 @@
+master
+------
+
+Bugs fixed:
+
+- Fixed issue with encode_cbor overload for user type input and output stream, 
+[\#259](https://github.com/danielaparker/jsoncons/issues/259)
+
 v0.154.0
 --------
 
