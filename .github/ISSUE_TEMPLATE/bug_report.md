@@ -9,11 +9,14 @@ assignees: ''
 
 **Describe the bug**
 
-**List the steps to reproduce the bug**
+**Enumerate the steps to reproduce the bug**
 
-**What platform?**
+**Include a small, self-contained example if possible**
+
+**What compiler, architecture, and operating system?**
 
 - Compiler: ________
+- Architecture (e.g. x86, x64) ____
 - Operating system: ________
 
 **What jsoncons library version?**
