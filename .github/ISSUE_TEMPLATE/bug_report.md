@@ -9,6 +9,9 @@ assignees: ''
 
 **Describe the bug**
 
+<!-- What is the actual behavior? -->
+<!-- What is the expected behavior? -->
+
 **Enumerate the steps to reproduce the bug**
 
 **Include a small, self-contained example if possible**
