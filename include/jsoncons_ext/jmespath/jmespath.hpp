@@ -541,7 +541,7 @@ namespace jmespath {
                 pointer value_;
             };
 
-            parameter(const parameter& other)
+            parameter(const parameter& other) noexcept
                 : type_(other.type_)
             {
                 switch (type_)
@@ -557,12 +557,12 @@ namespace jmespath {
                 }
             }
 
-            parameter(pointer value)
+            parameter(pointer value) noexcept
                 : type_(parameter_type::value), value_(value)
             {
             }
 
-            parameter(expression_base* expression)
+            parameter(expression_base* expression) noexcept
                 : type_(parameter_type::expression), expression_(expression)
             {
             }
