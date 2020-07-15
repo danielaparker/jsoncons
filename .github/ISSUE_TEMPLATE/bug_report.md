@@ -9,8 +9,8 @@ assignees: ''
 
 **Describe the bug**
 
-<!-- What is the actual behavior? -->
 <!-- What is the expected behavior? -->
+<!-- What is the actual behavior? -->
 
 **Enumerate the steps to reproduce the bug**
 
