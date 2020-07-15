@@ -765,7 +765,7 @@ namespace jsoncons {
             std::size_t count_;
         public:
 
-            level(target_t state, container_t type)
+            level(target_t state, container_t type) noexcept
                 : state_(state), type_(type), even_odd_(type == container_t::object ? 0 : 1), count_(0)
             {
             }
