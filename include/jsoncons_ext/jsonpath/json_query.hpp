@@ -189,12 +189,12 @@ namespace jsoncons { namespace jsonpath {
         {
         }
 
-        explicit state_item(path_state state)
+        explicit state_item(path_state state) noexcept
             : state(state), is_recursive_descent(false), is_union(false)
         {
         }
 
-        state_item(path_state state, const state_item& parent)
+        state_item(path_state state, const state_item& parent) noexcept
             : state(state), 
               is_recursive_descent(parent.is_recursive_descent), 
               is_union(parent.is_union)
