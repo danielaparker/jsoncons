@@ -662,12 +662,12 @@ namespace jsoncons {
     inline
     bool operator==(const byte_string_view& lhs, const byte_string_view& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept == 0;
+        return lhs.compare(rhs) == 0;
     }
     template<class Allocator>
     bool operator==(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept == 0;
+        return lhs.compare(rhs) == 0;
     }
     template<class Allocator>
     bool operator==(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
@@ -685,12 +685,12 @@ namespace jsoncons {
     inline
     bool operator!=(const byte_string_view& lhs, const byte_string_view& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept != 0;
+        return lhs.compare(rhs) != 0;
     }
     template<class Allocator>
     bool operator!=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept != 0;
+        return lhs.compare(rhs) != 0;
     }
     template<class Allocator>
     bool operator!=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
@@ -708,12 +708,12 @@ namespace jsoncons {
     inline
     bool operator<=(const byte_string_view& lhs, const byte_string_view& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept <= 0;
+        return lhs.compare(rhs) <= 0;
     }
     template<class Allocator>
     bool operator<=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept <= 0;
+        return lhs.compare(rhs) <= 0;
     }
     template<class Allocator>
     bool operator<=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
@@ -731,12 +731,12 @@ namespace jsoncons {
     inline
     bool operator<(const byte_string_view& lhs, const byte_string_view& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept < 0;
+        return lhs.compare(rhs) < 0;
     }
     template<class Allocator>
     bool operator<(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept < 0;
+        return lhs.compare(rhs) < 0;
     }
     template<class Allocator>
     bool operator<(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
@@ -754,12 +754,12 @@ namespace jsoncons {
     inline
     bool operator>=(const byte_string_view& lhs, const byte_string_view& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept >= 0;
+        return lhs.compare(rhs) >= 0;
     }
     template<class Allocator>
     bool operator>=(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept >= 0;
+        return lhs.compare(rhs) >= 0;
     }
     template<class Allocator>
     bool operator>=(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
@@ -777,12 +777,12 @@ namespace jsoncons {
     inline
     bool operator>(const byte_string_view& lhs, const byte_string_view& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept > 0;
+        return lhs.compare(rhs) > 0;
     }
     template<class Allocator>
     bool operator>(const byte_string_view& lhs, const basic_byte_string<Allocator>& rhs) noexcept
     {
-        return lhs.compare(rhs) noexcept > 0;
+        return lhs.compare(rhs) > 0;
     }
     template<class Allocator>
     bool operator>(const basic_byte_string<Allocator>& lhs, const byte_string_view& rhs) noexcept
