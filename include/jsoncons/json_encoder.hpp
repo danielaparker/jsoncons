@@ -227,7 +227,7 @@ namespace detail {
             std::size_t data_pos_;
         public:
             encoding_context(container_type type, line_split_kind split_lines, bool indent_once,
-                                  std::size_t begin_pos, std::size_t data_pos)
+                             std::size_t begin_pos, std::size_t data_pos) noexcept
                : type_(type), count_(0), line_splits_(split_lines), indent_before_(indent_once), new_line_after_(false),
                  begin_pos_(begin_pos), data_pos_(data_pos)
             {
@@ -1067,7 +1067,7 @@ namespace detail {
             container_type type_;
             std::size_t count_;
         public:
-            encoding_context(container_type type)
+            encoding_context(container_type type) noexcept
                : type_(type), count_(0)
             {
             }
