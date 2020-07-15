@@ -539,7 +539,7 @@ namespace ns {
     };
 
     struct ValueHash {
-		std::size_t operator()(const Value& val) const
+		std::size_t operator()(const Value& val) const noexcept
         {
             std::size_t h1 = std::hash<std::string>{}(val.name);
             std::size_t h2 = std::hash<std::int32_t>{}(val.value);
