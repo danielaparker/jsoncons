@@ -94,6 +94,15 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-9
+      env: COMPILER=gcc VERSION=9 JSONCONS_SANITIZE=1 CXXFLAGS="-std=c++17 -Wnoexcept -Werror -Wall -Wextra -Wimplicit-fallthrough -pedantic -Wcast-align -Wcast-qual" 
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
       env: COMPILER=gcc VERSION=9 JSONCONS_SANITIZE=1 CXXFLAGS="-std=c++2a -DJSONCONS_HAS_STRING_VIEW" 
 
     - os: linux
