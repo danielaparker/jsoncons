@@ -30,7 +30,7 @@ struct parse_state
     std::size_t length;
     std::size_t index;
 
-    parse_state(parse_mode mode, std::size_t length)
+    parse_state(parse_mode mode, std::size_t length) noexcept
         : mode(mode), length(length), index(0)
     {
     }

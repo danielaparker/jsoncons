@@ -67,7 +67,7 @@ struct parse_state
     std::size_t index;
     bool pop_stringref_map_stack;
 
-    parse_state(parse_mode mode, std::size_t length, bool pop_stringref_map_stack = false)
+    parse_state(parse_mode mode, std::size_t length, bool pop_stringref_map_stack = false) noexcept
         : mode(mode), length(length), index(0), pop_stringref_map_stack(pop_stringref_map_stack)
     {
     }
