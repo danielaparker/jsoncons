@@ -56,7 +56,7 @@ struct csv_type_info
     csv_type_info(const csv_type_info&) = default;
     csv_type_info(csv_type_info&&) = default;
 
-    csv_type_info(csv_column_type ctype, std::size_t lev, std::size_t repcount = 0)
+    csv_type_info(csv_column_type ctype, std::size_t lev, std::size_t repcount = 0) noexcept
     {
         col_type = ctype;
         level = lev;
