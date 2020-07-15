@@ -371,7 +371,7 @@ namespace jsoncons {
         }
 
         template <typename... Args>
-        key_value(key_type&& name,  Args&& ... args)
+        key_value(key_type&& name,  Args&& ... args) nothrow
             : key_(std::forward<key_type>(name)), value_(std::forward<Args>(args)...)
         {
         }
