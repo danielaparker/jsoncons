@@ -377,37 +377,37 @@ namespace detail
     template <class T1, class T2>
     constexpr bool operator==(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs) noexcept;
+        return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs);
     }
 
     template <class T1, class T2>
     constexpr bool operator!=(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs) noexcept;
+        return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs);
     }
 
     template <class T1, class T2>
     constexpr bool operator<(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs) noexcept;
+        return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
     }
 
     template <class T1, class T2>
     constexpr bool operator>(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs) noexcept;
+        return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
     }
 
     template <class T1, class T2>
     constexpr bool operator<=(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs) noexcept;
+        return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
     }
 
     template <class T1, class T2>
     constexpr bool operator>=(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs) noexcept;
+        return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
     }
 
     template <class T1, class T2>
