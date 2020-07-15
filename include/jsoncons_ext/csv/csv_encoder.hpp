@@ -71,7 +71,7 @@ private:
         stack_item_kind item_kind_;
         std::size_t count_;
 
-        stack_item(stack_item_kind item_kind)
+        stack_item(stack_item_kind item_kind) noexcept
            : item_kind_(item_kind), count_(0)
         {
         }

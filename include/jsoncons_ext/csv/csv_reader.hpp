@@ -30,7 +30,7 @@ class basic_csv_reader
 {
     struct stack_item
     {
-        stack_item()
+        stack_item() noexcept
            : array_begun_(false)
         {
         }

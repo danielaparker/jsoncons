@@ -41,7 +41,7 @@ private:
         Json value_;
 
         template <class... Args>
-        stack_item(key_type&& name, Args&& ... args)
+        stack_item(key_type&& name, Args&& ... args) 
             : name_(std::move(name)), value_(std::forward<Args>(args)...)
         {
         }

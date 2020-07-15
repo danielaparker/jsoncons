@@ -41,7 +41,7 @@ private:
         std::size_t name_offset_;
         std::size_t index_;
 
-        stack_item(jsoncons::bson::detail::bson_container_type type, std::size_t offset)
+        stack_item(jsoncons::bson::detail::bson_container_type type, std::size_t offset) noexcept
            : type_(type), offset_(offset), name_offset_(0), index_(0)
         {
         }

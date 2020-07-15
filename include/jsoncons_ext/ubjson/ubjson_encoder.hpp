@@ -42,7 +42,7 @@ private:
         std::size_t length_;
         std::size_t count_;
 
-        stack_item(ubjson_container_type type, std::size_t length = 0)
+        stack_item(ubjson_container_type type, std::size_t length = 0) noexcept
            : type_(type), length_(length), count_(0)
         {
         }
