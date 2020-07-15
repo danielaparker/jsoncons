@@ -1082,62 +1082,62 @@ public:
 
 //  Global Operators
 
-    friend bool operator==( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
+    friend bool operator==( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y ) noexcept
     {
         return x.compare(y) == 0 ? true : false;
     }
 
-    friend bool operator==( const basic_bigint<Allocator>& x, int y )
+    friend bool operator==( const basic_bigint<Allocator>& x, int y ) noexcept
     {
         return x.compare(y) == 0 ? true : false;
     }
 
-    friend bool operator!=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
+    friend bool operator!=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y ) noexcept
     {
         return x.compare(y) != 0 ? true : false;
     }
 
-    friend bool operator!=( const basic_bigint<Allocator>& x, int y )
+    friend bool operator!=( const basic_bigint<Allocator>& x, int y ) noexcept
     {
         return x.compare(basic_bigint<Allocator>(y)) != 0 ? true : false;
     }
 
-    friend bool operator<( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
+    friend bool operator<( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y ) noexcept
     {
        return x.compare(y) < 0 ? true : false;
     }
 
-    friend bool operator<( const basic_bigint<Allocator>& x, int64_t y )
+    friend bool operator<( const basic_bigint<Allocator>& x, int64_t y ) noexcept
     {
        return x.compare(y) < 0 ? true : false;
     }
 
-    friend bool operator>( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
+    friend bool operator>( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y ) noexcept
     {
         return x.compare(y) > 0 ? true : false;
     }
 
-    friend bool operator>( const basic_bigint<Allocator>& x, int y )
+    friend bool operator>( const basic_bigint<Allocator>& x, int y ) noexcept
     {
         return x.compare(basic_bigint<Allocator>(y)) > 0 ? true : false;
     }
 
-    friend bool operator<=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
+    friend bool operator<=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y ) noexcept
     {
         return x.compare(y) <= 0 ? true : false;
     }
 
-    friend bool operator<=( const basic_bigint<Allocator>& x, int y )
+    friend bool operator<=( const basic_bigint<Allocator>& x, int y ) noexcept
     {
         return x.compare(y) <= 0 ? true : false;
     }
 
-    friend bool operator>=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y )
+    friend bool operator>=( const basic_bigint<Allocator>& x, const basic_bigint<Allocator>& y ) noexcept
     {
         return x.compare(y) >= 0 ? true : false;
     }
 
-    friend bool operator>=( const basic_bigint<Allocator>& x, int y )
+    friend bool operator>=( const basic_bigint<Allocator>& x, int y ) noexcept
     {
         return x.compare(y) >= 0 ? true : false;
     }
@@ -1312,7 +1312,7 @@ public:
         return os;
     }
 
-    int compare( const basic_bigint<Allocator>& y ) const
+    int compare( const basic_bigint<Allocator>& y ) const noexcept
     {
         if ( is_negative() != y.is_negative() )
             return y.is_negative() - is_negative();

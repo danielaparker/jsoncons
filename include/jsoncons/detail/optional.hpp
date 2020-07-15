@@ -375,104 +375,104 @@ namespace detail
     }
 
     template <class T1, class T2>
-    constexpr bool operator==(const optional<T1>& lhs, const optional<T2>& rhs) 
+    constexpr bool operator==(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs);
+        return lhs.has_value() == rhs.has_value() && (!lhs.has_value() || *lhs == *rhs) noexcept;
     }
 
     template <class T1, class T2>
-    constexpr bool operator!=(const optional<T1>& lhs, const optional<T2>& rhs) 
+    constexpr bool operator!=(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs);
+        return lhs.has_value() != rhs.has_value() || (lhs.has_value() && *lhs != *rhs) noexcept;
     }
 
     template <class T1, class T2>
-    constexpr bool operator<(const optional<T1>& lhs, const optional<T2>& rhs) 
+    constexpr bool operator<(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs);
+        return rhs.has_value() && (!lhs.has_value() || *lhs < *rhs) noexcept;
     }
 
     template <class T1, class T2>
-    constexpr bool operator>(const optional<T1>& lhs, const optional<T2>& rhs) 
+    constexpr bool operator>(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs);
+        return lhs.has_value() && (!rhs.has_value() || *lhs > *rhs) noexcept;
     }
 
     template <class T1, class T2>
-    constexpr bool operator<=(const optional<T1>& lhs, const optional<T2>& rhs) 
+    constexpr bool operator<=(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs);
+        return !lhs.has_value() || (rhs.has_value() && *lhs <= *rhs) noexcept;
     }
 
     template <class T1, class T2>
-    constexpr bool operator>=(const optional<T1>& lhs, const optional<T2>& rhs) 
+    constexpr bool operator>=(const optional<T1>& lhs, const optional<T2>& rhs) noexcept 
     {
-        return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs);
+        return !rhs.has_value() || (lhs.has_value() && *lhs >= *rhs) noexcept;
     }
 
     template <class T1, class T2>
-    constexpr bool operator==(const optional<T1>& lhs, const T2& rhs) 
+    constexpr bool operator==(const optional<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs == rhs : false;
     }
     template <class T1, class T2>
-    constexpr bool operator==(const T1& lhs, const optional<T2>& rhs) 
+    constexpr bool operator==(const T1& lhs, const optional<T2>& rhs) noexcept 
     {
         return rhs ? lhs == *rhs : false;
     }
 
     template <class T1, class T2>
-    constexpr bool operator!=(const optional<T1>& lhs, const T2& rhs) 
+    constexpr bool operator!=(const optional<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs != rhs : true;
     }
     template <class T1, class T2>
-    constexpr bool operator!=(const T1& lhs, const optional<T2>& rhs) 
+    constexpr bool operator!=(const T1& lhs, const optional<T2>& rhs) noexcept 
     {
         return rhs ? lhs != *rhs : true;
     }
 
     template <class T1, class T2>
-    constexpr bool operator<(const optional<T1>& lhs, const T2& rhs) 
+    constexpr bool operator<(const optional<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs < rhs : true;
     }
     template <class T1, class T2>
-    constexpr bool operator<(const T1& lhs, const optional<T2>& rhs) 
+    constexpr bool operator<(const T1& lhs, const optional<T2>& rhs) noexcept 
     {
         return rhs ? lhs < *rhs : false;
     }
 
     template <class T1, class T2>
-    constexpr bool operator<=(const optional<T1>& lhs, const T2& rhs) 
+    constexpr bool operator<=(const optional<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs <= rhs : true;
     }
     template <class T1, class T2>
-    constexpr bool operator<=(const T1& lhs, const optional<T2>& rhs) 
+    constexpr bool operator<=(const T1& lhs, const optional<T2>& rhs) noexcept 
     {
         return rhs ? lhs <= *rhs : false;
     }
 
     template <class T1, class T2>
-    constexpr bool operator>(const optional<T1>& lhs, const T2& rhs) 
+    constexpr bool operator>(const optional<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs > rhs : false;
     }
 
     template <class T1, class T2>
-    constexpr bool operator>(const T1& lhs, const optional<T2>& rhs) 
+    constexpr bool operator>(const T1& lhs, const optional<T2>& rhs) noexcept 
     {
         return rhs ? lhs > *rhs : true;
     }
 
     template <class T1, class T2>
-    constexpr bool operator>=(const optional<T1>& lhs, const T2& rhs) 
+    constexpr bool operator>=(const optional<T1>& lhs, const T2& rhs) noexcept 
     {
         return lhs ? *lhs >= rhs : false;
     }
     template <class T1, class T2>
-    constexpr bool operator>=(const T1& lhs, const optional<T2>& rhs) 
+    constexpr bool operator>=(const T1& lhs, const optional<T2>& rhs) noexcept 
     {
         return rhs ? lhs >= *rhs : true;
     }

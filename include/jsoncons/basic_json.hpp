@@ -165,17 +165,17 @@ namespace detail {
             return temp -= offset;
         }
 
-        difference_type operator-(const random_access_iterator_wrapper& rhs) const 
+        difference_type operator-(const random_access_iterator_wrapper& rhs) const noexcept
         {
             return it_ - rhs.it_;
         }
 
-        reference operator[](const difference_type offset) const 
+        reference operator[](const difference_type offset) const noexcept
         {
             return *(*this + offset);
         }
 
-        bool operator==(const random_access_iterator_wrapper& rhs) const 
+        bool operator==(const random_access_iterator_wrapper& rhs) const noexcept
         {
             if (!has_value_ || !rhs.has_value_)
             {
@@ -187,12 +187,12 @@ namespace detail {
             }
         }
 
-        bool operator!=(const random_access_iterator_wrapper& rhs) const 
+        bool operator!=(const random_access_iterator_wrapper& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        bool operator<(const random_access_iterator_wrapper& rhs) const 
+        bool operator<(const random_access_iterator_wrapper& rhs) const noexcept
         {
             if (!has_value_ || !rhs.has_value_)
             {
@@ -204,17 +204,17 @@ namespace detail {
             }
         }
 
-        bool operator>(const random_access_iterator_wrapper& rhs) const 
+        bool operator>(const random_access_iterator_wrapper& rhs) const noexcept
         {
             return rhs < *this;
         }
 
-        bool operator<=(const random_access_iterator_wrapper& rhs) const 
+        bool operator<=(const random_access_iterator_wrapper& rhs) const noexcept
         {
             return !(rhs < *this);
         }
 
-        bool operator>=(const random_access_iterator_wrapper& rhs) const 
+        bool operator>=(const random_access_iterator_wrapper& rhs) const noexcept
         {
             return !(*this < rhs);
         }
@@ -1269,7 +1269,7 @@ public:
             }
         }
 
-        bool operator==(const variant& rhs) const
+        bool operator==(const variant& rhs) const noexcept
         {
             if (this ==&rhs)
             {
@@ -1409,12 +1409,12 @@ public:
             }
         }
 
-        bool operator!=(const variant& rhs) const
+        bool operator!=(const variant& rhs) const noexcept
         {
             return !(*this == rhs);
         }
 
-        bool operator<(const variant& rhs) const
+        bool operator<(const variant& rhs) const noexcept
         {
             if (this == &rhs)
             {
@@ -2155,32 +2155,32 @@ public:
             return *this;
         }
 
-        bool operator==(const basic_json& rhs) const
+        bool operator==(const basic_json& rhs) const noexcept
         {
             return evaluate() == rhs;
         }
 
-        bool operator!=(const basic_json& rhs) const
+        bool operator!=(const basic_json& rhs) const noexcept
         {
             return evaluate() != rhs;
         }
 
-        bool operator<(const basic_json& rhs) const
+        bool operator<(const basic_json& rhs) const noexcept
         {
             return evaluate() < rhs;
         }
 
-        bool operator<=(const basic_json& rhs) const
+        bool operator<=(const basic_json& rhs) const noexcept
         {
             return !(rhs < evaluate());
         }
 
-        bool operator>(const basic_json& rhs) const
+        bool operator>(const basic_json& rhs) const noexcept
         {
             return !(evaluate() <= rhs);
         }
 
-        bool operator>=(const basic_json& rhs) const
+        bool operator>=(const basic_json& rhs) const noexcept
         {
             return !(evaluate() < rhs);
         }
@@ -3247,32 +3247,32 @@ public:
         return *this;
     }
 
-    friend bool operator==(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator==(const basic_json& lhs, const basic_json& rhs) noexcept
     {
         return lhs.var_ == rhs.var_;
     }
 
-    friend bool operator!=(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator!=(const basic_json& lhs, const basic_json& rhs) noexcept
     {
         return !(lhs == rhs);
     }
 
-    friend bool operator<(const basic_json& lhs, const basic_json& rhs) 
+    friend bool operator<(const basic_json& lhs, const basic_json& rhs) noexcept
     {
         return lhs.var_ < rhs.var_;
     }
 
-    friend bool operator<=(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator<=(const basic_json& lhs, const basic_json& rhs) noexcept
     {
         return !(rhs < lhs);
     }
 
-    friend bool operator>(const basic_json& lhs, const basic_json& rhs) 
+    friend bool operator>(const basic_json& lhs, const basic_json& rhs) noexcept
     {
         return !(lhs <= rhs);
     }
 
-    friend bool operator>=(const basic_json& lhs, const basic_json& rhs)
+    friend bool operator>=(const basic_json& lhs, const basic_json& rhs) noexcept
     {
         return !(lhs < rhs);
     }

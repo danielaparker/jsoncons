@@ -547,7 +547,7 @@ namespace ns {
 		}
 	};
 
-    inline bool operator<(const Value &l, const Value &r) {
+    inline bool operator<(const Value &l, const Value &r) noexcept {
       return l.name < r.name;
     }
 

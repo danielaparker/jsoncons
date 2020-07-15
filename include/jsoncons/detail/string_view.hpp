@@ -164,13 +164,13 @@ namespace detail {
             return basic_string_view(data_ + pos, n);
         }
 
-        int compare(const basic_string_view& s) const 
+        int compare(const basic_string_view& s) const noexcept
         {
             const int rc = Traits::compare(data_, s.data_, (std::min)(length_, s.length_));
             return rc != 0 ? rc : (length_ == s.length_ ? 0 : length_ < s.length_ ? -1 : 1);
         }
 
-        int compare(const CharT* data) const 
+        int compare(const CharT* data) const noexcept 
         {
             const size_t length = Traits::length(data);
             const int rc = Traits::compare(data_, data, (std::min)(length_, length));
@@ -178,7 +178,7 @@ namespace detail {
         }
 
         template <class Allocator>
-        int compare(const std::basic_string<CharT,Traits,Allocator>& s) const 
+        int compare(const std::basic_string<CharT,Traits,Allocator>& s) const noexcept 
         {
             const int rc = Traits::compare(data_, s.data(), (std::min)(length_, s.length()));
             return rc != 0 ? rc : (length_ == s.length() ? 0 : length_ < s.length() ? -1 : 1);
@@ -381,31 +381,31 @@ namespace detail {
     // ==
     template<class CharT,class Traits>
     bool operator==(const basic_string_view<CharT,Traits>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator==(const basic_string_view<CharT,Traits>& lhs, 
-                    const std::basic_string<CharT,Traits,Allocator>& rhs)
+                    const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator==(const std::basic_string<CharT,Traits,Allocator>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) == 0;
     }
     template<class CharT,class Traits>
     bool operator==(const basic_string_view<CharT,Traits>& lhs, 
-                    const CharT* rhs)
+                    const CharT* rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
     template<class CharT,class Traits>
     bool operator==(const CharT* lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) == 0;
     }
@@ -413,31 +413,31 @@ namespace detail {
     // !=
     template<class CharT,class Traits>
     bool operator!=(const basic_string_view<CharT,Traits>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator!=(const basic_string_view<CharT,Traits>& lhs, 
-                    const std::basic_string<CharT,Traits,Allocator>& rhs)
+                    const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator!=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) != 0;
     }
     template<class CharT,class Traits>
     bool operator!=(const basic_string_view<CharT,Traits>& lhs, 
-                    const CharT* rhs)
+                    const CharT* rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
     template<class CharT,class Traits>
     bool operator!=(const CharT* lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) != 0;
     }
@@ -445,19 +445,19 @@ namespace detail {
     // <=
     template<class CharT,class Traits>
     bool operator<=(const basic_string_view<CharT,Traits>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) <= 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator<=(const basic_string_view<CharT,Traits>& lhs, 
-                    const std::basic_string<CharT,Traits,Allocator>& rhs)
+                    const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) <= 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator<=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) >= 0;
     }
@@ -465,19 +465,19 @@ namespace detail {
     // <
     template<class CharT,class Traits>
     bool operator<(const basic_string_view<CharT,Traits>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) < 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator<(const basic_string_view<CharT,Traits>& lhs, 
-                    const std::basic_string<CharT,Traits,Allocator>& rhs)
+                    const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) < 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator<(const std::basic_string<CharT,Traits,Allocator>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) > 0;
     }
@@ -485,19 +485,19 @@ namespace detail {
     // >=
     template<class CharT,class Traits>
     bool operator>=(const basic_string_view<CharT,Traits>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) >= 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator>=(const basic_string_view<CharT,Traits>& lhs, 
-                    const std::basic_string<CharT,Traits,Allocator>& rhs)
+                    const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) >= 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator>=(const std::basic_string<CharT,Traits,Allocator>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) <= 0;
     }
@@ -505,19 +505,19 @@ namespace detail {
     // >
     template<class CharT,class Traits>
     bool operator>(const basic_string_view<CharT,Traits>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return lhs.compare(rhs) > 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator>(const basic_string_view<CharT,Traits>& lhs, 
-                    const std::basic_string<CharT,Traits,Allocator>& rhs)
+                    const std::basic_string<CharT,Traits,Allocator>& rhs) noexcept
     {
         return lhs.compare(rhs) > 0;
     }
     template<class CharT,class Traits,class Allocator>
     bool operator>(const std::basic_string<CharT,Traits,Allocator>& lhs, 
-                    const basic_string_view<CharT,Traits>& rhs)
+                    const basic_string_view<CharT,Traits>& rhs) noexcept
     {
         return rhs.compare(lhs) < 0;
     }

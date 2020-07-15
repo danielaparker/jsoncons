@@ -267,12 +267,12 @@ namespace jsoncons {
 
         const_iterator end() const {return elements_.end();}
 
-        bool operator==(const json_array<Json>& rhs) const
+        bool operator==(const json_array<Json>& rhs) const noexcept
         {
             return elements_ == rhs.elements_;
         }
 
-        bool operator<(const json_array<Json>& rhs) const
+        bool operator<(const json_array<Json>& rhs) const noexcept
         {
             return elements_ < rhs.elements_;
         }
@@ -446,17 +446,17 @@ namespace jsoncons {
         }
     #endif
 
-        friend bool operator==(const key_value& lhs, const key_value& rhs)
+        friend bool operator==(const key_value& lhs, const key_value& rhs) noexcept
         {
             return lhs.key_ == rhs.key_ && lhs.value_ == rhs.value_;
         }
 
-        friend bool operator!=(const key_value& lhs, const key_value& rhs)
+        friend bool operator!=(const key_value& lhs, const key_value& rhs) noexcept
         {
             return !(lhs == rhs);
         }
 
-        friend bool operator<(const key_value& lhs, const key_value& rhs)
+        friend bool operator<(const key_value& lhs, const key_value& rhs) noexcept
         {
             if (lhs.key_ < rhs.key_)
             {
@@ -469,17 +469,17 @@ namespace jsoncons {
             return false;
         }
 
-        friend bool operator<=(const key_value& lhs, const key_value& rhs)
+        friend bool operator<=(const key_value& lhs, const key_value& rhs) noexcept
         {
             return !(rhs < lhs);
         }
 
-        friend bool operator>(const key_value& lhs, const key_value& rhs) 
+        friend bool operator>(const key_value& lhs, const key_value& rhs) noexcept
         {
             return !(lhs <= rhs);
         }
 
-        friend bool operator>=(const key_value& lhs, const key_value& rhs)
+        friend bool operator>=(const key_value& lhs, const key_value& rhs) noexcept
         {
             return !(lhs < rhs);
         }
