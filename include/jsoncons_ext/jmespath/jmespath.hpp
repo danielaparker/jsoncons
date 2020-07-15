@@ -1842,72 +1842,72 @@ namespace jmespath {
             };
         public:
 
-            token(current_node_arg_t)
+            token(current_node_arg_t) noexcept
                 : type_(token_type::current_node)
             {
             }
 
-            token(begin_function_arg_t)
+            token(begin_function_arg_t) noexcept
                 : type_(token_type::begin_function)
             {
             }
 
-            token(end_function_arg_t)
+            token(end_function_arg_t) noexcept
                 : type_(token_type::end_function)
             {
             }
 
-            token(separator_arg_t)
+            token(separator_arg_t) noexcept
                 : type_(token_type::separator)
             {
             }
 
-            token(lparen_arg_t)
+            token(lparen_arg_t) noexcept
                 : type_(token_type::lparen)
             {
             }
 
-            token(rparen_arg_t)
+            token(rparen_arg_t) noexcept
                 : type_(token_type::rparen)
             {
             }
 
-            token(end_of_expression_arg_t)
+            token(end_of_expression_arg_t) noexcept
                 : type_(token_type::end_of_expression)
             {
             }
 
-            token(begin_multi_select_hash_arg_t)
+            token(begin_multi_select_hash_arg_t) noexcept
                 : type_(token_type::begin_multi_select_hash)
             {
             }
 
-            token(end_multi_select_hash_arg_t)
+            token(end_multi_select_hash_arg_t) noexcept
                 : type_(token_type::end_multi_select_hash)
             {
             }
 
-            token(begin_multi_select_list_arg_t)
+            token(begin_multi_select_list_arg_t) noexcept
                 : type_(token_type::begin_multi_select_list)
             {
             }
 
-            token(end_multi_select_list_arg_t)
+            token(end_multi_select_list_arg_t) noexcept
                 : type_(token_type::end_multi_select_list)
             {
             }
 
-            token(begin_filter_arg_t)
+            token(begin_filter_arg_t) noexcept
                 : type_(token_type::begin_filter)
             {
             }
 
-            token(end_filter_arg_t)
+            token(end_filter_arg_t) noexcept
                 : type_(token_type::end_filter)
             {
             }
 
-            token(pipe_arg_t)
+            token(pipe_arg_t) noexcept
                 : type_(token_type::pipe)
             {
             }
@@ -1924,45 +1924,45 @@ namespace jmespath {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
             }
 
-            token(unary_operator* expression)
+            token(unary_operator* expression) noexcept
                 : type_(token_type::unary_operator),
                   unary_operator_(expression)
             {
             }
 
-            token(binary_operator* expression)
+            token(binary_operator* expression) noexcept
                 : type_(token_type::binary_operator),
                   binary_operator_(expression)
             {
             }
 
-            token(function_base* function)
+            token(function_base* function) noexcept
                 : type_(token_type::function),
                   function_(function)
             {
             }
 
-            token(argument_arg_t)
+            token(argument_arg_t) noexcept
                 : type_(token_type::argument)
             {
             }
 
-            token(begin_expression_type_arg_t)
+            token(begin_expression_type_arg_t) noexcept
                 : type_(token_type::begin_expression_type)
             {
             }
 
-            token(end_expression_type_arg_t)
+            token(end_expression_type_arg_t) noexcept
                 : type_(token_type::end_expression_type)
             {
             }
 
-            token(literal_arg_t, Json&& value)
+            token(literal_arg_t, Json&& value) noexcept
                 : type_(token_type::literal), value_(std::move(value))
             {
             }
 
-            token(token&& other)
+            token(token&& other) noexcept
             {
                 construct(std::forward<token>(other));
             }
