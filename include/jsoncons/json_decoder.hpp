@@ -60,7 +60,7 @@ private:
         structure_type type_;
         std::size_t container_index_;
 
-        structure_info(structure_type type, std::size_t offset)
+        structure_info(structure_type type, std::size_t offset) noexcept
             : type_(type), container_index_(offset)
         {
         }
