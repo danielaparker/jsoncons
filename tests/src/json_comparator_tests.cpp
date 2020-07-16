@@ -156,6 +156,55 @@ TEST_CASE("test_byte_strings_equal")
     CHECK(o2 != o3);
 }
 
+TEST_CASE("json comparator equals tests")
+{
+    json var1(semantic_tag::none);
+    json var2{ json::object(), semantic_tag::none };
+    CHECK((var1 == var1 && var2 == var2));
+    CHECK((var1 == var2 && var2 == var1));
+
+    json var3{semantic_tag::none };
+    CHECK((var3 == var1 && var1 == var3));
+    json var4{ json::object({{"first",1},{"second",2}}), semantic_tag::none };
+    json var5{ json::object({ { "first",1 },{ "second",2 } }), semantic_tag::none };
+    CHECK((var3 != var4 && var4 != var3));
+    CHECK((var2 != var4 && var4 != var2));
+    CHECK(var4 == var4);
+    CHECK(var4 == var5);
+    CHECK(var5 == var4);
+
+    json var6(int64_t(100), semantic_tag::none);
+    json var7(uint64_t(100), semantic_tag::none);
+    CHECK((var6 == var7 && var7 == var6));
+
+    json var8(100.0, semantic_tag::none);
+    CHECK((var8 == var8 && var6 == var8 && var8 == var6 && var7 == var8 && var8 == var7));
+
+    std::string val9("small string");
+    std::string val11("small string 2");
+    json var9(val9.data(), val9.length(), semantic_tag::none);
+    json var10(val9.data(),val9.length(), semantic_tag::none);
+    json var11(val11.data(),val11.length(), semantic_tag::none);
+
+    std::string val12("too long for small string");
+    std::string val14("too long for small string 2");
+    json var12(val12.data(),val12.length(), semantic_tag::none);
+    json var13(val12.data(),val12.length(), semantic_tag::none);
+    json var14(val14.data(),val14.length(), semantic_tag::none);
+    CHECK((var9 == var10 && var10 == var9));
+    CHECK((var9 != var11 && var11 != var9));
+    CHECK((var12 == var13 && var13 == var12));
+    CHECK((var12 != var14 && var14 != var12));
+
+    json var15(val9.data(),val9.length(), semantic_tag::none, std::allocator<char>());
+    CHECK((var9 == var15 && var15 == var9));
+
+    json var16(static_cast<int64_t>(0), semantic_tag::none);
+    json var17(static_cast<uint64_t>(0), semantic_tag::none);
+    CHECK(var16 == var17);
+    CHECK(var17 == var16);
+}
+
 TEST_CASE("json json_pointer_arg")
 {
     json val1 = json::parse(R"(
