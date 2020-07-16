@@ -121,12 +121,12 @@ namespace detail {
                 result.insert(result.array_range().end(),temp_diff.array_range().begin(),temp_diff.array_range().end());
             }
             // Element in source, not in target - remove
-            for (std::size_t i = target.size(); i < source.size(); ++i)
+            for (std::size_t i = source.size(); i-- > target.size();)
             {
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
                 jsoncons::detail::write_integer(i,ss);
-                Json val = typename Json::object();
+                Json val(json_object_arg);
                 val.insert_or_assign(op_literal<char_type>(), remove_literal<char_type>());
                 val.insert_or_assign(path_literal<char_type>(), ss);
                 result.push_back(std::move(val));
@@ -139,7 +139,7 @@ namespace detail {
                 std::basic_string<char_type> ss(path); 
                 ss.push_back('/');
                 jsoncons::detail::write_integer(i,ss);
-                Json val = typename Json::object();
+                Json val(json_object_arg);
                 val.insert_or_assign(op_literal<char_type>(), add_literal<char_type>());
                 val.insert_or_assign(path_literal<char_type>(), ss);
                 val.insert_or_assign(value_literal<char_type>(), a);
@@ -161,7 +161,7 @@ namespace detail {
                 }
                 else
                 {
-                    Json val = typename Json::object();
+                    Json val(json_object_arg);
                     val.insert_or_assign(op_literal<char_type>(), remove_literal<char_type>());
                     val.insert_or_assign(path_literal<char_type>(), ss);
                     result.push_back(std::move(val));
@@ -175,7 +175,7 @@ namespace detail {
                     std::basic_string<char_type> ss(path); 
                     ss.push_back('/');
                     jsonpointer::escape(a.key(),ss);
-                    Json val = typename Json::object();
+                    Json val(json_object_arg);
                     val.insert_or_assign(op_literal<char_type>(), add_literal<char_type>());
                     val.insert_or_assign(path_literal<char_type>(), ss);
                     val.insert_or_assign(value_literal<char_type>(), a.value());
@@ -185,7 +185,7 @@ namespace detail {
         }
         else
         {
-            Json val = typename Json::object();
+            Json val(json_object_arg);
             val.insert_or_assign(op_literal<char_type>(), replace_literal<char_type>());
             val.insert_or_assign(path_literal<char_type>(), path);
             val.insert_or_assign(value_literal<char_type>(), target);
