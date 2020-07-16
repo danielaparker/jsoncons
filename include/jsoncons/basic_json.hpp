@@ -1654,6 +1654,7 @@ public:
                 case storage_kind::byte_string_value  : swap_a_b<TypeA, byte_string_storage>(other); break;
                 case storage_kind::array_value        : swap_a_b<TypeA, array_storage>(other); break;
                 case storage_kind::object_value       : swap_a_b<TypeA, object_storage>(other); break;
+                case storage_kind::json_pointer       : swap_a_b<TypeA, json_pointer_storage>(other); break;
                 default:
                     JSONCONS_UNREACHABLE();
                     break;
@@ -1682,6 +1683,7 @@ public:
                 case storage_kind::byte_string_value: swap_a<byte_string_storage>(other); break;
                 case storage_kind::array_value: swap_a<array_storage>(other); break;
                 case storage_kind::object_value: swap_a<object_storage>(other); break;
+                case storage_kind::json_pointer: swap_a<json_pointer_storage>(other); break;
                 default:
                     JSONCONS_UNREACHABLE();
                     break;
@@ -1715,6 +1717,9 @@ public:
                 case storage_kind::double_value:
                     construct_var<double_storage>(val.cast<double_storage>());
                     break;
+                case storage_kind::json_pointer:
+                    construct_var<json_pointer_storage>(val.cast<json_pointer_storage>());
+                    break;
                 case storage_kind::short_string_value:
                     construct_var<short_string_storage>(val.cast<short_string_storage>());
                     break;
@@ -1739,30 +1744,31 @@ public:
         {
             switch (val.storage())
             {
-            case storage_kind::null_value:
-            case storage_kind::empty_object_value:
-            case storage_kind::bool_value:
-            case storage_kind::int64_value:
-            case storage_kind::uint64_value:
-            case storage_kind::half_value:
-            case storage_kind::double_value:
-            case storage_kind::short_string_value:
-                Init_(val);
-                break;
-            case storage_kind::long_string_value:
-                construct_var<long_string_storage>(val.cast<long_string_storage>(),a);
-                break;
-            case storage_kind::byte_string_value:
-                construct_var<byte_string_storage>(val.cast<byte_string_storage>(),a);
-                break;
-            case storage_kind::array_value:
-                construct_var<array_storage>(val.cast<array_storage>(),a);
-                break;
-            case storage_kind::object_value:
-                construct_var<object_storage>(val.cast<object_storage>(),a);
-                break;
-            default:
-                break;
+                case storage_kind::null_value:
+                case storage_kind::empty_object_value:
+                case storage_kind::bool_value:
+                case storage_kind::int64_value:
+                case storage_kind::uint64_value:
+                case storage_kind::half_value:
+                case storage_kind::double_value:
+                case storage_kind::json_pointer:
+                case storage_kind::short_string_value:
+                    Init_(val);
+                    break;
+                case storage_kind::long_string_value:
+                    construct_var<long_string_storage>(val.cast<long_string_storage>(),a);
+                    break;
+                case storage_kind::byte_string_value:
+                    construct_var<byte_string_storage>(val.cast<byte_string_storage>(),a);
+                    break;
+                case storage_kind::array_value:
+                    construct_var<array_storage>(val.cast<array_storage>(),a);
+                    break;
+                case storage_kind::object_value:
+                    construct_var<object_storage>(val.cast<object_storage>(),a);
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -1774,6 +1780,7 @@ public:
                 case storage_kind::empty_object_value:
                 case storage_kind::half_value:
                 case storage_kind::double_value:
+                case storage_kind::json_pointer:
                 case storage_kind::int64_value:
                 case storage_kind::uint64_value:
                 case storage_kind::bool_value:
@@ -1808,6 +1815,7 @@ public:
                 case storage_kind::empty_object_value:
                 case storage_kind::half_value:
                 case storage_kind::double_value:
+                case storage_kind::json_pointer:
                 case storage_kind::int64_value:
                 case storage_kind::uint64_value:
                 case storage_kind::bool_value:
