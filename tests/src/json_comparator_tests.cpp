@@ -177,4 +177,17 @@ TEST_CASE("json json_pointer_arg")
         CHECK(lhs != val2);
         CHECK(val2 != rhs);
     }
+    SECTION("test <")
+    {
+        json lhs(json_pointer_arg, &val1);
+
+        json rhs(json_pointer_arg, &val1);
+
+        CHECK_FALSE(lhs < rhs);
+        CHECK_FALSE(rhs < lhs);
+        CHECK(val2 < lhs);
+        CHECK_FALSE(lhs < val2);
+        CHECK(lhs > val2);
+        CHECK_FALSE(val2 > lhs);
+    }
 }
