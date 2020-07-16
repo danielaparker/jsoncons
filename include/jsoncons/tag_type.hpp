@@ -45,6 +45,13 @@ struct json_array_arg_t
 
 constexpr json_array_arg_t json_array_arg{};
 
+struct json_pointer_arg_t
+{
+    explicit json_pointer_arg_t() = default; 
+};
+
+constexpr json_pointer_arg_t json_pointer_arg{};
+
 struct json_object_arg_t
 {
     explicit json_object_arg_t() = default; 

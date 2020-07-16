@@ -508,6 +508,27 @@ public:
             }
         };
 
+        class json_pointer_storage final
+        {
+        public:
+            uint8_t storage_:4;
+            uint8_t length_:4;
+            semantic_tag tag_;
+        private:
+            const basic_json* p_;
+        public:
+            json_pointer_storage(const basic_json* p)
+                : storage_(static_cast<uint8_t>(storage_kind::json_pointer_value)), length_(0), tag_(p->tag()),
+                  p_(p)
+            {
+            }
+
+            const basic_json* value() const
+            {
+                return p_;
+            }
+        };
+
         class short_string_storage final
         {
         public:
@@ -973,6 +994,11 @@ public:
         variant(const array& val, semantic_tag tag, const Allocator& alloc)
         {
             construct_var<array_storage>(val, tag, alloc);
+        }
+
+        variant(json_pointer_arg_t, const basic_json* p)
+        {
+            construct_var<json_pointer_storage>(p);
         }
 
         variant(const variant& val)
@@ -3034,6 +3060,11 @@ public:
 
     basic_json(basic_json&& other, const Allocator&) noexcept
         : var_(std::move(other.var_) /*,alloc*/ )
+    {
+    }
+
+    explicit basic_json(json_pointer_arg_t, const basic_json* p) noexcept 
+        : var_(json_pointer_arg, p)
     {
     }
 
