@@ -518,7 +518,7 @@ public:
             const basic_json* p_;
         public:
             json_pointer_storage(const basic_json* p)
-                : storage_(static_cast<uint8_t>(storage_kind::json_pointer_value)), length_(0), tag_(p->tag()),
+                : storage_(static_cast<uint8_t>(storage_kind::json_pointer)), length_(0), tag_(p->tag()),
                   p_(p)
             {
             }
@@ -904,6 +904,7 @@ public:
             uint64_storage uint64_stor_;
             half_storage half_stor_;
             double_storage double_stor_;
+            json_pointer_storage json_pointer_stor_;
             short_string_storage short_string_stor_;
             long_string_storage long_string_stor_;
             byte_string_storage byte_string_stor_;
@@ -1182,6 +1183,16 @@ public:
             return double_stor_;
         }
 
+        json_pointer_storage& cast(identity<json_pointer_storage>) 
+        {
+            return json_pointer_stor_;
+        }
+
+        const json_pointer_storage& cast(identity<json_pointer_storage>) const
+        {
+            return json_pointer_stor_;
+        }
+
         short_string_storage& cast(identity<short_string_storage>)
         {
             return short_string_stor_;
@@ -1295,19 +1306,30 @@ public:
             }
         }
 
-        bool operator==(const variant& rhs) const noexcept
+        friend bool operator==(const variant& lhs, const variant& rhs) noexcept
         {
-            if (this ==&rhs)
+            if (&lhs ==&rhs)
             {
                 return true;
             }
-            switch (storage())
+            switch (lhs.storage())
             {
+                case storage_kind::json_pointer:
+                    switch (rhs.storage())
+                    {
+                        case storage_kind::json_pointer:
+                            return *(lhs.cast<json_pointer_storage>().value()) == *(rhs.cast<json_pointer_storage>().value());
+                        default:
+                            return *(lhs.cast<json_pointer_storage>().value()) == rhs;
+                    }
+                    break;
                 case storage_kind::null_value:
                     switch (rhs.storage())
                     {
                         case storage_kind::null_value:
                             return true;
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1319,6 +1341,8 @@ public:
                             return true;
                         case storage_kind::object_value:
                             return rhs.size() == 0;
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1327,7 +1351,9 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::bool_value:
-                            return cast<bool_storage>().value() == rhs.cast<bool_storage>().value();
+                            return lhs.cast<bool_storage>().value() == rhs.cast<bool_storage>().value();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1336,13 +1362,15 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return cast<int64_storage>().value() == rhs.cast<int64_storage>().value();
+                            return lhs.cast<int64_storage>().value() == rhs.cast<int64_storage>().value();
                         case storage_kind::uint64_value:
-                            return cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(cast<int64_storage>().value()) == rhs.cast<uint64_storage>().value() : false;
+                            return lhs.cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(lhs.cast<int64_storage>().value()) == rhs.cast<uint64_storage>().value() : false;
                         case storage_kind::half_value:
-                            return static_cast<double>(cast<int64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
+                            return static_cast<double>(lhs.cast<int64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
-                            return static_cast<double>(cast<int64_storage>().value()) == rhs.cast<double_storage>().value();
+                            return static_cast<double>(lhs.cast<int64_storage>().value()) == rhs.cast<double_storage>().value();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1351,13 +1379,15 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return rhs.cast<int64_storage>().value() >= 0 ? cast<uint64_storage>().value() == static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : false;
+                            return rhs.cast<int64_storage>().value() >= 0 ? lhs.cast<uint64_storage>().value() == static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : false;
                         case storage_kind::uint64_value:
-                            return cast<uint64_storage>().value() == rhs.cast<uint64_storage>().value();
+                            return lhs.cast<uint64_storage>().value() == rhs.cast<uint64_storage>().value();
                         case storage_kind::half_value:
-                            return static_cast<double>(cast<uint64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
+                            return static_cast<double>(lhs.cast<uint64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
-                            return static_cast<double>(cast<uint64_storage>().value()) == rhs.cast<double_storage>().value();
+                            return static_cast<double>(lhs.cast<uint64_storage>().value()) == rhs.cast<double_storage>().value();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1366,22 +1396,26 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::half_value:
-                            return cast<half_storage>().value() == rhs.cast<half_storage>().value();
+                            return lhs.cast<half_storage>().value() == rhs.cast<half_storage>().value();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
-                            return variant(jsoncons::detail::decode_half(cast<half_storage>().value()),semantic_tag::none) == rhs;
+                            return variant(jsoncons::detail::decode_half(lhs.cast<half_storage>().value()),semantic_tag::none) == rhs;
                     }
                     break;
                 case storage_kind::double_value:
                     switch (rhs.storage())
                     {
                         case storage_kind::int64_value:
-                            return cast<double_storage>().value() == static_cast<double>(rhs.cast<int64_storage>().value());
+                            return lhs.cast<double_storage>().value() == static_cast<double>(rhs.cast<int64_storage>().value());
                         case storage_kind::uint64_value:
-                            return cast<double_storage>().value() == static_cast<double>(rhs.cast<uint64_storage>().value());
+                            return lhs.cast<double_storage>().value() == static_cast<double>(rhs.cast<uint64_storage>().value());
                         case storage_kind::half_value:
-                            return cast<double_storage>().value() == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
+                            return lhs.cast<double_storage>().value() == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                         case storage_kind::double_value:
-                            return cast<double_storage>().value() == rhs.cast<double_storage>().value();
+                            return lhs.cast<double_storage>().value() == rhs.cast<double_storage>().value();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1391,9 +1425,11 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::short_string_value:
-                            return as_string_view() == rhs.as_string_view();
+                            return lhs.as_string_view() == rhs.as_string_view();
                         case storage_kind::long_string_value:
-                            return as_string_view() == rhs.as_string_view();
+                            return lhs.as_string_view() == rhs.as_string_view();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1403,8 +1439,10 @@ public:
                     {
                         case storage_kind::byte_string_value:
                         {
-                            return as_byte_string_view() == rhs.as_byte_string_view();
+                            return lhs.as_byte_string_view() == rhs.as_byte_string_view();
                         }
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1413,7 +1451,9 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::array_value:
-                            return cast<array_storage>().value() == rhs.cast<array_storage>().value();
+                            return lhs.cast<array_storage>().value() == rhs.cast<array_storage>().value();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1422,9 +1462,11 @@ public:
                     switch (rhs.storage())
                     {
                         case storage_kind::empty_object_value:
-                            return size() == 0;
+                            return lhs.size() == 0;
                         case storage_kind::object_value:
-                            return cast<object_storage>().value() == rhs.cast<object_storage>().value();
+                            return lhs.cast<object_storage>().value() == rhs.cast<object_storage>().value();
+                        case storage_kind::json_pointer:
+                            return lhs == *(rhs.cast<json_pointer_storage>().value());
                         default:
                             return false;
                     }
@@ -1435,9 +1477,9 @@ public:
             }
         }
 
-        bool operator!=(const variant& rhs) const noexcept
+        friend bool operator!=(const variant& lhs, const variant& rhs) noexcept
         {
-            return !(*this == rhs);
+            return !(lhs == rhs);
         }
 
         bool operator<(const variant& rhs) const noexcept

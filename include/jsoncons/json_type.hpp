@@ -20,8 +20,7 @@ namespace jsoncons {
         string_value,
         byte_string_value,
         array_value,
-        object_value,
-        json_pointer_value
+        object_value
     };
 
     enum class storage_kind : uint8_t 
@@ -37,7 +36,8 @@ namespace jsoncons {
         byte_string_value = 0x08,
         array_value = 0x09,
         empty_object_value = 0x0a,
-        object_value = 0x0b
+        object_value = 0x0b,
+        json_pointer = 0x0c
     };
 
 } // jsoncons

@@ -156,4 +156,25 @@ TEST_CASE("test_byte_strings_equal")
     CHECK(o2 != o3);
 }
 
+TEST_CASE("json json_pointer_arg")
+{
+    json val1 = json::parse(R"(
+{ "names" : [ "a", "b", "c", "d" ] }
+    )");
 
+    json val2 = json::parse(R"(
+{ "names" : [ "a", "b" ] }
+    )");
+
+    SECTION("test ==")
+    {
+        json lhs(json_pointer_arg, &val1);
+
+        json rhs(json_pointer_arg, &val1);
+
+        CHECK(lhs == rhs);
+        CHECK(lhs == val1);
+        CHECK(lhs != val2);
+        CHECK(val2 != rhs);
+    }
+}
