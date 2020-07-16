@@ -15,7 +15,8 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
-using namespace jsoncons;
+using jsoncons::json;
+namespace jsonpatch = jsoncons::jsonpatch;
 using namespace jsoncons::literals;
 
 void check_patch(json& target, const json& patch, std::error_code expected_ec, const json& expected)
@@ -464,30 +465,45 @@ TEST_CASE("test_diff2")
 
 TEST_CASE("add_when_new_items_in_target_array1")
 {
-    jsoncons::json source = R"(
+    json source = R"(
         {"/": 9, "foo": [ "bar"]}
     )"_json;
 
-    jsoncons::json target = R"(
+    json target = R"(
         { "baz":"qux", "foo": [ "bar", "baz" ]}
     )"_json;
 
-    jsoncons::json patch = jsoncons::jsonpatch::from_diff(source, target); 
+    json patch = jsoncons::jsonpatch::from_diff(source, target); 
 
     check_patch(source,patch,std::error_code(),target);
 }
 
 TEST_CASE("add_when_new_items_in_target_array2")
 {
-    jsoncons::json source = R"(
+    json source = R"(
         {"/": 9, "foo": [ "bar", "bar"]}
     )"_json;
 
-    jsoncons::json target = R"(
+    json target = R"(
         { "baz":"qux", "foo": [ "bar", "baz" ]}
     )"_json;
 
-    jsoncons::json patch = jsoncons::jsonpatch::from_diff(source, target); 
+    json patch = jsoncons::jsonpatch::from_diff(source, target); 
+
+    check_patch(source,patch,std::error_code(),target);
+}
+
+TEST_CASE("jsonpatch - remove two items from array")
+{
+    json source = json::parse(R"(
+{ "names" : [ "a", "b", "c", "d" ] }
+    )");
+
+    json target = json::parse(R"(
+{ "names" : [ "a", "b" ] }
+    )");
+
+    json patch = jsoncons::jsonpatch::from_diff(source, target); 
 
     check_patch(source,patch,std::error_code(),target);
 }
