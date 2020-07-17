@@ -1,3 +1,13 @@
+v0.154.2
+--------
+
+Bugs fixed:
+
+- Fixed g++ compile issue with -Wnoexcept compiler flag, [\260](https://github.com/danielaparker/jsoncons/issues/260)
+
+- Fixed issue with creating a patch to remove array elements using `json_patch::from_diff`, 
+[\#261](https://github.com/danielaparker/jsoncons/issues/261)
+
 v0.154.1
 --------
 
