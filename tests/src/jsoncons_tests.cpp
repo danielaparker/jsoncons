@@ -13,8 +13,6 @@
 
 using namespace jsoncons;
 
-#if 0
-
 TEST_CASE("test_assignment")
 {
     json root;
@@ -22,8 +20,6 @@ TEST_CASE("test_assignment")
     root["double_1"] = 10.0;
 
     json double_1 = root["double_1"];
-
-    CHECK(double_1.as<double>() == Approx(10.0).epsilon(0.000001));
 
     root["myobject"] = json();
     root["myobject"]["double_2"] = 7.0;
@@ -33,6 +29,8 @@ TEST_CASE("test_assignment")
     root["myarray"] = json(json_array_arg);
 
     json double_2 = root["myobject"]["double_2"];
+#if 0
+    CHECK(double_1.as<double>() == Approx(10.0).epsilon(0.000001));
 
     CHECK(double_2.as<double>() == Approx(7.0).epsilon(0.000001));
     CHECK(double_2.as<int>() == 7);
@@ -43,9 +41,9 @@ TEST_CASE("test_assignment")
     CHECK(root["myobject"]["bool_2"].as<bool>());
     CHECK(root["myobject"]["int_2"].as<long long>() == 0);
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
-
-}
 #endif
+}
+
 TEST_CASE("test_1")
 {
     basic_json<char32_t> j; 
