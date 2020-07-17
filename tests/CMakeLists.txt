@@ -95,7 +95,8 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_tests.cpp
    ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_typed_array_tests.cpp
    ${JSONCONS_TESTS_SOURCE_DIR}/cbor/decode_cbor_tests.cpp
-   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/encode_cbor_tests.cppconverter_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/encode_cbor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/converter_tests.cpp
    ${JSONCONS_TESTS_SOURCE_DIR}/csv/csv_cursor_tests.cpp
    ${JSONCONS_TESTS_SOURCE_DIR}/csv/csv_subfield_tests.cpp
    ${JSONCONS_TESTS_SOURCE_DIR}/csv/csv_tests.cpp
@@ -171,7 +172,8 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_SOURCE_DIR}/ubjson/encode_ubjson_tests.cpp
    ${JSONCONS_TESTS_SOURCE_DIR}/ubjson/ubjson_cursor_tests.cpp
    ${JSONCONS_TESTS_SOURCE_DIR}/ubjson/ubjson_encoder_tests.cpp
-   ${JSONCONS_TESTS_SOURCE_DIR}/unicode_tests.cppwjson_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/unicode_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/wjson_tests.cpp
 )
 set(JSONCONS_TARGET test_jsoncons)
 add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${JSONCONS_HEADERS})
