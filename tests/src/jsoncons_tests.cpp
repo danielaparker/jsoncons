@@ -83,6 +83,7 @@ TEST_CASE("test_assignment")
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
 }
+#endif
 
 TEST_CASE("test_array")
 {
@@ -121,7 +122,6 @@ TEST_CASE("test_null")
     obj["field"] = json::null();
     CHECK(obj["field"] == json::null());
 }
-#endif
 
 TEST_CASE("test_to_string")
 {
