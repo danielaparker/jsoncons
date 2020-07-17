@@ -121,6 +121,7 @@ TEST_CASE("test_null")
     obj["field"] = json::null();
     CHECK(obj["field"] == json::null());
 }
+#endif
 
 TEST_CASE("test_to_string")
 {
@@ -181,7 +182,6 @@ TEST_CASE("test_u0000")
     //std::cout << std::hex << "Output:   " << os.str() << std::endl;
 
 }
-#endif
 TEST_CASE("test_uHHHH")
 {
     std::string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
