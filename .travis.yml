@@ -14,15 +14,6 @@ matrix:
             - g++-5
       env: COMPILER=gcc VERSION=5  CXXFLAGS="-std=gnu++11" 
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-      env: COMPILER=gcc VERSION=5  CXXFLAGS="-std=c++11" 
-
 before_install:
     - |
       # Configure build variables

@@ -52,7 +52,6 @@ TEST_CASE("test_for_each_value")
     ++it;
     CHECK((it == val.object_range().end()));
 }
-#endif
 
 TEST_CASE("test_assignment")
 {
@@ -84,6 +83,7 @@ TEST_CASE("test_assignment")
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
 
 }
+#endif
 
 TEST_CASE("test_array")
 {
