@@ -75,14 +75,104 @@ set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
-file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
+#file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
+#message((${JSONCONS_TESTS_SOURCES}))
 
-message((${JSONCONS_TESTS_SOURCES}))
-
-#set(JSONCONS_TESTS_SOURCES
-#     ${JSONCONS_TESTS_SOURCE_DIR}/tests_main.cpp
-#     ${JSONCONS_TESTS_SOURCE_DIR}/json_type_traits_tests.cpp
-# )
+set(JSONCONS_TESTS_SOURCES
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsoncons_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/JSONTestSuite_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/bigint_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/bson/bson_cursor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/bson/bson_encoder_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/bson/bson_reader_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/bson/bson_test_suite.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/bson/encode_decode_bson_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/byte_string_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_cursor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_encoder_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_json_visitor2_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_reader_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/cbor_typed_array_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/decode_cbor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/cbor/encode_cbor_tests.cppconverter_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/csv/csv_cursor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/csv/csv_subfield_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/csv/csv_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/csv/encode_decode_csv_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/deser_traits_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/detail/optional_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/detail/span_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/detail/string_view_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/detail/string_wrapper_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/detail/to_integer_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/double_round_trip_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/double_to_string_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/dtoa_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/encode_decode_json_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/error_recovery_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/fuzz_regression/fuzz_regression_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jmespath/jmespath_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_array_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_as_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_checker_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_comparator_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_constructor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_cursor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_encoder_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_exception_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_filter_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_in_place_update_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_integer_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_less_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_line_split_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_literal_operator_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_object_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_options_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_parse_error_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_parser_position_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_parser_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_proxy_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_push_back_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_reader_exception_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_reader_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_storage_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_swap_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_traits_macro_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_traits_name_macro_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_type_traits_container_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_type_traits_string_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/json_type_traits_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpatch/jsonpatch_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpath/JSONPathTestSuite_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpath/jsonpath_error_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpath/jsonpath_flatten_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpath/jsonpath_function_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpath/jsonpath_normalized_path_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpath/jsonpath_test_suite.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpath/jsonpath_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpointer/jsonpointer_flatten_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/jsonpointer/jsonpointer_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/msgpack/decode_msgpack_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/msgpack/encode_msgpack_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/msgpack/msgpack_cursor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/msgpack/msgpack_encoder_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/msgpack/msgpack_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/ojson_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/order_preserving_json_object_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/parse_string_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/ser_traits_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/short_string_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/staj_iterator_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/stateful_allocator_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/string_to_double_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/tests_main.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/ubjson/decode_ubjson_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/ubjson/encode_ubjson_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/ubjson/ubjson_cursor_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/ubjson/ubjson_encoder_tests.cpp
+   ${JSONCONS_TESTS_SOURCE_DIR}/unicode_tests.cppwjson_tests.cpp
+)
 set(JSONCONS_TARGET test_jsoncons)
 add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${JSONCONS_HEADERS})
 

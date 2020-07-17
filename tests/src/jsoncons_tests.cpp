@@ -27,7 +27,6 @@ TEST_CASE("test_assignment")
     root["myobject"]["int_2"] = 0LL;
     root["myobject"]["string_2"] = "my string";
     root["myarray"] = json(json_array_arg);
-#if 0
 
     json double_2 = root["myobject"]["double_2"];
     CHECK(double_1.as<double>() == Approx(10.0).epsilon(0.000001));
@@ -41,7 +40,6 @@ TEST_CASE("test_assignment")
     CHECK(root["myobject"]["bool_2"].as<bool>());
     CHECK(root["myobject"]["int_2"].as<long long>() == 0);
     CHECK(root["myobject"]["string_2"].as<std::string>() == std::string("my string"));
-#endif
 }
 
 TEST_CASE("test_1")
