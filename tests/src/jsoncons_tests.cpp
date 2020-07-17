@@ -27,9 +27,9 @@ TEST_CASE("test_assignment")
     root["myobject"]["int_2"] = 0LL;
     root["myobject"]["string_2"] = "my string";
     root["myarray"] = json(json_array_arg);
+#if 0
 
     json double_2 = root["myobject"]["double_2"];
-#if 0
     CHECK(double_1.as<double>() == Approx(10.0).epsilon(0.000001));
 
     CHECK(double_2.as<double>() == Approx(7.0).epsilon(0.000001));
