@@ -1,6 +1,8 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
+#if 0
+
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <catch/catch.hpp>
@@ -227,4 +229,4 @@ TEST_CASE("test_multiline_comments")
     CHECK(j.is_array());
     CHECK(j.size() == 0);
 }
-
+#endif
