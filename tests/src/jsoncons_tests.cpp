@@ -1,8 +1,6 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#if 0
-
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_encoder.hpp>
 #include <catch/catch.hpp>
@@ -14,6 +12,8 @@
 #include <fstream>
 
 using namespace jsoncons;
+
+#if 0
 
 TEST_CASE("test_1")
 {
@@ -181,7 +181,7 @@ TEST_CASE("test_u0000")
     //std::cout << std::hex << "Output:   " << os.str() << std::endl;
 
 }
-
+#endif
 TEST_CASE("test_uHHHH")
 {
     std::string inputStr("[\"\\u007F\\u07FF\\u0800\"]");
@@ -229,4 +229,4 @@ TEST_CASE("test_multiline_comments")
     CHECK(j.is_array());
     CHECK(j.size() == 0);
 }
-#endif
+
