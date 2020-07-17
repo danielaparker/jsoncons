@@ -205,38 +205,4 @@ TEST_CASE("json comparator equals tests")
     CHECK(var17 == var16);
 }
 
-TEST_CASE("json json_pointer_arg")
-{
-    json val1 = json::parse(R"(
-{ "names" : [ "a", "b", "c", "d" ] }
-    )");
 
-    json val2 = json::parse(R"(
-{ "names" : [ "a", "b" ] }
-    )");
-
-    SECTION("test ==")
-    {
-        json lhs(json_pointer_arg, &val1);
-
-        json rhs(json_pointer_arg, &val1);
-
-        CHECK(lhs == rhs);
-        CHECK(lhs == val1);
-        CHECK(lhs != val2);
-        CHECK(val2 != rhs);
-    }
-    SECTION("test <")
-    {
-        json lhs(json_pointer_arg, &val1);
-
-        json rhs(json_pointer_arg, &val1);
-
-        CHECK_FALSE(lhs < rhs);
-        CHECK_FALSE(rhs < lhs);
-        CHECK(val2 < lhs);
-        CHECK_FALSE(lhs < val2);
-        CHECK(lhs > val2);
-        CHECK_FALSE(val2 > lhs);
-    }
-}
