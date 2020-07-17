@@ -77,6 +77,8 @@ target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 file(GLOB_RECURSE JSONCONS_TESTS_SOURCES ${JSONCONS_TESTS_SOURCE_DIR}/*.cpp)
 
+message(($JSONCONS_TESTS_SOURCES))
+
 #set(JSONCONS_TESTS_SOURCES
 #     ${JSONCONS_TESTS_SOURCE_DIR}/tests_main.cpp
 #     ${JSONCONS_TESTS_SOURCE_DIR}/json_type_traits_tests.cpp
