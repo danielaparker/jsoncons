@@ -17,7 +17,6 @@ TEST_CASE("test_filename_invalid")
 {
     std::string in_file = "./input/json-exception--1.json";
     std::ifstream is(in_file);
-    REQUIRE(is);
 
     json_decoder<json> decoder;
 
