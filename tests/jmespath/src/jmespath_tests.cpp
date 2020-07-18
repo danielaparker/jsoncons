@@ -89,33 +89,33 @@ TEST_CASE("jmespath-tests")
 {
     SECTION("Examples and tutorials")
     {
-        //jmespath_tests("./input/jmespath/examples/jmespath-tests.json");
+        //jmespath_tests("./jmespath/input/examples/jmespath-tests.json");
 
     }
     SECTION("compliance")
     {
         // 4 syntax tests don't pass, appear to require extra grammatical checks 
-        jmespath_tests("./input/jmespath/compliance/syntax.json"); 
+        jmespath_tests("./jmespath/input/compliance/syntax.json"); 
 
-        jmespath_tests("./input/jmespath/compliance/basic.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/boolean.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/current.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/escape.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/filters.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/identifiers.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/indices.json");  // OK
-        jmespath_tests("./input/jmespath/compliance/literal.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/multiselect.json"); // OK 
-        jmespath_tests("./input/jmespath/compliance/pipe.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/slice.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/unicode.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/wildcard.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/benchmarks.json"); // OK
-        jmespath_tests("./input/jmespath/compliance/functions.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/basic.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/boolean.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/current.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/escape.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/filters.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/identifiers.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/indices.json");  // OK
+        jmespath_tests("./jmespath/input/compliance/literal.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/multiselect.json"); // OK 
+        jmespath_tests("./jmespath/input/compliance/pipe.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/slice.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/unicode.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/wildcard.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/benchmarks.json"); // OK
+        jmespath_tests("./jmespath/input/compliance/functions.json"); // OK
 
-        //jmespath_tests("./input/jmespath/compliance/test.json"); 
+        //jmespath_tests("./jmespath/input/compliance/test.json"); 
 
-        jmespath_tests("./input/jmespath/examples/jmespath-examples.json"); 
+        jmespath_tests("./jmespath/input/examples/jmespath-examples.json"); 
     }
 }
 

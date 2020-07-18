@@ -31,7 +31,7 @@ TEST_CASE("JSONPath Test Suite")
     std::map<fs::path,std::string> query_dictionary;
     std::map<fs::path,ojson> expected_dictionary;
 
-    std::string path = "./input/JSONPathTestSuite";
+    std::string path = "./jsonpath/input/JSONPathTestSuite";
     for (auto& p : fs::directory_iterator(path))
     {
         if (fs::exists(p) && fs::is_regular_file(p))

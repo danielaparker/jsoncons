@@ -7,7 +7,7 @@
 //#include <jsoncons_ext/csv/csv_options.hpp>
 #include <jsoncons_ext/csv/csv.hpp>
 #include <jsoncons/json_reader.hpp>
-#include "../sample_allocators.hpp"
+#include "./csv_sample_allocators.hpp"
 #include <sstream>
 #include <vector>
 #include <utility>
@@ -837,8 +837,9 @@ TEST_CASE("csv_test1_object_3cols_crlf")
 
 TEST_CASE("read_comma_delimited_file")
 {
-    std::string in_file = "./input/countries.csv";
+    std::string in_file = "./csv/input/countries.csv";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     json_decoder<json> decoder;
 
@@ -862,8 +863,9 @@ TEST_CASE("read_comma_delimited_file")
 
 TEST_CASE("read_comma_delimited_file_header")
 {
-    std::string in_file = "./input/countries.csv";
+    std::string in_file = "./csv/input/countries.csv";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     json_decoder<json> decoder;
 
@@ -887,8 +889,9 @@ TEST_CASE("read_comma_delimited_file_header")
  
 TEST_CASE("serialize_comma_delimited_file")
 {
-    std::string in_file = "./input/countries.json";
+    std::string in_file = "./csv/input/countries.json";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     csv::csv_options options;
     options.assume_header(false);
@@ -912,8 +915,9 @@ TEST_CASE("serialize_comma_delimited_file")
 
 TEST_CASE("test_tab_delimited_file")
 {
-    std::string in_file = "./input/employees.txt";
+    std::string in_file = "./csv/input/employees.txt";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     json_decoder<json> decoder;
     csv::csv_options options;
@@ -932,8 +936,9 @@ TEST_CASE("test_tab_delimited_file")
 
 TEST_CASE("serialize_tab_delimited_file")
 {
-    std::string in_file = "./input/employees.json";
+    std::string in_file = "./csv/input/employees.json";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     json_decoder<ojson> decoder;
     csv::csv_options options;
@@ -1484,17 +1489,17 @@ TEST_CASE("csv_reader constructors")
 
     SECTION("stateful allocator")
     {
-        using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
+        using my_json = basic_json<char,sorted_policy,csv_test::FreelistAllocator<char>>;
 
-        FreelistAllocator<char> my_allocator{1}; 
+        csv_test::FreelistAllocator<char> my_allocator{1}; 
 
         csv::csv_options options;
         options.assume_header(true)
                .mapping(csv::mapping_kind::n_objects);
 
-        json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, my_allocator,
+        json_decoder<my_json,csv_test::FreelistAllocator<char>> decoder(result_allocator_arg, my_allocator,
                                                               my_allocator);
-        csv::basic_csv_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, options, my_allocator);
+        csv::basic_csv_reader<char,stream_source<char>,csv_test::FreelistAllocator<char>> reader(input, decoder, options, my_allocator);
         reader.read();
 
         my_json j = decoder.get_result();

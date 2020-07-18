@@ -17,6 +17,7 @@ TEST_CASE("test_filename_invalid")
 {
     std::string in_file = "./input/json-exception--1.json";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     json_decoder<json> decoder;
 
@@ -35,6 +36,7 @@ TEST_CASE("test_exception_left_brace")
 {
     std::string in_file = "./input/json-exception-1.json";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     json_decoder<json> decoder;
     JSONCONS_TRY
@@ -54,6 +56,7 @@ TEST_CASE("test_exception_right_brace")
 {
     std::string in_file = "./input/json-exception-2.json";
     std::ifstream is(in_file);
+    REQUIRE(is);
 
     json_decoder<json> decoder;
     JSONCONS_TRY

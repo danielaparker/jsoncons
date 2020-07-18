@@ -17,7 +17,7 @@ namespace
     std::vector<char> read_bytes(const std::string& filename)
     {
         std::vector<char> bytes;
-        std::string in_file = "./input/bson/test34.bson";
+        std::string in_file = "./bson/input/test34.bson";
         std::ifstream is(filename, std::ifstream::binary);
         REQUIRE(is);
         is.seekg (0, is.end);
@@ -36,7 +36,7 @@ TEST_CASE("bson c test suite")
 {
     SECTION("int32")
     {
-        std::string in_file = "./input/bson/test33.bson";
+        std::string in_file = "./bson/input/test33.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         std::vector<char> bytes2;
@@ -52,7 +52,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("int64")
     {
-        std::string in_file = "./input/bson/test34.bson";
+        std::string in_file = "./bson/input/test34.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         bytes_source source(bytes);
@@ -90,7 +90,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("double")
     {
-        std::string in_file = "./input/bson/test20.bson";
+        std::string in_file = "./bson/input/test20.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         std::vector<char> bytes2;
@@ -103,7 +103,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("bool")
     {
-        std::string in_file = "./input/bson/test19.bson";
+        std::string in_file = "./bson/input/test19.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         std::vector<char> bytes2;
@@ -116,7 +116,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("array")
     {
-        std::string in_file = "./input/bson/test23.bson";
+        std::string in_file = "./bson/input/test23.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         std::vector<char> bytes2;
@@ -135,7 +135,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("binary")
     {
-        std::string in_file = "./input/bson/test24.bson";
+        std::string in_file = "./bson/input/test24.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         std::vector<char> bytes2;
@@ -154,7 +154,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("binary (jsoncons default)")
     {
-        std::string in_file = "./input/bson/test24.bson";
+        std::string in_file = "./bson/input/test24.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         std::vector<char> bytes2;
@@ -173,7 +173,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("null")
     {
-        std::string in_file = "./input/bson/test18.bson";
+        std::string in_file = "./bson/input/test18.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         json j;
@@ -190,7 +190,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("utf8")
     {
-        std::string in_file = "./input/bson/test11.bson";
+        std::string in_file = "./bson/input/test11.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         json j;
@@ -207,7 +207,7 @@ TEST_CASE("bson c test suite")
     }
     SECTION("document")
     {
-        std::string in_file = "./input/bson/test21.bson";
+        std::string in_file = "./bson/input/test21.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
         json b;

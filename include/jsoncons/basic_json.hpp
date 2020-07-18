@@ -3143,6 +3143,7 @@ public:
 
     ~basic_json() noexcept
     {
+         Destroy_();
     }
 
     template <class T>

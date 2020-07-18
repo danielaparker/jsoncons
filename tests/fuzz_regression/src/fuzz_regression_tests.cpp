@@ -17,6 +17,7 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
+#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -27,7 +28,7 @@ TEST_CASE("oss-fuzz issues")
     // - max_nesting_depth option for all parsers and encoders (default 1024)
     SECTION("issue 21589")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_parse-5763671533027328";
         json_options options;
         options.max_nesting_depth(std::numeric_limits<int>::max());
 
@@ -41,7 +42,7 @@ TEST_CASE("oss-fuzz issues")
     // Resolution: Read from source in chunks, to avoid bad_alloc, and fail with unexpected_eof
     SECTION("issue 21619")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5171679883165696";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor-5171679883165696";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -63,7 +64,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Timeout in fuzz_cbor
     SECTION("issue 21631")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5639265590706176";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor-5639265590706176";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -85,7 +86,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Integer-overflow
     SECTION("issue 21663")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv-5762751990595584";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_csv-5762751990595584";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -118,7 +119,7 @@ TEST_CASE("oss-fuzz issues")
     // Resolution: limit number of items to max_items set in options
     SECTION("issue 21667")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5738905124208640";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson-5738905124208640";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -136,7 +137,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Timeout 
     SECTION("issue 21697")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_ubjson-5737197673381888";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson-5737197673381888";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -153,7 +154,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Stack overflow
     SECTION("issue 21709")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5740910806827008.fuzz";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor-5740910806827008.fuzz";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         cbor::cbor_options options;
@@ -165,7 +166,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Stack overflow
     SECTION("issue 21710")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -178,7 +179,7 @@ TEST_CASE("oss-fuzz issues")
 
     SECTION("issue 21710b")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor-5141282369568768";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -198,7 +199,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Out of memory
     SECTION("issue 21801")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_msgpack-5651190114418688";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_msgpack-5651190114418688";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -218,7 +219,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Stack overflow
     SECTION("issue 21805")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor-5687592176844800";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor-5687592176844800";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -240,7 +241,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Timeout
     SECTION("issue 21813")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_msgpack-5727715157344256";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_msgpack-5727715157344256";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -260,7 +261,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Timeout
     SECTION("issue 21865")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_bson-5637264110780416";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_bson-5637264110780416";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -282,7 +283,7 @@ TEST_CASE("oss-fuzz issues")
     // Resolution: change assert to illegal_chunked_string error code
     SECTION("issue 21902")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5665976638242816";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor_encoder-5665976638242816";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -308,7 +309,7 @@ TEST_CASE("oss-fuzz issues")
     // Resolution: check if csv_parser is still in start state when no more input
     SECTION("issue 21912")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv_encoder-5202115606872064.fuzz";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_csv_encoder-5202115606872064.fuzz";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -329,7 +330,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: failed_throw
     SECTION("issue 21948")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor-5743359164678144";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor-5743359164678144";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -349,7 +350,7 @@ TEST_CASE("oss-fuzz issues")
     // Resolution: Fixed check for floating point values
     SECTION("issue 21990")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_csv_encoder-5682837304115200.fuzz";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_csv_encoder-5682837304115200.fuzz";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -369,7 +370,7 @@ TEST_CASE("oss-fuzz issues")
     //             has size 2 with error code invalid_decimal_fraction
     SECTION("issue  22000")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5685492533428224";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor_encoder-5685492533428224";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -389,7 +390,7 @@ TEST_CASE("oss-fuzz issues")
 
     SECTION("issue 22018")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5673305546948608";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor_encoder-5673305546948608";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -408,7 +409,7 @@ TEST_CASE("oss-fuzz issues")
 
     SECTION("issue 22023")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_cbor_encoder-5681910597812224";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_cbor_encoder-5681910597812224";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -427,7 +428,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: Timeout
     SECTION("issue 22024")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-fuzz_msgpack_encoder-5677646685143040";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-fuzz_msgpack_encoder-5677646685143040";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -447,7 +448,7 @@ TEST_CASE("oss-fuzz issues")
     // Issue: failed_throw
     SECTION("issue 22091")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_json_cursor-5686693027119104";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_json_cursor-5686693027119104";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -472,7 +473,7 @@ TEST_CASE("oss-fuzz issues")
 /*
     SECTION("issue 22379")
     {
-        std::string pathname = "input/fuzz/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-6266427819687936";
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_cbor_encoder-6266427819687936";
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
@@ -495,5 +496,23 @@ TEST_CASE("oss-fuzz issues")
         //CHECK(ec == cbor::cbor_errc::unexpected_eof);
     }
 */
+#endif
+    // Fuzz target: fuzz_ubjson
+    // Issue: Direct-leak in std::__1::__libcpp_allocate
+    SECTION("issue 24216")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson-5667315455361024";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        try {
+           json j2 = ubjson::decode_ubjson<json>(is);
+        }
+        catch(jsoncons::ser_error e) 
+        {
+            //std::cout << e.what() << "\n\n";
+        }
+    }
 }
 

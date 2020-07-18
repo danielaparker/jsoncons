@@ -93,18 +93,18 @@ TEST_CASE("jsonpath-tests")
 {
     SECTION("Examples and tutorials")
     {
-        //jsonpath_tests("./input/jsonpath/examples/jsonpath-tests.json");
+        //jsonpath_tests("./jsonpath/input/examples/jsonpath-tests.json");
 
     }
     SECTION("compliance")
     {
     #if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
     // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
-        jsonpath_tests("./input/jsonpath/compliance/jsonpath-regex-tests.json");
+        jsonpath_tests("./jsonpath/input/compliance/jsonpath-regex-tests.json");
     #endif
-        jsonpath_tests("./input/jsonpath/compliance/basic.json"); 
-        jsonpath_tests("./input/jsonpath/compliance/slice.json");
-        jsonpath_tests("./input/jsonpath/compliance/jsonpath-tests.json");
+        jsonpath_tests("./jsonpath/input/compliance/basic.json"); 
+        jsonpath_tests("./jsonpath/input/compliance/slice.json");
+        jsonpath_tests("./jsonpath/input/compliance/jsonpath-tests.json");
     }
 }
 
