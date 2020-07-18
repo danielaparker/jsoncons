@@ -1,4 +1,4 @@
-v0.154.2
+v0.154.3
 --------
 
 Bugs fixed:
@@ -7,6 +7,13 @@ Bugs fixed:
 
 - Fixed issue with creating a patch to remove array elements using `json_patch::from_diff`, 
 [\#261](https://github.com/danielaparker/jsoncons/issues/261)
+
+- Fixed memory leak issue introduced in v0.154.2
+
+v0.154.2
+--------
+
+Withdrawn
 
 v0.154.1
 --------
