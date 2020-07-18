@@ -509,7 +509,7 @@ TEST_CASE("oss-fuzz issues")
         try {
            json j2 = ubjson::decode_ubjson<json>(is);
         }
-        catch(jsoncons::ser_error e) 
+        catch(jsoncons::ser_error) 
         {
             //std::cout << e.what() << "\n\n";
         }
