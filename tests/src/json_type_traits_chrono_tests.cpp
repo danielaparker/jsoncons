@@ -8,21 +8,24 @@ using namespace jsoncons;
 
 namespace ns {
 
-    template <class J,class Rep>
+    template <class J,class T>
     struct A
     {
-        static void f(const J&)
+        static T f(const J&)
         {
-            static_assert(sizeof(Rep) == 0, "f not implemented");
+            static_assert(sizeof(T) == 0, "f not implemented");
         }
     };
 
     template<class J,class Rep>
     struct A<J,std::chrono::duration<Rep>>
     {
-        static void f(const J&)
+        using duration_type = std::chrono::duration<Rep>;
+
+        static duration_type f(const J&)
         {
             std::cout << "Hello duration\n";
+            return duration_type{};
         }
     };
 }
@@ -34,7 +37,7 @@ TEST_CASE("test_chrono")
     ns::A<std::string,std::chrono::duration<double>>::f(s);
 } 
 
-//#if 0
+#if 0
 
 TEST_CASE("json_type_traits chron tests")
 {
@@ -59,4 +62,4 @@ TEST_CASE("json_type_traits chron tests")
         CHECK(val.count() == time);
     }
 }
-//#endif
+#endif
