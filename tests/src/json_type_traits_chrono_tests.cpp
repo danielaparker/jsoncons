@@ -4,6 +4,7 @@
 //#include <catch/catch.hpp>
 //#include <jsoncons/json.hpp>
 #include <chrono>
+#include <string>
 #include <type_traits>
 
 //using namespace jsoncons;
@@ -34,11 +35,19 @@ namespace {
         {
         }
     };
+    template <>
+    struct A<std::string>
+    {
+        static void f()
+        {
+        }
+    };
 }
 
 void test_chrono()
 {
-    A<std::chrono::seconds>::f();
+    //A<std::chrono::seconds>::f();
+    A<std::string>::f();
 }
 
 #if 0
