@@ -7,8 +7,9 @@ enum class semantic_tag : uint8_t
 {
     none = 0,
     undefined,
-    epoch_time,
-    timestamp,
+    datetime,
+    epoch_time, // since 0.155.0
+    timestamp,  // deprecated (since 0.155.0)
     bigint,
     bigdec,
     bigfloat,
