@@ -18,6 +18,7 @@ namespace ns {
         static void f()
         {
             std::cout << "Hello default\n";
+            static_assert(sizeof(T) > 0, "f not implemented");
         }
     };
 /*
