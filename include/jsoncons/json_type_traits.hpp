@@ -1302,10 +1302,10 @@ namespace variant_detail
 
     // std::chrono::duration
 
-    template<class Json, class Rep>
-    struct json_type_traits<Json, std::chrono::duration<Rep>>
+    template<class Json, class Rep, class Period>
+    struct json_type_traits<Json, std::chrono::duration<Rep,Period>>
     {
-        using duration_type = std::chrono::duration<Rep>;
+        using duration_type = std::chrono::duration<Rep,Period>;
 
         using allocator_type = typename Json::allocator_type;
 
