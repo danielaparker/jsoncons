@@ -9,7 +9,7 @@
 
 //using namespace jsoncons;
 
-namespace {
+namespace ns {
 
     template <class T>
     struct A
@@ -47,7 +47,7 @@ namespace {
 void test_chrono()
 {
     //A<std::chrono::seconds>::f();
-    A<std::string>::f();
+    ns::A<std::string>::f();
 }
 
 #if 0
