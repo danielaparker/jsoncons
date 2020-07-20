@@ -6,7 +6,6 @@
 
 using namespace jsoncons;
 
-#if 0
 namespace ns {
 
     template <class T>
@@ -14,7 +13,7 @@ namespace ns {
     {
         static void f()
         {
-            static_assert(sizeof(T) > 0, "f not implemented");
+            static_assert(sizeof(T) == 0, "f not implemented");
         }
     };
 
@@ -50,8 +49,9 @@ TEST_CASE("test_chrono")
 {
     ns::A<std::chrono::seconds>::f();
     ns::A<std::string>::f();
-}
-#endif 
+} 
+
+#if 0
 
 TEST_CASE("json_type_traits chron tests")
 {
@@ -76,3 +76,4 @@ TEST_CASE("json_type_traits chron tests")
         CHECK(val.count() == time);
     }
 }
+#endif
