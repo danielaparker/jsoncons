@@ -2,14 +2,11 @@
 // Distributed under Boost license
 
 #include <catch/catch.hpp>
-//#include <jsoncons/json.hpp>
-#include <chrono>
-#include <string>
-#include <type_traits>
-#include <iostream>
+#include <jsoncons/json.hpp>
 
-//using namespace jsoncons;
+using namespace jsoncons;
 
+#if 0
 namespace ns {
 
     template <class T>
@@ -54,8 +51,8 @@ TEST_CASE("test_chrono")
     ns::A<std::chrono::seconds>::f();
     ns::A<std::string>::f();
 }
+#endif 
 
-#if 0
 TEST_CASE("json_type_traits chron tests")
 {
     SECTION("test 1")
@@ -79,4 +76,3 @@ TEST_CASE("json_type_traits chron tests")
         CHECK(val.count() == time);
     }
 }
-#endif

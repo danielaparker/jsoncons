@@ -62,12 +62,14 @@ namespace jsoncons {
 
         static T as(const Json&)
         {
-            static_assert(sizeof(T) > 0, "as not implemented");
+            static_assert(sizeof(T) == 0, "as not implemented");
+            return T{10};
         }
 
         static Json to_json(const T&, const allocator_type& = allocator_type())
         {
-            static_assert(sizeof(T) > 0, "to_json not implemented");
+            static_assert(sizeof(T) == 0, "to_json not implemented");
+            return Json::null();
         }
     };
 
