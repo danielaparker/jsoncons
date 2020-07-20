@@ -1,11 +1,12 @@
 // Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
-#include <catch/catch.hpp>
-#include <jsoncons/json.hpp>
+//#include <catch/catch.hpp>
+//#include <jsoncons/json.hpp>
 #include <chrono>
+#include <type_traits>
 
-using namespace jsoncons;
+//using namespace jsoncons;
 
 namespace {
 
@@ -35,7 +36,7 @@ namespace {
     };
 }
 
-TEST_CASE("std::chrono::duration test")
+void test_chrono()
 {
     A<std::chrono::seconds>::f();
 }
