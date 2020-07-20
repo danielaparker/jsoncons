@@ -29,13 +29,14 @@ namespace ns {
         }
     };
 */
-    /*template <>
+    template <>
     struct A<std::chrono::seconds>
     {
         static void f()
         {
+            std::cout << "Hello seconds\n";
         }
-    };*/
+    };
     template <>
     struct A<std::string>
     {
@@ -48,7 +49,7 @@ namespace ns {
 
 TEST_CASE("test_chrono")
 {
-    //A<std::chrono::seconds>::f();
+    ns::A<std::chrono::seconds>::f();
     ns::A<std::string>::f();
 }
 
