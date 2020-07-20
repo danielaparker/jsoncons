@@ -14,7 +14,7 @@ namespace {
     {
         static void f()
         {
-            static_assert(std::false_type<T>::value, "f not implemented");
+            static_assert(std::false_type::value, "f not implemented");
         }
     };
 
