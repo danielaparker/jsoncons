@@ -9,7 +9,7 @@ using namespace jsoncons;
 
 namespace {
 
-    template <class T, class = void>
+    template <class T>
     struct A
     {
         static void f()
