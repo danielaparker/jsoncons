@@ -7,6 +7,33 @@
 
 using namespace jsoncons;
 
+namespace {
+
+    template <class T, class = void>
+    struct A
+    {
+        static void f()
+        {
+            static_assert(std::false_type<T>::value, "f not implemented");
+        }
+    };
+
+    template<class Rep>
+    struct A<std::chrono::duration<Rep>>
+    {
+        static void f()
+        {
+        }
+    };
+
+}
+
+TEST_CASE("std::chrono::duration test")
+{
+    A<std::chrono::seconds>::f();
+}
+
+#if 0
 TEST_CASE("json_type_traits chron tests")
 {
     SECTION("test 1")
@@ -30,4 +57,4 @@ TEST_CASE("json_type_traits chron tests")
         CHECK(val.count() == time);
     }
 }
-
+#endif
