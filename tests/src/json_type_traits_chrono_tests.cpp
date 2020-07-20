@@ -1,11 +1,12 @@
 // Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
-//#include <catch/catch.hpp>
+#include <catch/catch.hpp>
 //#include <jsoncons/json.hpp>
 #include <chrono>
 #include <string>
 #include <type_traits>
+#include <iostream>
 
 //using namespace jsoncons;
 
@@ -16,7 +17,7 @@ namespace ns {
     {
         static void f()
         {
-            static_assert(std::false_type::value, "f not implemented");
+            std::cout << "Hello default\n";
         }
     };
 /*
@@ -28,23 +29,24 @@ namespace ns {
         }
     };
 */
-    template <>
+    /*template <>
     struct A<std::chrono::seconds>
     {
         static void f()
         {
         }
-    };
+    };*/
     template <>
     struct A<std::string>
     {
         static void f()
         {
+            std::cout << "Hello string\n";
         }
     };
 }
 
-void test_chrono()
+TEST_CASE("test_chrono")
 {
     //A<std::chrono::seconds>::f();
     ns::A<std::string>::f();
