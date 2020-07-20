@@ -48,10 +48,6 @@ namespace jsoncons {
 
     // json_type_traits
 
-    template<typename T>
-    struct unimplemented : std::false_type
-    {};
-
     template <class Json, class T, class Enable=void>
     struct json_type_traits
     {
@@ -66,12 +62,12 @@ namespace jsoncons {
 
         static T as(const Json&)
         {
-            static_assert(unimplemented<T>::value, "as not implemented");
+            static_assert(sizeof(T) > 0, "as not implemented");
         }
 
         static Json to_json(const T&, const allocator_type& = allocator_type())
         {
-            static_assert(unimplemented<T>::value, "to_json not implemented");
+            static_assert(sizeof(T) > 0, "to_json not implemented");
         }
     };
 

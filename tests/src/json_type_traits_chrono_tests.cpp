@@ -17,19 +17,19 @@ namespace ns {
     {
         static void f()
         {
-            std::cout << "Hello default\n";
             static_assert(sizeof(T) > 0, "f not implemented");
         }
     };
-/*
+
     template<class T>
     struct A<std::chrono::duration<T>>
     {
         static void f()
         {
+            std::cout << "Hello duration\n";
         }
     };
-*/
+/*
     template <>
     struct A<std::chrono::seconds>
     {
@@ -38,6 +38,7 @@ namespace ns {
             std::cout << "Hello seconds\n";
         }
     };
+*/
     template <>
     struct A<std::string>
     {
