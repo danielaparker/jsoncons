@@ -64,7 +64,7 @@ enum class semantic_tag : uint8_t
     none = 0,
     undefined = 0x01,
     datetime = 0x02,
-    timestamp = 0x03,
+    epoch_time = 0x03,
     bigint = 0x04,
     bigdec = 0x05,
     bigfloat = 0x06,
@@ -81,6 +81,7 @@ enum class semantic_tag : uint8_t
     , big_decimal = bigdec
     , big_float = bigfloat
     , date_time = datetime
+    , timestamp = 0x03
 #endif
 };
 
@@ -120,7 +121,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
             os << datetime_name;
             break;
         }
-        case semantic_tag::timestamp:
+        case semantic_tag::epoch_time:
         {
             os << timestamp_name;
             break;

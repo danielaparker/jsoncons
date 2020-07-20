@@ -106,30 +106,30 @@ TEST_CASE("json(string, semantic_tag::datetime)")
 }
 
 
-TEST_CASE("json(string, semantic_tag::timestamp)")
+TEST_CASE("json(string, semantic_tag::epoch_time)")
 {
     SECTION("positive integer")
     {
         int t = 10000;
-        json j(t, semantic_tag::timestamp);
+        json j(t, semantic_tag::epoch_time);
 
-        CHECK(j.tag() == semantic_tag::timestamp);
+        CHECK(j.tag() == semantic_tag::epoch_time);
         CHECK(j.as<int>() == t);
     }
     SECTION("negative integer")
     {
         int t = -10000;
-        json j(t, semantic_tag::timestamp);
+        json j(t, semantic_tag::epoch_time);
 
-        CHECK(j.tag() == semantic_tag::timestamp);
+        CHECK(j.tag() == semantic_tag::epoch_time);
         CHECK(j.as<int>() == t);
     }
     SECTION("floating point")
     {
         double t = 10000.1;
-        json j(t, semantic_tag::timestamp);
+        json j(t, semantic_tag::epoch_time);
 
-        CHECK(j.tag() == semantic_tag::timestamp);
+        CHECK(j.tag() == semantic_tag::epoch_time);
         CHECK(j.as<double>() == t);
     }
 

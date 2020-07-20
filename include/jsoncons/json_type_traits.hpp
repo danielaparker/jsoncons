@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSON_TYPE_TRAITS_HPP
 #define JSONCONS_JSON_TYPE_TRAITS_HPP
 
+#include <chrono>
 #include <array>
 #include <string>
 #include <vector>
@@ -1296,6 +1297,36 @@ namespace variant_detail
             variant_detail::variant_to_json_visitor<Json> visitor(j);
             std::visit(visitor, var);
             return j;
+        }
+    };
+
+    // std::chrono::duration
+
+    template<class Json, class Rep>
+    struct json_type_traits<Json, std::chrono::duration<Rep>>
+    {
+        using duration_type = std::chrono::duration<Rep>;
+
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return (j.tag() == semantic_tag::epoch_time);
+        }
+        static duration_type as(const Json& j)
+        {
+            if (j.is_number())
+            {
+                return duration_type(j.template as<Rep>());
+            }
+            else
+            {
+                return duration_type();
+            }
+        }
+        static Json to_json(const duration_type& val, allocator_type = allocator_type())
+        {
+            return Json(val.count(), semantic_tag::epoch_time);
         }
     };
 

@@ -372,7 +372,7 @@ private:
                     return;
                 }
                 auto val = jsoncons::detail::little_to_native<uint64_t>(buf, sizeof(buf));
-                more_ = visitor.uint64_value(val, semantic_tag::timestamp, *this, ec);
+                more_ = visitor.uint64_value(val, semantic_tag::epoch_time, *this, ec);
                 break;
             }
 
@@ -400,7 +400,7 @@ private:
                     return;
                 }
                 auto val = jsoncons::detail::little_to_native<int64_t>(buf, sizeof(buf));
-                more_ = visitor.int64_value(val, semantic_tag::timestamp, *this, ec);
+                more_ = visitor.int64_value(val, semantic_tag::epoch_time, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::binary_cd: 

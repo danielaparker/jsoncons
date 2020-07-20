@@ -141,6 +141,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/src/json_traits_macro_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_traits_name_macro_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_container_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/json_type_traits_chrono_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_string_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/jsonpatch/src/jsonpatch_tests.cpp

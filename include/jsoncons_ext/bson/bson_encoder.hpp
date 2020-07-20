@@ -302,7 +302,7 @@ private:
                      const ser_context&,
                      std::error_code&) override
     {
-        if (tag == semantic_tag::timestamp)
+        if (tag == semantic_tag::epoch_time)
         {
             before_value(jsoncons::bson::detail::bson_format::datetime_cd);
             jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
@@ -327,7 +327,7 @@ private:
                       std::error_code& ec) override
     {
         bool more;
-        if (tag == semantic_tag::timestamp)
+        if (tag == semantic_tag::epoch_time)
         {
             before_value(jsoncons::bson::detail::bson_format::datetime_cd);
             more = true;

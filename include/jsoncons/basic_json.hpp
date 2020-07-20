@@ -1623,7 +1623,7 @@ private:
             return evaluate().is_datetime();
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::timestamp")
+        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_time")
         bool is_epoch_time() const noexcept
         {
             if (!parent_.contains(key_))
@@ -4741,10 +4741,10 @@ public:
         return tag() == semantic_tag::datetime;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::timestamp")
+    JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_time")
     bool is_epoch_time() const noexcept
     {
-        return tag() == semantic_tag::timestamp;
+        return tag() == semantic_tag::epoch_time;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
