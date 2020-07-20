@@ -1319,7 +1319,7 @@ namespace variant_detail
             }
             else
             {
-                return duration_type();
+                return duration_type{};
             }
         }
         static Json to_json(const duration_type& val, allocator_type = allocator_type())

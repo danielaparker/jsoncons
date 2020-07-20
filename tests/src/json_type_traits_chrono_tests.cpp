@@ -34,7 +34,7 @@ TEST_CASE("test_chrono")
     ns::A<std::string,std::chrono::duration<double>>::f(s);
 } 
 
-#if 0
+//#if 0
 
 TEST_CASE("json_type_traits chron tests")
 {
@@ -59,4 +59,4 @@ TEST_CASE("json_type_traits chron tests")
         CHECK(val.count() == time);
     }
 }
-#endif
+//#endif
