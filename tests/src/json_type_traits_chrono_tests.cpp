@@ -8,7 +8,7 @@ using namespace jsoncons;
 
 namespace ns {
 
-    template <class T>
+    template <class J,class T>
     struct A
     {
         static void f()
@@ -17,10 +17,10 @@ namespace ns {
         }
     };
 
-    template<class T>
-    struct A<std::chrono::duration<T>>
+    template<class J,class T>
+    struct A<J,std::chrono::duration<T>>
     {
-        static void f()
+        static void f(const J&)
         {
             std::cout << "Hello duration\n";
         }
@@ -35,20 +35,13 @@ namespace ns {
         }
     };
 */
-    template <>
-    struct A<std::string>
-    {
-        static void f()
-        {
-            std::cout << "Hello string\n";
-        }
-    };
 }
 
 TEST_CASE("test_chrono")
 {
-    ns::A<std::chrono::seconds>::f();
-    ns::A<std::string>::f();
+    std::string s;
+    ns::A<std::string,std::chrono::seconds>::f(s);
+    ns::A<std::string,std::chrono::duration<double>>::f(s);
 } 
 
 #if 0
