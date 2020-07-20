@@ -17,7 +17,7 @@ namespace {
             static_assert(std::false_type::value, "f not implemented");
         }
     };
-
+/*
     template<class T>
     struct A<std::chrono::duration<T>>
     {
@@ -25,7 +25,14 @@ namespace {
         {
         }
     };
-
+*/
+    template <>
+    struct A<std::chrono::seconds>
+    {
+        static void f()
+        {
+        }
+    };
 }
 
 TEST_CASE("std::chrono::duration test")
