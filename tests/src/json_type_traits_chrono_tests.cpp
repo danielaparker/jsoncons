@@ -18,8 +18,8 @@ namespace {
         }
     };
 
-    template<class Rep>
-    struct A<std::chrono::duration<Rep>>
+    template<class T>
+    struct A<std::chrono::duration<T>>
     {
         static void f()
         {
