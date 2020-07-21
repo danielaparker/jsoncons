@@ -494,7 +494,7 @@ namespace detail {
         // array back insertable non-byte container
 
         template <class Container = T>
-        static typename std::enable_if<!jsoncons::detail::is_back_insertable_byte_container<Container>::value,Container>::type
+        static typename std::enable_if<!jsoncons::detail::is_byte_sized<typename Container::value_type>::value,Container>::type
         as(const Json& j)
         {
             if (j.is_array())
@@ -517,7 +517,7 @@ namespace detail {
         // array back insertable byte container
 
         template <class Container = T>
-        static typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,Container>::type
+        static typename std::enable_if<jsoncons::detail::is_byte_sized<typename Container::value_type>::value,Container>::type
         as(const Json& j)
         {
             converter<T> convert;

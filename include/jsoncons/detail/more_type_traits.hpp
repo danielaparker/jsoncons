@@ -409,6 +409,16 @@ namespace detail {
         static constexpr bool value = has_data<Container>::value && has_size<Container>::value;
     };
 
+    // is_byte_sized
+
+    template <class T, class Enable=void>
+    struct is_byte_sized : std::false_type {};
+
+    template <class T>
+    struct is_byte_sized<T, 
+           typename std::enable_if<sizeof(typename T) == sizeof(uint8_t)
+    >::type> : std::true_type {};
+
     // is_byte_sequence
 
     template <class Container, class Enable=void>
@@ -418,7 +428,7 @@ namespace detail {
     struct is_byte_sequence<Container, 
            typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
                                    has_size<Container>::value &&
-                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
+                                   is_byte_sized<typename Container::value_type>::value
     >::type> : std::true_type {};
 
     // is_back_insertable_byte_container
@@ -429,7 +439,7 @@ namespace detail {
     template <class Container>
     struct is_back_insertable_byte_container<Container, 
            typename std::enable_if<is_back_insertable<Container>::value &&
-                                   sizeof(typename Container::value_type) == sizeof(uint8_t)
+                                   is_byte_sized<typename Container::value_type>::value
     >::type> : std::true_type {};
 
     // is_c_array
