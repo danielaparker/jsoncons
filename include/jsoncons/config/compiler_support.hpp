@@ -136,6 +136,12 @@
 #  endif // defined(JSONCONS_HAS_2017)
 #endif // !defined(JSONCONS_HAS_STD_STRING_VIEW)
 
+#if !defined(JSONCONS_HAS_STD_BYTE)
+#  if (defined JSONCONS_HAS_2017)
+#    define JSONCONS_HAS_STD_BYTE 1
+#  endif // defined(JSONCONS_HAS_2017)
+#endif // !defined(JSONCONS_HAS_STD_BYTE)
+
 #if !defined(JSONCONS_HAS_STD_OPTIONAL)
 #  if (defined JSONCONS_HAS_2017)
 #    if defined(__clang__)

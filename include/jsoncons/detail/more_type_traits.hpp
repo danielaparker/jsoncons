@@ -14,7 +14,8 @@
 #include <memory>
 #include <iterator> // std::iterator_traits
 #include <exception>
-#include <array>
+#include <array> // std::array
+#include <cstddef> // std::byte
 #include <utility> // std::declval
 #include <jsoncons/config/compiler_support.hpp>
 
@@ -418,6 +419,17 @@ namespace detail {
     struct is_byte_sized<T, 
            typename std::enable_if<sizeof(typename T) == sizeof(uint8_t)
     >::type> : std::true_type {};
+
+    // is_std_byte
+
+    template <class T, class Enable=void>
+    struct is_std_byte : std::false_type {};
+#if defined(JSONCONS_HAS_STD_BYTE)
+    template <class T>
+    struct is_std_byte<T, 
+           typename std::enable_if<std::is_same<T,std::byte>::value
+    >::type> : std::true_type {};
+#endif
 
     // is_byte_sequence
 
