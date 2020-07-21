@@ -29,18 +29,18 @@ namespace jsoncons {
         template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder,
-                              const Json& context_j, 
+                              const Json& proto, 
                               std::error_code& ec)
         {
             serialize(std::integral_constant<bool, jsoncons::detail::is_stateless<typename Json::allocator_type>::value>(),
-                      val, encoder, context_j, ec);
+                      val, encoder, proto, ec);
         }
     private:
         template <class Json>
         static void serialize(std::true_type,
                               const T& val, 
                               basic_json_visitor<CharT>& encoder,
-                              const Json& /*context_j*/, 
+                              const Json& /*proto*/, 
                               std::error_code& ec)
         {
             auto j = json_type_traits<Json,T>::to_json(val);
@@ -50,10 +50,10 @@ namespace jsoncons {
         static void serialize(std::false_type, 
                               const T& val, 
                               basic_json_visitor<CharT>& encoder,
-                              const Json& context_j, 
+                              const Json& proto, 
                               std::error_code& ec)
         {
-            auto j = json_type_traits<Json,T>::to_json(val, context_j.get_allocator());
+            auto j = json_type_traits<Json,T>::to_json(val, proto.get_allocator());
             j.dump(encoder, ec);
         }
     };
@@ -168,14 +168,14 @@ namespace jsoncons {
         template <class Json>
         static void serialize(const value_type& val, 
                               basic_json_visitor<CharT>& encoder, 
-                              const Json& context_j, 
+                              const Json& proto, 
                               std::error_code& ec)
         {
             encoder.begin_array(2,semantic_tag::none,ser_context(),ec);
             if (ec) return;
-            ser_traits<T1,CharT>::serialize(val.first, encoder, context_j, ec);
+            ser_traits<T1,CharT>::serialize(val.first, encoder, proto, ec);
             if (ec) return;
-            ser_traits<T2,CharT>::serialize(val.second, encoder, context_j, ec);
+            ser_traits<T2,CharT>::serialize(val.second, encoder, proto, ec);
             if (ec) return;
             encoder.end_array(ser_context(),ec);
         }
@@ -194,12 +194,12 @@ namespace jsoncons {
 
             static void serialize(const Tuple& tuple,
                                   basic_json_visitor<char_type>& encoder, 
-                                  const Json& context_j, 
+                                  const Json& proto, 
                                   std::error_code& ec)
             {
-                ser_traits<element_type,char_type>::serialize(std::get<Size-Pos>(tuple), encoder, context_j, ec);
+                ser_traits<element_type,char_type>::serialize(std::get<Size-Pos>(tuple), encoder, proto, ec);
                 if (ec) return;
-                next::serialize(tuple, encoder, context_j, ec);
+                next::serialize(tuple, encoder, proto, ec);
             }
         };
 
@@ -226,13 +226,13 @@ namespace jsoncons {
         template <class Json>
         static void serialize(const value_type& val, 
                               basic_json_visitor<CharT>& encoder, 
-                              const Json& context_j, 
+                              const Json& proto, 
                               std::error_code& ec)
         {
             using helper = jsoncons::detail::json_serialize_tuple_helper<size, size, Json, std::tuple<E...>>;
             encoder.begin_array(semantic_tag::none,ser_context(),ec);
             if (ec) return;
-            helper::serialize(val, encoder, context_j, ec);
+            helper::serialize(val, encoder, proto, ec);
             if (ec) return;
             encoder.end_array(ser_context(),ec);
         }
@@ -251,14 +251,14 @@ namespace jsoncons {
         template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
-                              const Json& context_j, 
+                              const Json& proto, 
                               std::error_code& ec)
         {
             encoder.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
             if (ec) return;
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
-                ser_traits<value_type,CharT>::serialize(*it, encoder, context_j, ec);
+                ser_traits<value_type,CharT>::serialize(*it, encoder, proto, ec);
                 if (ec) return;
             }
             encoder.end_array(ser_context(), ec);
@@ -294,14 +294,14 @@ namespace jsoncons {
         template <class Json>
         static void serialize(const std::array<T, N>& val, 
                            basic_json_visitor<CharT>& encoder, 
-                           const Json& context_j, 
+                           const Json& proto, 
                            std::error_code& ec)
         {
             encoder.begin_array(val.size(),semantic_tag::none,ser_context(),ec);
             if (ec) return;
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
-                ser_traits<value_type,CharT>::serialize(*it, encoder, context_j, ec);
+                ser_traits<value_type,CharT>::serialize(*it, encoder, proto, ec);
                 if (ec) return;
             }
             encoder.end_array(ser_context(),ec);
@@ -324,7 +324,7 @@ namespace jsoncons {
         template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
-                              const Json& context_j, 
+                              const Json& proto, 
                               std::error_code& ec)
         {
             encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
@@ -332,7 +332,7 @@ namespace jsoncons {
             for (auto it = std::begin(val); it != std::end(val); ++it)
             {
                 encoder.key(it->first);
-                ser_traits<mapped_type,CharT>::serialize(it->second, encoder, context_j, ec);
+                ser_traits<mapped_type,CharT>::serialize(it->second, encoder, proto, ec);
                 if (ec) return;
             }
             encoder.end_object(ser_context(), ec);
@@ -354,7 +354,7 @@ namespace jsoncons {
         template <class Json>
         static void serialize(const T& val, 
                               basic_json_visitor<CharT>& encoder, 
-                              const Json& context_j, 
+                              const Json& proto, 
                               std::error_code& ec)
         {
             encoder.begin_object(val.size(), semantic_tag::none, ser_context(), ec);
@@ -364,7 +364,7 @@ namespace jsoncons {
                 std::basic_string<typename Json::char_type> s;
                 jsoncons::detail::write_integer(it->first,s);
                 encoder.key(s);
-                ser_traits<mapped_type,CharT>::serialize(it->second, encoder, context_j, ec);
+                ser_traits<mapped_type,CharT>::serialize(it->second, encoder, proto, ec);
                 if (ec) return;
             }
             encoder.end_object(ser_context(), ec);
