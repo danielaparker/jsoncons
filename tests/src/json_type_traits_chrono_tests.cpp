@@ -7,7 +7,7 @@
 using namespace jsoncons;
 
 namespace jsoncons {
-
+#if 0
     template <class Json,class T,class Enable=void>
     struct A
     {
@@ -25,9 +25,9 @@ namespace jsoncons {
             static_assert(sizeof(T) == 0, "to_json not implemented");
         }
     };
-
+#endif
     template<class Json,class Rep>
-    struct A<Json,std::chrono::duration<Rep>>
+    struct json_type_traits<Json,std::chrono::duration<Rep>>
     {
         using duration_type = std::chrono::duration<Rep>;
 
@@ -60,8 +60,8 @@ TEST_CASE("test_chrono")
 {
     json j1(1000, semantic_tag::epoch_time);
     json j2(1000.10, semantic_tag::epoch_time);
-    auto val1 = jsoncons::A<json,std::chrono::seconds>::as(j1);
-    auto val2 = jsoncons::A<json,std::chrono::duration<double>>::as(j2);
+    auto val1 = jsoncons::json_type_traits<json,std::chrono::seconds>::as(j1);
+    auto val2 = jsoncons::json_type_traits<json,std::chrono::duration<double>>::as(j2);
 
     std::cout << val1.count() << ", " << val2.count() << "\n";
 } 

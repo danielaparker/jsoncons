@@ -1299,7 +1299,7 @@ namespace variant_detail
     };
 
     // std::chrono::duration
-
+#if 0
     template<class Json, class Rep>
     struct json_type_traits<Json, std::chrono::duration<Rep>>
     {
@@ -1327,7 +1327,7 @@ namespace variant_detail
             return Json(val.count(), semantic_tag::epoch_time);
         }
     };
-
+#endif
 #endif
 
 } // jsoncons
