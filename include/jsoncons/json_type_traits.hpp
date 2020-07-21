@@ -1315,7 +1315,7 @@ namespace variant_detail
         {
             if (j.is_number())
             {
-                return duration_type(j.template as<Rep>());
+                return duration_type{j.template as<Rep>()};
             }
             else
             {

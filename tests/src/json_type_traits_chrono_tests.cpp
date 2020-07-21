@@ -22,19 +22,21 @@ namespace ns {
     {
         using duration_type = std::chrono::duration<Rep>;
 
-        static duration_type f(const J&)
+        static duration_type f(const J& j)
         {
             std::cout << "Hello duration\n";
-            return duration_type{};
+            return duration_type{j.as<Rep>()};
         }
     };
 }
 
 TEST_CASE("test_chrono")
 {
-    std::string s;
-    ns::A<std::string,std::chrono::seconds>::f(s);
-    ns::A<std::string,std::chrono::duration<double>>::f(s);
+    json j(1000, semantic_tag::epoch_time);
+    auto val1 = ns::A<json,std::chrono::seconds>::f(j);
+    auto val2 = ns::A<json,std::chrono::duration<double>>::f(j);
+
+    std::cout << val1.count() << ", " << val2.count() << "\n";
 } 
 
 #if 0
