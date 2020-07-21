@@ -417,7 +417,7 @@ namespace detail {
 
     template <class T>
     struct is_byte_sized<T, 
-           typename std::enable_if<sizeof(typename T) == sizeof(uint8_t)
+           typename std::enable_if<sizeof(T) == sizeof(uint8_t)
     >::type> : std::true_type {};
 
     // is_std_byte
