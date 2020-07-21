@@ -1,3 +1,15 @@
+v0.155.0
+--------
+
+Changes:
+
+- The `semantic_tag` enum value `timestamp` has been deprecated 
+(still works) and renamed to `epoch_time`.
+
+Enhancements:
+
+- Added `json_type_traits` support for `std::chrono::duration`
+
 v0.154.3
 --------
 
