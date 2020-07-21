@@ -48,6 +48,10 @@ namespace jsoncons {
 
     // json_type_traits
 
+    template<typename T>
+    struct unimplemented : std::false_type
+    {};
+
     template <class Json, class T, class Enable=void>
     struct json_type_traits
     {
@@ -62,14 +66,12 @@ namespace jsoncons {
 
         static T as(const Json&)
         {
-            static_assert(sizeof(T) == 0, "as not implemented");
-            return T{10};
+            static_assert(unimplemented<T>::value, "as not implemented");
         }
 
         static Json to_json(const T&, const allocator_type& = allocator_type())
         {
-            static_assert(sizeof(T) == 0, "to_json not implemented");
-            return Json::null();
+            static_assert(unimplemented<T>::value, "to_json not implemented");
         }
     };
 
@@ -1297,11 +1299,12 @@ namespace variant_detail
             return j;
         }
     };
+#endif
+
 
     // std::chrono::duration
-#if 0
-    template<class Json, class Rep>
-    struct json_type_traits<Json, std::chrono::duration<Rep>>
+    template<class Json,class Rep>
+    struct json_type_traits<Json,std::chrono::duration<Rep>>
     {
         using duration_type = std::chrono::duration<Rep>;
 
@@ -1311,6 +1314,7 @@ namespace variant_detail
         {
             return (j.tag() == semantic_tag::epoch_time);
         }
+
         static duration_type as(const Json& j)
         {
             if (j.is_number())
@@ -1327,8 +1331,6 @@ namespace variant_detail
             return Json(val.count(), semantic_tag::epoch_time);
         }
     };
-#endif
-#endif
 
 } // jsoncons
 

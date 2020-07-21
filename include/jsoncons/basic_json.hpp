@@ -3614,8 +3614,8 @@ public:
     }
 
     template<class T>
-    //typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
-    T as() const
+    typename std::enable_if<is_json_type_traits_specialized<basic_json,T>::value,T>::type
+    as() const
     {
         T val = json_type_traits<basic_json,T>::as(*this);
         return val;
