@@ -6,23 +6,23 @@
 
 using namespace jsoncons;
 
-namespace ns {
+namespace jsoncons {
 
-    template <class J,class T>
+    template <class Json,class T,class Enable=void>
     struct A
     {
-        static T f(const J&)
+        static T as(const Json&)
         {
-            static_assert(sizeof(T) == 0, "f not implemented");
+            static_assert(sizeof(T) == 0, "as not implemented");
         }
     };
 
-    template<class J,class Rep>
-    struct A<J,std::chrono::duration<Rep>>
+    template<class Json,class Rep>
+    struct A<Json,std::chrono::duration<Rep>>
     {
         using duration_type = std::chrono::duration<Rep>;
 
-        static duration_type f(const J& j)
+        static duration_type as(const Json& j)
         {
             std::cout << "Hello duration\n";
             return duration_type(j.template as<Rep>());
@@ -33,8 +33,8 @@ namespace ns {
 TEST_CASE("test_chrono")
 {
     json j(1000, semantic_tag::epoch_time);
-    auto val1 = ns::A<json,std::chrono::seconds>::f(j);
-    auto val2 = ns::A<json,std::chrono::duration<double>>::f(j);
+    auto val1 = jsoncons::A<json,std::chrono::seconds>::as(j);
+    auto val2 = jsoncons::A<json,std::chrono::duration<double>>::as(j);
 
     std::cout << val1.count() << ", " << val2.count() << "\n";
 } 
