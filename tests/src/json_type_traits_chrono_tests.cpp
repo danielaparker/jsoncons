@@ -25,7 +25,7 @@ namespace ns {
         static duration_type f(const J& j)
         {
             std::cout << "Hello duration\n";
-            return duration_type{j.template as<Rep>()};
+            return duration_type(j.template as<Rep>());
         }
     };
 }
