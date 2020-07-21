@@ -11,9 +11,18 @@ namespace jsoncons {
     template <class Json,class T,class Enable=void>
     struct A
     {
+        using allocator_type = typename Json::allocator_type;
+
+        static constexpr bool is_compatible = false;
+
         static T as(const Json&)
         {
             static_assert(sizeof(T) == 0, "as not implemented");
+        }
+
+        static Json to_json(const T&, const allocator_type& = allocator_type())
+        {
+            static_assert(sizeof(T) == 0, "to_json not implemented");
         }
     };
 
@@ -22,19 +31,37 @@ namespace jsoncons {
     {
         using duration_type = std::chrono::duration<Rep>;
 
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return (j.tag() == semantic_tag::epoch_time);
+        }
+
         static duration_type as(const Json& j)
         {
-            std::cout << "Hello duration\n";
-            return duration_type(j.template as<Rep>());
+            if (j.is_number())
+            {
+                return duration_type{j.template as<Rep>()};
+            }
+            else
+            {
+                return duration_type{};
+            }
+        }
+        static Json to_json(const duration_type& val, allocator_type = allocator_type())
+        {
+            return Json(val.count(), semantic_tag::epoch_time);
         }
     };
 }
 
 TEST_CASE("test_chrono")
 {
-    json j(1000, semantic_tag::epoch_time);
-    auto val1 = jsoncons::A<json,std::chrono::seconds>::as(j);
-    auto val2 = jsoncons::A<json,std::chrono::duration<double>>::as(j);
+    json j1(1000, semantic_tag::epoch_time);
+    json j2(1000.10, semantic_tag::epoch_time);
+    auto val1 = jsoncons::A<json,std::chrono::seconds>::as(j1);
+    auto val2 = jsoncons::A<json,std::chrono::duration<double>>::as(j2);
 
     std::cout << val1.count() << ", " << val2.count() << "\n";
 } 
