@@ -1,98 +1,24 @@
-### jsoncons::json_type_traits
-
-```c++
-#include <jsoncons/json_type_traits.hpp>
-```
-
-<br>
-
-`json_type_traits` defines a compile time template based interface for conversion between a `basic_json` value
-and a value of some other type.
-
-The interface that `json_type_traits` specializations must conform to is as follows:
-
-```c++
-template <class Json, class T, class Enable=void>
-struct JsonTypeTraits
-{
-    using allocator_type = typename Json::allocator_type;
-
-    static constexpr bool is(const Json&);
-
-    static T as(const Json&);
-
-    static Json to_json(const T&);
-
-    static Json to_json(const T&, const allocator_type& alloc);
-};
-```
-
-[jsoncons Specializations](jsoncons specializations.md)
-
-[Custom Specializations](jsoncons specializations.md)
-
-[Convenience Macros](jsoncons specializations.md)
-
-
-If you try to specialize `json_type_traits` for a type that is already
-specialized in the jsoncons library, for example, a custom container 
-type that satisfies the conditions for a sequence container, you 
-may see a compile error "more than one partial specialization matches the template argument list".
-For these situations `jsoncons` provides the traits class
-```c++
-template <class T>
-struct is_json_type_traits_declared : public std::false_type {};
-```
-which inherits from [std::false_type](http://www.cplusplus.com/reference/type_traits/false_type/).
-This traits class may be specialized for a user-defined type with member constant `value` equal `true`
-to inform the `jsoncons` library that the type is already specialized.  
-
-### jsoncons specializations
-
-`T`|`j.is<T>()`|`j.as<T>()`|j is assignable from `T`
---------|-----------|--------------|---
-`Json`|`true`|self|<em>&#x2713;</em>
-`Json::object`|`true` if `j.is_object()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`Json::array`|`true` if `j.is_array()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`bool`|`true` if `j.is_bool()`, otherwise `false`|as `bool`|<em>&#x2713;</em>
-`null_type`|`true` if `j.is_null()`, otherwise `false`|`null_type()` value if j.is_null(), otherwise throws|<em>&#x2713;</em>
-`integral types`|`true` if `j.is_int64()` or `j.is_uint64()` and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
-`floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
-`std::basic_string<CharT>`<sup>1</sup>|`true` if `j.is<std::basic_string<CharT>>()`, otherwise `false`|j.as<std::basic_string<CharT>>|<em>&#x2713;</em>
-`jsoncons::basic_string_view<CharT>`<sup>1</sup><sup>,2</sup>|`true` if `j.is<jsoncons::basic_string_view<CharT>>()`, otherwise `false`|j.as<std::basic_string_view<CharT>>|<em>&#x2713;</em>
-STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
-STL associative container e.g. `std::map<K,U>`|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
-`std::tuple<Args...>`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
-`std::pair<U,V>`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
-`std::shared_ptr<U>`<sup>3</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty shared_ptr if `j.is_null()`, otherwise `make_shared(j.as<U>())`|<em>&#x2713;</em>
-`std::unique_ptr<U>`<sup>4</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty unique_ptr if `j.is_null()`, otherwise `make_unique(j.as<U>())`|<em>&#x2713;</em>
-`jsoncons::optional<U>`<sup>5</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `jsoncons::optional<U>` if `j.is_null()`, otherwise `jsoncons::optional<U>(j.as<U>())`|<em>&#x2713;</em>
-`std::variant<Types...>`<sup>6</sup>|&nbsp;|<em>&#x2713;</em>
-  
-1. For `CharT` `char` or `wchar_t`.
-2. `jsoncons::basic_string_view<CharT>` is aliased to [std::basic_string_view<CharT>](https://en.cppreference.com/w/cpp/utility/optional) if 
-jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_STRING_VIEW` is defined.  
-3. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.  
-4. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.   
-5. `jsoncons::optional<U>` is aliased to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
-jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.
-6. Since v0.154.0  
-
 ### Convenience Macros
 
 The `jsoncons` library provides a number of macros that can be used to generate the code to specialize `json_type_traits`
 for a user-defined class.
 
-Macro names include qualifiers `_ALL_` or `_N_` to indicate that the generated traits require all
-members be present in the JSON, or only a specified number be present. For non-mandatory members,
-empty values for `std::shared_ptr`, `std::unique_ptr` and `std::optional` are excluded altogether
-when serializing. For mandatory members, empty values for `std::shared_ptr`, `std::unique_ptr` and `std::optional` 
-become JSON null when serializing.
+Macro names follow naming conventions.
 
-The qualifer `_TPL` indicates that the generated traits are for a template class with a specified number
-of template parameters.
+Component | Description
+----------|--------------------
+TPL       | Template class with a specified number of template parameters
+ALL       | All data members are mandatory
+N         | A specified number of data members are mandatory
+MEMBER    | Accesses and modifies class data members
+CTOR      | Requires constructor that takes all data members
+GETTER    | Accesses data members through getter functions
+SETTER    | Modifies data members through setter functions
+NAME      | Serialize with provided names (instead of C++ member names)
 
 ```c++
+#include <jsoncons/json_type_traits.hpp>
+
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
                          member_name0,member_name1,...) // (1)
 
@@ -306,182 +232,13 @@ All of the `json_type_traits` specializations for type `T` generated by the conv
 
 ### Examples
 
-[Convert from and to standard library sequence containers](#A1)  
-[Convert from and to standard library associative containers](#A2)  
-[Convert from and to std::map with integer key](#A3)  
-[Convert from and to std::tuple](#A4)  
-[Extend json_type_traits to support `boost::gregorian` dates.](#A5)  
-[Specialize json_type_traits to support a book class.](#A6)  
-[Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_type_traits](#A7)  
-[Example with std::shared_ptr, std::unique_ptr and std::optional](#A8)  
-[Serialize a polymorphic type based on the presence of members](#A9)  
-[Ensuring type selection is possible](#A10)  
-[Specialize json_type_traits for a container type that the jsoncons library also supports](#A11)  
-[Convert JSON to/from boost matrix](#A12)
+[Specialize json_type_traits to support a book class](#A1)  
+[Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_type_traits](#A2)  
+[Example with std::shared_ptr, std::unique_ptr and std::optional](#A3)  
+[Serialize a polymorphic type based on the presence of members](#A4)  
+[Ensuring type selection is possible](#A5)  
 
 <div id="A1"/> 
-
-#### Convert from and to standard library sequence containers
-
-```c++
-std::vector<int> v{1, 2, 3, 4};
-json j(v);
-std::cout << "(1) "<< j << std::endl;
-std::deque<int> d = j.as<std::deque<int>>();
-```
-Output:
-```
-(1) [1,2,3,4]
-```
-
-<div id="A2"/> 
-
-#### Convert from and to standard library associative containers
-
-```c++
-std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
-json j(m);
-std::cout << j << std::endl;
-std::unordered_map<std::string,int> um = j.as<std::unordered_map<std::string,int>>();
-```
-Output:
-```
-{"one":1,"three":3,"two":2}
-```
-
-<div id="A3"/> 
-
-#### Convert from and to std::map with integer key
-
-```c++
-std::map<short, std::string> m{ {1,"foo",},{2,"baz"} };
-
-json j{m};
-
-std::cout << "(1)\n";
-std::cout << pretty_print(j) << "\n\n";
-
-auto other = j.as<std::map<uint64_t, std::string>>();
-
-std::cout << "(2)\n";
-for (const auto& item : other)
-{
-    std::cout << item.first << " | " << item.second << "\n";
-}
-std::cout << "\n\n";
-```
-Output:
-
-```c++
-(1)
-{
-    "1": "foo",
-    "2": "baz"
-}
-
-(2)
-1 | foo
-2 | baz
-```
-
-<div id="A4"/> 
-
-#### Convert from and to std::tuple
-
-```c++
-    auto t = std::make_tuple(false,1,"foo");
-    json j(t);
-    std::cout << j << std::endl;
-    auto t2 = j.as<std::tuple<bool,int,std::string>>();
-```
-Output:
-```
-[false,1,"foo"]
-```
-
-<div id="A5"/> 
-
-#### Extend json_type_traits to support `boost::gregorian` dates.
-
-```c++
-#include <jsoncons/json.hpp>
-#include "boost/datetime/gregorian/gregorian.hpp"
-
-namespace jsoncons 
-{
-    template <class Json>
-    struct json_type_traits<Json,boost::gregorian::date>
-    {
-        static bool is(const Json& val) noexcept
-        {
-            if (!val.is_string())
-            {
-                return false;
-            }
-            std::string s = val.template as<std::string>();
-            try
-            {
-                boost::gregorian::from_simple_string(s);
-                return true;
-            }
-            catch (...)
-            {
-                return false;
-            }
-        }
-
-        static boost::gregorian::date as(const Json& val)
-        {
-            std::string s = val.template as<std::string>();
-            return boost::gregorian::from_simple_string(s);
-        }
-
-        static Json to_json(boost::gregorian::date val)
-        {
-            return Json(to_iso_extended_string(val));
-        }
-    };
-}
-```
-```c++
-namespace ns
-{
-    using jsoncons::json;
-    using boost::gregorian::date;
-
-    json deal = json::parse(R"(
-    {
-        "Maturity":"2014-10-14",
-        "ObservationDates": ["2014-02-14","2014-02-21"]
-    }
-    )");
-
-    deal["ObservationDates"].push_back(date(2014,2,28));    
-
-    date maturity = deal["Maturity"].as<date>();
-    std::cout << "Maturity: " << maturity << std::endl << std::endl;
-
-    std::cout << "Observation dates: " << std::endl << std::endl;
-
-    for (auto observation_date: deal["ObservationDates"].array_range())
-    {
-        std::cout << observation_date << std::endl;
-    }
-    std::cout << std::endl;
-}
-```
-Output:
-```
-Maturity: 2014-Oct-14
-
-Observation dates:
-
-2014-Feb-14
-2014-Feb-21
-2014-Feb-28
-```
-
-<div id="A6"/> 
 
 #### Specialize json_type_traits to support a book class.
 
@@ -499,42 +256,6 @@ namespace ns {
         double price;
     };
 } // namespace ns
-
-namespace jsoncons {
-
-    template<class Json>
-    struct json_type_traits<Json, ns::book>
-    {
-        using allocator_type = typename Json::allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            return j.is_object() && j.contains("author") && 
-                   j.contains("title") && j.contains("price");
-        }
-        static ns::book as(const Json& j)
-        {
-            ns::book val;
-            val.author = j.at("author").template as<std::string>();
-            val.title = j.at("title").template as<std::string>();
-            val.price = j.at("price").template as<double>();
-            return val;
-        }
-        static Json to_json(const ns::book& val, 
-                            allocator_type alloc=allocator_type())
-        {
-            Json j(alloc);
-            j.try_emplace("author", val.author);
-            j.try_emplace("title", val.title);
-            j.try_emplace("price", val.price);
-            return j;
-        }
-    };
-} // namespace jsoncons
-```
-
-To save typing and enhance readability, the jsoncons library defines macros, 
-so you could also write
 
 ```c++
 JSONCONS_N_MEMBER_TRAITS(ns::book, author, title, price)
@@ -598,7 +319,7 @@ Charles Bukowski, Pulp, 22.48
 ]
 ```
 
-<div id="A7"/> 
+<div id="A2"/> 
 
 #### Using JSONCONS_ALL_CTOR_GETTER_TRAITS to generate the json_type_traits 
 
@@ -707,7 +428,7 @@ Output:
 }
 ```
 
-<div id="A8"/> 
+<div id="A3"/> 
 
 #### Example with std::shared_ptr, std::unique_ptr and std::optional
 
@@ -796,7 +517,7 @@ Output:
 }
 ```
 
-<div id="A9"/> 
+<div id="A4"/> 
 
 #### Serialize a polymorphic type based on the presence of members
 
@@ -974,7 +695,7 @@ Jane Doe, 30250
 ]
 ```
 
-<div id="A10"/>
+<div id="A5"/>
 
 #### Ensuring type selection is possible
 
@@ -1054,211 +775,4 @@ Output:
 A bar
 A baz
 ```
-
-<div id="A10"/> 
-
-#### Specialize json_type_traits for a container type that the jsoncons library also supports
-
-```c++
-#include <cassert>
-#include <string>
-#include <vector>
-#include <jsoncons/json.hpp>
-
-//own vector will always be of an even length 
-struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; };
-
-namespace jsoncons {
-
-template<class Json>
-struct json_type_traits<Json, own_vector> 
-{
-    static bool is(const Json& j) noexcept
-    { 
-        return j.is_object() && j.size() % 2 == 0;
-    }
-    static own_vector as(const Json& j)
-    {   
-        own_vector v;
-        for (auto& item : j.object_range())
-        {
-            std::string s(item.key());
-            v.push_back(std::strtol(s.c_str(),nullptr,10));
-            v.push_back(item.value().template as<int64_t>());
-        }
-        return v;
-    }
-    static Json to_json(const own_vector& val){
-		Json j;
-		for(std::size_t i=0;i<val.size();i+=2){
-			j[std::to_string(val[i])] = val[i + 1];
-		}
-		return j;
-	}
-};
-
-template <> 
-struct is_json_type_traits_declared<own_vector> : public std::true_type 
-{}; 
-} // jsoncons
-
-using jsoncons::json;
-
-int main()
-{
-    json j(json::object_arg, {{"1",2},{"3",4}});
-    assert(j.is<own_vector>());
-    auto v = j.as<own_vector>();
-    json j2 = v;
-
-    std::cout << j2 << "\n";
-}
-```
-Output:
-```
-{"1":2,"3":4}
-```
-
-<div id="A12"/>
-
-#### Convert JSON to/from boost matrix
-
-```c++
-#include <jsoncons/json.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-
-namespace jsoncons {
-
-    template <class Json, class T>
-    struct json_type_traits<Json,boost::numeric::ublas::matrix<T>>
-    {
-        static bool is(const Json& val) noexcept
-        {
-            if (!val.is_array())
-            {
-                return false;
-            }
-            if (val.size() > 0)
-            {
-                std::size_t n = val[0].size();
-                for (const auto& a: val.array_range())
-                {
-                    if (!(a.is_array() && a.size() == n))
-                    {
-                        return false;
-                    }
-                    for (auto x: a.array_range())
-                    {
-                        if (!x.template is<T>())
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-
-        static boost::numeric::ublas::matrix<T> as(const Json& val)
-        {
-            if (val.is_array() && val.size() > 0)
-            {
-                std::size_t m = val.size();
-                std::size_t n = 0;
-                for (const auto& a : val.array_range())
-                {
-                    if (a.size() > n)
-                    {
-                        n = a.size();
-                    }
-                }
-
-                boost::numeric::ublas::matrix<T> A(m,n,T());
-                for (std::size_t i = 0; i < m; ++i)
-                {
-                    const auto& a = val[i];
-                    for (std::size_t j = 0; j < a.size(); ++j)
-                    {
-                        A(i,j) = a[j].template as<T>();
-                    }
-                }
-                return A;
-            }
-            else
-            {
-                boost::numeric::ublas::matrix<T> A;
-                return A;
-            }
-        }
-
-        static Json to_json(const boost::numeric::ublas::matrix<T>& val)
-        {
-            Json a = Json::template make_array<2>(val.size1(), val.size2(), T());
-            for (std::size_t i = 0; i < val.size1(); ++i)
-            {
-                for (std::size_t j = 0; j < val.size1(); ++j)
-                {
-                    a[i][j] = val(i,j);
-                }
-            }
-            return a;
-        }
-    };
-} // jsoncons
-
-using namespace jsoncons;
-using boost::numeric::ublas::matrix;
-
-int main()
-{
-    matrix<double> A(2, 2);
-    A(0, 0) = 1.1;
-    A(0, 1) = 2.1;
-    A(1, 0) = 3.1;
-    A(1, 1) = 4.1;
-
-    json a = A;
-
-    std::cout << "(1) " << std::boolalpha << a.is<matrix<double>>() << "\n\n";
-
-    std::cout << "(2) " << std::boolalpha << a.is<matrix<int>>() << "\n\n";
-
-    std::cout << "(3) \n\n" << pretty_print(a) << "\n\n";
-
-    matrix<double> B = a.as<matrix<double>>();
-
-    std::cout << "(4) \n\n";
-    for (std::size_t i = 0; i < B.size1(); ++i)
-    {
-        for (std::size_t j = 0; j < B.size2(); ++j)
-        {
-            if (j > 0)
-            {
-                std::cout << ",";
-            }
-            std::cout << B(i, j);
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n\n";
-}
-```
-Output:
-```
-(1) true
-
-(2) false
-
-(3)
-
-[
-    [1.1,2.1],
-    [3.1,4.1]
-]
-
-(4)
-
-1.1,2.1
-3.1,4.1
-``` 
 

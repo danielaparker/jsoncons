@@ -557,7 +557,9 @@ namespace detail {
             }
         }
 
-        static Json to_json(const T& val)
+        template <class Container = T>
+        static typename std::enable_if<!jsoncons::detail::is_std_byte<typename Container::value_type>::value,Json>::type
+        to_json(const T& val)
         {
             Json j(json_array_arg);
             auto first = std::begin(val);
@@ -571,7 +573,9 @@ namespace detail {
             return j;
         }
 
-        static Json to_json(const T& val, const allocator_type& alloc)
+        template <class Container = T>
+        static typename std::enable_if<!jsoncons::detail::is_std_byte<typename Container::value_type>::value,Json>::type
+        to_json(const T& val, const allocator_type& alloc)
         {
             Json j(json_array_arg, alloc);
             auto first = std::begin(val);
@@ -582,6 +586,22 @@ namespace detail {
             {
                 j.push_back(*it);
             }
+            return j;
+        }
+
+        template <class Container = T>
+        static typename std::enable_if<jsoncons::detail::is_std_byte<typename Container::value_type>::value,Json>::type
+        to_json(const T& val)
+        {
+            Json j(byte_string_arg, val);
+            return j;
+        }
+
+        template <class Container = T>
+        static typename std::enable_if<jsoncons::detail::is_std_byte<typename Container::value_type>::value,Json>::type
+        to_json(const T& val, const allocator_type& alloc)
+        {
+            Json j(byte_string_arg, val, semantic_tag::none, alloc);
             return j;
         }
 
