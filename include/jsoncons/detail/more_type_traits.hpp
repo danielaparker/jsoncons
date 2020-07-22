@@ -15,7 +15,7 @@
 #include <iterator> // std::iterator_traits
 #include <exception>
 #include <array> // std::array
-//#include <cstddef> // std::byte
+#include <cstddef> // std::byte
 #include <utility> // std::declval
 #include <jsoncons/config/compiler_support.hpp>
 
@@ -123,6 +123,16 @@ namespace detail {
                                    std::is_floating_point<T>::value
     >::type> : std::true_type {};
 
+    // is_std_byte
+
+    template <class T, class Enable=void>
+    struct is_std_byte : std::false_type {};
+#if defined(JSONCONS_HAS_STD_BYTE)
+    template <class T>
+    struct is_std_byte<T, 
+           typename std::enable_if<std::is_same<T,std::byte>::value
+    >::type> : std::true_type {};
+#endif
     // is_byte
 
     template <class T, class Enable=void>
@@ -132,7 +142,8 @@ namespace detail {
     struct is_byte<T, 
            typename std::enable_if<std::is_same<T,char>::value ||
                                    std::is_same<T,signed char>::value ||
-                                   std::is_same<T,unsigned char>::value 
+                                   std::is_same<T,unsigned char>::value ||
+                                   is_std_byte<T>::value
     >::type> : std::true_type {};
 
     // is_character
