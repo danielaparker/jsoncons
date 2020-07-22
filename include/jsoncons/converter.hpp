@@ -258,7 +258,7 @@ namespace jsoncons {
 
         template <class ChT = char_type>
         JSONCONS_CPP14_CONSTEXPR
-        typename std::enable_if<jsoncons::detail::is_byte_sized<ChT>::value>::type
+        typename std::enable_if<jsoncons::detail::is_byte<ChT>::value>::type
         from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code&) const
         {
             switch (tag)
@@ -277,7 +277,7 @@ namespace jsoncons {
 
         template <class ChT = char_type>
         JSONCONS_CPP14_CONSTEXPR
-        typename std::enable_if<!jsoncons::detail::is_byte_sized<ChT>::value>::type
+        typename std::enable_if<!jsoncons::detail::is_byte<ChT>::value>::type
         from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
         {
             converter<std::string> convert{ dummy_ };

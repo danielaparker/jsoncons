@@ -15,7 +15,7 @@
 #include <iterator> // std::iterator_traits
 #include <exception>
 #include <array> // std::array
-#include <cstddef> // std::byte
+//#include <cstddef> // std::byte
 #include <utility> // std::declval
 #include <jsoncons/config/compiler_support.hpp>
 
@@ -121,6 +121,18 @@ namespace detail {
     struct is_primitive<T, 
            typename std::enable_if<std::is_integral<T>::value ||
                                    std::is_floating_point<T>::value
+    >::type> : std::true_type {};
+
+    // is_byte
+
+    template <class T, class Enable=void>
+    struct is_byte : std::false_type {};
+
+    template <class T>
+    struct is_byte<T, 
+           typename std::enable_if<std::is_same<T,char>::value ||
+                                   std::is_same<T,signed char>::value ||
+                                   std::is_same<T,unsigned char>::value 
     >::type> : std::true_type {};
 
     // is_character
@@ -410,27 +422,6 @@ namespace detail {
         static constexpr bool value = has_data<Container>::value && has_size<Container>::value;
     };
 
-    // is_byte_sized
-
-    template <class T, class Enable=void>
-    struct is_byte_sized : std::false_type {};
-
-    template <class T>
-    struct is_byte_sized<T, 
-           typename std::enable_if<sizeof(T) == sizeof(uint8_t)
-    >::type> : std::true_type {};
-
-    // is_std_byte
-
-    template <class T, class Enable=void>
-    struct is_std_byte : std::false_type {};
-#if defined(JSONCONS_HAS_STD_BYTE)
-    template <class T>
-    struct is_std_byte<T, 
-           typename std::enable_if<std::is_same<T,std::byte>::value
-    >::type> : std::true_type {};
-#endif
-
     // is_byte_sequence
 
     template <class Container, class Enable=void>
@@ -440,7 +431,7 @@ namespace detail {
     struct is_byte_sequence<Container, 
            typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
                                    has_size<Container>::value &&
-                                   is_byte_sized<typename Container::value_type>::value
+                                   is_byte<typename Container::value_type>::value
     >::type> : std::true_type {};
 
     // is_back_insertable_byte_container
@@ -451,7 +442,7 @@ namespace detail {
     template <class Container>
     struct is_back_insertable_byte_container<Container, 
            typename std::enable_if<is_back_insertable<Container>::value &&
-                                   is_byte_sized<typename Container::value_type>::value
+                                   is_byte<typename Container::value_type>::value
     >::type> : std::true_type {};
 
     // is_c_array

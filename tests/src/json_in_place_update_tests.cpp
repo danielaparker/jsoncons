@@ -35,7 +35,12 @@ namespace {
         {
             if (value == from_)
             {
-                std::copy(to_.begin(), to_.end(), data_ + context.position() + 1);
+                //std::copy(to_.begin(), to_.end(), data_ + context.position() + 1);
+                auto p = data_ + context.position() + 1;
+                for (auto it = to_.begin(); it != to_.end(); ++it)
+                {
+                    *p++ = *it;
+                }
             }
             return true;
         }
