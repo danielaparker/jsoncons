@@ -13,6 +13,6 @@ and a value of some other type.
 
 [Convenience Macros](json_type_traits/convenience-macros.md)
 
-[Custom Specializations](json_type_traits/jsoncons-specializations.md)
+[Custom Specializations](json_type_traits/custom-specializations.md)
 
 
