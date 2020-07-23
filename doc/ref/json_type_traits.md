@@ -17,15 +17,27 @@ struct json_type_traits
 {
     using allocator_type = typename Json::allocator_type;
 
-    static constexpr bool is(const Json&);
+    static constexpr bool is(const Json&) noexcept;
 
     static T as(const Json&);
 
-    static Json to_json(const T&);
+    static Json to_json(const T& val);
 
-    static Json to_json(const T&, const allocator_type& = allocator_type());
+    static Json to_json(const T& val, const allocator_type& alloc);
 };
 ```
+
+The function `json_type_traits<Json,T>::is(const Json& j)` indictates whether `j` satisfies 
+the requirements of type `T`. This function supports the type selection strategy when
+converting a `Json` value to the proper derived class in the polymorphic case, and
+when converting a `Json` value to the proper alternative type in the variant case.  
+
+The function `json_type_traits<Json,T>::as(const Json& j)` tries to convert `j`
+to a value of type `T`.
+
+The functions `json_type_traits<Json,T>::to_json(const T& val)` and 
+`json_type_traits<Json,T>::to_json(const T& val, const allocator_type& alloc)`
+try to convert `val` into a `Json` value.
 
 jsoncons includes specializiations for most types in the standard library. 
 And it includes convenience macros that make specializing `json_type_traits` for your own types easier.

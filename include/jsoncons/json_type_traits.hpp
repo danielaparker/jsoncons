@@ -59,7 +59,7 @@ namespace jsoncons {
 
         static constexpr bool is_compatible = false;
 
-        static constexpr bool is(const Json&)
+        static constexpr bool is(const Json&) noexcept
         {
             return false;
         }
