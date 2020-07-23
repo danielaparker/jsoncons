@@ -1,23 +1,5 @@
 ### Custom Specializations
 
-The interface that `json_type_traits` specializations must conform to is as follows:
-
-```c++
-template <class Json, class T, class Enable=void>
-struct JsonTypeTraits
-{
-    using allocator_type = typename Json::allocator_type;
-
-    static constexpr bool is(const Json&);
-
-    static T as(const Json&);
-
-    static Json to_json(const T&);
-
-    static Json to_json(const T&, const allocator_type& alloc);
-};
-```
-
 If you try to specialize `json_type_traits` for a type that is already
 specialized in the jsoncons library, for example, a custom container 
 type that satisfies the conditions for a sequence container, you 
