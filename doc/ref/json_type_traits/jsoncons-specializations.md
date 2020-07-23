@@ -61,6 +61,12 @@ int main()
     cbor::encode_cbor(j, data);
 
     std::cout << "CBOR bytes: " << jsoncons::byte_string_view(data) << "\n\n";
+
+    /*
+        c1 -- tag value 1 (seconds relative to 1970-01-01T00:00Z in UTC time) 
+        fb -- double precision float
+        41,d7,c6,7b,8f,c7,05,51 -- 1595534911.1097 
+    */
 }
 ```
 Output:
