@@ -4,6 +4,17 @@ jsoncons supports most types in the standard library.
 
 * [duration](#duration) - jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 with a tick period of 1 second.
+* [sequence containers](#sequence) - jsoncons supports [std::array](https://en.cppreference.com/w/cpp/container/array), 
+[std::vector](https://en.cppreference.com/w/cpp/container/vector), [std::deque](https://en.cppreference.com/w/cpp/container/deque), 
+[std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) and [std::list](https://en.cppreference.com/w/cpp/container/list).
+* [associative containers](#associative) jsoncons supports [std::set](https://en.cppreference.com/w/cpp/container/set), 
+[std::map](https://en.cppreference.com/w/cpp/container/map), [std::multiset](https://en.cppreference.com/w/cpp/container/multiset), 
+and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
+* [unordered associative containers](#unordered) - jsoncons supports unordered associative containers
+[std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set), 
+[std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map), 
+[std::unordered_multiset](https://en.cppreference.com/w/cpp/container/unordered_multiset), and 
+[std::unordered_multimap](https://en.cppreference.com/w/cpp/container/unordered_multimap).
 
 ### duration
 
