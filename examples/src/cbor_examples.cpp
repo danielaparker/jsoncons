@@ -537,10 +537,25 @@ namespace {
         std::cout << "(4)\n" << byte_string_view(buffer2.data(),buffer2.size()) << "\n";
     }
     
+    void duration_example1()
+    {
+        auto duration = std::chrono::system_clock::now().time_since_epoch();
+        double time = std::chrono::duration_cast<std::chrono::duration<double>>(duration).count();
 
-}; // namespace
+        json j(time, jsoncons::semantic_tag::epoch_time);
 
-void run_cbor_examples()
+        auto dur = j.as<std::chrono::duration<double>>();
+        std::cout << "Time since epoch: " << dur.count() << "\n\n";
+
+        std::vector<uint8_t> data;
+        cbor::encode_cbor(j, data);
+
+        std::cout << "CBOR bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+    }
+
+} // namespace
+
+void cbor_examples()
 {
     std::cout << "\ncbor examples\n\n";
 
@@ -567,5 +582,6 @@ void run_cbor_examples()
     query_cbor();
 
     ext_type_example();
+    duration_example1();
 }
 

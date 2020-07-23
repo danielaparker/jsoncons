@@ -34,7 +34,7 @@ void jsonpointer_examples();
 void msgpack_examples();
 void ojson_examples();
 void readme_examples();
-void run_cbor_examples();
+void cbor_examples();
 void run_cbor_typed_array_examples();
 void run_csv_examples();
 void run_ubjson_examples();
@@ -421,13 +421,9 @@ int main()
 
         json_traits_macros_named_examples();
 
-        msgpack_examples();
-
         readme_examples();
 
         run_cbor_typed_array_examples();
-
-        run_cbor_examples();
 
         data_model_examples();
 
@@ -436,8 +432,6 @@ int main()
         json_accessor_examples();
 
         array_examples();
-
-        run_cbor_examples();
 
         json_reader_examples();
 
@@ -448,6 +442,10 @@ int main()
         jmespath_examples();
 
         json_type_traits_variant_examples();
+
+        msgpack_examples();
+
+        cbor_examples();
     }
     catch (const std::exception& e)
     {

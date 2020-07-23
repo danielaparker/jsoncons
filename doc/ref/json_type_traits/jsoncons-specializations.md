@@ -1,5 +1,75 @@
 ### jsoncons Specializations
 
+jsoncons supports most types in the standard library.
+
+* [std::duration](#duration) - jsoncons supports [std::duration](https://en.cppreference.com/w/cpp/chrono/duration)
+with a tick period of 1 second.
+
+### duration
+
+jsoncons supports [std::duration](https://en.cppreference.com/w/cpp/chrono/duration)
+with a tick period of 1 second.
+
+#### MessagePack example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0xd6, // fixext 4 stores an integer and a byte array whose length is 4 bytes
+        0xff, // timestamp
+        0x5a,0x4a,0xf6,0xa5 // 1514862245
+    };
+    auto j = msgpack::decode_msgpack<json>(data);
+    auto seconds = j.as<std::chrono::duration<uint32_t>>();
+    std::cout << "Seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+}
+```
+Output:
+```
+Seconds elapsed since 1970-01-01 00:00:00 UTC: 1514862245
+```
+
+#### CBOR example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    double time = std::chrono::duration_cast<std::chrono::duration<double>>(duration).count();
+
+    json j(time, jsoncons::semantic_tag::epoch_time);
+
+    auto dur = j.as<std::chrono::duration<double>>();
+    std::cout << "Time since epoch: " << dur.count() << "\n\n";
+
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(j, data);
+
+    std::cout << "CBOR bytes: " << jsoncons::byte_string_view(data) << "\n\n";
+}
+```
+Output:
+```
+Time since epoch: 1595534911.1097
+
+CBOR bytes: c1,fb,41,d7,c6,7b,8f,c7,05,51
+```
+
 `T`|`j.is<T>()`|`j.as<T>()`|j is assignable from `T`
 --------|-----------|--------------|---
 `Json`|`true`|self|<em>&#x2713;</em>

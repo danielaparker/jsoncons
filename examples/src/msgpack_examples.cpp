@@ -5,7 +5,10 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/msgpack/msgpack.hpp>
 
-using namespace jsoncons;
+// For brevity
+using jsoncons::json;
+using jsoncons::ojson;
+namespace msgpack = jsoncons::msgpack;
 
 namespace {
 
@@ -52,7 +55,7 @@ namespace {
         j1["zero"] = 0;
         j1["one"] = 1;
         j1["two"] = 2;
-        j1["null"] = null_type();
+        j1["null"] = jsoncons::null_type();
         j1["true"] = true;
         j1["false"] = false;
         j1["max int64_t"] = (std::numeric_limits<int64_t>::max)();
@@ -110,11 +113,27 @@ namespace {
         auto v = j["Data"].as<std::vector<uint8_t>>(); 
 
         std::cout << "(3)\n";
-        std::cout << byte_string_view(v) << "\n\n";
+        std::cout << jsoncons::byte_string_view(v) << "\n\n";
 
         std::vector<uint8_t> output;
         msgpack::encode_msgpack(j,output);
         assert(output == input);
+    }
+
+    void duration_example1()
+    {
+        std::vector<uint8_t> data = {
+            0xd6, // fixext 4 stores an integer and a byte array whose length is 4 bytes
+            0xff, // timestamp
+            0x5a,0x4a,0xf6,0xa5 // 1514862245
+        };
+        auto j = msgpack::decode_msgpack<json>(data);
+        auto seconds = j.as<std::chrono::duration<uint32_t>>();
+        std::cout << "Seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+    }
+
+    void duration_example2()
+    {
     }
 
 } // namespace
@@ -125,6 +144,7 @@ void msgpack_examples()
     example1();
     example2();
     ext_example();
+    duration_example1();
     std::cout << std::endl;
 }
 
