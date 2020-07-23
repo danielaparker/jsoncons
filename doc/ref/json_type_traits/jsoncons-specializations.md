@@ -2,12 +2,12 @@
 
 jsoncons supports most types in the standard library.
 
-* [std::duration](#duration) - jsoncons supports [std::duration](https://en.cppreference.com/w/cpp/chrono/duration)
+* [duration](#duration) - jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 with a tick period of 1 second.
 
 ### duration
 
-jsoncons supports [std::duration](https://en.cppreference.com/w/cpp/chrono/duration)
+jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 with a tick period of 1 second.
 
 #### MessagePack example
