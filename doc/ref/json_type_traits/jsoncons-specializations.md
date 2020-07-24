@@ -2,8 +2,19 @@
 
 jsoncons supports most types in the standard library.
 
+* [basic_string](#basic_string) - jsoncons supports [std::basic_string](https://en.cppreference.com/w/cpp/string/basic_string) 
+with character types `char` and `wchar_t`
+* [basic_string_view](#basic_string_view) - jsoncons supports [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) 
+with character types `char` and `wchar_t`
 * [duration](#duration) - jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 with a tick period of 1 second.
+* [pair](#pair)
+* [tuple](#tuple)
+* [optional](#optional)
+* [shared_ptr and unique_ptr](#shared_ptr) - if `T` is a class that is not a polymorphic class, i.e., does not have any virtual functions,
+jsoncons provides specializations for [std::shared_ptr<T>](https://en.cppreference.com/w/cpp/memory/unique_ptr) and 
+[std::unique_ptr<T>](https://en.cppreference.com/w/cpp/memory/unique_ptr) 
+* [variant](#variant)
 * [sequence containers](#sequence) - includes [std::array](https://en.cppreference.com/w/cpp/container/array), 
 [std::vector](https://en.cppreference.com/w/cpp/container/vector), [std::deque](https://en.cppreference.com/w/cpp/container/deque), 
 [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) and [std::list](https://en.cppreference.com/w/cpp/container/list).
@@ -86,35 +97,6 @@ Time since epoch: 1595534911.1097
 
 CBOR bytes: c1,fb,41,d7,c6,7b,8f,c7,05,51
 ```
-
-`T`|`j.is<T>()`|`j.as<T>()`|j is assignable from `T`
---------|-----------|--------------|---
-`Json`|`true`|self|<em>&#x2713;</em>
-`Json::object`|`true` if `j.is_object()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`Json::array`|`true` if `j.is_array()`, otherwise `false`|Compile-time error|<em>&#x2713;</em>
-`bool`|`true` if `j.is_bool()`, otherwise `false`|as `bool`|<em>&#x2713;</em>
-`null_type`|`true` if `j.is_null()`, otherwise `false`|`null_type()` value if j.is_null(), otherwise throws|<em>&#x2713;</em>
-`integral types`|`true` if `j.is_int64()` or `j.is_uint64()` and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
-`floating point types`|`true` if j.is_double() and value is in range, otherwise `false`|j numeric value cast to `T`|<em>&#x2713;</em>
-`std::basic_string<CharT>`<sup>1</sup>|`true` if `j.is<std::basic_string<CharT>>()`, otherwise `false`|j.as<std::basic_string<CharT>>|<em>&#x2713;</em>
-`jsoncons::basic_string_view<CharT>`<sup>1</sup><sup>,2</sup>|`true` if `j.is<jsoncons::basic_string_view<CharT>>()`, otherwise `false`|j.as<std::basic_string_view<CharT>>|<em>&#x2713;</em>
-STL sequence container (other than string) e.g. std::vector|`true` if array and each value is assignable to a `Json` value, otherwise `false`|if array and each value is convertible to `value_type`, as container, otherwise throws|<em>&#x2713;</em>
-STL associative container e.g. `std::map<K,U>`|`true` if object and each `mapped_type` is assignable to `Json`, otherwise `false`|if object and each member value is convertible to `mapped_type`, as container|<em>&#x2713;</em>
-`std::tuple<Args...>`|`true` if `j.is_array()` and each array element is assignable to the corresponding `tuple` element, otherwise false|tuple with array elements converted to tuple elements|<em>&#x2713;</em>
-`std::pair<U,V>`|`true` if `j.is_array()` and `j.size()==2` and each array element is assignable to the corresponding pair element, otherwise false|pair with array elements converted to pair elements|<em>&#x2713;</em>
-`std::shared_ptr<U>`<sup>3</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty shared_ptr if `j.is_null()`, otherwise `make_shared(j.as<U>())`|<em>&#x2713;</em>
-`std::unique_ptr<U>`<sup>4</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty unique_ptr if `j.is_null()`, otherwise `make_unique(j.as<U>())`|<em>&#x2713;</em>
-`jsoncons::optional<U>`<sup>5</sup>|`true` if `j.is_null()` or `j.is<U>()`|Empty `jsoncons::optional<U>` if `j.is_null()`, otherwise `jsoncons::optional<U>(j.as<U>())`|<em>&#x2713;</em>
-`std::variant<Types...>`<sup>6</sup>|&nbsp;|<em>&#x2713;</em>
-  
-1. For `CharT` `char` or `wchar_t`.
-2. `jsoncons::basic_string_view<CharT>` is aliased to [std::basic_string_view<CharT>](https://en.cppreference.com/w/cpp/utility/optional) if 
-jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_STRING_VIEW` is defined.  
-3. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.  
-4. Defined if `U` is not a polymorphic class, i.e., does not have any virtual functions.   
-5. `jsoncons::optional<U>` is aliased to [std::optional<U>](https://en.cppreference.com/w/cpp/utility/optional) if 
-jsoncons detects the presence of C++17, or if `JSONCONS_HAS_STD_OPTIONAL` is defined.
-6. Since v0.154.0  
 
 ### Examples
 
