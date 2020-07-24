@@ -7,7 +7,7 @@
 <br>
 
 `json_type_traits` defines a compile time template based interface for conversion between a `basic_json` value
-and a value of some other type. The traits class that `json_type_traits` implementations must specialize is as follows:
+and a value of some other type. `json_type_traits` implementations must specialize this traits class:
 
 ```c++
 template <class Json, class T, class Enable=void>
