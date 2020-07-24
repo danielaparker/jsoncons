@@ -6,7 +6,7 @@ jsoncons supports most types in the standard library.
 with character types `char` and `wchar_t`
 * [basic_string_view](#basic_string_view) - jsoncons supports [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) 
 with character types `char` and `wchar_t`
-* [duration](#duration) - jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
+* [duration](#duration) (since 0.155.0) - jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 with a tick period of 1 second.
 * [pair](#pair)
 * [tuple](#tuple)
@@ -14,7 +14,7 @@ with a tick period of 1 second.
 * [shared_ptr and unique_ptr](#shared_ptr) - if `T` is a class that is not a polymorphic class (does not have any virtual functions),
 jsoncons provides specializations for [std::shared_ptr<T>](https://en.cppreference.com/w/cpp/memory/unique_ptr) and 
 [std::unique_ptr<T>](https://en.cppreference.com/w/cpp/memory/unique_ptr) 
-* [variant](#variant)
+* [variant](#variant) (since 0.154.0)
 * [sequence containers](#sequence) - includes [std::array](https://en.cppreference.com/w/cpp/container/array), 
 [std::vector](https://en.cppreference.com/w/cpp/container/vector), [std::deque](https://en.cppreference.com/w/cpp/container/deque), 
 [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) and [std::list](https://en.cppreference.com/w/cpp/container/list).
