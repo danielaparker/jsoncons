@@ -98,16 +98,33 @@ Time since epoch: 1595534911.1097
 CBOR bytes: c1,fb,41,d7,c6,7b,8f,c7,05,51
 ```
 
-### Examples
+### pair
 
-[Convert from and to standard library sequence containers](#A1)  
-[Convert from and to standard library associative containers](#A2)  
-[Convert from and to std::map with integer key](#A3)  
-[Convert from and to std::tuple](#A4)  
+The pair specialization encodes an `std::pair` as a JSON array of size 2.
 
-<div id="A1"/> 
+### tuple
 
-#### Convert from and to standard library sequence containers
+The tuple specialization encodes an `std::tuple` as a fixed size JSON array.
+
+#### Example
+
+```c++
+auto t = std::make_tuple(false,1,"foo");
+json j(t);
+std::cout << j << std::endl;
+auto t2 = j.as<std::tuple<bool,int,std::string>>();
+```
+Output:
+```
+[false,1,"foo"]
+```
+
+### variant
+
+
+### sequence containers 
+
+#### Example
 
 ```c++
 std::vector<int> v{1, 2, 3, 4};
@@ -120,9 +137,9 @@ Output:
 (1) [1,2,3,4]
 ```
 
-<div id="A2"/> 
+### associative containers 
 
-#### Convert from and to standard library associative containers
+#### From std::map, to std::unordered_map
 
 ```c++
 std::map<std::string,int> m{{"one",1},{"two",2},{"three",3}};
@@ -134,10 +151,7 @@ Output:
 ```
 {"one":1,"three":3,"two":2}
 ```
-
-<div id="A3"/> 
-
-#### Convert from and to std::map with integer key
+#### std::map with integer key
 
 ```c++
 std::map<short, std::string> m{ {1,"foo",},{2,"baz"} };
@@ -169,20 +183,4 @@ Output:
 1 | foo
 2 | baz
 ```
-
-<div id="A4"/> 
-
-#### Convert from and to std::tuple
-
-```c++
-    auto t = std::make_tuple(false,1,"foo");
-    json j(t);
-    std::cout << j << std::endl;
-    auto t2 = j.as<std::tuple<bool,int,std::string>>();
-```
-Output:
-```
-[false,1,"foo"]
-```
-
 
