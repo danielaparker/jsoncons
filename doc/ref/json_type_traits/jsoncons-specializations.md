@@ -6,7 +6,7 @@ jsoncons supports most types in the standard library.
 with character types `char` and `wchar_t`
 * [basic_string_view](#basic_string_view) - jsoncons supports [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) 
 with character types `char` and `wchar_t`
-* [duration](#duration) (since 0.155.0) - includes [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
+* [duration](#duration) (since 0.155.0) - covers [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 with a tick period of 1 second.
 * [pair](#pair)
 * [tuple](#tuple)
