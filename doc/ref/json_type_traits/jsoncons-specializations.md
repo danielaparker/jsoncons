@@ -18,7 +18,7 @@ jsoncons provides specializations for [std::shared_ptr<T>](https://en.cppreferen
 * [sequence containers](#sequence) - includes [std::array](https://en.cppreference.com/w/cpp/container/array), 
 [std::vector](https://en.cppreference.com/w/cpp/container/vector), [std::deque](https://en.cppreference.com/w/cpp/container/deque), 
 [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) and [std::list](https://en.cppreference.com/w/cpp/container/list).
-* [associative containers](#associative) includes [std::set](https://en.cppreference.com/w/cpp/container/set), 
+* [associative containers](#associative) - includes [std::set](https://en.cppreference.com/w/cpp/container/set), 
 [std::map](https://en.cppreference.com/w/cpp/container/map), [std::multiset](https://en.cppreference.com/w/cpp/container/multiset), 
 and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 * [unordered associative containers](#unordered) - includes unordered associative containers
