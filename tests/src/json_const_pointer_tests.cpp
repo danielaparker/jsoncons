@@ -56,6 +56,9 @@ TEST_CASE("json_const_pointer object tests")
         REQUIRE_THROWS(v.at("two"));
         CHECK(v.contains("two"));
         CHECK(v.count("two") == 1);
+
+        CHECK(v.get_value_or<int>("three", 0) == 3);
+        CHECK(v.get_value_or<int>("four", 4) == 4);
     }
     SECTION("at() const")
     {
@@ -64,6 +67,9 @@ TEST_CASE("json_const_pointer object tests")
         CHECK(v.at("two") == 2);
         CHECK(v.contains("two"));
         CHECK(v.count("two") == 1);
+
+        CHECK(v.get_value_or<int>("three", 0) == 3);
+        CHECK(v.get_value_or<int>("four", 4) == 4);
     }
 }
 

@@ -4240,7 +4240,7 @@ public:
                 }
             }
             case storage_kind::json_const_pointer:
-                return cast<json_const_pointer_storage>().value()->get_value_or(key,std::forward<U>(default_value));
+                return cast<json_const_pointer_storage>().value()->template get_value_or<T,U>(key,std::forward<U>(default_value));
             default:
             {
                 JSONCONS_THROW(not_an_object(key.data(),key.length()));
