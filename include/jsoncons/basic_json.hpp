@@ -2440,13 +2440,53 @@ public:
         return static_cast<storage_kind>(common_stor_.storage_);
     }
 
+    json_type type() const
+    {
+        switch(storage())
+        {
+            case storage_kind::null_value:
+                return json_type::null_value;
+            case storage_kind::bool_value:
+                return json_type::bool_value;
+            case storage_kind::int64_value:
+                return json_type::int64_value;
+            case storage_kind::uint64_value:
+                return json_type::uint64_value;
+            case storage_kind::half_value:
+                return json_type::half_value;
+            case storage_kind::double_value:
+                return json_type::double_value;
+            case storage_kind::short_string_value:
+            case storage_kind::long_string_value:
+                return json_type::string_value;
+            case storage_kind::byte_string_value:
+                return json_type::byte_string_value;
+            case storage_kind::array_value:
+                return json_type::array_value;
+            case storage_kind::empty_object_value:
+            case storage_kind::object_value:
+                return json_type::object_value;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->type();
+            default:
+                JSONCONS_UNREACHABLE();
+                break;
+        }
+    }
+
     semantic_tag tag() const
     {
         // It is legal to access 'common_stor_.tag_' even though 
         // common_stor_ is not the active member of the union because 'tag_' 
         // is a part of the common initial sequence of all union members
         // as defined in 11.4-25 of the Standard.
-        return common_stor_.tag_;
+        switch(storage())
+        {
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->tag();
+            default:
+                return common_stor_.tag_;
+        }
     }
 
     std::size_t size() const
@@ -2474,6 +2514,8 @@ public:
                 return string_view_type(cast<short_string_storage>().data(),cast<short_string_storage>().length());
             case storage_kind::long_string_value:
                 return string_view_type(cast<long_string_storage>().data(),cast<long_string_storage>().length());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_string_view();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a string"));
         }
@@ -3489,6 +3531,8 @@ public:
             {
                 return cast<byte_string_storage>().ext_tag();
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->ext_tag();
             default:
                 return 0;
         }
@@ -3498,39 +3542,41 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::object_value:
+            case storage_kind::object_value:
             {
                 auto it = object_value().find(key);
                 return it != object_value().end();
             }
-            break;
-        default:
-            return false;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->contains(key);
+            default:
+                return false;
         }
     }
 
-    std::size_t count(const string_view_type& name) const
+    std::size_t count(const string_view_type& key) const
     {
         switch (storage())
         {
-        case storage_kind::object_value:
+            case storage_kind::object_value:
             {
-                auto it = object_value().find(name);
+                auto it = object_value().find(key);
                 if (it == object_value().end())
                 {
                     return 0;
                 }
                 std::size_t count = 0;
-                while (it != object_value().end()&& it->key() == name)
+                while (it != object_value().end()&& it->key() == key)
                 {
                     ++count;
                     ++it;
                 }
                 return count;
             }
-            break;
-        default:
-            return 0;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->count(key);
+            default:
+                return 0;
         }
     }
 
@@ -3865,7 +3911,7 @@ public:
             case storage_kind::byte_string_value:
                 return T(as_byte_string_view().begin(), as_byte_string_view().end());
             case storage_kind::json_const_pointer:
-                return cast<json_const_pointer_storage>().value()->as(byte_string_arg, hint);
+                return cast<json_const_pointer_storage>().value()->template as<T>(byte_string_arg, hint);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
         }
@@ -4037,24 +4083,26 @@ public:
         }
     }
 
-    const basic_json& at(const string_view_type& name) const
+    const basic_json& at(const string_view_type& key) const
     {
         switch (storage())
         {
             case storage_kind::empty_object_value:
-                JSONCONS_THROW(key_not_found(name.data(),name.length()));
+                JSONCONS_THROW(key_not_found(key.data(),key.length()));
             case storage_kind::object_value:
             {
-                auto it = object_value().find(name);
+                auto it = object_value().find(key);
                 if (it == object_value().end())
                 {
-                    JSONCONS_THROW(key_not_found(name.data(),name.length()));
+                    JSONCONS_THROW(key_not_found(key.data(),key.length()));
                 }
                 return it->value();
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->at(key);
             default:
             {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+                JSONCONS_THROW(not_an_object(key.data(),key.length()));
             }
         }
     }
@@ -4088,6 +4136,8 @@ public:
                 return array_value().operator[](i);
             case storage_kind::object_value:
                 return object_value().at(i);
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->at(i);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
         }
@@ -4108,22 +4158,24 @@ public:
         }
     }
 
-    const_object_iterator find(const string_view_type& name) const
+    const_object_iterator find(const string_view_type& key) const
     {
         switch (storage())
         {
             case storage_kind::empty_object_value:
                 return object_range().end();
             case storage_kind::object_value:
-                return const_object_iterator(object_value().find(name));
+                return const_object_iterator(object_value().find(key));
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->find(key);
             default:
             {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+                JSONCONS_THROW(not_an_object(key.data(),key.length()));
             }
         }
     }
 
-    const basic_json& at_or_null(const string_view_type& name) const
+    const basic_json& at_or_null(const string_view_type& key) const
     {
         switch (storage())
         {
@@ -4134,7 +4186,7 @@ public:
             }
             case storage_kind::object_value:
             {
-                auto it = object_value().find(name);
+                auto it = object_value().find(key);
                 if (it != object_value().end())
                 {
                     return it->value();
@@ -4144,15 +4196,17 @@ public:
                     return null();
                 }
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->at_or_null(key);
             default:
             {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+                JSONCONS_THROW(not_an_object(key.data(),key.length()));
             }
         }
     }
 
     template <class T,class U>
-    T get_value_or(const string_view_type& name, U&& default_value) const
+    T get_value_or(const string_view_type& key, U&& default_value) const
     {
         static_assert(std::is_copy_constructible<T>::value,
                       "get_value_or: T must be copy constructible");
@@ -4160,14 +4214,14 @@ public:
                       "get_value_or: U must be convertible to T");
         switch (storage())
         {
-        case storage_kind::null_value:
-        case storage_kind::empty_object_value:
+            case storage_kind::null_value:
+            case storage_kind::empty_object_value:
             {
                 return static_cast<T>(std::forward<U>(default_value));
             }
-        case storage_kind::object_value:
+            case storage_kind::object_value:
             {
-                auto it = object_value().find(name);
+                auto it = object_value().find(key);
                 if (it != object_value().end())
                 {
                     return it->value().template as<T>();
@@ -4177,9 +4231,11 @@ public:
                     return static_cast<T>(std::forward<U>(default_value));
                 }
             }
-        default:
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->get_value_or(key,std::forward<U>(default_value));
+            default:
             {
-                JSONCONS_THROW(not_an_object(name.data(),name.length()));
+                JSONCONS_THROW(not_an_object(key.data(),key.length()));
             }
         }
     }
@@ -4591,38 +4647,6 @@ public:
             {
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Attempting to insert into a value that is not an array"));
             }
-        }
-    }
-
-    json_type type() const
-    {
-        switch(storage())
-        {
-            case storage_kind::null_value:
-                return json_type::null_value;
-            case storage_kind::bool_value:
-                return json_type::bool_value;
-            case storage_kind::int64_value:
-                return json_type::int64_value;
-            case storage_kind::uint64_value:
-                return json_type::uint64_value;
-            case storage_kind::half_value:
-                return json_type::half_value;
-            case storage_kind::double_value:
-                return json_type::double_value;
-            case storage_kind::short_string_value:
-            case storage_kind::long_string_value:
-                return json_type::string_value;
-            case storage_kind::byte_string_value:
-                return json_type::byte_string_value;
-            case storage_kind::array_value:
-                return json_type::array_value;
-            case storage_kind::empty_object_value:
-            case storage_kind::object_value:
-                return json_type::object_value;
-            default:
-                JSONCONS_UNREACHABLE();
-                break;
         }
     }
 

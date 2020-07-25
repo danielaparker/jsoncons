@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>
@@ -24,6 +24,18 @@ TEST_CASE("json_const_pointer array tests")
         CHECK(v.size() == 3);
         CHECK_FALSE(v.empty());
     }
+    SECTION("at()")
+    {
+        json v(json_const_pointer_arg, &j);
+        REQUIRE(v.is_array());
+        REQUIRE_THROWS(v.at(1));
+    }
+    SECTION("at() const")
+    {
+        const json v(json_const_pointer_arg, &j);
+        REQUIRE(v.is_array());
+        CHECK(v.at(1) == std::string("two"));
+    }
 }
 
 TEST_CASE("json_const_pointer object tests")
@@ -36,6 +48,22 @@ TEST_CASE("json_const_pointer object tests")
         REQUIRE(v.is_object());
         CHECK(v.size() == 3);
         CHECK_FALSE(v.empty());
+    }
+    SECTION("at()")
+    {
+        json v(json_const_pointer_arg, &j);
+        REQUIRE(v.is_object());
+        REQUIRE_THROWS(v.at("two"));
+        CHECK(v.contains("two"));
+        CHECK(v.count("two") == 1);
+    }
+    SECTION("at() const")
+    {
+        const json v(json_const_pointer_arg, &j);
+        REQUIRE(v.is_object());
+        CHECK(v.at("two") == 2);
+        CHECK(v.contains("two"));
+        CHECK(v.count("two") == 1);
     }
 }
 
