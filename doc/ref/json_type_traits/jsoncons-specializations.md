@@ -2,6 +2,10 @@
 
 jsoncons supports most types in the standard library.
 
+* integer types 
+* float and double
+* bool
+* [nullptr_t](https://en.cppreference.com/w/cpp/types/nullptr_t) (since 0.155.0)
 * [basic_string](#basic_string) - jsoncons supports [std::basic_string](https://en.cppreference.com/w/cpp/string/basic_string) 
 with character types `char` and `wchar_t`
 * [basic_string_view](#basic_string_view) - jsoncons supports [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) 
