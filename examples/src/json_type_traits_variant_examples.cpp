@@ -139,34 +139,15 @@ void variant_example2()
 {
     using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
 
-    variant_type var1(100);
-    variant_type var2(10.1);
-    variant_type var3(false);
-    variant_type var4(std::string("Hello World"));
-    variant_type var5(ns::Color::yellow);
 
-    std::string buffer1;
-    jsoncons::encode_json(var1,buffer1);
-    std::string buffer2;
-    jsoncons::encode_json(var2,buffer2);
-    std::string buffer3;
-    jsoncons::encode_json(var3,buffer3);
-    std::string buffer4;
-    jsoncons::encode_json(var4,buffer4);
-    std::string buffer5;
-    jsoncons::encode_json(var5,buffer5);
+    std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
-    std::cout << "(1) " << buffer1 << "\n";
-    std::cout << "(2) " << buffer2 << "\n";
-    std::cout << "(3) " << buffer3 << "\n";
-    std::cout << "(4) " << buffer4 << "\n";
-    std::cout << "(5) " << buffer5 << "\n";
+    std::string buffer;
+    jsoncons::encode_json(vars, buffer, jsoncons::indenting::indent);
 
-    auto v1 = jsoncons::decode_json<variant_type>(buffer1);
-    auto v2 = jsoncons::decode_json<variant_type>(buffer2);
-    auto v3 = jsoncons::decode_json<variant_type>(buffer3);
-    auto v4 = jsoncons::decode_json<variant_type>(buffer4);
-    auto v5 = jsoncons::decode_json<variant_type>(buffer5);
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
 
     auto visitor = [](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
@@ -182,52 +163,26 @@ void variant_example2()
                 std::cout << "ns::Color " << arg << '\n';
         };
 
+    std::cout << "(2)\n";
+    for (const auto& item : vars2)
+    {
+        std::visit(visitor, item);
+    }
     std::cout << "\n";
-    std::cout << "(6) ";
-    std::visit(visitor, v1);
-    std::cout << "(7) ";
-    std::visit(visitor, v2);
-    std::cout << "(8) ";
-    std::visit(visitor, v3);
-    std::cout << "(9) ";
-    std::visit(visitor, v4);
-    std::cout << "(10) ";
-    std::visit(visitor, v5);
-    std::cout << "\n\n";
 }
 
 void variant_example3()
 {
     using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
 
-    variant_type var1(100);
-    variant_type var2(10.1);
-    variant_type var3(false);
-    variant_type var4(std::string("Hello World"));
-    variant_type var5(ns::Color::yellow);
+    std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
-    std::string buffer1;
-    jsoncons::encode_json(var1, buffer1);
-    std::string buffer2;
-    jsoncons::encode_json(var2, buffer2);
-    std::string buffer3;
-    jsoncons::encode_json(var3, buffer3);
-    std::string buffer4;
-    jsoncons::encode_json(var4, buffer4);
-    std::string buffer5;
-    jsoncons::encode_json(var5, buffer5);
+    std::string buffer;
+    jsoncons::encode_json(vars, buffer, jsoncons::indenting::indent);
 
-    std::cout << "(1) " << buffer1 << "\n";
-    std::cout << "(2) " << buffer2 << "\n";
-    std::cout << "(3) " << buffer3 << "\n";
-    std::cout << "(4) " << buffer4 << "\n";
-    std::cout << "(5) " << buffer5 << "\n";
+    std::cout << "(1)\n" << buffer << "\n\n";
 
-    auto v1 = jsoncons::decode_json<variant_type>(buffer1);
-    auto v2 = jsoncons::decode_json<variant_type>(buffer2);
-    auto v3 = jsoncons::decode_json<variant_type>(buffer3);
-    auto v4 = jsoncons::decode_json<variant_type>(buffer4);
-    auto v5 = jsoncons::decode_json<variant_type>(buffer5);
+    auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
 
     auto visitor = [](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
@@ -243,18 +198,12 @@ void variant_example3()
                 std::cout << "ns::Color " << arg << '\n';
         };
 
+    std::cout << "(2)\n";
+    for (const auto& item : vars2)
+    {
+        std::visit(visitor, item);
+    }
     std::cout << "\n";
-    std::cout << "(6) ";
-    std::visit(visitor, v1);
-    std::cout << "(7) ";
-    std::visit(visitor, v2);
-    std::cout << "(8) ";
-    std::visit(visitor, v3);
-    std::cout << "(9) ";
-    std::visit(visitor, v4);
-    std::cout << "(10) ";
-    std::visit(visitor, v5);
-    std::cout << "\n\n";
 }
 
 void variant_example4()
@@ -298,9 +247,9 @@ void json_type_traits_variant_examples()
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
     variant_example();
+    variant_example4();
     variant_example2();
     variant_example3();
-    variant_example4();
 #endif
 
     std::cout << std::endl;

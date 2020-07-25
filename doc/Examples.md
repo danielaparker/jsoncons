@@ -51,6 +51,7 @@
 [Insert a new value in an array at a specific position](#C3)  
 [Merge two json objects](#C5)  
 [Construct a json byte string](#C6)  
+[Construct a multidimensional json array](#C7)  
 
 ### Access
 
@@ -2341,34 +2342,14 @@ int main()
 {
     using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
 
-    variant_type var1(100);
-    variant_type var2(10.1);
-    variant_type var3(false);
-    variant_type var4(std::string("Hello World"));
-    variant_type var5(ns::Color::yellow);
+    std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
-    std::string buffer1;
-    jsoncons::encode_json(var1,buffer1);
-    std::string buffer2;
-    jsoncons::encode_json(var2,buffer2);
-    std::string buffer3;
-    jsoncons::encode_json(var3,buffer3);
-    std::string buffer4;
-    jsoncons::encode_json(var4,buffer4);
-    std::string buffer5;
-    jsoncons::encode_json(var5,buffer5);
+    std::string buffer;
+    jsoncons::encode_json(vars, buffer, jsoncons::indenting::indent);
 
-    std::cout << "(1) " << buffer1 << "\n";
-    std::cout << "(2) " << buffer2 << "\n";
-    std::cout << "(3) " << buffer3 << "\n";
-    std::cout << "(4) " << buffer4 << "\n";
-    std::cout << "(5) " << buffer5 << "\n";
+    std::cout << "(1)\n" << buffer << "\n\n";
 
-    auto v1 = jsoncons::decode_json<variant_type>(buffer1);
-    auto v2 = jsoncons::decode_json<variant_type>(buffer2);
-    auto v3 = jsoncons::decode_json<variant_type>(buffer3);
-    auto v4 = jsoncons::decode_json<variant_type>(buffer4);
-    auto v5 = jsoncons::decode_json<variant_type>(buffer5);
+    auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
 
     auto visitor = [](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
@@ -2384,34 +2365,33 @@ int main()
                 std::cout << "ns::Color " << arg << '\n';
         };
 
+    std::cout << "(2)\n";
+    for (const auto& item : vars2)
+    {
+        std::visit(visitor, item);
+    }
     std::cout << "\n";
-    std::cout << "(6) ";
-    std::visit(visitor, v1);
-    std::cout << "(7) ";
-    std::visit(visitor, v2);
-    std::cout << "(8) ";
-    std::visit(visitor, v3);
-    std::cout << "(9) ";
-    std::visit(visitor, v4);
-    std::cout << "(10) ";
-    std::visit(visitor, v5);
-    std::cout << "\n\n";
 }
 ```
 Output:
 ```
-(1) 100
-(2) 10.1
-(3) false
-(4) "Hello World"
-(5) "YELLOW"
+(1)
+[
+    100,
+    10.1,
+    false,
+    "Hello World",
+    "YELLOW"
+]
 
-(6) int 100
-(7) double 10.1
-(8) bool false
-(9) std::string Hello World
-(10) std::string YELLOW
+(2)
+int 100
+double 10.1
+bool false
+std::string Hello World
+std::string YELLOW
 ```
+
 Encode is fine. But when decoding, jsoncons checks if the JSON string "YELLOW" is a `std::string` 
 before it checks whether it is an `ns::Color`, and since the answer is yes, 
 it is stored in the variant as a `std::string`.
@@ -2425,18 +2405,23 @@ strings containing  the text "YELLOW", "RED", "GREEN", or "BLUE" are detected to
 
 And the output becomes
 ```
-(1) 100
-(2) 10.1
-(3) false
-(4) "Hello World"
-(5) "YELLOW"
+(1)
+[
+    100,
+    10.1,
+    false,
+    "Hello World",
+    "YELLOW"
+]
 
-(6) int 100
-(7) double 10.1
-(8) bool false
-(9) std::string Hello World
-(10) ns::Color yellow
+(2)
+int 100
+double 10.1
+bool false
+std::string Hello World
+ns::Color yellow
 ```
+
 So: types that are more constrained should appear to the left of types that are less constrained.
 
 <div id="G13"/>
@@ -2639,6 +2624,53 @@ Output:
 (2) "SGVsbG8="
 
 (3) "48656C6C6F"
+```
+<div id="C7"/>
+
+#### Construct multidimensional json arrays
+
+Create a 4 x 3 x 2 json array with all elements initialized to 0.0:
+
+```c++
+json j = json::make_array<3>(4, 3, 2, 0.0);
+double val = 1.0;
+for (size_t i = 0; i < a.size(); ++i)
+{
+    for (size_t j = 0; j < j[i].size(); ++j)
+    {
+        for (size_t k = 0; k < j[i][j].size(); ++k)
+        {
+            j[i][j][k] = val;
+            val += 1.0;
+        }
+    }
+}
+std::cout << pretty_print(j) << std::endl;
+```
+Output:
+```json
+[
+    [
+        [1.0,2.0],
+        [3.0,4.0],
+        [5.0,6.0]
+    ],
+    [
+        [7.0,8.0],
+        [9.0,10.0],
+        [11.0,12.0]
+    ],
+    [
+        [13.0,14.0],
+        [15.0,16.0],
+        [17.0,18.0]
+    ],
+    [
+        [19.0,20.0],
+        [21.0,22.0],
+        [23.0,24.0]
+    ]
+]
 ```
 
 ### Iterate
