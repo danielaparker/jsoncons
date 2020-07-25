@@ -87,7 +87,7 @@ namespace detail {
                 case convert_errc::not_variant:
                     return "Cannot convert to std::variant";
                 case convert_errc::not_nullptr:
-                    return "Cannot convert to nullptr_t";
+                    return "Cannot convert to std::nullptr_t";
                 default:
                     return "Unknown convert error";
             }

@@ -1465,9 +1465,9 @@ namespace variant_detail
         }
     };
 
-    // nullptr_t
+    // std::nullptr_t
     template <class Json>
-    struct json_type_traits<Json,nullptr_t>
+    struct json_type_traits<Json,std::nullptr_t>
     {
         using allocator_type = typename Json::allocator_type;
 
@@ -1476,7 +1476,7 @@ namespace variant_detail
             return j.is_null();
         }
 
-        static nullptr_t as(const Json& j)
+        static std::nullptr_t as(const Json& j)
         {
             if (!j.is_null())
             {
@@ -1485,7 +1485,7 @@ namespace variant_detail
             return nullptr;
         }
 
-        static Json to_json(const nullptr_t&, allocator_type = allocator_type())
+        static Json to_json(const std::nullptr_t&, allocator_type = allocator_type())
         {
             return Json::null();
         }

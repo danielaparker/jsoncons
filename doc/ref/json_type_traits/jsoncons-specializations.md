@@ -142,7 +142,7 @@ int main()
 
     auto visitor = [](auto&& arg) {
             using T = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_same_v<T, nullptr_t>)
+            if constexpr (std::is_same_v<T, std::nullptr_t>)
                 std::cout << "nullptr " << arg << '\n';
             else if constexpr (std::is_same_v<T, int>)
                 std::cout << "int " << arg << '\n';

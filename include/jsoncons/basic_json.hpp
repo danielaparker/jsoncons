@@ -3547,6 +3547,8 @@ public:
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_string();
             default:
                 return false;
         }
@@ -3563,6 +3565,8 @@ public:
         {
             case storage_kind::byte_string_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_byte_string();
             default:
                 return false;
         }
@@ -3583,6 +3587,8 @@ public:
             case storage_kind::int64_value:
             case storage_kind::uint64_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_bignum();
             default:
                 return false;
         }
@@ -3594,6 +3600,8 @@ public:
         {
             case storage_kind::bool_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_bool();
             default:
                 return false;
         }
@@ -3634,6 +3642,8 @@ public:
                 return true;
             case storage_kind::uint64_value:
                 return as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_int64();
             default:
                 return false;
         }
@@ -3647,6 +3657,8 @@ public:
                 return true;
             case storage_kind::int64_value:
                 return as_integer<int64_t>() >= 0;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_uint64();
             default:
                 return false;
         }
@@ -3658,6 +3670,8 @@ public:
         {
             case storage_kind::half_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_half();
             default:
                 return false;
         }
@@ -3669,6 +3683,8 @@ public:
         {
             case storage_kind::double_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_double();
             default:
                 return false;
         }
@@ -3688,6 +3704,8 @@ public:
                 return tag() == semantic_tag::bigint ||
                        tag() == semantic_tag::bigdec ||
                        tag() == semantic_tag::bigfloat;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_number();
             default:
                 return false;
         }
@@ -3710,6 +3728,8 @@ public:
                 return true;
             case storage_kind::object_value:
                 return object_value().size() == 0;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->empty();
             default:
                 return false;
         }
@@ -3844,6 +3864,8 @@ public:
             }
             case storage_kind::byte_string_value:
                 return T(as_byte_string_view().begin(), as_byte_string_view().end());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as(byte_string_arg, hint);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
         }
@@ -3859,6 +3881,8 @@ public:
                 return cast<int64_storage>().value() != 0;
             case storage_kind::uint64_value:
                 return cast<uint64_storage>().value() != 0;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_bool();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bool"));
         }
@@ -3893,6 +3917,8 @@ public:
                 return static_cast<T>(cast<uint64_storage>().value());
             case storage_kind::bool_value:
                 return static_cast<T>(cast<bool_storage>().value() ? 1 : 0);
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template as_integer<T>();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
         }
@@ -3917,6 +3943,8 @@ public:
                 return static_cast<double>(cast<int64_storage>().value());
             case storage_kind::uint64_value:
                 return static_cast<double>(cast<uint64_storage>().value());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_double();
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
@@ -3960,6 +3988,8 @@ public:
                 }
                 return s;
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_string(alloc);
             default:
             {
                 string_type s(alloc);
@@ -3978,6 +4008,8 @@ public:
                 return cast<short_string_storage>().c_str();
             case storage_kind::long_string_value:
                 return cast<long_string_storage>().c_str();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_cstring();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a cstring"));
         }
