@@ -2459,6 +2459,8 @@ public:
                 return 0;
             case storage_kind::object_value:
                 return cast<object_storage>().value().size();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->size();
             default:
                 return 0;
         }
@@ -3604,6 +3606,8 @@ public:
             case storage_kind::empty_object_value:
             case storage_kind::object_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_object();
             default:
                 return false;
         }
@@ -3615,6 +3619,8 @@ public:
         {
             case storage_kind::array_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_array();
             default:
                 return false;
         }
