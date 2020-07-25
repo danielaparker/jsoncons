@@ -139,7 +139,6 @@ void variant_example2()
 {
     using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
 
-
     std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
     std::string buffer;
