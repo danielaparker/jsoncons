@@ -8,6 +8,8 @@ Changes:
 
 Enhancements:
 
+- Added `json_type_traits` support for `std::nullptr_t`
+
 - Added `json_type_traits` support for `std::chrono::duration`
 
 v0.154.3
