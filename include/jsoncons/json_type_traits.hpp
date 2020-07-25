@@ -1435,7 +1435,6 @@ namespace variant_detail
     };
 #endif
 
-
     // std::chrono::duration
     template<class Json,class Rep>
     struct json_type_traits<Json,std::chrono::duration<Rep>>
@@ -1463,6 +1462,32 @@ namespace variant_detail
         static Json to_json(const duration_type& val, allocator_type = allocator_type())
         {
             return Json(val.count(), semantic_tag::epoch_time);
+        }
+    };
+
+    // nullptr_t
+    template <class Json>
+    struct json_type_traits<Json,nullptr_t>
+    {
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            return j.is_null();
+        }
+
+        static nullptr_t as(const Json& j)
+        {
+            if (!j.is_null())
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_nullptr));
+            }
+            return nullptr;
+        }
+
+        static Json to_json(const nullptr_t&, allocator_type = allocator_type())
+        {
+            return Json::null();
         }
     };
 

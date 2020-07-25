@@ -121,6 +121,60 @@ Output:
 
 ### variant
 
+#### Example
+
+```c++
+int main()
+{
+    using variant_type = std::variant<std::nullptr_t, int, double, bool, std::string>;
+    
+    std::vector<variant_type> v = {nullptr, 10, 5.1, true, std::string("Hello World")}; 
+
+    std::string buffer;
+    jsoncons::encode_json(v, buffer, jsoncons::indenting::indent);
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto v2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
+
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, nullptr_t>)
+                std::cout << "nullptr " << arg << '\n';
+            else if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+        };
+
+    std::cout << "(2)\n";
+    for (const auto& item : v2)
+    {
+        std::visit(visitor, item);
+    }
+}
+```
+Output:
+```
+(1)
+[
+    null,
+    10,
+    5.1,
+    true,
+    "Hello World"
+]
+
+(2)
+nullptr nullptr
+int 10
+double 5.1
+bool true
+std::string Hello World
+```
 
 ### sequence containers 
 

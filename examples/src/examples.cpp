@@ -441,11 +441,11 @@ int main()
 
         jmespath_examples();
 
-        json_type_traits_variant_examples();
-
         msgpack_examples();
 
         cbor_examples();
+
+        json_type_traits_variant_examples();
     }
     catch (const std::exception& e)
     {

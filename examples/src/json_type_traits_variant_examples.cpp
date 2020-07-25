@@ -257,6 +257,39 @@ void variant_example3()
     std::cout << "\n\n";
 }
 
+void variant_example4()
+{
+    using variant_type = std::variant<std::nullptr_t, int, double, bool, std::string>;
+    
+    std::vector<variant_type> v = {nullptr, 10, 5.1, true, std::string("Hello World")}; 
+
+    std::string buffer;
+    jsoncons::encode_json(v, buffer, jsoncons::indenting::indent);
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto v2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
+
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, nullptr_t>)
+                std::cout << "nullptr " << arg << '\n';
+            else if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+        };
+
+    std::cout << "(2)\n";
+    for (const auto& item : v2)
+    {
+        std::visit(visitor, item);
+    }
+}
+
 #endif // defined(JSONCONS_HAS_STD_VARIANT)
 
 void json_type_traits_variant_examples()
@@ -267,6 +300,7 @@ void json_type_traits_variant_examples()
     variant_example();
     variant_example2();
     variant_example3();
+    variant_example4();
 #endif
 
     std::cout << std::endl;
