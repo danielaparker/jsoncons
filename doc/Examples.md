@@ -2629,7 +2629,7 @@ Output:
 
 #### Construct multidimensional json arrays
 
-Create a 4 x 3 x 2 json array with all elements initialized to 0.0:
+Construct a 3-dimensional 4 x 3 x 2 json array with all elements initialized to 0.0:
 
 ```c++
 json j = json::make_array<3>(4, 3, 2, 0.0);
