@@ -3335,7 +3335,13 @@ public:
 
     bool is_null() const noexcept
     {
-        return storage() == storage_kind::null_value;
+        switch (storage())
+        {
+            case storage_kind::null_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     allocator_type get_allocator() const
@@ -3424,7 +3430,14 @@ public:
 
     bool is_string() const noexcept
     {
-        return (storage() == storage_kind::long_string_value) || (storage() == storage_kind::short_string_value);
+        switch (storage())
+        {
+            case storage_kind::short_string_value:
+            case storage_kind::long_string_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_string_view() const noexcept
@@ -3434,7 +3447,13 @@ public:
 
     bool is_byte_string() const noexcept
     {
-        return storage() == storage_kind::byte_string_value;
+        switch (storage())
+        {
+            case storage_kind::byte_string_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_byte_string_view() const noexcept
@@ -3459,37 +3478,84 @@ public:
 
     bool is_bool() const noexcept
     {
-        return storage() == storage_kind::bool_value;
+        switch (storage())
+        {
+            case storage_kind::bool_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_object() const noexcept
     {
-        return storage() == storage_kind::object_value || storage() == storage_kind::empty_object_value;
+        switch (storage())
+        {
+            case storage_kind::empty_object_value:
+            case storage_kind::object_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_array() const noexcept
     {
-        return storage() == storage_kind::array_value;
+        switch (storage())
+        {
+            case storage_kind::array_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_int64() const noexcept
     {
-        return storage() == storage_kind::int64_value || (storage() == storage_kind::uint64_value&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+        switch (storage())
+        {
+            case storage_kind::int64_value:
+                return true;
+            case storage_kind::uint64_value:
+                return as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
+            default:
+                return false;
+        }
     }
 
     bool is_uint64() const noexcept
     {
-        return storage() == storage_kind::uint64_value || (storage() == storage_kind::int64_value&& as_integer<int64_t>() >= 0);
+        switch (storage())
+        {
+            case storage_kind::uint64_value:
+                return true;
+            case storage_kind::int64_value:
+                return as_integer<int64_t>() >= 0;
+            default:
+                return false;
+        }
     }
 
     bool is_half() const noexcept
     {
-        return storage() == storage_kind::half_value;
+        switch (storage())
+        {
+            case storage_kind::half_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_double() const noexcept
     {
-        return storage() == storage_kind::double_value;
+        switch (storage())
+        {
+            case storage_kind::double_value:
+                return true;
+            default:
+                return false;
+        }
     }
 
     bool is_number() const noexcept
@@ -3568,22 +3634,22 @@ public:
         {
             switch (storage())
             {
-            case storage_kind::array_value:
-                array_value().reserve(n);
+                case storage_kind::array_value:
+                    array_value().reserve(n);
+                    break;
+                case storage_kind::empty_object_value:
+                {
+                    create_object_implicitly();
+                    object_value().reserve(n);
+                }
                 break;
-            case storage_kind::empty_object_value:
-            {
-                create_object_implicitly();
-                object_value().reserve(n);
-            }
-            break;
-            case storage_kind::object_value:
-            {
-                object_value().reserve(n);
-            }
-                break;
-            default:
-                break;
+                case storage_kind::object_value:
+                {
+                    object_value().reserve(n);
+                }
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -3592,11 +3658,11 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::array_value:
-            array_value().resize(n);
-            break;
-        default:
-            break;
+            case storage_kind::array_value:
+                array_value().resize(n);
+                break;
+            default:
+                break;
         }
     }
 
@@ -3605,11 +3671,11 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::array_value:
-            array_value().resize(n, val);
-            break;
-        default:
-            break;
+            case storage_kind::array_value:
+                array_value().resize(n, val);
+                break;
+            default:
+                break;
         }
     }
 
@@ -3792,12 +3858,12 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::short_string_value:
-            return cast<short_string_storage>().c_str();
-        case storage_kind::long_string_value:
-            return cast<long_string_storage>().c_str();
-        default:
-            JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a cstring"));
+            case storage_kind::short_string_value:
+                return cast<short_string_storage>().c_str();
+            case storage_kind::long_string_value:
+                return cast<long_string_storage>().c_str();
+            default:
+                JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a cstring"));
         }
     }
 
@@ -3805,9 +3871,9 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::empty_object_value:
-            JSONCONS_THROW(key_not_found(name.data(),name.length()));
-        case storage_kind::object_value:
+            case storage_kind::empty_object_value:
+                JSONCONS_THROW(key_not_found(name.data(),name.length()));
+            case storage_kind::object_value:
             {
                 auto it = object_value().find(name);
                 if (it == object_value().end())
@@ -3816,8 +3882,7 @@ public:
                 }
                 return it->value();
             }
-            break;
-        default:
+            default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }
@@ -3828,9 +3893,9 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::empty_object_value:
-            JSONCONS_THROW(key_not_found(name.data(),name.length()));
-        case storage_kind::object_value:
+            case storage_kind::empty_object_value:
+                JSONCONS_THROW(key_not_found(name.data(),name.length()));
+            case storage_kind::object_value:
             {
                 auto it = object_value().find(name);
                 if (it == object_value().end())
@@ -3839,8 +3904,7 @@ public:
                 }
                 return it->value();
             }
-            break;
-        default:
+            default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }
@@ -3851,16 +3915,16 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::array_value:
-            if (i >= array_value().size())
-            {
-                JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
-            }
-            return array_value().operator[](i);
-        case storage_kind::object_value:
-            return object_value().at(i);
-        default:
-            JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
+            case storage_kind::array_value:
+                if (i >= array_value().size())
+                {
+                    JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
+                }
+                return array_value().operator[](i);
+            case storage_kind::object_value:
+                return object_value().at(i);
+            default:
+                JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
         }
     }
 
@@ -3868,16 +3932,16 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::array_value:
-            if (i >= array_value().size())
-            {
-                JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
-            }
-            return array_value().operator[](i);
-        case storage_kind::object_value:
-            return object_value().at(i);
-        default:
-            JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
+            case storage_kind::array_value:
+                if (i >= array_value().size())
+                {
+                    JSONCONS_THROW(json_runtime_error<std::out_of_range>("Invalid array subscript"));
+                }
+                return array_value().operator[](i);
+            case storage_kind::object_value:
+                return object_value().at(i);
+            default:
+                JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
         }
     }
 
@@ -3885,11 +3949,11 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::empty_object_value:
-            return object_range().end();
-        case storage_kind::object_value:
-            return object_iterator(object_value().find(name));
-        default:
+            case storage_kind::empty_object_value:
+                return object_range().end();
+            case storage_kind::object_value:
+                return object_iterator(object_value().find(name));
+            default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }
@@ -3900,11 +3964,11 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::empty_object_value:
-            return object_range().end();
-        case storage_kind::object_value:
-            return const_object_iterator(object_value().find(name));
-        default:
+            case storage_kind::empty_object_value:
+                return object_range().end();
+            case storage_kind::object_value:
+                return const_object_iterator(object_value().find(name));
+            default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }
@@ -3915,12 +3979,12 @@ public:
     {
         switch (storage())
         {
-        case storage_kind::null_value:
-        case storage_kind::empty_object_value:
+            case storage_kind::null_value:
+            case storage_kind::empty_object_value:
             {
                 return null();
             }
-        case storage_kind::object_value:
+            case storage_kind::object_value:
             {
                 auto it = object_value().find(name);
                 if (it != object_value().end())
@@ -3932,7 +3996,7 @@ public:
                     return null();
                 }
             }
-        default:
+            default:
             {
                 JSONCONS_THROW(not_an_object(name.data(),name.length()));
             }
@@ -4756,19 +4820,19 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use is_int64()")
     bool is_integer() const noexcept
     {
-        return storage() == storage_kind::int64_value || (storage() == storage_kind::uint64_value&& (as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)())));
+        return is_int64();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use is_uint64()")
     bool is_uinteger() const noexcept
     {
-        return storage() == storage_kind::uint64_value || (storage() == storage_kind::int64_value&& as_integer<int64_t>() >= 0);
+        return is_uint64();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<uint64_t>()")
     uint64_t as_uinteger() const
     {
-        return as_integer<uint64_t>();
+        return as<uint64_t>();
     }
 
     JSONCONS_DEPRECATED_MSG("No replacement")
@@ -4937,113 +5001,55 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use is<long long>()")
     bool is_longlong() const noexcept
     {
-        return storage() == storage_kind::int64_value;
+        return is<long long>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
     bool is_ulonglong() const noexcept
     {
-        return storage() == storage_kind::uint64_value;
+        return is<unsigned long long>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<long long>()")
     long long as_longlong() const
     {
-        return as_integer<int64_t>();
+        return as<long long>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned long long>()")
     unsigned long long as_ulonglong() const
     {
-        return as_integer<uint64_t>();
+        return as<unsigned long long>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<int>()")
     int as_int() const
     {
-        switch (storage())
-        {
-        case storage_kind::double_value:
-            return static_cast<int>(cast<double_storage>().value());
-        case storage_kind::int64_value:
-            return static_cast<int>(cast<int64_storage>().value());
-        case storage_kind::uint64_value:
-            return static_cast<int>(cast<uint64_storage>().value());
-        case storage_kind::bool_value:
-            return cast<bool_storage>().value() ? 1 : 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an int"));
-        }
+        return as<int>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned int>()")
     unsigned int as_uint() const
     {
-        switch (storage())
-        {
-        case storage_kind::double_value:
-            return static_cast<unsigned int>(cast<double_storage>().value());
-        case storage_kind::int64_value:
-            return static_cast<unsigned int>(cast<int64_storage>().value());
-        case storage_kind::uint64_value:
-            return static_cast<unsigned int>(cast<uint64_storage>().value());
-        case storage_kind::bool_value:
-            return cast<bool_storage>().value() ? 1 : 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an unsigned int"));
-        }
+        return as<unsigned int>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<long>()")
     long as_long() const
     {
-        switch (storage())
-        {
-        case storage_kind::double_value:
-            return static_cast<long>(cast<double_storage>().value());
-        case storage_kind::int64_value:
-            return static_cast<long>(cast<int64_storage>().value());
-        case storage_kind::uint64_value:
-            return static_cast<long>(cast<uint64_storage>().value());
-        case storage_kind::bool_value:
-            return cast<bool_storage>().value() ? 1 : 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a long"));
-        }
+        return as<long>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<unsigned long>()")
     unsigned long as_ulong() const
     {
-        switch (storage())
-        {
-        case storage_kind::double_value:
-            return static_cast<unsigned long>(cast<double_storage>().value());
-        case storage_kind::int64_value:
-            return static_cast<unsigned long>(cast<int64_storage>().value());
-        case storage_kind::uint64_value:
-            return static_cast<unsigned long>(cast<uint64_storage>().value());
-        case storage_kind::bool_value:
-            return cast<bool_storage>().value() ? 1 : 0;
-        default:
-            JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an unsigned long"));
-        }
+        return as<unsigned long>();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
-    bool has_member(const string_view_type& name) const noexcept
+    bool has_member(const string_view_type& key) const noexcept
     {
-        switch (storage())
-        {
-        case storage_kind::object_value:
-            {
-                auto it = object_value().find(name);
-                return it != object_value().end();
-            }
-            break;
-        default:
-            return false;
-        }
+        return contains(key);
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
