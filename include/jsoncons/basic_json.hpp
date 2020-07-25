@@ -2244,7 +2244,7 @@ private:
                 construct<array_storage>(val.cast<array_storage>());
                 break;
             case storage_kind::json_const_pointer:
-                construct<json_const_pointer_storage>(val.cast<json_const_pointer_storage>());
+                Init_(*(val.cast<json_const_pointer_storage>().value()));
                 break;
             default:
                 break;
@@ -2263,7 +2263,6 @@ private:
             case storage_kind::half_value:
             case storage_kind::double_value:
             case storage_kind::short_string_value:
-            case storage_kind::json_const_pointer:
                 Init_(val);
                 break;
             case storage_kind::long_string_value:
@@ -2277,6 +2276,9 @@ private:
                 break;
             case storage_kind::object_value:
                 construct<object_storage>(val.cast<object_storage>(),a);
+                break;
+            case storage_kind::json_const_pointer:
+                Init_(*(val.cast<json_const_pointer_storage>().value()), a);
                 break;
             default:
                 break;

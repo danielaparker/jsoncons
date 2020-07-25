@@ -36,6 +36,23 @@ TEST_CASE("json_const_pointer array tests")
         REQUIRE(v.is_array());
         CHECK(v.at(1) == std::string("two"));
     }
+    SECTION("copy")
+    {
+        json v(json_const_pointer_arg, &j);
+        CHECK(v.storage() == storage_kind::json_const_pointer);
+
+        json j2(v);
+        CHECK(j2.storage() == storage_kind::array_value);
+    }
+    SECTION("assignment")
+    {
+        json v(json_const_pointer_arg, &j);
+        CHECK(v.storage() == storage_kind::json_const_pointer);
+
+        json j2;
+        j2 = v;
+        CHECK(j2.storage() == storage_kind::array_value);
+    }
 }
 
 TEST_CASE("json_const_pointer object tests")
