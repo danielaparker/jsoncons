@@ -11,7 +11,7 @@ TPL       | Template class with a specified number of template parameters
 ALL       | All data members are mandatory
 N         | A specified number of data members are mandatory
 MEMBER    | Accesses and modifies class data members
-CTOR      | Requires constructor that takes all data members
+CTOR      | Requires constructor that takes all data members in the order they appear in the list
 GETTER    | Accesses data members through getter functions
 SETTER    | Modifies data members through setter functions
 NAME      | Serialize with provided names (instead of C++ member names)
