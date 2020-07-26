@@ -36,8 +36,7 @@ namespace jsoncons {
         byte_string_value = 0x08,
         array_value = 0x09,
         empty_object_value = 0x0a,
-        object_value = 0x0b,
-        json_const_pointer = 0x0c
+        object_value = 0x0b
     };
 
 } // jsoncons
