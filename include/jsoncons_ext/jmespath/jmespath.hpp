@@ -2931,27 +2931,27 @@ namespace jmespath {
                     return context.null_value();
                 }
 
-                auto currentp = context.create_json(json_array_arg);
-                for (reference item : val.array_range())
+                std::vector<pointer> temp;
+                for (reference current_elem : val.array_range())
                 {
-                    if (item.is_array())
+                    if (current_elem.is_array())
                     {
-                        for (reference item_of_item : item.array_range())
+                        for (reference elem : current_elem.array_range())
                         {
-                            currentp->push_back(item_of_item);
+                            temp.push_back(std::addressof(elem));
                         }
                     }
                     else
                     {
-                        currentp->push_back(item);
+                        temp.push_back(std::addressof(current_elem));
                     }
                 }
                 auto result = context.create_json(json_array_arg);
-                for (reference item : currentp->array_range())
+                for (pointer item : temp)
                 {
-                    if (!item.is_null())
+                    if (!item->is_null())
                     {
-                        reference j = this->apply_expressions(item, context, ec);
+                        reference j = this->apply_expressions(*item, context, ec);
                         if (!j.is_null())
                         {
                             result->push_back(j);
