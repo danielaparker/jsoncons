@@ -456,6 +456,17 @@ namespace detail {
                                    is_byte<typename Container::value_type>::value
     >::type> : std::true_type {};
 
+    // is_back_insertable_char_container
+
+    template <class Container, class Enable=void>
+    struct is_back_insertable_char_container : std::false_type {};
+
+    template <class Container>
+    struct is_back_insertable_char_container<Container, 
+           typename std::enable_if<is_back_insertable<Container>::value &&
+                                   is_character<typename Container::value_type>::value
+    >::type> : std::true_type {};
+
     // is_c_array
 
     template<class T>

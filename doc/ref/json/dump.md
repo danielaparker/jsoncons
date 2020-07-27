@@ -1,6 +1,21 @@
 ### `jsoncons::basic_json::dump`
 
 ```c++
+
+    template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (1)
+
+    void dump(std::basic_ostream<char_type>& os, 
+              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (2)
+
+    template <class SAllocator=std::allocator<char_type>>
+    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+                     const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (3)
+
+    void dump_pretty(std::basic_ostream<char_type>& os, 
+                     const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (4)
+
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
               indenting line_indent = indenting::no_indent) const; // (1)

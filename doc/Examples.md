@@ -419,7 +419,7 @@ std::string s;
 
 j.dump(s); // compressed
 
-j.dump(s, indenting::indent); // pretty print
+j.dump_pretty(s); // pretty print
 ```
 
 <div id="B2"/>
@@ -429,7 +429,7 @@ j.dump(s, indenting::indent); // pretty print
 ```
 j.dump(std::cout); // compressed
 
-j.dump(std::cout, indenting::indent); // pretty print
+j.dump_pretty(std::cout); // pretty print
 ```
 or
 ```
@@ -448,7 +448,7 @@ options.escape_all_non_ascii(true);
 
 j.dump(std::cout, options); // compressed
 
-j.dump(std::cout, options, indenting::indent); // pretty print
+j.dump_pretty(std::cout, options); // pretty print
 ```
 or
 ```

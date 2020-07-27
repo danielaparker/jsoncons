@@ -53,17 +53,15 @@ void encode_json(const T& val,
                  indenting line_indent); // (9)
 ```
 
-(1) Encode `val` to string using the specified (or defaulted) [line_indent](indenting.md).
+(1) Encode `val` to a string using the specified (or defaulted) [options](basic_json_options.md).
 
-(2) Encode `val` to string using the specified (or defaulted) [options](basic_json_options.md) and [line_indent](indenting.md).
+(2) Encode `val` to an output stream using the specified (or defaulted) [options](basic_json_options.md).
 
 (3) Encode `val` to output stream with the specified (or defaulted) [line_indent](indenting.md).
 
 (4) Encode `val` to output stream using the specified (or defaulted) [options](basic_json_options.md) and [line_indent](indenting.md).
 
 (5) Convert `val` to json events and stream through encoder.
-
-Functions (6)-(10) are the same except `temp_alloc` is used to allocate temporary work areas.
 
 #### Parameters
 

@@ -424,7 +424,7 @@ TEST_CASE("json_options tests")
         options.pad_inside_array_brackets(true);
 
         std::ostringstream os;
-        j.dump(os, options, indenting::indent);
+        j.dump_pretty(os, options);
         CHECK(os.str() == s);
     }
     SECTION("pad_inside_object_braces")
@@ -438,7 +438,7 @@ TEST_CASE("json_options tests")
                .array_object_line_splits(line_split_kind::same_line);
 
         std::ostringstream os;
-        j.dump(os, options, indenting::indent);
+        j.dump_pretty(os, options);
         CHECK(os.str() == s);
     }
 }
