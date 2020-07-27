@@ -136,7 +136,7 @@ namespace jsoncons {
         encode_json(temp_allocator_arg, temp_alloc, val, s, basic_json_encode_options<typename Container::value_type>(), line_indent);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
+// legacy
 
     template <class T, class Container>
     void encode_json(const T& val, Container& s, indenting line_indent)
@@ -198,7 +198,7 @@ namespace jsoncons {
         }
     }
 
-#endif
+//end legacy
 
     template <class T, class Container, class TempAllocator>
     typename std::enable_if<is_basic_json<T>::value &&
