@@ -3284,6 +3284,40 @@ public:
         }
     }
 
+    // dump_pretty
+
+    template <class SAllocator=std::allocator<char_type>>
+    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+                     const basic_json_encode_options<char_type>& options, 
+                     std::error_code& ec) const
+    {
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
+        basic_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
+        dump(encoder, ec);
+    }
+
+    template <class SAllocator=std::allocator<char_type>>
+    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+                     std::error_code& ec) const
+    {
+        dump_pretty(s, basic_json_encode_options<char_type>(), ec);
+    }
+
+    void dump_pretty(std::basic_ostream<char_type>& os, 
+                     const basic_json_encode_options<char_type>& options, 
+                     std::error_code& ec) const
+    {
+        basic_json_encoder<char_type> encoder(os, options);
+        dump(encoder, ec);
+    }
+
+    void dump_pretty(std::basic_ostream<char_type>& os, 
+                     std::error_code& ec) const
+    {
+        dump_pretty(os, basic_json_encode_options<char_type>(), ec);
+    }
+
+    //
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_encode_options<char_type>& options, 
