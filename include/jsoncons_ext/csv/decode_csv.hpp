@@ -15,11 +15,12 @@
 namespace jsoncons { 
 namespace csv {
 
-    template <class T,class CharT>
-    typename std::enable_if<is_basic_json<T>::value,T>::type 
-    decode_csv(const std::basic_string<CharT>& s, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
+    template <class T,class Source>
+    typename std::enable_if<is_basic_json<T>::value &&
+                            jsoncons::detail::is_sequence_of<Source,typename T::char_type>::value,T>::type 
+    decode_csv(const Source& s, const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
-        using char_type = CharT;
+        using char_type = typename Source::value_type;
 
         json_decoder<T> decoder;
 
@@ -28,15 +29,18 @@ namespace csv {
         return decoder.get_result();
     }
 
-    template <class T,class CharT>
-    typename std::enable_if<!is_basic_json<T>::value,T>::type 
-    decode_csv(const std::basic_string<CharT>& s, const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
+    template <class T,class Source>
+    typename std::enable_if<!is_basic_json<T>::value &&
+                            jsoncons::detail::is_char_sequence<Source>::value,T>::type 
+    decode_csv(const Source& s, const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
-        basic_csv_cursor<CharT> cursor(s, options);
-        jsoncons::json_decoder<basic_json<CharT>> decoder;
+        using char_type = typename Source::value_type;
+
+        basic_csv_cursor<char_type> cursor(s, options);
+        jsoncons::json_decoder<basic_json<char_type>> decoder;
 
         std::error_code ec;
-        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,char_type>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -108,13 +112,14 @@ namespace csv {
 
     // With leading allocator parameter
 
-    template <class T,class CharT,class TempAllocator>
-    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    template <class T,class Source,class TempAllocator>
+    typename std::enable_if<is_basic_json<T>::value &&
+                            jsoncons::detail::is_sequence_of<Source,typename T::char_type>::value,T>::type 
     decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-               const std::basic_string<CharT>& s, 
-               const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
+               const Source& s, 
+               const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
-        using char_type = CharT;
+        using char_type = typename Source::value_type;
 
         json_decoder<T,TempAllocator> decoder(temp_alloc);
 
@@ -123,17 +128,20 @@ namespace csv {
         return decoder.get_result();
     }
 
-    template <class T,class CharT,class TempAllocator>
-    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    template <class T,class Source,class TempAllocator>
+    typename std::enable_if<!is_basic_json<T>::value &&
+                            jsoncons::detail::is_char_sequence<Source>::value,T>::type 
     decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-               const std::basic_string<CharT>& s, 
-               const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())
+               const Source& s, 
+               const basic_csv_decode_options<typename Source::value_type>& options = basic_csv_decode_options<typename Source::value_type>())
     {
-        basic_csv_cursor<CharT,stream_source<CharT>,TempAllocator> cursor(s, options, temp_alloc);
-        json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
+        using char_type = typename Source::value_type;
+
+        basic_csv_cursor<char_type,stream_source<char_type>,TempAllocator> cursor(s, options, temp_alloc);
+        json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
+        T val = deser_traits<T,char_type>::deserialize(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
