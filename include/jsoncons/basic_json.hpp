@@ -2839,9 +2839,12 @@ public:
 
     // from string
 
-    static basic_json parse(const string_view_type& s, 
-                            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+    template <class Source>
+    static
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,basic_json>::type
+    parse(const Source& s, 
+          const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+          std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
     {
         json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(options,err_handler);
@@ -2863,8 +2866,11 @@ public:
         return decoder.get_result();
     }
 
-    static basic_json parse(const string_view_type& s, 
-                            std::function<bool(json_errc,const ser_context&)> err_handler)
+    template <class Source>
+    static
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,basic_json>::type
+    parse(const Source& s, 
+                std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         return parse(s, basic_json_decode_options<CharT>(), err_handler);
     }

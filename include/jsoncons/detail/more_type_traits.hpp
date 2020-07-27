@@ -445,6 +445,30 @@ namespace detail {
                                    is_byte<typename Container::value_type>::value
     >::type> : std::true_type {};
 
+    // is_char_sequence
+
+    template <class Container, class Enable=void>
+    struct is_char_sequence : std::false_type {};
+
+    template <class Container>
+    struct is_char_sequence<Container, 
+           typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
+                                   has_size<Container>::value &&
+                                   is_character<typename Container::value_type>::value
+    >::type> : std::true_type {};
+
+    // is_sequence_of
+
+    template <class Container, class ValueT, class Enable=void>
+    struct is_sequence_of : std::false_type {};
+
+    template <class Container, class ValueT>
+    struct is_sequence_of<Container,ValueT, 
+           typename std::enable_if<has_data_exact<const typename Container::value_type*,const Container>::value &&
+                                   has_size<Container>::value &&
+                                   std::is_same<typename Container::value_type,ValueT>::value
+    >::type> : std::true_type {};
+
     // is_back_insertable_byte_container
 
     template <class Container, class Enable=void>
@@ -465,6 +489,17 @@ namespace detail {
     struct is_back_insertable_char_container<Container, 
            typename std::enable_if<is_back_insertable<Container>::value &&
                                    is_character<typename Container::value_type>::value
+    >::type> : std::true_type {};
+
+    // is_back_insertable_container_of
+
+    template <class Container, class ValueT, class Enable=void>
+    struct is_back_insertable_container_of : std::false_type {};
+
+    template <class Container, class ValueT>
+    struct is_back_insertable_container_of<Container, ValueT,
+           typename std::enable_if<is_back_insertable<Container>::value &&
+                                   std::is_same<typename Container::value_type,ValueT>::value
     >::type> : std::true_type {};
 
     // is_c_array
