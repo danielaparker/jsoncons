@@ -1501,9 +1501,10 @@ private:
             evaluate_with_default().insert(tag, first, last);
         }
 
-        template <class SAllocator=std::allocator<char_type>>
-        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-                  indenting line_indent = indenting::no_indent) const
+        template <class Container>
+        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+        dump(Container& s, 
+             indenting line_indent = indenting::no_indent) const
         {
             evaluate().dump(s, line_indent);
         }
@@ -1514,10 +1515,11 @@ private:
             evaluate().dump(os, line_indent);
         }
 
-        template <class SAllocator=std::allocator<char_type>>
-        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-                  const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent = indenting::no_indent) const
+        template <class Container>
+        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+        dump(Container& s,
+             const basic_json_encode_options<char_type>& options, 
+             indenting line_indent = indenting::no_indent) const
         {
             evaluate().dump(s, options, line_indent);
         }
@@ -1534,19 +1536,21 @@ private:
             evaluate().dump(visitor);
         }
 
-        template <class SAllocator=std::allocator<char_type>>
-        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-                  indenting line_indent,
-                  std::error_code& ec) const
+        template <class Container>
+        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+        dump(Container& s, 
+             indenting line_indent,
+             std::error_code& ec) const
         {
             evaluate().dump(s, line_indent, ec);
         }
 
-        template <class SAllocator=std::allocator<char_type>>
-        void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-                  const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent,
-                  std::error_code& ec) const
+        template <class Container>
+        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+        dump(Container& s,
+             const basic_json_encode_options<char_type>& options, 
+             indenting line_indent,
+             std::error_code& ec) const
         {
             evaluate().dump(s, options, line_indent, ec);
         }
@@ -3222,9 +3226,10 @@ public:
         return at(name);
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump(Container& s,
+         const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
     {
         std::error_code ec;
         dump(s, options, ec);
@@ -3234,8 +3239,9 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump_pretty(Container& s,
                     const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
     {
         std::error_code ec;
@@ -3270,8 +3276,9 @@ public:
 
     // Legacy
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump(Container& s, 
               indenting line_indent) const
     {
         std::error_code ec;
@@ -3283,8 +3290,9 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump(Container& s,
               const basic_json_encode_options<char_type>& options, 
               indenting line_indent) const
     {
@@ -3335,22 +3343,22 @@ public:
     }
 
     // dump
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump(Container& s,
               const basic_json_encode_options<char_type>& options, 
               std::error_code& ec) const
     {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
-        basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
+        basic_compact_json_encoder<char_type,jsoncons::string_sink<Container>> encoder(s, options);
         dump(encoder, ec);
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump(Container& s, 
               std::error_code& ec) const
     {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
-        basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+        basic_compact_json_encoder<char_type,jsoncons::string_sink<Container>> encoder(s);
         dump(encoder, ec);
     }
 
@@ -3371,18 +3379,19 @@ public:
 
     // dump_pretty
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump_pretty(Container& s,
                      const basic_json_encode_options<char_type>& options, 
                      std::error_code& ec) const
     {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
-        basic_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
+        basic_json_encoder<char_type,jsoncons::string_sink<Container>> encoder(s, options);
         dump(encoder, ec);
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump_pretty(Container& s, 
                      std::error_code& ec) const
     {
         dump_pretty(s, basic_json_encode_options<char_type>(), ec);
@@ -3403,8 +3412,9 @@ public:
     }
 
     // legacy
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump(Container& s,
               const basic_json_encode_options<char_type>& options, 
               indenting line_indent,
               std::error_code& ec) const
@@ -3419,8 +3429,9 @@ public:
         }
     }
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+    template <class Container>
+    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    dump(Container& s, 
               indenting line_indent,
               std::error_code& ec) const
     {
