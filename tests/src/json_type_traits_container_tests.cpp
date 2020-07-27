@@ -483,7 +483,7 @@ TEST_CASE("map with enum key")
         ns::TCriterion<ns::MyCriterionType> criterion(ns::MyCriterionType::MessageType,"foo");
 
         std::string buffer;
-        encode_json(criterion, buffer, indenting::indent);
+        encode_json_pretty(criterion, buffer);
         //std::cout << buffer << "\n";
 
         auto val = decode_json<ns::TCriterion<ns::MyCriterionType>>(buffer);
@@ -509,7 +509,7 @@ TEST_CASE("map with enum key")
     }
 }
         )";
-        encode_json(criteria, buffer, indenting::indent);
+        encode_json_pretty(criteria, buffer);
         //std::cout << buffer << "\n";
 
         auto val = decode_json<ns::TCriteria<ns::MyCriterionType>>(buffer);
@@ -604,7 +604,7 @@ TEST_CASE("encode/decode set traits")
     SECTION("encode/decode")
     {
         std::string s;
-        encode_json(project, s, indenting::indent);
+        encode_json_pretty(project, s);
 
         auto project2 = decode_json<project_type>(s);
 
@@ -636,7 +636,7 @@ TEST_CASE("encode/decode multiset traits")
     SECTION("encode/decode")
     {
         std::string s;
-        encode_json(project, s, indenting::indent);
+        encode_json_pretty(project, s);
 
         auto project2 = decode_json<project_type>(s);
 
@@ -668,7 +668,7 @@ TEST_CASE("encode/decode unordered_set traits")
     SECTION("encode/decode")
     {
         std::string s;
-        encode_json(project, s, indenting::indent);
+        encode_json_pretty(project, s);
 
         auto project2 = decode_json<project_type>(s);
 
@@ -700,7 +700,7 @@ TEST_CASE("encode/decode unordered_multiset traits")
     SECTION("encode/decode")
     {
         std::string s;
-        encode_json(project, s, indenting::indent);
+        encode_json_pretty(project, s);
 
         auto project2 = decode_json<project_type>(s);
 
@@ -732,7 +732,7 @@ TEST_CASE("encode/decode std::forward_list traits")
     SECTION("encode/decode")
     {
         std::string s;
-        encode_json(project, s, indenting::indent);
+        encode_json_pretty(project, s);
 
         auto project2 = decode_json<project_type>(s);
 
@@ -764,7 +764,7 @@ TEST_CASE("encode/decode std::deque traits")
     SECTION("encode/decode")
     {
         std::string s;
-        encode_json(project, s, indenting::indent);
+        encode_json_pretty(project, s);
 
         auto project2 = decode_json<project_type>(s);
 
@@ -796,7 +796,7 @@ TEST_CASE("encode/decode std::vector traits")
     SECTION("encode/decode")
     {
         std::string s;
-        encode_json(project, s, indenting::indent);
+        encode_json_pretty(project, s);
 
         auto project2 = decode_json<project_type>(s);
 

@@ -76,7 +76,7 @@ void book_extensibility_example2()
     }
 
     std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
+    encode_json_pretty(book_list, std::cout);
     std::cout << "\n\n";
 }
 
@@ -85,7 +85,7 @@ void reputons_extensibility_example()
     ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
-    encode_json(val, s, indenting::indent);
+    encode_json_pretty(val, s);
     std::cout << s << "\n";
 
     auto val2 = decode_json<ns::hiking_reputation>(s);
@@ -102,7 +102,7 @@ void person_extensibility_example()
         auto person = jsoncons::decode_json<ns::Person>(data);
 
         std::string s;
-        jsoncons::encode_json(person, s, indenting::indent);
+        jsoncons::encode_json_pretty(person, s);
         std::cout << s << "\n";
     }
     catch (const std::exception& e)
@@ -116,7 +116,7 @@ void named_example()
     ns::bond bond{1000000,"2024-03-30",0.02,"6M"};
 
     std::string s;
-    jsoncons::encode_json(bond, s, indenting::indent);
+    jsoncons::encode_json_pretty(bond, s);
 
     std::cout << s << "\n";
 }

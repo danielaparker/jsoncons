@@ -1056,7 +1056,7 @@ int main()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
+    encode_json_pretty(books1, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -1069,7 +1069,7 @@ int main()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
+    encode_json_pretty(books2, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -1082,7 +1082,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
+    encode_json_pretty(books3, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -1095,7 +1095,7 @@ int main()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books4, std::cout, indenting::indent);
+    encode_json_pretty(books4, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -1269,7 +1269,7 @@ int main()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json(books1, std::cout, indenting::indent);
+    encode_json_pretty(books1, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -1282,7 +1282,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books2, std::cout, indenting::indent);
+    encode_json_pretty(books2, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -1295,7 +1295,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json(books3, std::cout, indenting::indent);
+    encode_json_pretty(books3, std::cout);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -1308,7 +1308,7 @@ int main()
                   << item.getPrice() << "\n";
     }
     std::cout << "\n";
-    encode_json(books4, std::cout, indenting::indent);
+    encode_json_pretty(books4, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -1388,7 +1388,7 @@ int main()
         auto person = jsoncons::decode_json<ns::Person>(data);
 
         std::string s;
-        jsoncons::encode_json(person, s, indenting::indent);
+        jsoncons::encode_json_pretty(person, s);
         std::cout << s << "\n";
     }
     catch (const std::exception& e)
@@ -1517,7 +1517,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
+    encode_json_pretty(book_list, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -1621,8 +1621,8 @@ int main()
     std::string output1;
     std::string output2;
 
-    encode_json(val2,output2,indenting::indent);
-    encode_json(val1,output1,indenting::indent);
+    encode_json_pretty(val2,output2);
+    encode_json_pretty(val1,output1);
 
     std::cout << "(1)\n";
     std::cout << output1 << "\n\n";
@@ -1694,7 +1694,7 @@ int main()
     val.field8 = std::unique_ptr<std::string>(nullptr);
 
     std::string buf;
-    encode_json(val, buf, indenting::indent);
+    encode_json_pretty(val, buf);
 
     std::cout << buf << "\n";
 
@@ -1862,7 +1862,7 @@ int main()
     ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
-    encode_json(val, s, indenting::indent);
+    encode_json_pretty(val, s);
     std::cout << s << "\n";
 
     auto val2 = decode_json<ns::hiking_reputation>(s);
@@ -2015,7 +2015,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json(v, std::cout, indenting::indent);
+    encode_json_pretty(v, std::cout);
 
     std::cout << "\n\n(3)\n";
     json j(v);
@@ -2273,7 +2273,7 @@ int main()
     }
 
     std::string output;
-    jsoncons::encode_json(basket, output, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(basket, output);
     std::cout << "(2)\n" << output << "\n\n";
 }
 ```
@@ -2345,7 +2345,7 @@ int main()
     std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
     std::string buffer;
-    jsoncons::encode_json(vars, buffer, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(vars, buffer);
 
     std::cout << "(1)\n" << buffer << "\n\n";
 

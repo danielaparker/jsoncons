@@ -308,7 +308,7 @@ TEST_CASE("json_type_traits for std::variant")
         ns::Basket basket = decode_json<ns::Basket>(input);
 
         std::string output;
-        encode_json(basket, output, indenting::indent);
+        encode_json_pretty(basket, output);
 
         json j1 = json::parse(input);
         json j2 = json::parse(output);

@@ -294,7 +294,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json(book_list, std::cout, indenting::indent);
+    encode_json_pretty(book_list, std::cout);
     std::cout << "\n\n";
 }
 ```
@@ -405,7 +405,7 @@ int main()
     ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
 
     std::string s;
-    encode_json(val, s, indenting::indent);
+    encode_json_pretty(val, s);
     std::cout << s << "\n";
 
     auto val2 = decode_json<ns::hiking_reputation>(s);
@@ -483,7 +483,7 @@ int main()
     val.field12 = std::optional<std::string>();
 
     std::string buf;
-    encode_json(val, buf, indenting::indent);
+    encode_json_pretty(val, buf);
     std::cout << buf << "\n";
 
     auto other = decode_json<ns::smart_pointer_and_optional_test>(buf);
@@ -647,7 +647,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json(v, std::cout, indenting::indent);
+    encode_json_pretty(v, std::cout);
 
     std::cout << "\n\n(3)\n";
     json j(v);

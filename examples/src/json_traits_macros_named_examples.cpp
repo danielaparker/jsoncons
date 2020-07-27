@@ -150,7 +150,7 @@ namespace {
                       << item.price << "\n";
         }
         std::cout << "\n";
-        encode_json(books1, std::cout, indenting::indent);
+        encode_json_pretty(books1, std::cout);
         std::cout << "\n\n";
 
         std::cout << "(2)\n\n";
@@ -163,7 +163,7 @@ namespace {
                       << item.price() << "\n";
         }
         std::cout << "\n";
-        encode_json(books2, std::cout, indenting::indent);
+        encode_json_pretty(books2, std::cout);
         std::cout << "\n\n";
 
         std::cout << "(3)\n\n";
@@ -176,7 +176,7 @@ namespace {
                       << item.price() << "\n";
         }
         std::cout << "\n";
-        encode_json(books3, std::cout, indenting::indent);
+        encode_json_pretty(books3, std::cout);
         std::cout << "\n\n";
 
         std::cout << "(4)\n\n";
@@ -189,7 +189,7 @@ namespace {
                       << item.getPrice() << "\n";
         }
         std::cout << "\n";
-        encode_json(books4, std::cout, indenting::indent);
+        encode_json_pretty(books4, std::cout);
         std::cout << "\n\n";
     }
 

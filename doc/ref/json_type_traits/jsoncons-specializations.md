@@ -135,7 +135,7 @@ int main()
     std::vector<variant_type> v = {nullptr, 10, 5.1, true, std::string("Hello World")}; 
 
     std::string buffer;
-    jsoncons::encode_json(v, buffer, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(v, buffer);
     std::cout << "(1)\n" << buffer << "\n\n";
 
     auto v2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);

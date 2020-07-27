@@ -132,7 +132,7 @@ int main()
     std::cout << "\n\n";
 
     std::cout << "(2) Again, with pretty print\n" << std::endl; 
-    encode_json(employees, std::cout, jsoncons::indenting::indent);
+    encode_json_pretty(employees, std::cout);
 }
 ```
 Output:

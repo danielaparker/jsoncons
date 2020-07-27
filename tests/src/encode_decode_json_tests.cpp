@@ -293,7 +293,7 @@ TEST_CASE("convert_tuple_test")
     };
 
     std::string s;
-    jsoncons::encode_json(input, s, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(input, s);
 
     json j = json::parse(s);
     REQUIRE(j.is_object());
@@ -318,7 +318,7 @@ TEST_CASE("convert_tuple_test, temp_allocator")
     };
 
     std::string s;
-    jsoncons::encode_json(employees, s, jsoncons::indenting::indent);
+    jsoncons::encode_json_pretty(employees, s);
     auto employees2 = jsoncons::decode_json<employee_collection>(
         temp_allocator_arg, MyAlloc<char>(1), s);
     REQUIRE(employees2.size() == employees.size());

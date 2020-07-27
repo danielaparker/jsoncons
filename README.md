@@ -277,7 +277,7 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json<ns::hiking_reputation>(v, s, indenting::indent);
+    encode_json_pretty(v, s);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
