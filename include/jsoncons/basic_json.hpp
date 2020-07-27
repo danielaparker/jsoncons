@@ -3223,8 +3223,56 @@ public:
     }
 
     template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+    {
+        std::error_code ec;
+        dump(s, options, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+    }
+
+    template <class SAllocator=std::allocator<char_type>>
+    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+                    const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+    {
+        std::error_code ec;
+        dump_pretty(s, options, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+    }
+
+    void dump(std::basic_ostream<char_type>& os, 
+              const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+    {
+        std::error_code ec;
+        dump(os, options, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+    }
+
+    void dump_pretty(std::basic_ostream<char_type>& os, 
+                     const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+    {
+        std::error_code ec;
+        dump_pretty(os, options, ec);
+        if (ec)
+        {
+            JSONCONS_THROW(ser_error(ec));
+        }
+    }
+
+    // Legacy
+
+    template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              indenting line_indent = indenting::no_indent) const
+              indenting line_indent) const
     {
         std::error_code ec;
 
@@ -3238,7 +3286,7 @@ public:
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_encode_options<char_type>& options, 
-              indenting line_indent = indenting::no_indent) const
+              indenting line_indent) const
     {
         std::error_code ec;
 
@@ -3250,7 +3298,7 @@ public:
     }
 
     void dump(std::basic_ostream<char_type>& os, 
-              indenting line_indent = indenting::no_indent) const
+              indenting line_indent) const
     {
         std::error_code ec;
 
@@ -3263,7 +3311,7 @@ public:
 
     void dump(std::basic_ostream<char_type>& os, 
               const basic_json_encode_options<char_type>& options, 
-              indenting line_indent = indenting::no_indent) const
+              indenting line_indent) const
     {
         std::error_code ec;
 
@@ -3274,6 +3322,8 @@ public:
         }
     }
 
+    // end legacy
+
     void dump(basic_json_visitor<char_type>& visitor) const
     {
         std::error_code ec;
@@ -3282,6 +3332,41 @@ public:
         {
             JSONCONS_THROW(ser_error(ec));
         }
+    }
+
+    // dump
+    template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
+              const basic_json_encode_options<char_type>& options, 
+              std::error_code& ec) const
+    {
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
+        basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
+        dump(encoder, ec);
+    }
+
+    template <class SAllocator=std::allocator<char_type>>
+    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
+              std::error_code& ec) const
+    {
+        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
+        basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
+        dump(encoder, ec);
+    }
+
+    void dump(std::basic_ostream<char_type>& os, 
+              const basic_json_encode_options<char_type>& options,
+              std::error_code& ec) const
+    {
+        basic_compact_json_encoder<char_type> encoder(os, options);
+        dump(encoder, ec);
+    }
+
+    void dump(std::basic_ostream<char_type>& os, 
+              std::error_code& ec) const
+    {
+        basic_compact_json_encoder<char_type> encoder(os);
+        dump(encoder, ec);
     }
 
     // dump_pretty
@@ -3317,23 +3402,20 @@ public:
         dump_pretty(os, basic_json_encode_options<char_type>(), ec);
     }
 
-    //
+    // legacy
     template <class SAllocator=std::allocator<char_type>>
     void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
               const basic_json_encode_options<char_type>& options, 
               indenting line_indent,
               std::error_code& ec) const
     {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
-            dump(encoder, ec);
+            dump_pretty(s, options, ec);
         }
         else
         {
-            basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s, options);
-            dump(encoder, ec);
+            dump(s, options, ec);
         }
     }
 
@@ -3342,16 +3424,13 @@ public:
               indenting line_indent,
               std::error_code& ec) const
     {
-        using string_type = std::basic_string<char_type,char_traits_type,SAllocator>;
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
-            dump(encoder, ec);
+            dump_pretty(s, ec);
         }
         else
         {
-            basic_compact_json_encoder<char_type,jsoncons::string_sink<string_type>> encoder(s);
-            dump(encoder, ec);
+            dump(s, ec);
         }
     }
 
@@ -3362,13 +3441,11 @@ public:
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type> encoder(os, options);
-            dump(encoder, ec);
+            dump_pretty(os, options, ec);
         }
         else
         {
-            basic_compact_json_encoder<char_type> encoder(os, options);
-            dump(encoder, ec);
+            dump(os, options, ec);
         }
     }
 
@@ -3378,15 +3455,14 @@ public:
     {
         if (line_indent == indenting::indent)
         {
-            basic_json_encoder<char_type> encoder(os);
-            dump(encoder, ec);
+            dump_pretty(os, ec);
         }
         else
         {
-            basic_compact_json_encoder<char_type> encoder(os);
-            dump(encoder, ec);
+            dump(os, ec);
         }
     }
+// end legacy
 
     void dump(basic_json_visitor<char_type>& visitor, 
               std::error_code& ec) const
