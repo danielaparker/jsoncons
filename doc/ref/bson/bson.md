@@ -21,14 +21,14 @@ BSON data item  | jsoncons data item  |jsoncons tag
  null           | null          |                  
  true or false  | bool          |                  
  int32 or int64 | int64         |                  
- datetime       | int64         | timestamp        
+ datetime       | int64         | 
  int32 or int64 | uint64        |                  
- datetime       | uint64        | timestamp        
+ datetime       | uint64        | epoch_milli
  double         | double        |                  
  string         | string        |                  
  binary         | byte_string   | ext                  
  0x04 (array )  | array         |                  
- 0x03 (document)| object        |                  
+ 0x03 (embedded document)| object        |                  
 
 ### Examples
 

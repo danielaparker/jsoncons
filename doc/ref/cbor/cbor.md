@@ -81,12 +81,12 @@ CBOR data item|CBOR tag                                         | jsoncons data 
  undefined |&#160;                                              | null          | undefined        
  true or false |&#160;                                          | bool          |                  
  unsigned or negative integer |&#160;                           | int64         |                  
- unsigned or negative integer | 1 (epoch-based date/time)       | int64         | timestamp        
+ unsigned or negative integer | 1 (epoch-based date/time)       | int64         | epoch_second        
  unsigned integer |&#160;                                       | uint64        |                  
- unsigned integer | 1 (epoch-based date/time)                   | uint64        | timestamp        
+ unsigned integer | 1 (epoch-based date/time)                   | uint64        | epoch_second        
  half-precision float, float, or double |&#160;                 | half          |                  
  float or double |&#160;                                        | double        |                  
- double | 1 (epoch-based date/time)                             | double        | timestamp        
+ double | 1 (epoch-based date/time)                             | double        | epoch_second        
  string |&#160;                                                 | string        |                  
  byte string | 2 (positive bignum) or 2 (negative bignum)       | string        | bigint           
  array | 4 (decimal fraction)                                   | string        | bigdec           
