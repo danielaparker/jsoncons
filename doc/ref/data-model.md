@@ -23,7 +23,8 @@ Tag|Description
 ---|-----------
 undefined |  
 datetime  |
-timestamp | 
+epoch_second | 
+epoch_milli | 
 bigint    | 
 bigdec    | 
 bigfloat  | 
