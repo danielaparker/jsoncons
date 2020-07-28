@@ -92,7 +92,8 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     JSONCONS_ARRAY_OF_CHAR(CharT,na_name,'n','/','a')
     JSONCONS_ARRAY_OF_CHAR(CharT,undefined_name,'u','n','d','e','f','i','n','e','d')
     JSONCONS_ARRAY_OF_CHAR(CharT,datetime_name,'d','a','t','e','t','i','m','e')
-    JSONCONS_ARRAY_OF_CHAR(CharT,timestamp_name,'t','i','m','e','s','t','a','m','p')
+    JSONCONS_ARRAY_OF_CHAR(CharT,epoch_seconds_name,'e','p','o','c','h','-','s','e','c','o','n','d','s')
+    JSONCONS_ARRAY_OF_CHAR(CharT,epoch_milliseconds_name,'e','p','o','c','h','-','m','i','l','l','i','s','e','c','o','n','d','s')
     JSONCONS_ARRAY_OF_CHAR(CharT,bigint_name,'b','i','g','i','n','t')
     JSONCONS_ARRAY_OF_CHAR(CharT,bigdec_name,'b','i','g','d','e','c')
     JSONCONS_ARRAY_OF_CHAR(CharT,bigfloat_name,'b','i','g','f','l','o','a','t')
@@ -124,7 +125,12 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
         }
         case semantic_tag::epoch_seconds:
         {
-            os << timestamp_name;
+            os << epoch_seconds_name;
+            break;
+        }
+        case semantic_tag::epoch_milliseconds:
+        {
+            os << epoch_milliseconds_name;
             break;
         }
         case semantic_tag::bigint:
