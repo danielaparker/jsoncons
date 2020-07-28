@@ -2855,10 +2855,16 @@ public:
     }
 
     static basic_json parse(const char_type* s, 
-                            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+                            const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>(), 
                             std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
     {
         return parse(basic_string_view<char_type>(s), options, err_handler);
+    }
+
+    static basic_json parse(const char_type* s, 
+                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+    {
+        return parse(basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
     }
 
     // from stream
