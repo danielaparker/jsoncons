@@ -19,61 +19,78 @@ void dump_pretty(std::basic_ostream<char_type>& os,
                  const basic_json_encode_options<char_type>& options 
                      = basic_json_encode_options<char_type>()) const; // (4)
 
-template <Container>
-void dump(Container& s, 
-          indenting line_indent = indenting::no_indent) const; // (1)
-
-template <Container>
-void dump(Container& s,
-          const basic_json_encode_options<char_type>& options, 
-          indenting line_indent = indenting::no_indent) const; // (2)
-
-void dump(std::basic_ostream<char_type>& os, 
-          indenting line_indent = indenting::no_indent) const; // (3)
-
-void dump(std::basic_ostream<char_type>& os, 
-          const basic_json_encode_options<char_type>& options, 
-          indenting line_indent = indenting::no_indent) const; // (4)
-
 void dump(basic_json_visitor<char_type>& visitor) const; // (5)
 
 template <Container>
 void dump(Container& s,
           const basic_json_encode_options<char_type>& options, 
-          indenting line_indent,
           std::error_code& ec) const; // (6)
+
+void dump(std::basic_ostream<char_type>& os, 
+          const basic_json_encode_options<char_type>& options,
+          std::error_code& ec) const; // (7)
+
+template <Container>
+void dump_pretty(Container& s,
+                 const basic_json_encode_options<char_type>& options,
+                 std::error_code& ec) const; // (8)
+
+void dump_pretty(std::basic_ostream<char_type>& os, 
+                 const basic_json_encode_options<char_type>& options,
+                 std::error_code& ec) const; // (9)
+
+void dump(basic_json_visitor<char_type>& visitor,
+          std::error_code& ec) const; // (10)
+
+template <Container>
+void dump(Container& s, indenting line_indent) const; // (11)
+
+template <Container>
+void dump(Container& s,
+          const basic_json_encode_options<char_type>& options, 
+          indenting line_indent) const; // (12)
+
+void dump(std::basic_ostream<char_type>& os, indenting line_indent) const; // (13)
+
+void dump(std::basic_ostream<char_type>& os, 
+          const basic_json_encode_options<char_type>& options, 
+          indenting line_indent) const; // (14)
+
+template <Container>
+void dump(Container& s,
+          const basic_json_encode_options<char_type>& options, 
+          indenting line_indent,
+          std::error_code& ec) const; // (15)
 
 template <Container>
 void dump(Container& s, 
           indenting line_indent,
-          std::error_code& ec) const; // (7)
+          std::error_code& ec) const; // (16)
 
 void dump(std::basic_ostream<char_type>& os, 
           const basic_json_encode_options<char_type>& options, 
           indenting line_indent,
-          std::error_code& ec) const; // (8)
+          std::error_code& ec) const; // (17)
 
 void dump(std::basic_ostream<char_type>& os, 
           indenting line_indent,
-          std::error_code& ec) const; // (9)
-
-void dump(basic_json_visitor<char_type>& visitor, 
-          std::error_code& ec) const; // (10)
+          std::error_code& ec) const; // (18)
 ```
 
-(1) Dumps a json value to a string using the specified [indenting](../indenting.md).
+(1) Dumps a json value to a character container with "minified" output.
 
-(2) Dumps a json value to a string using the specified [encoding options](../basic_json_options.md)
-    and [indenting](../indenting.md).
+(2) Dumps a json value to an output stream with "minified" output.
 
-(3) Dumps a json value to an output stream using the specified [indenting](../indenting.md).
+(3) Dumps a json value to a character container with prettified output including spaces and line breaks.
 
-(4) Dumps a json value to an output stream using the specified [encoding options](../basic_json_options.md)
-    and [indenting](../indenting.md).
+(4) Dumps a json value to an output stream with prettified output including spaces and line breaks.
 
 (5) Dumps a json value to the specified [visitor](../basic_json_visitor.md).
 
 (6) - (10) Same as (1)-(5), except set `ec` on serialization errors. 
+
+(11) - (18) support the pre 0.155.0 `dump` overloads with the `jsoncons::indenting` parameter.
+New code should use the `dump_pretty` overloads instead.
 
 #### Exceptions
 
