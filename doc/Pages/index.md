@@ -42,8 +42,8 @@ information about user types provided by specializations of [json_type_traits](d
 
 The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
-supports semantic tagging of date-time values, timestamp values, big integers, 
-big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
+supports semantic tagging of datetimes, epoch times, big integers, 
+big decimals, big floats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
 For the examples below you need to include some header files and initialize a string of JSON data:

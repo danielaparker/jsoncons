@@ -21,9 +21,9 @@ BSON data item  | jsoncons data item  |jsoncons tag
  null           | null          |                  
  true or false  | bool          |                  
  int32 or int64 | int64         |                  
- datetime       | int64         | timestamp        
+ datetime       | int64         | epoch_time        
  int32 or int64 | uint64        |                  
- datetime       | uint64        | timestamp        
+ datetime       | uint64        | epoch_time        
  double         | double        |                  
  string         | string        |                  
  binary         | byte_string   | ext                  

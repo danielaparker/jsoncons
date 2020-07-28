@@ -50,7 +50,7 @@ int main()
 {
     std::vector<uint8_t> data = {
         0xd6, // fixext 4 stores an integer and a byte array whose length is 4 bytes
-        0xff, // timestamp
+        0xff, // epoch_time
         0x5a,0x4a,0xf6,0xa5 // 1514862245
     };
     auto j = msgpack::decode_msgpack<json>(data);
