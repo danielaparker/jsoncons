@@ -126,8 +126,14 @@ private:
         } 
         if (buffer_.size() > 0)
         {
+            if (stack_.empty())
+            {
+                ec = bson_errc::expected_bson_document;
+                return false;
+            }
             before_value(jsoncons::bson::detail::bson_format::document_cd);
         }
+
         stack_.emplace_back(jsoncons::bson::detail::bson_container_type::document, buffer_.size());
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
 
@@ -164,6 +170,11 @@ private:
         } 
         if (buffer_.size() > 0)
         {
+            if (stack_.empty())
+            {
+                ec = bson_errc::expected_bson_document;
+                return false;
+            }
             before_value(jsoncons::bson::detail::bson_format::array_cd);
         }
         stack_.emplace_back(jsoncons::bson::detail::bson_container_type::array, buffer_.size());
@@ -204,14 +215,24 @@ private:
         return true;
     }
 
-    bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_null(semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (stack_.empty())
+        {
+            ec = bson_errc::expected_bson_document;
+            return false;
+        }
         before_value(jsoncons::bson::detail::bson_format::null_cd);
         return true;
     }
 
-    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code&) override
+    bool visit_bool(bool val, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (stack_.empty())
+        {
+            ec = bson_errc::expected_bson_document;
+            return false;
+        }
         before_value(jsoncons::bson::detail::bson_format::bool_cd);
         if (val)
         {
@@ -227,6 +248,11 @@ private:
 
     bool visit_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
     {
+        if (stack_.empty())
+        {
+            ec = bson_errc::expected_bson_document;
+            return false;
+        }
         before_value(jsoncons::bson::detail::bson_format::string_cd);
 
         std::size_t offset = buffer_.size();
@@ -253,8 +279,13 @@ private:
     bool visit_byte_string(const byte_string_view& b, 
                            semantic_tag, 
                            const ser_context&,
-                           std::error_code&) override
+                           std::error_code& ec) override
     {
+        if (stack_.empty())
+        {
+            ec = bson_errc::expected_bson_document;
+            return false;
+        }
         before_value(jsoncons::bson::detail::bson_format::binary_cd);
 
         std::size_t offset = buffer_.size();
@@ -276,8 +307,13 @@ private:
     bool visit_byte_string(const byte_string_view& b, 
                            uint64_t ext_tag, 
                            const ser_context&,
-                           std::error_code&) override
+                           std::error_code& ec) override
     {
+        if (stack_.empty())
+        {
+            ec = bson_errc::expected_bson_document;
+            return false;
+        }
         before_value(jsoncons::bson::detail::bson_format::binary_cd);
 
         std::size_t offset = buffer_.size();
@@ -300,25 +336,51 @@ private:
     bool visit_int64(int64_t val, 
                      semantic_tag tag, 
                      const ser_context&,
-                     std::error_code&) override
+                     std::error_code& ec) override
     {
-        if (tag == semantic_tag::epoch_time)
+        static constexpr int64_t min_value_div_1000 = (std::numeric_limits<int64_t>::min)() / 1000;
+        static constexpr int64_t max_value_div_1000 = (std::numeric_limits<int64_t>::max)() / 1000;
+        if (stack_.empty())
         {
-            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-            jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
-        }
-        else if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
-        {
-            before_value(jsoncons::bson::detail::bson_format::int32_cd);
-            jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
-        }
-        else if (val >= (std::numeric_limits<int64_t>::lowest)())
-        {
-            before_value(jsoncons::bson::detail::bson_format::int64_cd);
-            jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+            ec = bson_errc::expected_bson_document;
+            return false;
         }
 
-        return true;
+        switch (tag)
+        {
+            case semantic_tag::epoch_second:
+                if (val < min_value_div_1000)
+                {
+                    ec = bson_errc::datetime_too_small;
+                    return false;
+                }
+                if (val > max_value_div_1000)
+                {
+                    ec = bson_errc::datetime_too_large;
+                    return false;
+                }
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                jsoncons::detail::native_to_little(val*1000,std::back_inserter(buffer_));
+                return true;
+            case semantic_tag::epoch_milli:
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                jsoncons::detail::native_to_little(val,std::back_inserter(buffer_));
+                return true;
+            default:
+            {
+                if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
+                {
+                    before_value(jsoncons::bson::detail::bson_format::int32_cd);
+                    jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+                }
+                else 
+                {
+                    before_value(jsoncons::bson::detail::bson_format::int64_cd);
+                    jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+                }
+                return true;
+            }
+        }
     }
 
     bool visit_uint64(uint64_t val, 
@@ -326,38 +388,63 @@ private:
                       const ser_context&,
                       std::error_code& ec) override
     {
-        bool more;
-        if (tag == semantic_tag::epoch_time)
+        static constexpr uint64_t max_value_div_1000 = (std::numeric_limits<uint64_t>::max)() / 1000;
+        if (stack_.empty())
         {
-            before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-            more = true;
-        }
-        else if (val <= (std::numeric_limits<int32_t>::max)())
-        {
-            before_value(jsoncons::bson::detail::bson_format::int32_cd);
-            jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
-            more = true;
-        }
-        else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
-        {
-            before_value(jsoncons::bson::detail::bson_format::int64_cd);
-            jsoncons::detail::native_to_little(static_cast<uint64_t>(val),std::back_inserter(buffer_));
-            more = true;
-        }
-        else
-        {
-            ec = bson_errc::number_too_large;
-            more = false;
+            ec = bson_errc::expected_bson_document;
+            return false;
         }
 
-        return more;
+        switch (tag)
+        {
+            case semantic_tag::epoch_second:
+                if (val > max_value_div_1000)
+                {
+                    ec = bson_errc::datetime_too_large;
+                    return false;
+                }
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                jsoncons::detail::native_to_little(static_cast<int64_t>(val*1000),std::back_inserter(buffer_));
+                return true;
+            case semantic_tag::epoch_milli:
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+                return true;
+            default:
+            {
+                bool more;
+                if (val <= (std::numeric_limits<int32_t>::max)())
+                {
+                    before_value(jsoncons::bson::detail::bson_format::int32_cd);
+                    jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+                    more = true;
+                }
+                else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
+                {
+                    before_value(jsoncons::bson::detail::bson_format::int64_cd);
+                    jsoncons::detail::native_to_little(static_cast<uint64_t>(val),std::back_inserter(buffer_));
+                    more = true;
+                }
+                else
+                {
+                    ec = bson_errc::number_too_large;
+                    more = false;
+                }
+                return more;
+            }
+        }
     }
 
     bool visit_double(double val, 
                          semantic_tag,
                          const ser_context&,
-                         std::error_code&) override
+                         std::error_code& ec) override
     {
+        if (stack_.empty())
+        {
+            ec = bson_errc::expected_bson_document;
+            return false;
+        }
         before_value(jsoncons::bson::detail::bson_format::double_cd);
 
         jsoncons::detail::native_to_little(val,std::back_inserter(buffer_));
@@ -367,6 +454,7 @@ private:
 
     void before_value(uint8_t code) 
     {
+        JSONCONS_ASSERT(!stack_.empty());
         if (stack_.back().is_object())
         {
             buffer_[stack_.back().member_offset()] = code;

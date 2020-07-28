@@ -252,9 +252,9 @@ TEST_CASE("test_cbor_parsing")
     check_parse_cbor({0xc0,0x78,0x19,'2','0','1','5','-','0','5','-','0','7',' ','1','2',':','4','1',':','0','7','-','0','7',':','0','0'},
                   json("2015-05-07 12:41:07-07:00", semantic_tag::datetime));
 
-    // epoch_time
+    // epoch_second
     check_parse_cbor({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
-                  json(1431027667, semantic_tag::epoch_time));
+                  json(1431027667, semantic_tag::epoch_second));
 }
 
 TEST_CASE("cbor decimal fraction")
@@ -414,9 +414,9 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     encoder.string_value("18446744073709551616.15", semantic_tag::bigdec);
     encoder.string_value("-18446744073709551617.15", semantic_tag::bigdec);
     encoder.string_value("2018-10-19 12:41:07-07:00", semantic_tag::datetime) ;
-    encoder.int64_value(1431027667, semantic_tag::epoch_time);
-    encoder.int64_value(-1431027667, semantic_tag::epoch_time);
-    encoder.double_value(1431027667.5, semantic_tag::epoch_time);
+    encoder.int64_value(1431027667, semantic_tag::epoch_second);
+    encoder.int64_value(-1431027667, semantic_tag::epoch_second);
+    encoder.double_value(1431027667.5, semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 
@@ -429,9 +429,9 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     expected.emplace_back("1.844674407370955161615e+19", semantic_tag::bigdec);
     expected.emplace_back("-1.844674407370955161715e+19", semantic_tag::bigdec);
     expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
-    expected.emplace_back(1431027667, semantic_tag::epoch_time);
-    expected.emplace_back(-1431027667, semantic_tag::epoch_time);
-    expected.emplace_back(1431027667.5, semantic_tag::epoch_time);
+    expected.emplace_back(1431027667, semantic_tag::epoch_second);
+    expected.emplace_back(-1431027667, semantic_tag::epoch_second);
+    expected.emplace_back(1431027667.5, semantic_tag::epoch_second);
 
     json j = cbor::decode_cbor<json>(bytes);
 

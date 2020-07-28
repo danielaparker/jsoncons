@@ -21,7 +21,7 @@ namespace
         std::vector<uint8_t> purr = {'p','u','r','r'};
         encoder.byte_string_value(purr); // default subtype is user defined
         // or encoder.byte_string_value(purr, 0x80);
-        encoder.int64_value(1431027667, semantic_tag::epoch_time);
+        encoder.int64_value(1431027667, semantic_tag::epoch_second);
         encoder.end_array();
         encoder.flush();
 
@@ -181,6 +181,33 @@ namespace
         std::cout << byte_string_view(buffer) << "\n\n";
     }
 
+    void duration_example1()
+    {
+        auto duration = std::chrono::system_clock::now().time_since_epoch();
+        auto time = std::chrono::duration_cast<std::chrono::duration<int64_t,std::milli>>(duration);
+
+        json j;
+        j.try_emplace("time", time);
+
+        auto milliseconds = j["time"].as<std::chrono::milliseconds>();
+        std::cout << "Time since epoch (milliseconds): " << milliseconds.count() << "\n\n";
+        auto seconds = j["time"].as<std::chrono::seconds>();
+        std::cout << "Time since epoch (seconds): " << seconds.count() << "\n\n";
+
+        std::vector<uint8_t> data;
+        bson::encode_bson(j, data);
+
+        std::cout << "BSON bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+    /*
+        13,00,00,00, // document has 19 bytes
+          09, // UTC datetime
+            74,69,6d,65,00, // "time"
+            ea,14,7f,96,73,01,00,00, // 1595957777642
+        00 // terminating null    
+    */
+    }
+
 } // namespace
 
 void bson_examples()
@@ -196,6 +223,7 @@ void bson_examples()
     utf8_string_example();
     binary_example();
     array_example();
+    duration_example1();
     std::cout << std::endl;
 }
 

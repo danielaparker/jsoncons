@@ -64,24 +64,25 @@ enum class semantic_tag : uint8_t
     none = 0,
     undefined = 0x01,
     datetime = 0x02,
-    epoch_time = 0x03,
-    bigint = 0x04,
-    bigdec = 0x05,
-    bigfloat = 0x06,
-    base16 = 0x07,
-    base64 = 0x08,
-    base64url = 0x09,
-    uri = 0x0a,
-    clamped = 0x0b,
-    multi_dim_row_major = 0x0c,
-    multi_dim_column_major = 0x0d,
-    ext = 0x0e
+    epoch_second = 0x03,
+    epoch_milli = 0x04,
+    bigint = 0x05,
+    bigdec = 0x06,
+    bigfloat = 0x07,
+    base16 = 0x08,
+    base64 = 0x09,
+    base64url = 0x0a,
+    uri = 0x0b,
+    clamped = 0x0c,
+    multi_dim_row_major = 0x0d,
+    multi_dim_column_major = 0x0e,
+    ext = 0x0f
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec
     , big_float = bigfloat
     , date_time = datetime
-    , timestamp = 0x03
+    , timestamp = epoch_second
 #endif
 };
 
@@ -91,7 +92,8 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     JSONCONS_ARRAY_OF_CHAR(CharT,na_name,'n','/','a')
     JSONCONS_ARRAY_OF_CHAR(CharT,undefined_name,'u','n','d','e','f','i','n','e','d')
     JSONCONS_ARRAY_OF_CHAR(CharT,datetime_name,'d','a','t','e','t','i','m','e')
-    JSONCONS_ARRAY_OF_CHAR(CharT,timestamp_name,'t','i','m','e','s','t','a','m','p')
+    JSONCONS_ARRAY_OF_CHAR(CharT,epoch_second_name,'e','p','o','c','h','-','s','e','c','o','n','d')
+    JSONCONS_ARRAY_OF_CHAR(CharT,epoch_milli_name,'e','p','o','c','h','-','m','i','l','l','i')
     JSONCONS_ARRAY_OF_CHAR(CharT,bigint_name,'b','i','g','i','n','t')
     JSONCONS_ARRAY_OF_CHAR(CharT,bigdec_name,'b','i','g','d','e','c')
     JSONCONS_ARRAY_OF_CHAR(CharT,bigfloat_name,'b','i','g','f','l','o','a','t')
@@ -121,9 +123,14 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
             os << datetime_name;
             break;
         }
-        case semantic_tag::epoch_time:
+        case semantic_tag::epoch_second:
         {
-            os << timestamp_name;
+            os << epoch_second_name;
+            break;
+        }
+        case semantic_tag::epoch_milli:
+        {
+            os << epoch_milli_name;
             break;
         }
         case semantic_tag::bigint:

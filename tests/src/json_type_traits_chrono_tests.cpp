@@ -12,7 +12,7 @@ TEST_CASE("json_type_traits chron tests")
     {
         uint64_t time = 1000;
 
-        json j(time, semantic_tag::epoch_time);
+        json j(time, semantic_tag::epoch_second);
 
         auto val = j.as<std::chrono::seconds>(); 
 
@@ -22,7 +22,7 @@ TEST_CASE("json_type_traits chron tests")
     {
         double time = 1000.100;
 
-        json j(time, semantic_tag::epoch_time);
+        json j(time, semantic_tag::epoch_second);
 
         auto val = j.as<std::chrono::duration<double>>();
 

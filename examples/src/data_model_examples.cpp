@@ -17,9 +17,9 @@ void data_model_example1()
     j.emplace_back("-18446744073709551617", semantic_tag::bigint);
     j.emplace_back("273.15", semantic_tag::bigdec);
     j.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
-    j.emplace_back(1431027667, semantic_tag::epoch_time);
-    j.emplace_back(-1431027667, semantic_tag::epoch_time);
-    j.emplace_back(1431027667.5, semantic_tag::epoch_time);
+    j.emplace_back(1431027667, semantic_tag::epoch_second);
+    j.emplace_back(-1431027667, semantic_tag::epoch_second);
+    j.emplace_back(1431027667.5, semantic_tag::epoch_second);
 
     std::cout << "(1)\n" << pretty_print(j) << "\n\n";
 
@@ -64,9 +64,9 @@ void data_model_example2()
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);
     encoder.string_value("273.15", semantic_tag::bigdec);
     encoder.string_value("2018-10-19 12:41:07-07:00", semantic_tag::datetime) ;
-    encoder.int64_value(1431027667, semantic_tag::epoch_time);
-    encoder.int64_value(-1431027667, semantic_tag::epoch_time);
-    encoder.double_value(1431027667.5, semantic_tag::epoch_time);
+    encoder.int64_value(1431027667, semantic_tag::epoch_second);
+    encoder.int64_value(-1431027667, semantic_tag::epoch_second);
+    encoder.double_value(1431027667.5, semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 

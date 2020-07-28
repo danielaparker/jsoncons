@@ -427,7 +427,7 @@ int main()
     encoder.byte_string_value(purr);
     std::vector<uint8_t> hiss = {'h','i','s','s'};
     encoder.byte_string_value(hiss, semantic_tag::base64); // suggested conversion to base64
-    encoder.int64_value(1431027667, semantic_tag::epoch_time);
+    encoder.int64_value(1431027667, semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 
@@ -470,7 +470,7 @@ int main()
     encoder.begin_array(3); // array of length 3
     encoder.string_value("-18446744073709551617", semantic_tag::bigint);
     encoder.string_value("184467440737095516.16", semantic_tag::bigdec);
-    encoder.int64_value(1431027667, semantic_tag::epoch_time);
+    encoder.int64_value(1431027667, semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 

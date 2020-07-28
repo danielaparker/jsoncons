@@ -306,7 +306,7 @@ int main()
     encoder.string_value("cat");
     std::vector<uint8_t> purr = {'p','u','r','r'};
     encoder.byte_string_value(purr, 7);
-    encoder.int64_value(1431027667, semantic_tag::epoch_time);
+    encoder.int64_value(1431027667, semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 

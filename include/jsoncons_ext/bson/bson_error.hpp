@@ -22,6 +22,9 @@ enum class bson_errc
     string_length_is_non_positive,
     length_is_negative,
     number_too_large,
+    datetime_too_small,
+    datetime_too_large,
+    expected_bson_document,
     unknown_type
 };
 
@@ -53,6 +56,12 @@ public:
                 return "An unknown type was found in the stream";
             case bson_errc::number_too_large:
                 return "Number too large";
+            case bson_errc::datetime_too_large:
+                return "datetime too large";
+            case bson_errc::datetime_too_small:
+                return "datetime too small";
+            case bson_errc::expected_bson_document:
+                return "Expected BSON document";
             default:
                 return "Unknown BSON parser error";
         }
