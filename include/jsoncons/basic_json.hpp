@@ -1623,14 +1623,14 @@ private:
             return evaluate().is_datetime();
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_time")
-        bool is_epoch_time() const noexcept
+        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_seconds")
+        bool is_epoch_seconds() const noexcept
         {
             if (!parent_.contains(key_))
             {
                 return false;
             }
-            return evaluate().is_epoch_time();
+            return evaluate().is_epoch_seconds();
         }
 
         template <class T>
@@ -4803,10 +4803,10 @@ public:
         return tag() == semantic_tag::datetime;
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_time")
-    bool is_epoch_time() const noexcept
+    JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_seconds")
+    bool is_epoch_seconds() const noexcept
     {
-        return tag() == semantic_tag::epoch_time;
+        return tag() == semantic_tag::epoch_seconds;
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")

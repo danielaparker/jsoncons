@@ -78,7 +78,7 @@ int main()
     auto duration = std::chrono::system_clock::now().time_since_epoch();
     double time = std::chrono::duration_cast<std::chrono::duration<double>>(duration).count();
 
-    json j(time, jsoncons::semantic_tag::epoch_time);
+    json j(time, jsoncons::semantic_tag::epoch_seconds);
 
     auto dur = j.as<std::chrono::duration<double>>();
     std::cout << "Time since epoch: " << dur.count() << "\n\n";

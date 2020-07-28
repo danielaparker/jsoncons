@@ -64,24 +64,25 @@ enum class semantic_tag : uint8_t
     none = 0,
     undefined = 0x01,
     datetime = 0x02,
-    epoch_time = 0x03,
-    bigint = 0x04,
-    bigdec = 0x05,
-    bigfloat = 0x06,
-    base16 = 0x07,
-    base64 = 0x08,
-    base64url = 0x09,
-    uri = 0x0a,
-    clamped = 0x0b,
-    multi_dim_row_major = 0x0c,
-    multi_dim_column_major = 0x0d,
-    ext = 0x0e
+    epoch_seconds = 0x03,
+    epoch_milliseconds = 0x04,
+    bigint = 0x05,
+    bigdec = 0x06,
+    bigfloat = 0x07,
+    base16 = 0x08,
+    base64 = 0x09,
+    base64url = 0x0a,
+    uri = 0x0b,
+    clamped = 0x0c,
+    multi_dim_row_major = 0x0d,
+    multi_dim_column_major = 0x0e,
+    ext = 0x0f
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec
     , big_float = bigfloat
     , date_time = datetime
-    , timestamp = 0x03
+    , timestamp = epoch_seconds
 #endif
 };
 
@@ -121,7 +122,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
             os << datetime_name;
             break;
         }
-        case semantic_tag::epoch_time:
+        case semantic_tag::epoch_seconds:
         {
             os << timestamp_name;
             break;

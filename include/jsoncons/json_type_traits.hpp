@@ -1445,7 +1445,7 @@ namespace variant_detail
 
         static bool is(const Json& j) noexcept
         {
-            return (j.tag() == semantic_tag::epoch_time);
+            return (j.tag() == semantic_tag::epoch_seconds);
         }
 
         static duration_type as(const Json& j)
@@ -1461,7 +1461,7 @@ namespace variant_detail
         }
         static Json to_json(const duration_type& val, allocator_type = allocator_type())
         {
-            return Json(val.count(), semantic_tag::epoch_time);
+            return Json(val.count(), semantic_tag::epoch_seconds);
         }
     };
 

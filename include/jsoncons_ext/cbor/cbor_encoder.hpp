@@ -993,7 +993,7 @@ private:
                          const ser_context&,
                          std::error_code&) override
     {
-        if (tag == semantic_tag::epoch_time)
+        if (tag == semantic_tag::epoch_seconds)
         {
             write_tag(1);
         }
@@ -1023,7 +1023,7 @@ private:
                         const ser_context&,
                         std::error_code&) override
     {
-        if (tag == semantic_tag::epoch_time)
+        if (tag == semantic_tag::epoch_seconds)
         {
             write_tag(1);
         }
@@ -1108,7 +1108,7 @@ private:
                          const ser_context&,
                          std::error_code&) override
     {
-        if (tag == semantic_tag::epoch_time)
+        if (tag == semantic_tag::epoch_seconds)
         {
             write_tag(1);
         }
