@@ -25,6 +25,7 @@ undefined |
 datetime  |
 epoch_second | 
 epoch_milli | 
+epoch_nano | 
 bigint    | 
 bigdec    | 
 bigfloat  | 

@@ -13,6 +13,7 @@
 #include <utility> // std::move
 #include <jsoncons/json.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/bigint.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/msgpack/msgpack_detail.hpp>
@@ -56,7 +57,6 @@ class basic_msgpack_parser : public ser_context
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
-    std::vector<int64_t,int64_allocator_type> timestamp_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
 
@@ -483,14 +483,14 @@ private:
 
                     int8_t ext_type = jsoncons::detail::big_to_native<int8_t>(buf, sizeof(buf));
 
-                    semantic_tag tag{}; 
+                    bool is_timestamp = false; 
                     if (ext_type == -1)
                     {
-                        tag = semantic_tag::epoch_second;
+                        is_timestamp = true;;
                     }
 
                     // payload
-                    if (tag == semantic_tag::epoch_second && len == 4)
+                    if (is_timestamp && len == 4)
                     {
                         uint8_t buf32[sizeof(uint32_t)];
                         if (source_.read(buf32, sizeof(uint32_t)) != sizeof(uint32_t))
@@ -500,9 +500,9 @@ private:
                             return;
                         }
                         uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf32, sizeof(buf32));
-                        more_ = visitor.uint64_value(val, tag, *this, ec);
+                        more_ = visitor.uint64_value(val, semantic_tag::epoch_second, *this, ec);
                     }
-                    else if (tag == semantic_tag::epoch_second && len == 8)
+                    else if (is_timestamp && len == 8)
                     {
                         uint8_t buf64[sizeof(uint64_t)];
                         if (source_.read(buf64, sizeof(uint64_t)) != sizeof(uint64_t))
@@ -514,13 +514,16 @@ private:
                         uint64_t data64 = jsoncons::detail::big_to_native<uint64_t>(buf64, sizeof(buf64));
                         uint64_t sec = data64 & 0x00000003ffffffffL;
                         uint64_t nsec = data64 >> 34;
-                        timestamp_buffer_.clear();
-                        timestamp_buffer_.push_back(static_cast<int64_t>(sec));
-                        timestamp_buffer_.push_back(static_cast<int64_t>(nsec));
-                        more_ = visitor.typed_array(span<const int64_t>(timestamp_buffer_), tag, *this, ec);
+
+                        bigint nano(sec);
+                        nano *= uint64_t(1000000000);
+                        nano += nsec;
+                        text_buffer_.clear();
+                        nano.write_string(text_buffer_);
+                        more_ = visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
                         if (!more_) return;
                     }
-                    else if (tag == semantic_tag::epoch_second && len == 12)
+                    else if (is_timestamp && len == 12)
                     {
                         uint8_t buf1[sizeof(uint32_t)];
                         if (source_.read(buf1, sizeof(uint32_t)) != sizeof(uint32_t))
@@ -539,10 +542,13 @@ private:
                             return;
                         }
                         int64_t sec = jsoncons::detail::big_to_native<int64_t>(buf2, sizeof(buf2));
-                        timestamp_buffer_.clear();
-                        timestamp_buffer_.push_back(sec);
-                        timestamp_buffer_.push_back(nsec);
-                        more_ = visitor.typed_array(span<const int64_t>(timestamp_buffer_), tag, *this, ec);
+                        bigint nano(sec);
+
+                        nano *= uint64_t(1000000000);
+                        nano += nsec;
+                        text_buffer_.clear();
+                        nano.write_string(text_buffer_);
+                        more_ = visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
                         if (!more_) return;
                     }
                     else
