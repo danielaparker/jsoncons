@@ -6,9 +6,10 @@ work for all C++ classes that have [json_type_traits](https://github.com/daniela
 ```c++
 #include <jsoncons/decode_json.hpp>
 
-template <class T, class CharT>
-T decode_json(const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (1)
+template <class T, class Source>
+T decode_json(const Source& s,
+              const basic_json_decode_options<Source::value_type>& options 
+                  = basic_json_decode_options<Source::value_type>()); // (1)
 
 template <class T, class CharT>
 T decode_json(std::basic_istream<CharT>& is,
@@ -18,10 +19,11 @@ template <class T, class Iterator>
 T decode_json(Iterator first, Iterator last,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (3)
 
-template <class T,class CharT,class TempAllocator>
+template <class T,class Source,class TempAllocator>
 T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-              const std::basic_string<CharT>& s,
-              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (4)
+              const Source& s,
+              const basic_json_decode_options<Source::value_type>& options 
+                  = basic_json_decode_options<Source::value_type>()); // (4)
 
 template <class T,class CharT,class TempAllocator>
 T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
@@ -29,7 +31,7 @@ T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); // (5)
 ```
 
-(1) Reads JSON from a string into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
+(1) Reads JSON from a contiguous character sequence provided by `s` into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 

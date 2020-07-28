@@ -1,61 +1,64 @@
 ### `jsoncons::basic_json::dump`
 
 ```c++
+template <Container>
+void dump(Container& s,
+          const basic_json_encode_options<char_type>& options 
+              = basic_json_encode_options<char_type>()) const; // (1)
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (1)
+void dump(std::basic_ostream<char_type>& os, 
+          const basic_json_encode_options<char_type>& options 
+              = basic_json_encode_options<char_type>()) const; // (2)
 
-    void dump(std::basic_ostream<char_type>& os, 
-              const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (2)
+template <Container>
+void dump_pretty(Container& s,
+                 const basic_json_encode_options<char_type>& options 
+                     = basic_json_encode_options<char_type>()) const; // (3)
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump_pretty(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-                     const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (3)
+void dump_pretty(std::basic_ostream<char_type>& os, 
+                 const basic_json_encode_options<char_type>& options 
+                     = basic_json_encode_options<char_type>()) const; // (4)
 
-    void dump_pretty(std::basic_ostream<char_type>& os, 
-                     const basic_json_encode_options<char_type>& options = basic_json_encode_options<char_type>()) const; // (4)
+template <Container>
+void dump(Container& s, 
+          indenting line_indent = indenting::no_indent) const; // (1)
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              indenting line_indent = indenting::no_indent) const; // (1)
+template <Container>
+void dump(Container& s,
+          const basic_json_encode_options<char_type>& options, 
+          indenting line_indent = indenting::no_indent) const; // (2)
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_encode_options<char_type>& options, 
-              indenting line_indent = indenting::no_indent) const; // (2)
+void dump(std::basic_ostream<char_type>& os, 
+          indenting line_indent = indenting::no_indent) const; // (3)
 
-    void dump(std::basic_ostream<char_type>& os, 
-              indenting line_indent = indenting::no_indent) const; // (3)
+void dump(std::basic_ostream<char_type>& os, 
+          const basic_json_encode_options<char_type>& options, 
+          indenting line_indent = indenting::no_indent) const; // (4)
 
-    void dump(std::basic_ostream<char_type>& os, 
-              const basic_json_encode_options<char_type>& options, 
-              indenting line_indent = indenting::no_indent) const; // (4)
+void dump(basic_json_visitor<char_type>& visitor) const; // (5)
 
-    void dump(basic_json_visitor<char_type>& visitor) const; // (5)
+template <Container>
+void dump(Container& s,
+          const basic_json_encode_options<char_type>& options, 
+          indenting line_indent,
+          std::error_code& ec) const; // (6)
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s,
-              const basic_json_encode_options<char_type>& options, 
-              indenting line_indent,
-              std::error_code& ec) const; // (6)
+template <Container>
+void dump(Container& s, 
+          indenting line_indent,
+          std::error_code& ec) const; // (7)
 
-    template <class SAllocator=std::allocator<char_type>>
-    void dump(std::basic_string<char_type,char_traits_type,SAllocator>& s, 
-              indenting line_indent,
-              std::error_code& ec) const; // (7)
+void dump(std::basic_ostream<char_type>& os, 
+          const basic_json_encode_options<char_type>& options, 
+          indenting line_indent,
+          std::error_code& ec) const; // (8)
 
-    void dump(std::basic_ostream<char_type>& os, 
-              const basic_json_encode_options<char_type>& options, 
-              indenting line_indent,
-              std::error_code& ec) const; // (8)
+void dump(std::basic_ostream<char_type>& os, 
+          indenting line_indent,
+          std::error_code& ec) const; // (9)
 
-    void dump(std::basic_ostream<char_type>& os, 
-              indenting line_indent,
-              std::error_code& ec) const; // (9)
-
-    void dump(basic_json_visitor<char_type>& visitor, 
-              std::error_code& ec) const; // (10)
+void dump(basic_json_visitor<char_type>& visitor, 
+          std::error_code& ec) const; // (10)
 ```
 
 (1) Dumps a json value to a string using the specified [indenting](../indenting.md).
