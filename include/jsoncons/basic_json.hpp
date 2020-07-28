@@ -2862,7 +2862,7 @@ public:
     }
 
     static basic_json parse(const char_type* s, 
-                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+                            std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         return parse(basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
     }
