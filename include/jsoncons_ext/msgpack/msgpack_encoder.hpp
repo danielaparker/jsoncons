@@ -182,7 +182,7 @@ namespace msgpack {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
                 return false;
             } 
-            if (tag == semantic_tag::epoch_seconds && length == 2)
+            if (tag == semantic_tag::epoch_second && length == 2)
             {
                 timestamp_parts_.clear();
                 stack_.push_back(stack_item(msgpack_container_type::timestamp_array, length));
@@ -436,7 +436,7 @@ namespace msgpack {
                          const ser_context&,
                          std::error_code&) override
         {
-            if (tag == semantic_tag::epoch_seconds)
+            if (tag == semantic_tag::epoch_second)
             {
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext4_cd);
                 sink_.push_back(0xff);
@@ -519,7 +519,7 @@ namespace msgpack {
                           const ser_context&,
                           std::error_code&) override
         {
-            if (tag == semantic_tag::epoch_seconds)
+            if (tag == semantic_tag::epoch_second)
             {
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext4_cd);
                 sink_.push_back(0xff);

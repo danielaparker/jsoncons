@@ -1436,32 +1436,82 @@ namespace variant_detail
 #endif
 
     // std::chrono::duration
-    template<class Json,class Rep>
-    struct json_type_traits<Json,std::chrono::duration<Rep>>
+    template<class Json,class Rep,class Period>
+    struct json_type_traits<Json,std::chrono::duration<Rep,Period>>
     {
-        using duration_type = std::chrono::duration<Rep>;
+        using duration_type = std::chrono::duration<Rep,Period>;
 
         using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
-            return (j.tag() == semantic_tag::epoch_seconds);
+            return (j.tag() == semantic_tag::epoch_second || j.tag() == semantic_tag::epoch_milli);
         }
 
         static duration_type as(const Json& j)
         {
-            if (j.is_number())
-            {
-                return duration_type{j.template as<Rep>()};
-            }
-            else
+            return from_json_(j);
+        }
+
+        static Json to_json(const duration_type& val, allocator_type = allocator_type())
+        {
+            return to_json_(val);
+        }
+
+        template <class PeriodT=Period>
+        static 
+        typename std::enable_if<std::is_same<PeriodT,std::milli>::value, duration_type>::type
+        from_json_(const Json& j)
+        {
+            if (!j.is_number())
             {
                 return duration_type{};
             }
+            auto count = j.template as<Rep>();
+            if (j.tag() == semantic_tag::epoch_milli)
+            {
+                return duration_type(count);
+            }
+            else
+            {
+                return duration_type(count*1000);
+            }
         }
-        static Json to_json(const duration_type& val, allocator_type = allocator_type())
+
+        template <class PeriodT=Period>
+        static 
+        typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value, duration_type>::type
+        from_json_(const Json& j)
         {
-            return Json(val.count(), semantic_tag::epoch_seconds);
+            if (!j.is_number())
+            {
+                return duration_type{};
+            }
+            auto count = j.template as<Rep>();
+            if (j.tag() == semantic_tag::epoch_milli)
+            {
+                return count == 0 ? duration_type(count) : duration_type(count/1000);
+            }
+            else
+            {
+                return duration_type(count);
+            }
+        }
+
+        template <class PeriodT=Period>
+        static 
+        typename std::enable_if<std::is_same<PeriodT,std::milli>::value,Json>::type
+        to_json_(const duration_type& val)
+        {
+            return Json(val.count(), semantic_tag::epoch_milli);
+        }
+
+        template <class PeriodT=Period>
+        static 
+        typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value,Json>::type
+        to_json_(const duration_type& val)
+        {
+            return Json(val.count(), semantic_tag::epoch_second);
         }
     };
 

@@ -989,13 +989,21 @@ private:
     }
 
     bool visit_double(double val, 
-                         semantic_tag tag,
-                         const ser_context&,
-                         std::error_code&) override
+                      semantic_tag tag,
+                      const ser_context&,
+                      std::error_code&) override
     {
-        if (tag == semantic_tag::epoch_seconds)
+        switch (tag)
         {
-            write_tag(1);
+            case semantic_tag::epoch_second:
+                write_tag(1);
+                break;
+            case semantic_tag::epoch_milli:
+                write_tag(1);
+                val /= 1000;
+                break;
+            default:
+                break;
         }
 
         float valf = (float)val;
@@ -1023,9 +1031,17 @@ private:
                         const ser_context&,
                         std::error_code&) override
     {
-        if (tag == semantic_tag::epoch_seconds)
+        switch (tag)
         {
-            write_tag(1);
+            case semantic_tag::epoch_second:
+                write_tag(1);
+                break;
+            case semantic_tag::epoch_milli:
+                write_tag(1);
+                value /= 1000;
+                break;
+            default:
+                break;
         }
         if (value >= 0)
         {
@@ -1104,13 +1120,21 @@ private:
     }
 
     bool visit_uint64(uint64_t value, 
-                         semantic_tag tag, 
-                         const ser_context&,
-                         std::error_code&) override
+                      semantic_tag tag, 
+                      const ser_context&,
+                      std::error_code&) override
     {
-        if (tag == semantic_tag::epoch_seconds)
+        switch (tag)
         {
-            write_tag(1);
+            case semantic_tag::epoch_second:
+                write_tag(1);
+                break;
+            case semantic_tag::epoch_milli:
+                write_tag(1);
+                value /= 1000;
+                break;
+            default:
+                break;
         }
 
         write_uint64_value(value);

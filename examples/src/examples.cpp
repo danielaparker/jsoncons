@@ -437,8 +437,6 @@ int main()
 
         run_cbor_typed_array_examples();
 
-        bson_examples();
-
         jmespath_examples();
 
         msgpack_examples();
@@ -446,6 +444,8 @@ int main()
         cbor_examples();
 
         json_type_traits_variant_examples();
+
+        bson_examples();
     }
     catch (const std::exception& e)
     {

@@ -486,11 +486,11 @@ private:
                     semantic_tag tag{}; 
                     if (ext_type == -1)
                     {
-                        tag = semantic_tag::epoch_seconds;
+                        tag = semantic_tag::epoch_second;
                     }
 
                     // payload
-                    if (tag == semantic_tag::epoch_seconds && len == 4)
+                    if (tag == semantic_tag::epoch_second && len == 4)
                     {
                         uint8_t buf32[sizeof(uint32_t)];
                         if (source_.read(buf32, sizeof(uint32_t)) != sizeof(uint32_t))
@@ -502,7 +502,7 @@ private:
                         uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf32, sizeof(buf32));
                         more_ = visitor.uint64_value(val, tag, *this, ec);
                     }
-                    else if (tag == semantic_tag::epoch_seconds && len == 8)
+                    else if (tag == semantic_tag::epoch_second && len == 8)
                     {
                         uint8_t buf64[sizeof(uint64_t)];
                         if (source_.read(buf64, sizeof(uint64_t)) != sizeof(uint64_t))
@@ -520,7 +520,7 @@ private:
                         more_ = visitor.typed_array(span<const int64_t>(timestamp_buffer_), tag, *this, ec);
                         if (!more_) return;
                     }
-                    else if (tag == semantic_tag::epoch_seconds && len == 12)
+                    else if (tag == semantic_tag::epoch_second && len == 12)
                     {
                         uint8_t buf1[sizeof(uint32_t)];
                         if (source_.read(buf1, sizeof(uint32_t)) != sizeof(uint32_t))

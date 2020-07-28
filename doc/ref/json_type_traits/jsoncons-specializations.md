@@ -71,14 +71,14 @@ Seconds elapsed since 1970-01-01 00:00:00 UTC: 1514862245
 #include <iostream>
 
 using jsoncons::json;
-namespace msgpack = jsoncons::msgpack;
+namespace cbor = jsoncons::cbor;
 
 int main()
 {
     auto duration = std::chrono::system_clock::now().time_since_epoch();
-    double time = std::chrono::duration_cast<std::chrono::duration<double>>(duration).count();
+    auto time = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
 
-    json j(time, jsoncons::semantic_tag::epoch_seconds);
+    json j(time);
 
     auto dur = j.as<std::chrono::duration<double>>();
     std::cout << "Time since epoch: " << dur.count() << "\n\n";
@@ -89,9 +89,9 @@ int main()
     std::cout << "CBOR bytes: " << jsoncons::byte_string_view(data) << "\n\n";
 
     /*
-        c1 -- tag value 1 (seconds relative to 1970-01-01T00:00Z in UTC time) 
-        fb -- double precision float
-        41,d7,c6,7b,8f,c7,05,51 -- 1595534911.1097 
+        c1, // tag value 1 (seconds relative to 1970-01-01T00:00Z in UTC time) 
+        fb, // double precision float
+        41,d7,c6,7b,8f,c7,05,51 // 1595534911.1097 
     */
 }
 ```
@@ -100,6 +100,53 @@ Output:
 Time since epoch: 1595534911.1097
 
 CBOR bytes: c1,fb,41,d7,c6,7b,8f,c7,05,51
+```
+
+#### BSON example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace bson = jsoncons::bson;
+
+int main()
+{
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto time = std::chrono::duration_cast<std::chrono::duration<int64_t,std::milli>>(duration);
+
+    json j;
+    j.try_emplace("time", time);
+
+    auto milliseconds = j["time"].as<std::chrono::milliseconds>();
+    std::cout << "Time since epoch (milliseconds): " << milliseconds.count() << "\n\n";
+    auto seconds = j["time"].as<std::chrono::seconds>();
+    std::cout << "Time since epoch (seconds): " << seconds.count() << "\n\n";
+
+    std::vector<uint8_t> data;
+    bson::encode_bson(j, data);
+
+    std::cout << "BSON bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+/*
+    13,00,00,00, // document has 19 bytes
+      09, // UTC datetime
+        74,69,6d,65,00, // "time"
+        ea,14,7f,96,73,01,00,00, // 1595957777642
+    00 // terminating null    
+*/
+}
+```
+Output:
+```
+Time since epoch (milliseconds): 1595957777642
+
+Time since epoch (seconds): 1595957777
+
+BSON bytes:
+13,00,00,00,09,74,69,6d,65,00,ea,14,7f,96,73,01,00,00,00
 ```
 
 ### pair

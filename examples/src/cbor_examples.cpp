@@ -25,7 +25,7 @@ namespace {
         encoder.byte_string_value(purr);
         std::vector<uint8_t> hiss = {'h','i','s','s'};
         encoder.byte_string_value(hiss, semantic_tag::base64); // suggested conversion to base64
-        encoder.int64_value(1431027667, semantic_tag::epoch_seconds);
+        encoder.int64_value(1431027667, semantic_tag::epoch_second);
         encoder.end_array();
         encoder.flush();
 
@@ -55,7 +55,7 @@ namespace {
         encoder.begin_array(3); // array of length 3
         encoder.string_value("-18446744073709551617", semantic_tag::bigint);
         encoder.string_value("184467440737095516.16", semantic_tag::bigdec);
-        encoder.int64_value(1431027667, semantic_tag::epoch_seconds);
+        encoder.int64_value(1431027667, semantic_tag::epoch_second);
         encoder.end_array();
         encoder.flush();
 
@@ -542,7 +542,7 @@ namespace {
         auto duration = std::chrono::system_clock::now().time_since_epoch();
         double time = std::chrono::duration_cast<std::chrono::duration<double>>(duration).count();
 
-        json j(time, jsoncons::semantic_tag::epoch_seconds);
+        json j(time, jsoncons::semantic_tag::epoch_second);
 
         auto dur = j.as<std::chrono::duration<double>>();
         std::cout << "Time since epoch: " << dur.count() << "\n\n";
