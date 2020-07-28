@@ -540,9 +540,9 @@ namespace {
     void duration_example1()
     {
         auto duration = std::chrono::system_clock::now().time_since_epoch();
-        double time = std::chrono::duration_cast<std::chrono::duration<double>>(duration).count();
+        auto time = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
 
-        json j(time, jsoncons::semantic_tag::epoch_second);
+        json j(time);
 
         auto dur = j.as<std::chrono::duration<double>>();
         std::cout << "Time since epoch: " << dur.count() << "\n\n";
