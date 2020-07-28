@@ -2815,36 +2815,8 @@ public:
                 break;
         }
     }
-    // from stream
-
-    static basic_json parse(std::basic_istream<char_type>& is, 
-                            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
-    {
-        json_decoder<basic_json> visitor;
-        basic_json_reader<char_type,stream_source<char_type>> reader(is, visitor, options, err_handler);
-        reader.read_next();
-        reader.check_done();
-        if (!visitor.is_valid())
-        {
-            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
-        }
-        return visitor.get_result();
-    }
-
-    static basic_json parse(std::basic_istream<char_type>& is, std::function<bool(json_errc,const ser_context&)> err_handler)
-    {
-        return parse(is, basic_json_decode_options<CharT>(), err_handler);
-    }
 
     // from string
-
-    static basic_json parse(const char_type* s, 
-                            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
-    {
-        return parse(basic_string_view(s), options, err_handler);
-    }
 
     template <class Source>
     static
@@ -2880,6 +2852,35 @@ public:
                 std::function<bool(json_errc,const ser_context&)> err_handler)
     {
         return parse(s, basic_json_decode_options<CharT>(), err_handler);
+    }
+
+    static basic_json parse(const char_type* s, 
+                            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+    {
+        return parse(basic_string_view<char_type>(s), options, err_handler);
+    }
+
+    // from stream
+
+    static basic_json parse(std::basic_istream<char_type>& is, 
+                            const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
+                            std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
+    {
+        json_decoder<basic_json> visitor;
+        basic_json_reader<char_type,stream_source<char_type>> reader(is, visitor, options, err_handler);
+        reader.read_next();
+        reader.check_done();
+        if (!visitor.is_valid())
+        {
+            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Failed to parse json stream"));
+        }
+        return visitor.get_result();
+    }
+
+    static basic_json parse(std::basic_istream<char_type>& is, std::function<bool(json_errc,const ser_context&)> err_handler)
+    {
+        return parse(is, basic_json_decode_options<CharT>(), err_handler);
     }
 
     // from iterator
