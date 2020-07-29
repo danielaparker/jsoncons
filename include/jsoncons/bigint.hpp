@@ -1341,6 +1341,84 @@ public:
         }
         return is_negative() ? -code : code;
     }
+
+    void divide( basic_bigint<Allocator> denom, basic_bigint<Allocator>& quot, basic_bigint<Allocator>& rem, bool remDesired ) const
+    {
+        if ( denom.length() == 0 )
+        {
+            JSONCONS_THROW(std::runtime_error( "Zero divide." ));
+        }
+        bool quot_neg = is_negative() ^ denom.is_negative();
+        bool rem_neg = is_negative();
+        int x = 0;
+        basic_bigint<Allocator> num = *this;
+        num.common_stor_.is_negative_ = denom.common_stor_.is_negative_ = false;
+        if ( num < denom )
+        {
+            quot = uint64_t(0);
+            rem = num;
+            rem.common_stor_.is_negative_ = rem_neg;
+            return;
+        }
+        if ( denom.length() == 1 && num.length() == 1 )
+        {
+            quot = uint64_t( num.data()[0]/denom.data()[0] );
+            rem = uint64_t( num.data()[0]%denom.data()[0] );
+            quot.common_stor_.is_negative_ = quot_neg;
+            rem.common_stor_.is_negative_ = rem_neg;
+            return;
+        }
+        else if (denom.length() == 1 && (denom.data()[0] & l_mask) == 0 )
+        {
+            // Denominator fits into a half word
+            uint64_t divisor = denom.data()[0], dHi = 0,
+                     q1, r, q2, dividend;
+            quot.resize(length());
+            for (size_type i=length(); i-- > 0; )
+            {
+                dividend = (dHi << basic_type_halfBits) | (data()[i] >> basic_type_halfBits);
+                q1 = dividend/divisor;
+                r = dividend % divisor;
+                dividend = (r << basic_type_halfBits) | (data()[i] & r_mask);
+                q2 = dividend/divisor;
+                dHi = dividend % divisor;
+                quot.data()[i] = (q1 << basic_type_halfBits) | q2;
+            }
+            quot.reduce();
+            rem = dHi;
+            quot.common_stor_.is_negative_ = quot_neg;
+            rem.common_stor_.is_negative_ = rem_neg;
+            return;
+        }
+        basic_bigint<Allocator> num0 = num, denom0 = denom;
+        int second_done = normalize(denom, num, x);
+        size_type l = denom.length() - 1;
+        size_type n = num.length() - 1;
+        quot.resize(n - l);
+        for (size_type i=quot.length(); i-- > 0; )
+            quot.data()[i] = 0;
+        rem = num;
+        if ( rem.data()[n] >= denom.data()[l] )
+        {
+            rem.resize(rem.length() + 1);
+            n++;
+            quot.resize(quot.length() + 1);
+        }
+        uint64_t d = denom.data()[l];
+        for ( size_type k = n; k > l; k-- )
+        {
+            uint64_t q = DDquotient(rem.data()[k], rem.data()[k-1], d);
+            subtractmul( rem.data() + k - l - 1, denom.data(), l + 1, q );
+            quot.data()[k - l - 1] = q;
+        }
+        quot.reduce();
+        quot.common_stor_.is_negative_ = quot_neg;
+        if ( remDesired )
+        {
+            unnormalize(rem, x, second_done);
+            rem.common_stor_.is_negative_ = rem_neg;
+        }
+    }
 private:
     void destroy() noexcept
     {
@@ -1478,84 +1556,6 @@ private:
         else
         {
             rem.reduce();
-        }
-    }
-
-    void divide( basic_bigint<Allocator> denom, basic_bigint<Allocator>& quot, basic_bigint<Allocator>& rem, bool remDesired ) const
-    {
-        if ( denom.length() == 0 )
-        {
-            JSONCONS_THROW(std::runtime_error( "Zero divide." ));
-        }
-        bool quot_neg = is_negative() ^ denom.is_negative();
-        bool rem_neg = is_negative();
-        int x = 0;
-        basic_bigint<Allocator> num = *this;
-        num.common_stor_.is_negative_ = denom.common_stor_.is_negative_ = false;
-        if ( num < denom )
-        {
-            quot = uint64_t(0);
-            rem = num;
-            rem.common_stor_.is_negative_ = rem_neg;
-            return;
-        }
-        if ( denom.length() == 1 && num.length() == 1 )
-        {
-            quot = uint64_t( num.data()[0]/denom.data()[0] );
-            rem = uint64_t( num.data()[0]%denom.data()[0] );
-            quot.common_stor_.is_negative_ = quot_neg;
-            rem.common_stor_.is_negative_ = rem_neg;
-            return;
-        }
-        else if (denom.length() == 1 && (denom.data()[0] & l_mask) == 0 )
-        {
-            // Denominator fits into a half word
-            uint64_t divisor = denom.data()[0], dHi = 0,
-                     q1, r, q2, dividend;
-            quot.resize(length());
-            for (size_type i=length(); i-- > 0; )
-            {
-                dividend = (dHi << basic_type_halfBits) | (data()[i] >> basic_type_halfBits);
-                q1 = dividend/divisor;
-                r = dividend % divisor;
-                dividend = (r << basic_type_halfBits) | (data()[i] & r_mask);
-                q2 = dividend/divisor;
-                dHi = dividend % divisor;
-                quot.data()[i] = (q1 << basic_type_halfBits) | q2;
-            }
-            quot.reduce();
-            rem = dHi;
-            quot.common_stor_.is_negative_ = quot_neg;
-            rem.common_stor_.is_negative_ = rem_neg;
-            return;
-        }
-        basic_bigint<Allocator> num0 = num, denom0 = denom;
-        int second_done = normalize(denom, num, x);
-        size_type l = denom.length() - 1;
-        size_type n = num.length() - 1;
-        quot.resize(n - l);
-        for (size_type i=quot.length(); i-- > 0; )
-            quot.data()[i] = 0;
-        rem = num;
-        if ( rem.data()[n] >= denom.data()[l] )
-        {
-            rem.resize(rem.length() + 1);
-            n++;
-            quot.resize(quot.length() + 1);
-        }
-        uint64_t d = denom.data()[l];
-        for ( size_type k = n; k > l; k-- )
-        {
-            uint64_t q = DDquotient(rem.data()[k], rem.data()[k-1], d);
-            subtractmul( rem.data() + k - l - 1, denom.data(), l + 1, q );
-            quot.data()[k - l - 1] = q;
-        }
-        quot.reduce();
-        quot.common_stor_.is_negative_ = quot_neg;
-        if ( remDesired )
-        {
-            unnormalize(rem, x, second_done);
-            rem.common_stor_.is_negative_ = rem_neg;
         }
     }
 
