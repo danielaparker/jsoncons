@@ -359,7 +359,6 @@ int main()
 {
     try
     {
-
         std::cout << "jsoncons version: " << version() << std::endl;
 
         object_range_based_for_loop();
@@ -439,13 +438,13 @@ int main()
 
         jmespath_examples();
 
-        cbor_examples();
-
         json_type_traits_variant_examples();
 
         bson_examples();
 
         msgpack_examples();
+
+        cbor_examples();
     }
     catch (const std::exception& e)
     {

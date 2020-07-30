@@ -36,7 +36,45 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 for tick periods `std::ratio<1>` (one second), `std::milli` and  `std::nano`.
 
-#### CBOR example
+#### CBOR example (integer)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace cbor = jsoncons::cbor;
+
+int main()
+{
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto time = std::chrono::duration_cast<std::chrono::seconds>(duration);
+
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(time, data);
+
+    /*
+      c1, // Tag 1 (epoch time)
+        1a, // 32 bit unsigned integer
+          5f,23,29,18 // 1596139800
+    */
+
+    std::cout << "CBOR bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+    auto seconds = cbor::decode_cbor<std::chrono::seconds>(data);
+    std::cout << "Time since epoch (seconds): " << seconds.count() << "\n";
+}
+```
+Output:
+```
+CBOR bytes: 
+c1,1a,5f,23,29,18
+
+Time since epoch (seconds): 1596139800
+```
+
+#### CBOR example (double)
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -51,28 +89,31 @@ int main()
     auto duration = std::chrono::system_clock::now().time_since_epoch();
     auto time = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
 
-    json j(time);
-
-    auto dur = j.as<std::chrono::duration<double>>();
-    std::cout << "Time since epoch: " << dur.count() << "\n\n";
-
     std::vector<uint8_t> data;
-    cbor::encode_cbor(j, data);
-
-    std::cout << "CBOR bytes: " << jsoncons::byte_string_view(data) << "\n\n";
+    cbor::encode_cbor(time, data);
 
     /*
-        c1, // tag value 1 (seconds relative to 1970-01-01T00:00Z in UTC time) 
-        fb, // double precision float
-        41,d7,c6,7b,8f,c7,05,51 // 1595534911.1097 
+      c1, // Tag 1 (epoch time)
+        fb,  // Double
+          41,d7,c8,ca,46,1c,0f,87 // 1596139800.43845
     */
+
+    std::cout << "CBOR bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+    auto seconds = cbor::decode_cbor<std::chrono::duration<double>>(data);
+    std::cout << "Time since epoch (seconds): " << seconds.count() << "\n";
+
+    auto milliseconds = cbor::decode_cbor<std::chrono::milliseconds>(data);
+    std::cout << "Time since epoch (milliseconds): " << milliseconds.count() << "\n";
 }
 ```
 Output:
 ```
-Time since epoch: 1595534911.1097
+CBOR bytes:
+c1,fb,41,d7,c8,ca,46,1c,0f,87
 
-CBOR bytes: c1,fb,41,d7,c6,7b,8f,c7,05,51
+Time since epoch (seconds): 1596139800.43845
+Time since epoch (milliseconds): 1596139800438
 ```
 
 #### MessagePack example (timestamp 32)

@@ -139,13 +139,13 @@ namespace {
         std::vector<uint8_t> data;
         msgpack::encode_msgpack(dur_nano, data);
 
+        std::cout << "MessagePack bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
         /*
             d7, ff, // timestamp 64
             e3,94,56,e0, // nanoseconds in 30-bit unsigned int
             5f,22,b6,8b // seconds in 34-bit unsigned int         
         */ 
-
-        std::cout << "MessagePack bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
 
         auto nanoseconds = msgpack::decode_msgpack<std::chrono::nanoseconds>(data);
         std::cout << "nanoseconds elapsed since 1970-01-01 00:00:00 UTC: " << nanoseconds.count() << "\n";

@@ -1529,7 +1529,7 @@ namespace variant_detail
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value, duration_type>::type
         from_json_(const Json& j)
         {
-            if (j.is_int64() || j.is_uint64() || j.is_double())
+            if (j.is_int64() || j.is_uint64())
             {
                 auto count = j.template as<Rep>();
                 switch (j.tag())
@@ -1542,6 +1542,21 @@ namespace variant_detail
                         return duration_type(count == 0 ? 0 : count/nanos_in_milli);
                     default:
                         return duration_type(count);
+                }
+            }
+            else if (j.is_double())
+            {
+                auto count = j.template as<double>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(static_cast<Rep>(count * millis_in_second));
+                    case semantic_tag::epoch_milli:
+                        return duration_type(static_cast<Rep>(count));
+                    case semantic_tag::epoch_nano:
+                        return duration_type(count == 0 ? 0 : static_cast<Rep>(count / nanos_in_milli));
+                    default:
+                        return duration_type(static_cast<Rep>(count));
                 }
             }
             else if (j.is_string())
@@ -1604,6 +1619,21 @@ namespace variant_detail
                         return duration_type(count);
                     default:
                         return duration_type(count);
+                }
+            }
+            else if (j.is_double())
+            {
+                auto count = j.template as<double>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(static_cast<Rep>(count * nanos_in_second));
+                    case semantic_tag::epoch_milli:
+                        return duration_type(static_cast<Rep>(count * nanos_in_milli));
+                    case semantic_tag::epoch_nano:
+                        return duration_type(static_cast<Rep>(count));
+                    default:
+                        return duration_type(static_cast<Rep>(count));
                 }
             }
             else if (j.is_string())

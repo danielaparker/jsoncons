@@ -540,17 +540,44 @@ namespace {
     void duration_example1()
     {
         auto duration = std::chrono::system_clock::now().time_since_epoch();
-        auto time = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
-
-        json j(time);
-
-        auto dur = j.as<std::chrono::duration<double>>();
-        std::cout << "Time since epoch: " << dur.count() << "\n\n";
+        auto time = std::chrono::duration_cast<std::chrono::seconds>(duration);
 
         std::vector<uint8_t> data;
-        cbor::encode_cbor(j, data);
+        cbor::encode_cbor(time, data);
+
+        /*
+          c1, // Tag 1 (epoch time)
+            1a, // 32 bit unsigned integer
+              5f,23,29,18 // 1596139800
+        */
 
         std::cout << "CBOR bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+        auto seconds = cbor::decode_cbor<std::chrono::seconds>(data);
+        std::cout << "Time since epoch (seconds): " << seconds.count() << "\n";
+    }
+
+    void duration_example2()
+    {
+        auto duration = std::chrono::system_clock::now().time_since_epoch();
+        auto time = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
+
+        std::vector<uint8_t> data;
+        cbor::encode_cbor(time, data);
+
+        /*
+          c1, // Tag 1 (epoch time)
+            fb,  // Double
+              41,d7,c8,ca,46,1c,0f,87 // 1596139800.43845
+        */
+
+        std::cout << "CBOR bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+        auto seconds = cbor::decode_cbor<std::chrono::duration<double>>(data);
+        std::cout << "Time since epoch (seconds): " << seconds.count() << "\n";
+
+        auto milliseconds = cbor::decode_cbor<std::chrono::milliseconds>(data);
+        std::cout << "Time since epoch (milliseconds): " << milliseconds.count() << "\n";
     }
 
 } // namespace
@@ -583,5 +610,6 @@ void cbor_examples()
 
     ext_type_example();
     duration_example1();
+    duration_example2();
 }
 

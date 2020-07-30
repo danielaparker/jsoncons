@@ -32,6 +32,9 @@ class basic_cbor_encoder final : public basic_json_visitor<char>
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
     enum class hexfloat_parse_state { start, expect_0, expect_x, integer, exp1, exp2, fraction1 };
 
+    static constexpr int64_t nanos_in_second = 1000000000;
+    static constexpr int64_t millis_in_second = 1000;
+
 public:
     using allocator_type = Allocator;
     using sink_type = Sink;
@@ -1000,7 +1003,17 @@ private:
                 break;
             case semantic_tag::epoch_milli:
                 write_tag(1);
-                val /= 1000;
+                if (val != 0)
+                {
+                    val /= millis_in_second;
+                }
+                break;
+            case semantic_tag::epoch_nano:
+                write_tag(1);
+                if (val != 0)
+                {
+                    val /= nanos_in_second;
+                }
                 break;
             default:
                 break;
@@ -1028,17 +1041,16 @@ private:
 
     bool visit_int64(int64_t value, 
                         semantic_tag tag, 
-                        const ser_context&,
-                        std::error_code&) override
+                        const ser_context& context,
+                        std::error_code& ec) override
     {
         switch (tag)
         {
+            case semantic_tag::epoch_milli:
+            case semantic_tag::epoch_nano:
+                return visit_double(static_cast<double>(value), tag, context, ec);
             case semantic_tag::epoch_second:
                 write_tag(1);
-                break;
-            case semantic_tag::epoch_milli:
-                write_tag(1);
-                value /= 1000;
                 break;
             default:
                 break;
@@ -1121,17 +1133,16 @@ private:
 
     bool visit_uint64(uint64_t value, 
                       semantic_tag tag, 
-                      const ser_context&,
-                      std::error_code&) override
+                      const ser_context& context,
+                      std::error_code& ec) override
     {
         switch (tag)
         {
+            case semantic_tag::epoch_milli:
+            case semantic_tag::epoch_nano:
+                return visit_double(static_cast<double>(value), tag, context, ec);
             case semantic_tag::epoch_second:
                 write_tag(1);
-                break;
-            case semantic_tag::epoch_milli:
-                write_tag(1);
-                value /= 1000;
                 break;
             default:
                 break;
