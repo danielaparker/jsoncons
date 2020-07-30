@@ -420,8 +420,6 @@ int main()
 
         json_traits_macros_named_examples();
 
-        readme_examples();
-
         run_cbor_typed_array_examples();
 
         data_model_examples();
@@ -445,6 +443,8 @@ int main()
         msgpack_examples();
 
         cbor_examples();
+
+        readme_examples();
     }
     catch (const std::exception& e)
     {

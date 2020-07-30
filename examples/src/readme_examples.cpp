@@ -27,7 +27,7 @@ namespace {
                    "assertion": "advanced",
                    "rated": "Marilyn C",
                    "rating": 0.90,
-                   "confidence": 0.99
+                   "generated": 1514862245
                  }
                ]
             }
@@ -72,7 +72,7 @@ namespace {
                    "assertion": "advanced",
                    "rated": "Marilyn C",
                    "rating": 0.90,
-                   "confidence": 0.99
+                   "generated": 1514862245
                  }
                ]
             }
@@ -85,7 +85,12 @@ namespace {
         std::cout << "(1)\n";
         for (const auto& item : v.reputons())
         {
-            std::cout << item.rated() << ", " << item.rating() << "\n";
+            std::cout << item.rated() << ", " << item.rating();
+            if (item.generated())
+            {
+                std::cout << ", " << (*item.generated()).count();
+            }
+            std::cout << "\n";
         }
 
         // Encode the c++ structure into a string
@@ -107,7 +112,7 @@ namespace {
                    "assertion": "advanced",
                    "rated": "Marilyn C",
                    "rating": 0.90,
-                   "confidence": 0.99
+                   "generated": 1514862245
                  }
                ]
             }
@@ -172,7 +177,8 @@ namespace {
                    "rater": "HikingAsylum",
                    "assertion": "advanced",
                    "rated": "Marilyn C",
-                   "rating": 0.90
+                   "rating": 0.90,
+                   "generated": 1514862245
                  }
                ]
             }
@@ -333,10 +339,10 @@ void readme_examples()
     std::cout << "\nReadme examples\n\n";
 
     playing_around();
-    as_a_strongly_typed_cpp_structure();
-    as_a_filtered_stream_of_json_events();
-    with_cursor_level_access();
     as_a_variant_like_structure();
+    as_a_strongly_typed_cpp_structure();
+    with_cursor_level_access();
+    as_a_filtered_stream_of_json_events();
     std::cout << std::endl;
 }
 
