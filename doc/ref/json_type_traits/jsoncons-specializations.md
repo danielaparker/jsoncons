@@ -34,7 +34,7 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 ### duration
 
 jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
-for tick periods `std::ratio<1>` (one second) and `std::milli`.
+for tick periods `std::ratio<1>` (one second), `std::milli` and  `std::nano`.
 
 #### CBOR example
 
