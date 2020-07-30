@@ -127,26 +127,11 @@ namespace {
             0xff, // timestamp
             0x5a,0x4a,0xf6,0xa5 // 1514862245
         };
-        auto j = msgpack::decode_msgpack<json>(data);
-        auto seconds = j.as<std::chrono::duration<uint64_t>>();
+        auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(data);
         std::cout << "Seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
     }
 
     void duration_example2()
-    {
-        std::vector<uint8_t> input = 
-        {0xc7,0x0c,0xff,0x3b,0x9a,0xc9,0xff,0xff,0xff,0xff,0xff,0x7c,0x55,0x81,0x7f};
-          //c7,   0c,  ff,ff,ff,ff,ff,ff,ff,ff,ff,7c,55,81,80
-        auto j = msgpack::decode_msgpack<json>(input);
-        auto milliseconds = j.as<std::chrono::milliseconds>();
-        std::cout << "milliseconds elapsed since 1970-01-01 00:00:00 UTC: " << milliseconds.count() << "\n";
-
-        std::vector<uint8_t> data;
-        msgpack::encode_msgpack(milliseconds, data);
-        std::cout << "MessagePack bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
-    }
-
-    void duration_example3()
     {
         auto duration = std::chrono::system_clock::now().time_since_epoch();
         auto dur_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(duration);
@@ -162,14 +147,29 @@ namespace {
 
         std::cout << "MessagePack bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
 
-        auto nanoseconds2 = msgpack::decode_msgpack<std::chrono::nanoseconds>(data);
-        std::cout << nanoseconds2.count() << "\n";
+        auto nanoseconds = msgpack::decode_msgpack<std::chrono::nanoseconds>(data);
+        std::cout << "nanoseconds elapsed since 1970-01-01 00:00:00 UTC: " << nanoseconds.count() << "\n";
 
-        auto milliseconds2 = msgpack::decode_msgpack<std::chrono::milliseconds>(data);
-        std::cout << milliseconds2.count() << "\n";
+        auto milliseconds = msgpack::decode_msgpack<std::chrono::milliseconds>(data);
+        std::cout << "milliseconds elapsed since 1970-01-01 00:00:00 UTC: " << milliseconds.count() << "\n";
 
-        auto seconds2 = msgpack::decode_msgpack<std::chrono::seconds>(data);
-        std::cout << seconds2.count() << "\n";
+        auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(data);
+        std::cout << "seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+    }
+
+    void duration_example3()
+    {
+        std::vector<uint8_t> input = {
+            0xc7,0x0c,0xff, // timestamp 96
+            0x3b,0x9a,0xc9,0xff, // 999999999 nanoseconds in 32-bit unsigned int
+            0xff,0xff,0xff,0xff,0x7c,0x55,0x81,0x7f // -2208988801 seconds in 64-bit signed int
+        };
+
+        auto milliseconds = msgpack::decode_msgpack<std::chrono::milliseconds>(input);
+        std::cout << "milliseconds elapsed since 1970-01-01 00:00:00 UTC: " << milliseconds.count() << "\n";
+
+        auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(input);
+        std::cout << "seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
     }
 
 } // namespace

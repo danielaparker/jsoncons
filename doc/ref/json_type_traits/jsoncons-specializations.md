@@ -36,33 +36,6 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
 for tick periods `std::ratio<1>` (one second) and `std::milli`.
 
-#### MessagePack example
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/msgpack.hpp>
-#include <iostream>
-
-using jsoncons::json;
-namespace msgpack = jsoncons::msgpack;
-
-int main()
-{
-    std::vector<uint8_t> data = {
-        0xd6, // fixext 4 stores an integer and a byte array whose length is 4 bytes
-        0xff, // timestamp
-        0x5a,0x4a,0xf6,0xa5 // 1514862245
-    };
-    auto j = msgpack::decode_msgpack<json>(data);
-    auto seconds = j.as<std::chrono::duration<uint32_t>>();
-    std::cout << "Seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
-}
-```
-Output:
-```
-Seconds elapsed since 1970-01-01 00:00:00 UTC: 1514862245
-```
-
 #### CBOR example
 
 ```c++
@@ -100,6 +73,105 @@ Output:
 Time since epoch: 1595534911.1097
 
 CBOR bytes: c1,fb,41,d7,c6,7b,8f,c7,05,51
+```
+
+#### MessagePack example (timestamp 32)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0xd6, 0xff, // timestamp 32
+        0x5a,0x4a,0xf6,0xa5 // 1514862245
+    };
+    auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(data);
+    std::cout << "Seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+}
+```
+Output:
+```
+Seconds elapsed since 1970-01-01 00:00:00 UTC: 1514862245
+```
+
+#### MessagePack example (timestamp 64)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto dur_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(duration);
+
+    std::vector<uint8_t> data;
+    msgpack::encode_msgpack(dur_nano, data);
+
+    /*
+        d7, ff, // timestamp 64
+        e3,94,56,e0, // nanoseconds in 30-bit unsigned int
+        5f,22,b6,8b // seconds in 34-bit unsigned int         
+    */ 
+
+    std::cout << "MessagePack bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+    auto nanoseconds = msgpack::decode_msgpack<std::chrono::nanoseconds>(data);
+    std::cout << "nanoseconds elapsed since 1970-01-01 00:00:00 UTC: " << nanoseconds.count() << "\n";
+
+    auto milliseconds = msgpack::decode_msgpack<std::chrono::milliseconds>(data);
+    std::cout << "milliseconds elapsed since 1970-01-01 00:00:00 UTC: " << milliseconds.count() << "\n";
+
+    auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(data);
+    std::cout << "seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+}
+```
+Output:
+```
+nanoseconds elapsed since 1970-01-01 00:00:00 UTC: 1596128821304212600
+milliseconds elapsed since 1970-01-01 00:00:00 UTC: 1596128821304
+seconds elapsed since 1970-01-01 00:00:00 UTC: 1596128821
+```
+
+#### MessagePack example (timestamp 96)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    std::vector<uint8_t> input = {
+        0xc7,0x0c,0xff, // timestamp 96
+        0x3b,0x9a,0xc9,0xff, // 999999999 nanoseconds in 32-bit unsigned int
+        0xff,0xff,0xff,0xff,0x7c,0x55,0x81,0x7f // -2208988801 seconds in 64-bit signed int
+    };
+
+    auto milliseconds = msgpack::decode_msgpack<std::chrono::milliseconds>(input);
+    std::cout << "milliseconds elapsed since 1970-01-01 00:00:00 UTC: " << milliseconds.count() << "\n";
+
+    auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(input);
+    std::cout << "seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+}
+```
+Output:
+```
+milliseconds elapsed since 1970-01-01 00:00:00 UTC: -2208988801999
+seconds elapsed since 1970-01-01 00:00:00 UTC: -2208988801
 ```
 
 #### BSON example
