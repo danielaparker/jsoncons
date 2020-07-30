@@ -11,7 +11,7 @@ with character types `char` and `wchar_t`
 * [basic_string_view](#basic_string_view) - jsoncons supports [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) 
 with character types `char` and `wchar_t`
 * [duration](#duration) (since 0.155.0) - covers [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
-for tick periods `std::ratio<1>` (one second) and `std::milli`.
+for tick periods `std::ratio<1>` (one second), `std::milli` and  `std::nano`.
 * [pair](#pair)
 * [tuple](#tuple)
 * [optional](#optional)
