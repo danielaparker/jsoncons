@@ -51,6 +51,8 @@ class basic_msgpack_parser : public ser_context
     using int64_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<int64_t>;                  
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
+    static constexpr int64_t nanos_in_second = 1000000000;
+
     Src source_;
     msgpack_decode_options options_;
     bool more_;
@@ -516,7 +518,7 @@ private:
                         uint64_t nsec = data64 >> 34;
 
                         bigint nano(sec);
-                        nano *= uint64_t(1000000000);
+                        nano *= uint64_t(nanos_in_second);
                         nano += nsec;
                         text_buffer_.clear();
                         nano.write_string(text_buffer_);
@@ -534,18 +536,28 @@ private:
                         }
                         uint32_t nsec = jsoncons::detail::big_to_native<uint32_t>(buf1, sizeof(buf1));
 
-                        uint8_t buf2[sizeof(uint64_t)];
-                        if (source_.read(buf2, sizeof(uint64_t)) != sizeof(uint64_t))
+                        uint8_t buf2[sizeof(int64_t)];
+                        if (source_.read(buf2, sizeof(int64_t)) != sizeof(int64_t))
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;
                             return;
                         }
                         int64_t sec = jsoncons::detail::big_to_native<int64_t>(buf2, sizeof(buf2));
+
                         bigint nano(sec);
 
-                        nano *= uint64_t(1000000000);
-                        nano += nsec;
+                        nano *= uint64_t(nanos_in_second);
+
+                        if (nano < 0)
+                        {
+                            nano -= nsec;
+                        }
+                        else
+                        {
+                            nano += nsec;
+                        }
+
                         text_buffer_.clear();
                         nano.write_string(text_buffer_);
                         more_ = visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);

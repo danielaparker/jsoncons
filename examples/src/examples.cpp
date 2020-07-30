@@ -439,13 +439,13 @@ int main()
 
         jmespath_examples();
 
-        msgpack_examples();
-
         cbor_examples();
 
         json_type_traits_variant_examples();
 
         bson_examples();
+
+        msgpack_examples();
     }
     catch (const std::exception& e)
     {
