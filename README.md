@@ -191,7 +191,8 @@ Marilyn C, 0.9
             "rating": 0.9
         }
     ]
-}```
+}
+```
 
 #### As a strongly typed C++ data structure
 
