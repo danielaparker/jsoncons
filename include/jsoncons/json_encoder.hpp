@@ -317,7 +317,7 @@ namespace detail {
         std::basic_string<CharT> close_object_brace_str_;
         std::basic_string<CharT> open_array_bracket_str_;
         std::basic_string<CharT> close_array_bracket_str_;
-        std::size_t nesting_depth_;
+        int nesting_depth_;
 
         // Noncopyable and nonmoveable
         basic_json_encoder(const basic_json_encoder&) = delete;
@@ -1093,7 +1093,7 @@ namespace detail {
         basic_json_encode_options<CharT> options_;
         jsoncons::detail::write_double fp_;
         std::vector<encoding_context,encoding_context_allocator_type> stack_;
-        std::size_t nesting_depth_;
+        int nesting_depth_;
 
         // Noncopyable
         basic_compact_json_encoder(const basic_compact_json_encoder&) = delete;
