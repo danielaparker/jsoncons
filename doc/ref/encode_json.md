@@ -61,15 +61,15 @@ void encode_json(const T& val,
 
 (2) Encode `val` to an output stream using the specified (or defaulted) [options](basic_json_options.md).
 
-(3) Encode `val` into a character container using the specified (or defaulted) [options](basic_json_options.md).
+(3) Encode `val` into a character container using the specified (or defaulted) [options](basic_json_options.md)
+and prettified with spaces and line breaks.
 
-(4) Encode `val` to an output stream using the specified (or defaulted) [options](basic_json_options.md).
-
-(3) Encode `val` to output stream with the specified (or defaulted) [line_indent](indenting.md).
-
-(4) Encode `val` to output stream using the specified (or defaulted) [options](basic_json_options.md) and [line_indent](indenting.md).
+(4) Encode `val` to an output stream using the specified (or defaulted) [options](basic_json_options.md)
+and prettified with spaces and line breaks.
 
 (5) Convert `val` to json events and stream through encoder.
+
+(6-9) Legacy overloads that indicate prettified output with [line_indent](indenting.md) parameter.
 
 #### Parameters
 
