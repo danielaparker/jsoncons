@@ -5,8 +5,8 @@ Decodes a [comma-separated variables (CSV)](https://en.wikipedia.org/wiki/Comma-
 ```c++
 #include <jsoncons_ext/csv/csv.hpp>
 
-template <class T,class CharT>
-T decode_csv(const std::basic_string<CharT>& s, 
+template <class T,class Source>
+T decode_csv(const Source& s, 
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (1)
 
 template <class T,class CharT>
@@ -17,9 +17,9 @@ template <class T,class InputIt>
 T decode_csv(InputIt first, InputIt last,
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (3) (since v0.153.0)
 
-template <class T,class CharT,class TempAllocator>
+template <class T,class Source,class TempAllocator>
 T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-             const std::basic_string<CharT>& s, 
+             const Source& s, 
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (4)
 
 template <class T,class CharT>
