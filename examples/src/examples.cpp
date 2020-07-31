@@ -44,6 +44,7 @@ void type_extensibility_examples();
 void unicode_examples();
 void wjson_examples();
 void json_type_traits_variant_examples();
+void update_json_in_place_examples();
 
 void comment_example()
 {
@@ -445,6 +446,8 @@ int main()
         cbor_examples();
 
         readme_examples();
+
+        update_json_in_place_examples();
     }
     catch (const std::exception& e)
     {
