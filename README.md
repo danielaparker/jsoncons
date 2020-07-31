@@ -205,8 +205,6 @@ defined. Many standard library classes are already supported,
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
-This example assumes C++17 language support for `std::optional` (otherwise substitute `jsoncons::optional`.)
-
 ```c++
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
@@ -217,7 +215,7 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
-        std::optional<std::chrono::seconds> generated_; // use std::optional if C++17
+        std::optional<std::chrono::seconds> generated_; // assumes C++17, if not use jsoncons::optional
         std::optional<std::chrono::seconds> expires_;
     public:
         hiking_reputon(const std::string& rater,

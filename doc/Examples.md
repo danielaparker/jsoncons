@@ -1784,7 +1784,6 @@ the enum values, and the macro `JSONCONS_ALL_CTOR_GETTER_TRAITS`
 generates the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
-
 ```c++
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
@@ -1795,7 +1794,7 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
-        std::optional<std::chrono::seconds> generated_; // use std::optional if C++17
+        std::optional<std::chrono::seconds> generated_; // assumes C++17, if not use jsoncons::optional
         std::optional<std::chrono::seconds> expires_;
     public:
         hiking_reputon(const std::string& rater,
