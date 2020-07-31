@@ -200,9 +200,11 @@ The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/en
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](doc/ref/json_type_traits.md) 
-defined. The standard library containers are already supported, 
+defined. Many standard library classes are already supported, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
+
+This example assumes C++17 language support for `std::optional` (otherwise substitute `jsoncons::optional`.)
 
 ```c++
 namespace ns {
@@ -214,15 +216,15 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
-        jsoncons::optional<std::chrono::seconds> generated_; // use std::optional if C++17
-        jsoncons::optional<std::chrono::seconds> expires_;
+        std::optional<std::chrono::seconds> generated_; // use std::optional if C++17
+        std::optional<std::chrono::seconds> expires_;
     public:
         hiking_reputon(const std::string& rater,
                        hiking_experience assertion,
                        const std::string& rated,
                        double rating,
-                       const jsoncons::optional<std::chrono::seconds>& generated = jsoncons::optional<std::chrono::seconds>(),
-                       const jsoncons::optional<std::chrono::seconds>& expires = jsoncons::optional<std::chrono::seconds>())
+                       const std::optional<std::chrono::seconds>& generated = std::optional<std::chrono::seconds>(),
+                       const std::optional<std::chrono::seconds>& expires = std::optional<std::chrono::seconds>())
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
               generated_(generated), expires_(expires)
         {
@@ -232,8 +234,8 @@ namespace ns {
         hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
-        jsoncons::optional<std::chrono::seconds> generated() const {return generated_;}
-        jsoncons::optional<std::chrono::seconds> expires() const {return expires_;}
+        std::optional<std::chrono::seconds> generated() const {return generated_;}
+        std::optional<std::chrono::seconds> expires() const {return expires_;}
 
         friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
