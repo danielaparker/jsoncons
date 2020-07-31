@@ -3034,8 +3034,8 @@ Output:
 
 #### Update JSON in place
 
-Suppose you have a JSON text, and need to replace a string found
-at a relative location path,  
+Suppose you have a JSON text, and need to replace one or more strings
+found at a relative location path,  
 but are not allowed to modify anything else in the original text.
 
 ```c++
@@ -3098,9 +3098,9 @@ public:
 };
 
 void update_json_in_place(std::string& input,
-                     const std::vector<std::string>& path,
-                     const std::string& from,
-                     const std::string& to)
+                          const std::vector<std::string>& path,
+                          const std::string& from,
+                          const std::string& to)
 {
     std::vector<std::size_t> positions;
     string_locator locator(input.data(), input.size(), path, from, positions);
