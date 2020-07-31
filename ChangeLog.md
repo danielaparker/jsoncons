@@ -13,6 +13,14 @@ Enhancements:
 
 - Added `json_type_traits` support for `std::chrono::duration`
 
+- Improved memory efficiency of jmespath extension
+
+- Added function `json_encode_pretty` as the preferred alternative   
+to the `json_encode` overload with `indenting::indent` argument.
+
+- Added `basic_json` member function `dump_pretty` as the preferred alternative   
+to the `dump` overload with `indenting::indent` argument.
+
 v0.154.3
 --------
 

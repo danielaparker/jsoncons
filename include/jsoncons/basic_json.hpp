@@ -1503,37 +1503,64 @@ private:
 
         template <class Container>
         typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
-        dump(Container& s, 
-             indenting line_indent = indenting::no_indent) const
+        dump(Container& s,
+             const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+        {
+            evaluate().dump(s, options);
+        }
+
+        void dump(std::basic_ostream<char_type>& os, 
+                  const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+        {
+            evaluate().dump(os, options);
+        }
+
+        template <class Container>
+        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+        dump_pretty(Container& s,
+             const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+        {
+            evaluate().dump_pretty(s, options);
+        }
+
+        void dump_pretty(std::basic_ostream<char_type>& os, 
+                  const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+        {
+            evaluate().dump_pretty(os, options);
+        }
+
+        template <class Container>
+        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+        dump(Container& s, indenting line_indent) const
         {
             evaluate().dump(s, line_indent);
         }
 
         void dump(std::basic_ostream<char_type>& os, 
-                  indenting line_indent = indenting::no_indent) const
+                  indenting line_indent) const
         {
             evaluate().dump(os, line_indent);
+        }
+
+        void dump(basic_json_visitor<char_type>& visitor) const
+        {
+            evaluate().dump(visitor);
         }
 
         template <class Container>
         typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
         dump(Container& s,
              const basic_json_encode_options<char_type>& options, 
-             indenting line_indent = indenting::no_indent) const
+             indenting line_indent) const
         {
             evaluate().dump(s, options, line_indent);
         }
 
         void dump(std::basic_ostream<char_type>& os, 
                   const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent = indenting::no_indent) const
+                  indenting line_indent) const
         {
             evaluate().dump(os, options, line_indent);
-        }
-
-        void dump(basic_json_visitor<char_type>& visitor) const
-        {
-            evaluate().dump(visitor);
         }
 
         template <class Container>
