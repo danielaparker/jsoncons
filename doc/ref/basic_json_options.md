@@ -80,7 +80,7 @@ Move constructor.
 
 #### Modifiers
 
-    void max_nesting_depth(std::size_t depth)
+    void max_nesting_depth(int depth)
 The maximum nesting depth allowed when decoding and encoding JSON. 
 Default is 1024. Parsing can have an arbitrarily large depth
 limited only by available memory. Serializing a [basic_json](../basic_json.md) to
