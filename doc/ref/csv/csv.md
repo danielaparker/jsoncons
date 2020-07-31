@@ -97,7 +97,7 @@ EUR_LIBOR_06M, 2015-10-27, 0.0000001
 
 jsoncons supports mapping CSV data into C++ data structures. The functions decode_csv and encode_csv convert strings or streams of 
 CSV data to C++ data structures and back. Decode and encode work for all C++ classes that have [json_type_traits](../json_type_traits.md) defined. 
-The standard library containers are already supported, and your own types will be supported too if you specialize [json_type_traits](../json_type_traits.md) 
+jsoncons already supports many types in the standard library, and your own types will be supported too if you specialize [json_type_traits](../json_type_traits.md) 
 in the jsoncons namespace.
 ```c++
 #include <boost/date_time/gregorian/gregorian.hpp>

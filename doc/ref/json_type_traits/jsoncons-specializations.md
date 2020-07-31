@@ -1,6 +1,6 @@
 ### jsoncons Specializations
 
-jsoncons supports most types in the standard library.
+jsoncons supports many types in the standard library.
 
 * integer types 
 * float and double
