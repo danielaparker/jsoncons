@@ -129,7 +129,12 @@ namespace msgpack = jsoncons::msgpack;
 int main()
 {
     std::vector<uint8_t> data = {
+<<<<<<< HEAD
+        0xd6, // fixext 4 stores an integer and a byte array whose length is 4 bytes
+        0xff, // epoch_time
+=======
         0xd6, 0xff, // timestamp 32
+>>>>>>> a1bd35d792a6b9022bf29b900e4588f00c29c8b5
         0x5a,0x4a,0xf6,0xa5 // 1514862245
     };
     auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(data);

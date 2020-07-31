@@ -1874,8 +1874,12 @@ int main()
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json_pretty(v, s);
+<<<<<<< HEAD
+    encode_json_pretty(val, s);
+=======
+    encode_json<ns::hiking_reputation>(v, s, indenting::indent);
     std::cout << "(2)\n";
+>>>>>>> a1bd35d792a6b9022bf29b900e4588f00c29c8b5
     std::cout << s << "\n";
 }
 ```
