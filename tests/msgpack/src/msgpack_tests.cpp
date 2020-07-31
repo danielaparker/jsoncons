@@ -358,63 +358,6 @@ TEST_CASE("msgpack ext tests")
     }
 }
 
-TEST_CASE("msgpack timestamp tests")
-{
-    SECTION("test 1")
-    {
-        std::vector<uint8_t> u = {0xce,0x5a,0x4a,0xf6,0xa5};
-        uint64_t expected = decode_msgpack<uint64_t>(u);
-        CHECK(expected == 1514862245);
-
-        std::vector<uint8_t> input = {0xd6,0xff,0x5a,0x4a,0xf6,0xa5};
-        auto r = decode_msgpack<uint64_t>(input);
-
-        CHECK(r == expected);
-
-        std::vector<uint8_t> output;
-        json j = decode_msgpack<json>(input);
-        encode_msgpack(j,output);
-        CHECK(output == input);
-    }
-    SECTION("test 2")
-    {
-        std::vector<uint64_t> expected = {1514862245,678901234};
-
-        std::vector<uint8_t> input = {0xd7,0xff,0xa1,0xdc,0xd7,0xc8,0x5a,0x4a,0xf6,0xa5};
-        auto r = decode_msgpack<std::vector<uint64_t>>(input);
-
-        CHECK(r == expected);
-    }
-    SECTION("test 3")
-    {
-        std::vector<int64_t> expected = {-int64_t(2208988801),999999999};
-
-        std::vector<uint8_t> input = {0xc7,0x0c,0xff,0x3b,0x9a,0xc9,0xff,0xff,0xff,0xff,0xff,0x7c,0x55,0x81,0x7f};
-        auto r = decode_msgpack<std::vector<int64_t>>(input);
-
-        CHECK(r == expected);
-
-        std::vector<uint8_t> output;
-        json j = decode_msgpack<json>(input);
-        encode_msgpack(j,output);
-        CHECK(output == input);
-    }
-    SECTION("test 4")
-    {
-        std::vector<uint64_t> expected = {2147483648,1};
-
-        std::vector<uint8_t> input = {0xd7,0xff,0x00,0x00,0x00,0x04,0x80,0x00,0x00,0x00};
-        auto r = decode_msgpack<std::vector<uint64_t>>(input);
-
-        CHECK(r == expected);
-
-        std::vector<uint8_t> output;
-        json j = decode_msgpack<json>(input);
-        encode_msgpack(j,output);
-        CHECK(output == input);
-    }
-}
-
 namespace { namespace ns {
 
     struct Person

@@ -1443,9 +1443,13 @@ namespace variant_detail
 
         using allocator_type = typename Json::allocator_type;
 
+        static constexpr int64_t nanos_in_milli = 1000000;
+        static constexpr int64_t nanos_in_second = 1000000000;
+        static constexpr int64_t millis_in_second = 1000;
+
         static bool is(const Json& j) noexcept
         {
-            return (j.tag() == semantic_tag::epoch_second || j.tag() == semantic_tag::epoch_milli);
+            return (j.tag() == semantic_tag::epoch_second || j.tag() == semantic_tag::epoch_milli || j.tag() == semantic_tag::epoch_nano);
         }
 
         static duration_type as(const Json& j)
@@ -1460,42 +1464,205 @@ namespace variant_detail
 
         template <class PeriodT=Period>
         static 
-        typename std::enable_if<std::is_same<PeriodT,std::milli>::value, duration_type>::type
+        typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value, duration_type>::type
         from_json_(const Json& j)
         {
-            if (!j.is_number())
+            if (j.is_int64() || j.is_uint64() || j.is_double())
             {
-                return duration_type{};
+                auto count = j.template as<Rep>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(count);
+                    case semantic_tag::epoch_milli:
+                        return duration_type(count == 0 ? 0 : count/millis_in_second);
+                    case semantic_tag::epoch_nano:
+                        return duration_type(count == 0 ? 0 : count/nanos_in_second);
+                    default:
+                        return duration_type(count);
+                }
             }
-            auto count = j.template as<Rep>();
-            if (j.tag() == semantic_tag::epoch_milli)
+            else if (j.is_string())
             {
-                return duration_type(count);
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                    {
+                        auto count = j.template as<Rep>();
+                        return duration_type(count);
+                    }
+                    case semantic_tag::epoch_milli:
+                    {
+                        auto sv = j.as_string_view();
+                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        if (n != 0)
+                        {
+                            n = n / millis_in_second;
+                        }
+                        return duration_type(static_cast<Rep>(n));
+                    }
+                    case semantic_tag::epoch_nano:
+                    {
+                        auto sv = j.as_string_view();
+                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        if (n != 0)
+                        {
+                            n = n / nanos_in_second;
+                        }
+                        return duration_type(static_cast<Rep>(n));
+                    }
+                    default:
+                    {
+                        auto count = j.template as<Rep>();
+                        return duration_type(count);
+                    }
+                }
             }
             else
             {
-                return duration_type(count*1000);
+                return duration_type();
             }
         }
 
         template <class PeriodT=Period>
         static 
-        typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value, duration_type>::type
+        typename std::enable_if<std::is_same<PeriodT,std::milli>::value, duration_type>::type
         from_json_(const Json& j)
         {
-            if (!j.is_number())
+            if (j.is_int64() || j.is_uint64())
             {
-                return duration_type{};
+                auto count = j.template as<Rep>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(count*millis_in_second);
+                    case semantic_tag::epoch_milli:
+                        return duration_type(count);
+                    case semantic_tag::epoch_nano:
+                        return duration_type(count == 0 ? 0 : count/nanos_in_milli);
+                    default:
+                        return duration_type(count);
+                }
             }
-            auto count = j.template as<Rep>();
-            if (j.tag() == semantic_tag::epoch_milli)
+            else if (j.is_double())
             {
-                return count == 0 ? duration_type(count) : duration_type(count/1000);
+                auto count = j.template as<double>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(static_cast<Rep>(count * millis_in_second));
+                    case semantic_tag::epoch_milli:
+                        return duration_type(static_cast<Rep>(count));
+                    case semantic_tag::epoch_nano:
+                        return duration_type(count == 0 ? 0 : static_cast<Rep>(count / nanos_in_milli));
+                    default:
+                        return duration_type(static_cast<Rep>(count));
+                }
+            }
+            else if (j.is_string())
+            {
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                    {
+                        auto count = j.template as<Rep>();
+                        return duration_type(count*millis_in_second);
+                    }
+                    case semantic_tag::epoch_milli:
+                    {
+                        auto sv = j.as_string_view();
+                        auto result = jsoncons::detail::to_integer_decimal<Rep>(sv.data(), sv.size());
+                        if (!result)
+                        {
+                            return duration_type();
+                        }
+                        return duration_type(result.value());
+                    }
+                    case semantic_tag::epoch_nano:
+                    {
+                        auto sv = j.as_string_view();
+                        bigint n = bigint::from_string(sv.data(), sv.length());
+                        if (n != 0)
+                        {
+                            n = n / nanos_in_milli;
+                        }
+                        return duration_type(static_cast<Rep>(n));
+                    }
+                    default:
+                    {
+                        auto count = j.template as<Rep>();
+                        return duration_type(count);
+                    }
+                }
             }
             else
             {
-                return duration_type(count);
+                return duration_type();
             }
+        }
+
+        template <class PeriodT=Period>
+        static 
+        typename std::enable_if<std::is_same<PeriodT,std::nano>::value, duration_type>::type
+        from_json_(const Json& j)
+        {
+            if (j.is_int64() || j.is_uint64() || j.is_double())
+            {
+                auto count = j.template as<Rep>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(count*nanos_in_second);
+                    case semantic_tag::epoch_milli:
+                        return duration_type(count*nanos_in_milli);
+                    case semantic_tag::epoch_nano:
+                        return duration_type(count);
+                    default:
+                        return duration_type(count);
+                }
+            }
+            else if (j.is_double())
+            {
+                auto count = j.template as<double>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(static_cast<Rep>(count * nanos_in_second));
+                    case semantic_tag::epoch_milli:
+                        return duration_type(static_cast<Rep>(count * nanos_in_milli));
+                    case semantic_tag::epoch_nano:
+                        return duration_type(static_cast<Rep>(count));
+                    default:
+                        return duration_type(static_cast<Rep>(count));
+                }
+            }
+            else if (j.is_string())
+            {
+                auto count = j.template as<Rep>();
+                switch (j.tag())
+                {
+                    case semantic_tag::epoch_second:
+                        return duration_type(count*nanos_in_second);
+                    case semantic_tag::epoch_milli:
+                        return duration_type(count*nanos_in_milli);
+                    case semantic_tag::epoch_nano:
+                        return duration_type(count);
+                    default:
+                        return duration_type(count);
+                }
+            }
+            else
+            {
+                return duration_type();
+            }
+        }
+
+        template <class PeriodT=Period>
+        static 
+        typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value,Json>::type
+        to_json_(const duration_type& val)
+        {
+            return Json(val.count(), semantic_tag::epoch_second);
         }
 
         template <class PeriodT=Period>
@@ -1508,10 +1675,10 @@ namespace variant_detail
 
         template <class PeriodT=Period>
         static 
-        typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value,Json>::type
+        typename std::enable_if<std::is_same<PeriodT,std::nano>::value,Json>::type
         to_json_(const duration_type& val)
         {
-            return Json(val.count(), semantic_tag::epoch_second);
+            return Json(val.count(), semantic_tag::epoch_nano);
         }
     };
 

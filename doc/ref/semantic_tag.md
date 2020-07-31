@@ -11,6 +11,7 @@ enum class semantic_tag : uint8_t
     epoch_second, // since 0.155.0
     timestamp = epoch_second,  // deprecated (since 0.155.0)
     epoch_milli, // since 0.155.0
+    epoch_nano, // since 0.155.0
     bigint,
     bigdec,
     bigfloat,

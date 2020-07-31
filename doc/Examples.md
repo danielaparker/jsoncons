@@ -419,7 +419,7 @@ std::string s;
 
 j.dump(s); // compressed
 
-j.dump_pretty(s); // pretty print
+j.dump(s, indenting::indent); // pretty print
 ```
 
 <div id="B2"/>
@@ -429,7 +429,7 @@ j.dump_pretty(s); // pretty print
 ```
 j.dump(std::cout); // compressed
 
-j.dump_pretty(std::cout); // pretty print
+j.dump(std::cout, indenting::indent); // pretty print
 ```
 or
 ```
@@ -448,7 +448,7 @@ options.escape_all_non_ascii(true);
 
 j.dump(std::cout, options); // compressed
 
-j.dump_pretty(std::cout, options); // pretty print
+j.dump(std::cout, options, indenting::indent); // pretty print
 ```
 or
 ```
@@ -1056,7 +1056,7 @@ int main()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books1, std::cout);
+    encode_json(books1, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -1069,7 +1069,7 @@ int main()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books2, std::cout);
+    encode_json(books2, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -1082,7 +1082,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books3, std::cout);
+    encode_json(books3, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -1095,7 +1095,7 @@ int main()
                   << item.get_price() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books4, std::cout);
+    encode_json(books4, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
@@ -1269,7 +1269,7 @@ int main()
                   << item.price << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books1, std::cout);
+    encode_json(books1, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(2)\n\n";
@@ -1282,7 +1282,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books2, std::cout);
+    encode_json(books2, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(3)\n\n";
@@ -1295,7 +1295,7 @@ int main()
                   << item.price() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books3, std::cout);
+    encode_json(books3, std::cout, indenting::indent);
     std::cout << "\n\n";
 
     std::cout << "(4)\n\n";
@@ -1308,7 +1308,7 @@ int main()
                   << item.getPrice() << "\n";
     }
     std::cout << "\n";
-    encode_json_pretty(books4, std::cout);
+    encode_json(books4, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
@@ -1388,7 +1388,7 @@ int main()
         auto person = jsoncons::decode_json<ns::Person>(data);
 
         std::string s;
-        jsoncons::encode_json_pretty(person, s);
+        jsoncons::encode_json(person, s, indenting::indent);
         std::cout << s << "\n";
     }
     catch (const std::exception& e)
@@ -1517,7 +1517,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json_pretty(book_list, std::cout);
+    encode_json(book_list, std::cout, indenting::indent);
     std::cout << "\n\n";
 }
 ```
@@ -1621,8 +1621,8 @@ int main()
     std::string output1;
     std::string output2;
 
-    encode_json_pretty(val2,output2);
-    encode_json_pretty(val1,output1);
+    encode_json(val2,output2,indenting::indent);
+    encode_json(val1,output1,indenting::indent);
 
     std::cout << "(1)\n";
     std::cout << output1 << "\n\n";
@@ -1694,7 +1694,7 @@ int main()
     val.field8 = std::unique_ptr<std::string>(nullptr);
 
     std::string buf;
-    encode_json_pretty(val, buf);
+    encode_json(val, buf, indenting::indent);
 
     std::cout << buf << "\n";
 
@@ -1783,11 +1783,8 @@ the enum values, and the macro `JSONCONS_ALL_CTOR_GETTER_TRAITS`
 generates the code from the get functions and a constructor. 
 These macro declarations must be placed outside any namespace blocks.
 
-```c++
-#include <cassert>
-#include <iostream>
-#include <jsoncons/json.hpp>
 
+```c++
 namespace ns {
     enum class hiking_experience {beginner,intermediate,advanced};
 
@@ -1797,12 +1794,17 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
+        std::optional<std::chrono::seconds> generated_; // use std::optional if C++17
+        std::optional<std::chrono::seconds> expires_;
     public:
         hiking_reputon(const std::string& rater,
                        hiking_experience assertion,
                        const std::string& rated,
-                       double rating)
-            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating)
+                       double rating,
+                       const std::optional<std::chrono::seconds>& generated = std::optional<std::chrono::seconds>(),
+                       const std::optional<std::chrono::seconds>& expires = std::optional<std::chrono::seconds>())
+            : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
+              generated_(generated), expires_(expires)
         {
         }
 
@@ -1810,11 +1812,14 @@ namespace ns {
         hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
+        std::optional<std::chrono::seconds> generated() const {return generated_;}
+        std::optional<std::chrono::seconds> expires() const {return expires_;}
 
         friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
         {
             return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
-                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_;
+                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_ &&
+                   lhs.confidence_ == rhs.confidence_ && lhs.expires_ == rhs.expires_;
         }
 
         friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
@@ -1836,47 +1841,55 @@ namespace ns {
 
         const std::string& application() const { return application_;}
         const std::vector<hiking_reputon>& reputons() const { return reputons_;}
-
-        friend bool operator==(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return (lhs.application_ == rhs.application_) && (lhs.reputons_ == rhs.reputons_);
-        }
-
-        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return !(lhs == rhs);
-        };
     };
 
 } // namespace ns
 
 // Declare the traits. Specify which data members need to be serialized.
-JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
-JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputon, rater, assertion, rated, rating)
-JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputation, application, reputons)
 
-using namespace jsoncons; // for convenience
+JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
+// First four members listed are mandatory, generated and expires are optional
+JSONCONS_N_CTOR_GETTER_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
+                              generated, expires)
+
+// All members are mandatory
+JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputation, application, reputons)
 
 int main()
 {
-    ns::hiking_reputation val("hiking", { ns::hiking_reputon{"HikingAsylum",ns::hiking_experience::advanced,"Marilyn C",0.90} });
+    // Decode the string of data into a c++ structure
+    ns::hiking_reputation v = decode_json<ns::hiking_reputation>(data);
 
+    // Iterate over reputons array value
+    std::cout << "(1)\n";
+    for (const auto& item : v.reputons())
+    {
+        std::cout << item.rated() << ", " << item.rating();
+        if (item.generated())
+        {
+            std::cout << ", " << (*item.generated()).count();
+        }
+        std::cout << "\n";
+    }
+
+    // Encode the c++ structure into a string
     std::string s;
-    encode_json_pretty(val, s);
+    encode_json<ns::hiking_reputation>(v, s, indenting::indent);
+    std::cout << "(2)\n";
     std::cout << s << "\n";
-
-    auto val2 = decode_json<ns::hiking_reputation>(s);
-
-    assert(val2 == val);
 }
 ```
 Output:
 ```
+(1)
+Marilyn C, 0.9, 1514862245
+(2)
 {
     "application": "hiking",
     "reputons": [
         {
             "assertion": "advanced",
+            "generated": 1514862245,
             "rated": "Marilyn C",
             "rater": "HikingAsylum",
             "rating": 0.9
@@ -2015,7 +2028,7 @@ int main()
     }
 
     std::cout << "\n(2)\n";
-    encode_json_pretty(v, std::cout);
+    encode_json(v, std::cout, indenting::indent);
 
     std::cout << "\n\n(3)\n";
     json j(v);
@@ -2273,7 +2286,7 @@ int main()
     }
 
     std::string output;
-    jsoncons::encode_json_pretty(basket, output);
+    jsoncons::encode_json(basket, output, jsoncons::indenting::indent);
     std::cout << "(2)\n" << output << "\n\n";
 }
 ```
@@ -2345,7 +2358,7 @@ int main()
     std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
 
     std::string buffer;
-    jsoncons::encode_json_pretty(vars, buffer);
+    jsoncons::encode_json(vars, buffer, jsoncons::indenting::indent);
 
     std::cout << "(1)\n" << buffer << "\n\n";
 

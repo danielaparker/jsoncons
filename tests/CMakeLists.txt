@@ -159,6 +159,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_encoder_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_tests.cpp
+   ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_timestamp_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/ojson_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/order_preserving_json_object_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/parse_string_tests.cpp

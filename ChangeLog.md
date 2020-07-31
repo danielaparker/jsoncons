@@ -4,7 +4,7 @@ master
 Changes:
 
 - The `semantic_tag` enum value `timestamp` has been deprecated. 
-It is replaced by `epoch_second` and `epoch_milli`.
+It has been replaced by `epoch_second`, `epoch_milli` and `epoch_nano`.
 The deprecated `timestamp` value has been aliased to `epoch_second`. 
 
 Enhancements:

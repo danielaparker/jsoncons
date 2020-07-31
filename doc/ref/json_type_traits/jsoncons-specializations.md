@@ -11,7 +11,7 @@ with character types `char` and `wchar_t`
 * [basic_string_view](#basic_string_view) - jsoncons supports [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) 
 with character types `char` and `wchar_t`
 * [duration](#duration) (since 0.155.0) - covers [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
-for tick periods `std::ratio<1>` (one second) and `std::milli`.
+for tick periods `std::ratio<1>` (one second), `std::milli` and  `std::nano`.
 * [pair](#pair)
 * [tuple](#tuple)
 * [optional](#optional)
@@ -34,36 +34,47 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 ### duration
 
 jsoncons supports [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration)
-for tick periods `std::ratio<1>` (one second) and `std::milli`.
+for tick periods `std::ratio<1>` (one second), `std::milli` and  `std::nano`.
 
-#### MessagePack example
+#### CBOR example (integer)
 
 ```c++
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
 #include <iostream>
 
 using jsoncons::json;
-namespace msgpack = jsoncons::msgpack;
+namespace cbor = jsoncons::cbor;
 
 int main()
 {
-    std::vector<uint8_t> data = {
-        0xd6, // fixext 4 stores an integer and a byte array whose length is 4 bytes
-        0xff, // epoch_time
-        0x5a,0x4a,0xf6,0xa5 // 1514862245
-    };
-    auto j = msgpack::decode_msgpack<json>(data);
-    auto seconds = j.as<std::chrono::duration<uint32_t>>();
-    std::cout << "Seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto time = std::chrono::duration_cast<std::chrono::seconds>(duration);
+
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(time, data);
+
+    /*
+      c1, // Tag 1 (epoch time)
+        1a, // 32 bit unsigned integer
+          5f,23,29,18 // 1596139800
+    */
+
+    std::cout << "CBOR bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+    auto seconds = cbor::decode_cbor<std::chrono::seconds>(data);
+    std::cout << "Time since epoch (seconds): " << seconds.count() << "\n";
 }
 ```
 Output:
 ```
-Seconds elapsed since 1970-01-01 00:00:00 UTC: 1514862245
+CBOR bytes: 
+c1,1a,5f,23,29,18
+
+Time since epoch (seconds): 1596139800
 ```
 
-#### CBOR example
+#### CBOR example (double)
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -78,28 +89,130 @@ int main()
     auto duration = std::chrono::system_clock::now().time_since_epoch();
     auto time = std::chrono::duration_cast<std::chrono::duration<double>>(duration);
 
-    json j(time);
-
-    auto dur = j.as<std::chrono::duration<double>>();
-    std::cout << "Time since epoch: " << dur.count() << "\n\n";
-
     std::vector<uint8_t> data;
-    cbor::encode_cbor(j, data);
-
-    std::cout << "CBOR bytes: " << jsoncons::byte_string_view(data) << "\n\n";
+    cbor::encode_cbor(time, data);
 
     /*
-        c1, // tag value 1 (seconds relative to 1970-01-01T00:00Z in UTC time) 
-        fb, // double precision float
-        41,d7,c6,7b,8f,c7,05,51 // 1595534911.1097 
+      c1, // Tag 1 (epoch time)
+        fb,  // Double
+          41,d7,c8,ca,46,1c,0f,87 // 1596139800.43845
     */
+
+    std::cout << "CBOR bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+    auto seconds = cbor::decode_cbor<std::chrono::duration<double>>(data);
+    std::cout << "Time since epoch (seconds): " << seconds.count() << "\n";
+
+    auto milliseconds = cbor::decode_cbor<std::chrono::milliseconds>(data);
+    std::cout << "Time since epoch (milliseconds): " << milliseconds.count() << "\n";
 }
 ```
 Output:
 ```
-Time since epoch: 1595534911.1097
+CBOR bytes:
+c1,fb,41,d7,c8,ca,46,1c,0f,87
 
-CBOR bytes: c1,fb,41,d7,c6,7b,8f,c7,05,51
+Time since epoch (seconds): 1596139800.43845
+Time since epoch (milliseconds): 1596139800438
+```
+
+#### MessagePack example (timestamp 32)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    std::vector<uint8_t> data = {
+        0xd6, 0xff, // timestamp 32
+        0x5a,0x4a,0xf6,0xa5 // 1514862245
+    };
+    auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(data);
+    std::cout << "Seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+}
+```
+Output:
+```
+Seconds elapsed since 1970-01-01 00:00:00 UTC: 1514862245
+```
+
+#### MessagePack example (timestamp 64)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto dur_nano = std::chrono::duration_cast<std::chrono::nanoseconds>(duration);
+
+    std::vector<uint8_t> data;
+    msgpack::encode_msgpack(dur_nano, data);
+
+    /*
+        d7, ff, // timestamp 64
+        e3,94,56,e0, // nanoseconds in 30-bit unsigned int
+        5f,22,b6,8b // seconds in 34-bit unsigned int         
+    */ 
+
+    std::cout << "MessagePack bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+    auto nanoseconds = msgpack::decode_msgpack<std::chrono::nanoseconds>(data);
+    std::cout << "nanoseconds elapsed since 1970-01-01 00:00:00 UTC: " << nanoseconds.count() << "\n";
+
+    auto milliseconds = msgpack::decode_msgpack<std::chrono::milliseconds>(data);
+    std::cout << "milliseconds elapsed since 1970-01-01 00:00:00 UTC: " << milliseconds.count() << "\n";
+
+    auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(data);
+    std::cout << "seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+}
+```
+Output:
+```
+nanoseconds elapsed since 1970-01-01 00:00:00 UTC: 1596128821304212600
+milliseconds elapsed since 1970-01-01 00:00:00 UTC: 1596128821304
+seconds elapsed since 1970-01-01 00:00:00 UTC: 1596128821
+```
+
+#### MessagePack example (timestamp 96)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    std::vector<uint8_t> input = {
+        0xc7,0x0c,0xff, // timestamp 96
+        0x3b,0x9a,0xc9,0xff, // 999999999 nanoseconds in 32-bit unsigned int
+        0xff,0xff,0xff,0xff,0x7c,0x55,0x81,0x7f // -2208988801 seconds in 64-bit signed int
+    };
+
+    auto milliseconds = msgpack::decode_msgpack<std::chrono::milliseconds>(input);
+    std::cout << "milliseconds elapsed since 1970-01-01 00:00:00 UTC: " << milliseconds.count() << "\n";
+
+    auto seconds = msgpack::decode_msgpack<std::chrono::seconds>(input);
+    std::cout << "seconds elapsed since 1970-01-01 00:00:00 UTC: " << seconds.count() << "\n";
+}
+```
+Output:
+```
+milliseconds elapsed since 1970-01-01 00:00:00 UTC: -2208988801999
+seconds elapsed since 1970-01-01 00:00:00 UTC: -2208988801
 ```
 
 #### BSON example
@@ -182,7 +295,7 @@ int main()
     std::vector<variant_type> v = {nullptr, 10, 5.1, true, std::string("Hello World")}; 
 
     std::string buffer;
-    jsoncons::encode_json_pretty(v, buffer);
+    jsoncons::encode_json(v, buffer, jsoncons::indenting::indent);
     std::cout << "(1)\n" << buffer << "\n\n";
 
     auto v2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);

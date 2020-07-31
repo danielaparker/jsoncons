@@ -24,12 +24,16 @@
 namespace jsoncons { 
 namespace msgpack {
 
-    enum class msgpack_container_type {object, array, timestamp_array};
+    enum class msgpack_container_type {object, array};
 
     template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<char>>
     class basic_msgpack_encoder final : public basic_json_visitor<char>
     {
         enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
+
+        static constexpr int64_t nanos_in_milli = 1000000;
+        static constexpr int64_t nanos_in_second = 1000000000;
+        static constexpr int64_t millis_in_second = 1000;
     public:
         using allocator_type = Allocator;
         using char_type = char;
@@ -62,11 +66,6 @@ namespace msgpack {
             {
                 return type_ == msgpack_container_type::object;
             }
-
-            bool is_timestamp() const
-            {
-                return type_ == msgpack_container_type::timestamp_array;
-            }
         };
 
         Sink sink_;
@@ -75,7 +74,6 @@ namespace msgpack {
 
         std::vector<stack_item> stack_;
         int nesting_depth_;
-        std::vector<uint64_t> timestamp_parts_;
 
         // Noncopyable and nonmoveable
         basic_msgpack_encoder(const basic_msgpack_encoder&) = delete;
@@ -175,38 +173,30 @@ namespace msgpack {
             return false;
         }
 
-        bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context&, std::error_code& ec) override
+        bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code& ec) override
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
                 ec = msgpack_errc::max_nesting_depth_exceeded;
                 return false;
             } 
-            if (tag == semantic_tag::epoch_second && length == 2)
+            stack_.push_back(stack_item(msgpack_container_type::array, length));
+            if (length <= 15)
             {
-                timestamp_parts_.clear();
-                stack_.push_back(stack_item(msgpack_container_type::timestamp_array, length));
+                // fixarray
+                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixarray_base_cd | (length & 0xf));
             }
-            else
+            else if (length <= (std::numeric_limits<uint16_t>::max)())
             {
-                stack_.push_back(stack_item(msgpack_container_type::array, length));
-                if (length <= 15)
-                {
-                    // fixarray
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixarray_base_cd | (length & 0xf));
-                }
-                else if (length <= (std::numeric_limits<uint16_t>::max)())
-                {
-                    // array 16
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::array16_cd);
-                    jsoncons::detail::native_to_big(static_cast<uint16_t>(length),std::back_inserter(sink_));
-                }
-                else if (length <= (std::numeric_limits<uint32_t>::max)())
-                {
-                    // array 32
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::array32_cd);
-                    jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
-                }
+                // array 16
+                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::array16_cd);
+                jsoncons::detail::native_to_big(static_cast<uint16_t>(length),std::back_inserter(sink_));
+            }
+            else if (length <= (std::numeric_limits<uint32_t>::max)())
+            {
+                // array 32
+                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::array32_cd);
+                jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
             }
             return true;
         }
@@ -226,25 +216,6 @@ namespace msgpack {
             {
                 ec = msgpack_errc::too_many_items;
                 return false;
-            }
-            if (stack_.back().is_timestamp())
-            {
-                JSONCONS_ASSERT(timestamp_parts_.size() == 2);
-                if ((timestamp_parts_[0] >> 34) == 0) 
-                {
-                    uint64_t data64 = (timestamp_parts_[1] << 34) | timestamp_parts_[0];
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext8_cd);
-                    sink_.push_back(0xff);
-                    jsoncons::detail::native_to_big(static_cast<uint64_t>(data64), std::back_inserter(sink_));
-                }
-                else 
-                {
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext8_cd);
-                    sink_.push_back(0x0c); // 12
-                    sink_.push_back(0xff);
-                    jsoncons::detail::native_to_big(static_cast<uint32_t>(timestamp_parts_[1]), std::back_inserter(sink_));
-                    jsoncons::detail::native_to_big(static_cast<uint64_t>(timestamp_parts_[0]), std::back_inserter(sink_));
-                }
             }
 
             stack_.pop_back();
@@ -266,10 +237,104 @@ namespace msgpack {
             return true;
         }
 
-        bool visit_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code&) override
+        void write_timestamp(int64_t seconds, int64_t nanoseconds)
         {
-            write_string_value(sv);
-            end_value();
+            if ((seconds >> 34) == 0) 
+            {
+                uint64_t data64 = (nanoseconds << 34) | seconds;
+                if ((data64 & 0xffffffff00000000L) == 0) 
+                {
+                    // timestamp 32
+                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext4_cd);
+                    sink_.push_back(0xff);
+                    jsoncons::detail::native_to_big(static_cast<uint32_t>(data64), std::back_inserter(sink_));
+                }
+                else 
+                {
+                    // timestamp 64
+                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext8_cd);
+                    sink_.push_back(0xff);
+                    jsoncons::detail::native_to_big(static_cast<uint64_t>(data64), std::back_inserter(sink_));
+                }
+            }
+            else 
+            {
+                // timestamp 96
+                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext8_cd);
+                sink_.push_back(0x0c); // 12
+                sink_.push_back(0xff);
+                jsoncons::detail::native_to_big(static_cast<uint32_t>(nanoseconds), std::back_inserter(sink_));
+                jsoncons::detail::native_to_big(static_cast<uint64_t>(seconds), std::back_inserter(sink_));
+            }
+        }
+
+        bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
+        {
+            switch (tag)
+            {
+                case semantic_tag::epoch_second:
+                {
+                    auto result = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
+                    if (!result)
+                    {
+                        ec = msgpack_errc::invalid_timestamp;
+                        return false;
+                    }
+                    int64_t seconds = result.value();
+                    write_timestamp(seconds, 0);
+                    break;
+                }
+                case semantic_tag::epoch_milli:
+                {
+                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    if (n != 0)
+                    {
+                        bigint q;
+                        bigint rem;
+                        n.divide(millis_in_second, q, rem, true);
+                        int64_t seconds = static_cast<int64_t>(q);
+                        int64_t nanoseconds = static_cast<int64_t>(rem) * nanos_in_milli;
+                        if (nanoseconds < 0)
+                        {
+                            nanoseconds = -nanoseconds; 
+                        }
+                        write_timestamp(seconds, nanoseconds);
+                    }
+                    else
+                    {
+                        write_timestamp(0, 0);
+                    }
+                    break;
+                }
+                case semantic_tag::epoch_nano:
+                {
+                    bigint n = bigint::from_string(sv.data(), sv.length());
+                    if (n != 0)
+                    {
+                        bigint q;
+                        bigint rem;
+                        n.divide(nanos_in_second, q, rem, true);
+                        int64_t seconds = static_cast<int64_t>(q);
+                        int64_t nanoseconds = static_cast<int64_t>(rem);
+                        if (nanoseconds < 0)
+                        {
+                            nanoseconds = -nanoseconds; 
+                        }
+                        write_timestamp(seconds, nanoseconds);
+                    }
+                    else
+                    {
+                        write_timestamp(0, 0);
+                    }
+                    break;
+                }
+                default:
+                {
+                    write_string_value(sv);
+                    end_value();
+                    break;
+                }
+            }
             return true;
         }
 
@@ -436,79 +501,117 @@ namespace msgpack {
                          const ser_context&,
                          std::error_code&) override
         {
-            if (tag == semantic_tag::epoch_second)
+            switch (tag)
             {
-                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext4_cd);
-                sink_.push_back(0xff);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(val), std::back_inserter(sink_));
-            }
-            else if (!stack_.empty() && stack_.back().is_timestamp())
-            {
-                timestamp_parts_.push_back(static_cast<uint64_t>(val));
-            }
-            else if (val >= 0)
-            {
-                if (val <= 0x7f)
+                case semantic_tag::epoch_second:
+                    write_timestamp(val, 0);
+                    break;
+                case semantic_tag::epoch_milli:
                 {
-                    // positive fixnum stores 7-bit positive integer
-                    sink_.push_back(static_cast<uint8_t>(val));
+                    if (val != 0)
+                    {
+                        auto dv = std::div(val,millis_in_second);
+                        int64_t seconds = dv.quot;
+                        int64_t nanoseconds = dv.rem*nanos_in_milli;
+                        if (nanoseconds < 0)
+                        {
+                            nanoseconds = -nanoseconds; 
+                        }
+                        write_timestamp(seconds, nanoseconds);
+                    }
+                    else
+                    {
+                        write_timestamp(0, 0);
+                    }
+                    break;
                 }
-                else if (val <= (std::numeric_limits<uint8_t>::max)())
+                case semantic_tag::epoch_nano:
                 {
-                    // uint 8 stores a 8-bit unsigned integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint8_cd);
-                    sink_.push_back(static_cast<uint8_t>(val));
+                    if (val != 0)
+                    {
+                        auto dv = std::div(val,static_cast<int64_t>(nanos_in_second));
+                        int64_t seconds = dv.quot;
+                        int64_t nanoseconds = dv.rem;
+                        if (nanoseconds < 0)
+                        {
+                            nanoseconds = -nanoseconds; 
+                        }
+                        write_timestamp(seconds, nanoseconds);
+                    }
+                    else
+                    {
+                        write_timestamp(0, 0);
+                    }
+                    break;
                 }
-                else if (val <= (std::numeric_limits<uint16_t>::max)())
+                default:
                 {
-                    // uint 16 stores a 16-bit big-endian unsigned integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint16_cd);
-                    jsoncons::detail::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
+                    if (val >= 0)
+                    {
+                        if (val <= 0x7f)
+                        {
+                            // positive fixnum stores 7-bit positive integer
+                            sink_.push_back(static_cast<uint8_t>(val));
+                        }
+                        else if (val <= (std::numeric_limits<uint8_t>::max)())
+                        {
+                            // uint 8 stores a 8-bit unsigned integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint8_cd);
+                            sink_.push_back(static_cast<uint8_t>(val));
+                        }
+                        else if (val <= (std::numeric_limits<uint16_t>::max)())
+                        {
+                            // uint 16 stores a 16-bit big-endian unsigned integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint16_cd);
+                            jsoncons::detail::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
+                        }
+                        else if (val <= (std::numeric_limits<uint32_t>::max)())
+                        {
+                            // uint 32 stores a 32-bit big-endian unsigned integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint32_cd);
+                            jsoncons::detail::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
+                        }
+                        else if (val <= (std::numeric_limits<int64_t>::max)())
+                        {
+                            // int 64 stores a 64-bit big-endian signed integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint64_cd);
+                            jsoncons::detail::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
+                        }
+                    }
+                    else
+                    {
+                        if (val >= -32)
+                        {
+                            // negative fixnum stores 5-bit negative integer
+                            jsoncons::detail::native_to_big(static_cast<int8_t>(val), std::back_inserter(sink_));
+                        }
+                        else if (val >= (std::numeric_limits<int8_t>::lowest)())
+                        {
+                            // int 8 stores a 8-bit signed integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int8_cd);
+                            jsoncons::detail::native_to_big(static_cast<int8_t>(val),std::back_inserter(sink_));
+                        }
+                        else if (val >= (std::numeric_limits<int16_t>::lowest)())
+                        {
+                            // int 16 stores a 16-bit big-endian signed integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int16_cd);
+                            jsoncons::detail::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
+                        }
+                        else if (val >= (std::numeric_limits<int32_t>::lowest)())
+                        {
+                            // int 32 stores a 32-bit big-endian signed integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int32_cd);
+                            jsoncons::detail::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
+                        }
+                        else if (val >= (std::numeric_limits<int64_t>::lowest)())
+                        {
+                            // int 64 stores a 64-bit big-endian signed integer
+                            sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int64_cd);
+                            jsoncons::detail::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+                        }
+                    }
                 }
-                else if (val <= (std::numeric_limits<uint32_t>::max)())
-                {
-                    // uint 32 stores a 32-bit big-endian unsigned integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint32_cd);
-                    jsoncons::detail::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
-                }
-                else if (val <= (std::numeric_limits<int64_t>::max)())
-                {
-                    // int 64 stores a 64-bit big-endian signed integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint64_cd);
-                    jsoncons::detail::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
-                }
-            }
-            else
-            {
-                if (val >= -32)
-                {
-                    // negative fixnum stores 5-bit negative integer
-                    jsoncons::detail::native_to_big(static_cast<int8_t>(val), std::back_inserter(sink_));
-                }
-                else if (val >= (std::numeric_limits<int8_t>::lowest)())
-                {
-                    // int 8 stores a 8-bit signed integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int8_cd);
-                    jsoncons::detail::native_to_big(static_cast<int8_t>(val),std::back_inserter(sink_));
-                }
-                else if (val >= (std::numeric_limits<int16_t>::lowest)())
-                {
-                    // int 16 stores a 16-bit big-endian signed integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int16_cd);
-                    jsoncons::detail::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
-                }
-                else if (val >= (std::numeric_limits<int32_t>::lowest)())
-                {
-                    // int 32 stores a 32-bit big-endian signed integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int32_cd);
-                    jsoncons::detail::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
-                }
-                else if (val >= (std::numeric_limits<int64_t>::lowest)())
-                {
-                    // int 64 stores a 64-bit big-endian signed integer
-                    sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int64_cd);
-                    jsoncons::detail::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
-                }
+                break;
             }
             end_value();
             return true;
@@ -519,44 +622,82 @@ namespace msgpack {
                           const ser_context&,
                           std::error_code&) override
         {
-            if (tag == semantic_tag::epoch_second)
+            switch (tag)
             {
-                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext4_cd);
-                sink_.push_back(0xff);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(val), std::back_inserter(sink_));
-            }
-            else if (!stack_.empty() && stack_.back().is_timestamp())
-            {
-                timestamp_parts_.push_back(val);
-            }
-            else if (val <= (std::numeric_limits<int8_t>::max)())
-            {
-                // positive fixnum stores 7-bit positive integer
-                sink_.push_back(static_cast<uint8_t>(val));
-            }
-            else if (val <= (std::numeric_limits<uint8_t>::max)())
-            {
-                // uint 8 stores a 8-bit unsigned integer
-                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint8_cd);
-                sink_.push_back(static_cast<uint8_t>(val));
-            }
-            else if (val <= (std::numeric_limits<uint16_t>::max)())
-            {
-                // uint 16 stores a 16-bit big-endian unsigned integer
-                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint16_cd);
-                jsoncons::detail::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
-            }
-            else if (val <= (std::numeric_limits<uint32_t>::max)())
-            {
-                // uint 32 stores a 32-bit big-endian unsigned integer
-                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint32_cd);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
-            }
-            else if (val <= (std::numeric_limits<uint64_t>::max)())
-            {
-                // uint 64 stores a 64-bit big-endian unsigned integer
-                sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint64_cd);
-                jsoncons::detail::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
+                case semantic_tag::epoch_second:
+                    write_timestamp(static_cast<int64_t>(val), 0);
+                    break;
+                case semantic_tag::epoch_milli:
+                {
+                    if (val != 0)
+                    {
+                        auto dv = std::div(static_cast<int64_t>(val), static_cast<int64_t>(millis_in_second));
+                        int64_t seconds = dv.quot;
+                        int64_t nanoseconds = dv.rem*nanos_in_milli;
+                        if (nanoseconds < 0)
+                        {
+                            nanoseconds = -nanoseconds; 
+                        }
+                        write_timestamp(seconds, nanoseconds);
+                    }
+                    else
+                    {
+                        write_timestamp(0, 0);
+                    }
+                    break;
+                }
+                case semantic_tag::epoch_nano:
+                {
+                    if (val != 0)
+                    {
+                        auto dv = std::div(static_cast<int64_t>(val), static_cast<int64_t>(nanos_in_second));
+                        int64_t seconds = dv.quot;
+                        int64_t nanoseconds = dv.rem;
+                        if (nanoseconds < 0)
+                        {
+                            nanoseconds = -nanoseconds; 
+                        }
+                        write_timestamp(seconds, nanoseconds);
+                    }
+                    else
+                    {
+                        write_timestamp(0, 0);
+                    }
+                    break;
+                }
+                default:
+                {
+                    if (val <= (std::numeric_limits<int8_t>::max)())
+                    {
+                        // positive fixnum stores 7-bit positive integer
+                        sink_.push_back(static_cast<uint8_t>(val));
+                    }
+                    else if (val <= (std::numeric_limits<uint8_t>::max)())
+                    {
+                        // uint 8 stores a 8-bit unsigned integer
+                        sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint8_cd);
+                        sink_.push_back(static_cast<uint8_t>(val));
+                    }
+                    else if (val <= (std::numeric_limits<uint16_t>::max)())
+                    {
+                        // uint 16 stores a 16-bit big-endian unsigned integer
+                        sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint16_cd);
+                        jsoncons::detail::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
+                    }
+                    else if (val <= (std::numeric_limits<uint32_t>::max)())
+                    {
+                        // uint 32 stores a 32-bit big-endian unsigned integer
+                        sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint32_cd);
+                        jsoncons::detail::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
+                    }
+                    else if (val <= (std::numeric_limits<uint64_t>::max)())
+                    {
+                        // uint 64 stores a 64-bit big-endian unsigned integer
+                        sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint64_cd);
+                        jsoncons::detail::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
+                    }
+                    break;
+                }
             }
             end_value();
             return true;

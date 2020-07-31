@@ -24,7 +24,8 @@ namespace {
                "rater": "HikingAsylum",
                "assertion": "advanced",
                "rated": "Marilyn C",
-               "rating": 0.90
+               "rating": 0.90,
+               "generated": 1514862245
              }
            ]
         }

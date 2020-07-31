@@ -24,6 +24,7 @@ enum class msgpack_errc
     too_few_items,
     max_nesting_depth_exceeded,
     length_is_negative,
+    invalid_timestamp,
     unknown_type
 };
 
@@ -57,6 +58,8 @@ public:
                 return "Data item nesting exceeds limit in options";
             case msgpack_errc::length_is_negative:
                 return "Request for the length of an array, map or string returned a negative result";
+            case msgpack_errc::invalid_timestamp:
+                return "Invalid timestamp";
             case msgpack_errc::unknown_type:
                 return "An unknown type was found in the stream";
             default:
