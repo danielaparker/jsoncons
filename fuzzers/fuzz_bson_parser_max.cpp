@@ -12,7 +12,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
 	std::string s(reinterpret_cast<const char*>(data), size);
 	std::istringstream is(s);
 
-	json_decoder<json> visitor;
+    default_json_visitor visitor;
 	bson_options options;
 	options.max_nesting_depth(std::numeric_limits<int>::max());
 
