@@ -22,59 +22,19 @@ void dump_pretty(std::basic_ostream<char_type>& os,
 void dump(basic_json_visitor<char_type>& visitor) const; // (5)
 
 template <Container>
-void dump(Container& s,
-          const basic_json_encode_options<char_type>& options, 
-          std::error_code& ec) const; // (6)
-
-void dump(std::basic_ostream<char_type>& os, 
-          const basic_json_encode_options<char_type>& options,
-          std::error_code& ec) const; // (7)
-
-template <Container>
-void dump_pretty(Container& s,
-                 const basic_json_encode_options<char_type>& options,
-                 std::error_code& ec) const; // (8)
-
-void dump_pretty(std::basic_ostream<char_type>& os, 
-                 const basic_json_encode_options<char_type>& options,
-                 std::error_code& ec) const; // (9)
-
-void dump(basic_json_visitor<char_type>& visitor,
-          std::error_code& ec) const; // (10)
-
-template <Container>
-void dump(Container& s, indenting line_indent) const; // (11)
+void dump(Container& s, indenting line_indent) const; // (6)
 
 template <Container>
 void dump(Container& s,
           const basic_json_encode_options<char_type>& options, 
-          indenting line_indent) const; // (12)
+          indenting line_indent) const; // (7)
 
 void dump(std::basic_ostream<char_type>& os, indenting line_indent) const; // (13)
 
 void dump(std::basic_ostream<char_type>& os, 
           const basic_json_encode_options<char_type>& options, 
-          indenting line_indent) const; // (14)
-
-template <Container>
-void dump(Container& s,
-          const basic_json_encode_options<char_type>& options, 
-          indenting line_indent,
-          std::error_code& ec) const; // (15)
-
-template <Container>
-void dump(Container& s, 
-          indenting line_indent,
-          std::error_code& ec) const; // (16)
-
-void dump(std::basic_ostream<char_type>& os, 
-          const basic_json_encode_options<char_type>& options, 
-          indenting line_indent,
-          std::error_code& ec) const; // (17)
-
-void dump(std::basic_ostream<char_type>& os, 
-          indenting line_indent,
-          std::error_code& ec) const; // (18)
+          indenting line_indent) const; // (8)
+)
 ```
 
 (1) Dumps a json value to a character container with "minified" output.
@@ -87,9 +47,7 @@ void dump(std::basic_ostream<char_type>& os,
 
 (5) Dumps a json value to the specified [visitor](../basic_json_visitor.md).
 
-(6) - (10) Same as (1)-(5), except set `ec` on serialization errors. 
-
-(11) - (18) support the pre 0.155.0 `dump` overloads with the `jsoncons::indenting` parameter.
+(6) - (8) support the pre 0.155.0 `dump` overloads with the `jsoncons::indenting` parameter.
 New code should use the `dump_pretty` overloads instead.
 
 #### Exceptions
