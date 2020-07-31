@@ -52,11 +52,7 @@ New code should use the `dump_pretty` overloads instead.
 
 #### Exceptions
 
-The overloads that do not take a `std::error_code&` parameter throw a
-[ser_error](ser_error.md) on serialization errors, constructed with the error code as the error code argument
-and line and column from the `context`. 
-
-The overloads that take a `std::error_code&` parameter set it to the error code on serialization errors.
+Throws [ser_error](ser_error.md) if there is a serialization error. 
 
 ### Examples
 
