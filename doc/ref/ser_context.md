@@ -18,8 +18,9 @@ Returns the column number to the end of the text being parsed.
 Column numbers (if available) start at 1. The default implementation returns 0.
 
     virtual size_t position() const; 
-`position()` is defined for all JSON parse events, and indicates the position 
-of the character at the beginning of the event, e.g. '[' for an array, '{' for 
-an object, and '"' for a string. Not currently supported for non-JSON (e.g. CSV) parsers.   
+`position()` is defined for all JSON values, and indicates the position 
+of the character at the beginning of the value, e.g. '"' for a string
+or the first digit for a positive number. 
+Currently only supported for the JSON parser.   
 
 

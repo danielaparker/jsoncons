@@ -179,7 +179,10 @@ TEST_CASE("json_parser position")
           {
             "Parent": {
                 "Child": {
-                    "Test": 4444333322221111
+                    "Test": 4444333322221111,
+                    "NegativeInt": -4444333322221111,
+                    "Double" : 12345.6789,
+                    "NegativeDouble" : -12345.6789
                 }
             }
         }
@@ -205,6 +208,21 @@ TEST_CASE("json_parser position")
             update_in_place(input2, "$['Parent']['Child']['Test']", positions);
             REQUIRE(positions.size() == 1);
             CHECK(input2.substr(positions.back(),18) == std::string("\"4444333322221111\""));
+
+            positions.clear();
+            update_in_place(input1, "$['Parent']['Child']['NegativeInt']", positions);
+            REQUIRE(positions.size() == 1);
+            CHECK(input1.substr(positions.back(),17) == std::string("-4444333322221111"));
+
+            positions.clear();
+            update_in_place(input1, "$['Parent']['Child']['Double']", positions);
+            REQUIRE(positions.size() == 1);
+            CHECK(input1.substr(positions.back(),10) == std::string("12345.6789"));
+
+            positions.clear();
+            update_in_place(input1, "$['Parent']['Child']['NegativeDouble']", positions);
+            REQUIRE(positions.size() == 1);
+            CHECK(input1.substr(positions.back(),11) == std::string("-12345.6789"));
         }
         catch (std::exception& e)
         {
