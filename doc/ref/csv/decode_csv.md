@@ -28,7 +28,7 @@ T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); // (5)
 ```
 
-(1) Reads CSV data from a string into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
+(1) Reads CSV data from a contiguous character sequence into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md).
 

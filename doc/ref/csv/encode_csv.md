@@ -17,7 +17,7 @@ void encode_csv(const T& val,
                 const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>()); // (2)
 ```
 
-(1) Writes a value of type T into a string in the CSV data format, using the specified (or defaulted) [options](basic_csv_options.md). 
+(1) Writes a value of type T into a character container in the CSV data format, using the specified (or defaulted) [options](basic_csv_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
 
