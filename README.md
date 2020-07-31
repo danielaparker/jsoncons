@@ -196,7 +196,7 @@ Marilyn C, 0.9
 
 #### As a strongly typed C++ data structure
 
-jsoncons supports mapping JSON data into C++ data structures. 
+jsoncons supports transforming JSON texts into C++ data structures. 
 The functions [decode_json](doc/ref/decode_json.md) and [encode_json](doc/ref/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
