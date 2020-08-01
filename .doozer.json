@@ -38,21 +38,6 @@
         "cd tests",
         "./test_jsoncons;"
       ]
-    },
-    "jessie-i386": {
-      "buildenv": "jessie-i386",
-      "builddeps": ["cmake", "make", "gcc g++"],
-      "environment": {
-         "CXXFLAGS": "-std=c++11 -Wall -g3"
-      },
-      "buildcmd": [
-      	"uname -a",
-        "g++ --version",
-        "cmake . -DBUILD_TESTS=ON",
-      	"cmake --build . --target test_jsoncons",
-        "cd tests",
-        "./test_jsoncons;"
-      ]
     }
   }
 }
