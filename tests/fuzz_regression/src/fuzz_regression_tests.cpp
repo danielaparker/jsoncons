@@ -527,7 +527,6 @@ TEST_CASE("oss-fuzz issues")
         msgpack::msgpack_stream_reader reader(is, visitor, options);
         std::error_code ec;
         reader.read(ec);
-        std::cout << ec.message() << "\n";
     }
 }
 

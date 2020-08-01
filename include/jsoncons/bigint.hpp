@@ -121,7 +121,8 @@ private:
               is_negative_(n < 0),
               length_(n == 0 ? 0 : 1)
         {
-            values_[0] = is_negative_ ? -n : n;
+            auto u = is_negative_ ? -n : n;
+            values_[0] = static_cast<uint64_t>(u);
             values_[1] = 0;
         }
 
