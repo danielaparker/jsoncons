@@ -17,7 +17,6 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
-#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -50,7 +49,7 @@ TEST_CASE("oss-fuzz issues")
         cbor::cbor_options options;
         options.max_nesting_depth(std::numeric_limits<int>::max());
 
-        json_decoder<json> visitor;
+        default_json_visitor visitor;
 
         cbor::cbor_stream_reader reader(is,visitor,options);
 
@@ -207,7 +206,6 @@ TEST_CASE("oss-fuzz issues")
         json_decoder<json> visitor;
 
         msgpack::msgpack_options options;
-        //options.max_nesting_depth(std::numeric_limits<int>::max());
 
         msgpack::msgpack_stream_reader reader(is,visitor);
         std::error_code ec;
@@ -246,7 +244,7 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
 
-        json_decoder<json> visitor;
+        default_json_visitor visitor;
 
         msgpack::msgpack_options options;
         options.max_nesting_depth(std::numeric_limits<int>::max());
@@ -266,8 +264,7 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is);
 
-        json_decoder<json> visitor;
-        //diagnostics_visitor visitor;
+        default_json_visitor visitor;
 
         bson::bson_options options;
         options.max_nesting_depth(std::numeric_limits<int>::max());
@@ -496,7 +493,6 @@ TEST_CASE("oss-fuzz issues")
         //CHECK(ec == cbor::cbor_errc::unexpected_eof);
     }
 */
-#endif
     // Fuzz target: fuzz_ubjson
     // Issue: Direct-leak in std::__1::__libcpp_allocate
     SECTION("issue 24216")
@@ -513,6 +509,25 @@ TEST_CASE("oss-fuzz issues")
         {
             //std::cout << e.what() << "\n\n";
         }
+    }
+
+    // Fuzz target: fuzz_msgpack_parser_max
+    // Issue:  Integer-overflow
+    SECTION("issue 24574")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_msgpack_parser_max-6248108141576192";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        default_json_visitor visitor;
+        msgpack::msgpack_options options;
+        options.max_nesting_depth(std::numeric_limits<int>::max());
+
+        msgpack::msgpack_stream_reader reader(is, visitor, options);
+        std::error_code ec;
+        reader.read(ec);
+        std::cout << ec.message() << "\n";
     }
 }
 
