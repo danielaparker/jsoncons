@@ -121,8 +121,7 @@ private:
               is_negative_(n < 0),
               length_(n == 0 ? 0 : 1)
         {
-            auto u = is_negative_ ? -n : n;
-            values_[0] = static_cast<uint64_t>(u);
+            values_[0] = n < 0 ? (uint64_t(0)-static_cast<uint64_t>(n)) : static_cast<uint64_t>(n);
             values_[1] = 0;
         }
 
@@ -148,7 +147,9 @@ private:
               is_negative_(n < 0),
               length_(n == 0 ? 0 : 2)
         {
-            auto u = is_negative_ ? -n : n;
+            using unsigned_type = typename std::make_unsigned<T>::type;
+
+            auto u = n < 0 ? (unsigned_type(0)-static_cast<unsigned_type>(n)) : static_cast<unsigned_type>(n);
             values_[0] = uint64_t(u & max_basic_type);;
             u >>= basic_type_bits;
             values_[1] = uint64_t(u & max_basic_type);;
