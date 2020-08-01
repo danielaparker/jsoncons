@@ -184,7 +184,7 @@ namespace
     void duration_example1()
     {
         auto duration = std::chrono::system_clock::now().time_since_epoch();
-        auto time = std::chrono::duration_cast<std::chrono::duration<int64_t,std::milli>>(duration);
+        auto time = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
 
         json j;
         j.try_emplace("time", time);
