@@ -13,7 +13,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
 	std::istringstream is(s);
 	std::vector<uint8_t> s1;
 	ubjson_bytes_encoder encoder(s1);
-	ubjson_reader reader(is, encoder);
+	ubjson_stream_reader reader(is, encoder);
 
 	std::error_code ec;
 	reader.read(ec);

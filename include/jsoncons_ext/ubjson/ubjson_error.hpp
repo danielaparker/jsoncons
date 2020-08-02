@@ -52,6 +52,8 @@ public:
                 return "Request for the length of an array, map or string returned a negative result";
             case ubjson_errc::length_must_be_integer:
                 return "Length must be a integer numeric type (int8, uint8, int16, int32, int64)";
+            case ubjson_errc::unknown_type:
+                return "Unknown type";
             case ubjson_errc::invalid_utf8_text_string:
                 return "Illegal UTF-8 encoding in text string";
             case ubjson_errc::too_many_items:

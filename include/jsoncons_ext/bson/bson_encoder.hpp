@@ -454,7 +454,7 @@ private:
     }
 
     bool visit_double(double val, 
-                      semantic_tag tag,
+                      semantic_tag,
                       const ser_context&,
                       std::error_code& ec) override
     {

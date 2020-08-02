@@ -528,5 +528,23 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
         reader.read(ec);
     }
+
+    // Fuzz target: fuzz_ubjson_encoder
+    // Issue: Timeout
+    SECTION("issue 23840")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson_encoder-5711604342849536";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::vector<uint8_t> output;
+        ubjson::ubjson_bytes_encoder encoder(output);
+        ubjson::ubjson_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        reader.read(ec);
+        CHECK(ec == ubjson::ubjson_errc::unknown_type);
+    }
 }
 
