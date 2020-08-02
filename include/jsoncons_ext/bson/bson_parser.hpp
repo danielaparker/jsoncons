@@ -110,16 +110,12 @@ public:
 
     void array_expected(json_visitor& visitor, std::error_code& ec)
     {
-        if (state_stack_.back().mode == parse_mode::array)
-        {
-        }
-        else if (state_stack_.size() == 2 && 
-                 state_stack_.back().mode == parse_mode::document)
+        if (state_stack_.size() == 2 && state_stack_.back().mode == parse_mode::document)
         {
             state_stack_.back().mode = parse_mode::array;
             more_ = visitor.begin_array(semantic_tag::none, *this, ec);
         }
-        else
+        else if (!(state_stack_.back().mode == parse_mode::array || state_stack_.back().mode == parse_mode::byte_string_value))
         {
             ec = convert_errc::not_vector;
         }

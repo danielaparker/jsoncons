@@ -1346,7 +1346,7 @@ public:
 
     virtual void array_expected(std::error_code& ec)
     {
-        if (current().event_type() != staj_event_type::begin_array)
+        if (!(current().event_type() == staj_event_type::begin_array || current().event_type() == staj_event_type::byte_string_value))
         {
             ec = convert_errc::not_vector;
         }
