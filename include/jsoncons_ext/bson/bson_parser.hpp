@@ -37,6 +37,8 @@ struct parse_state
 
     parse_state(const parse_state&) = default;
     parse_state(parse_state&&) = default;
+    parse_state& operator=(const parse_state&) = default;
+    parse_state& operator=(parse_state&&) = default;
 };
 
 template <class Src,class Allocator=std::allocator<char>>
@@ -104,6 +106,23 @@ public:
     std::size_t column() const override
     {
         return source_.position();
+    }
+
+    void array_expected(json_visitor& visitor, std::error_code& ec)
+    {
+        if (state_stack_.back().mode == parse_mode::array)
+        {
+        }
+        else if (state_stack_.size() == 2 && 
+                 state_stack_.back().mode == parse_mode::document)
+        {
+            state_stack_.back().mode = parse_mode::array;
+            more_ = visitor.begin_array(semantic_tag::none, *this, ec);
+        }
+        else
+        {
+            ec = convert_errc::not_vector;
+        }
     }
 
     void parse(json_visitor& visitor, std::error_code& ec)

@@ -36,7 +36,7 @@ void ojson_examples();
 void readme_examples();
 void cbor_examples();
 void run_cbor_typed_array_examples();
-void run_csv_examples();
+void csv_examples();
 void run_ubjson_examples();
 void serialization_examples();
 void staj_iterator_examples();
@@ -45,6 +45,7 @@ void unicode_examples();
 void wjson_examples();
 void json_type_traits_variant_examples();
 void update_json_in_place_examples();
+void json_type_traits_tuple_examples();
 
 void comment_example()
 {
@@ -361,7 +362,7 @@ int main()
     try
     {
         std::cout << "jsoncons version: " << version() << std::endl;
-
+#if 0
         object_range_based_for_loop();
 
         basics_examples();
@@ -400,8 +401,6 @@ int main()
         run_ubjson_examples();
 
         type_extensibility_examples();
-
-        run_csv_examples();
 
         byte_string_examples();
 
@@ -448,6 +447,10 @@ int main()
         readme_examples();
 
         update_json_in_place_examples();
+
+        csv_examples();
+#endif
+        json_type_traits_tuple_examples();
     }
     catch (const std::exception& e)
     {

@@ -101,6 +101,14 @@ public:
         return parser_.done();
     }
 
+    void array_expected(std::error_code& ec) override
+    {
+        if (cursor_visitor_.event().event_type() != staj_event_type::begin_array)
+        {
+            parser_.array_expected(cursor_visitor_, ec);
+        }
+    }
+
     const staj_event& current() const override
     {
         return cursor_visitor_.event();

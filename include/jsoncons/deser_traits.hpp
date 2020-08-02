@@ -152,6 +152,11 @@ namespace jsoncons {
         {
             T v;
 
+            cursor.array_expected(ec);
+            if (ec)
+            {
+                return T{};
+            }
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
                 ec = convert_errc::not_vector;
@@ -289,6 +294,11 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
+            cursor.array_expected(ec);
+            if (ec)
+            {
+                return T{};
+            }
             switch (cursor.current().event_type())
             {
                 case staj_event_type::byte_string_value:
@@ -341,6 +351,11 @@ namespace jsoncons {
                              json_decoder<Json,TempAllocator>&, 
                              std::error_code& ec)
         {
+            cursor.array_expected(ec);
+            if (ec)
+            {
+                return T{};
+            }
             switch (cursor.current().event_type())
             {
                 case staj_event_type::begin_array:
@@ -377,6 +392,11 @@ namespace jsoncons {
         {
             T v;
 
+            cursor.array_expected(ec);
+            if (ec)
+            {
+                return T{};
+            }
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
                 ec = convert_errc::not_vector;

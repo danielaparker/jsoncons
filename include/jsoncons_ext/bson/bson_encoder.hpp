@@ -27,6 +27,9 @@ template<class Sink=jsoncons::binary_stream_sink,class Allocator=std::allocator<
 class basic_bson_encoder final : public basic_json_visitor<char>
 {
     enum class decimal_parse_state { start, integer, exp1, exp2, fraction1 };
+    static constexpr int64_t nanos_in_milli = 1000000;
+    static constexpr int64_t nanos_in_second = 1000000000;
+    static constexpr int64_t millis_in_second = 1000;
 public:
     using allocator_type = Allocator;
     using char_type = char;
@@ -332,7 +335,6 @@ private:
         return true;
     }
 
-
     bool visit_int64(int64_t val, 
                      semantic_tag tag, 
                      const ser_context&,
@@ -360,11 +362,19 @@ private:
                     return false;
                 }
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                jsoncons::detail::native_to_little(val*1000,std::back_inserter(buffer_));
+                jsoncons::detail::native_to_little(val*millis_in_second,std::back_inserter(buffer_));
                 return true;
             case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
                 jsoncons::detail::native_to_little(val,std::back_inserter(buffer_));
+                return true;
+            case semantic_tag::epoch_nano:
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                if (val != 0)
+                {
+                    val /= nanos_in_milli;
+                }
+                jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 return true;
             default:
             {
@@ -404,10 +414,18 @@ private:
                     return false;
                 }
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                jsoncons::detail::native_to_little(static_cast<int64_t>(val*1000),std::back_inserter(buffer_));
+                jsoncons::detail::native_to_little(static_cast<int64_t>(val*millis_in_second),std::back_inserter(buffer_));
                 return true;
             case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+                return true;
+            case semantic_tag::epoch_nano:
+                before_value(jsoncons::bson::detail::bson_format::datetime_cd);
+                if (val != 0)
+                {
+                    val /= nanos_in_second;
+                }
                 jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 return true;
             default:
@@ -436,9 +454,9 @@ private:
     }
 
     bool visit_double(double val, 
-                         semantic_tag,
-                         const ser_context&,
-                         std::error_code& ec) override
+                      semantic_tag tag,
+                      const ser_context&,
+                      std::error_code& ec) override
     {
         if (stack_.empty())
         {
@@ -446,9 +464,7 @@ private:
             return false;
         }
         before_value(jsoncons::bson::detail::bson_format::double_cd);
-
         jsoncons::detail::native_to_little(val,std::back_inserter(buffer_));
-
         return true;
     }
 

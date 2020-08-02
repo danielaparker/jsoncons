@@ -230,7 +230,7 @@ namespace jsoncons {
                               std::error_code& ec)
         {
             using helper = jsoncons::detail::json_serialize_tuple_helper<size, size, Json, std::tuple<E...>>;
-            encoder.begin_array(semantic_tag::none,ser_context(),ec);
+            encoder.begin_array(size,semantic_tag::none,ser_context(),ec);
             if (ec) return;
             helper::serialize(val, encoder, proto, ec);
             if (ec) return;

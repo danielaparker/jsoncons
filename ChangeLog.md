@@ -9,6 +9,9 @@ The deprecated `timestamp` value has been aliased to `epoch_second`.
 
 Enhancements:
 
+- Allow `bson_parser` to switch to array parsing when the root
+object is a document but `decode_bson` expects an array. 
+
 - Added `json_type_traits` support for `std::nullptr_t`
 
 - Added `json_type_traits` support for `std::chrono::duration`
@@ -24,7 +27,7 @@ to the `dump` overload with `indenting::indent` argument.
 - Generalized the `basic_json` member function `dump` and the functions `encode_json` 
 and `encode_csv` to write to any back insertable character container.
 
-Generalized the `basic_json` function `parse` and the  functions `decode_json` 
+- Generalized the `basic_json` function `parse` and the  functions `decode_json` 
 and `decode_csv` to read from any contiguous character sequence.
 
 0.154.3

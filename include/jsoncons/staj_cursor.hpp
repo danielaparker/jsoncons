@@ -375,6 +375,7 @@ public:
     semantic_tag tag() const noexcept { return tag_; }
 
     uint64_t ext_tag() const noexcept { return ext_tag_; }
+
 private:
 
     int64_t as_int64(std::error_code& ec) const
@@ -1343,6 +1344,14 @@ class basic_staj_cursor
 public:
     virtual ~basic_staj_cursor() noexcept = default;
 
+    virtual void array_expected(std::error_code& ec)
+    {
+        if (current().event_type() != staj_event_type::begin_array)
+        {
+            ec = convert_errc::not_vector;
+        }
+    }
+
     virtual bool done() const = 0;
 
     virtual const basic_staj_event<CharT>& current() const = 0;
@@ -1350,7 +1359,7 @@ public:
     virtual void read_to(basic_json_visitor<CharT>& visitor) = 0;
 
     virtual void read_to(basic_json_visitor<CharT>& visitor,
-                      std::error_code& ec) = 0;
+                         std::error_code& ec) = 0;
 
     virtual void next() = 0;
 

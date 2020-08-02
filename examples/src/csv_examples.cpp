@@ -85,10 +85,7 @@ void encode_n_rows()
     csv::encode_csv(j, output, ioptions);
     std::cout << output << "\n\n";
 
-    csv::csv_options ooptions;
-    ooptions.assume_header(true)
-            .mapping(csv::mapping_kind::n_rows);
-    json other = csv::decode_csv<json>(output, ooptions);
+    json other = csv::decode_csv<json>(output);
     assert(other == j);
 }
 
@@ -158,7 +155,7 @@ void csv_source_to_cpp_object()
 
     csv::csv_options ioptions;
     ioptions.header_lines(1)
-           .mapping(csv::mapping_kind::n_rows);
+            .mapping(csv::mapping_kind::n_rows);
 
     using table_type = std::vector<std::tuple<std::string,double,double,double,double>>;
 
@@ -646,7 +643,7 @@ void grouped_into_strongly_typed_records()
 
 } // namespace
 
-void run_csv_examples()
+void csv_examples()
 {
     std::cout << "\nCSV examples\n\n";
     read_write_csv_tasks();
@@ -666,7 +663,6 @@ void run_csv_examples()
 
     decode_csv_with_subfields();
     csv_source_to_json_value();
-    csv_source_to_cpp_object();
 
     std::cout << "\n";
     as_a_variant_like_structure();
@@ -685,6 +681,8 @@ void run_csv_examples()
     std::cout << "\n";
     encode_m_columns();
     std::cout << "\n";
+
+    csv_source_to_cpp_object();
 
     std::cout << std::endl;
 }

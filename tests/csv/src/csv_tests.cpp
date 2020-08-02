@@ -130,7 +130,6 @@ TEST_CASE("n_objects_test")
 
     json_decoder<ojson> decoder;
     csv::csv_options options;
-    options.assume_header(true);
 
     options.mapping(csv::mapping_kind::n_rows);
     csv::csv_reader reader1(bond_yields,decoder,options);
@@ -139,6 +138,7 @@ TEST_CASE("n_objects_test")
     //std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
     CHECK(val1.size() == 4);
 
+    options.assume_header(true);
     options.mapping(csv::mapping_kind::n_objects);
     csv::csv_reader reader2(bond_yields,decoder,options);
     reader2.read();
@@ -1354,8 +1354,7 @@ TEST_CASE("test_type_inference")
         )");
 
         csv::csv_options options;
-        options.assume_header(true)
-               .mapping(csv::mapping_kind::n_rows);
+        options.mapping(csv::mapping_kind::n_rows);
 
         ojson j = csv::decode_csv<ojson>(input,options);
         REQUIRE(j == expected);
