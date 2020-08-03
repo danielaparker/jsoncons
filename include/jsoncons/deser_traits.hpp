@@ -106,6 +106,11 @@ namespace jsoncons {
             std::error_code& ec)
         {
             using value_type = std::pair<T1, T2>;
+            cursor.array_expected(ec);
+            if (ec)
+            {
+                return value_type{};
+            }
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
                 ec = convert_errc::not_pair;
@@ -424,6 +429,11 @@ namespace jsoncons {
                                             json_decoder<Json,TempAllocator>& decoder, 
                                             std::error_code& ec)
         {
+            cursor.array_expected(ec);
+            if (ec)
+            {
+                return T{};
+            }
             std::array<T,N> v;
             v.fill(T{});
             if (cursor.current().event_type() != staj_event_type::begin_array)

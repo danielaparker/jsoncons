@@ -156,5 +156,29 @@ TEST_CASE("encode_bson overloads")
     }
 }
 
+TEST_CASE("bson encode array")
+{
+    SECTION("test1")
+    {
+        std::vector<uint8_t> expected = {0x13,0x00,0x00,0x00,0x10,0x30,0x00,0x01,0x00,0x00,0x00,0x10,0x31,0x00,0x02,0x00,0x00,0x00,0x00};
+        /*
+        13,00,00,00, // document has 19 bytes
+        10,30,00, // "0"
+        01,00,00,00, // 1
+        10,31,00, // "1"
+        02,00,00,00, // 2
+        00 // terminating null
+        */
 
+        std::pair<int,int> p{1,2};
+
+        std::vector<uint8_t> data;
+        bson::encode_bson(p, data);
+
+        CHECK(data == expected);
+
+        auto p2 = bson::decode_bson<std::pair<int,int>>(data);
+        CHECK(p2 == p);
+    }
+}
 
