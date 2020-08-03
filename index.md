@@ -42,8 +42,8 @@ information about user types provided by specializations of [json_type_traits](d
 
 The [jsoncons data model](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/data-model.md) supports the familiar JSON types - nulls,
 booleans, numbers, strings, arrays, objects - plus byte strings. In addition, jsoncons 
-supports semantic tagging of date-time values, timestamp values, big integers, 
-big decimals, bigfloats and binary encodings. This allows it to preserve these type semantics when parsing 
+supports semantic tagging of datetimes, epoch times, big integers, 
+big decimals, big floats and binary encodings. This allows it to preserve these type semantics when parsing 
 JSON-like data formats such as CBOR that have them.
 
 For the examples below you need to include some header files and initialize a string of JSON data:
@@ -141,18 +141,17 @@ Marilyn C, 0.9
 
 #### As a strongly typed C++ data structure
 
-jsoncons supports mapping JSON data into C++ data structures. 
+jsoncons supports transforming JSON texts into C++ data structures. 
 The functions [decode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/decode_json.md) and [encode_json](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/encode_json.md) 
 convert strings or streams of JSON data to C++ data structures and back. 
 Decode and encode work for all C++ classes that have 
 [json_type_traits](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/json_type_traits.md) 
-defined. The standard library containers are already supported, 
+defined. jsoncons already supports many types in the standard library, 
 and your own types will be supported too if you specialize `json_type_traits`
 in the `jsoncons` namespace. 
 
 ```c++
 namespace ns {
-
     enum class hiking_experience {beginner,intermediate,advanced};
 
     class hiking_reputon
@@ -161,17 +160,17 @@ namespace ns {
         hiking_experience assertion_;
         std::string rated_;
         double rating_;
-        std::optional<double> confidence_; // assumes C++17, otherwise use jsoncons::optional
-        std::optional<uint64_t> expires_;
+        std::optional<std::chrono::seconds> generated_; // assumes C++17, if not use jsoncons::optional
+        std::optional<std::chrono::seconds> expires_;
     public:
         hiking_reputon(const std::string& rater,
                        hiking_experience assertion,
                        const std::string& rated,
                        double rating,
-                       const std::optional<double>& confidence = std::optional<double>(),
-                       const std::optional<uint64_t>& expires = std::optional<uint64_t>())
+                       const std::optional<std::chrono::seconds>& generated = std::optional<std::chrono::seconds>(),
+                       const std::optional<std::chrono::seconds>& expires = std::optional<std::chrono::seconds>())
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
-              confidence_(confidence), expires_(expires)
+              generated_(generated), expires_(expires)
         {
         }
 
@@ -179,8 +178,20 @@ namespace ns {
         hiking_experience assertion() const {return assertion_;}
         const std::string& rated() const {return rated_;}
         double rating() const {return rating_;}
-        std::optional<double> confidence() const {return confidence_;}
-        std::optional<uint64_t> expires() const {return expires_;}
+        std::optional<std::chrono::seconds> generated() const {return generated_;}
+        std::optional<std::chrono::seconds> expires() const {return expires_;}
+
+        friend bool operator==(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return lhs.rater_ == rhs.rater_ && lhs.assertion_ == rhs.assertion_ && 
+                   lhs.rated_ == rhs.rated_ && lhs.rating_ == rhs.rating_ &&
+                   lhs.confidence_ == rhs.confidence_ && lhs.expires_ == rhs.expires_;
+        }
+
+        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
+        {
+            return !(lhs == rhs);
+        };
     };
 
     class hiking_reputation
@@ -203,9 +214,10 @@ namespace ns {
 // Declare the traits. Specify which data members need to be serialized.
 
 JSONCONS_ENUM_TRAITS(ns::hiking_experience, beginner, intermediate, advanced)
-// First four members listed are mandatory, confidence and expires are optional
+// First four members listed are mandatory, generated and expires are optional
 JSONCONS_N_CTOR_GETTER_TRAITS(ns::hiking_reputon, 4, rater, assertion, rated, rating, 
-                              confidence, expires)
+                              generated, expires)
+
 // All members are mandatory
 JSONCONS_ALL_CTOR_GETTER_TRAITS(ns::hiking_reputation, application, reputons)
 
@@ -218,12 +230,17 @@ int main()
     std::cout << "(1)\n";
     for (const auto& item : v.reputons())
     {
-        std::cout << item.rated() << ", " << item.rating() << "\n";
+        std::cout << item.rated() << ", " << item.rating();
+        if (item.generated())
+        {
+            std::cout << ", " << (*item.generated()).count();
+        }
+        std::cout << "\n";
     }
 
     // Encode the c++ structure into a string
     std::string s;
-    encode_json<ns::hiking_reputation>(v, s, indenting::indent);
+    encode_json_pretty(v, s);
     std::cout << "(2)\n";
     std::cout << s << "\n";
 }
@@ -231,14 +248,14 @@ int main()
 Output:
 ```
 (1)
-Marilyn C, 0.9
+Marilyn C, 0.9, 1514862245
 (2)
 {
     "application": "hiking",
     "reputons": [
         {
             "assertion": "advanced",
-            "confidence": 0.99,
+            "generated": 1514862245,
             "rated": "Marilyn C",
             "rater": "HikingAsylum",
             "rating": 0.9
@@ -246,6 +263,7 @@ Marilyn C, 0.9
     ]
 }
 ```
+
 This example makes use of the convenience macros `JSONCONS_ENUM_TRAITS`
 and `JSONCONS_ALL_CTOR_GETTER_TRAITS` to specialize the 
 [json_type_traits](doc/ref/json_type_traits.md) for the enum type
