@@ -497,6 +497,7 @@ public:
 
 private:
     bool assume_header_:1;
+    bool skip_header_:1;
     bool ignore_empty_values_:1;
     bool ignore_empty_lines_:1;
     bool trim_leading_:1;
@@ -515,6 +516,7 @@ private:
 public:
     basic_csv_decode_options()
         : assume_header_(false),
+          skip_header_(false),
           ignore_empty_values_(false),
           ignore_empty_lines_(true),
           trim_leading_(false),
@@ -535,6 +537,7 @@ public:
     basic_csv_decode_options(basic_csv_decode_options&& other)
         : super_type(std::forward<basic_csv_decode_options>(other)),
           assume_header_(other.assume_header_),
+          skip_header_(other.skip_header_),
           ignore_empty_values_(other.ignore_empty_values_),
           ignore_empty_lines_(other.ignore_empty_lines_),
           trim_leading_(other.trim_leading_),
@@ -554,12 +557,17 @@ public:
 
     std::size_t header_lines() const 
     {
-        return (assume_header_ && header_lines_ <= 1) ? 1 : header_lines_;
+        return ((skip_header_ || assume_header_) && header_lines_ <= 1) ? 1 : header_lines_;
     }
 
     bool assume_header() const 
     {
         return assume_header_;
+    }
+
+    bool skip_header() const 
+    {
+        return skip_header_;
     }
 
     bool ignore_empty_values() const 
@@ -772,6 +780,12 @@ public:
     basic_csv_options& assume_header(bool value)
     {
         this->assume_header_ = value;
+        return *this;
+    }
+
+    basic_csv_options& skip_header(bool value)
+    {
+        this->skip_header_ = value;
         return *this;
     }
 
