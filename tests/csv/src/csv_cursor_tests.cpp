@@ -27,7 +27,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     SECTION("n_rows test")
     {
         csv::csv_options options;
-        options.mapping(csv::mapping_kind::n_rows);
+        options.assume_header(true)
+               .mapping(csv::mapping_kind::n_rows);
         csv::csv_cursor cursor(data, options);
 
         CHECK(cursor.current().event_type() == staj_event_type::begin_array);
@@ -156,7 +157,8 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
     SECTION("test 1")
     {
         csv::csv_options options;
-        options.mapping(csv::mapping_kind::n_rows);
+        options.assume_header(true)
+               .mapping(csv::mapping_kind::n_rows);
         csv::csv_cursor cursor(data, options);
         /* for (; !cursor.done(); cursor.next())
         {
@@ -652,7 +654,8 @@ TEST_CASE("csv_cursor header, subfield no terminating new line test")
     SECTION("test 1")
     {
         csv::csv_options options;
-        options.subfield_delimiter(';')
+        options.assume_header(true)
+               .subfield_delimiter(';')
                .mapping(csv::mapping_kind::n_rows);
         csv::csv_cursor cursor(data, options);
 
