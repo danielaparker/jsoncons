@@ -429,16 +429,17 @@ namespace jsoncons {
                                             json_decoder<Json,TempAllocator>& decoder, 
                                             std::error_code& ec)
         {
+            std::array<T,N> v;
             cursor.array_expected(ec);
             if (ec)
             {
-                return value_type{};
+                return v;
             }
-            std::array<T,N> v;
             v.fill(T{});
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
                 ec = convert_errc::not_vector;
+                return v;
             }
             cursor.next(ec);
             for (std::size_t i = 0; i < N && cursor.current().event_type() != staj_event_type::end_array && !ec; ++i)
