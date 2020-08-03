@@ -840,9 +840,9 @@ public:
                     }
                     if (!options_.assume_header() && options_.mapping() == mapping_kind::n_rows && options_.column_names().size() > 0)
                     {
-                        //column_index_ = 0;
-                        //state_ = csv_parse_state::column_labels;
-                        //more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
+                        column_index_ = 0;
+                        state_ = csv_parse_state::column_labels;
+                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
                         state_ = csv_parse_state::expect_comment_or_record;
                     }
                     else
