@@ -31,6 +31,7 @@ quote_style| |Indicates what [quote_style](quote_style_kind.md) to use when quot
 column_names|Use these column names when reading the file.|Write these column names to the header line.
 header_lines|Number of header lines in the CSV text. Defaults to 1 if assume_header is true, otherwise 0|
 assume_header|Assume first row in file is header, use field names to construct objects. Default is `false`.|
+skip_header|Skip the first (header) line of input. Default is `false`.|
 ignore_empty_values|Do not read CSV fields that have empty values. Default is `false`.|
 ignore_empty_lines|If set to true, all lines in the file that are empty (apart from record delimiter characters) are ignored. To ignore lines with only spaces or tabs, set trim to true. Default is `true`.|
 trim_leading|Trim leading whitespace. Default is `false`.|
