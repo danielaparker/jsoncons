@@ -12,9 +12,6 @@ Enhancements:
 - Allow `bson_parser` to switch to array parsing when the root
 object is a document but `decode_bson` expects an array. 
 
-- Added csv decode option `skip_header` to skip the first
-(header) line of input
-
 - Added `json_type_traits` support for `std::nullptr_t`
 
 - Added `json_type_traits` support for `std::chrono::duration`

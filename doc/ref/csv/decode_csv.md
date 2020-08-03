@@ -206,7 +206,7 @@ int main()
 
     csv::csv_options options;
     options.assume_header(true)
-          .column_types("string,float,float,float,float");
+           .column_types("string,float,float,float,float");
 
     // mapping_kind::n_objects
     options.mapping(csv::mapping_kind::n_objects);

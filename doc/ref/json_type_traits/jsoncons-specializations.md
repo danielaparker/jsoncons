@@ -297,14 +297,14 @@ int main()
     auto results1 = decode_json<std::vector<qualifying_results_type>>(json_data);
     assert(results1 == results);
 
-    csv::csv_options options2;
+    csv::csv_options csv_options;
     options2.column_names("Pos,Driver,Entrant,Time,Gap");
     options2.mapping(csv::mapping_kind::n_rows);
     std::string csv_data;
-    options2.skip_header(true);
-    csv::encode_csv(results, csv_data, options2);
+    options2.header_lines(1);
+    csv::encode_csv(results, csv_data, csv_options);
     std::cout << csv_data << "\n\n";
-    auto results2 = csv::decode_csv<std::vector<qualifying_results_type>>(csv_data, options2);
+    auto results2 = csv::decode_csv<std::vector<qualifying_results_type>>(csv_data, csv_options);
     assert(results2 == results);
 
     std::vector<uint8_t> bson_data;

@@ -376,8 +376,8 @@ TEST_CASE("csv_test1_array_1col_skip1_b")
     json_decoder<json> decoder;
 
     csv::csv_options options;
-    options.header_lines(1);
-    options.infer_types(false);
+    options.header_lines(1)
+           .infer_types(false);
 
     csv::csv_reader reader(is,decoder,options);
     reader.read();

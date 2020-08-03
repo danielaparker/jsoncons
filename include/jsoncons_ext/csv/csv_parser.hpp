@@ -838,7 +838,7 @@ public:
                     {
                         more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
                     }
-                    if (!options_.assume_header() && options_.mapping() == mapping_kind::n_rows && options_.column_names().size() > 0)
+                    if (options_.assume_header() && options_.mapping() == mapping_kind::n_rows && options_.column_names().size() > 0)
                     {
                         column_index_ = 0;
                         state_ = csv_parse_state::column_labels;
@@ -1327,12 +1327,9 @@ private:
                 if (line_ == header_line_)
                 {
                     column_names_.push_back(buffer_);
-                    if (options_.mapping() == mapping_kind::n_rows)
+                    if (options_.assume_header() && options_.mapping() == mapping_kind::n_rows)
                     {
-                        if (!options_.skip_header())
-                        {
-                            more_ = visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
-                        }
+                        more_ = visitor_->string_value(buffer_, semantic_tag::none, *this, ec);
                     }
                 }
                 break;
@@ -1365,10 +1362,7 @@ private:
                 {
                     if (options_.mapping() == mapping_kind::n_rows)
                     {
-                        if (!options_.skip_header())
-                        {
-                            more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
-                        }
+                        more_ = visitor_->begin_array(semantic_tag::none, *this, ec);
                     }
                 }
                 break;
@@ -1413,7 +1407,7 @@ private:
                 switch (options_.mapping())
                 {
                     case mapping_kind::n_rows:
-                        if (!options_.skip_header())
+                        if (options_.assume_header())
                         {
                             more_ = visitor_->end_array(*this, ec);
                         }
