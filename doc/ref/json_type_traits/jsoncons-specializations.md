@@ -301,7 +301,7 @@ int main()
     options2.column_names("Pos,Driver,Entrant,Time,Gap");
     options2.mapping(csv::mapping_kind::n_rows);
     std::string csv_data;
-    options2.header_lines(1);
+    options2.skip_header(true);
     csv::encode_csv(results, csv_data, options2);
     std::cout << csv_data << "\n\n";
     auto results2 = csv::decode_csv<std::vector<qualifying_results_type>>(csv_data, options2);
