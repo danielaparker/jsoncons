@@ -115,10 +115,6 @@ public:
             state_stack_.back().mode = parse_mode::array;
             more_ = visitor.begin_array(semantic_tag::none, *this, ec);
         }
-        else if (!(state_stack_.back().mode == parse_mode::array || state_stack_.back().mode == parse_mode::byte_string_value))
-        {
-            ec = convert_errc::not_vector;
-        }
     }
 
     void parse(json_visitor& visitor, std::error_code& ec)
