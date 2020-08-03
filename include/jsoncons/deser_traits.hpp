@@ -432,7 +432,7 @@ namespace jsoncons {
             cursor.array_expected(ec);
             if (ec)
             {
-                return T{};
+                return value_type{};
             }
             std::array<T,N> v;
             v.fill(T{});
