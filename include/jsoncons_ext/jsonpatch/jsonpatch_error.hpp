@@ -82,6 +82,19 @@ namespace std {
 
 namespace jsoncons { namespace jsonpatch {
 
+// allow to disable exceptions
+#if !defined(JSONCONS_NO_EXCEPTIONS)
+    #define JSONCONS_THROW(exception) throw exception
+    #define JSONCONS_RETHROW throw
+    #define JSONCONS_TRY try
+    #define JSONCONS_CATCH(exception) catch(exception)
+#else
+    #define JSONCONS_THROW(exception) std::terminate()
+    #define JSONCONS_RETHROW std::terminate()
+    #define JSONCONS_TRY if(true)
+    #define JSONCONS_CATCH(exception) if(false)
+#endif
+
     class jsonpatch_error : public std::system_error, public virtual json_exception
     {
     public:
