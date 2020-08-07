@@ -66,7 +66,7 @@ Or, download the latest code on [master](https://github.com/danielaparker/jsonco
 - [Quick guide](http://danielaparker.github.io/jsoncons)
 - [Examples](doc/Examples.md)
 - [Reference](doc/Reference.md)
-- [Ask questions and suggest new features](https://github.com/danielaparker/jsoncons/discussions)
+- [Ask questions and suggest ideas for new features](https://github.com/danielaparker/jsoncons/discussions)
 
 The library requires a C++ Compiler with C++11 support. In addition the library defines `jsoncons::endian`,
 `jsoncons::basic_string_view`, `jsoncons::optional`, and `jsoncons::span`, which will be typedefed to
