@@ -100,7 +100,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/csv/src/csv_subfield_tests.cpp
    ${JSONCONS_TESTS_DIR}/csv/src/csv_tests.cpp
    ${JSONCONS_TESTS_DIR}/csv/src/encode_decode_csv_tests.cpp
-   ${JSONCONS_TESTS_DIR}/src/deser_traits_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/decode_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/detail/optional_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/detail/span_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/detail/string_view_tests.cpp
@@ -163,7 +163,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/src/ojson_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/order_preserving_json_object_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/parse_string_tests.cpp
-   ${JSONCONS_TESTS_DIR}/src/ser_traits_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/encode_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/short_string_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/staj_iterator_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/stateful_allocator_tests.cpp
