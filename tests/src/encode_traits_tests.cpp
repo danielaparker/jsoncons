@@ -14,7 +14,7 @@ using jsoncons::wjson;
 using jsoncons::decode_json;
 using jsoncons::encode_json;
 
-namespace ser_traits_tests {
+namespace encode_traits_tests {
 
     struct book
     {
@@ -31,9 +31,9 @@ namespace ser_traits_tests {
         {
         }
     };
-} // namespace ser_traits_tests
+} // namespace encode_traits_tests
 
-namespace ns = ser_traits_tests;
+namespace ns = encode_traits_tests;
 
 JSONCONS_ALL_MEMBER_TRAITS(ns::book,author,title,price)
 
