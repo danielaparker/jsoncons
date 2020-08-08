@@ -9,7 +9,7 @@
 
 using namespace jsoncons;
 
-TEST_CASE("deser_traits primitive")
+TEST_CASE("decode_traits primitive")
 {
     SECTION("is_primitive")
     {
@@ -23,7 +23,7 @@ TEST_CASE("deser_traits primitive")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<uint64_t,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<uint64_t,char>::decode(cursor,decoder,ec);
 
         CHECK(val == 1000);
     }
@@ -37,7 +37,7 @@ TEST_CASE("deser_traits primitive")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         REQUIRE(val.size() == 3);
         CHECK(val[0] == 1000);
@@ -46,7 +46,7 @@ TEST_CASE("deser_traits primitive")
     }
 }
 
-TEST_CASE("deser_traits std::string")
+TEST_CASE("decode_traits std::string")
 {
     SECTION("is_string")
     {
@@ -60,13 +60,13 @@ TEST_CASE("deser_traits std::string")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<std::string,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<std::string,char>::decode(cursor,decoder,ec);
 
         CHECK((val == "Hello World"));
     }
 }
 
-TEST_CASE("deser_traits std::pair")
+TEST_CASE("decode_traits std::pair")
 {
     SECTION("std::pair<std::string,std::string>")
     {
@@ -77,7 +77,7 @@ TEST_CASE("deser_traits std::pair")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         CHECK((val == test_type("first","second")));
     }
@@ -90,7 +90,7 @@ TEST_CASE("deser_traits std::pair")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
         REQUIRE_FALSE(ec);
 
         REQUIRE(val.size() == 2);
@@ -106,7 +106,7 @@ TEST_CASE("deser_traits std::pair")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         REQUIRE_FALSE(ec);
 
@@ -127,13 +127,13 @@ TEST_CASE("deser_traits std::pair")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         CHECK(ec == convert_errc::not_pair);
     }
 }
 
-TEST_CASE("deser_traits deserialization errors")
+TEST_CASE("decode_traits deserialization errors")
 {
     SECTION("Expected comma or right brace")
     {
@@ -144,7 +144,7 @@ TEST_CASE("deser_traits deserialization errors")
         std::error_code ec;
 
         json_cursor cursor(input);
-        auto val = deser_traits<test_type,char>::deserialize(cursor,decoder,ec);
+        auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
         CHECK(ec == json_errc::expected_comma_or_right_brace);
     }

@@ -15,7 +15,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/ser_traits.hpp>
+#include <jsoncons/encode_traits.hpp>
 #include <jsoncons_ext/cbor/cbor_encoder.hpp>
 
 namespace jsoncons { 
@@ -44,7 +44,7 @@ namespace cbor {
     {
         basic_cbor_encoder<jsoncons::bytes_sink<Container>> encoder(v, options);
         std::error_code ec;
-        ser_traits<T,char>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -73,7 +73,7 @@ namespace cbor {
     {
         cbor_stream_encoder encoder(os, options);
         std::error_code ec;
-        ser_traits<T,char>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -108,7 +108,7 @@ namespace cbor {
     {
         basic_cbor_encoder<jsoncons::bytes_sink<Container>,TempAllocator> encoder(v, options, temp_alloc);
         std::error_code ec;
-        ser_traits<T,char>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));

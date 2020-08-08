@@ -40,7 +40,7 @@ namespace csv {
         jsoncons::json_decoder<basic_json<char_type>> decoder;
 
         std::error_code ec;
-        T val = deser_traits<T,char_type>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -69,7 +69,7 @@ namespace csv {
         jsoncons::json_decoder<basic_json<CharT>> decoder;
 
         std::error_code ec;
-        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -102,7 +102,7 @@ namespace csv {
         basic_csv_cursor<char_type,iterator_source<InputIt>> cursor(iterator_source<InputIt>(first, last), options);
         jsoncons::json_decoder<basic_json<char_type>> decoder;
         std::error_code ec;
-        T val = deser_traits<T,char_type>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -141,7 +141,7 @@ namespace csv {
         json_decoder<basic_json<char_type,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T,char_type>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -174,7 +174,7 @@ namespace csv {
         json_decoder<basic_json<CharT,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T,CharT>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

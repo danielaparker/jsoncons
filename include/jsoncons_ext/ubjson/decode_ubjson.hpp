@@ -43,7 +43,7 @@ namespace ubjson {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -72,7 +72,7 @@ namespace ubjson {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -101,7 +101,7 @@ namespace ubjson {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -136,7 +136,7 @@ namespace ubjson {
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -167,7 +167,7 @@ namespace ubjson {
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

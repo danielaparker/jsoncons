@@ -12,7 +12,7 @@
 #include <tuple>
 #include <memory>
 #include <istream> // std::basic_istream
-#include <jsoncons/ser_traits.hpp>
+#include <jsoncons/encode_traits.hpp>
 #include <jsoncons/json_cursor.hpp>
 
 namespace jsoncons {
@@ -119,7 +119,7 @@ namespace jsoncons {
     void encode_json(const T& val, basic_json_visitor<CharT>& encoder)
     {
         std::error_code ec;
-        ser_traits<T,CharT>::serialize(val, encoder, basic_json<CharT>(), ec);
+        encode_traits<T,CharT>::encode(val, encoder, basic_json<CharT>(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -301,7 +301,7 @@ namespace jsoncons {
     {
         std::error_code ec;
         basic_json<CharT,sorted_policy,TempAllocator> proto(temp_alloc);
-        ser_traits<T,CharT>::serialize(val, encoder, proto, ec);
+        encode_traits<T,CharT>::encode(val, encoder, proto, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));

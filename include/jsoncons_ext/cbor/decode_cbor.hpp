@@ -14,7 +14,7 @@
 #include <istream> // std::basic_istream
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_filter.hpp>
-#include <jsoncons/deser_traits.hpp>
+#include <jsoncons/decode_traits.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/cbor/cbor_reader.hpp>
 #include <jsoncons_ext/cbor/cbor_cursor.hpp>
@@ -45,7 +45,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -74,7 +74,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -103,7 +103,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy>> decoder{};
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -138,7 +138,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
@@ -169,7 +169,7 @@ namespace cbor {
         json_decoder<basic_json<char,sorted_policy,TempAllocator>,TempAllocator> decoder(temp_alloc, temp_alloc);
 
         std::error_code ec;
-        T val = deser_traits<T,char>::deserialize(cursor, decoder, ec);
+        T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));

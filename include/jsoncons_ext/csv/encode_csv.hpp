@@ -32,7 +32,7 @@ namespace csv {
         using char_type = typename Container::value_type;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>> encoder(s,options);
         std::error_code ec;
-        ser_traits<T,char_type>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char_type>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -55,7 +55,7 @@ namespace csv {
         using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>> encoder(os,options);
         std::error_code ec;
-        ser_traits<T,CharT>::serialize(val, encoder, json(), ec);
+        encode_traits<T,CharT>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -84,7 +84,7 @@ namespace csv {
         using char_type = typename Container::value_type;
         basic_csv_encoder<char_type,jsoncons::string_sink<std::basic_string<char_type>>,TempAllocator> encoder(s, options, temp_alloc);
         std::error_code ec;
-        ser_traits<T,char_type>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char_type>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -109,7 +109,7 @@ namespace csv {
         using char_type = CharT;
         basic_csv_encoder<char_type,jsoncons::stream_sink<char_type>,TempAllocator> encoder(os, options, temp_alloc);
         std::error_code ec;
-        ser_traits<T,CharT>::serialize(val, encoder, json(), ec);
+        encode_traits<T,CharT>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));

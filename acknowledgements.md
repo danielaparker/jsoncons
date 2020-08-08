@@ -82,7 +82,7 @@ has virtual functions and accessible non-virtual destructor
 and [Rodrigo Broggi](https://github.com/rbroggi) for providing feedback and helpful suggestions regarding the `json_type_traits`
 convenience macros.
 
-- [dvzubarev](https://github.com/dvzubarev) for contributing suggestions for improving the `ser_traits` implementation.
+- [dvzubarev](https://github.com/dvzubarev) for contributing suggestions for improving the `encode_traits` implementation.
 
 - [David Korczynski](https://github.com/DavidKorczynski) for integrating jsoncons into OSS-fuzz and contributing fuzzers 
 

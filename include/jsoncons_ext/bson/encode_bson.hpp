@@ -42,7 +42,7 @@ namespace bson {
     {
         basic_bson_encoder<jsoncons::bytes_sink<Container>> encoder(v, options);
         std::error_code ec;
-        ser_traits<T,char>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -69,7 +69,7 @@ namespace bson {
     {
         bson_stream_encoder encoder(os, options);
         std::error_code ec;
-        ser_traits<T,char>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -102,7 +102,7 @@ namespace bson {
     {
         basic_bson_encoder<jsoncons::bytes_sink<Container>,TempAllocator> encoder(v, options, temp_alloc);
         std::error_code ec;
-        ser_traits<T,char>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
@@ -131,7 +131,7 @@ namespace bson {
     {
         basic_bson_encoder<jsoncons::binary_stream_sink,TempAllocator> encoder(os, options, temp_alloc);
         std::error_code ec;
-        ser_traits<T,char>::serialize(val, encoder, json(), ec);
+        encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
             JSONCONS_THROW(ser_error(ec));
