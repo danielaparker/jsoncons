@@ -945,8 +945,8 @@ Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/googl
 |                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
 |                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
 |                         | 4.9.2                     | i386        | Debian 8          |       |
-| clang                   | 3.8 and above             | x64         | Ubuntu            |       |
-| clang xcode             | 6.4 and above             | x64         | OSX               |       |
+| clang                   | 4.0, 5.0, 6.0, 7, 8                | x64         | Ubuntu            |       |
+| clang xcode             | 9.3, 9.4, 10, 10.1, 10.2, 11.2, 12 | x64         | OSX               |       |
 
 ## Building the test suite and examples with CMake
 
