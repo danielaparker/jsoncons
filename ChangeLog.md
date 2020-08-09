@@ -5,7 +5,7 @@ Enhancements:
 
 - Improved support for `bson_parser` to switch to array parsing 
 when the BSON root object is a document but `decode_bson` needs
-to convert to an `std::array`, `std::tuple` or `std::pair` object. 
+to convert to an `std::array`, `std::tuple` or `std::pair`. 
 
 0.155.0
 --------
