@@ -3049,18 +3049,23 @@ class string_locator : public jsoncons::default_json_visitor
     std::vector<std::string> path_;
     std::string from_;
     std::vector<std::string> current_;
-    std::vector<std::size_t>& positions_;
+    std::vector<std::size_t> positions_;
 public:
     using jsoncons::default_json_visitor::string_view_type;
 
     string_locator(char* data, std::size_t length,
-                   const std::vector<std::string>& path, 
-                   const std::string& from, std::vector<std::size_t>& positions)
+                   const std::vector<std::string>& path,
+                   const std::string& from)
         : data_(data), length_(length),
-          path_(path), from_(from), positions_(positions)
+          path_(path), from_(from)
     {
     }
 
+    const std::vector<std::size_t>& positions() const
+    {
+        return positions_;
+    }
+private:
     bool visit_begin_object(semantic_tag, const ser_context&, std::error_code&) override
     {
         current_.emplace_back();
@@ -3097,16 +3102,15 @@ public:
 };
 
 void update_json_in_place(std::string& input,
-                          const std::vector<std::string>& path,
-                          const std::string& from,
-                          const std::string& to)
+                     const std::vector<std::string>& path,
+                     const std::string& from,
+                     const std::string& to)
 {
-    std::vector<std::size_t> positions;
-    string_locator locator(input.data(), input.size(), path, from, positions);
+    string_locator locator(input.data(), input.size(), path, from);
     jsoncons::json_reader reader(jsoncons::string_view(input), locator);
     reader.read();
 
-    for (auto it = positions.rbegin(); it != positions.rend(); ++it)
+    for (auto it = locator.positions().rbegin(); it != locator.positions().rend(); ++it)
     {
         input.replace(*it, from.size(), to);
     }
