@@ -12,7 +12,7 @@
 #include <vector>
 #include <exception>
 #include <cstring>
-#include <ostream>
+#include <ostream> 
 #include <memory> // std::allocator
 #include <typeinfo>
 #include <cstring> // std::memcpy
@@ -872,6 +872,27 @@ private:
         }
     };
 
+    class json_const_pointer_storage final
+    {
+    public:
+        uint8_t storage_:4;
+        uint8_t length_:4;
+        semantic_tag tag_;
+    private:
+        const basic_json* p_;
+    public:
+        json_const_pointer_storage(const basic_json* p)
+            : storage_(static_cast<uint8_t>(storage_kind::json_const_pointer)), length_(0), tag_(p->tag()),
+              p_(p)
+        {
+        }
+
+        const basic_json* value() const
+        {
+            return p_;
+        }
+    };
+
     template <class ParentT>
     class proxy 
     {
@@ -1501,6 +1522,7 @@ private:
             evaluate_with_default().insert(tag, first, last);
         }
 
+
         template <class Container>
         typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
         dump(Container& s,
@@ -1655,13 +1677,13 @@ private:
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_second")
-        bool is_epoch_second() const noexcept
+        bool is_epoch_time() const noexcept
         {
             if (!parent_.contains(key_))
             {
                 return false;
             }
-            return evaluate().is_epoch_second();
+            return evaluate().is_epoch_time();
         }
 
         template <class T>
@@ -1998,6 +2020,7 @@ private:
         array_storage array_stor_;
         object_storage object_stor_;
         empty_object_storage empty_object_stor_;
+        json_const_pointer_storage json_const_pointer_stor_;
     };
 
     void Destroy_()
@@ -2168,6 +2191,16 @@ private:
         return array_stor_;
     }
 
+    json_const_pointer_storage& cast(identity<json_const_pointer_storage>) 
+    {
+        return json_const_pointer_stor_;
+    }
+
+    const json_const_pointer_storage& cast(identity<json_const_pointer_storage>) const
+    {
+        return json_const_pointer_stor_;
+    }
+
     template <class TypeA, class TypeB>
     void swap_a_b(basic_json& other)
     {
@@ -2195,6 +2228,7 @@ private:
             case storage_kind::byte_string_value  : swap_a_b<TypeA, byte_string_storage>(other); break;
             case storage_kind::array_value        : swap_a_b<TypeA, array_storage>(other); break;
             case storage_kind::object_value       : swap_a_b<TypeA, object_storage>(other); break;
+            case storage_kind::json_const_pointer : swap_a_b<TypeA, json_const_pointer_storage>(other); break;
             default:
                 JSONCONS_UNREACHABLE();
                 break;
@@ -2241,6 +2275,9 @@ private:
             case storage_kind::array_value:
                 construct<array_storage>(val.cast<array_storage>());
                 break;
+            case storage_kind::json_const_pointer:
+                Init_(*(val.cast<json_const_pointer_storage>().value()));
+                break;
             default:
                 break;
         }
@@ -2272,6 +2309,9 @@ private:
             case storage_kind::object_value:
                 construct<object_storage>(val.cast<object_storage>(),a);
                 break;
+            case storage_kind::json_const_pointer:
+                Init_(*(val.cast<json_const_pointer_storage>().value()), a);
+                break;
             default:
                 break;
         }
@@ -2289,6 +2329,7 @@ private:
             case storage_kind::uint64_value:
             case storage_kind::bool_value:
             case storage_kind::short_string_value:
+            case storage_kind::json_const_pointer:
                 Init_(val);
                 break;
             case storage_kind::long_string_value:
@@ -2323,6 +2364,7 @@ private:
             case storage_kind::uint64_value:
             case storage_kind::bool_value:
             case storage_kind::short_string_value:
+            case storage_kind::json_const_pointer:
                 Init_(std::forward<basic_json>(val));
                 break;
             case storage_kind::long_string_value:
@@ -2458,6 +2500,8 @@ public:
             case storage_kind::empty_object_value:
             case storage_kind::object_value:
                 return json_type::object_value;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->type();
             default:
                 JSONCONS_UNREACHABLE();
                 break;
@@ -2470,7 +2514,13 @@ public:
         // common_stor_ is not the active member of the union because 'tag_' 
         // is a part of the common initial sequence of all union members
         // as defined in 11.4-25 of the Standard.
-        return common_stor_.tag_;
+        switch(storage())
+        {
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->tag();
+            default:
+                return common_stor_.tag_;
+        }
     }
 
     std::size_t size() const
@@ -2483,6 +2533,8 @@ public:
                 return 0;
             case storage_kind::object_value:
                 return cast<object_storage>().value().size();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->size();
             default:
                 return 0;
         }
@@ -2496,6 +2548,8 @@ public:
                 return string_view_type(cast<short_string_storage>().data(),cast<short_string_storage>().length());
             case storage_kind::long_string_value:
                 return string_view_type(cast<long_string_storage>().data(),cast<long_string_storage>().length());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_string_view();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a string"));
         }
@@ -2522,6 +2576,8 @@ public:
             }
             case storage_kind::byte_string_value:
                 return basic_byte_string<BAllocator>(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_byte_string();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
         }
@@ -2533,6 +2589,8 @@ public:
         {
             case storage_kind::byte_string_value:
                 return byte_string_view(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_byte_string_view();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
         }
@@ -2546,11 +2604,22 @@ public:
         }
         switch (lhs.storage())
         {
+            case storage_kind::json_const_pointer:
+                switch (rhs.storage())
+                {
+                    case storage_kind::json_const_pointer:
+                        return *(lhs.cast<json_const_pointer_storage>().value()) == *(rhs.cast<json_const_pointer_storage>().value());
+                    default:
+                        return *(lhs.cast<json_const_pointer_storage>().value()) == rhs;
+                }
+                break;
             case storage_kind::null_value:
                 switch (rhs.storage())
                 {
                     case storage_kind::null_value:
                         return true;
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2562,6 +2631,8 @@ public:
                         return true;
                     case storage_kind::object_value:
                         return rhs.size() == 0;
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2571,6 +2642,8 @@ public:
                 {
                     case storage_kind::bool_value:
                         return lhs.cast<bool_storage>().value() == rhs.cast<bool_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2586,6 +2659,8 @@ public:
                         return static_cast<double>(lhs.cast<int64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                     case storage_kind::double_value:
                         return static_cast<double>(lhs.cast<int64_storage>().value()) == rhs.cast<double_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2601,6 +2676,8 @@ public:
                         return static_cast<double>(lhs.cast<uint64_storage>().value()) == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                     case storage_kind::double_value:
                         return static_cast<double>(lhs.cast<uint64_storage>().value()) == rhs.cast<double_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2610,6 +2687,8 @@ public:
                 {
                     case storage_kind::half_value:
                         return lhs.cast<half_storage>().value() == rhs.cast<half_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return basic_json(jsoncons::detail::decode_half(lhs.cast<half_storage>().value()),semantic_tag::none) == rhs;
                 }
@@ -2625,6 +2704,8 @@ public:
                         return lhs.cast<double_storage>().value() == jsoncons::detail::decode_half(rhs.cast<half_storage>().value());
                     case storage_kind::double_value:
                         return lhs.cast<double_storage>().value() == rhs.cast<double_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2637,6 +2718,8 @@ public:
                         return lhs.as_string_view() == rhs.as_string_view();
                     case storage_kind::long_string_value:
                         return lhs.as_string_view() == rhs.as_string_view();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2648,6 +2731,8 @@ public:
                     {
                         return lhs.as_byte_string_view() == rhs.as_byte_string_view();
                     }
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2657,6 +2742,8 @@ public:
                 {
                     case storage_kind::array_value:
                         return lhs.cast<array_storage>().value() == rhs.cast<array_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2668,6 +2755,8 @@ public:
                         return lhs.size() == 0;
                     case storage_kind::object_value:
                         return lhs.cast<object_storage>().value() == rhs.cast<object_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs == *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return false;
                 }
@@ -2686,6 +2775,15 @@ public:
         }
         switch (lhs.storage())
         {
+            case storage_kind::json_const_pointer:
+                switch (rhs.storage())
+                {
+                    case storage_kind::json_const_pointer:
+                        return *(lhs.cast<json_const_pointer_storage>().value()) < *(rhs.cast<json_const_pointer_storage>().value());
+                    default:
+                        return *(lhs.cast<json_const_pointer_storage>().value()) < rhs;
+                }
+                break;
             case storage_kind::null_value:
                 return (int)lhs.storage() < (int)rhs.storage();
             case storage_kind::empty_object_value:
@@ -2695,6 +2793,8 @@ public:
                         return false;
                     case storage_kind::object_value:
                         return rhs.size() != 0;
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2704,6 +2804,8 @@ public:
                 {
                     case storage_kind::bool_value:
                         return lhs.cast<bool_storage>().value() < rhs.cast<bool_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2717,6 +2819,8 @@ public:
                         return lhs.cast<int64_storage>().value() >= 0 ? static_cast<uint64_t>(lhs.cast<int64_storage>().value()) < rhs.cast<uint64_storage>().value() : true;
                     case storage_kind::double_value:
                         return static_cast<double>(lhs.cast<int64_storage>().value()) < rhs.cast<double_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2730,6 +2834,8 @@ public:
                         return lhs.cast<uint64_storage>().value() < rhs.cast<uint64_storage>().value();
                     case storage_kind::double_value:
                         return static_cast<double>(lhs.cast<uint64_storage>().value()) < rhs.cast<double_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2743,6 +2849,8 @@ public:
                         return lhs.cast<double_storage>().value() < static_cast<double>(rhs.cast<uint64_storage>().value());
                     case storage_kind::double_value:
                         return lhs.cast<double_storage>().value() < rhs.cast<double_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2755,6 +2863,8 @@ public:
                         return lhs.as_string_view() < rhs.as_string_view();
                     case storage_kind::long_string_value:
                         return lhs.as_string_view() < rhs.as_string_view();
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2766,6 +2876,8 @@ public:
                     {
                         return lhs.as_byte_string_view() < rhs.as_byte_string_view();
                     }
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2775,6 +2887,8 @@ public:
                 {
                     case storage_kind::array_value:
                         return lhs.cast<array_storage>().value() < rhs.cast<array_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2786,6 +2900,8 @@ public:
                         return false;
                     case storage_kind::object_value:
                         return lhs.cast<object_storage>().value() < rhs.cast<object_storage>().value();
+                    case storage_kind::json_const_pointer:
+                        return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
                         return (int)lhs.storage() < (int)rhs.storage();
                 }
@@ -2837,12 +2953,12 @@ public:
             case storage_kind::byte_string_value: swap_a<byte_string_storage>(other); break;
             case storage_kind::array_value: swap_a<array_storage>(other); break;
             case storage_kind::object_value: swap_a<object_storage>(other); break;
+            case storage_kind::json_const_pointer: swap_a<json_const_pointer_storage>(other); break;
             default:
                 JSONCONS_UNREACHABLE();
                 break;
         }
     }
-
     // from string
 
     template <class Source>
@@ -3092,6 +3208,18 @@ public:
         construct<array_storage>(array(init,alloc), tag);
     }
 
+    basic_json(json_const_pointer_arg_t, const basic_json* p) noexcept 
+    {
+        if (p == nullptr)
+        {
+            construct<null_storage>(semantic_tag::none);
+        }
+        else
+        {
+            construct<json_const_pointer_storage>(p);
+        }
+    }
+
     basic_json(const array& val, semantic_tag tag = semantic_tag::none)
     {
         construct<array_storage>(val, tag);
@@ -3272,6 +3400,7 @@ public:
     {
         return at(name);
     }
+
 
     template <class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
@@ -3539,6 +3668,8 @@ public:
         {
             case storage_kind::null_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_null();
             default:
                 return false;
         }
@@ -3577,6 +3708,8 @@ public:
             {
                 return cast<byte_string_storage>().ext_tag();
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->ext_tag();
             default:
                 return 0;
         }
@@ -3591,6 +3724,8 @@ public:
                 auto it = object_value().find(key);
                 return it != object_value().end();
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->contains(key);
             default:
                 return false;
         }
@@ -3615,6 +3750,8 @@ public:
                 }
                 return count;
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->count(key);
             default:
                 return 0;
         }
@@ -3633,6 +3770,8 @@ public:
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_string();
             default:
                 return false;
         }
@@ -3649,6 +3788,8 @@ public:
         {
             case storage_kind::byte_string_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_byte_string();
             default:
                 return false;
         }
@@ -3669,6 +3810,8 @@ public:
             case storage_kind::int64_value:
             case storage_kind::uint64_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_bignum();
             default:
                 return false;
         }
@@ -3680,6 +3823,8 @@ public:
         {
             case storage_kind::bool_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_bool();
             default:
                 return false;
         }
@@ -3692,6 +3837,8 @@ public:
             case storage_kind::empty_object_value:
             case storage_kind::object_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_object();
             default:
                 return false;
         }
@@ -3703,6 +3850,8 @@ public:
         {
             case storage_kind::array_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_array();
             default:
                 return false;
         }
@@ -3716,6 +3865,8 @@ public:
                 return true;
             case storage_kind::uint64_value:
                 return as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_int64();
             default:
                 return false;
         }
@@ -3729,6 +3880,8 @@ public:
                 return true;
             case storage_kind::int64_value:
                 return as_integer<int64_t>() >= 0;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_uint64();
             default:
                 return false;
         }
@@ -3740,6 +3893,8 @@ public:
         {
             case storage_kind::half_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_half();
             default:
                 return false;
         }
@@ -3751,6 +3906,8 @@ public:
         {
             case storage_kind::double_value:
                 return true;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_double();
             default:
                 return false;
         }
@@ -3770,6 +3927,8 @@ public:
                 return tag() == semantic_tag::bigint ||
                        tag() == semantic_tag::bigdec ||
                        tag() == semantic_tag::bigfloat;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->is_number();
             default:
                 return false;
         }
@@ -3792,6 +3951,8 @@ public:
                 return true;
             case storage_kind::object_value:
                 return object_value().size() == 0;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->empty();
             default:
                 return false;
         }
@@ -3805,6 +3966,8 @@ public:
                 return array_value().capacity();
             case storage_kind::object_value:
                 return object_value().capacity();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->capacity();
             default:
                 return 0;
         }
@@ -3926,6 +4089,8 @@ public:
             }
             case storage_kind::byte_string_value:
                 return T(as_byte_string_view().begin(), as_byte_string_view().end());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template as<T>(byte_string_arg, hint);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a byte string"));
         }
@@ -3941,6 +4106,8 @@ public:
                 return cast<int64_storage>().value() != 0;
             case storage_kind::uint64_value:
                 return cast<uint64_storage>().value() != 0;
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_bool();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bool"));
         }
@@ -3975,6 +4142,8 @@ public:
                 return static_cast<T>(cast<uint64_storage>().value());
             case storage_kind::bool_value:
                 return static_cast<T>(cast<bool_storage>().value() ? 1 : 0);
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template as_integer<T>();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
         }
@@ -3999,6 +4168,8 @@ public:
                 return static_cast<double>(cast<int64_storage>().value());
             case storage_kind::uint64_value:
                 return static_cast<double>(cast<uint64_storage>().value());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_double();
             default:
                 JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a double"));
         }
@@ -4042,6 +4213,8 @@ public:
                 }
                 return s;
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_string(alloc);
             default:
             {
                 string_type s(alloc);
@@ -4060,6 +4233,8 @@ public:
                 return cast<short_string_storage>().c_str();
             case storage_kind::long_string_value:
                 return cast<long_string_storage>().c_str();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->as_cstring();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a cstring"));
         }
@@ -4102,6 +4277,8 @@ public:
                 }
                 return it->value();
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->at(key);
             default:
             {
                 JSONCONS_THROW(not_an_object(key.data(),key.length()));
@@ -4138,6 +4315,8 @@ public:
                 return array_value().operator[](i);
             case storage_kind::object_value:
                 return object_value().at(i);
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->at(i);
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Index on non-array value not supported"));
         }
@@ -4166,6 +4345,8 @@ public:
                 return object_range().end();
             case storage_kind::object_value:
                 return const_object_iterator(object_value().find(key));
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->find(key);
             default:
             {
                 JSONCONS_THROW(not_an_object(key.data(),key.length()));
@@ -4194,6 +4375,8 @@ public:
                     return null();
                 }
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->at_or_null(key);
             default:
             {
                 JSONCONS_THROW(not_an_object(key.data(),key.length()));
@@ -4227,6 +4410,8 @@ public:
                     return static_cast<T>(std::forward<U>(default_value));
                 }
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template get_value_or<T,U>(key,std::forward<U>(default_value));
             default:
             {
                 JSONCONS_THROW(not_an_object(key.data(),key.length()));
@@ -4686,6 +4871,8 @@ public:
                     return default_value;
                 }
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->get_with_default(key, default_value);
             default:
             {
                 JSONCONS_THROW(not_an_object(key.data(),key.length()));
@@ -4715,6 +4902,8 @@ public:
                     return T(default_value);
                 }
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->get_with_default(key, default_value);
             default:
             {
                 JSONCONS_THROW(not_an_object(key.data(),key.length()));
@@ -4972,7 +5161,7 @@ public:
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_second")
-    bool is_epoch_second() const noexcept
+    bool is_epoch_time() const noexcept
     {
         return tag() == semantic_tag::epoch_second;
     }
@@ -5309,6 +5498,8 @@ public:
             case storage_kind::object_value:
                 return range<const_object_iterator, const_object_iterator>(const_object_iterator(object_value().begin()),
                                                     const_object_iterator(object_value().end()));
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->object_range();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an object"));
         }
@@ -5331,6 +5522,8 @@ public:
         {
             case storage_kind::array_value:
                 return range<const_array_iterator, const_array_iterator>(array_value().begin(),array_value().end());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->array_range();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an array"));
         }
@@ -5354,6 +5547,8 @@ public:
         {
             case storage_kind::array_value:
                 return cast<array_storage>().value();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->array_value();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad array cast"));
                 break;
@@ -5384,6 +5579,8 @@ public:
                 JSONCONS_FALLTHROUGH;
             case storage_kind::object_value:
                 return cast<object_storage>().value();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->object_value();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Bad object cast"));
                 break;
@@ -5463,6 +5660,8 @@ private:
                 }
                 break;
             }
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->dump_noflush(visitor, ec);
             default:
                 break;
         }

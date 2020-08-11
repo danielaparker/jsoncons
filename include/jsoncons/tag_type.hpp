@@ -59,6 +59,13 @@ struct byte_string_arg_t
 
 constexpr byte_string_arg_t byte_string_arg{};
 
+struct json_const_pointer_arg_t
+{
+    explicit json_const_pointer_arg_t() = default; 
+};
+
+constexpr json_const_pointer_arg_t json_const_pointer_arg{};
+ 
 enum class semantic_tag : uint8_t 
 {
     none = 0,
