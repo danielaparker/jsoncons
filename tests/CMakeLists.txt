@@ -117,6 +117,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/src/json_as_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_checker_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_comparator_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/json_const_pointer_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_constructor_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_encoder_tests.cpp
