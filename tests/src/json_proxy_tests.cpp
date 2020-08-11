@@ -46,5 +46,16 @@ TEST_CASE("json proxy tests")
         jv.push_back(j["a"]["c"]);
 
     }
+    SECTION("dump test")
+    {
+        json j = json::parse(R"(
+         {"a" : {}, "b" : 2} 
+         )");
+
+        json& j1 = j["b"];
+        std::string output;
+        j1.dump(output);
+        CHECK(output == std::string("2"));
+    }
 }
 

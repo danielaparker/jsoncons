@@ -1522,107 +1522,16 @@ private:
             evaluate_with_default().insert(tag, first, last);
         }
 
-
-        template <class Container>
-        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
-        dump(Container& s,
-             const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+        template <typename... Args>
+        void dump(Args&& ... args) const
         {
-            evaluate().dump(s, options);
+            evaluate().dump(std::forward<Args>(args)...);
         }
 
-        void dump(std::basic_ostream<char_type>& os, 
-                  const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
+        template <typename... Args>
+        void dump_pretty(Args&& ... args) const
         {
-            evaluate().dump(os, options);
-        }
-
-        template <class Container>
-        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
-        dump_pretty(Container& s,
-             const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
-        {
-            evaluate().dump_pretty(s, options);
-        }
-
-        void dump_pretty(std::basic_ostream<char_type>& os, 
-                  const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
-        {
-            evaluate().dump_pretty(os, options);
-        }
-
-        template <class Container>
-        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
-        dump(Container& s, indenting line_indent) const
-        {
-            evaluate().dump(s, line_indent);
-        }
-
-        void dump(std::basic_ostream<char_type>& os, 
-                  indenting line_indent) const
-        {
-            evaluate().dump(os, line_indent);
-        }
-
-        void dump(basic_json_visitor<char_type>& visitor) const
-        {
-            evaluate().dump(visitor);
-        }
-
-        template <class Container>
-        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
-        dump(Container& s,
-             const basic_json_encode_options<char_type>& options, 
-             indenting line_indent) const
-        {
-            evaluate().dump(s, options, line_indent);
-        }
-
-        void dump(std::basic_ostream<char_type>& os, 
-                  const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent) const
-        {
-            evaluate().dump(os, options, line_indent);
-        }
-
-        template <class Container>
-        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
-        dump(Container& s, 
-             indenting line_indent,
-             std::error_code& ec) const
-        {
-            evaluate().dump(s, line_indent, ec);
-        }
-
-        template <class Container>
-        typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
-        dump(Container& s,
-             const basic_json_encode_options<char_type>& options, 
-             indenting line_indent,
-             std::error_code& ec) const
-        {
-            evaluate().dump(s, options, line_indent, ec);
-        }
-
-        void dump(std::basic_ostream<char_type>& os, 
-                  const basic_json_encode_options<char_type>& options, 
-                  indenting line_indent,
-                  std::error_code& ec) const
-        {
-            evaluate().dump(os, options, line_indent, ec);
-        }
-
-        void dump(std::basic_ostream<char_type>& os, 
-                  indenting line_indent,
-                  std::error_code& ec) const
-        {
-            evaluate().dump(os, line_indent, ec);
-        }
-
-        void dump(basic_json_visitor<char_type>& visitor,
-                  std::error_code& ec) const
-        {
-            evaluate().dump(visitor, ec);
+            evaluate().dump_pretty(std::forward<Args>(args)...);
         }
 
         void swap(basic_json& val) 
@@ -1802,17 +1711,6 @@ private:
             return evaluate().as_uinteger();
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&, indenting)")
-        void dump(std::basic_ostream<char_type>& os, const basic_json_encode_options<char_type>& options, bool pprint) const
-        {
-            evaluate().dump(os,options,pprint);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, indenting)")
-        void dump(std::basic_ostream<char_type>& os, bool pprint) const
-        {
-            evaluate().dump(os, pprint);
-        }
         JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
         void write(basic_json_visitor<char_type>& visitor) const
         {
