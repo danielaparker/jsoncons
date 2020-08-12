@@ -23,7 +23,7 @@ namespace jsoncons {
         object_value
     };
 
-    enum class storage_kind : uint8_t 
+    enum class storage_type : uint8_t 
     {
         null_value = 0x00,
         bool_value = 0x01,
