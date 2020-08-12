@@ -266,5 +266,32 @@ TEST_CASE("json_const_pointer identifier tests")
         target = j3;
         CHECK(target == expected);
     }
+
+    SECTION("test2")
+    {
+        json expected = json::parse("[1,2,4,5,6,8]");
+        json target;
+        {
+            json j1(json_array_arg);
+            json j2(json_array_arg);
+            json j3(json_array_arg);
+            const json v1(json_const_pointer_arg, &source.at("reservations"));
+            flatten(v1, "instances", j1);
+
+            const json v2(json_const_pointer_arg, &j1);
+            flatten(v2, "foo", j2);
+
+            const json v3(json_const_pointer_arg, &j2);
+            flatten(v3, "bar", j3);
+
+            target = deep_copy(j3);
+        }
+        CHECK(target == expected);
+        CHECK(target.storage() == storage_kind::array_value);
+        for (const auto& item : target.array_range())
+        {
+            CHECK(item.storage() == storage_kind::uint64_value);
+        }
+    }
 }
 

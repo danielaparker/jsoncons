@@ -5582,6 +5582,37 @@ private:
         o = visitor.get_result();
         return is;
     }
+
+    friend basic_json deep_copy(const basic_json& other)
+    {
+        switch (other.storage())
+        {
+            case storage_kind::array_value:
+            {
+                basic_json j(json_array_arg, other.tag(), other.get_allocator());
+
+                for (const auto& item : other.array_range())
+                {
+                    j.push_back(deep_copy(item));
+                }
+                return j;
+            }
+            case storage_kind::object_value:
+            {
+                basic_json j(json_object_arg, other.tag(), other.get_allocator());
+
+                for (const auto& item : other.object_range())
+                {
+                    j.try_emplace(item.key(), deep_copy(item.value()));
+                }
+                return j;
+            }
+            case storage_kind::json_const_pointer:
+                return deep_copy(*(other.cast<json_const_pointer_storage>().value()));
+            default:
+                return other;
+        }
+    }
 };
 
 template <class Json>
