@@ -301,12 +301,19 @@ namespace json_type_traits_named_macro_tests
  
     enum class float_format {scientific = 1,fixed = 2,hex = 4,general = fixed | scientific};
 
+    struct Person1 
+    {
+        std::string name;
+        std::string surname;
+    };
+
 } // namespace json_type_traits_named_macro_tests
 
 namespace ns = json_type_traits_named_macro_tests;
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1a,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1b,(author,"Author"),(title,"Title"),(price,"Price"))
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Person1, 1, (name, "n"), (surname, "sn"))
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::book2a, (author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::book2b, 2, (author,"Author"),(title,"Title"),(price,"Price"), (isbn, "Isbn"), (publisher, "Publisher"))
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::book3a, (get_author,set_author,"Author"),(get_title,set_title,"Title"),(get_price,set_price,"Price"))
@@ -380,6 +387,24 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS tests 2")
         CHECK(val.author == book.author);
         CHECK(val.title == book.title);
         CHECK(val.price == Approx(book.price).epsilon(0.001));
+    }
+}
+
+TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS tests")
+{
+    SECTION("decode")
+    {
+        std::string data = R"({"n":"Rod"})";
+        auto person = jsoncons::decode_json<ns::Person1>(data);
+        CHECK(person.name == std::string("Rod"));
+        CHECK(person.surname.empty());
+
+        std::string s;
+        jsoncons::encode_json_pretty(person, s);
+
+        auto other = jsoncons::decode_json<ns::Person1>(s);
+        CHECK(other.name == person.name);
+        CHECK(other.surname == person.surname);
     }
 }
 
