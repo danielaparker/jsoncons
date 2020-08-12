@@ -1,3 +1,10 @@
+master
+------
+
+Bugs Fixed:
+
+- Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\263](https://github.com/danielaparker/jsoncons/issues/263)
+
 0.155.1
 --------
 
