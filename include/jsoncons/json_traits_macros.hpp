@@ -289,11 +289,6 @@ namespace jsoncons \
 #define JSONCONS_NAME_IS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_EXPAND(JSONCONS_NAME_IS_ Seq) 
 #define JSONCONS_NAME_IS_(Member, Name) !ajson.contains(Name)) return false;
 
-//#define JSONCONS_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-//#define JSONCONS_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 || JSONCONS_EXPAND(JSONCONS_NAME_AS_ Seq)
-//#define JSONCONS_NAME_AS_(Member, Name) ajson.contains(Name)) \
-//    {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
-
 #define JSONCONS_NAME_AS(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_NAME_AS_ Seq)
 #define JSONCONS_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_NAME_AS_ Seq)
 #define JSONCONS_NAME_AS_(Member, Name) \
