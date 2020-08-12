@@ -149,18 +149,6 @@ namespace
         std::cout << byte_string_view(buffer) << "\n\n";
     }
 
-    void binary_example()
-    {
-        json j;
-        std::vector<uint8_t> bstr = {'1', '2', '3', '4'};
-        j.try_emplace("binary", byte_string_arg, bstr); // default subtype is user defined
-        // or j.try_emplace("binary", byte_string_arg, bstr, 0x80);
-
-        std::vector<char> buffer;
-        bson::encode_bson(j, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
-    }
-
     void utf8_string_example()
     {
         json j;
@@ -208,6 +196,38 @@ namespace
     */
     }
 
+    void binary_example1()
+    {
+        json j;
+        std::vector<uint8_t> bstr = { '1', '2', '3', '4' };
+        j.try_emplace("binary", byte_string_arg, bstr); // default subtype is user defined
+        // or j.try_emplace("binary", byte_string_arg, bstr, 0x80);
+
+        std::vector<char> buffer;
+        bson::encode_bson(j, buffer);
+        std::cout << byte_string_view(buffer) << "\n\n";
+    }
+
+    void binary_example2()
+    {
+        std::vector<uint8_t> input = { 0x13,0x00,0x00,0x00, // Document has 19 bytes
+                                      0x05, // Binary data
+                                      0x70,0x44,0x00, // "pD"
+                                      0x05,0x00,0x00,0x00, // Length is 5
+                                      0x80, // Subtype is 128
+                                      0x48,0x65,0x6c,0x6c,0x6f, // 'H','e','l','l','o'
+                                      0x00 // terminating null
+        };
+
+        json j = bson::decode_bson<json>(input);
+        std::cout << "JSON:\n" << pretty_print(j) << "\n\n";
+
+        std::cout << "tag: " << j["pD"].tag() << "\n";
+        std::cout << "ext_tag: " << j["pD"].ext_tag() << "\n";
+        auto bytes = j["pD"].as<std::vector<uint8_t>>();
+        std::cout << "binary data: " << byte_string_view{ bytes } << "\n";
+    }
+
 } // namespace
 
 void bson_examples()
@@ -221,9 +241,10 @@ void bson_examples()
     int64_example();
     double_example();
     utf8_string_example();
-    binary_example();
     array_example();
     duration_example1();
+    binary_example1();
+    binary_example2();
     std::cout << std::endl;
 }
 

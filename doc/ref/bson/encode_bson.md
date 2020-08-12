@@ -180,6 +180,50 @@ Output:
 2b,00,00,00,04,61,72,72,61,79,00,1f,00,00,00,02,30,00,06,00,00,00,68,65,6c,6c,6f,00,02,31,00,06,00,00,00,77,6f,72,6c,64,00,00,00
 ```
 
+#### UTC datetime
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <iostream>
+
+int main()
+{
+    auto duration = std::chrono::system_clock::now().time_since_epoch();
+    auto time = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+
+    json j;
+    j.try_emplace("time", time);
+
+    auto milliseconds = j["time"].as<std::chrono::milliseconds>();
+    std::cout << "Time since epoch (milliseconds): " << milliseconds.count() << "\n\n";
+    auto seconds = j["time"].as<std::chrono::seconds>();
+    std::cout << "Time since epoch (seconds): " << seconds.count() << "\n\n";
+
+    std::vector<uint8_t> data;
+    bson::encode_bson(j, data);
+
+    std::cout << "BSON bytes:\n" << jsoncons::byte_string_view(data) << "\n\n";
+
+/*
+    13,00,00,00, // document has 19 bytes
+      09, // UTC datetime
+        74,69,6d,65,00, // "time"
+        ea,14,7f,96,73,01,00,00, // 1595957777642
+    00 // terminating null    
+*/
+}
+```
+Output:
+```
+Time since epoch (milliseconds): 1595957777642
+
+Time since epoch (seconds): 1595957777
+
+BSON bytes:
+13,00,00,00,09,74,69,6d,65,00,ea,14,7f,96,73,01,00,00,00
+```
+
 ### See also
 
 [decode_bson](decode_bson) decodes a [Bin­ary JSON](http://bsonspec.org/) data format to a json value.

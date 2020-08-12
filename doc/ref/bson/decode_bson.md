@@ -56,6 +56,48 @@ or support [json_type_traits](../json_type_traits.md).
 
 Throws a [ser_error](../ser_error.md) if parsing fails.
 
+### Examples
+
+#### Binary example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <iostream>
+
+int main()
+{
+    std::vector<uint8_t> input = { 0x13,0x00,0x00,0x00, // Document has 19 bytes
+                                  0x05, // Binary data
+                                  0x70,0x44,0x00, // "pD"
+                                  0x05,0x00,0x00,0x00, // Length is 5
+                                  0x80, // Subtype is 128
+                                  0x48,0x65,0x6c,0x6c,0x6f, // 'H','e','l','l','o'
+                                  0x00 // terminating null
+    };
+
+    json j = bson::decode_bson<json>(input);
+    std::cout << "JSON:\n" << pretty_print(j) << "\n\n";
+
+    std::cout << "tag: " << j["pD"].tag() << "\n";
+    std::cout << "ext_tag: " << j["pD"].ext_tag() << "\n";
+    auto bytes = j["pD"].as<std::vector<uint8_t>>();
+    std::cout << "binary data: " << byte_string_view{ bytes } << "\n";
+}
+```
+Output:
+```
+JSON:
+{
+    "pD": "SGVsbG8"
+}
+
+tag: ext
+ext_tag: 128
+binary data: 48,65,6c,6c,6f
+```
+Note that printing a json value by default encodes byte strings as base64url strings, but the json value holds the actual bytes.
+
 ### See also
 
 [encode_bson](encode_bson.md) encodes a json value to the [Bin­ary JSON](http://bsonspec.org/) data format.
