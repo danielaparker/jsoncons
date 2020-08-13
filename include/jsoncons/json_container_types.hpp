@@ -286,7 +286,7 @@ namespace jsoncons {
             {
                 value_type current = std::move(elements_.back());
                 elements_.pop_back();
-                switch (current.stored_type())
+                switch (current.storage())
                 {
                     case storage_kind::array_value:
                     {

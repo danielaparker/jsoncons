@@ -1001,9 +1001,9 @@ private:
             return evaluate().size();
         }
 
-        storage_kind stored_type() const
+        storage_kind storage() const
         {
-            return evaluate().stored_type();
+            return evaluate().storage();
         }
 
         semantic_tag tag() const
@@ -1923,7 +1923,7 @@ private:
 
     void Destroy_()
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::long_string_value:
                 destroy_var<long_string_storage>();
@@ -2112,7 +2112,7 @@ private:
     template <class TypeA>
     void swap_a(basic_json& other)
     {
-        switch (other.stored_type())
+        switch (other.storage())
         {
             case storage_kind::null_value         : swap_a_b<TypeA, null_storage>(other); break;
             case storage_kind::empty_object_value : swap_a_b<TypeA, empty_object_storage>(other); break;
@@ -2135,7 +2135,7 @@ private:
 
     void Init_(const basic_json& val)
     {
-        switch (val.stored_type())
+        switch (val.storage())
         {
             case storage_kind::null_value:
                 construct<null_storage>(val.cast<null_storage>());
@@ -2183,7 +2183,7 @@ private:
 
     void Init_(const basic_json& val, const Allocator& a)
     {
-        switch (val.stored_type())
+        switch (val.storage())
         {
             case storage_kind::null_value:
             case storage_kind::empty_object_value:
@@ -2215,7 +2215,7 @@ private:
 
     void Init_rv_(basic_json&& val) noexcept
     {
-        switch (val.stored_type())
+        switch (val.storage())
         {
             case storage_kind::null_value:
             case storage_kind::empty_object_value:
@@ -2250,7 +2250,7 @@ private:
 
     void Init_rv_(basic_json&& val, const Allocator& a, std::false_type) noexcept
     {
-        switch (val.stored_type())
+        switch (val.storage())
         {
             case storage_kind::null_value:
             case storage_kind::empty_object_value:
@@ -2361,7 +2361,7 @@ public:
         return *this;
     }
 
-    storage_kind stored_type() const
+    storage_kind storage() const
     {
         // It is legal to access 'common_stor_.storage_' even though 
         // common_stor_ is not the active member of the union because 'storage_' 
@@ -2372,7 +2372,7 @@ public:
 
     json_type type() const
     {
-        switch(stored_type())
+        switch(storage())
         {
             case storage_kind::null_value:
                 return json_type::null_value;
@@ -2410,7 +2410,7 @@ public:
         // common_stor_ is not the active member of the union because 'tag_' 
         // is a part of the common initial sequence of all union members
         // as defined in 11.4-25 of the Standard.
-        switch(stored_type())
+        switch(storage())
         {
             case storage_kind::json_const_pointer:
                 return cast<json_const_pointer_storage>().value()->tag();
@@ -2421,7 +2421,7 @@ public:
 
     std::size_t size() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 return cast<array_storage>().value().size();
@@ -2438,7 +2438,7 @@ public:
 
     string_view_type as_string_view() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
                 return string_view_type(cast<short_string_storage>().data(),cast<short_string_storage>().length());
@@ -2458,7 +2458,7 @@ public:
         converter<byte_string_type> convert;
         std::error_code ec;
 
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -2481,7 +2481,7 @@ public:
 
     byte_string_view as_byte_string_view() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::byte_string_value:
                 return byte_string_view(cast<byte_string_storage>().data(),cast<byte_string_storage>().length());
@@ -2498,10 +2498,10 @@ public:
         {
             return true;
         }
-        switch (lhs.stored_type())
+        switch (lhs.storage())
         {
             case storage_kind::json_const_pointer:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::json_const_pointer:
                         return *(lhs.cast<json_const_pointer_storage>().value()) == *(rhs.cast<json_const_pointer_storage>().value());
@@ -2510,7 +2510,7 @@ public:
                 }
                 break;
             case storage_kind::null_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::null_value:
                         return true;
@@ -2521,7 +2521,7 @@ public:
                 }
                 break;
             case storage_kind::empty_object_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::empty_object_value:
                         return true;
@@ -2534,7 +2534,7 @@ public:
                 }
                 break;
             case storage_kind::bool_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::bool_value:
                         return lhs.cast<bool_storage>().value() == rhs.cast<bool_storage>().value();
@@ -2545,7 +2545,7 @@ public:
                 }
                 break;
             case storage_kind::int64_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::int64_value:
                         return lhs.cast<int64_storage>().value() == rhs.cast<int64_storage>().value();
@@ -2562,7 +2562,7 @@ public:
                 }
                 break;
             case storage_kind::uint64_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::int64_value:
                         return rhs.cast<int64_storage>().value() >= 0 ? lhs.cast<uint64_storage>().value() == static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : false;
@@ -2579,7 +2579,7 @@ public:
                 }
                 break;
             case storage_kind::half_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::half_value:
                         return lhs.cast<half_storage>().value() == rhs.cast<half_storage>().value();
@@ -2590,7 +2590,7 @@ public:
                 }
                 break;
             case storage_kind::double_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::int64_value:
                         return lhs.cast<double_storage>().value() == static_cast<double>(rhs.cast<int64_storage>().value());
@@ -2608,7 +2608,7 @@ public:
                 break;
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::short_string_value:
                         return lhs.as_string_view() == rhs.as_string_view();
@@ -2621,7 +2621,7 @@ public:
                 }
                 break;
             case storage_kind::byte_string_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::byte_string_value:
                     {
@@ -2634,7 +2634,7 @@ public:
                 }
                 break;
             case storage_kind::array_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::array_value:
                         return lhs.cast<array_storage>().value() == rhs.cast<array_storage>().value();
@@ -2645,7 +2645,7 @@ public:
                 }
                 break;
             case storage_kind::object_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::empty_object_value:
                         return lhs.size() == 0;
@@ -2669,10 +2669,10 @@ public:
         {
             return false;
         }
-        switch (lhs.stored_type())
+        switch (lhs.storage())
         {
             case storage_kind::json_const_pointer:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::json_const_pointer:
                         return *(lhs.cast<json_const_pointer_storage>().value()) < *(rhs.cast<json_const_pointer_storage>().value());
@@ -2681,9 +2681,9 @@ public:
                 }
                 break;
             case storage_kind::null_value:
-                return (int)lhs.stored_type() < (int)rhs.stored_type();
+                return (int)lhs.storage() < (int)rhs.storage();
             case storage_kind::empty_object_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::empty_object_value:
                         return false;
@@ -2692,22 +2692,22 @@ public:
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::bool_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::bool_value:
                         return lhs.cast<bool_storage>().value() < rhs.cast<bool_storage>().value();
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::int64_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::int64_value:
                         return lhs.cast<int64_storage>().value() < rhs.cast<int64_storage>().value();
@@ -2718,11 +2718,11 @@ public:
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::uint64_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::int64_value:
                         return rhs.cast<int64_storage>().value() >= 0 ? lhs.cast<uint64_storage>().value() < static_cast<uint64_t>(rhs.cast<int64_storage>().value()) : false;
@@ -2733,11 +2733,11 @@ public:
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::double_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::int64_value:
                         return lhs.cast<double_storage>().value() < static_cast<double>(rhs.cast<int64_storage>().value());
@@ -2748,12 +2748,12 @@ public:
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::short_string_value:
                         return lhs.as_string_view() < rhs.as_string_view();
@@ -2762,11 +2762,11 @@ public:
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::byte_string_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::byte_string_value:
                     {
@@ -2775,22 +2775,22 @@ public:
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::array_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::array_value:
                         return lhs.cast<array_storage>().value() < rhs.cast<array_storage>().value();
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             case storage_kind::object_value:
-                switch (rhs.stored_type())
+                switch (rhs.storage())
                 {
                     case storage_kind::empty_object_value:
                         return false;
@@ -2799,7 +2799,7 @@ public:
                     case storage_kind::json_const_pointer:
                         return lhs < *(rhs.cast<json_const_pointer_storage>().value());
                     default:
-                        return (int)lhs.stored_type() < (int)rhs.stored_type();
+                        return (int)lhs.storage() < (int)rhs.storage();
                 }
                 break;
             default:
@@ -2835,7 +2835,7 @@ public:
             return;
         }
 
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::null_value: swap_a<null_storage>(other); break;
             case storage_kind::empty_object_value : swap_a<empty_object_storage>(other); break;
@@ -3278,7 +3278,7 @@ public:
 
     proxy_type operator[](const string_view_type& name)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value: 
             create_object_implicitly();
@@ -3560,7 +3560,7 @@ public:
 
     bool is_null() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::null_value:
                 return true;
@@ -3573,7 +3573,7 @@ public:
 
     allocator_type get_allocator() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::long_string_value:
             {
@@ -3598,7 +3598,7 @@ public:
 
     uint64_t ext_tag() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::byte_string_value:
             {
@@ -3613,7 +3613,7 @@ public:
 
     bool contains(const string_view_type& key) const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::object_value:
             {
@@ -3629,7 +3629,7 @@ public:
 
     std::size_t count(const string_view_type& key) const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::object_value:
             {
@@ -3661,7 +3661,7 @@ public:
 
     bool is_string() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -3680,7 +3680,7 @@ public:
 
     bool is_byte_string() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::byte_string_value:
                 return true;
@@ -3698,7 +3698,7 @@ public:
 
     bool is_bignum() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -3715,7 +3715,7 @@ public:
 
     bool is_bool() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::bool_value:
                 return true;
@@ -3728,7 +3728,7 @@ public:
 
     bool is_object() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
             case storage_kind::object_value:
@@ -3742,7 +3742,7 @@ public:
 
     bool is_array() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 return true;
@@ -3755,7 +3755,7 @@ public:
 
     bool is_int64() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::int64_value:
                 return true;
@@ -3770,7 +3770,7 @@ public:
 
     bool is_uint64() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::uint64_value:
                 return true;
@@ -3785,7 +3785,7 @@ public:
 
     bool is_half() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::half_value:
                 return true;
@@ -3798,7 +3798,7 @@ public:
 
     bool is_double() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::double_value:
                 return true;
@@ -3811,7 +3811,7 @@ public:
 
     bool is_number() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::int64_value:
             case storage_kind::uint64_value:
@@ -3832,7 +3832,7 @@ public:
 
     bool empty() const noexcept
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::byte_string_value:
                 return cast<byte_string_storage>().length() == 0;
@@ -3856,7 +3856,7 @@ public:
 
     std::size_t capacity() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 return array_value().capacity();
@@ -3889,7 +3889,7 @@ public:
     {
         if (n > 0)
         {
-            switch (stored_type())
+            switch (storage())
             {
                 case storage_kind::array_value:
                     array_value().reserve(n);
@@ -3913,7 +3913,7 @@ public:
 
     void resize(std::size_t n)
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 array_value().resize(n);
@@ -3926,7 +3926,7 @@ public:
     template <class T>
     void resize(std::size_t n, T val)
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 array_value().resize(n, val);
@@ -3952,7 +3952,7 @@ public:
     {
         converter<T> convert;
         std::error_code ec;
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -3994,7 +3994,7 @@ public:
 
     bool as_bool() const 
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::bool_value:
                 return cast<bool_storage>().value();
@@ -4016,7 +4016,7 @@ public:
     >
     T as_integer() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -4047,7 +4047,7 @@ public:
 
     double as_double() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -4084,7 +4084,7 @@ public:
 
         converter<string_type> convert;
         std::error_code ec;
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -4123,7 +4123,7 @@ public:
 
     const char_type* as_cstring() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
                 return cast<short_string_storage>().c_str();
@@ -4138,7 +4138,7 @@ public:
 
     basic_json& at(const string_view_type& name)
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
                 JSONCONS_THROW(key_not_found(name.data(),name.length()));
@@ -4160,7 +4160,7 @@ public:
 
     const basic_json& at(const string_view_type& key) const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
                 JSONCONS_THROW(key_not_found(key.data(),key.length()));
@@ -4184,7 +4184,7 @@ public:
 
     basic_json& at(std::size_t i)
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 if (i >= array_value().size())
@@ -4201,7 +4201,7 @@ public:
 
     const basic_json& at(std::size_t i) const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 if (i >= array_value().size())
@@ -4220,7 +4220,7 @@ public:
 
     object_iterator find(const string_view_type& name)
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
                 return object_range().end();
@@ -4235,7 +4235,7 @@ public:
 
     const_object_iterator find(const string_view_type& key) const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
                 return object_range().end();
@@ -4252,7 +4252,7 @@ public:
 
     const basic_json& at_or_null(const string_view_type& key) const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::null_value:
             case storage_kind::empty_object_value:
@@ -4287,7 +4287,7 @@ public:
                       "get_value_or: T must be copy constructible");
         static_assert(std::is_convertible<U&&, T>::value,
                       "get_value_or: U must be convertible to T");
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::null_value:
             case storage_kind::empty_object_value:
@@ -4319,7 +4319,7 @@ public:
 
     void shrink_to_fit()
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             array_value().shrink_to_fit();
@@ -4334,7 +4334,7 @@ public:
 
     void clear()
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             array_value().clear();
@@ -4349,7 +4349,7 @@ public:
 
     void erase(const_object_iterator pos)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             break;
@@ -4364,7 +4364,7 @@ public:
 
     void erase(const_object_iterator first, const_object_iterator last)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             break;
@@ -4379,7 +4379,7 @@ public:
 
     void erase(const_array_iterator pos)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             array_value().erase(pos);
@@ -4392,7 +4392,7 @@ public:
 
     void erase(const_array_iterator first, const_array_iterator last)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             array_value().erase(first, last);
@@ -4407,7 +4407,7 @@ public:
 
     void erase(const string_view_type& name)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             break;
@@ -4423,7 +4423,7 @@ public:
     template <class T>
     std::pair<object_iterator,bool> insert_or_assign(const string_view_type& name, T&& val)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4443,7 +4443,7 @@ public:
     template <class ... Args>
     std::pair<object_iterator,bool> try_emplace(const string_view_type& name, Args&&... args)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4464,7 +4464,7 @@ public:
 
     void merge(const basic_json& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4481,7 +4481,7 @@ public:
 
     void merge(basic_json&& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4498,7 +4498,7 @@ public:
 
     void merge(object_iterator hint, const basic_json& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4515,7 +4515,7 @@ public:
 
     void merge(object_iterator hint, basic_json&& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4534,7 +4534,7 @@ public:
 
     void merge_or_update(const basic_json& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4551,7 +4551,7 @@ public:
 
     void merge_or_update(basic_json&& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4568,7 +4568,7 @@ public:
 
     void merge_or_update(object_iterator hint, const basic_json& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4585,7 +4585,7 @@ public:
 
     void merge_or_update(object_iterator hint, basic_json&& source)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4603,7 +4603,7 @@ public:
     template <class T>
     object_iterator insert_or_assign(object_iterator hint, const string_view_type& name, T&& val)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4620,7 +4620,7 @@ public:
     template <class ... Args>
     object_iterator try_emplace(object_iterator hint, const string_view_type& name, Args&&... args)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             create_object_implicitly();
@@ -4637,7 +4637,7 @@ public:
     template <class T>
     array_iterator insert(const_array_iterator pos, T&& val)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             return array_value().insert(pos, std::forward<T>(val));
@@ -4652,7 +4652,7 @@ public:
     template <class InputIt>
     array_iterator insert(const_array_iterator pos, InputIt first, InputIt last)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             return array_value().insert(pos, first, last);
@@ -4667,7 +4667,7 @@ public:
     template <class InputIt>
     void insert(InputIt first, InputIt last)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
         case storage_kind::object_value:
@@ -4683,7 +4683,7 @@ public:
     template <class InputIt>
     void insert(sorted_unique_range_tag tag, InputIt first, InputIt last)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
         case storage_kind::object_value:
@@ -4699,7 +4699,7 @@ public:
     template <class... Args> 
     array_iterator emplace(const_array_iterator pos, Args&&... args)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             return array_value().emplace(pos, std::forward<Args>(args)...);
@@ -4714,7 +4714,7 @@ public:
     template <class... Args> 
     basic_json& emplace_back(Args&&... args)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             return array_value().emplace_back(std::forward<Args>(args)...);
@@ -4733,7 +4733,7 @@ public:
     template <class T>
     void push_back(T&& val)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             array_value().push_back(std::forward<T>(val));
@@ -4748,7 +4748,7 @@ public:
     template<class T>
     T get_with_default(const string_view_type& key, const T& default_value) const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::null_value:
             case storage_kind::empty_object_value:
@@ -4779,7 +4779,7 @@ public:
     template<class T = std::basic_string<char_type>>
     T get_with_default(const string_view_type& key, const char_type* default_value) const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::null_value:
             case storage_kind::empty_object_value:
@@ -5029,7 +5029,7 @@ public:
     JSONCONS_DEPRECATED_MSG("No replacement")
     std::size_t precision() const
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::double_value:
             return 0;
@@ -5041,7 +5041,7 @@ public:
     JSONCONS_DEPRECATED_MSG("No replacement")
     std::size_t decimal_places() const
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::double_value:
             return 0;
@@ -5089,7 +5089,7 @@ public:
     JSONCONS_DEPRECATED_MSG("No replacement")
     std::size_t double_precision() const
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::double_value:
             return 0;
@@ -5203,7 +5203,7 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use get_with_default(const string_view_type&, T&&)")
     basic_json get(const string_view_type& name, T&& default_value) const
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             {
@@ -5233,7 +5233,7 @@ public:
     {
         static const basic_json a_null = null_type();
 
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             return a_null;
@@ -5306,7 +5306,7 @@ public:
     JSONCONS_DEPRECATED_MSG("Instead, use erase(const_object_iterator, const_object_iterator)")
     void remove_range(std::size_t from_index, std::size_t to_index)
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             array_value().remove_range(from_index, to_index);
@@ -5364,16 +5364,16 @@ public:
         return array_range();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use stored_type()")
+    JSONCONS_DEPRECATED_MSG("Instead, use storage()")
     storage_kind get_stor_type() const
     {
-        return stored_type();
+        return storage();
     }
 #endif
 
     range<object_iterator, const_object_iterator> object_range()
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::empty_object_value:
             return range<object_iterator, const_object_iterator>(object_iterator(), object_iterator());
@@ -5387,7 +5387,7 @@ public:
 
     range<const_object_iterator, const_object_iterator> object_range() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
                 return range<const_object_iterator, const_object_iterator>(const_object_iterator(), const_object_iterator());
@@ -5403,7 +5403,7 @@ public:
 
     range<array_iterator, const_array_iterator> array_range()
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 return range<array_iterator, const_array_iterator>(array_value().begin(),array_value().end());
@@ -5414,7 +5414,7 @@ public:
 
     range<const_array_iterator, const_array_iterator> array_range() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 return range<const_array_iterator, const_array_iterator>(array_value().begin(),array_value().end());
@@ -5427,7 +5427,7 @@ public:
 
     array& array_value() 
     {
-        switch (stored_type())
+        switch (storage())
         {
         case storage_kind::array_value:
             return cast<array_storage>().value();
@@ -5439,7 +5439,7 @@ public:
 
     const array& array_value() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::array_value:
                 return cast<array_storage>().value();
@@ -5453,7 +5453,7 @@ public:
 
     object& object_value()
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
                 create_object_implicitly();
@@ -5468,7 +5468,7 @@ public:
 
     const object& object_value() const
     {
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::empty_object_value:
                 const_cast<basic_json*>(this)->create_object_implicitly(); // HERE
@@ -5488,7 +5488,7 @@ private:
     void dump_noflush(basic_json_visitor<char_type>& visitor, std::error_code& ec) const
     {
         const ser_context context{};
-        switch (stored_type())
+        switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
@@ -5585,7 +5585,7 @@ private:
 
     friend basic_json deep_copy(const basic_json& other)
     {
-        switch (other.stored_type())
+        switch (other.storage())
         {
             case storage_kind::array_value:
             {

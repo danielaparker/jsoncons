@@ -114,7 +114,7 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, storage_kind stored_type)
+    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, storage_kind storage)
     {
         JSONCONS_CSTRING(CharT,null_value,'n','u','l','l')
         JSONCONS_CSTRING(CharT,bool_value,'b','o','o','l')
@@ -130,7 +130,7 @@ namespace jsoncons {
         JSONCONS_CSTRING(CharT,object_value,'o','b','j','e','c','t')
         JSONCONS_CSTRING(CharT,json_const_pointer,'j','s','o','n',' ','c','o','n','s','t',' ','p','o','i','n','t','e','r')
 
-        switch (stored_type)
+        switch (storage)
         {
             case storage_kind::null_value:
             {

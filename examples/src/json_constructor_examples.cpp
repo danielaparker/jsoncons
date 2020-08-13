@@ -103,7 +103,7 @@ namespace {
 
         for (const auto& item : view.array_range())
         {
-            std::cout << item.type() << ", " << item.stored_type() << "\n";
+            std::cout << item.type() << ", " << item.storage() << "\n";
         }
 
         json doc2 = deep_copy(view);
@@ -112,7 +112,7 @@ namespace {
 
         for (const auto& item : doc2.array_range())
         {
-            std::cout << item.type() << ", " << item.stored_type() << "\n";
+            std::cout << item.type() << ", " << item.storage() << "\n";
         }
     }
 }
