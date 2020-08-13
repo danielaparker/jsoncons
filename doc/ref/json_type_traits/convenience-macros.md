@@ -257,13 +257,8 @@ namespace ns {
     };
 } // namespace ns
 
-```c++
 JSONCONS_N_MEMBER_TRAITS(ns::book, author, title, price)
-```
 
-which expands to the code above.
-
-```c++
 using namespace jsoncons; // for convenience
 
 int main()
