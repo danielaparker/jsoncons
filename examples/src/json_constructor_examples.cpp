@@ -88,34 +88,35 @@ namespace {
         }        
         )";
 
-        json doc = json::parse(input);
+        json j = json::parse(input);
 
-        json view(json_array_arg);
-        for (const auto& item : doc.at("machines").array_range())
+        json j_v(json_array_arg);
+        for (const auto& item : j.at("machines").array_range())
         {
             if (item.at("state").as<std::string>() == "running")
             {
-                view.emplace_back(json_const_pointer_arg, std::addressof(item));
+                j_v.emplace_back(json_const_pointer_arg, &item);
             }
         }
 
-        std::cout << pretty_print(view) << "\n\n";
+        std::cout << "\n(1)\n" << pretty_print(j_v) << "\n\n";
 
-        for (const auto& item : view.array_range())
+        for (const auto& item : j_v.array_range())
         {
-            std::cout << item.type() << ", " << item.storage() << "\n";
+            std::cout << "json type: " << item.type() << ", storage kind: " << item.storage() << "\n";
         }
 
-        json doc2 = deep_copy(view);
+        json j2 = deep_copy(j_v);
 
-        std::cout << pretty_print(doc2) << "\n\n";
+        std::cout << "\n(2)\n" << pretty_print(j2) << "\n\n";
 
-        for (const auto& item : doc2.array_range())
+        for (const auto& item : j2.array_range())
         {
-            std::cout << item.type() << ", " << item.storage() << "\n";
+            std::cout << "json type: " << item.type() << ", storage kind: " << item.storage() << "\n";
         }
     }
-}
+
+} // namespace
 
 void json_constructor_examples()
 {   

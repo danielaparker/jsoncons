@@ -4,10 +4,10 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-void add(J& target, const typename J::string_view_type& path, const J& value); // (1)
+void add(J& target, const typename J::string_view_type& path, const J& value); (1)
 
 template<class J>
-void add(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); // (2)
+void add(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); (2)
 ```
 
 Inserts a value into the target at the specified path, or if the path specifies an object member that already has the same key, assigns the new value to that member

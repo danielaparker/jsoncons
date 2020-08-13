@@ -37,29 +37,29 @@ wcsv_cursor    |basic_csv_cursor<wchar_t>
     basic_csv_cursor(Source&& source, 
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
-                     const Allocator& alloc = Allocator()); // (1)
+                     const Allocator& alloc = Allocator()); (1)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
-                     std::error_code& ec); // (2)
+                     std::error_code& ec); (2)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      const basic_csv_decode_options<CharT>& options,
-                     std::error_code& ec); // (3)
+                     std::error_code& ec); (3)
 
     template <class Source>
     basic_csv_cursor(Source&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec); // (4)
+                     std::error_code& ec); (4)
 
     template <class Source>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
                      Source&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
-                     std::error_code& ec); // (5)
+                     std::error_code& ec); (5)
 
 Constructors (1) reads from a character sequence or stream and throws a 
 [ser_error](../ser_error.md) if a parsing error is encountered while processing the initial event.

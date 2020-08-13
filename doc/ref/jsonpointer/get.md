@@ -6,16 +6,16 @@ Selects a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-J& get(J& root, const typename J::string_view_type& path); // (1)
+J& get(J& root, const typename J::string_view_type& path); (1)
 
 template<class J>
-const J& get(const J& root, const typename J::string_view_type& path); // (2)
+const J& get(const J& root, const typename J::string_view_type& path); (2)
 
 template<class J>
-J& get(J& root, const typename J::string_view_type& path, std::error_code& ec); // (3)
+J& get(J& root, const typename J::string_view_type& path, std::error_code& ec); (3)
 
 template<class J>
-const J& get(const J& root, const typename J::string_view_type& path, std::error_code& ec); // (4)
+const J& get(const J& root, const typename J::string_view_type& path, std::error_code& ec); (4)
 ```
 
 #### Return value

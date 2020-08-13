@@ -9,9 +9,9 @@ class jmespath_expression
 
 #### Member functions
 
-    Json evaluate(reference doc); // (1)
+    Json evaluate(reference doc); (1)
 
-    Json evaluate(reference doc, std::error_code& ec); // (2)
+    Json evaluate(reference doc, std::error_code& ec); (2)
 
 #### Parameters
 
@@ -34,7 +34,7 @@ class jmespath_expression
 
 #### Static functions
 
-    static jmespath_expression compile(const string_view_type& expr); // (1)
+    static jmespath_expression compile(const string_view_type& expr); (1)
 
     static jmespath_expression compile(const string_view_type& expr,
                                        std::error_code& ec); //(2)

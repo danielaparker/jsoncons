@@ -6,10 +6,10 @@ Adds a `json` value.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-void insert(J& target, const typename J::string_view_type& path, const J& value); // (1) 
+void insert(J& target, const typename J::string_view_type& path, const J& value); (1) 
 
 template<class J>
-void insert(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); // (2) 
+void insert(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); (2) 
 ```
 
 Inserts a value into the target at the specified path, if the path doesn't specify an object member that already has the same key.

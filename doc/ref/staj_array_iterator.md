@@ -29,12 +29,12 @@ Member type                         |Definition
 
 #### Constructors
 
-    staj_array_iterator() noexcept; // (1)
+    staj_array_iterator() noexcept; (1)
 
-    staj_array_iterator(staj_array_view<T, Json>& view); // (2)
+    staj_array_iterator(staj_array_view<T, Json>& view); (2)
 
     staj_array_iterator(staj_array_view<T, Json>& view,
-                        std::error_code& ec); // (3)
+                        std::error_code& ec); (3)
 
 (1) Constructs the end iterator
 

@@ -36,47 +36,47 @@ string_view_type           |
 
     template <class Source>
     explicit basic_json_reader(Source&& source, 
-                               const TempAllocator& alloc = TempAllocator()); // (1)
+                               const TempAllocator& alloc = TempAllocator()); (1)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       const basic_json_options<CharT>& options, 
-                      const TempAllocator& alloc = TempAllocator()); // (2)
+                      const TempAllocator& alloc = TempAllocator()); (2)
 
     template <class Source>
     basic_json_reader(Source&& source,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& alloc = TempAllocator()); // (3)
+                      const TempAllocator& alloc = TempAllocator()); (3)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& alloc = TempAllocator()); // (4)
+                      const TempAllocator& alloc = TempAllocator()); (4)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       basic_json_visitor<CharT>& visitor, 
-                      const TempAllocator& alloc = TempAllocator()); // (5)
+                      const TempAllocator& alloc = TempAllocator()); (5)
 
     template <class Source>
     basic_json_reader(Source&& source, 
                       basic_json_visitor<CharT>& visitor,
                       const basic_json_options<CharT>& options, 
-                      const TempAllocator& alloc = TempAllocator()); // (6)
+                      const TempAllocator& alloc = TempAllocator()); (6)
 
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_visitor<CharT>& visitor,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& alloc = TempAllocator()); // (7)
+                      const TempAllocator& alloc = TempAllocator()); (7)
 
     template <class Source>
     basic_json_reader(Source&& source,
                       basic_json_visitor<CharT>& visitor, 
                       const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
-                      const TempAllocator& alloc = TempAllocator()); // (8)
+                      const TempAllocator& alloc = TempAllocator()); (8)
 
 Constructors (1)-(4) use a default [basic_json_visitor](basic_json_visitor.md) that discards the JSON parse events, and are for validation only.
 
@@ -130,8 +130,8 @@ from `source`, `source` is dispatched immediately to the parser. Otherwise, the 
     bool eof() const
 Returns `true` when there are no more JSON texts to be read from the stream, `false` otherwise
 
-    void read(); // (1)
-    void read(std::error_code& ec); // (2)
+    void read(); (1)
+    void read(std::error_code& ec); (2)
 Reads the next JSON text from the stream and reports JSON events to a [basic_json_visitor](basic_json_visitor.md), such as a [json_decoder](json_decoder.md).
 Override (1) throws if parsing fails, or there are any unconsumed non-whitespace characters left in the input.
 Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails or if there are any unconsumed non-whitespace characters left in the input.
@@ -142,8 +142,8 @@ Reads the next JSON text from the stream and reports JSON events to a [basic_jso
 Override (1) throws [ser_error](ser_error.md) if parsing fails.
 Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
-    void check_done(); // (1)
-    void check_done(std::error_code& ec); // (2)
+    void check_done(); (1)
+    void check_done(std::error_code& ec); (2)
 Override (1) throws if there are any unconsumed non-whitespace characters in the input.
 Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if there are any unconsumed non-whitespace characters left in the input.
 

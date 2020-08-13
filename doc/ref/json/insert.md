@@ -2,10 +2,10 @@
 
 ```c++
 template <class T>
-array_iterator insert(const_array_iterator pos, T&& val); // (1)
+array_iterator insert(const_array_iterator pos, T&& val); (1)
 
 template <class InputIt>
-array_iterator insert(const_array_iterator pos, InputIt first, InputIt last); // (2)
+array_iterator insert(const_array_iterator pos, InputIt first, InputIt last); (2)
 ```
 (1) Adds a new json element at the specified position of a json array, shifting all elements currently at or above that position to the right.
 The argument `val` is forwarded to the `json` constructor as `std::forward<T>(val)`.
@@ -16,7 +16,7 @@ Throws `std::domain_error` if not an array.
 
 ```
 template <class InputIt>
-void insert(InputIt first, InputIt last); // (3)
+void insert(InputIt first, InputIt last); (3)
 ```
 
 (3) Inserts elements from range `[first, last)` into a json object. 

@@ -6,10 +6,10 @@ Removes a `json` element.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class J>
-void remove(J& target, const typename J::string_view_type& path); // (1)
+void remove(J& target, const typename J::string_view_type& path); (1)
 
 template<class J>
-void remove(J& target, const typename J::string_view_type& path, std::error_code& ec); // (2)
+void remove(J& target, const typename J::string_view_type& path, std::error_code& ec); (2)
 ```
 
 Removes the value at the location specifed by `path`.

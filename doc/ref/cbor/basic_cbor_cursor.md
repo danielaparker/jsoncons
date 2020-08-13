@@ -35,22 +35,22 @@ cbor_bytes_cursor   |basic_cbor_cursor<jsoncons::bytes_source>
 
     basic_cbor_cursor(Source&& source,
                       const cbor_decode_options& options = cbor_decode_options(),
-                      const Allocator& alloc = Allocator()); // (1)
+                      const Allocator& alloc = Allocator()); (1)
 
     template <class Source>
     basic_cbor_cursor(Source&& source, 
-                      std::error_code& ec); // (2)
+                      std::error_code& ec); (2)
 
     template <class Source>
     basic_cbor_cursor(Source&& source, 
                       const cbor_decode_options& options,
-                      std::error_code& ec); // (3)
+                      std::error_code& ec); (3)
 
     template <class Source>
     basic_cbor_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source,
                       const cbor_decode_options& options,
-                      std::error_code& ec); // (4)
+                      std::error_code& ec); (4)
 
 Constructors (1) reads from a buffer or stream source and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.

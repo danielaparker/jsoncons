@@ -7,16 +7,16 @@ Encodes a C++ data structure to the [Universal Binary JSON Specification (UBJSON
 
 template<class T>
 void encode_ubjson(const T& jval, std::vector<uint8_t>& v,
-                   const ubjson_decode_options& options = ubjson_decode_options()); // (1) (until v0.152.0)
+                   const ubjson_decode_options& options = ubjson_decode_options()); (1) (until v0.152.0)
 
 template<class T, class Container>
 void encode_ubjson(const T& jval, Container& v,
-                   const ubjson_decode_options& options = ubjson_decode_options()); // (1) (since v0.152.0)
+                   const ubjson_decode_options& options = ubjson_decode_options()); (1) (since v0.152.0)
 
 template<class T>
 void encode_ubjson(const T& jval, 
                    std::ostream& os,
-                   const bson_decode_options& options = bson_decode_options()); // (2)
+                   const bson_decode_options& options = bson_decode_options()); (2)
 ```
 
 (1) Writes a value of type T into a byte container in the UBJSON data format, using the specified (or defaulted) [options](ubjson_options.md).

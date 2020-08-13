@@ -2,12 +2,12 @@
 
 ```c++
 basic_json& operator=(const basic_json& rhs);
-basic_json& operator=(basic_json&& rhs) noexcept; // (1)
+basic_json& operator=(basic_json&& rhs) noexcept; (1)
 
 template <class T>
-basic_json& operator=(const T& rhs); // (2)
+basic_json& operator=(const T& rhs); (2)
 
-basic_json& operator=(const char_type* rhs); // (3)
+basic_json& operator=(const char_type* rhs); (3)
 ```
 
 (1) Assigns a new `json` value to a `json` variable, replacing it's current contents.

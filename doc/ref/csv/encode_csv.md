@@ -9,12 +9,12 @@ template <class T,class Container>
 void encode_csv(const T& val, 
                 Container& s, 
                 const basic_csv_encode_options<Container::value_type>& options = 
-                    basic_csv_encode_options<Container::value_type>()); // (1)
+                    basic_csv_encode_options<Container::value_type>()); (1)
 
 template <class T, class CharT>
 void encode_csv(const T& val, 
                 std::basic_ostream<CharT>& os, 
-                const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>()); // (2)
+                const basic_csv_encode_options<CharT>& options = basic_csv_encode_options<CharT>()); (2)
 ```
 
 (1) Writes a value of type T into a character container in the CSV data format, using the specified (or defaulted) [options](basic_csv_options.md). 

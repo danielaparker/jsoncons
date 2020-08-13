@@ -4,36 +4,36 @@
 template <Container>
 void dump(Container& s,
           const basic_json_encode_options<char_type>& options 
-              = basic_json_encode_options<char_type>()) const; // (1)
+              = basic_json_encode_options<char_type>()) const; (1)
 
 void dump(std::basic_ostream<char_type>& os, 
           const basic_json_encode_options<char_type>& options 
-              = basic_json_encode_options<char_type>()) const; // (2)
+              = basic_json_encode_options<char_type>()) const; (2)
 
 template <Container>
 void dump_pretty(Container& s,
                  const basic_json_encode_options<char_type>& options 
-                     = basic_json_encode_options<char_type>()) const; // (3)
+                     = basic_json_encode_options<char_type>()) const; (3)
 
 void dump_pretty(std::basic_ostream<char_type>& os, 
                  const basic_json_encode_options<char_type>& options 
-                     = basic_json_encode_options<char_type>()) const; // (4)
+                     = basic_json_encode_options<char_type>()) const; (4)
 
-void dump(basic_json_visitor<char_type>& visitor) const; // (5)
+void dump(basic_json_visitor<char_type>& visitor) const; (5)
 
 template <Container>
-void dump(Container& s, indenting line_indent) const; // (6)
+void dump(Container& s, indenting line_indent) const; (6)
 
 template <Container>
 void dump(Container& s,
           const basic_json_encode_options<char_type>& options, 
-          indenting line_indent) const; // (7)
+          indenting line_indent) const; (7)
 
-void dump(std::basic_ostream<char_type>& os, indenting line_indent) const; // (13)
+void dump(std::basic_ostream<char_type>& os, indenting line_indent) const; (13)
 
 void dump(std::basic_ostream<char_type>& os, 
           const basic_json_encode_options<char_type>& options, 
-          indenting line_indent) const; // (8)
+          indenting line_indent) const; (8)
 )
 ```
 

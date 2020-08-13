@@ -1,15 +1,15 @@
 ### jsoncons::basic_json::at
 
 ```c++
-basic_json& at(const string_view_type& name); // (1)
+basic_json& at(const string_view_type& name); (1)
 
-const basic_json& at(const string_view_type& name) const; // (2)
+const basic_json& at(const string_view_type& name) const; (2)
 
-const basic_json& at_or_null(const string_view_type& name) const; // (3)
+const basic_json& at_or_null(const string_view_type& name) const; (3)
 
-basic_json& at(std::size_t i); // (4)
+basic_json& at(std::size_t i); (4)
 
-const basic_json& at(std::size_t i) const; // (5)
+const basic_json& at(std::size_t i) const; (5)
 ```
 
 (1)-(2) return a reference to the value with the specifed name in a 

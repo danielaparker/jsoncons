@@ -5,34 +5,34 @@
 
 template<class T>
 T decode_msgpack(const std::vector<uint8_t>& source,
-                 const msgpack_decode_options& options = msgpack_decode_options()); // (1) (until v0.152.0)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (until v0.152.0)
 
 template<class T, class Source>
 T decode_msgpack(const Source& source,
-                 const msgpack_decode_options& options = msgpack_decode_options()); // (1) (since v0.152.0)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (since v0.152.0)
 
 template<class T>
 T decode_msgpack(std::istream& is,
-                 const msgpack_decode_options& options = msgpack_decode_options()); // (2)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (2)
 
 template<class T, class InputIt>
 T decode_msgpack(InputIt first, InputIt last,
-                 const msgpack_decode_options& options = msgpack_decode_options()); // (3) (since v0.153.0)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (3) (since v0.153.0)
 
 template<class T,class TempAllocator>
 T decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                  const std::vector<uint8_t>& source,
-                 const msgpack_decode_options& options = msgpack_decode_options()); // (4) (until v0.152.0)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (4) (until v0.152.0)
 
 template<class T, class Source, class TempAllocator>
 T decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                  const Source& source,
-                 const msgpack_decode_options& options = msgpack_decode_options()); // (4) (since v0.152.0)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (4) (since v0.152.0)
 
 template<class T,class TempAllocator>
 T decode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                  std::istream& is,
-                 const msgpack_decode_options& options = msgpack_decode_options()); // (5)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (5)
 ```
 
 Decodes a [MessagePack](http://msgpack.org/index.html) data format into a C++ data structure.

@@ -4,10 +4,10 @@
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 
 template <class Json>
-void apply_patch(Json& target, const Json& patch); // (1)
+void apply_patch(Json& target, const Json& patch); (1)
 
 template <class Json>
-void apply_patch(Json& target, const Json& patch, std::error_code& ec); // (2)
+void apply_patch(Json& target, const Json& patch, std::error_code& ec); (2)
 ```
 
 Applies a patch to a `json` document.

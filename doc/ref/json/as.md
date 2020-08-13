@@ -2,10 +2,10 @@
 
 ```c++
 template <class T>
-T as() const; // (1)
+T as() const; (1)
 
 template <class T>
-T as(byte_string_arg_t, semantic_tag hint) const; // (2)
+T as(byte_string_arg_t, semantic_tag hint) const; (2)
 ```
 
 (1) Generic get `as` type `T`. Attempts to convert the json value to the template value type using [json_type_traits](../json_type_traits.md).

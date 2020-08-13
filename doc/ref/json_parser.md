@@ -35,14 +35,14 @@ and by the pull parser [basic_json_cursor](basic_json_cursor.md).
 
 #### Constructors
 
-    json_parser(); // (1)
+    json_parser(); (1)
 
-    json_parser(const json_decode_options& options); // (2)
+    json_parser(const json_decode_options& options); (2)
 
-    json_parser(std::function<bool(json_errc,const ser_context&)> err_handler); // (3)
+    json_parser(std::function<bool(json_errc,const ser_context&)> err_handler); (3)
 
     json_parser(const json_decode_options& options, 
-                std::function<bool(json_errc,const ser_context&)> err_handler); // (4)
+                std::function<bool(json_errc,const ser_context&)> err_handler); (4)
 
 (1) Constructs a `json_parser` that uses default [basic_json_options](basic_json_options.md)
 and a default [parse_error_handler](parse_error_handler.md).
@@ -192,7 +192,7 @@ int main()
 
         parser.check_done(); // Checks if there are any unconsumed 
                              // non-whitespace characters in the input
-                             // (there are)
+                             (there are)
     }
     catch (const ser_error& e)
     {

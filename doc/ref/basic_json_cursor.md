@@ -37,29 +37,29 @@ wjson_cursor    |`basic_json_cursor<wchar_t>`
     basic_json_cursor(Source&& source, 
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
-                      const Allocator& alloc = Allocator()); // (1)
+                      const Allocator& alloc = Allocator()); (1)
 
     template <class Source>
     basic_json_cursor(Source&& source, 
-                      std::error_code& ec); // (2)
+                      std::error_code& ec); (2)
 
     template <class Source>
     basic_json_cursor(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec) // (3)
+                      std::error_code& ec); (3)
 
     template <class Source>
     basic_json_cursor(Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec) // (4)
+                      std::error_code& ec); (4)
 
     template <class Source>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
                       Source&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec); // (5)
+                      std::error_code& ec); (5)
 
 Constructor (1) reads from a character sequence or stream and throws a 
 [ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.

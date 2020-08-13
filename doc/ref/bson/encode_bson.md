@@ -7,15 +7,15 @@ Encodes a C++ data structure to the [Binary JSON (BSON)](http://bsonspec.org/) d
 
 template<class T>
 void encode_bson(const T& jval, std::vector<uint8_t>& v,
-                 const bson_decode_options& options = bson_decode_options()); // (1) (until v0.152.0)
+                 const bson_decode_options& options = bson_decode_options()); (1) (until v0.152.0)
 
 template<class T, class Container>
 void encode_bson(const T& jval, Container& v,
-                 const bson_decode_options& options = bson_decode_options()); // (1) (since v0.152.0)
+                 const bson_decode_options& options = bson_decode_options()); (1) (since v0.152.0)
 
 template<class T>
 void encode_bson(const T& jval, std::ostream& os,
-                 const bson_decode_options& options = bson_decode_options()); // (2)
+                 const bson_decode_options& options = bson_decode_options()); (2)
 ```
 
 (1) Writes a value of type T into a byte container in the BSON data format, using the specified (or defaulted) [options](bson_options.md). 

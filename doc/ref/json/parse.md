@@ -4,34 +4,34 @@
 template <class Source>
 static parse(const Source& s, 
              const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-             std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (1)
+             std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (1)
 
 template <class Source>
 static basic_json parse(const Source& s, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (2)
+                        std::function<bool(json_errc,const ser_context&)> err_handler); (2)
 
 static basic_json parse(const char_type* s, 
                         const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (3)
+                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (3)
 
 static basic_json parse(const char_type* s, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (4)
+                        std::function<bool(json_errc,const ser_context&)> err_handler); (4)
 
 static basic_json parse(std::basic_istream<char_type>& is, 
                         const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (5)
+                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (5)
               
 static basic_json parse(std::istream& is, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (6)
+                        std::function<bool(json_errc,const ser_context&)> err_handler); (6)
 
 template <class InputIt>
 static basic_json parse(InputIt first, InputIt last, 
                         const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); // (7) (since v0.153.0)
+                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (7) (since v0.153.0)
               
 template <class InputIt>
 static basic_json parse(InputIt first, InputIt last, 
-                        std::function<bool(json_errc,const ser_context&)> err_handler); // (8)
+                        std::function<bool(json_errc,const ser_context&)> err_handler); (8)
 ```
 (1) - (2) Parses JSON data from a contiguous character sequence provided by `s` and returns a `basic_json` value. 
 Throws a [ser_error](../ser_error.md) if parsing fails.

@@ -2,29 +2,29 @@
 
 ```c++
 template <class T, class... Args>
-bool is(Args&&... args) const noexcept; // (1)
+bool is(Args&&... args) const noexcept; (1)
 
-bool is_null() const noexcept; // (2)
+bool is_null() const noexcept; (2)
 
-bool is_string() const noexcept; // (3)
+bool is_string() const noexcept; (3)
 
-bool is_int64() const noexcept; // (4)
+bool is_int64() const noexcept; (4)
 
-bool is_uint64() const noexcept; // (5)
+bool is_uint64() const noexcept; (5)
 
-bool is_double() const noexcept; // (6)
+bool is_double() const noexcept; (6)
 
-bool is_number() const noexcept; // (7)
+bool is_number() const noexcept; (7)
 
-bool is_bool() const noexcept; // (8)
+bool is_bool() const noexcept; (8)
 
-bool is_byte_string() const; // (9)
+bool is_byte_string() const; (9)
 
-bool is_bignum() const; // (10)
+bool is_bignum() const; (10)
 
-bool is_array() const noexcept; // (11)
+bool is_array() const noexcept; (11)
 
-bool is_object() const noexcept; // (12)
+bool is_object() const noexcept; (12)
 ```
 
 (1) Generic `is` equivalent to type `T`. Returns `true` if the json value is the same as type `T` according to [json_type_traits](../json_type_traits.md), `false` otherwise.  

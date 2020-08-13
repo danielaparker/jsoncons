@@ -30,12 +30,12 @@ Member type                         |Definition
 
 #### Constructors
 
-    staj_object_iterator() noexcept; // (1)
+    staj_object_iterator() noexcept; (1)
 
-    staj_object_iterator(staj_object_view<Key, T, Json>& view); // (2)
+    staj_object_iterator(staj_object_view<Key, T, Json>& view); (2)
 
     staj_object_iterator(staj_object_view<Key, T, Json>& view,
-                         std::error_code& ec);  // (3)
+                         std::error_code& ec);  (3)
 
 (1) Constructs the end iterator
 

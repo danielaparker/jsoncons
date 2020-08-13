@@ -52,6 +52,7 @@
 [Merge two json objects](#C5)  
 [Construct a json byte string](#C6)  
 [Construct a multidimensional json array](#C7)  
+[Construct a json array that contains non-owning references to other json values (since 0.156.0)](#C8)
 
 ### Access
 
@@ -2684,6 +2685,87 @@ Output:
         [23.0,24.0]
     ]
 ]
+```
+<div id="C8"/>
+
+#### Construct a json array that contains non-owning references to other json values (since 0.156.0)
+
+```c++
+#include <jsoncons/json.hpp>
+#include <iostream>
+
+int main()
+{
+    std::string input = R"(
+    {
+      "machines": [
+        {"id": 1, "state": "running"},
+        {"id": 2, "state": "stopped"},
+        {"id": 3, "state": "running"}
+      ]
+    }        
+    )";
+
+    json j = json::parse(input);
+
+    json j_v(json_array_arg);
+    for (const auto& item : j.at("machines").array_range())
+    {
+        if (item.at("state").as<std::string>() == "running")
+        {
+            j_v.emplace_back(json_const_pointer_arg, &item);
+        }
+    }
+
+    std::cout << "\n(1)\n" << pretty_print(j_v) << "\n\n";
+
+    for (const auto& item : j_v.array_range())
+    {
+        std::cout << "json type: " << item.type() << ", storage kind: " << item.storage() << "\n";
+    }
+
+    json j2 = deep_copy(j_v);
+
+    std::cout << "\n(2)\n" << pretty_print(j2) << "\n\n";
+
+    for (const auto& item : j2.array_range())
+    {
+        std::cout << "json type: " << item.type() << ", storage kind: " << item.storage() << "\n";
+    }
+}
+
+```
+Output:
+```json
+(1)
+[
+    {
+        "id": 1,
+        "state": "running"
+    },
+    {
+        "id": 3,
+        "state": "running"
+    }
+]
+
+json type: object, storage kind: json const pointer
+json type: object, storage kind: json const pointer
+
+(2)
+[
+    {
+        "id": 1,
+        "state": "running"
+    },
+    {
+        "id": 3,
+        "state": "running"
+    }
+]
+
+json type: object, storage kind: object
+json type: object, storage kind: object
 ```
 
 ### Iterate

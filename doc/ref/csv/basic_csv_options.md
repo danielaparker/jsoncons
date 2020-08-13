@@ -84,7 +84,7 @@ to be used when reading JSON.
 Sets a string replacement for infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
-    basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true); // (4)
+    basic_json_options& neginf_to_str(const string_type& value, bool enable_inverse = true); (4)
 Sets a string replacement for negative infinity when writing JSON, and indicate whether it is also
 to be used when reading JSON.
 
