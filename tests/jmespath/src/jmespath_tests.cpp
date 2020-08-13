@@ -94,8 +94,7 @@ TEST_CASE("jmespath-tests")
     }
     SECTION("compliance")
     {
-        // 4 syntax tests don't pass, appear to require extra grammatical checks 
-        jmespath_tests("./jmespath/input/compliance/syntax.json"); 
+        jmespath_tests("./jmespath/input/compliance/syntax.json"); // OK
 
         jmespath_tests("./jmespath/input/compliance/basic.json"); // OK
         jmespath_tests("./jmespath/input/compliance/boolean.json"); // OK
