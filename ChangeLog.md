@@ -5,6 +5,18 @@ Bugs Fixed:
 
 - Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\263](https://github.com/danielaparker/jsoncons/issues/263)
 
+Enhancements:
+
+- New `basic_json(json_const_pointer_arg_t, const basic_json*)` constructor to 
+allow `basic_json` values to contain non-owning views of other `basic_json`
+values.
+
+- New `deep_copy` function to make a deep copy of a `basic_json` value that
+contains non-owning views on other `basic_json` values.
+
+- Reduced memory allocations in the jmespath extension using the new
+`basic_json(json_const_pointer_arg_t, const basic_json*)` constructor.
+
 0.155.1
 --------
 
