@@ -5590,6 +5590,7 @@ private:
             case storage_kind::array_value:
             {
                 basic_json j(json_array_arg, other.tag(), other.get_allocator());
+                j.reserve(other.size());
 
                 for (const auto& item : other.array_range())
                 {
@@ -5600,6 +5601,7 @@ private:
             case storage_kind::object_value:
             {
                 basic_json j(json_object_arg, other.tag(), other.get_allocator());
+                j.reserve(other.size());
 
                 for (const auto& item : other.object_range())
                 {

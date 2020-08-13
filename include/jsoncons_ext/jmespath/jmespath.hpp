@@ -2706,7 +2706,7 @@ namespace jmespath {
                         reference j = this->apply_expressions(item.value(), context, ec);
                         if (!j.is_null())
                         {
-                            result->push_back(j);
+                            result->emplace_back(json_const_pointer_arg, std::addressof(j));
                         }
                     }
                 }
@@ -2754,7 +2754,7 @@ namespace jmespath {
                         reference j = this->apply_expressions(item, context, ec);
                         if (!j.is_null())
                         {
-                            result->push_back(j);
+                            result->emplace_back(json_const_pointer_arg, std::addressof(j));
                         }
                     }
                 }
@@ -2821,7 +2821,7 @@ namespace jmespath {
                         reference j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), context, ec);
                         if (!j.is_null())
                         {
-                            result->push_back(j);
+                            result->emplace_back(json_const_pointer_arg, std::addressof(j));
                         }
                     }
                 }
@@ -2840,7 +2840,7 @@ namespace jmespath {
                         reference j = this->apply_expressions(val.at(static_cast<std::size_t>(i)), context, ec);
                         if (!j.is_null())
                         {
-                            result->push_back(j);
+                            result->emplace_back(json_const_pointer_arg, std::addressof(j));
                         }
                     }
                 }
@@ -2943,7 +2943,7 @@ namespace jmespath {
                                 reference j = this->apply_expressions(elem, context, ec);
                                 if (!j.is_null())
                                 {
-                                    result->push_back(j);
+                                    result->emplace_back(json_const_pointer_arg, std::addressof(j));
                                 }
                             }
                         }
@@ -2955,7 +2955,7 @@ namespace jmespath {
                             reference j = this->apply_expressions(current_elem, context, ec);
                             if (!j.is_null())
                             {
-                                result->push_back(j);
+                                result->emplace_back(json_const_pointer_arg, std::addressof(j));
                             }
                         }
                     }
@@ -3285,9 +3285,8 @@ namespace jmespath {
                 {
                     return Json::null();
                 }
-                eval_context dynamic_storage;
                 std::error_code ec;
-                Json result = evaluate_tokens(doc, output_stack_, dynamic_storage, ec);
+                Json result = evaluate(doc, ec);
                 if (ec)
                 {
                     JSONCONS_THROW(jmespath_error(ec));
@@ -3302,7 +3301,7 @@ namespace jmespath {
                     return Json::null();
                 }
                 eval_context dynamic_storage;
-                return evaluate_tokens(doc, output_stack_, dynamic_storage, ec);
+                return deep_copy(evaluate_tokens(doc, output_stack_, dynamic_storage, ec));
             }
 
             static jmespath_expression compile(const string_view_type& expr)
