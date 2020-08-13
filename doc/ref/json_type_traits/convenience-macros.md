@@ -257,7 +257,7 @@ namespace ns {
     };
 } // namespace ns
 
-JSONCONS_N_MEMBER_TRAITS(ns::book, author, title, price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
 
 using namespace jsoncons; // for convenience
 
