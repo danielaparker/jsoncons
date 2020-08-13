@@ -251,7 +251,7 @@ namespace detail {
        return jsoncons::basic_string_view<CharT>(s, sizeof(s) / sizeof(CharT));\
    }
 
-#define JSONCONS_ARRAY_OF_CHAR(CharT, name, ...) \
+#define JSONCONS_CSTRING(CharT, name, ...) \
     static constexpr CharT name[] = { __VA_ARGS__,0};
 
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP

@@ -39,19 +39,19 @@ TEST_CASE("json_const_pointer array tests")
     SECTION("copy")
     {
         json v(json_const_pointer_arg, &j);
-        CHECK(v.underlying_type() == storage_type::json_const_pointer);
+        CHECK(v.stored_type() == storage_kind::json_const_pointer);
 
         json j2(v);
-        CHECK(j2.underlying_type() == storage_type::json_const_pointer);
+        CHECK(j2.stored_type() == storage_kind::json_const_pointer);
     }
     SECTION("assignment")
     {
         json v(json_const_pointer_arg, &j);
-        CHECK(v.underlying_type() == storage_type::json_const_pointer);
+        CHECK(v.stored_type() == storage_kind::json_const_pointer);
 
         json j2;
         j2 = v;
-        CHECK(j2.underlying_type() == storage_type::json_const_pointer);
+        CHECK(j2.stored_type() == storage_kind::json_const_pointer);
     }
 }
 
@@ -287,10 +287,10 @@ TEST_CASE("json_const_pointer identifier tests")
             target = deep_copy(j3);
         }
         CHECK(target == expected);
-        CHECK(target.underlying_type() == storage_type::array_value);
+        CHECK(target.stored_type() == storage_kind::array_value);
         for (const auto& item : target.array_range())
         {
-            CHECK(item.underlying_type() == storage_type::uint64_value);
+            CHECK(item.stored_type() == storage_kind::uint64_value);
         }
     }
 }

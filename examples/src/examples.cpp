@@ -404,8 +404,6 @@ int main()
 
         byte_string_examples();
 
-        json_constructor_examples();
-
         container_examples();
 
         json_accessor_examples();
@@ -451,6 +449,8 @@ int main()
         csv_examples();
 
         json_type_traits_tuple_examples();
+
+        json_constructor_examples();
     }
     catch (const std::exception& e)
     {
