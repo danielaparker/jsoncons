@@ -1132,7 +1132,7 @@ namespace jmespath {
                         ec = jmespath_errc::invalid_type;
                         return context.null_value();
                     }
-                    result->push_back(j);
+                    result->emplace_back(json_const_pointer_arg, std::addressof(j));
                 }
 
                 return *result;
@@ -2197,7 +2197,7 @@ namespace jmespath {
             }
         };
 
-        static reference evaluate_tokens(reference doc, const std::vector<token>& output_stack, eval_context& context, std::error_code& ec)
+        static pointer evaluate_tokens(reference doc, const std::vector<token>& output_stack, eval_context& context, std::error_code& ec)
         {
             pointer root_ptr = std::addressof(doc);
             std::vector<parameter> stack;
@@ -2272,13 +2272,13 @@ namespace jmespath {
                         if (t.function_->arg_count() && *(t.function_->arg_count()) != arg_stack.size())
                         {
                             ec = jmespath_errc::invalid_arity;
-                            return context.null_value();
+                            return std::addressof(context.null_value());
                         }
 
                         reference r = t.function_->evaluate(arg_stack, context, ec);
                         if (ec)
                         {
-                            return context.null_value();
+                            return std::addressof(context.null_value());
                         }
                         arg_stack.clear();
                         stack.push_back(std::addressof(r));
@@ -2289,7 +2289,7 @@ namespace jmespath {
                 }
             }
             JSONCONS_ASSERT(stack.size() == 1);
-            return *stack.back().value_;
+            return stack.back().value_;
         }
 
         // Implementations
@@ -2885,13 +2885,13 @@ namespace jmespath {
 
                 for (auto& item : val.array_range())
                 {
-                    reference j = evaluate_tokens(item, token_list_, context, ec);
+                    Json j(json_const_pointer_arg, evaluate_tokens(item, token_list_, context, ec));
                     if (is_true(j))
                     {
                         reference jj = this->apply_expressions(item, context, ec);
                         if (!jj.is_null())
                         {
-                            result->push_back(jj);
+                            result->emplace_back(json_const_pointer_arg, std::addressof(jj));
                         }
                     }
                 }
@@ -3001,7 +3001,7 @@ namespace jmespath {
 
                 for (auto& list : token_lists_)
                 {
-                    result->push_back(evaluate_tokens(val, list, context, ec));
+                    result->emplace_back(json_const_pointer_arg, evaluate_tokens(val, list, context, ec));
                 }
                 return *result;
             }
@@ -3059,7 +3059,7 @@ namespace jmespath {
                 resultp->reserve(key_toks_.size());
                 for (auto& item : key_toks_)
                 {
-                    resultp->try_emplace(item.key, evaluate_tokens(val, item.tokens, context, ec));
+                    resultp->try_emplace(item.key, json_const_pointer_arg, evaluate_tokens(val, item.tokens, context, ec));
                 }
 
                 return *resultp;
@@ -3100,7 +3100,7 @@ namespace jmespath {
 
             reference evaluate(reference val, eval_context& context, std::error_code& ec) const override
             {
-                return evaluate_tokens(val, toks_, context, ec);
+                return *evaluate_tokens(val, toks_, context, ec);
             }
 
             std::string to_string(std::size_t indent = 0) const override
@@ -3301,7 +3301,7 @@ namespace jmespath {
                     return Json::null();
                 }
                 eval_context dynamic_storage;
-                return deep_copy(evaluate_tokens(doc, output_stack_, dynamic_storage, ec));
+                return deep_copy(*evaluate_tokens(doc, output_stack_, dynamic_storage, ec));
             }
 
             static jmespath_expression compile(const string_view_type& expr)
