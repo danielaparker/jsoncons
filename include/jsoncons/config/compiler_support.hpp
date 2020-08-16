@@ -255,10 +255,11 @@
 // Follows boost
 
 // gcc and clang
-#if defined(__clang__) || defined(__GNUC__)
+#if (defined(__clang__) || defined(__GNUC__)) && defined(__cplusplus)
 #if defined(__SIZEOF_INT128__) && !defined(_MSC_VER)
 #  define JSONCONS_HAS_INT128
 #endif
+
 #if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
 #if (__clang_major__ >= 4) && defined(__has_include)
 #if __has_include(<quadmath.h>)
