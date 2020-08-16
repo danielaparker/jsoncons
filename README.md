@@ -846,10 +846,8 @@ int main()
     json& ref = jsonpointer::get(j, "/1/2");
     std::cout << "(7) " << ref.as<std::string>() << "\n\n";
 
-#if (defined(__GNUC__) || defined(__clang__)) 
-    // e.g. if code compiled with GCC and std=gnu++11 (rather than std=c++11)
+    // If your compiler supports extended integer types
     __int128 i = j[1][2].as<__int128>();
-#endif
 
     // Get byte string value at position /1/1 as a std::vector<uint8_t>
     auto bstr = j[1][1].as<std::vector<uint8_t>>();

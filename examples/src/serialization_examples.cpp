@@ -406,8 +406,8 @@ void bignum_access_examples()
     jsoncons::bigint bn = j.as<jsoncons::bigint>();
     std::cout << "(3) " << bn << "\n\n";
 
-    // If your compiler supports extended integral types for which std::numeric_limits is specialized 
-#if (defined(__GNUC__) || defined(__clang__)) 
+    // If your compiler supports extended integral types
+#if (defined(__GNUC__) || defined(__clang__)) && JSONCONS_HAS_INT128
     __int128 i = j.as<__int128>();
     std::cout << "(4) " << i << "\n\n";
 #endif
