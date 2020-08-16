@@ -284,6 +284,28 @@
 #endif
 #endif
 
+// Follows boost config/detail/suffix.hpp
+#if defined(JSONCONS_HAS_INT128) && defined(__cplusplus)
+namespace jsoncons{
+#  ifdef __GNUC__
+   __extension__ typedef __int128 int128_type;
+   __extension__ typedef unsigned __int128 uint128_type;
+#  else
+   typedef __int128 int128_type;
+   typedef unsigned __int128 uint128_type;
+#  endif
+}
+#endif
+#if defined(JSONCONS_HAS_FLOAT128) && defined(__cplusplus)
+namespace jsoncons {
+#  ifdef __GNUC__
+   __extension__ typedef __float128 float128_type;
+#  else
+   typedef __float128 float128_type;
+#  endif
+}
+#endif
+
 namespace jsoncons {
 
     class assertion_error : public std::runtime_error
