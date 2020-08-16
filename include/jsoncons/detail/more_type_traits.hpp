@@ -261,7 +261,7 @@ namespace detail {
 
 #if defined(JSONCONS_HAS_INT128)
     template <class T>
-    struct is_int128_type<T,std::enable_if<std::is_same<T,int128_type>::value>::type> : std::true_type {};
+    struct is_int128_type<T,typename std::enable_if<std::is_same<T,int128_type>::value>::type> : std::true_type {};
 #endif
 
     // is_unsigned_integer
@@ -271,7 +271,7 @@ namespace detail {
 
 #if defined (JSONCONS_HAS_INT128)
     template <class T>
-    struct is_uint128_type<T,std::enable_if<std::is_same<T,uint128_type>::value>::type> : std::true_type {};
+    struct is_uint128_type<T,typename std::enable_if<std::is_same<T,uint128_type>::value>::type> : std::true_type {};
 #endif
 
     // Containers
