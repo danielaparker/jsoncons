@@ -179,6 +179,7 @@ class integer_limits<T,typename std::enable_if<jsoncons::detail::is_integer<T>::
 {
 public:
     static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
 
     static constexpr T(max)() noexcept
     {
@@ -199,6 +200,7 @@ class integer_limits<T,typename std::enable_if<!jsoncons::detail::is_integer<T>:
 {
 public:
     static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = true;
 
     static constexpr T(max)() noexcept
     {
@@ -219,6 +221,7 @@ class integer_limits<T,typename std::enable_if<!jsoncons::detail::is_integer<T>:
 {
 public:
     static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = false;
 
     static constexpr T(max)() noexcept
     {
@@ -235,7 +238,7 @@ public:
 };
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_decimal(const CharT* s, std::size_t length)
 {
     integer_chars_state state = integer_chars_state::initial;
@@ -297,7 +300,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_decimal(const CharT* s, std::size_t length)
 {
     if (length == 0)
@@ -344,7 +347,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer(const CharT* s, std::size_t length)
 {
     integer_chars_state state = integer_chars_state::initial;
@@ -526,7 +529,7 @@ to_integer(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer(const CharT* s, std::size_t length)
 {
     if (length == 0)
@@ -580,7 +583,7 @@ to_integer(const CharT* s, std::size_t length)
 // - digit1-digits
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_unchecked(const CharT* s, std::size_t length)
 {
     static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
@@ -641,7 +644,7 @@ to_integer_unchecked(const CharT* s, std::size_t length)
 // - digit1-digits
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_unchecked(const CharT* s, std::size_t length)
 {
     static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
@@ -697,7 +700,7 @@ to_integer_unchecked(const CharT* s, std::size_t length)
 // base16_to_integer
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
 base16_to_integer(const CharT* s, std::size_t length)
 {
     static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
@@ -780,7 +783,7 @@ base16_to_integer(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
+typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
 base16_to_integer(const CharT* s, std::size_t length)
 {
     static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
