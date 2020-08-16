@@ -167,78 +167,8 @@ bool is_base10(const CharT* s, std::size_t length)
     return state == integer_chars_state::decimal ? true : false;
 }
 
-template <class T, class Enable = void>
-class integer_limits
-{
-public:
-    static constexpr bool is_specialized = false;
-};
-
-template <class T>
-class integer_limits<T,typename std::enable_if<jsoncons::detail::is_integer<T>::value>::type>
-{
-public:
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
-
-    static constexpr T(max)() noexcept
-    {
-        return (std::numeric_limits<T>::max)();
-    }
-    static constexpr T(min)() noexcept
-    {
-        return (std::numeric_limits<T>::min)();
-    }
-    static constexpr T lowest() noexcept
-    {
-        return std::numeric_limits<T>::lowest();
-    }
-};
-
-template <class T>
-class integer_limits<T,typename std::enable_if<!jsoncons::detail::is_integer<T>::value && jsoncons::detail::is_int128_type<T>::value>::type>
-{
-public:
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = true;
-
-    static constexpr T(max)() noexcept
-    {
-        return T(T(~0) ^ (T(T(1) << 16)));
-    }
-    static constexpr T(min)() noexcept
-    {
-        return T(T(1) << 16);
-    }
-    static constexpr T lowest() noexcept
-    {
-        return (min)();
-    }
-};
-
-template <class T>
-class integer_limits<T,typename std::enable_if<!jsoncons::detail::is_integer<T>::value && jsoncons::detail::is_uint128_type<T>::value>::type>
-{
-public:
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = false;
-
-    static constexpr T(max)() noexcept
-    {
-        return T(T(~0));
-    }
-    static constexpr T(min)() noexcept
-    {
-        return 0;
-    }
-    static constexpr T lowest() noexcept
-    {
-        return std::numeric_limits<T>::lowest();
-    }
-};
-
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && !jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_decimal(const CharT* s, std::size_t length)
 {
     integer_chars_state state = integer_chars_state::initial;
@@ -265,7 +195,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
             }
             case integer_chars_state::decimal:
             {
-                static constexpr T max_value = (integer_limits<T>::max)();
+                static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
                 static constexpr T max_value_div_10 = max_value / 10;
                 for (; s < end; ++s)
                 {
@@ -300,7 +230,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_decimal(const CharT* s, std::size_t length)
 {
     if (length == 0)
@@ -324,7 +254,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
     }
     if (is_negative)
     {
-        if (u.value() > static_cast<U>(-((integer_limits<T>::lowest)()+T(1))) + U(1))
+        if (u.value() > static_cast<U>(-((jsoncons::detail::integer_limits<T>::lowest)()+T(1))) + U(1))
         {
             return to_integer_result<T>(to_integer_errc::overflow);
         }
@@ -335,7 +265,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
     }
     else
     {
-        if (u.value() > static_cast<U>((integer_limits<T>::max)()))
+        if (u.value() > static_cast<U>((jsoncons::detail::integer_limits<T>::max)()))
         {
             return to_integer_result<T>(to_integer_errc::overflow);
         }
@@ -347,7 +277,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && !jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer(const CharT* s, std::size_t length)
 {
     integer_chars_state state = integer_chars_state::initial;
@@ -402,7 +332,7 @@ to_integer(const CharT* s, std::size_t length)
             }
             case integer_chars_state::binary:
             {
-                static constexpr T max_value = (integer_limits<T>::max)();
+                static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
                 static constexpr T max_value_div_2 = max_value / 2;
                 for (; s < end; ++s)
                 {
@@ -430,7 +360,7 @@ to_integer(const CharT* s, std::size_t length)
             }
             case integer_chars_state::octal:
             {
-                static constexpr T max_value = (integer_limits<T>::max)();
+                static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
                 static constexpr T max_value_div_8 = max_value / 8;
                 for (; s < end; ++s)
                 {
@@ -458,7 +388,7 @@ to_integer(const CharT* s, std::size_t length)
             }
             case integer_chars_state::decimal:
             {
-                static constexpr T max_value = (integer_limits<T>::max)();
+                static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
                 static constexpr T max_value_div_10 = max_value / 10;
                 for (; s < end; ++s)
                 {
@@ -486,7 +416,7 @@ to_integer(const CharT* s, std::size_t length)
             }
             case integer_chars_state::hex:
             {
-                static constexpr T max_value = (integer_limits<T>::max)();
+                static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
                 static constexpr T max_value_div_16 = max_value / 16;
                 for (; s < end; ++s)
                 {
@@ -529,7 +459,7 @@ to_integer(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer(const CharT* s, std::size_t length)
 {
     if (length == 0)
@@ -553,7 +483,7 @@ to_integer(const CharT* s, std::size_t length)
     }
     if (is_negative)
     {
-        if (u.value() > static_cast<U>(-((integer_limits<T>::lowest)()+T(1))) + U(1))
+        if (u.value() > static_cast<U>(-((jsoncons::detail::integer_limits<T>::lowest)()+T(1))) + U(1))
         {
             return to_integer_result<T>(to_integer_errc::overflow);
         }
@@ -564,7 +494,7 @@ to_integer(const CharT* s, std::size_t length)
     }
     else
     {
-        if (u.value() > static_cast<U>((integer_limits<T>::max)()))
+        if (u.value() > static_cast<U>((jsoncons::detail::integer_limits<T>::max)()))
         {
             return to_integer_result<T>(to_integer_errc::overflow);
         }
@@ -583,17 +513,17 @@ to_integer(const CharT* s, std::size_t length)
 // - digit1-digits
 
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && !jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_unchecked(const CharT* s, std::size_t length)
 {
-    static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(jsoncons::detail::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     T n = 0;
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static constexpr T min_value = (integer_limits<T>::lowest)();
+        static constexpr T min_value = (jsoncons::detail::integer_limits<T>::lowest)();
         static constexpr T min_value_div_10 = min_value / 10;
         ++s;
         for (; s < end; ++s)
@@ -614,7 +544,7 @@ to_integer_unchecked(const CharT* s, std::size_t length)
     }
     else
     {
-        static constexpr T max_value = (integer_limits<T>::max)();
+        static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
         static constexpr T max_value_div_10 = max_value / 10;
         for (; s < end; ++s)
         {
@@ -644,17 +574,17 @@ to_integer_unchecked(const CharT* s, std::size_t length)
 // - digit1-digits
 
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer_unchecked(const CharT* s, std::size_t length)
 {
-    static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(jsoncons::detail::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     T n = 0;
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static constexpr T min_value = (integer_limits<T>::lowest)();
+        static constexpr T min_value = (jsoncons::detail::integer_limits<T>::lowest)();
         static constexpr T min_value_div_10 = min_value / 10;
         ++s;
         for (; s < end; ++s)
@@ -675,7 +605,7 @@ to_integer_unchecked(const CharT* s, std::size_t length)
     }
     else
     {
-        static constexpr T max_value = (integer_limits<T>::max)();
+        static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
         static constexpr T max_value_div_10 = max_value / 10;
         for (; s < end; ++s)
         {
@@ -700,17 +630,17 @@ to_integer_unchecked(const CharT* s, std::size_t length)
 // base16_to_integer
 
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 base16_to_integer(const CharT* s, std::size_t length)
 {
-    static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(jsoncons::detail::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     T n = 0;
     const CharT* end = s + length; 
     if (*s == '-')
     {
-        static constexpr T min_value = (integer_limits<T>::lowest)();
+        static constexpr T min_value = (jsoncons::detail::integer_limits<T>::lowest)();
         static constexpr T min_value_div_16 = min_value / 16;
         ++s;
         for (; s < end; ++s)
@@ -745,7 +675,7 @@ base16_to_integer(const CharT* s, std::size_t length)
     }
     else
     {
-        static constexpr T max_value = (integer_limits<T>::max)();
+        static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
         static constexpr T max_value_div_16 = max_value / 16;
         for (; s < end; ++s)
         {
@@ -783,16 +713,16 @@ base16_to_integer(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<integer_limits<T>::is_specialized && !integer_limits<T>::is_signed,to_integer_result<T>>::type
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && !jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 base16_to_integer(const CharT* s, std::size_t length)
 {
-    static_assert(integer_limits<T>::is_specialized, "Integer type not specialized");
+    static_assert(jsoncons::detail::integer_limits<T>::is_specialized, "Integer type not specialized");
     JSONCONS_ASSERT(length > 0);
 
     T n = 0;
     const CharT* end = s + length; 
 
-    static constexpr T max_value = (integer_limits<T>::max)();
+    static constexpr T max_value = (jsoncons::detail::integer_limits<T>::max)();
     static constexpr T max_value_div_16 = max_value / 16;
     for (; s < end; ++s)
     {
