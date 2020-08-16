@@ -147,7 +147,7 @@ namespace detail {
         }
     };
 
-    // integral
+    // integer
 
     template<class Json, class T>
     struct json_type_traits<Json, T,
@@ -160,11 +160,11 @@ namespace detail {
         {
             if (j.is_int64())
             {
-                return (j.template as_integer<int64_t>() >= (std::numeric_limits<T>::lowest)()) && (j.template as_integer<int64_t>() <= (std::numeric_limits<T>::max)());
+                return (j.template as_integer<int64_t>() >= (jsoncons::detail::integer_limits<T>::lowest)()) && (j.template as_integer<int64_t>() <= (jsoncons::detail::integer_limits<T>::max)());
             }
             else if (j.is_uint64())
             {
-                return j.template as_integer<uint64_t>() <= static_cast<uint64_t>((std::numeric_limits<T>::max)());
+                return j.template as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<T>::max)());
             }
             else
             {
@@ -191,11 +191,11 @@ namespace detail {
         {
             if (j.is_int64())
             {
-                return j.template as_integer<int64_t>() >= 0 && static_cast<uint64_t>(j.template as_integer<int64_t>()) <= (std::numeric_limits<T>::max)();
+                return j.template as_integer<int64_t>() >= 0 && static_cast<uint64_t>(j.template as_integer<int64_t>()) <= (jsoncons::detail::integer_limits<T>::max)();
             }
             else if (j.is_uint64())
             {
-                return j.template as_integer<uint64_t>() <= (std::numeric_limits<T>::max)();
+                return j.template as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<T>::max)();
             }
             else
             {
