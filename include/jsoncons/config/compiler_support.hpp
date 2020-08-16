@@ -252,6 +252,13 @@
 #  define JSONCONS_CPP14_CONSTEXPR
 #endif
 
+// gcc and clang
+#if defined(__clang__) || defined(__GNUC__)
+#if defined(__SIZEOF_INT128__) && !defined(_MSC_VER)
+#  define JSONCONS_HAS_INT128
+#endif
+#endif
+
 namespace jsoncons {
 
     class assertion_error : public std::runtime_error

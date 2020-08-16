@@ -253,7 +253,6 @@ namespace detail {
     struct is_unsigned_integer<T, 
                             typename std::enable_if<is_integer<T>::value && 
                             !std::is_signed<T>::value>::type> : std::true_type {};
-
     // Containers
 
     template <class Container>
