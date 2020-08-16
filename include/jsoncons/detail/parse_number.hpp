@@ -193,27 +193,47 @@ public:
         return std::numeric_limits<T>::lowest();
     }
 };
-/*
+
 template <class T>
-class integer_limits<T,typename std::enable_if<!jsoncons::detail::is_integer<T>::value && is_int128<T>::value>::type>
+class integer_limits<T,typename std::enable_if<!jsoncons::detail::is_integer<T>::value && jsoncons::detail::is_int128_type<T>::value>::type>
 {
 public:
     static constexpr bool is_specialized = true;
 
     static constexpr T(max)() noexcept
     {
-        return (std::numeric_limits<T>::max)();
+        return T(T(~0) ^ (T(T(1) << 16)));
     }
     static constexpr T(min)() noexcept
     {
-        return (std::numeric_limits<T>::min)();
+        return T(T(1) << 16);
+    }
+    static constexpr T lowest() noexcept
+    {
+        return (min)();
+    }
+};
+
+template <class T>
+class integer_limits<T,typename std::enable_if<!jsoncons::detail::is_integer<T>::value && jsoncons::detail::is_uint128_type<T>::value>::type>
+{
+public:
+    static constexpr bool is_specialized = true;
+
+    static constexpr T(max)() noexcept
+    {
+        return T(T(~0));
+    }
+    static constexpr T(min)() noexcept
+    {
+        return 0;
     }
     static constexpr T lowest() noexcept
     {
         return std::numeric_limits<T>::lowest();
     }
 };
-*/
+
 template <class T, class CharT>
 typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value,to_integer_result<T>>::type
 to_integer_decimal(const CharT* s, std::size_t length)

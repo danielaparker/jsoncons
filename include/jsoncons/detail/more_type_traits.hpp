@@ -253,6 +253,27 @@ namespace detail {
     struct is_unsigned_integer<T, 
                             typename std::enable_if<is_integer<T>::value && 
                             !std::is_signed<T>::value>::type> : std::true_type {};
+
+    // is_int128
+
+    template <class T, class Enable=void>
+    struct is_int128_type : std::false_type {};
+
+#if defined(JSONCONS_HAS_INT128)
+    template <class T>
+    struct is_int128_type<T,std::is_same<T,int128_type>::value>::type> : std::true_type {};
+#endif
+
+    // is_unsigned_integer
+
+    template <class T, class Enable=void>
+    struct is_uint128_type : std::false_type {};
+
+#if defined (JSONCONS_HAS_INT128)
+    template <class T>
+    struct is_uint128_type<T,std::is_same<T,uint128_type>::value>::type> : std::true_type {};
+#endif
+
     // Containers
 
     template <class Container>

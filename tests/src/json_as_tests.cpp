@@ -97,9 +97,11 @@ TEST_CASE("json::as<jsoncons::bigint>()")
     }
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
+#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) /* && defined(_GLIBCXX_USE_INT128)) */
 TEST_CASE("json::as<__int128>()")
 {
+    std::cout << "__int128\n";
+
     std::string s = "-18446744073709551617";
 
     jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer_unchecked<__int128>(s.data(),s.size());
