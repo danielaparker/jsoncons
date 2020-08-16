@@ -97,7 +97,7 @@ TEST_CASE("json::as<jsoncons::bigint>()")
     }
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) && !defined(__STRICT_ANSI__) /* && defined(_GLIBCXX_USE_INT128)) */
+#if (defined(__GNUC__) || defined(__clang__))  
 TEST_CASE("json::as<__int128>()")
 {
     std::cout << "__int128\n";

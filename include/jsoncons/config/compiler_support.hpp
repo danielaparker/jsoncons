@@ -269,7 +269,7 @@
 #endif
 
 #if defined(__GNUC__)
-#if defined(_GLIBCXX_USE_FLOAT128) && !defined(__STRICT_ANSI__)
+#if defined(_GLIBCXX_USE_FLOAT128) 
 # define BOOST_HAS_FLOAT128
 #endif
 #endif
