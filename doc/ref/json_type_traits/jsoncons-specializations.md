@@ -469,3 +469,43 @@ Output:
 and to a hex encoded string in JSON and CSV.
 
 #### JSON example
+
+```c++
+int main()
+{
+     std::bitset<70> bs1(ULLONG_MAX);
+
+     std::string s;
+     encode_json(bs1, s);
+     std::cout << byte_string_view(s) << "\n\n";
+
+     auto bs2 = decode_json<std::bitset<70>>(s);
+
+     assert(bs2 == bs1);
+}
+```
+Output:
+```
+22,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,30,30,22
+```
+
+#### CBOR example
+
+```c++
+int main()
+{
+    std::bitset<8> bs1(42);
+
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(bs1, data);
+    std::cout << byte_string_view(data) << "\n\n";
+
+    auto bs2 = cbor::decode_cbor<std::bitset<8>>(data);
+
+    assert(bs2 == bs1);
+}
+```
+Output:
+```
+d7,41,54
+```

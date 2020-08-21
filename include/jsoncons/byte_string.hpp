@@ -257,14 +257,26 @@ namespace jsoncons {
                                                 result);
     }
 
+    enum class to_base16_errc
+    {
+        success = 0, odd_length, invalid_byte
+    };
+
+    template <class InputIt>
+    struct to_base16_result 
+    {
+        InputIt it;
+        to_base16_errc ec;
+    };
+
     template <class InputIt,class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
+    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,to_base16_result<InputIt>>::type 
     decode_base16(InputIt first, InputIt last, Container& result)
     {
         std::size_t len = std::distance(first,last);
         if (len & 1) 
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Cannot decode encoded base16 string - odd length"));
+            return to_base16_result<InputIt>{first, to_base16_errc::odd_length};
         }
 
         InputIt it = first;
@@ -282,7 +294,7 @@ namespace jsoncons {
             } 
             else 
             {
-                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
+                return to_base16_result<InputIt>{first, to_base16_errc::invalid_byte};
             }
 
             auto b = *it++;
@@ -296,11 +308,12 @@ namespace jsoncons {
             } 
             else 
             {
-                JSONCONS_THROW(json_runtime_error<std::invalid_argument>("Not a hex digit. Cannot decode encoded base16 string"));
+                return to_base16_result<InputIt>{first, to_base16_errc::invalid_byte};
             }
 
             result.push_back(val);
         }
+        return to_base16_result<InputIt>{last, to_base16_errc::success};
     }
 
     struct byte_traits

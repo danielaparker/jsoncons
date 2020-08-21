@@ -1717,6 +1717,15 @@ namespace variant_detail
 
     // std::bitset
 
+    struct null_back_insertable_container
+    {
+        using value_type = uint8_t;
+
+        void push_back(value_type)
+        {
+        }
+    };
+
     template<class Json, std::size_t N>
     struct json_type_traits<Json, std::bitset<N>>
     {
@@ -1724,7 +1733,18 @@ namespace variant_detail
 
         static bool is(const Json& j) noexcept
         {
-            return j.template is<uint64_t>() || j.is_byte_string() || j.is_string();
+            if (j.is_byte_string())
+            {
+                return true;
+            }
+            else if (j.is_string())
+            {
+                jsoncons::string_view sv = j.as_string_view();
+                null_back_insertable_container cont;
+                auto result = decode_base16(sv.begin(), sv.end(), cont);
+                return result.ec ? false : true;
+            }
+            return false;
         }
 
         static std::bitset<N> as(const Json& j)
@@ -1746,7 +1766,11 @@ namespace variant_detail
                 else
                 {
                     jsoncons::string_view sv = j.as_string_view();
-                    decode_base16(sv.begin(), sv.end(), bits);
+                    auto result = decode_base16(sv.begin(), sv.end(), bits);
+                    if (result.ec != to_base16_errc::success)
+                    {
+                        JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                    }
                 }
                 std::uint8_t byte = 0;
                 std::uint8_t mask  = 0;
