@@ -29,6 +29,7 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map), 
 [std::unordered_multiset](https://en.cppreference.com/w/cpp/container/unordered_multiset), and 
 [std::unordered_multimap](https://en.cppreference.com/w/cpp/container/unordered_multimap).
+* [bitset](https://en.cppreference.com/w/cpp/utility/bitset)
 
 ### duration
 
@@ -462,3 +463,9 @@ Output:
 2 | baz
 ```
 
+### bitset
+
+`std::bitset` is serialized to a byte string in binary formats that support byte strings,
+and to a hex encoded string in JSON and CSV.
+
+#### JSON example

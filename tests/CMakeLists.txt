@@ -185,7 +185,7 @@ add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${J
 
 add_test(example_test ${JSONCONS_TARGET})
 
-target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
+target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR} PUBLIC ${JSONCONS_TESTS_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 target_link_libraries(${JSONCONS_TARGET} Catch)

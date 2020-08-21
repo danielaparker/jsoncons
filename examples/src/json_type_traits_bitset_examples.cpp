@@ -19,7 +19,7 @@ namespace {
 
     using qualifying_results_type = std::tuple<std::size_t,std::string,std::string,std::string,std::chrono::milliseconds>;
 
-    void tuple_example()
+    void json_example()
     {
         std::vector<qualifying_results_type> results = {
             {1,"Lewis Hamilton","Mercedes","1'24.303",std::chrono::milliseconds(0)},
@@ -66,11 +66,11 @@ namespace {
 
 } // namespace
 
-void json_type_traits_tuple_examples()
+void json_type_traits_bitset_examples()
 {
-    std::cout << "\njson_type_traits tuple examples\n\n";
+    std::cout << "\njson_type_traits bitset examples\n\n";
 
-    tuple_example();
+    json_example();
 
     std::cout << std::endl;
 }

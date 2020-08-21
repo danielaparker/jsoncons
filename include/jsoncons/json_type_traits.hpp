@@ -1748,7 +1748,7 @@ namespace variant_detail
                     jsoncons::string_view sv = j.as_string_view();
                     decode_base16(sv.begin(), sv.end(), bits);
                 }
-                std::uint8_t chunk = 0;
+                std::uint8_t byte = 0;
                 std::uint8_t mask  = 0;
 
                 std::size_t pos = 0;
@@ -1760,11 +1760,11 @@ namespace variant_detail
                         {
                             JSONCONS_THROW(ser_error(convert_errc::not_bitset));
                         }
-                        chunk = bits.at(pos++);
+                        byte = bits.at(pos++);
                         mask = 0x80;
                     }
 
-                    if (chunk & mask)
+                    if (byte & mask)
                     {
                         bs[i] = 1;
                     }
@@ -1784,22 +1784,22 @@ namespace variant_detail
         {
             std::vector<uint8_t> bits;
 
-            uint8_t chunk = 0;
+            uint8_t byte = 0;
             uint8_t mask = 0x80;
 
             for (std::size_t i = 0; i < N; ++i)
             {
                 if (val[i])
                 {
-                    chunk |= mask;
+                    byte |= mask;
                 }
 
                 mask = static_cast<uint8_t>(mask >> 1);
 
                 if (mask == 0)
                 {
-                    bits.push_back(chunk);
-                    chunk = 0;
+                    bits.push_back(byte);
+                    byte = 0;
                     mask = 0x80;
                 }
             }
@@ -1807,7 +1807,7 @@ namespace variant_detail
             // Encode remainder
             if (mask != 0x80)
             {
-                bits.push_back(chunk);
+                bits.push_back(byte);
             }
 
             Json j(byte_string_arg, bits, semantic_tag::base16, alloc);
