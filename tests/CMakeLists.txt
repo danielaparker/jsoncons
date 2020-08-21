@@ -95,6 +95,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_typed_array_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/decode_cbor_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/encode_cbor_tests.cpp
+   ${JSONCONS_TESTS_DIR}/cbor/src/cbor_bitset_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/converter_tests.cpp
    ${JSONCONS_TESTS_DIR}/csv/src/csv_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/csv/src/csv_subfield_tests.cpp
@@ -162,6 +163,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_encoder_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_timestamp_tests.cpp
+   ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_bitset_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/ojson_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/order_preserving_json_object_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/parse_string_tests.cpp
