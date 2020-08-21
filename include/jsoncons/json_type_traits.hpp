@@ -1724,7 +1724,7 @@ namespace variant_detail
 
         static bool is(const Json& j) noexcept
         {
-            return j.template is<uint64_t>() || j.is_string();
+            return j.template is<uint64_t>() || j.is_byte_string() || j.is_string();
         }
 
         static std::bitset<N> as(const Json& j)
