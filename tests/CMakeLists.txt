@@ -87,6 +87,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/bson/src/bson_test_suite.cpp
    ${JSONCONS_TESTS_DIR}/bson/src/encode_decode_bson_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/byte_string_tests.cpp
+   ${JSONCONS_TESTS_DIR}/cbor/src/cbor_bitset_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_encoder_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_json_visitor2_tests.cpp
@@ -95,7 +96,6 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_typed_array_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/decode_cbor_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/encode_cbor_tests.cpp
-   ${JSONCONS_TESTS_DIR}/cbor/src/cbor_bitset_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/converter_tests.cpp
    ${JSONCONS_TESTS_DIR}/csv/src/csv_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/csv/src/csv_subfield_tests.cpp
@@ -116,6 +116,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/jmespath/src/jmespath_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_array_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_as_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/json_bitset_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_checker_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_comparator_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_const_pointer_tests.cpp
@@ -145,7 +146,6 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_container_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_chrono_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_chrono_tests.cpp
-   ${JSONCONS_TESTS_DIR}/src/json_bitset_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/jsonpatch/src/jsonpatch_tests.cpp
    ${JSONCONS_TESTS_DIR}/jsonpath/src/JSONPathTestSuite_tests.cpp
@@ -159,11 +159,11 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/jsonpointer/src/jsonpointer_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/decode_msgpack_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/encode_msgpack_tests.cpp
+   ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_bitset_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_encoder_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_timestamp_tests.cpp
-   ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_bitset_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/ojson_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/order_preserving_json_object_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/parse_string_tests.cpp

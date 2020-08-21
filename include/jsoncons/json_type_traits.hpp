@@ -298,7 +298,10 @@ namespace detail {
         }
         static typename jsoncons::null_type as(const Json& j)
         {
-            JSONCONS_ASSERT(j.is_null());
+            if (!j.is_null())
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_jsoncons_null_type));
+            }
             return jsoncons::null_type();
         }
         static Json to_json(jsoncons::null_type, allocator_type = allocator_type())
@@ -801,7 +804,10 @@ namespace detail {
         static std::array<E, N> as(const Json& j)
         {
             std::array<E, N> buff;
-            JSONCONS_ASSERT(j.size() == N);
+            if (j.size() != N)
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_array));
+            }
             for (size_t i = 0; i < N; i++)
             {
                 buff[i] = j[i].template as<E>();
@@ -1745,22 +1751,16 @@ namespace variant_detail
                 std::uint8_t chunk = 0;
                 std::uint8_t mask  = 0;
 
-                // Load one chunk at a time, rotating through the chunk
-                // to set bits in the bitset
-
                 std::size_t pos = 0;
                 for (std::size_t i = 0; i < N; ++i)
                 {
                     if (mask == 0)
                     {
-                        if (pos < bits.size())
+                        if (pos >= bits.size())
                         {
-                            chunk = bits.at(pos++);
+                            JSONCONS_THROW(ser_error(convert_errc::not_bitset));
                         }
-                        else
-                        {
-                            chunk = 0;
-                        }
+                        chunk = bits.at(pos++);
                         mask = 0x80;
                     }
 
@@ -1772,6 +1772,10 @@ namespace variant_detail
                     mask = static_cast<std::uint8_t>(mask >> 1);
                 }
                 return bs;
+            }
+            else
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_bitset));
             }
         }
 
@@ -1800,7 +1804,7 @@ namespace variant_detail
                 }
             }
 
-            // Encode remainder, if it exists
+            // Encode remainder
             if (mask != 0x80)
             {
                 bits.push_back(chunk);
