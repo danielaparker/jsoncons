@@ -85,7 +85,11 @@ namespace jsoncons {
             {
                 case semantic_tag::base16:
                 {
-                    decode_base16(s.begin(), s.end(), bytes);
+                    auto res = decode_base16(s.begin(), s.end(), bytes);
+                    if (res.ec != to_base16_errc::success)
+                    {
+                        ec = convert_errc::not_byte_string;
+                    }
                     break;
                 }
                 case semantic_tag::base64:
