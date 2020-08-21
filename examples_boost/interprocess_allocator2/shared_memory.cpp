@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 {
    typedef std::pair<double, int> MyType;
 
-   if(argc == 1){  //Parent process
+   if (argc == 1){  //Parent process
       //Remove shared memory on construction and destruction
       struct shm_remove
       {
@@ -73,12 +73,12 @@ int main(int argc, char *argv[])
 
       //Launch child process
       std::string s(argv[0]); s += " child ";
-      if(0 != std::system(s.c_str()))
+      if (0 != std::system(s.c_str()))
          return 1;
 
 
       //Check child has destroyed all objects
-      if(segment.find<MyType>("my json").first)
+      if (segment.find<MyType>("my json").first)
          return 1;
    }
    else{
