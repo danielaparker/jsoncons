@@ -1742,7 +1742,7 @@ namespace variant_detail
                 jsoncons::string_view sv = j.as_string_view();
                 null_back_insertable_container cont;
                 auto result = decode_base16(sv.begin(), sv.end(), cont);
-                return result.ec ? false : true;
+                return result.ec == to_base16_errc::success ? true : false;
             }
             return false;
         }
