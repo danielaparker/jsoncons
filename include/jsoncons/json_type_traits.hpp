@@ -1731,7 +1731,7 @@ namespace variant_detail
         {
             if (j.template is<uint64_t>())
             {
-                auto bits = j.as<uint64_t>();
+                auto bits = j.template as<uint64_t>();
                 std::bitset<N> bs = static_cast<unsigned long long>(bits);
                 return bs;
             }
@@ -1741,7 +1741,7 @@ namespace variant_detail
                 std::vector<uint8_t> bits;
                 if (j.is_byte_string())
                 {
-                    bits = j.as<std::vector<uint8_t>>();
+                    bits = j.template as<std::vector<uint8_t>>();
                 }
                 else
                 {
