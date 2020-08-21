@@ -83,7 +83,7 @@ public:
 
 enum class jmespath_errc 
 {
-    success = 0,
+    ok = 0,
     expected_identifier,
     expected_index,
     expected_A_Za_Z_,
