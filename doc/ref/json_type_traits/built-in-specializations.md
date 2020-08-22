@@ -484,7 +484,7 @@ int main()
 
      std::string s;
      encode_json(bs1, s);
-     std::cout << byte_string_view(s) << "\n\n";
+     std::cout << s << "\n\n";
 
      auto bs2 = decode_json<std::bitset<70>>(s);
 
@@ -493,7 +493,7 @@ int main()
 ```
 Output:
 ```
-22,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,46,30,30,22
+"FFFFFFFFFFFFFFFF00"
 ```
 
 #### CBOR example
