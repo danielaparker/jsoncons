@@ -29,7 +29,7 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map), 
 [std::unordered_multiset](https://en.cppreference.com/w/cpp/container/unordered_multiset), and 
 [std::unordered_multimap](https://en.cppreference.com/w/cpp/container/unordered_multimap).
-* [bitset](https://en.cppreference.com/w/cpp/utility/bitset)
+* [bitset](https://en.cppreference.com/w/cpp/utility/bitset) (since 0.156.0)
 
 ### duration
 
