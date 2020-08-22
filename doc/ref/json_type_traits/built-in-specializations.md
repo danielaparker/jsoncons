@@ -513,6 +513,11 @@ int main()
     std::vector<uint8_t> data;
     cbor::encode_cbor(bs1, data);
     std::cout << byte_string_view(data) << "\n\n";
+    /*
+      0xd7, // Expected conversion to base16
+        0x41, // Byte string value of length 1 
+          0x54
+    */
 
     auto bs2 = cbor::decode_cbor<std::bitset<8>>(data);
 
