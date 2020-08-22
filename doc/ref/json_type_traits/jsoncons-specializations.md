@@ -465,8 +465,9 @@ Output:
 
 ### bitset
 
-`std::bitset` is serialized to a byte string in binary formats that support byte strings,
-and to a hex encoded string in JSON and CSV.
+jsoncons encodes a `std::bitset` into `base16` encoded strings (JSON) and
+byte strings (binary formats.) jsoncons can decode a `std::bitset` 
+from integers, `base16` encoded strings and byte strings.
 
 #### JSON example
 
