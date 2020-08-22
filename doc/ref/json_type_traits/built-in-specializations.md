@@ -1,4 +1,4 @@
-### jsoncons Specializations
+### Built-in Specializations
 
 jsoncons supports many types in the standard library.
 
