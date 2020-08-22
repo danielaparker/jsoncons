@@ -146,7 +146,7 @@ namespace jsoncons {
 
     template <class InputIt, class Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
-    encode_base16(InputIt first, InputIt last, Container& result)
+    to_base16(InputIt first, InputIt last, Container& result)
     {
         static constexpr char characters[] = "0123456789ABCDEF";
 
@@ -161,7 +161,7 @@ namespace jsoncons {
 
     template <class InputIt, class Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
-    encode_base64url(InputIt first, InputIt last, Container& result)
+    to_base64url(InputIt first, InputIt last, Container& result)
     {
         static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                       "abcdefghijklmnopqrstuvwxyz"
@@ -172,7 +172,7 @@ namespace jsoncons {
 
     template <class InputIt, class Container>
     typename std::enable_if<std::is_same<typename std::iterator_traits<InputIt>::value_type,uint8_t>::value,size_t>::type
-    encode_base64(InputIt first, InputIt last, Container& result)
+    to_base64(InputIt first, InputIt last, Container& result)
     {
         static constexpr char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                                    "abcdefghijklmnopqrstuvwxyz"
@@ -203,7 +203,7 @@ namespace jsoncons {
 
     template <class InputIt, class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
-    decode_base64url(InputIt first, InputIt last, Container& result)
+    from_base64url(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -232,7 +232,7 @@ namespace jsoncons {
 
     template <class InputIt, class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
-    decode_base64(InputIt first, InputIt last, Container& result)
+    from_base64(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
             0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -257,26 +257,26 @@ namespace jsoncons {
                                                 result);
     }
 
-    enum class to_base16_errc
+    enum class from_base16_errc
     {
         ok = 0, odd_length, invalid_byte
     };
 
     template <class InputIt>
-    struct to_base16_result 
+    struct from_base16_result 
     {
         InputIt it;
-        to_base16_errc ec;
+        from_base16_errc ec;
     };
 
     template <class InputIt,class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,to_base16_result<InputIt>>::type 
-    decode_base16(InputIt first, InputIt last, Container& result)
+    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,from_base16_result<InputIt>>::type 
+    from_base16(InputIt first, InputIt last, Container& result)
     {
         std::size_t len = std::distance(first,last);
         if (len & 1) 
         {
-            return to_base16_result<InputIt>{first, to_base16_errc::odd_length};
+            return from_base16_result<InputIt>{first, from_base16_errc::odd_length};
         }
 
         InputIt it = first;
@@ -294,7 +294,7 @@ namespace jsoncons {
             } 
             else 
             {
-                return to_base16_result<InputIt>{first, to_base16_errc::invalid_byte};
+                return from_base16_result<InputIt>{first, from_base16_errc::invalid_byte};
             }
 
             auto b = *it++;
@@ -308,12 +308,12 @@ namespace jsoncons {
             } 
             else 
             {
-                return to_base16_result<InputIt>{first, to_base16_errc::invalid_byte};
+                return from_base16_result<InputIt>{first, from_base16_errc::invalid_byte};
             }
 
             result.push_back(val);
         }
-        return to_base16_result<InputIt>{last, to_base16_errc::ok};
+        return from_base16_result<InputIt>{last, from_base16_errc::ok};
     }
 
     struct byte_traits

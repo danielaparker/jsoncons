@@ -18,7 +18,7 @@ using namespace jsoncons;
 void check_encode_base64(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
-    encode_base64(input.begin(),input.end(),result);
+    to_base64(input.begin(),input.end(),result);
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
@@ -26,7 +26,7 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::string& e
     }
 
     std::vector<uint8_t> output;
-    decode_base64(result.begin(), result.end(), output);
+    from_base64(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {
@@ -37,7 +37,7 @@ void check_encode_base64(const std::vector<uint8_t>& input, const std::string& e
 void check_encode_base64url(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
-    encode_base64url(input.begin(),input.end(),result);
+    to_base64url(input.begin(),input.end(),result);
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
@@ -45,7 +45,7 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::string
     }
 
     std::vector<uint8_t> output; 
-    decode_base64url(result.begin(), result.end(), output);
+    from_base64url(result.begin(), result.end(), output);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {
@@ -56,7 +56,7 @@ void check_encode_base64url(const std::vector<uint8_t>& input, const std::string
 void check_encode_base16(const std::vector<uint8_t>& input, const std::string& expected)
 {
     std::string result;
-    encode_base16(input.begin(),input.end(),result);
+    to_base16(input.begin(),input.end(), result);
     REQUIRE(result.size() == expected.size());
     for (std::size_t i = 0; i < result.size(); ++i)
     {
@@ -64,8 +64,8 @@ void check_encode_base16(const std::vector<uint8_t>& input, const std::string& e
     }
 
     std::vector<uint8_t> output;
-    auto res = decode_base16(result.begin(), result.end(), output);
-    REQUIRE(res.ec == to_base16_errc::ok);
+    auto res = from_base16(result.begin(), result.end(), output);
+    REQUIRE(res.ec == from_base16_errc::ok);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {
