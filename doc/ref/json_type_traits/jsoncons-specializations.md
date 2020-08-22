@@ -472,6 +472,12 @@ from integers, `base16` encoded strings and byte strings.
 #### JSON example
 
 ```c++
+#include <cassert>
+#include <string>
+#include <climits>
+#include <iostream>
+#include <jsoncons/json.hpp>
+
 int main()
 {
      std::bitset<70> bs1(ULLONG_MAX);
@@ -493,6 +499,13 @@ Output:
 #### CBOR example
 
 ```c++
+#include <cassert>
+#include <string>
+#include <climits>
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+
 int main()
 {
     std::bitset<8> bs1(42);
