@@ -97,7 +97,7 @@ TEST_CASE("json::as<jsoncons::bigint>()")
     }
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) defined(JSONCONS_HAS_INT128) 
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 TEST_CASE("json::as<__int128>()")
