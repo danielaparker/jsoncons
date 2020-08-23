@@ -245,7 +245,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
         --length;
     }
 
-    using U = typename std::make_unsigned<T>::type;
+    using U = typename jsoncons::detail::make_unsigned<T>::type;
 
     auto u = to_integer_decimal<U>(s, length);
     if (!u)
@@ -474,7 +474,7 @@ to_integer(const CharT* s, std::size_t length)
         --length;
     }
 
-    using U = typename std::make_unsigned<T>::type;
+    using U = typename jsoncons::detail::make_unsigned<T>::type;
 
     auto u = to_integer<U>(s, length);
     if (!u)

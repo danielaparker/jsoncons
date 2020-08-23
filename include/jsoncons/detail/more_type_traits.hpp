@@ -314,6 +314,22 @@ namespace detail {
                                                       std::is_same<T,double>::value
     >::type> : std::true_type {};
 
+    // make_unsigned
+    template <class T>
+    struct make_unsigned_impl {using type = typename std::make_unsigned<T>::type;};
+
+    #if defined(JSONCONS_HAS_INT128)
+    template <> 
+    struct make_unsigned_impl<int128_type> {using type = uint128_type;};
+    template <> 
+    struct make_unsigned_impl<uint128_type> {using type = uint128_type;};
+    #endif
+
+    template <class T>
+    struct make_unsigned
+       : make_unsigned_impl<typename std::remove_cv<T>::type>
+    {};
+
     // is_integer
 
     template <class T, class Enable=void>
