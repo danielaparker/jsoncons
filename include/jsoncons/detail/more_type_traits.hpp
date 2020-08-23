@@ -55,6 +55,7 @@ namespace detail {
     public:
         static constexpr bool is_specialized = true;
         static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
+        static constexpr int digits =  std::numeric_limits<T>::digits;
 
         static constexpr T(max)() noexcept
         {
@@ -76,14 +77,15 @@ namespace detail {
     public:
         static constexpr bool is_specialized = true;
         static constexpr bool is_signed = true;
+        static constexpr int digits =  sizeof(T)*CHAR_BIT - 1;
 
         static constexpr T(max)() noexcept
         {
-            return T(T(~0) ^ (T(T(1) << 16)));
+            return (((((T)1 << (digits - 1)) - 1) << 1) + 1);
         }
         static constexpr T(min)() noexcept
         {
-            return T(T(1) << 16);
+            return -(max)() - 1;
         }
         static constexpr T lowest() noexcept
         {
@@ -97,6 +99,7 @@ namespace detail {
     public:
         static constexpr bool is_specialized = true;
         static constexpr bool is_signed = false;
+        static constexpr int digits =  sizeof(T)*CHAR_BIT;
 
         static constexpr T(max)() noexcept
         {
