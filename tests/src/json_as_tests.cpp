@@ -111,7 +111,7 @@ TEST_CASE("json::as<__int128>()")
     __int128 val = j.as<__int128>();
 
     std::string s2;
-    write_integer(val, s2);
+    jsoncons::detail::write_integer(val, s2);
     std::cout << "__int128: " << << s1 << ", " << s2 << "\n";
 
     CHECK((result.value() == val));
@@ -128,7 +128,7 @@ TEST_CASE("json::as<unsigned __int128>()")
     unsigned __int128 val = j.as<unsigned __int128>();
 
     std::string s2;
-    write_integer(val, s2);
+    jsoncons::detail::write_integer(val, s2);
     std::cout << "__uint128: " << << s1 << ", " << s2 << "\n";
 
     CHECK((result.value() == val));
