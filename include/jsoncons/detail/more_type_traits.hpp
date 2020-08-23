@@ -17,7 +17,7 @@
 #include <array> // std::array
 #include <cstddef> // std::byte
 #include <utility> // std::declval
-#include <cstdint> // CHAR_BIT
+#include <climits> // CHAR_BIT
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
