@@ -118,7 +118,6 @@ TEST_CASE("json::as<__int128>()")
     jsoncons::detail::write_integer(result.value(), s3);
 
     CHECK((result.value() == val));
-    #pragma GCC diagnostic pop
 }
 
 TEST_CASE("json::as<unsigned __int128>()")
