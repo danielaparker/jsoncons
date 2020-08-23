@@ -97,14 +97,15 @@ TEST_CASE("json::as<jsoncons::bigint>()")
     }
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
+#if (defined(__GNUC__) || defined(__clang__)) defined(JSONCONS_HAS_INT128) 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 TEST_CASE("json::as<__int128>()")
 {
-    std::cout << "__int128\n";
-
     std::string s1 = "-18446744073709551617";
 
     jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer_unchecked<__int128>(s1.data(),s1.size());
+    REQUIRE(result.ec == jsoncons::detail::to_integer_errc::ok);
 
     jsoncons::json j(s1);
 
@@ -112,13 +113,12 @@ TEST_CASE("json::as<__int128>()")
 
     std::string s2;
     jsoncons::detail::write_integer(val, s2);
-    std::cout << "__int128: " << s1 << ", " << s2 << "\n";
 
     std::string s3;
     jsoncons::detail::write_integer(result.value(), s3);
-    std::cout << "__int128: " << s1 << ", val: " << s2 << ", result.value(): " << s3 << "\n";
 
     CHECK((result.value() == val));
+    #pragma GCC diagnostic pop
 }
 
 TEST_CASE("json::as<unsigned __int128>()")
@@ -126,6 +126,7 @@ TEST_CASE("json::as<unsigned __int128>()")
     std::string s1 = "18446744073709551616";
 
     jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::to_integer_unchecked<unsigned __int128>(s1.data(),s1.size());
+    REQUIRE(result.ec == jsoncons::detail::to_integer_errc::ok);
 
     jsoncons::json j(s1);
 
@@ -135,10 +136,10 @@ TEST_CASE("json::as<unsigned __int128>()")
     jsoncons::detail::write_integer(val, s2);
     std::string s3;
     jsoncons::detail::write_integer(result.value(), s3);
-    std::cout << "unsigned __int128: " << s1 << ", val: " << s2 << ", result.value(): " << s3 << "\n";
 
     CHECK((result.value() == val));
 }
+#pragma GCC diagnostic pop
 #endif
 
 TEST_CASE("as byte string tests")
