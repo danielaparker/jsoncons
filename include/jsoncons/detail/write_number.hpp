@@ -18,6 +18,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/detail/grisu3.hpp>
 #include <jsoncons/detail/parse_number.hpp>
+#include <jsoncons/detail/more_type_traits.hpp>
 
 namespace jsoncons { 
 namespace detail {
@@ -31,7 +32,7 @@ namespace detail {
     // write_integer
 
     template<class Integer,class Result>
-    typename std::enable_if<std::is_integral<Integer>::value,std::size_t>::type
+    typename std::enable_if<jsoncons::detail::is_integer<Integer>::value,std::size_t>::type
     write_integer(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
@@ -78,7 +79,7 @@ namespace detail {
     // integer_to_string_hex
 
     template<class Integer,class Result>
-    typename std::enable_if<std::is_integral<Integer>::value,std::size_t>::type
+    typename std::enable_if<jsoncons::detail::is_integer<Integer>::value,std::size_t>::type
     integer_to_string_hex(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
