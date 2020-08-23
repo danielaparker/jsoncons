@@ -114,6 +114,10 @@ TEST_CASE("json::as<__int128>()")
     jsoncons::detail::write_integer(val, s2);
     std::cout << "__int128: " << s1 << ", " << s2 << "\n";
 
+    std::string s3;
+    jsoncons::detail::write_integer(result.value(), s3);
+    std::cout << "__int128: " << s1 << ", val: " << s2 << ", result.value(): " << s3 << "\n";
+
     CHECK((result.value() == val));
 }
 
