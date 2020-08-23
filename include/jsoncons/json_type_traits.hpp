@@ -28,6 +28,7 @@
 #include <map>
 #include <functional>
 #include <memory>
+#include <bitset> // std::bitset
 #include <jsoncons/convert_error.hpp>
 #include <jsoncons/converter.hpp>
 
@@ -297,7 +298,10 @@ namespace detail {
         }
         static typename jsoncons::null_type as(const Json& j)
         {
-            JSONCONS_ASSERT(j.is_null());
+            if (!j.is_null())
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_jsoncons_null_type));
+            }
             return jsoncons::null_type();
         }
         static Json to_json(jsoncons::null_type, allocator_type = allocator_type())
@@ -800,7 +804,10 @@ namespace detail {
         static std::array<E, N> as(const Json& j)
         {
             std::array<E, N> buff;
-            JSONCONS_ASSERT(j.size() == N);
+            if (j.size() != N)
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_array));
+            }
             for (size_t i = 0; i < N; i++)
             {
                 buff[i] = j[i].template as<E>();
@@ -972,7 +979,7 @@ namespace detail {
             
             static bool is(const Json& j) noexcept
             {
-                if(j[Size-Pos].template is<element_type>())
+                if (j[Size-Pos].template is<element_type>())
                 {
                     return next::is(j);
                 }
@@ -1351,7 +1358,7 @@ namespace variant_detail
     typename std::enable_if<N < std::variant_size_v<Variant>, bool>::type
     is_variant(const Json& j)
     {
-      if(j.template is<T>())
+      if (j.template is<T>())
       {
           return true;
       }
@@ -1372,7 +1379,7 @@ namespace variant_detail
     typename std::enable_if<N < std::variant_size_v<Variant>, Variant>::type
     as_variant(const Json& j)
     {
-      if(j.template is<T>())
+      if (j.template is<T>())
       {
         Variant var(j.template as<T>());
         return var;
@@ -1705,6 +1712,130 @@ namespace variant_detail
         static Json to_json(const std::nullptr_t&, allocator_type = allocator_type())
         {
             return Json::null();
+        }
+    };
+
+    // std::bitset
+
+    struct null_back_insertable_container
+    {
+        using value_type = uint8_t;
+
+        void push_back(value_type)
+        {
+        }
+    };
+
+    template<class Json, std::size_t N>
+    struct json_type_traits<Json, std::bitset<N>>
+    {
+        using allocator_type = typename Json::allocator_type;
+
+        static bool is(const Json& j) noexcept
+        {
+            if (j.is_byte_string())
+            {
+                return true;
+            }
+            else if (j.is_string())
+            {
+                jsoncons::string_view sv = j.as_string_view();
+                null_back_insertable_container cont;
+                auto result = from_base16(sv.begin(), sv.end(), cont);
+                return result.ec == from_base16_errc::ok ? true : false;
+            }
+            return false;
+        }
+
+        static std::bitset<N> as(const Json& j)
+        {
+            if (j.template is<uint64_t>())
+            {
+                auto bits = j.template as<uint64_t>();
+                std::bitset<N> bs = static_cast<unsigned long long>(bits);
+                return bs;
+            }
+            else if (j.is_byte_string() || j.is_string())
+            {
+                std::bitset<N> bs;
+                std::vector<uint8_t> bits;
+                if (j.is_byte_string())
+                {
+                    bits = j.template as<std::vector<uint8_t>>();
+                }
+                else
+                {
+                    jsoncons::string_view sv = j.as_string_view();
+                    auto result = from_base16(sv.begin(), sv.end(), bits);
+                    if (result.ec != from_base16_errc::ok)
+                    {
+                        JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                    }
+                }
+                std::uint8_t byte = 0;
+                std::uint8_t mask  = 0;
+
+                std::size_t pos = 0;
+                for (std::size_t i = 0; i < N; ++i)
+                {
+                    if (mask == 0)
+                    {
+                        if (pos >= bits.size())
+                        {
+                            JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                        }
+                        byte = bits.at(pos++);
+                        mask = 0x80;
+                    }
+
+                    if (byte & mask)
+                    {
+                        bs[i] = 1;
+                    }
+
+                    mask = static_cast<std::uint8_t>(mask >> 1);
+                }
+                return bs;
+            }
+            else
+            {
+                JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+            }
+        }
+
+        static Json to_json(const std::bitset<N>& val, 
+                            const allocator_type& alloc = allocator_type())
+        {
+            std::vector<uint8_t> bits;
+
+            uint8_t byte = 0;
+            uint8_t mask = 0x80;
+
+            for (std::size_t i = 0; i < N; ++i)
+            {
+                if (val[i])
+                {
+                    byte |= mask;
+                }
+
+                mask = static_cast<uint8_t>(mask >> 1);
+
+                if (mask == 0)
+                {
+                    bits.push_back(byte);
+                    byte = 0;
+                    mask = 0x80;
+                }
+            }
+
+            // Encode remainder
+            if (mask != 0x80)
+            {
+                bits.push_back(byte);
+            }
+
+            Json j(byte_string_arg, bits, semantic_tag::base16, alloc);
+            return j;
         }
     };
 

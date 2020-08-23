@@ -17,6 +17,10 @@ contains non-owning views on other `basic_json` values.
 - Reduced memory allocations in the jmespath extension using the new
 `basic_json(json_const_pointer_arg_t, const basic_json*)` constructor.
 
+- Support for encoding `std::bitset` into `base16` encoded strings (JSON) and
+byte strings (binary formats), and decoding `std::bitset` from integer values,
+byte strings and `base16` encoded strings.
+
 0.155.1
 --------
 

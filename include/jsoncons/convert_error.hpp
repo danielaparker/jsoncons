@@ -14,7 +14,7 @@ namespace jsoncons {
 
     enum class convert_errc
     {
-        success = 0,
+        ok = 0,
         not_utf8,
         not_wide_char,
         not_vector,
@@ -30,7 +30,9 @@ namespace jsoncons {
         not_double,
         not_bool,
         not_variant,
-        not_nullptr
+        not_nullptr,
+        not_jsoncons_null_type,
+        not_bitset
     };
 }
 
@@ -88,6 +90,10 @@ namespace detail {
                     return "Cannot convert to std::variant";
                 case convert_errc::not_nullptr:
                     return "Cannot convert to std::nullptr_t";
+                case convert_errc::not_jsoncons_null_type:
+                    return "Cannot convert to jsoncons::null_type";
+                case convert_errc::not_bitset:
+                    return "Cannot convert to std::bitset";
                 default:
                     return "Unknown convert error";
             }

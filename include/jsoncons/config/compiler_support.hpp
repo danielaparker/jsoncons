@@ -211,8 +211,8 @@
 #else
     #define JSONCONS_THROW(exception) std::terminate()
     #define JSONCONS_RETHROW std::terminate()
-    #define JSONCONS_TRY if(true)
-    #define JSONCONS_CATCH(exception) if(false)
+    #define JSONCONS_TRY if (true)
+    #define JSONCONS_CATCH(exception) if (false)
 #endif
 
 #if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)

@@ -87,6 +87,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/bson/src/bson_test_suite.cpp
    ${JSONCONS_TESTS_DIR}/bson/src/encode_decode_bson_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/byte_string_tests.cpp
+   ${JSONCONS_TESTS_DIR}/cbor/src/cbor_bitset_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_encoder_tests.cpp
    ${JSONCONS_TESTS_DIR}/cbor/src/cbor_json_visitor2_tests.cpp
@@ -115,6 +116,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/jmespath/src/jmespath_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_array_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_as_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/json_bitset_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_checker_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_comparator_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_const_pointer_tests.cpp
@@ -143,7 +145,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/src/json_traits_name_macro_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_container_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_chrono_tests.cpp
-   ${JSONCONS_TESTS_DIR}/src/json_type_traits_string_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/json_type_traits_chrono_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/jsonpatch/src/jsonpatch_tests.cpp
    ${JSONCONS_TESTS_DIR}/jsonpath/src/JSONPathTestSuite_tests.cpp
@@ -157,6 +159,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/jsonpointer/src/jsonpointer_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/decode_msgpack_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/encode_msgpack_tests.cpp
+   ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_bitset_traits_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_cursor_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_encoder_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_tests.cpp
@@ -182,7 +185,7 @@ add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${J
 
 add_test(example_test ${JSONCONS_TARGET})
 
-target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR}
+target_include_directories (${JSONCONS_TARGET} PUBLIC ${JSONCONS_INCLUDE_DIR} PUBLIC ${JSONCONS_TESTS_DIR}
                                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 target_link_libraries(${JSONCONS_TARGET} Catch)

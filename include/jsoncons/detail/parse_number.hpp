@@ -20,7 +20,7 @@
 
 namespace jsoncons { namespace detail {
 
-    enum class to_integer_errc : uint8_t {success=0,overflow,invalid_digit,invalid_number};
+    enum class to_integer_errc : uint8_t {ok=0,overflow,invalid_digit,invalid_number};
 
     class to_integer_error_category_impl
        : public std::error_category
@@ -76,7 +76,7 @@ class to_integer_result
     to_integer_errc ec;
 public:
     constexpr to_integer_result(T value_)
-        : value_(value_), ec(to_integer_errc::success)
+        : value_(value_), ec(to_integer_errc::ok)
     {
     }
     constexpr to_integer_result(to_integer_errc ec)
@@ -90,7 +90,7 @@ public:
 
     constexpr explicit operator bool() const noexcept
     {
-        return ec == to_integer_errc::success;
+        return ec == to_integer_errc::ok;
     }
 
     T value() const

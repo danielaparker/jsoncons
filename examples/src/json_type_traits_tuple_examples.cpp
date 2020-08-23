@@ -70,9 +70,7 @@ void json_type_traits_tuple_examples()
 {
     std::cout << "\njson_type_traits tuple examples\n\n";
 
-#if defined(JSONCONS_HAS_STD_VARIANT)
     tuple_example();
-#endif
 
     std::cout << std::endl;
 }

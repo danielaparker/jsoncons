@@ -26,7 +26,7 @@ using my_json = basic_json<char,boost_sorted_policy,shmem_allocator>;
 
 int f1(int argc, char *argv[])
 {
-   if(argc == 1){  //Parent process
+   if (argc == 1){  //Parent process
       //Remove shared memory on construction and destruction
       struct shm_remove
       {
@@ -69,11 +69,11 @@ int f1(int argc, char *argv[])
 
       //Launch child process
       std::string s(argv[0]); s += " child ";
-      if(0 != std::system(s.c_str()))
+      if (0 != std::system(s.c_str()))
          return 1;
 
       //Check child has destroyed all objects
-      if(segment.find<my_json>("MyJson1").first)
+      if (segment.find<my_json>("MyJson1").first)
          return 1;
    }
    else{
@@ -104,7 +104,7 @@ int f2(int argc, char *argv[])
 {
    typedef std::pair<double, int> MyType;
 
-   if(argc == 1){  //Parent process
+   if (argc == 1){  //Parent process
       //Remove shared memory on construction and destruction
       struct shm_remove
       {
@@ -137,11 +137,11 @@ int f2(int argc, char *argv[])
 
       //Launch child process
       std::string s(argv[0]); s += " child ";
-      if(0 != std::system(s.c_str()))
+      if (0 != std::system(s.c_str()))
          return 1;
 
       //Check child has destroyed all objects
-      if(segment.find<my_json>("MyJson2").first)
+      if (segment.find<my_json>("MyJson2").first)
          return 1;
    }
    else{

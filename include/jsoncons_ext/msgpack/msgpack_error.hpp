@@ -14,7 +14,7 @@ namespace jsoncons { namespace msgpack {
 
 enum class msgpack_errc
 {
-    success = 0,
+    ok = 0,
     unexpected_eof = 1,
     source_error,
     invalid_utf8_text_string,

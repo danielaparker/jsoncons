@@ -78,7 +78,7 @@ void basics_json_example1()
     std::cout << book1 << "," << book2 << "," << book3 << "," << book4 << std::endl;
 
     //Loop through the booklist elements using a range-based for loop    
-    for(auto book : booklist.array_range())
+    for (auto book : booklist.array_range())
     {
         std::cout << book["title"].as<std::string>()
                   << ","
@@ -89,7 +89,7 @@ void basics_json_example1()
     json& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-    for(auto member : book.object_range())
+    for (auto member : book.object_range())
     {
         std::cout << member.key()
                   << ","

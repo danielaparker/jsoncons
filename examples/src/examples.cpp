@@ -46,6 +46,7 @@ void wjson_examples();
 void json_type_traits_variant_examples();
 void update_json_in_place_examples();
 void json_type_traits_tuple_examples();
+void json_type_traits_bitset_examples();
 
 void comment_example()
 {
@@ -451,6 +452,8 @@ int main()
         json_type_traits_tuple_examples();
 
         json_constructor_examples();
+
+        json_type_traits_bitset_examples();
     }
     catch (const std::exception& e)
     {

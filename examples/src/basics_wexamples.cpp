@@ -88,7 +88,7 @@ void basics_wjson_example1()
     wjson& book = booklist[1];
 
     //Loop through the book members using a range-based for loop    
-    for(const auto& member : book.object_range())
+    for (const auto& member : book.object_range())
     {
         std::wcout << member.key()
                    << L","

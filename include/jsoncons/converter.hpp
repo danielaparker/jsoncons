@@ -85,17 +85,21 @@ namespace jsoncons {
             {
                 case semantic_tag::base16:
                 {
-                    decode_base16(s.begin(), s.end(), bytes);
+                    auto res = from_base16(s.begin(), s.end(), bytes);
+                    if (res.ec != from_base16_errc::ok)
+                    {
+                        ec = convert_errc::not_byte_string;
+                    }
                     break;
                 }
                 case semantic_tag::base64:
                 {
-                    decode_base64(s.begin(), s.end(), bytes);
+                    from_base64(s.begin(), s.end(), bytes);
                     break;
                 }
                 case semantic_tag::base64url:
                 {
-                    decode_base64url(s.begin(), s.end(), bytes);
+                    from_base64url(s.begin(), s.end(), bytes);
                     break;
                 }
                 default:
@@ -264,13 +268,13 @@ namespace jsoncons {
             switch (tag)
             {
                 case semantic_tag::base64:
-                    encode_base64(bytes.begin(), bytes.end(), s);
+                    to_base64(bytes.begin(), bytes.end(), s);
                     break;
                 case semantic_tag::base16:
-                    encode_base16(bytes.begin(), bytes.end(), s);
+                    to_base16(bytes.begin(), bytes.end(), s);
                     break;
                 default:
-                    encode_base64url(bytes.begin(), bytes.end(), s);
+                    to_base64url(bytes.begin(), bytes.end(), s);
                     break;
             }
         }
