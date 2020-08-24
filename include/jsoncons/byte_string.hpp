@@ -259,7 +259,7 @@ namespace jsoncons {
 
     enum class from_base16_errc
     {
-        ok = 0, odd_length, invalid_byte
+        success = 0, odd_length, invalid_byte
     };
 
     template <class InputIt>
@@ -313,7 +313,7 @@ namespace jsoncons {
 
             result.push_back(val);
         }
-        return from_base16_result<InputIt>{last, from_base16_errc::ok};
+        return from_base16_result<InputIt>{last, from_base16_errc::success};
     }
 
     struct byte_traits

@@ -14,7 +14,7 @@ namespace jsoncons { namespace bson {
 
 enum class bson_errc
 {
-    ok = 0,
+    success = 0,
     unexpected_eof = 1,
     source_error,
     invalid_utf8_text_string,

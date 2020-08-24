@@ -14,7 +14,7 @@ namespace jsoncons {
 
     enum class convert_errc
     {
-        ok = 0,
+        success = 0,
         not_utf8,
         not_wide_char,
         not_vector,
