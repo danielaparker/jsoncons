@@ -29,11 +29,11 @@ namespace detail {
         return (char)((c < 10) ? ('0' + c) : ('A' - 10 + c));
     }
 
-    // write_integer
+    // from_integer
 
     template<class Integer,class Result>
     typename std::enable_if<jsoncons::detail::is_integer<Integer>::value,std::size_t>::type
-    write_integer(Integer value, Result& result)
+    from_integer(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
 
@@ -157,7 +157,7 @@ namespace detail {
         }
         else
         {
-            jsoncons::detail::write_integer(K, result);
+            jsoncons::detail::from_integer(K, result);
         }
     }
 

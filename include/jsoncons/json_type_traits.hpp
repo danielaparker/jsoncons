@@ -176,9 +176,10 @@ namespace detail {
         {
             return j.template as_integer<T>();
         }
-        static Json to_json(T val, allocator_type = allocator_type())
+
+        static Json to_json(T val, allocator_type alloc = allocator_type())
         {
-            return Json(val, semantic_tag::none);
+            return Json(val, semantic_tag::none, alloc);
         }
     };
 
@@ -209,9 +210,9 @@ namespace detail {
             return j.template as_integer<T>();
         }
 
-        static Json to_json(T val, allocator_type = allocator_type())
+        static Json to_json(T val, allocator_type alloc = allocator_type())
         {
-            return Json(val, semantic_tag::none);
+            return Json(val, semantic_tag::none, alloc);
         }
     };
 

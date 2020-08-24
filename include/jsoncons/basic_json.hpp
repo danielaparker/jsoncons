@@ -3195,48 +3195,48 @@ public:
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag, 
+    basic_json(IntegerType val, semantic_tag tag, Allocator = Allocator(), 
                typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)
     {
         construct<uint64_storage>(val, tag);
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag, 
+    basic_json(IntegerType val, semantic_tag tag, Allocator alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
     {
         std::basic_string<CharT> s;
-        jsoncons::detail::write_integer(val, s);
+        jsoncons::detail::from_integer(val, s);
         if (s.length() <= short_string_storage::max_length)
         {
             construct<short_string_storage>(tag, s.data(), static_cast<uint8_t>(s.length()));
         }
         else
         {
-            construct<long_string_storage>(tag, s.data(), s.length(), allocator_type());
+            construct<long_string_storage>(tag, s.data(), s.length(), alloc);
         }
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag,
+    basic_json(IntegerType val, semantic_tag tag, Allocator = Allocator(),
                typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),int>::type = 0)
     {
         construct<int64_storage>(val, tag);
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag,
+    basic_json(IntegerType val, semantic_tag tag, Allocator alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
     {
         std::basic_string<CharT> s;
-        jsoncons::detail::write_integer(val, s);
+        jsoncons::detail::from_integer(val, s);
         if (s.length() <= short_string_storage::max_length)
         {
             construct<short_string_storage>(tag, s.data(), static_cast<uint8_t>(s.length()));
         }
         else
         {
-            construct<long_string_storage>(tag, s.data(), s.length(), allocator_type());
+            construct<long_string_storage>(tag, s.data(), s.length(), alloc);
         }
     }
 

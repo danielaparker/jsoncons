@@ -12,7 +12,7 @@
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/convert_error.hpp>
-#include <jsoncons/detail/write_number.hpp> // write_integer
+#include <jsoncons/detail/write_number.hpp> // from_integer
 
 namespace jsoncons {
 
@@ -143,7 +143,7 @@ namespace jsoncons {
         from(Integer val, semantic_tag, std::error_code&) const
         {
             Into s;
-            jsoncons::detail::write_integer(val, s);
+            jsoncons::detail::from_integer(val, s);
             return s;
         }
 
@@ -153,7 +153,7 @@ namespace jsoncons {
         from(Integer val, semantic_tag, const allocator_type& alloc, std::error_code&) const
         {
             Into s(alloc);
-            jsoncons::detail::write_integer(val, s);
+            jsoncons::detail::from_integer(val, s);
             return s;
         }
 

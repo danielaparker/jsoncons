@@ -1129,7 +1129,7 @@ private:
                 {
                     return;
                 }
-                jsoncons::detail::write_integer(val, s);
+                jsoncons::detail::from_integer(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1139,7 +1139,7 @@ private:
                 {
                     return;
                 }
-                jsoncons::detail::write_integer(val, s);
+                jsoncons::detail::from_integer(val, s);
                 break;
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:

@@ -1213,7 +1213,7 @@ namespace jsoncons {
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
-                jsoncons::detail::write_integer(value,key_);
+                jsoncons::detail::from_integer(value,key_);
             }
 
             if (level_stack_.back().is_key())
@@ -1263,7 +1263,7 @@ namespace jsoncons {
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
-                jsoncons::detail::write_integer(value,key_);
+                jsoncons::detail::from_integer(value,key_);
             }
 
             if (level_stack_.back().is_key())
