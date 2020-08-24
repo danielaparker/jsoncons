@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <locale>
+#include <string>
 #include <limits> // std::numeric_limits
 #include <type_traits> // std::enable_if
 #include <exception>
@@ -280,7 +281,7 @@ template <class T, class CharT>
 typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized,to_integer_result<T>>::type
 to_integer(const CharT* s)
 {
-    return to_integer<T,CharT>(s, std::char_traits<CharT>::length());
+    return to_integer<T,CharT>(s, std::char_traits<CharT>::length(s));
 }
 
 template <class T, class CharT>
