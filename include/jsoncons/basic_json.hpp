@@ -3195,7 +3195,14 @@ public:
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag, Allocator = Allocator(), 
+    basic_json(IntegerType val, semantic_tag tag, 
+               typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)
+    {
+        construct<uint64_storage>(val, tag);
+    }
+
+    template <class IntegerType>
+    basic_json(IntegerType val, semantic_tag tag, Allocator, 
                typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)
     {
         construct<uint64_storage>(val, tag);
@@ -3218,7 +3225,14 @@ public:
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag, Allocator = Allocator(),
+    basic_json(IntegerType val, semantic_tag tag,
+               typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),int>::type = 0)
+    {
+        construct<int64_storage>(val, tag);
+    }
+
+    template <class IntegerType>
+    basic_json(IntegerType val, semantic_tag tag, Allocator,
                typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),int>::type = 0)
     {
         construct<int64_storage>(val, tag);

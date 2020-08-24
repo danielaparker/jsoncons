@@ -2020,13 +2020,13 @@ private:
                     {
                         more_ = visitor_->uint64_value(result.value(), semantic_tag::none, *this, ec);
                     }
-                    else if (result.error_code() == jsoncons::detail::to_integer_errc::overflow)
+                    else if (result.error() == jsoncons::detail::to_integer_errc::overflow)
                     {
                         more_ = visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
                     }
                     else
                     {
-                        ec = result.error_code();
+                        ec = result.error();
                         more_ = false;
                         return;
                     }

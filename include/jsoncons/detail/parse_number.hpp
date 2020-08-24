@@ -104,7 +104,7 @@ public:
         return make_error_code(ec);
     }
 
-    to_integer_errc errc() const
+    to_integer_errc error() const
     {
         return ec;
     }
@@ -251,7 +251,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
     auto u = to_integer_decimal<U>(s, length);
     if (!u)
     {
-        return to_integer_result<T>(u.errc());
+        return to_integer_result<T>(u.error());
     }
     if (is_negative)
     {
@@ -480,7 +480,7 @@ to_integer(const CharT* s, std::size_t length)
     auto u = to_integer<U>(s, length);
     if (!u)
     {
-        return to_integer_result<T>(u.errc());
+        return to_integer_result<T>(u.error());
     }
     if (is_negative)
     {

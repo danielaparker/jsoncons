@@ -13,14 +13,14 @@ TEST_CASE("detail::to_integer tests")
         std::string s = "-";
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::invalid_number);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::invalid_number);
     }
     SECTION("-")
     {
         std::string s = "-";
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::invalid_number);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::invalid_number);
     }
     SECTION("min int64_t")
     {
@@ -41,14 +41,14 @@ TEST_CASE("detail::to_integer tests")
         std::string s = "-9223372036854775809";
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::overflow);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::overflow);
     }
     SECTION("max int64_t + 1")
     {
         std::string s = "9223372036854775808";
         auto result = jsoncons::detail::to_integer<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::overflow);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::overflow);
     }
 }
 
@@ -59,14 +59,14 @@ TEST_CASE("detail::to_integer_decimal tests")
         std::string s = "-";
         auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::invalid_number);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::invalid_number);
     }
     SECTION("-")
     {
         std::string s = "-";
         auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::invalid_number);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::invalid_number);
     }
     SECTION("min int64_t")
     {
@@ -87,14 +87,14 @@ TEST_CASE("detail::to_integer_decimal tests")
         std::string s = "-9223372036854775809";
         auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::overflow);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::overflow);
     }
     SECTION("max int64_t + 1")
     {
         std::string s = "9223372036854775808";
         auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length());
         REQUIRE_FALSE(result);
-        CHECK(result.errc() == jsoncons::detail::to_integer_errc::overflow);
+        CHECK(result.error() == jsoncons::detail::to_integer_errc::overflow);
     }
 }
 
