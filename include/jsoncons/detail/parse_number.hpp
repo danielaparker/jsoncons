@@ -278,13 +278,6 @@ to_integer_decimal(const CharT* s, std::size_t length)
 }
 
 template <class T, class CharT>
-typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized,to_integer_result<T>>::type
-to_integer(const CharT* s)
-{
-    return to_integer<T,CharT>(s, std::char_traits<CharT>::length(s));
-}
-
-template <class T, class CharT>
 typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized && !jsoncons::detail::integer_limits<T>::is_signed,to_integer_result<T>>::type
 to_integer(const CharT* s, std::size_t length)
 {
@@ -511,6 +504,13 @@ to_integer(const CharT* s, std::size_t length)
             return to_integer_result<T>(static_cast<T>(u.value()));
         }
     }
+}
+
+template <class T, class CharT>
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized,to_integer_result<T>>::type
+to_integer(const CharT* s)
+{
+    return to_integer<T,CharT>(s, std::char_traits<CharT>::length(s));
 }
 
 // Precondition: s satisfies
