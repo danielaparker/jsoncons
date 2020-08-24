@@ -17,10 +17,104 @@
 #include <array> // std::array
 #include <cstddef> // std::byte
 #include <utility> // std::declval
+#include <climits> // CHAR_BIT
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
 namespace detail {
+
+    // is_int128
+
+    template <class T, class Enable=void>
+    struct is_int128_type : std::false_type {};
+
+#if defined(JSONCONS_HAS_INT128)
+    template <class T>
+    struct is_int128_type<T,typename std::enable_if<std::is_same<T,int128_type>::value>::type> : std::true_type {};
+#endif
+
+    // is_unsigned_integer
+
+    template <class T, class Enable=void>
+    struct is_uint128_type : std::false_type {};
+
+#if defined (JSONCONS_HAS_INT128)
+    template <class T>
+    struct is_uint128_type<T,typename std::enable_if<std::is_same<T,uint128_type>::value>::type> : std::true_type {};
+#endif
+
+    template <class T, class Enable = void>
+    class integer_limits
+    {
+    public:
+        static constexpr bool is_specialized = false;
+    };
+
+    template <class T>
+    class integer_limits<T,typename std::enable_if<std::is_integral<T>::value && !std::is_same<T,bool>::value>::type>
+    {
+    public:
+        static constexpr bool is_specialized = true;
+        static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
+        static constexpr int digits =  std::numeric_limits<T>::digits;
+
+        static constexpr T(max)() noexcept
+        {
+            return (std::numeric_limits<T>::max)();
+        }
+        static constexpr T(min)() noexcept
+        {
+            return (std::numeric_limits<T>::min)();
+        }
+        static constexpr T lowest() noexcept
+        {
+            return std::numeric_limits<T>::lowest();
+        }
+    };
+
+    template <class T>
+    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && jsoncons::detail::is_int128_type<T>::value>::type>
+    {
+    public:
+        static constexpr bool is_specialized = true;
+        static constexpr bool is_signed = true;
+        static constexpr int digits =  sizeof(T)*CHAR_BIT - 1;
+
+        static constexpr T(max)() noexcept
+        {
+            return (((((T)1 << (digits - 1)) - 1) << 1) + 1);
+        }
+        static constexpr T(min)() noexcept
+        {
+            return -(max)() - 1;
+        }
+        static constexpr T lowest() noexcept
+        {
+            return (min)();
+        }
+    };
+
+    template <class T>
+    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && jsoncons::detail::is_uint128_type<T>::value>::type>
+    {
+    public:
+        static constexpr bool is_specialized = true;
+        static constexpr bool is_signed = false;
+        static constexpr int digits =  sizeof(T)*CHAR_BIT;
+
+        static constexpr T(max)() noexcept
+        {
+            return T(T(~0));
+        }
+        static constexpr T(min)() noexcept
+        {
+            return 0;
+        }
+        static constexpr T lowest() noexcept
+        {
+            return std::numeric_limits<T>::lowest();
+        }
+    };
 
     #ifndef JSONCONS_HAS_VOID_T
     // follows https://en.cppreference.com/w/cpp/types/void_t
@@ -224,15 +318,29 @@ namespace detail {
                                                       std::is_same<T,double>::value
     >::type> : std::true_type {};
 
+    // make_unsigned
+    template <class T>
+    struct make_unsigned_impl {using type = typename std::make_unsigned<T>::type;};
+
+    #if defined(JSONCONS_HAS_INT128)
+    template <> 
+    struct make_unsigned_impl<int128_type> {using type = uint128_type;};
+    template <> 
+    struct make_unsigned_impl<uint128_type> {using type = uint128_type;};
+    #endif
+
+    template <class T>
+    struct make_unsigned
+       : make_unsigned_impl<typename std::remove_cv<T>::type>
+    {};
+
     // is_integer
 
     template <class T, class Enable=void>
     struct is_integer : std::false_type {};
 
     template <class T>
-    struct is_integer<T, 
-                      typename std::enable_if<std::is_integral<T>::value && 
-                      !std::is_same<T,bool>::value>::type> : std::true_type {};
+    struct is_integer<T,typename std::enable_if<integer_limits<T>::is_specialized>::type> : std::true_type {};
 
     // is_signed_integer
 
@@ -240,9 +348,8 @@ namespace detail {
     struct is_signed_integer : std::false_type {};
 
     template <class T>
-    struct is_signed_integer<T, 
-                           typename std::enable_if<is_integer<T>::value && 
-                           std::is_signed<T>::value>::type> : std::true_type {};
+    struct is_signed_integer<T, typename std::enable_if<integer_limits<T>::is_specialized && 
+                                                        integer_limits<T>::is_signed>::type> : std::true_type {};
 
     // is_unsigned_integer
 
@@ -251,8 +358,8 @@ namespace detail {
 
     template <class T>
     struct is_unsigned_integer<T, 
-                            typename std::enable_if<is_integer<T>::value && 
-                            !std::is_signed<T>::value>::type> : std::true_type {};
+                               typename std::enable_if<integer_limits<T>::is_specialized && 
+                               !integer_limits<T>::is_signed>::type> : std::true_type {};
 
     // Containers
 

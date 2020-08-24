@@ -97,32 +97,48 @@ TEST_CASE("json::as<jsoncons::bigint>()")
     }
 }
 
-#if (defined(__GNUC__) || defined(__clang__)) && (!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_INT128))
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 TEST_CASE("json::as<__int128>()")
 {
-    std::string s = "-18446744073709551617";
+    std::string s1 = "-18446744073709551617";
 
-    jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer_unchecked<__int128>(s.data(),s.size());
-    REQUIRE(result);
+    jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer_unchecked<__int128>(s1.data(),s1.size());
+    REQUIRE(result.errc() == jsoncons::detail::to_integer_errc::ok);
 
-    jsoncons::json j(s);
+    jsoncons::json j(s1);
 
     __int128 val = j.as<__int128>();
-    CHECK(result.value() == val);
+
+    std::string s2;
+    jsoncons::detail::write_integer(val, s2);
+
+    std::string s3;
+    jsoncons::detail::write_integer(result.value(), s3);
+
+    CHECK((result.value() == val));
 }
 
 TEST_CASE("json::as<unsigned __int128>()")
 {
-    std::string s = "18446744073709551616";
+    std::string s1 = "18446744073709551616";
 
-    jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::to_integer_unchecked<unsigned __int128>(s.data(),s.size());
-    REQUIRE(result);
+    jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::to_integer_unchecked<unsigned __int128>(s1.data(),s1.size());
+    REQUIRE(result.errc() == jsoncons::detail::to_integer_errc::ok);
 
-    jsoncons::json j(s);
+    jsoncons::json j(s1);
 
     unsigned __int128 val = j.as<unsigned __int128>();
-    CHECK(result.value() == val);
+
+    std::string s2;
+    jsoncons::detail::write_integer(val, s2);
+    std::string s3;
+    jsoncons::detail::write_integer(result.value(), s3);
+
+    CHECK((result.value() == val));
 }
+#pragma GCC diagnostic pop
 #endif
 
 TEST_CASE("as byte string tests")
