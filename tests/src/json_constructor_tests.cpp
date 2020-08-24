@@ -312,7 +312,8 @@ TEST_CASE("json constructor __int64 tests")
         json j(result.value());
         std::cout << j << "\n\n";
         __int128 val = j.as<__int128>();
-        std::cout << val << "\n\n";
+        CHECK(val == result.value());
+        //std::cout << val << "\n\n";
     }
 }
 #pragma GCC diagnostic pop
