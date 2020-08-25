@@ -1569,7 +1569,7 @@ private:
             {
                 return false;
             }
-            return evaluate().is_integer<IntegerType>();
+            return evaluate().template is_integer<IntegerType>();
         }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
