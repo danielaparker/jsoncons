@@ -206,17 +206,6 @@ namespace detail {
         return (ptr);
     }  
 
-    // is_primitive
-
-    template <class T, class Enable=void>
-    struct is_primitive : std::false_type {};
-
-    template <class T>
-    struct is_primitive<T, 
-           typename std::enable_if<std::is_integral<T>::value ||
-                                   std::is_floating_point<T>::value
-    >::type> : std::true_type {};
-
     // is_std_byte
 
     template <class T, class Enable=void>
@@ -360,6 +349,18 @@ namespace detail {
     struct is_unsigned_integer<T, 
                                typename std::enable_if<integer_limits<T>::is_specialized && 
                                !integer_limits<T>::is_signed>::type> : std::true_type {};
+
+    // is_primitive
+
+    template <class T, class Enable=void>
+    struct is_primitive : std::false_type {};
+
+    template <class T>
+    struct is_primitive<T, 
+           typename std::enable_if<is_integer<T>::value ||
+                                   is_bool<T>::value ||
+                                   std::is_floating_point<T>::value
+    >::type> : std::true_type {};
 
     // Containers
 
