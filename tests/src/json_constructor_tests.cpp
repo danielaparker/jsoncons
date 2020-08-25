@@ -307,13 +307,28 @@ TEST_CASE("json constructor __int64 tests")
 {
     SECTION("test 1")
     {
-        auto result = jsoncons::detail::to_integer<__int128>("-18446744073709551617");
-        REQUIRE(result);
-        json j(result.value());
-        std::cout << j << "\n\n";
-        __int128 val = j.as<__int128>();
-        CHECK(val == result.value());
-        //std::cout << val << "\n\n";
+        json j1("-18446744073709551617", semantic_tag::bigint);
+        std::cout << j1 << "\n\n";
+
+        __int128 val = j1.as<__int128>();
+
+        json j2(val);
+
+        CHECK((j2 == j1));
+    }
+}
+TEST_CASE("json constructor unsigned __int64 tests")
+{
+    SECTION("test 1")
+    {
+        json j1("18446744073709551616", semantic_tag::bigint);
+        std::cout << j1 << "\n\n";
+
+        __int128 val = j1.as<__int128>();
+
+        json j2(val);
+
+        CHECK((j2 == j1));
     }
 }
 #pragma GCC diagnostic pop

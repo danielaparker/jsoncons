@@ -66,9 +66,9 @@ namespace {
 
 } // namespace
 
-void json_type_traits_tuple_examples()
+void json_traits_tuple_examples()
 {
-    std::cout << "\njson_type_traits tuple examples\n\n";
+    std::cout << "\njson traits tuple examples\n\n";
 
     tuple_example();
 

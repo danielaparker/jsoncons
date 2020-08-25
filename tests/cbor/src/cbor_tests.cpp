@@ -191,3 +191,47 @@ ojson j1 = ojson::parse(R"(
     CHECK(j3 == j1);
 }
 
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+TEST_CASE("cbor json constructor __int64 tests")
+{
+    SECTION("test 1")
+    {
+        json j1("-18446744073709551617", semantic_tag::bigint);
+        std::cout << j1 << "\n\n";
+
+        __int128 val1 = j1.as<__int128>();
+
+        std::vector<uint8_t> data;
+        cbor::encode_cbor(val1, data);
+
+        std::cout << byte_string_view(data) << "\n\n";
+
+        auto val2 = cbor::decode_cbor<__int128>(data);
+
+        CHECK((val2 == val1));
+    }
+}
+TEST_CASE("cbor json constructor unsigned __int64 tests")
+{
+    SECTION("test 1")
+    {
+        json j1("18446744073709551616", semantic_tag::bigint);
+        std::cout << j1 << "\n\n";
+
+        auto val1 = j1.as<unsigned __int128>();
+
+        std::vector<uint8_t> data;
+        cbor::encode_cbor(val1, data);
+
+        std::cout << byte_string_view(data) << "\n\n";
+
+        auto val2 = cbor::decode_cbor<unsigned __int128>(data);
+
+        CHECK((val2 == val1));
+    }
+}
+#pragma GCC diagnostic pop
+#endif
+

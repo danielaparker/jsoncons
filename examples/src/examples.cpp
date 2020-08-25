@@ -43,10 +43,11 @@ void staj_iterator_examples();
 void type_extensibility_examples();
 void unicode_examples();
 void wjson_examples();
-void json_type_traits_variant_examples();
+void json_traits_variant_examples();
 void update_json_in_place_examples();
-void json_type_traits_tuple_examples();
-void json_type_traits_bitset_examples();
+void json_traits_tuple_examples();
+void json_traits_bitset_examples();
+void json_traits_integer_examples();
 
 void comment_example()
 {
@@ -435,7 +436,7 @@ int main()
 
         jmespath_examples();
 
-        json_type_traits_variant_examples();
+        json_traits_variant_examples();
 
         bson_examples();
 
@@ -449,11 +450,13 @@ int main()
 
         csv_examples();
 
-        json_type_traits_tuple_examples();
+        json_traits_tuple_examples();
 
         json_constructor_examples();
 
-        json_type_traits_bitset_examples();
+        json_traits_bitset_examples();
+
+        json_traits_integer_examples();
     }
     catch (const std::exception& e)
     {

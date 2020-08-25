@@ -240,9 +240,9 @@ void variant_example4()
 
 #endif // defined(JSONCONS_HAS_STD_VARIANT)
 
-void json_type_traits_variant_examples()
+void json_traits_variant_examples()
 {
-    std::cout << "\njson_type_traits variant examples\n\n";
+    std::cout << "\njson traits variant examples\n\n";
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
     variant_example();

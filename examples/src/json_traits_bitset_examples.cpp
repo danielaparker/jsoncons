@@ -45,9 +45,9 @@ namespace {
 
 } // namespace
 
-void json_type_traits_bitset_examples()
+void json_traits_bitset_examples()
 {
-    std::cout << "\njson_type_traits bitset examples\n\n";
+    std::cout << "\njson traits bitset examples\n\n";
 
     json_example();
     cbor_example();
