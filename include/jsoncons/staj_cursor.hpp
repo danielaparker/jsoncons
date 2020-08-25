@@ -332,18 +332,36 @@ public:
         }
     }
 
-    template<class T>
-    typename std::enable_if<detail::is_signed_integer<T>::value, T>::type
-        get(std::error_code& ec) const
+    template <class IntegerType>
+    typename std::enable_if<detail::is_integer<IntegerType>::value, IntegerType>::type
+    get(std::error_code& ec) const
     {
-        return static_cast<T>(as_int64(ec));
-    }
-
-    template<class T>
-    typename std::enable_if<detail::is_unsigned_integer<T>::value, T>::type
-        get(std::error_code& ec) const
-    {
-        return static_cast<T>(as_uint64(ec));
+        switch (event_type_)
+        {
+            case staj_event_type::string_value:
+            {
+                auto result = jsoncons::detail::to_integer<IntegerType>(value_.string_data_, length_);
+                if (!result)
+                {
+                    ec = convert_errc::not_integer;
+                    return IntegerType();
+                }
+                return result.value();
+            }
+            case staj_event_type::half_value:
+                return static_cast<IntegerType>(value_.half_value_);
+            case staj_event_type::double_value:
+                return static_cast<IntegerType>(value_.double_value_);
+            case staj_event_type::int64_value:
+                return static_cast<IntegerType>(value_.int64_value_);
+            case staj_event_type::uint64_value:
+                return static_cast<IntegerType>(value_.uint64_value_);
+            case staj_event_type::bool_value:
+                return static_cast<IntegerType>(value_.bool_value_ ? 1 : 0);
+            default:
+                ec = convert_errc::not_integer;
+                return IntegerType();
+        }
     }
 
     template<class T>
@@ -377,82 +395,6 @@ public:
     uint64_t ext_tag() const noexcept { return ext_tag_; }
 
 private:
-
-    int64_t as_int64(std::error_code& ec) const
-    {
-        int64_t value = 0;
-        switch (event_type_)
-        {
-            case staj_event_type::key:
-            case staj_event_type::string_value:
-            {
-                auto result = jsoncons::detail::to_integer<int64_t>(value_.string_data_, length_);
-                if (!result)
-                {
-                    ec = convert_errc::not_signed_integer;
-                }
-                else
-                {
-                    value = result.value();
-                }
-                break;
-            }
-            case staj_event_type::double_value:
-                value = static_cast<int64_t>(value_.double_value_);
-                break;
-            case staj_event_type::int64_value:
-                value = value_.int64_value_;
-                break;
-            case staj_event_type::uint64_value:
-                value = static_cast<int64_t>(value_.uint64_value_);
-                break;
-            case staj_event_type::bool_value:
-                value = value_.bool_value_ ? 1 : 0;
-                break;
-            default:
-                ec = convert_errc::not_signed_integer;
-                break;
-        }
-        return value;
-    }
-
-    uint64_t as_uint64(std::error_code& ec) const
-    {
-        uint64_t value = 0;
-        switch (event_type_)
-        {
-            case staj_event_type::key:
-            case staj_event_type::string_value:
-            {
-                auto result = jsoncons::detail::to_integer<uint64_t>(value_.string_data_, length_);
-                if (!result)
-                {
-                    ec = convert_errc::not_unsigned_integer;
-                }
-                else
-                {
-                    value = result.value();
-                }
-                break;
-            }
-            case staj_event_type::double_value:
-                value = static_cast<uint64_t>(value_.double_value_);
-                break;
-            case staj_event_type::int64_value:
-                value = static_cast<uint64_t>(value_.int64_value_);
-                break;
-            case staj_event_type::uint64_value:
-                value = value_.uint64_value_;
-                break;
-            case staj_event_type::bool_value:
-                value = value_.bool_value_ ? 1 : 0;
-                break;
-            default:
-                ec = convert_errc::not_unsigned_integer;
-                break;
-        }
-        return value;
-    }
 
     double as_double(std::error_code& ec) const
     {

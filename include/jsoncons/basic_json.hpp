@@ -1258,11 +1258,7 @@ private:
             return evaluate().as_double();
         }
 
-        template <class T
-#if !defined(JSONCONS_NO_DEPRECATED)
-             = int64_t
-#endif
-        >
+        template <class T>
         T as_integer() const
         {
             return evaluate().template as_integer<T>();
@@ -4045,19 +4041,15 @@ public:
         }
     }
 
-    template <class T
-#if !defined(JSONCONS_NO_DEPRECATED)
-         = int64_t
-#endif
-    >
-    T as_integer() const
+    template <class IntegerType>
+    IntegerType as_integer() const
     {
         switch (storage())
         {
             case storage_kind::short_string_value:
             case storage_kind::long_string_value:
             {
-                auto result = jsoncons::detail::to_integer<T>(as_string_view().data(), as_string_view().length());
+                auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length());
                 if (!result)
                 {
                     JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
@@ -4065,17 +4057,17 @@ public:
                 return result.value();
             }
             case storage_kind::half_value:
-                return static_cast<T>(cast<half_storage>().value());
+                return static_cast<IntegerType>(cast<half_storage>().value());
             case storage_kind::double_value:
-                return static_cast<T>(cast<double_storage>().value());
+                return static_cast<IntegerType>(cast<double_storage>().value());
             case storage_kind::int64_value:
-                return static_cast<T>(cast<int64_storage>().value());
+                return static_cast<IntegerType>(cast<int64_storage>().value());
             case storage_kind::uint64_value:
-                return static_cast<T>(cast<uint64_storage>().value());
+                return static_cast<IntegerType>(cast<uint64_storage>().value());
             case storage_kind::bool_value:
-                return static_cast<T>(cast<bool_storage>().value() ? 1 : 0);
+                return static_cast<IntegerType>(cast<bool_storage>().value() ? 1 : 0);
             case storage_kind::json_const_pointer:
-                return cast<json_const_pointer_storage>().value()->template as_integer<T>();
+                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
             default:
                 JSONCONS_THROW(json_runtime_error<std::domain_error>("Not an integer"));
         }

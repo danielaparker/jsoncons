@@ -25,6 +25,7 @@ namespace jsoncons {
         not_string_view,
         not_byte_string,
         not_byte_string_view,
+        not_integer,
         not_signed_integer,
         not_unsigned_integer,
         not_double,
@@ -78,6 +79,8 @@ namespace detail {
                     return "Cannot convert to byte_string";
                 case convert_errc::not_byte_string_view:
                     return "Cannot convert to byte_string_view";
+                case convert_errc::not_integer:
+                    return "Cannot convert to integer";
                 case convert_errc::not_signed_integer:
                     return "Cannot convert to signed integer";
                 case convert_errc::not_unsigned_integer:
