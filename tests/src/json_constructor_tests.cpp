@@ -300,3 +300,22 @@ TEST_CASE("test_copy_constructor")
     CHECK(val17 == var18);
 }
 
+#if (defined(__GNUC__) || defined(__clang__)) && defined(JSONCONS_HAS_INT128) 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+TEST_CASE("json constructor __int64 tests")
+{
+    SECTION("test 1")
+    {
+        auto result = jsoncons::detail::to_integer<__int128>("-18446744073709551617");
+        REQUIRE(result);
+        json j(result.value());
+        std::cout << j << "\n\n";
+        __int128 val = j.as<__int128>();
+        CHECK(val == result.value());
+        //std::cout << val << "\n\n";
+    }
+}
+#pragma GCC diagnostic pop
+#endif
+

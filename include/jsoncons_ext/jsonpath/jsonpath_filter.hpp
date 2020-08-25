@@ -942,7 +942,7 @@ struct PathConstructor
         string_type s;
         s.append(path);
         s.push_back('[');
-        jsoncons::detail::write_integer(index,s);
+        jsoncons::detail::from_integer(index,s);
         s.push_back(']');
         return s;
     }

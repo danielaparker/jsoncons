@@ -807,7 +807,7 @@ private:
     {
         begin_value(sink);
 
-        jsoncons::detail::write_integer(val,sink);
+        jsoncons::detail::from_integer(val,sink);
 
         end_value();
     }
@@ -817,7 +817,7 @@ private:
     {
         begin_value(sink);
 
-        jsoncons::detail::write_integer(val,sink);
+        jsoncons::detail::from_integer(val,sink);
 
         end_value();
     }

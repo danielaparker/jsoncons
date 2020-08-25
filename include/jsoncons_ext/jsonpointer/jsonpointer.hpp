@@ -955,7 +955,7 @@ enum class pointer_state
                     {
                         string_type key(parent_key);
                         key.push_back('/');
-                        jsoncons::detail::write_integer(i,key);
+                        jsoncons::detail::from_integer(i,key);
                         flatten_(key, parent_value.at(i), result);
                     }
                 }

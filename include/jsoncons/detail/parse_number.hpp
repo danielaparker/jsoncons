@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <locale>
+#include <string>
 #include <limits> // std::numeric_limits
 #include <type_traits> // std::enable_if
 #include <exception>
@@ -20,7 +21,7 @@
 
 namespace jsoncons { namespace detail {
 
-    enum class to_integer_errc : uint8_t {ok=0,overflow,invalid_digit,invalid_number};
+    enum class to_integer_errc : uint8_t {success=0, overflow, invalid_digit, invalid_number};
 
     class to_integer_error_category_impl
        : public std::error_category
@@ -76,7 +77,7 @@ class to_integer_result
     to_integer_errc ec;
 public:
     constexpr to_integer_result(T value_)
-        : value_(value_), ec(to_integer_errc::ok)
+        : value_(value_), ec(to_integer_errc::success)
     {
     }
     constexpr to_integer_result(to_integer_errc ec)
@@ -90,7 +91,7 @@ public:
 
     constexpr explicit operator bool() const noexcept
     {
-        return ec == to_integer_errc::ok;
+        return ec == to_integer_errc::success;
     }
 
     T value() const
@@ -103,7 +104,7 @@ public:
         return make_error_code(ec);
     }
 
-    to_integer_errc errc() const
+    to_integer_errc error() const
     {
         return ec;
     }
@@ -250,7 +251,7 @@ to_integer_decimal(const CharT* s, std::size_t length)
     auto u = to_integer_decimal<U>(s, length);
     if (!u)
     {
-        return to_integer_result<T>(u.errc());
+        return to_integer_result<T>(u.error());
     }
     if (is_negative)
     {
@@ -479,7 +480,7 @@ to_integer(const CharT* s, std::size_t length)
     auto u = to_integer<U>(s, length);
     if (!u)
     {
-        return to_integer_result<T>(u.errc());
+        return to_integer_result<T>(u.error());
     }
     if (is_negative)
     {
@@ -503,6 +504,13 @@ to_integer(const CharT* s, std::size_t length)
             return to_integer_result<T>(static_cast<T>(u.value()));
         }
     }
+}
+
+template <class T, class CharT>
+typename std::enable_if<jsoncons::detail::integer_limits<T>::is_specialized,to_integer_result<T>>::type
+to_integer(const CharT* s)
+{
+    return to_integer<T,CharT>(s, std::char_traits<CharT>::length(s));
 }
 
 // Precondition: s satisfies

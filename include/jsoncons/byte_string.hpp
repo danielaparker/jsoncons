@@ -201,11 +201,6 @@ namespace jsoncons {
 
     // decode
 
-    enum class decode_binary_errc
-    {
-        ok = 0, invalid_length, invalid_byte
-    };
-
     template <class InputIt, class Container>
     typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
     from_base64url(InputIt first, InputIt last, Container& result)
@@ -262,11 +257,16 @@ namespace jsoncons {
                                                 result);
     }
 
+    enum class from_base16_errc
+    {
+        success = 0, odd_length, invalid_byte
+    };
+
     template <class InputIt>
     struct from_base16_result 
     {
         InputIt it;
-        decode_binary_errc ec;
+        from_base16_errc ec;
     };
 
     template <class InputIt,class Container>
@@ -276,7 +276,7 @@ namespace jsoncons {
         std::size_t len = std::distance(first,last);
         if (len & 1) 
         {
-            return from_base16_result<InputIt>{first, decode_binary_errc::invalid_length};
+            return from_base16_result<InputIt>{first, from_base16_errc::odd_length};
         }
 
         InputIt it = first;
@@ -294,7 +294,7 @@ namespace jsoncons {
             } 
             else 
             {
-                return from_base16_result<InputIt>{first, decode_binary_errc::invalid_byte};
+                return from_base16_result<InputIt>{first, from_base16_errc::invalid_byte};
             }
 
             auto b = *it++;
@@ -308,12 +308,12 @@ namespace jsoncons {
             } 
             else 
             {
-                return from_base16_result<InputIt>{first, decode_binary_errc::invalid_byte};
+                return from_base16_result<InputIt>{first, from_base16_errc::invalid_byte};
             }
 
             result.push_back(val);
         }
-        return from_base16_result<InputIt>{last, decode_binary_errc::ok};
+        return from_base16_result<InputIt>{last, from_base16_errc::success};
     }
 
     struct byte_traits

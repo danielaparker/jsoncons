@@ -65,7 +65,7 @@ void check_encode_base16(const std::vector<uint8_t>& input, const std::string& e
 
     std::vector<uint8_t> output;
     auto res = from_base16(result.begin(), result.end(), output);
-    REQUIRE(res.ec == decode_binary_errc::ok);
+    REQUIRE(res.ec == from_base16_errc::success);
     REQUIRE(output.size() == input.size());
     for (std::size_t i = 0; i < output.size(); ++i)
     {

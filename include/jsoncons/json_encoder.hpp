@@ -848,7 +848,7 @@ namespace detail {
                     break_line();
                 }
             }
-            std::size_t length = jsoncons::detail::write_integer(value, sink_);
+            std::size_t length = jsoncons::detail::from_integer(value, sink_);
             column_ += length;
             end_value();
             return true;
@@ -870,7 +870,7 @@ namespace detail {
                     break_line();
                 }
             }
-            std::size_t length = jsoncons::detail::write_integer(value, sink_);
+            std::size_t length = jsoncons::detail::from_integer(value, sink_);
             column_ += length;
             end_value();
             return true;
@@ -1465,7 +1465,7 @@ namespace detail {
             {
                 sink_.push_back(',');
             }
-            jsoncons::detail::write_integer(value, sink_);
+            jsoncons::detail::from_integer(value, sink_);
             if (!stack_.empty())
             {
                 stack_.back().increment_count();
@@ -1482,7 +1482,7 @@ namespace detail {
             {
                 sink_.push_back(',');
             }
-            jsoncons::detail::write_integer(value, sink_);
+            jsoncons::detail::from_integer(value, sink_);
             if (!stack_.empty())
             {
                 stack_.back().increment_count();
