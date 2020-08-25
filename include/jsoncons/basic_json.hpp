@@ -3195,18 +3195,18 @@ public:
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag, Allocator alloc = Allocator(),
+    basic_json(IntegerType val, semantic_tag, Allocator alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
     {
         std::basic_string<CharT> s;
         jsoncons::detail::from_integer(val, s);
         if (s.length() <= short_string_storage::max_length)
         {
-            construct<short_string_storage>(tag, s.data(), static_cast<uint8_t>(s.length()));
+            construct<short_string_storage>(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
         }
         else
         {
-            construct<long_string_storage>(tag, s.data(), s.length(), alloc);
+            construct<long_string_storage>(semantic_tag::bigint, s.data(), s.length(), alloc);
         }
     }
 
@@ -3225,18 +3225,18 @@ public:
     }
 
     template <class IntegerType>
-    basic_json(IntegerType val, semantic_tag tag, Allocator alloc = Allocator(),
+    basic_json(IntegerType val, semantic_tag, Allocator alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
     {
         std::basic_string<CharT> s;
         jsoncons::detail::from_integer(val, s);
         if (s.length() <= short_string_storage::max_length)
         {
-            construct<short_string_storage>(tag, s.data(), static_cast<uint8_t>(s.length()));
+            construct<short_string_storage>(semantic_tag::bigint, s.data(), static_cast<uint8_t>(s.length()));
         }
         else
         {
-            construct<long_string_storage>(tag, s.data(), s.length(), alloc);
+            construct<long_string_storage>(semantic_tag::bigint, s.data(), s.length(), alloc);
         }
     }
 
