@@ -2,7 +2,8 @@
 
 jsoncons supports many types in the standard library.
 
-* integer types 
+* [integer](#integer) Includes integral types such as `char`, `int8_t`, `int`, and `uint64_t`.
+Also includes 128 bit integer types `__int128` and `__uint128`, if supported on the platform.
 * float and double
 * bool
 * [nullptr_t](https://en.cppreference.com/w/cpp/types/nullptr_t) (since 0.155.0)
@@ -30,6 +31,65 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 [std::unordered_multiset](https://en.cppreference.com/w/cpp/container/unordered_multiset), and 
 [std::unordered_multimap](https://en.cppreference.com/w/cpp/container/unordered_multimap).
 * [bitset](https://en.cppreference.com/w/cpp/utility/bitset) (since 0.156.0)
+
+### integer
+
+Includes integral types such as `char`, `int8_t`, `int`, and `uint64_t`.
+Also includes 128 bit integer types `__int128` and `unsigned __int128`, if supported on the platform.
+
+#### JSON example assuming gcc or clang
+
+```c++
+#include <jsoncons/json.hpp>
+#include <iostream>
+#include <cassert>
+
+int main()
+{
+    jsoncons::json j1("-18446744073709551617", semantic_tag::bigint);
+    std::cout << j1 << "\n\n";
+
+    __int128 val1 = j1.as<__int128>();
+
+    jsoncons::json j2(val1);
+    assert(j2 == j1);
+
+    __int128 val2 = j2.as<__int128>();
+    assert(val2 == val1);
+}
+```
+Output:
+```
+"-18446744073709551617"
+```
+
+#### CBOR example assuming gcc or clang
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/cbor/cbor.hpp>
+#include <iostream>
+#include <cassert>
+
+int main()
+{
+    jsoncons::json j1("-18446744073709551617", semantic_tag::bigint);
+    std::cout << j1 << "\n\n";
+
+    __int128 val1 = j1.as<__int128>();
+
+    std::vector<uint8_t> data;
+    cbor::encode_cbor(val1, data);
+    std::cout << byte_string_view(data) << "\n\n";
+
+    auto val2 = cbor::decode_cbor<unsigned __int128>(data);
+    CHECK((val2 == val1));
+}
+```
+Output:
+```
+"-18446744073709551617"
+```
 
 ### duration
 

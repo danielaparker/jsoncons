@@ -310,11 +310,13 @@ TEST_CASE("json constructor __int64 tests")
         json j1("-18446744073709551617", semantic_tag::bigint);
         std::cout << j1 << "\n\n";
 
-        __int128 val = j1.as<__int128>();
+        __int128 val1 = j1.as<__int128>();
 
-        json j2(val);
-
+        json j2(val1);
         CHECK((j2 == j1));
+
+        __int128 val2 = j2.as<__int128>();
+        CHECK((val2 == val1));
     }
 }
 TEST_CASE("json constructor unsigned __int64 tests")
@@ -327,8 +329,10 @@ TEST_CASE("json constructor unsigned __int64 tests")
         __int128 val = j1.as<__int128>();
 
         json j2(val);
-
         CHECK((j2 == j1));
+
+        __int128 val2 = j2.as<__int128>();
+        CHECK((val2 == val1));
     }
 }
 #pragma GCC diagnostic pop

@@ -401,6 +401,7 @@ TEST_CASE("msgpack json constructor __int64 tests")
 {
     SECTION("test 1")
     {
+        std::cout << "MessagePack __int64 tests\n\n";
         json j1("-18446744073709551617", semantic_tag::bigint);
         std::cout << j1 << "\n\n";
 
@@ -420,6 +421,7 @@ TEST_CASE("msgpack json constructor unsigned __int64 tests")
 {
     SECTION("test 1")
     {
+        std::cout << "MessagePack __int64 tests\n\n";
         json j1("18446744073709551616", semantic_tag::bigint);
         std::cout << j1 << "\n\n";
 
