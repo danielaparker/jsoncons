@@ -1562,6 +1562,16 @@ private:
             return evaluate().to_string();
         }
 
+        template <class IntegerType>
+        bool is_integer() const noexcept
+        {
+            if (!parent_.contains(key_))
+            {
+                return false;
+            }
+            return evaluate().is_integer<IntegerType>();
+        }
+
 #if !defined(JSONCONS_NO_DEPRECATED)
 
         const basic_json& get_with_default(const string_view_type& name) const
@@ -1627,26 +1637,6 @@ private:
         bool has_key(const string_view_type& name) const noexcept
         {
             return contains(name);
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use is<int64_t>()")
-        bool is_integer() const noexcept
-        {
-            if (!parent_.contains(key_))
-            {
-                return false;
-            }
-            return evaluate().is_int64();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use is<uint64_t>()")
-        bool is_uinteger() const noexcept
-        {
-            if (!parent_.contains(key_))
-            {
-                return false;
-            }
-            return evaluate().is_uint64();
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use is<unsigned long long>()")
@@ -4091,6 +4081,86 @@ public:
         }
     }
 
+    template <class IntegerType>
+    typename std::enable_if<detail::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),bool>::type
+    is_integer() const noexcept
+    {
+        switch (storage())
+        {
+            case storage_kind::int64_value:
+                return (as_integer<int64_t>() >= (jsoncons::detail::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)());
+            case storage_kind::uint64_value:
+                return as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<IntegerType>::max)());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+            default:
+                return false;
+        }
+    }
+
+    template <class IntegerType>
+    typename std::enable_if<detail::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),bool>::type
+    is_integer() const noexcept
+    {
+        switch (storage())
+        {
+            case storage_kind::short_string_value:
+            case storage_kind::long_string_value:
+            {
+                auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length());
+                return result ? true : false;
+            }
+            case storage_kind::int64_value:
+                return (as_integer<int64_t>() >= (jsoncons::detail::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)());
+            case storage_kind::uint64_value:
+                return as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<IntegerType>::max)());
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+            default:
+                return false;
+        }
+    }
+
+    template <class IntegerType>
+    typename std::enable_if<detail::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),bool>::type
+    is_integer() const noexcept
+    {
+        switch (storage())
+        {
+            case storage_kind::int64_value:
+                return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+            case storage_kind::uint64_value:
+                return as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+            default:
+                return false;
+        }
+    }
+
+    template <class IntegerType>
+    typename std::enable_if<detail::is_unsigned_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),bool>::type
+    is_integer() const noexcept
+    {
+        switch (storage())
+        {
+            case storage_kind::short_string_value:
+            case storage_kind::long_string_value:
+            {
+                auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length());
+                return result ? true : false;
+            }
+            case storage_kind::int64_value:
+                return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+            case storage_kind::uint64_value:
+                return as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+            case storage_kind::json_const_pointer:
+                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+            default:
+                return false;
+        }
+    }
+
     double as_double() const
     {
         switch (storage())
@@ -5112,18 +5182,6 @@ public:
     bool has_key(const string_view_type& name) const noexcept
     {
         return contains(name);
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use is_int64()")
-    bool is_integer() const noexcept
-    {
-        return is_int64();
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use is_uint64()")
-    bool is_uinteger() const noexcept
-    {
-        return is_uint64();
     }
 
     JSONCONS_DEPRECATED_MSG("Instead, use as<uint64_t>()")

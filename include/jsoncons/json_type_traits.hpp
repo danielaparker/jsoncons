@@ -152,59 +152,15 @@ namespace detail {
 
     template<class Json, class T>
     struct json_type_traits<Json, T,
-                            typename std::enable_if<detail::is_signed_integer<T>::value
+                            typename std::enable_if<detail::is_integer<T>::value
     >::type>
     {
         using allocator_type = typename Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {
-            if (j.is_int64())
-            {
-                return (j.template as_integer<int64_t>() >= (jsoncons::detail::integer_limits<T>::lowest)()) && (j.template as_integer<int64_t>() <= (jsoncons::detail::integer_limits<T>::max)());
-            }
-            else if (j.is_uint64())
-            {
-                return j.template as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<T>::max)());
-            }
-            else
-            {
-                return false;
-            }
+            return j.template is_integer<T>();
         }
-        static T as(const Json& j)
-        {
-            return j.template as_integer<T>();
-        }
-
-        static Json to_json(T val, allocator_type alloc = allocator_type())
-        {
-            return Json(val, semantic_tag::none, alloc);
-        }
-    };
-
-    template<class Json, class T>
-    struct json_type_traits<Json, T,
-                            typename std::enable_if<detail::is_unsigned_integer<T>::value>::type>
-    {
-        using allocator_type = typename Json::allocator_type;
-
-        static bool is(const Json& j) noexcept
-        {
-            if (j.is_int64())
-            {
-                return j.template as_integer<int64_t>() >= 0 && static_cast<uint64_t>(j.template as_integer<int64_t>()) <= (jsoncons::detail::integer_limits<T>::max)();
-            }
-            else if (j.is_uint64())
-            {
-                return j.template as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<T>::max)();
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         static T as(const Json& j)
         {
             return j.template as_integer<T>();
@@ -1718,7 +1674,7 @@ namespace variant_detail
 
     // std::bitset
 
-    struct null_back_insertable_container
+    struct null_back_insertable_byte_container
     {
         using value_type = uint8_t;
 
@@ -1741,7 +1697,7 @@ namespace variant_detail
             else if (j.is_string())
             {
                 jsoncons::string_view sv = j.as_string_view();
-                null_back_insertable_container cont;
+                null_back_insertable_byte_container cont;
                 auto result = from_base16(sv.begin(), sv.end(), cont);
                 return result.ec == from_base16_errc::success ? true : false;
             }
