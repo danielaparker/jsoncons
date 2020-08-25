@@ -198,16 +198,14 @@ TEST_CASE("cbor json constructor __int64 tests")
 {
     SECTION("test 1")
     {
-        std::cout << "CBOR __int64 tests\n\n";
         json j1("-18446744073709551617", semantic_tag::bigint);
-        std::cout << j1 << "\n\n";
 
         __int128 val1 = j1.as<__int128>();
 
+        std::vector<uint8_t> expected = {0xc3,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
         std::vector<uint8_t> data;
         cbor::encode_cbor(val1, data);
-
-        std::cout << byte_string_view(data) << "\n\n";
+        CHECK(data == expected);
 
         auto val2 = cbor::decode_cbor<__int128>(data);
 
@@ -218,16 +216,14 @@ TEST_CASE("cbor json constructor unsigned __int64 tests")
 {
     SECTION("test 1")
     {
-        std::cout << "CBOR unsigned __int64 tests\n\n";
         json j1("18446744073709551616", semantic_tag::bigint);
-        std::cout << j1 << "\n\n";
 
         auto val1 = j1.as<unsigned __int128>();
 
+        std::vector<uint8_t> expected = {0xc2,0x49,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
         std::vector<uint8_t> data;
         cbor::encode_cbor(val1, data);
-
-        std::cout << byte_string_view(data) << "\n\n";
+        CHECK(data == expected);
 
         auto val2 = cbor::decode_cbor<unsigned __int128>(data);
 

@@ -36,6 +36,8 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 
 Includes integral types such as `char`, `int8_t`, `int`, and `uint64_t`.
 Also includes 128 bit integer types `__int128` and `unsigned __int128`, if supported on the platform.
+jsoncons encodes integer types with size greater than 64 bit to strings if JSON,
+`bignum` if CBOR, and strings for all other formats.
 
 #### JSON example assuming gcc or clang
 
@@ -44,14 +46,16 @@ Also includes 128 bit integer types `__int128` and `unsigned __int128`, if suppo
 #include <iostream>
 #include <cassert>
 
+using jsoncons::json;
+
 int main()
 {
-    jsoncons::json j1("-18446744073709551617", semantic_tag::bigint);
+    json j1("-18446744073709551617", semantic_tag::bigint);
     std::cout << j1 << "\n\n";
 
     __int128 val1 = j1.as<__int128>();
 
-    jsoncons::json j2(val1);
+    json j2(val1);
     assert(j2 == j1);
 
     __int128 val2 = j2.as<__int128>();
@@ -71,16 +75,23 @@ Output:
 #include <iostream>
 #include <cassert>
 
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
 int main()
 {
-    jsoncons::json j1("-18446744073709551617", semantic_tag::bigint);
-    std::cout << j1 << "\n\n";
+    json j1("-18446744073709551617", semantic_tag::bigint);
+    std::cout << "(1) " << j1 << "\n\n";
 
     __int128 val1 = j1.as<__int128>();
 
     std::vector<uint8_t> data;
     cbor::encode_cbor(val1, data);
-    std::cout << byte_string_view(data) << "\n\n";
+    std::cout << "(2) " << jsoncons::byte_string_view(data) << "\n\n";
+    /*
+       c3, // Negative bignum
+         49,01,00,00,00,00,00,00,00,00
+    */
 
     auto val2 = cbor::decode_cbor<unsigned __int128>(data);
     CHECK((val2 == val1));
@@ -88,7 +99,46 @@ int main()
 ```
 Output:
 ```
-"-18446744073709551617"
+(1) "-18446744073709551617"
+
+(2) c3,49,01,00,00,00,00,00,00,00,00
+```
+
+#### MessagePack example assuming gcc or clang
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/msgpack/msgpack.hpp>
+#include <iostream>
+#include <cassert>
+
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
+
+int main()
+{
+    json j1("-18446744073709551617", semantic_tag::bigint);
+    std::cout << "(1) " << j1 << "\n\n";
+
+    __int128 val1 = j1.as<__int128>();
+
+    std::vector<uint8_t> data;
+    msgpack::encode_msgpack(val1, data);
+    std::cout << "(2) " << byte_string_view(data) << "\n\n";
+    /*
+        b5, // fixstr, length 21
+          2d,31,38,34,34,36,37,34,34,30,37,33,37,30,39,35,35,31,36,31,37
+    */
+
+    auto val2 = msgpack::decode_msgpack<unsigned __int128>(data);
+    CHECK((val2 == val1));
+}
+```
+Output:
+```
+(1) "-18446744073709551617"
+
+(2) b5,2d,31,38,34,34,36,37,34,34,30,37,33,37,30,39,35,35,31,36,31,37
 ```
 
 ### duration

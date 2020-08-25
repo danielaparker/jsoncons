@@ -401,16 +401,14 @@ TEST_CASE("msgpack json constructor __int64 tests")
 {
     SECTION("test 1")
     {
-        std::cout << "MessagePack __int64 tests\n\n";
         json j1("-18446744073709551617", semantic_tag::bigint);
-        std::cout << j1 << "\n\n";
 
         __int128 val1 = j1.as<__int128>();
 
+        std::vector<uint8_t> expected = {0xb5,0x2d,0x31,0x38,0x34,0x34,0x36,0x37,0x34,0x34,0x30,0x37,0x33,0x37,0x30,0x39,0x35,0x35,0x31,0x36,0x31,0x37};
         std::vector<uint8_t> data;
         msgpack::encode_msgpack(val1, data);
-
-        std::cout << byte_string_view(data) << "\n\n";
+        CHECK(data == expected);
 
         auto val2 = msgpack::decode_msgpack<__int128>(data);
 
@@ -421,16 +419,14 @@ TEST_CASE("msgpack json constructor unsigned __int64 tests")
 {
     SECTION("test 1")
     {
-        std::cout << "MessagePack __int64 tests\n\n";
         json j1("18446744073709551616", semantic_tag::bigint);
-        std::cout << j1 << "\n\n";
 
         auto val1 = j1.as<unsigned __int128>();
 
+        std::vector<uint8_t> expected = {0xb4,0x31,0x38,0x34,0x34,0x36,0x37,0x34,0x34,0x30,0x37,0x33,0x37,0x30,0x39,0x35,0x35,0x31,0x36,0x31,0x36};
         std::vector<uint8_t> data;
         msgpack::encode_msgpack(val1, data);
-
-        std::cout << byte_string_view(data) << "\n\n";
+        CHECK(data == expected);
 
         auto val2 = msgpack::decode_msgpack<unsigned __int128>(data);
 

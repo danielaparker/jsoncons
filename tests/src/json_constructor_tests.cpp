@@ -308,7 +308,6 @@ TEST_CASE("json constructor __int64 tests")
     SECTION("test 1")
     {
         json j1("-18446744073709551617", semantic_tag::bigint);
-        std::cout << j1 << "\n\n";
 
         __int128 val1 = j1.as<__int128>();
 
@@ -324,7 +323,6 @@ TEST_CASE("json constructor unsigned __int64 tests")
     SECTION("test 1")
     {
         json j1("18446744073709551616", semantic_tag::bigint);
-        std::cout << j1 << "\n\n";
 
         __int128 val1 = j1.as<__int128>();
 
