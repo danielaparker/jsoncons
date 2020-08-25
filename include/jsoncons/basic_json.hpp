@@ -2965,7 +2965,7 @@ public:
 
     static basic_json make_array(const array& a, allocator_type alloc)
     {
-        return basic_json(basic_json(a, semantic_tag::none, alloc));
+        return basic_json(a, semantic_tag::none, alloc);
     }
 
     static basic_json make_array(std::initializer_list<basic_json> init, const Allocator& alloc = Allocator())
