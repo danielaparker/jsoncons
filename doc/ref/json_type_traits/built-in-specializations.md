@@ -76,7 +76,7 @@ Output:
 #include <cassert>
 
 using jsoncons::json;
-namespace msgpack = jsoncons::msgpack;
+namespace cbor = jsoncons::cbor;
 
 int main()
 {
