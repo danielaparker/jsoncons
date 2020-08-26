@@ -453,7 +453,7 @@ Pos,Driver,Entrant,Time,Gap
 3,Max Verstappen,Red Bull,1'25.325,1022
 ```
 
-### shared_ptr and unique_ptr
+### shared_ptr&sp;and&sp;unique_ptr
 
 if `T` is a class that is not a polymorphic class (does not have any virtual functions),
 jsoncons provides specializations for `std::shared_ptr<T>` and `std::unique_ptr<T>`.
