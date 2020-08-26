@@ -33,8 +33,8 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 
 ### integer
 
-Includes integral types such as `char`, `int8_t`, `int`, and `uint64_t`.
-Also includes 128 bit integer types `__int128` and `unsigned __int128`, if supported on the platform.
+Supported integer types include integral types such as `char`, `int8_t`, `int`, `unsigned long long`, `int64_t, and `uint64_t`.
+Also supported are 128 bit integer types `__int128` and `unsigned __int128`, if supported on the platform.
 jsoncons encodes integer types with size greater than 64 bit to strings if JSON,
 `bignum` if CBOR, and strings for all other formats.
 
@@ -457,7 +457,7 @@ Pos,Driver,Entrant,Time,Gap
 
 ### shared_ptr and unique_ptr
 
-if `T` is a class that is not a polymorphic class (does not have any virtual functions),
+If `T` is a class that is not a polymorphic class (does not have any virtual functions),
 jsoncons provides specializations for `std::shared_ptr<T>` and `std::unique_ptr<T>`.
 
 #### Example
