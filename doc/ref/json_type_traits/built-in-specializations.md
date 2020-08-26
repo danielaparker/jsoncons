@@ -15,7 +15,7 @@ for tick periods `std::ratio<1>` (one second), `std::milli` and  `std::nano`.
 * [pair](#pair)
 * [tuple](#tuple)
 * [optional](#optional)
-* [shared_ptr and unique_ptr](#shared_ptr and unique_ptr) - if `T` is a class that is not a polymorphic class,
+* [shared_ptr and unique_ptr](#shared_ptr&sp;and&sp;unique_ptr) - if `T` is a class that is not a polymorphic class,
 jsoncons provides specializations for `std::shared_ptr<T>` and `std::unique_ptr<T>`
 * [variant](#variant) (since 0.154.0)
 * [sequence containers](#sequence) - includes [std::array](https://en.cppreference.com/w/cpp/container/array), 
