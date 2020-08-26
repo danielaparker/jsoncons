@@ -33,7 +33,7 @@ and [std::multimap](https://en.cppreference.com/w/cpp/container/multimap).
 
 ### integer
 
-Supported integer types include integral types such as `char`, `int8_t`, `int`, `unsigned long long`, `int64_t, and `uint64_t`.
+Supported integer types include integral types such as `char`, `int8_t`, `int`, `unsigned long long`, `int64_t`, and `uint64_t`.
 Also supported are 128 bit integer types `__int128` and `unsigned __int128`, if supported on the platform.
 jsoncons encodes integer types with size greater than 64 bit to strings if JSON,
 `bignum` if CBOR, and strings for all other formats.
