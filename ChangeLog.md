@@ -1,5 +1,5 @@
-master
-------
+v0.156.0
+--------
 
 Bugs Fixed:
 
@@ -20,6 +20,9 @@ contains non-owning views on other `basic_json` values.
 - Support for encoding `std::bitset` into `base16` encoded strings (JSON) and
 byte strings (binary formats), and decoding `std::bitset` from integer values,
 byte strings and `base16` encoded strings.
+
+- Support 128 bit integer types `__int128` and `unsigned __int128`, if supported 
+on the platform.
 
 0.155.1
 --------
