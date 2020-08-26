@@ -454,6 +454,92 @@ Pos,Driver,Entrant,Time,Gap
 3,Max Verstappen,Red Bull,1'25.325,1022
 ```
 
+### shared_ptr and unique_ptr
+
+if `T` is a class that is not a polymorphic class (does not have any virtual functions),
+jsoncons provides specializations for `std::shared_ptr<T>` and `std::unique_ptr<T>`.
+
+#### Example
+
+```c++
+#include <jsoncons/json.hpp>
+#include <vector>
+#include <string>
+#include <iostream>
+
+namespace ns {
+    struct Model {
+        Model() : x(0), y(0), z(0) {}
+
+        std::string path;
+        int x;
+        int y;
+        int z;
+    };
+
+    struct Models {
+        std::vector<std::unique_ptr<Model>> models;
+    };
+}
+
+JSONCONS_ALL_MEMBER_TRAITS(ns::Model, path, x, y, z)
+JSONCONS_ALL_MEMBER_TRAITS(ns::Models, models)
+
+int main()
+{
+    std::string input = R"(
+    {
+      "models" : [
+        {"path" : "foo", "x" : 1, "y" : 2, "z" : 3}, 
+        {"path" : "bar", "x" : 4, "y" : 5, "z" : 6}, 
+        {"path" : "baz", "x" : 7, "y" : 8, "z" : 9} 
+      ]
+    }
+    )";
+
+    auto models = jsoncons::decode_json<std::shared_ptr<ns::Models>>(input);
+
+    for (auto& it : models->models)
+    {
+        std::cout << "path: " << it->path 
+                  << ", x: " << it->x << ", y: " << it->y << ", z: " << it->z << "\n";
+    }
+
+    std::cout << "\n";
+    jsoncons::encode_json_pretty(models, std::cout);
+    std::cout << "\n\n";
+}
+```
+Output:
+```
+path: foo, x: 1, y: 2, z: 3
+path: bar, x: 4, y: 5, z: 6
+path: baz, x: 7, y: 8, z: 9
+
+{
+    "models": [
+        {
+            "path": "foo",
+            "x": 1,
+            "y": 2,
+            "z": 3
+        },
+        {
+            "path": "bar",
+            "x": 4,
+            "y": 5,
+            "z": 6
+        },
+        {
+            "path": "baz",
+            "x": 7,
+            "y": 8,
+            "z": 9
+        }
+    ]
+}
+```
+
 ### variant
 
 #### Example
