@@ -15,8 +15,9 @@
 
 using namespace jsoncons;
 
-namespace json_type_traits_named_macro_tests
-{
+namespace {
+namespace ns {
+
     struct book1a
     {
         std::string author;
@@ -307,9 +308,8 @@ namespace json_type_traits_named_macro_tests
         std::string surname;
     };
 
-} // namespace json_type_traits_named_macro_tests
-
-namespace ns = json_type_traits_named_macro_tests;
+} // ns
+} // namespace 
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1a,(author,"Author"),(title,"Title"),(price,"Price"))
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::book1b,(author,"Author"),(title,"Title"),(price,"Price"))
