@@ -140,7 +140,7 @@ namespace ns {
             employees.push_back(id_employee_map.at(id));
         }
         return employees;
-    };
+    }
 
     template <class Employee>
     std::vector<uint64_t> fromEmployeesToIds(const std::vector<Employee>& employees)
@@ -159,7 +159,7 @@ namespace ns {
             ids.push_back(employee_id_map.at(employee));
         }
         return ids;
-    };
+    }
 
 } // namespace
 } // ns
