@@ -196,15 +196,15 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS functional tests")
         company.setName("Example");
         company.setIds(ids);
 
+        std::string output1;
+        encode_json(company, output1);
+        //std::cout << output1 << "\n\n";
+        auto company2 = decode_json<ns::Company_NGSN>(output1);
         std::string output2;
         encode_json(company, output2);
-        //std::cout << output2 << "\n\n";
-        auto company2 = decode_json<ns::Company_NGSN>(output2);
-        std::string output3;
-        encode_json(company, output3);
-        CHECK(output3 == output2);
+        CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output3);
+        auto j = decode_json<json>(output2);
         CHECK(j.is<ns::Company_NGSN>());
         CHECK(j.is<ns::Company_AGSN>());
     }
@@ -220,15 +220,15 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS functional tests")
         company.setName("Example");
         company.setIds(ids);
 
+        std::string output1;
+        encode_json(company, output1);
+        //std::cout << output1 << "\n\n";
+        auto company2 = decode_json<ns::Company_AGSN>(output1);
         std::string output2;
         encode_json(company, output2);
-        //std::cout << output2 << "\n\n";
-        auto company2 = decode_json<ns::Company_AGSN>(output2);
-        std::string output3;
-        encode_json(company, output3);
-        CHECK(output3 == output2);
+        CHECK(output2 == output1);
 
-        auto j = decode_json<json>(output3);
+        auto j = decode_json<json>(output2);
         CHECK(j.is<ns::Company_NGSN>());
         CHECK(j.is<ns::Company_AGSN>());
     }
