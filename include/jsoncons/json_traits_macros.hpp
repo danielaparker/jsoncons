@@ -799,17 +799,17 @@ namespace jsoncons \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
  
-#define JSONCONS_GETTER_SETTER_IS(P1, P2, P3, Seq, Count) JSONCONS_GETTER_SETTER_IS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_GETTER_SETTER_IS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_IS_ Seq)
-#define JSONCONS_GETTER_SETTER_IS_(Getter, Setter, Name) !ajson.contains(Name)) return false;
+#define JSONCONS_GETTER_SETTER_NAME_IS(P1, P2, P3, Seq, Count) JSONCONS_GETTER_SETTER_NAME_IS_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_GETTER_SETTER_NAME_IS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_NAME_IS_ Seq)
+#define JSONCONS_GETTER_SETTER_NAME_IS_(Getter, Setter, Name) !ajson.contains(Name)) return false;
 
-#define JSONCONS_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 || JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_NAME_AS_ Seq)
-#define JSONCONS_GETTER_SETTER_NAME_AS_(Getter, Setter, Name) ajson.contains(Name)) aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());
+#define JSONCONS_N_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 || JSONCONS_EXPAND(JSONCONS_N_GETTER_SETTER_NAME_AS_ Seq)
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_(Getter, Setter, Name) ajson.contains(Name)) aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());
 
-#define JSONCONS_GETTER_SETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_NAME_TO_JSON_ Seq)
-#define JSONCONS_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_GETTER_SETTER_NAME_TO_JSON_ Seq)
-#define JSONCONS_GETTER_SETTER_NAME_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
+#define JSONCONS_N_GETTER_SETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_N_GETTER_SETTER_NAME_TO_JSON_ Seq)
+#define JSONCONS_N_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_N_GETTER_SETTER_NAME_TO_JSON_ Seq)
+#define JSONCONS_N_GETTER_SETTER_NAME_TO_JSON_(Getter, Setter, Name) ajson.try_emplace(Name, aval.Getter() );
 
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_GETTER_SETTER_NAME_AS_ Seq)
@@ -838,7 +838,7 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_SETTER_IS,,,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(JSONCONS_GETTER_SETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
@@ -858,12 +858,12 @@ namespace jsoncons \
   /**/
  
 #define JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ValueType,NumMandatoryParams, ...)  \
-    JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(JSONCONS_GETTER_SETTER_NAME_AS,JSONCONS_GETTER_SETTER_NAME_TO_JSON, 0, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(JSONCONS_N_GETTER_SETTER_NAME_AS,JSONCONS_N_GETTER_SETTER_NAME_TO_JSON, 0, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <> struct is_json_type_traits_declared<ValueType> : public std::true_type {}; } \
   /**/
  
 #define JSONCONS_TPL_N_GETTER_SETTER_NAME_TRAITS(NumTemplateParams, ValueType,NumMandatoryParams, ...)  \
-    JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(JSONCONS_GETTER_SETTER_NAME_AS,JSONCONS_GETTER_SETTER_NAME_TO_JSON, NumTemplateParams, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
+    JSONCONS_GETTER_SETTER_NAME_TRAITS_BASE(JSONCONS_N_GETTER_SETTER_NAME_AS,JSONCONS_N_GETTER_SETTER_NAME_TO_JSON, NumTemplateParams, ValueType,NumMandatoryParams,NumMandatoryParams, __VA_ARGS__) \
     namespace jsoncons { template <JSONCONS_GENERATE_TPL_PARAMS(JSONCONS_GENERATE_TPL_PARAM, NumTemplateParams)> struct is_json_type_traits_declared<ValueType JSONCONS_GENERATE_TPL_ARGS(JSONCONS_GENERATE_TPL_ARG, NumTemplateParams)> : public std::true_type {}; } \
   /**/
  

@@ -19,10 +19,10 @@
 
 #define UNUSABLE_VALUE { static_assert (false, "bad value"); }
 
-#define NEW_GETTER_SETTER_IS(P1, P2, P3, Seq, Count) NEW_GETTER_SETTER_IS_LAST(P1, P2, P3, Seq, Count)
-#define NEW_GETTER_SETTER_IS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_EXPAND(NEW_CONCAT(NEW_GETTER_SETTER_IS_,JSONCONS_NARGS Seq) Seq)
-#define NEW_GETTER_SETTER_IS_3(Getter, Setter, Name) !ajson.contains(Name)) return false;
-#define NEW_GETTER_SETTER_IS_5(Getter, F1, F2, Setter, Name) !ajson.contains(Name)) return false;
+#define NEW_GETTER_SETTER_NAME_IS(P1, P2, P3, Seq, Count) NEW_GETTER_SETTER_NAME_IS_LAST(P1, P2, P3, Seq, Count)
+#define NEW_GETTER_SETTER_NAME_IS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_EXPAND(NEW_CONCAT(NEW_GETTER_SETTER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
+#define NEW_GETTER_SETTER_NAME_IS_3(Getter, Setter, Name) !ajson.contains(Name)) return false;
+#define NEW_GETTER_SETTER_NAME_IS_5(Getter, F1, F2, Setter, Name) !ajson.contains(Name)) return false;
 
 #define NEW_N_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) NEW_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define NEW_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 || JSONCONS_EXPAND(NEW_CONCAT(NEW_N_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
@@ -66,7 +66,7 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(NEW_GETTER_SETTER_IS,,,, __VA_ARGS__)\
+            JSONCONS_VARIADIC_REP_N(NEW_GETTER_SETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
