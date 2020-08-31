@@ -78,6 +78,8 @@ target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 #message((${JSONCONS_TESTS_SOURCES}))
 
 set(JSONCONS_TESTS_SOURCES
+   ${JSONCONS_TESTS_DIR}/src/json_traits_macro_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/json_traits_macro_functional_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/tests_main.cpp
 )
 set(JSONCONS_TARGET test_jsoncons)
