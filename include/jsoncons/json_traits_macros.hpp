@@ -293,25 +293,25 @@ namespace jsoncons \
 #define JSONCONS_MEMBER_NAME_IS_2(Member, Name) !ajson.contains(Name)) return false;
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_N_MEMBER_NAME_AS_ Seq)
-#define JSONCONS_N_MEMBER_NAME_AS_(Member, Name) \
+#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) \
     {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
 
-#define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_MEMBER_NAME_AS_ Seq)
-#define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_MEMBER_NAME_AS_ Seq)
-#define JSONCONS_ALL_MEMBER_NAME_AS_(Member, Name) \
+#define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
+#define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) \
     json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);
 
 #define JSONCONS_N_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_N_MEMBER_NAME_TO_JSON_ Seq)
-#define JSONCONS_N_MEMBER_NAME_TO_JSON_(Member, Name) \
+#define JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_TO_JSON_2(Member, Name) \
   {ajson.try_emplace(Name, aval.Member);} \
 else \
   {json_traits_helper<Json>::set_optional_json_member(Name, aval.Member, ajson);}
 
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_ALL_MEMBER_NAME_TO_JSON_ Seq)
-#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_(Member, Name) ajson.try_emplace(Name, aval.Member);
+#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_ALL_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_2(Member, Name) ajson.try_emplace(Name, aval.Member);
 
 #define JSONCONS_MEMBER_NAME_TRAITS_BASE(AsT,ToJ, NumTemplateParams, ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
 namespace jsoncons \
