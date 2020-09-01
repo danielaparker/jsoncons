@@ -461,23 +461,23 @@ namespace jsoncons \
 #define JSONCONS_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count),
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) ((num_params-Count) < num_mandatory_params2) ? JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_AS_2(Member, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>() : (ajson.contains(Name)) ? (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>() : typename std::decay<decltype(((value_type*)nullptr)->Member())>::type()
-#define JSONCONS_CTOR_GETTER_NAME_AS_4(Member, F1, F2, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>() : (ajson.contains(Name)) ? (F2(ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Member())>::type>()) : F2(typename std::decay<decltype(((value_type*)nullptr)->Member())>::type())
+#define JSONCONS_CTOR_GETTER_NAME_AS_4(Member, F1, F2, Name) F2(ajson.at(Name).template as<typename std::decay<decltype(F1(((value_type*)nullptr)->Member()))>::type>()) : (ajson.contains(Name)) ? F2(ajson.at(Name).template as<typename std::decay<decltype(F1(((value_type*)nullptr)->Member()))>::type>()) : F2(typename std::decay<decltype(F1(((value_type*)nullptr)->Member()))>::type())
 
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_CTOR_GETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_CTOR_GETTER_NAME_TO_JSON_2(Member, Name) \
+#define JSONCONS_CTOR_GETTER_NAME_TO_JSON_2(Getter, Name) \
 { \
-  ajson.try_emplace(Name, aval.Member() ); \
+  ajson.try_emplace(Name, aval.Getter() ); \
 } \
 else { \
-  json_traits_helper<Json>::set_optional_json_member(Name, aval.Member(), ajson); \
+  json_traits_helper<Json>::set_optional_json_member(Name, aval.Getter(), ajson); \
 }
-#define JSONCONS_CTOR_GETTER_NAME_TO_JSON_4(Member, F1, F2, Name) \
+#define JSONCONS_CTOR_GETTER_NAME_TO_JSON_4(Getter, F1, F2, Name) \
 { \
-  ajson.try_emplace(Name, F1(aval.Member()) ); \
+  ajson.try_emplace(Name, F1(aval.Getter()) ); \
 } \
 else { \
-  json_traits_helper<Json>::set_optional_json_member(Name, F1(aval.Member()), ajson); \
+  json_traits_helper<Json>::set_optional_json_member(Name, F1(aval.Getter()), ajson); \
 }
 
 #define JSONCONS_CTOR_GETTER_NAME_TRAITS_BASE(NumTemplateParams, ValueType,NumMandatoryParams1,NumMandatoryParams2, ...)  \
