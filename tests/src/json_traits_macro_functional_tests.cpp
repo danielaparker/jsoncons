@@ -4,18 +4,61 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <jsoncons/json.hpp>
-#include <jsoncons/json_encoder.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
 #include <utility>
 #include <ctime>
 #include <cstdint>
+#include <regex>
 #include <jsoncons/json.hpp>
 
 namespace {
 namespace ns {
+ 
+    class Person_NCGN 
+    {
+          std::string name_;
+          std::string socialSecurityNumber_;
+          jsoncons::optional<std::string> birthDate_;
+      public:
+          Person_NCGN(const std::string& name, const std::string& socialSecurityNumber, 
+                      const jsoncons::optional<std::string>& birthDate = jsoncons::optional<std::string>())
+            : name_(name), socialSecurityNumber_(socialSecurityNumber), birthDate_(birthDate)
+          {
+          }
+          std::string getName() const
+          {
+              return name_;
+          }
+          std::string getSocialSecurityNumber() const
+          {
+              return socialSecurityNumber_;
+          }
+          jsoncons::optional<std::string> getBirthDate() const
+          {
+              return birthDate_;
+          }
+    };
+
+    class Person_ACGN 
+    {
+          std::string name_;
+          std::string socialSecurityNumber_;
+      public:
+          Person_ACGN(const std::string& name, const std::string& socialSecurityNumber)
+            : name_(name), socialSecurityNumber_(socialSecurityNumber)
+          {
+          }
+          std::string getName() const
+          {
+              return name_;
+          }
+          std::string getSocialSecurityNumber() const
+          {
+              return socialSecurityNumber_;
+          }
+    };
 
     class Employee_NMN
     {
@@ -425,9 +468,36 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Company_ACGN,
     (getIds, "resources", ns::fromIdsToEmployees<ns::Employee_ACGN>, ns::fromEmployeesToIds<ns::Employee_ACGN>)
 )
 
+JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
+  (getName, "name"),
+  (getSocialSecurityNumber, "social_security_number",
+      [] (const std::string& unvalidated) {
+          std::regex myRegex(("^(\\d{9})$"));
+          if (!std::regex_match(unvalidated, myRegex) ) {
+              throw std::runtime_error("Invalid social security number");
+          }
+          return unvalidated;
+      }
+   ),
+   (getBirthDate, "birth_date")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN, 
+  (getName, "name"),
+  (getSocialSecurityNumber, "social_security_number",
+      [] (const std::string& unvalidated) {
+          std::regex myRegex(("^(\\d{9})$"));
+          if (!std::regex_match(unvalidated, myRegex) ) {
+              throw std::runtime_error("Invalid social security number");
+          }
+          return unvalidated;
+      }
+   )
+)
+
 using namespace jsoncons;
 
-TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS functional tests")
+TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS transform tests")
 {
     SECTION("test 1")
     {
@@ -449,7 +519,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS functional tests")
     }
 } 
 
-TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS functional tests")
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS transform tests")
 {
     SECTION("test 1")
     {
@@ -471,7 +541,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS functional tests")
     }
 } 
 
-TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS functional tests")
+TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS transform tests")
 {
     SECTION("test 1")
     {
@@ -507,7 +577,7 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS functional tests")
     }
 } 
 
-TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS functional tests")
+TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS transform tests")
 {
     SECTION("test 1")
     {
@@ -529,7 +599,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS functional tests")
     }
 } 
 
-TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS functional tests")
+TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS transform tests")
 {
     SECTION("test 1")
     {
@@ -551,7 +621,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS functional tests")
     }
 } 
 
-TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS functional tests")
+TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS transform tests")
 {
     SECTION("test 1")
     {
@@ -570,6 +640,42 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS functional tests")
         auto j = decode_json<json>(output2);
         CHECK(j.is<ns::Company_NMN>());
         CHECK(j.is<ns::Company_AMN>());
+    }
+} 
+
+TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS validation tests")
+{
+    SECTION("test 1")
+    {
+        std::vector<ns::Person_NCGN> persons = {ns::Person_NCGN("John Smith", "123456789"), ns::Person_NCGN("Jane Doe", "234567890")};    
+
+        std::string output1;
+        encode_json_pretty(persons, output1);
+        auto persons2 = decode_json<std::vector<ns::Person_NCGN>>(output1);
+        std::string output2;
+        encode_json_pretty(persons2, output2);
+        CHECK(output2 == output1);
+
+        auto j = decode_json<json>(output2);
+        CHECK(j.is<std::vector<ns::Person_NCGN>>());
+    }
+} 
+
+TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
+{
+    SECTION("test 1")
+    {
+        std::vector<ns::Person_ACGN> persons = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "234567890")};    
+
+        std::string output1;
+        encode_json_pretty(persons, output1);
+        auto persons2 = decode_json<std::vector<ns::Person_ACGN>>(output1);
+        std::string output2;
+        encode_json_pretty(persons2, output2);
+        CHECK(output2 == output1);
+
+        auto j = decode_json<json>(output2);
+        CHECK(j.is<std::vector<ns::Person_ACGN>>());
     }
 } 
 
