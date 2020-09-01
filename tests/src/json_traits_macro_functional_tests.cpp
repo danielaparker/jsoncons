@@ -263,9 +263,11 @@ namespace ns {
     {
         std::string name_;
         std::vector<uint64_t> employeeIds_;
+        jsoncons::optional<double> rating_;
     public:
-        Company_NCGN(const std::string& name, const std::vector<uint64_t>& employeeIds)
-            : name_(name), employeeIds_(employeeIds)
+        Company_NCGN(const std::string& name, const std::vector<uint64_t>& employeeIds,
+                     jsoncons::optional<double> rating = jsoncons::optional<double>())
+            : name_(name), employeeIds_(employeeIds), rating_(rating)
         {
         }
 
@@ -276,6 +278,11 @@ namespace ns {
         const std::vector<uint64_t> getIds() const
         {
             return employeeIds_;
+        }
+
+        jsoncons::optional<double> getRating() const
+        {
+            return rating_;
         }
     };
 
@@ -404,7 +411,8 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Company_NCGN, 2,
   (getName, "company"),
-  (getIds, ns::fromIdsToEmployees<ns::Employee_NCGN>, ns::fromEmployeesToIds<ns::Employee_NCGN>, "resources")
+  (getIds, ns::fromIdsToEmployees<ns::Employee_NCGN>, ns::fromEmployeesToIds<ns::Employee_NCGN>, "resources"),
+  (getRating, "rating")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Employee_ACGN,
