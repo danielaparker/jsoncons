@@ -43,11 +43,12 @@ namespace ns {
     public:
         std::string name_;
         std::vector<uint64_t> employeeIds_;
+        jsoncons::optional<double> rating_;
 
         Company_NMN() = default;
 
         Company_NMN(const std::string& name, const std::vector<uint64_t>& employeeIds)
-            : name_(name), employeeIds_(employeeIds)
+            : name_(name), employeeIds_(employeeIds), rating_()
         {
         }
     };
@@ -128,11 +129,12 @@ namespace ns {
     {
         std::string name_;
         std::vector<uint64_t> employeeIds_;
+        jsoncons::optional<double> rating_;
     public:
         Company_NGSN() = default;
 
         Company_NGSN(const std::string& name, const std::vector<uint64_t>& employeeIds)
-            : name_(name), employeeIds_(employeeIds)
+            : name_(name), employeeIds_(employeeIds), rating_()
         {
         }
 
@@ -152,6 +154,15 @@ namespace ns {
         {
             employeeIds_ = employeeIds;
         }
+
+        jsoncons::optional<double> getRating() const
+        {
+            return rating_;
+        }
+        void setRating(const jsoncons::optional<double>& rating)
+        {
+            rating_ = rating;
+        }    
     };
 
     class Employee_AGSN
@@ -351,7 +362,8 @@ JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Company_NMN, 2,
     (name_, "company"),
-    (employeeIds_, ns::fromIdsToEmployees<ns::Employee_NMN>, ns::fromEmployeesToIds<ns::Employee_NMN>, "resources")
+    (employeeIds_, ns::fromIdsToEmployees<ns::Employee_NMN>, ns::fromEmployeesToIds<ns::Employee_NMN>, "resources"),
+    (rating_, "rating")
 )
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Employee_AMN,
@@ -371,7 +383,8 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Company_NGSN, 2,
   (getName, setName, "company"),
-  (getIds, ns::fromIdsToEmployees<ns::Employee_NGSN>, ns::fromEmployeesToIds<ns::Employee_NGSN>, setIds, "resources")
+  (getIds, ns::fromIdsToEmployees<ns::Employee_NGSN>, ns::fromEmployeesToIds<ns::Employee_NGSN>, setIds, "resources"),
+  (getRating, setRating, "rating")
 )
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee_AGSN,
