@@ -30,14 +30,24 @@ namespace jsoncons
     {
         using string_view_type = typename Json::string_view_type; 
 
-        template <class U> 
-        static void set_udt_member(const Json&, const string_view_type&, const U&) 
+        template <class OutputType> 
+        static void set_udt_member(const Json&, const string_view_type&, const OutputType&) 
         { 
         } 
-        template <class U> 
-        static void set_udt_member(const Json& j, const string_view_type& key, U& val) 
+        template <class OutputType> 
+        static void set_udt_member(const Json& j, const string_view_type& key, OutputType& val) 
         { 
-            val = j.at(key).template as<U>(); 
+            val = j.at(key).template as<OutputType>(); 
+        } 
+
+        template <class T, class F, class OutputType> 
+        static void set_udt_member(const Json&, const string_view_type&, F f, const OutputType&) 
+        { 
+        } 
+        template <class T, class F, class OutputType> 
+        static void set_udt_member(const Json& j, const string_view_type& key, F f, OutputType& val) 
+        { 
+            val = f(j.at(key).template as<T>()); 
         } 
         template <class U> 
         static void set_optional_json_member(const string_view_type& key, const std::shared_ptr<U>& val, Json& j) 
@@ -298,14 +308,14 @@ namespace jsoncons \
 #define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) \
     {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
 #define JSONCONS_N_MEMBER_NAME_AS_4(Member, F1, F2, Name) \
-    {json_traits_helper<Json>::set_udt_member(ajson,Name,F2(aval.Member));}
+    {json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(F1(((value_type*)nullptr)->Member))>::type>(ajson,Name,F2,aval.Member);}
 
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) \
     json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);
 #define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, F1, F2, Name) \
-    json_traits_helper<Json>::set_udt_member(ajson,Name,F2(aval.Member));
+    json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(F1(((value_type*)nullptr)->Member))>::type>(ajson,Name,F2,aval.Member);
 
 #define JSONCONS_N_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)

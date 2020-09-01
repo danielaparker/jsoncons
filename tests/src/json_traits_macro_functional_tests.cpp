@@ -17,6 +17,76 @@
 namespace {
 namespace ns {
 
+    class Employee_NMN
+    {
+    public:
+        std::string name_;
+        std::string surname_;
+
+        Employee_NMN() = default;
+
+        Employee_NMN(const std::string& name, const std::string& surname)
+            : name_(name), surname_(surname)
+        {
+        }
+
+        friend bool operator<(const Employee_NMN& lhs, const Employee_NMN& rhs)
+        {
+            if (lhs.surname_ < rhs.surname_)
+                return true;
+            return lhs.name_ < rhs.name_;
+        }
+    };
+
+    class Company_NMN 
+    {
+    public:
+        std::string name_;
+        std::vector<uint64_t> employeeIds_;
+
+        Company_NMN() = default;
+
+        Company_NMN(const std::string& name, const std::vector<uint64_t>& employeeIds)
+            : name_(name), employeeIds_(employeeIds)
+        {
+        }
+    };
+
+    class Employee_AMN
+    {
+    public:
+        std::string name_;
+        std::string surname_;
+
+        Employee_AMN() = default;
+
+        Employee_AMN(const std::string& name, const std::string& surname)
+            : name_(name), surname_(surname)
+        {
+        }
+
+        friend bool operator<(const Employee_AMN& lhs, const Employee_AMN& rhs)
+        {
+            if (lhs.surname_ < rhs.surname_)
+                return true;
+            return lhs.name_ < rhs.name_;
+        }
+    };
+
+    class Company_AMN 
+    {
+    public:
+        std::string name_;
+        std::vector<uint64_t> employeeIds_;
+
+        Company_AMN() = default;
+
+        Company_AMN(const std::string& name, const std::vector<uint64_t>& employeeIds)
+            : name_(name), employeeIds_(employeeIds)
+        {
+        }
+    };
+
     class Employee_NGSN
     {
         std::string name_;
@@ -274,6 +344,26 @@ namespace ns {
 } // namespace
 } // ns
 
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
+    (name_, "employee_name"),
+    (surname_, "employee_surname")
+)
+
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Company_NMN, 2,
+    (name_, "company"),
+    (employeeIds_, ns::fromIdsToEmployees<ns::Employee_NMN>, ns::fromEmployeesToIds<ns::Employee_NMN>, "resources")
+)
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Employee_AMN,
+    (name_, "employee_name"),
+    (surname_, "employee_surname")
+)
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Company_AMN,
+    (name_, "company"),
+    (employeeIds_, ns::fromIdsToEmployees<ns::Employee_AMN>, ns::fromEmployeesToIds<ns::Employee_AMN>, "resources")
+)
+
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
                                       (getName, setName, "employee_name"),
                                       (getSurname, setSurname, "employee_surname")
@@ -415,6 +505,50 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS functional tests")
         auto j = decode_json<json>(output2);
         CHECK(j.is<ns::Company_NCGN>());
         CHECK(j.is<ns::Company_ACGN>());
+    }
+} 
+
+TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS functional tests")
+{
+    SECTION("test 1")
+    {
+        std::vector<uint64_t> ids = {1,2};
+
+        ns::Company_NMN company("Example", ids);
+
+        std::string output1;
+        encode_json(company, output1);
+        //std::cout << output1 << "\n\n";
+        auto company2 = decode_json<ns::Company_NMN>(output1);
+        std::string output2;
+        encode_json(company, output2);
+        CHECK(output2 == output1);
+
+        auto j = decode_json<json>(output2);
+        CHECK(j.is<ns::Company_NMN>());
+        CHECK(j.is<ns::Company_AMN>());
+    }
+} 
+
+TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS functional tests")
+{
+    SECTION("test 1")
+    {
+        std::vector<uint64_t> ids = {1,2};
+        
+        ns::Company_AMN company("Example", ids);
+
+        std::string output1;
+        encode_json(company, output1);
+        //std::cout << output1 << "\n\n";
+        auto company2 = decode_json<ns::Company_AMN>(output1);
+        std::string output2;
+        encode_json(company, output2);
+        CHECK(output2 == output1);
+
+        auto j = decode_json<json>(output2);
+        CHECK(j.is<ns::Company_NMN>());
+        CHECK(j.is<ns::Company_AMN>());
     }
 } 
 
