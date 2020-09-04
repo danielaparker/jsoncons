@@ -19,10 +19,10 @@ namespace ns {
     class Person_NCGN 
     {
           std::string name_;
-          std::string socialSecurityNumber_;
+          jsoncons::optional<std::string> socialSecurityNumber_;
           jsoncons::optional<std::string> birthDate_;
       public:
-          Person_NCGN(const std::string& name, const std::string& socialSecurityNumber, 
+          Person_NCGN(const std::string& name, const jsoncons::optional<std::string>& socialSecurityNumber, 
                       const jsoncons::optional<std::string>& birthDate = jsoncons::optional<std::string>())
             : name_(name), socialSecurityNumber_(socialSecurityNumber), birthDate_(birthDate)
           {
@@ -31,7 +31,7 @@ namespace ns {
           {
               return name_;
           }
-          std::string getSocialSecurityNumber() const
+          jsoncons::optional<std::string> getSocialSecurityNumber() const
           {
               return socialSecurityNumber_;
           }
@@ -44,9 +44,9 @@ namespace ns {
     class Person_ACGN 
     {
           std::string name_;
-          std::string socialSecurityNumber_;
+          jsoncons::optional<std::string> socialSecurityNumber_;
       public:
-          Person_ACGN(const std::string& name, const std::string& socialSecurityNumber)
+          Person_ACGN(const std::string& name, const jsoncons::optional<std::string>& socialSecurityNumber)
             : name_(name), socialSecurityNumber_(socialSecurityNumber)
           {
           }
@@ -54,7 +54,7 @@ namespace ns {
           {
               return name_;
           }
-          std::string getSocialSecurityNumber() const
+          jsoncons::optional<std::string> getSocialSecurityNumber() const
           {
               return socialSecurityNumber_;
           }
@@ -471,12 +471,16 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Company_ACGN,
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
   (getName, "name"),
   (getSocialSecurityNumber, "social_security_number",
-      [] (const std::string& unvalidated) {
+      [] (const jsoncons::optional<std::string>& unvalidated) {
+          if (!unvalidated)
+          {
+              return unvalidated;
+          }
           std::regex myRegex(("^(\\d{9})$"));
-          if (!std::regex_match(unvalidated, myRegex) ) {
+          if (!std::regex_match(unvalidated.value(), myRegex) ) {
               throw std::runtime_error("Invalid social security number");
           }
-          return unvalidated;
+          return jsoncons::optional<std::string>(unvalidated);
       }
    ),
    (getBirthDate, "birth_date")
@@ -485,10 +489,14 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN, 
   (getName, "name"),
   (getSocialSecurityNumber, "social_security_number",
-      [] (const std::string& unvalidated) {
+      [] (const jsoncons::optional<std::string>& unvalidated) -> jsoncons::optional<std::string> {
+          if (!unvalidated)
+          {
+              return unvalidated;
+          }
           std::regex myRegex(("^(\\d{9})$"));
-          if (!std::regex_match(unvalidated, myRegex) ) {
-              throw std::runtime_error("Invalid social security number");
+          if (!std::regex_match(unvalidated.value(), myRegex) ) {
+              return jsoncons::optional<std::string>();
           }
           return unvalidated;
       }
@@ -665,9 +673,9 @@ TEST_CASE("JSONCONS_N_CTOR_GETTER_NAME_TRAITS validation tests")
 
 TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
 {
-    SECTION("test 1")
+    SECTION("success")
     {
-        std::vector<ns::Person_ACGN> persons = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "234567890")};    
+        std::vector<ns::Person_ACGN> persons = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "123456789")};    
 
         std::string output1;
         encode_json_pretty(persons, output1);
@@ -678,6 +686,16 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
 
         auto j = decode_json<json>(output2);
         CHECK(j.is<std::vector<ns::Person_ACGN>>());
+    }
+    SECTION("failure")
+    {
+        std::vector<ns::Person_ACGN> persons1 = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "12345678")};    
+
+        std::string output1;
+        encode_json_pretty(persons1, output1);
+        auto persons2 = decode_json<std::vector<ns::Person_ACGN>>(output1);
+        CHECK(persons2.at(1).getName() == persons1.at(1).getName());
+        CHECK_FALSE(persons2.at(1).getSocialSecurityNumber());
     }
 } 
 #endif
