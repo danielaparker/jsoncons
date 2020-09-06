@@ -489,7 +489,7 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN, 
   (getName, "name"),
   (getSocialSecurityNumber, "social_security_number",
-      [] (const jsoncons::optional<std::string>& unvalidated) -> jsoncons::optional<std::string> {
+      [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
               return unvalidated;
@@ -694,6 +694,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
         std::string output1;
         encode_json_pretty(persons1, output1);
         auto persons2 = decode_json<std::vector<ns::Person_ACGN>>(output1);
+        CHECK(persons2.at(0).getName() == persons1.at(0).getName());
+        CHECK(persons2.at(0).getSocialSecurityNumber() == persons1.at(0).getSocialSecurityNumber());
         CHECK(persons2.at(1).getName() == persons1.at(1).getName());
         CHECK_FALSE(persons2.at(1).getSocialSecurityNumber());
     }
