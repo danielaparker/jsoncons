@@ -288,7 +288,7 @@ int main()
 
     csv::csv_cursor cursor(data, options);
 
-    auto view = staj_array<ojson>(cursor);
+    auto view = make_staj_array_view<ojson>(cursor);
 
     json_options print_options;
     print_options.float_format(float_chars_format::fixed);
@@ -328,7 +328,7 @@ int main()
     options.assume_header(true);
     csv::csv_cursor cursor(data, options);
 
-    auto view = staj_array<record_type>(cursor);
+    auto view = make_staj_array_view<record_type>(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
     for (const auto& record : view)

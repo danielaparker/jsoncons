@@ -812,7 +812,7 @@ int main()
 
     json_cursor cursor(is);
 
-    auto view = staj_array<json>(cursor);
+    auto view = make_staj_array_view<json>(cursor);
     for (const auto& j : view)
     {
         std::cout << pretty_print(j) << "\n";
@@ -860,7 +860,7 @@ int main()
 
     json_cursor cursor(is);
 
-    auto view = staj_array<ns::book>(cursor);
+    auto view = make_staj_array_view<ns::book>(cursor);
     for (const auto& book : view)
     {
         std::cout << book.author << ", " << book.title << "\n";
