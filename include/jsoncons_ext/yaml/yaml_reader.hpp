@@ -182,7 +182,7 @@ namespace yaml {
         explicit basic_yaml_reader(Source&& source, const Allocator& alloc = Allocator())
             : basic_yaml_reader(std::forward<Source>(source),
                                 default_visitor_,
-                                basic_json_decode_options<CharT>(),
+                                basic_yaml_decode_options<CharT>(),
                                 default_json_parsing(),
                                 alloc)
         {
@@ -190,7 +190,7 @@ namespace yaml {
 
         template <class Source>
         basic_yaml_reader(Source&& source, 
-                          const basic_json_decode_options<CharT>& options, 
+                          const basic_yaml_decode_options<CharT>& options, 
                           const Allocator& alloc = Allocator())
             : basic_yaml_reader(std::forward<Source>(source),
                                 default_visitor_,
@@ -206,7 +206,7 @@ namespace yaml {
                           const Allocator& alloc = Allocator())
             : basic_yaml_reader(std::forward<Source>(source),
                                 default_visitor_,
-                                basic_json_decode_options<CharT>(),
+                                basic_yaml_decode_options<CharT>(),
                                 err_handler,
                                 alloc)
         {
@@ -214,7 +214,7 @@ namespace yaml {
 
         template <class Source>
         basic_yaml_reader(Source&& source, 
-                          const basic_json_decode_options<CharT>& options,
+                          const basic_yaml_decode_options<CharT>& options,
                           std::function<bool(yaml_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
             : basic_yaml_reader(std::forward<Source>(source),
@@ -231,7 +231,7 @@ namespace yaml {
                           const Allocator& alloc = Allocator())
             : basic_yaml_reader(std::forward<Source>(source),
                                 visitor,
-                                basic_json_decode_options<CharT>(),
+                                basic_yaml_decode_options<CharT>(),
                                 default_json_parsing(),
                                 alloc)
         {
@@ -240,7 +240,7 @@ namespace yaml {
         template <class Source>
         basic_yaml_reader(Source&& source, 
                           basic_json_visitor<CharT>& visitor,
-                          const basic_json_decode_options<CharT>& options, 
+                          const basic_yaml_decode_options<CharT>& options, 
                           const Allocator& alloc = Allocator())
             : basic_yaml_reader(std::forward<Source>(source),
                                 visitor,
@@ -257,7 +257,7 @@ namespace yaml {
                           const Allocator& alloc = Allocator())
             : basic_yaml_reader(std::forward<Source>(source),
                                 visitor,
-                                basic_json_decode_options<CharT>(),
+                                basic_yaml_decode_options<CharT>(),
                                 err_handler,
                                 alloc)
         {
@@ -266,7 +266,7 @@ namespace yaml {
         template <class Source>
         basic_yaml_reader(Source&& source,
                           basic_json_visitor<CharT>& visitor, 
-                          const basic_json_decode_options<CharT>& options,
+                          const basic_yaml_decode_options<CharT>& options,
                           std::function<bool(yaml_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator(),
                           typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
@@ -284,7 +284,7 @@ namespace yaml {
         template <class Source>
         basic_yaml_reader(Source&& source,
                           basic_json_visitor<CharT>& visitor, 
-                          const basic_json_decode_options<CharT>& options,
+                          const basic_yaml_decode_options<CharT>& options,
                           std::function<bool(yaml_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator(),
                           typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)

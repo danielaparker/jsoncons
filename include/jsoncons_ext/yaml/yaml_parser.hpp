@@ -129,7 +129,7 @@ namespace yaml {
         static constexpr size_t initial_string_buffer_capacity_ = 1024;
         static constexpr int default_initial_stack_capacity_ = 100;
 
-        basic_json_decode_options<CharT> options_;
+        basic_yaml_decode_options<CharT> options_;
 
         std::function<bool(yaml_errc,const ser_context&)> err_handler_;
         int initial_stack_capacity_;
@@ -159,23 +159,23 @@ namespace yaml {
 
     public:
         basic_yaml_parser(const TempAllocator& alloc = TempAllocator())
-            : basic_yaml_parser(basic_json_decode_options<CharT>(), default_json_parsing(), alloc)
+            : basic_yaml_parser(basic_yaml_decode_options<CharT>(), default_json_parsing(), alloc)
         {
         }
 
         basic_yaml_parser(std::function<bool(yaml_errc,const ser_context&)> err_handler, 
                           const TempAllocator& alloc = TempAllocator())
-            : basic_yaml_parser(basic_json_decode_options<CharT>(), err_handler, alloc)
+            : basic_yaml_parser(basic_yaml_decode_options<CharT>(), err_handler, alloc)
         {
         }
 
-        basic_yaml_parser(const basic_json_decode_options<CharT>& options, 
+        basic_yaml_parser(const basic_yaml_decode_options<CharT>& options, 
                           const TempAllocator& alloc = TempAllocator())
             : basic_yaml_parser(options, default_json_parsing(), alloc)
         {
         }
 
-        basic_yaml_parser(const basic_json_decode_options<CharT>& options,
+        basic_yaml_parser(const basic_yaml_decode_options<CharT>& options,
                           std::function<bool(yaml_errc,const ser_context&)> err_handler, 
                           const TempAllocator& alloc = TempAllocator())
            : options_(options),

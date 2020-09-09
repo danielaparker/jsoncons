@@ -1,4 +1,4 @@
-﻿// Copyright 2013 Daniel Parker
+﻿// Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
 #include <jsoncons/json.hpp>

@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2020 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -220,7 +220,7 @@ namespace yaml {
     };
 
     template <class CharT>
-    class basic_json_decode_options : public virtual basic_yaml_options_common<CharT>
+    class basic_yaml_decode_options : public virtual basic_yaml_options_common<CharT>
     {
         friend class basic_yaml_options<CharT>;
         using super_type = basic_yaml_options_common<CharT>;
@@ -230,20 +230,20 @@ namespace yaml {
     private:
         bool lossless_number_:1;
     public:
-        basic_json_decode_options()
+        basic_yaml_decode_options()
             : lossless_number_(false)
         {
         }
 
-        basic_json_decode_options(const basic_json_decode_options&) = default;
+        basic_yaml_decode_options(const basic_yaml_decode_options&) = default;
 
-        basic_json_decode_options(basic_json_decode_options&& other)
-            : super_type(std::forward<basic_json_decode_options>(other)),
+        basic_yaml_decode_options(basic_yaml_decode_options&& other)
+            : super_type(std::forward<basic_yaml_decode_options>(other)),
                          lossless_number_(other.lossless_number_)
         {
         }
 
-        basic_json_decode_options& operator=(const basic_json_decode_options&) = default;
+        basic_yaml_decode_options& operator=(const basic_yaml_decode_options&) = default;
 
         bool lossless_number() const 
         {
@@ -253,7 +253,7 @@ namespace yaml {
     };
 
     template <class CharT>
-    class basic_json_encode_options : public virtual basic_yaml_options_common<CharT>
+    class basic_yaml_encode_options : public virtual basic_yaml_options_common<CharT>
     {
         friend class basic_yaml_options<CharT>;
         using super_type = basic_yaml_options_common<CharT>;
@@ -282,7 +282,7 @@ namespace yaml {
         std::size_t line_length_limit_;
         string_type new_line_chars_;
     public:
-        basic_json_encode_options()
+        basic_yaml_encode_options()
             : escape_all_non_ascii_(false),
               escape_solidus_(false),
               pad_inside_object_braces_(false),
@@ -303,10 +303,10 @@ namespace yaml {
             new_line_chars_.push_back('\n');
         }
 
-        basic_json_encode_options(const basic_json_encode_options&) = default;
+        basic_yaml_encode_options(const basic_yaml_encode_options&) = default;
 
-        basic_json_encode_options(basic_json_encode_options&& other)
-            : super_type(std::forward<basic_json_encode_options>(other)),
+        basic_yaml_encode_options(basic_yaml_encode_options&& other)
+            : super_type(std::forward<basic_yaml_encode_options>(other)),
               escape_all_non_ascii_(other.escape_all_non_ascii_),
               escape_solidus_(other.escape_solidus_),
               pad_inside_object_braces_(other.pad_inside_object_braces_),
@@ -327,7 +327,7 @@ namespace yaml {
         {
         }
 
-        basic_json_encode_options& operator=(const basic_json_encode_options&) = default;
+        basic_yaml_encode_options& operator=(const basic_yaml_encode_options&) = default;
 
         byte_string_chars_format byte_string_format() const  {return byte_string_format_;}
 
@@ -399,8 +399,8 @@ namespace yaml {
     };
 
     template <class CharT>
-    class basic_yaml_options final: public basic_json_decode_options<CharT>, 
-                                    public basic_json_encode_options<CharT>
+    class basic_yaml_options final: public basic_yaml_decode_options<CharT>, 
+                                    public basic_yaml_encode_options<CharT>
     {
     public:
         using char_type = CharT;
@@ -408,35 +408,35 @@ namespace yaml {
 
         using basic_yaml_options_common<CharT>::max_nesting_depth;
 
-        using basic_json_decode_options<CharT>::enable_str_to_nan;
-        using basic_json_decode_options<CharT>::enable_str_to_inf;
-        using basic_json_decode_options<CharT>::enable_str_to_neginf;
-        using basic_json_decode_options<CharT>::nan_to_str;
-        using basic_json_decode_options<CharT>::inf_to_str;
-        using basic_json_decode_options<CharT>::neginf_to_str;
-        using basic_json_decode_options<CharT>::nan_to_num;
-        using basic_json_decode_options<CharT>::inf_to_num;
-        using basic_json_decode_options<CharT>::neginf_to_num;
+        using basic_yaml_decode_options<CharT>::enable_str_to_nan;
+        using basic_yaml_decode_options<CharT>::enable_str_to_inf;
+        using basic_yaml_decode_options<CharT>::enable_str_to_neginf;
+        using basic_yaml_decode_options<CharT>::nan_to_str;
+        using basic_yaml_decode_options<CharT>::inf_to_str;
+        using basic_yaml_decode_options<CharT>::neginf_to_str;
+        using basic_yaml_decode_options<CharT>::nan_to_num;
+        using basic_yaml_decode_options<CharT>::inf_to_num;
+        using basic_yaml_decode_options<CharT>::neginf_to_num;
 
-        using basic_json_decode_options<CharT>::lossless_number;
+        using basic_yaml_decode_options<CharT>::lossless_number;
 
-        using basic_json_encode_options<CharT>::byte_string_format;
-        using basic_json_encode_options<CharT>::bigint_format;
-        using basic_json_encode_options<CharT>::object_object_line_splits;
-        using basic_json_encode_options<CharT>::array_object_line_splits;
-        using basic_json_encode_options<CharT>::object_array_line_splits;
-        using basic_json_encode_options<CharT>::array_array_line_splits;
-        using basic_json_encode_options<CharT>::indent_size;
-        using basic_json_encode_options<CharT>::spaces_around_colon;
-        using basic_json_encode_options<CharT>::spaces_around_comma;
-        using basic_json_encode_options<CharT>::pad_inside_object_braces;
-        using basic_json_encode_options<CharT>::pad_inside_array_brackets;
-        using basic_json_encode_options<CharT>::new_line_chars;
-        using basic_json_encode_options<CharT>::line_length_limit;
-        using basic_json_encode_options<CharT>::float_format;
-        using basic_json_encode_options<CharT>::precision;
-        using basic_json_encode_options<CharT>::escape_all_non_ascii;
-        using basic_json_encode_options<CharT>::escape_solidus;
+        using basic_yaml_encode_options<CharT>::byte_string_format;
+        using basic_yaml_encode_options<CharT>::bigint_format;
+        using basic_yaml_encode_options<CharT>::object_object_line_splits;
+        using basic_yaml_encode_options<CharT>::array_object_line_splits;
+        using basic_yaml_encode_options<CharT>::object_array_line_splits;
+        using basic_yaml_encode_options<CharT>::array_array_line_splits;
+        using basic_yaml_encode_options<CharT>::indent_size;
+        using basic_yaml_encode_options<CharT>::spaces_around_colon;
+        using basic_yaml_encode_options<CharT>::spaces_around_comma;
+        using basic_yaml_encode_options<CharT>::pad_inside_object_braces;
+        using basic_yaml_encode_options<CharT>::pad_inside_array_brackets;
+        using basic_yaml_encode_options<CharT>::new_line_chars;
+        using basic_yaml_encode_options<CharT>::line_length_limit;
+        using basic_yaml_encode_options<CharT>::float_format;
+        using basic_yaml_encode_options<CharT>::precision;
+        using basic_yaml_encode_options<CharT>::escape_all_non_ascii;
+        using basic_yaml_encode_options<CharT>::escape_solidus;
     public:
 
     //  Constructors
