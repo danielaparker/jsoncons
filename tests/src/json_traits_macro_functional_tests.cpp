@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <regex>
 #include <jsoncons/json.hpp>
+#include <functional>
 
 namespace {
 namespace ns {
@@ -402,8 +403,52 @@ namespace ns {
         return ids;
     }
 
+    class Shape
+    {
+    public:
+        virtual ~Shape() = default;
+        virtual double area() = 0;
+    };
+      
+    class Rectangle : public Shape
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double area() override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle : public Shape
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double area() override
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+          
 } // namespace
 } // ns
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+ 
+#endif
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
     (name_, "employee_name"),

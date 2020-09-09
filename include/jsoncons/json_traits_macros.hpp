@@ -349,7 +349,7 @@ else \
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_ALL_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_2(Member, Name) ajson.try_emplace(Name, aval.Member);
-#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_3(Member, Name, IsMatch, From) JSONCONS_ALL_MEMBER_NAME_TO_JSON_2(Member, Name)
+#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_3(Member, Name, IsMatch) JSONCONS_ALL_MEMBER_NAME_TO_JSON_2(Member, Name)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_4(Member, Name, IsMatch, From) JSONCONS_ALL_MEMBER_NAME_TO_JSON_5(Member, Name, IsMatch, From,)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_5(Member, Name, IsMatch, From, Into) ajson.try_emplace(Name, Into(aval.Member));
 
