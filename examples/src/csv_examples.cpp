@@ -611,7 +611,7 @@ void grouped_into_basic_json_records()
 
     csv::csv_cursor cursor(data, options);
 
-    auto view = staj_array<ojson>(cursor);
+    auto view = make_staj_array_view<ojson>(cursor);
     auto it = view.begin();
     auto end = view.end();
 
@@ -632,7 +632,7 @@ void grouped_into_strongly_typed_records()
     options.assume_header(true);
     csv::csv_cursor cursor(data, options);
 
-    auto view = staj_array<record_type>(cursor);
+    auto view = make_staj_array_view<record_type>(cursor);
 
     std::cout << std::fixed << std::setprecision(7);
     for (const auto& record : view)

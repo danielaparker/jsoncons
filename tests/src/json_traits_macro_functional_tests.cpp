@@ -522,7 +522,7 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
               return unvalidated;
           }
           std::regex myRegex(("^(\\d{9})$"));
-          if (!std::regex_match(unvalidated.value(), myRegex) ) {
+          if (!std::regex_match(*unvalidated, myRegex) ) {
               throw std::runtime_error("Invalid social security number");
           }
           return jsoncons::optional<std::string>(unvalidated);
@@ -541,7 +541,7 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN,
               return unvalidated;
           }
           std::regex myRegex(("^(\\d{9})$"));
-          if (!std::regex_match(unvalidated.value(), myRegex) ) {
+          if (!std::regex_match(*unvalidated, myRegex) ) {
               return jsoncons::optional<std::string>();
           }
           return unvalidated;
