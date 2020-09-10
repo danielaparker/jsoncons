@@ -48,8 +48,7 @@ _"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
 
 _"the ability to have an xpath like facility is so useful"_
 
-_"I think this is the closest
-cpp can get from languages with reflection behavior for serialization/deserialization"_
+_"the serialization lib of choice with its beautiful mappings and ease of use"_
 
 _"really good"_ _"awesome project"_ _"very solid and very dependable"_ _"my team loves it"_ _"Your repo rocks!!!!!"_
 
