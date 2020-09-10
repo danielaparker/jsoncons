@@ -457,7 +457,7 @@ JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Company_NMN, 2,
     (name_, "company"),
-    (employeeIds_, "resources", jsoncons::codec_flags(), jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NMN>, ns::fromIdsToEmployees<ns::Employee_NMN>),
+    (employeeIds_, "resources", jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NMN>, ns::fromIdsToEmployees<ns::Employee_NMN>),
     (rating_, "rating")
 )
 
@@ -468,7 +468,7 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Employee_AMN,
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Company_AMN,
     (name_, "company"),
-    (employeeIds_, "resources", jsoncons::codec_flags(), jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AMN>, ns::fromIdsToEmployees<ns::Employee_AMN>)
+    (employeeIds_, "resources", jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AMN>, ns::fromIdsToEmployees<ns::Employee_AMN>)
 )
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
@@ -478,7 +478,7 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Company_NGSN, 2,
   (getName, setName, "company"),
-  (getIds, setIds, "resources", jsoncons::codec_flags(), jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NGSN>, ns::fromIdsToEmployees<ns::Employee_NGSN>),
+  (getIds, setIds, "resources", jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NGSN>, ns::fromIdsToEmployees<ns::Employee_NGSN>),
   (getRating, setRating, "rating")
 )
 
@@ -489,7 +489,7 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee_AGSN,
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company_AGSN,
     (getName, setName, "company"),
-    (getIds, setIds, "resources", jsoncons::codec_flags(), jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AGSN>, ns::fromIdsToEmployees<ns::Employee_AGSN>)
+    (getIds, setIds, "resources", jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AGSN>, ns::fromIdsToEmployees<ns::Employee_AGSN>)
 )
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
@@ -499,7 +499,7 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Company_NCGN, 2,
   (getName, "company"),
-  (getIds, "resources", jsoncons::codec_flags(), jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NCGN>, ns::fromIdsToEmployees<ns::Employee_NCGN>),
+  (getIds, "resources", jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NCGN>, ns::fromIdsToEmployees<ns::Employee_NCGN>),
   (getRating, "rating")
 )
 
@@ -510,12 +510,12 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Employee_ACGN,
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Company_ACGN,
     (getName, "company"),
-    (getIds, "resources", jsoncons::codec_flags(), jsoncons::always_true{}, ns::fromEmployeesToIds<ns::Employee_ACGN>, ns::fromIdsToEmployees<ns::Employee_ACGN>)
+    (getIds, "resources", jsoncons::always_true{}, ns::fromEmployeesToIds<ns::Employee_ACGN>, ns::fromIdsToEmployees<ns::Employee_ACGN>)
 )
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
     (getName, "name"),
-    (getSocialSecurityNumber, "social_security_number", jsoncons::codec_flags(), jsoncons::always_true{},
+    (getSocialSecurityNumber, "social_security_number", jsoncons::always_true{},
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
@@ -534,7 +534,7 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN, 
   (getName, "name"),
   (getSocialSecurityNumber, "social_security_number", 
-      jsoncons::codec_flags(), jsoncons::always_true(),
+      jsoncons::always_true(),
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
