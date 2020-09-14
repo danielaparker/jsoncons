@@ -490,6 +490,7 @@ namespace jsoncons \
 #define JSONCONS_CTOR_GETTER_NAME_IS(P1, P2, P3, Seq, Count) JSONCONS_CTOR_GETTER_NAME_IS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_CTOR_GETTER_NAME_IS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_CTOR_GETTER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_IS_2(Getter, Name) !ajson.contains(Name)) return false;
+#define JSONCONS_CTOR_GETTER_NAME_IS_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_IS_2(Getter, Name)
 #define JSONCONS_CTOR_GETTER_NAME_IS_4(Getter, Name, Mode, IsMatch) JSONCONS_CTOR_GETTER_NAME_IS_6(Getter, Name, Mode, IsMatch, , )
 #define JSONCONS_CTOR_GETTER_NAME_IS_5(Getter, Name, Mode, IsMatch, From) JSONCONS_CTOR_GETTER_NAME_IS_6(Getter, Name, Mode, IsMatch, From, )
 #define JSONCONS_CTOR_GETTER_NAME_IS_6(Getter, Name, Mode, IsMatch, From, Into) !ajson.contains(Name)) return false; \
@@ -498,6 +499,7 @@ namespace jsoncons \
 
 #define JSONCONS_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) ((num_params-Count) < num_mandatory_params2) ? JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type>() : (ajson.contains(Name)) ? (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type>() : typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type() ,
+#define JSONCONS_CTOR_GETTER_NAME_AS_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name))
 #define JSONCONS_CTOR_GETTER_NAME_AS_4(Getter, Name, Mode, IsMatch) JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, IsMatch,,) 
 #define JSONCONS_CTOR_GETTER_NAME_AS_5(Getter, Name, Mode, IsMatch, From) JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, IsMatch, From, ) 
 #define JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, IsMatch, From, Into) Mode(From(ajson.at(Name).template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>())) : ajson.contains(Name) ? Mode(From(ajson.at(Name).template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>())) : Mode(From(typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type())) Mode(JSONCONS_COMMA)
@@ -505,6 +507,7 @@ namespace jsoncons \
 
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) ((num_params-Count) < num_mandatory_params2) ? JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_LAST_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_2(Getter, Name) (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type>() : (ajson.contains(Name)) ? (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type>() : typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type()
+#define JSONCONS_CTOR_GETTER_NAME_AS_LAST_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_AS_LAST_2(Getter, Name, Mode, IsMatch,,))
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_4(Getter, Name, Mode, IsMatch) JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter, Name, Mode, IsMatch,,)
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_5(Getter, Name, Mode, IsMatch, From) JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter, Name, Mode, IsMatch, From, )
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter, Name, Mode, IsMatch, From, Into) Mode(From(ajson.at(Name).template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>())) : ajson.contains(Name) ? Mode(From(ajson.at(Name).template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>())) : Mode(From(typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type()))
@@ -518,6 +521,7 @@ namespace jsoncons \
 else { \
   json_traits_helper<Json>::set_optional_json_member(Name, aval.Getter(), ajson); \
 }
+#define JSONCONS_CTOR_GETTER_NAME_TO_JSON_3(Getter, Name, Mode) JSONCONS_CTOR_GETTER_NAME_TO_JSON_2(Getter, Name)
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_4(Getter, Name, Mode, IsMatch) JSONCONS_CTOR_GETTER_NAME_TO_JSON_2(Getter, Name)
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_5(Getter, Name, Mode, IsMatch, From) JSONCONS_CTOR_GETTER_NAME_TO_JSON_6(Getter, Name, Mode, IsMatch, From, )
 #define JSONCONS_CTOR_GETTER_NAME_TO_JSON_6(Getter, Name, Mode, IsMatch, From, Into) \

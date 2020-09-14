@@ -410,41 +410,83 @@ namespace ns {
         virtual double area() = 0;
     };
       
-    class Rectangle : public Shape
+    class Rectangle_ACGN : public Shape
     {
         double height_;
         double width_;
     public:
-        Rectangle(double height, double width)
+        Rectangle_ACGN(double height, double width)
             : height_(height), width_(width)
         {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
         }
 
         double area() override
         {
             return height_ * width_;
         }
+
+        const std::string type() const
+        {
+            return "rectangle";
+        }
     };
 
-    class Triangle : public Shape
+    class Triangle_ACGN : public Shape
     { 
         double height_;
         double width_;
 
     public:
-        Triangle(double height, double width)
+        Triangle_ACGN(double height, double width)
             : height_(height), width_(width)
         {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
         }
 
         double area() override
         {
             return (height_ * width_)/2.0;
         }
+
+        const std::string type() const
+        {
+            return "triangle";
+        }
     };                 
           
 } // namespace
 } // ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
+    (type,"type",JSONCONS_SER_ONLY),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle_ACGN,
+    (height, "height"),
+    (width, "width")
+)
+
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
  
