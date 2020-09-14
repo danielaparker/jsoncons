@@ -553,6 +553,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
