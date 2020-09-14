@@ -407,7 +407,7 @@ namespace ns {
     {
     public:
         virtual ~Shape() = default;
-        virtual double area() = 0;
+        virtual double area() const = 0;
     };
       
     class Rectangle_ACGN : public Shape
@@ -430,7 +430,7 @@ namespace ns {
             return width_;
         }
 
-        double area() override
+        double area() const override
         {
             return height_ * width_;
         }
@@ -462,7 +462,7 @@ namespace ns {
             return width_;
         }
 
-        double area() override
+        double area() const override
         {
             return (height_ * width_)/2.0;
         }
@@ -475,7 +475,7 @@ namespace ns {
           
 } // namespace
 } // ns
-/*
+
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
     (type,"type",JSONCONS_RDONLY),
     (height, "height"),
@@ -483,10 +483,10 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle_ACGN,
+    (type,"type", JSONCONS_RDONLY),
     (height, "height"),
     (width, "width")
 )
-*/
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
  
@@ -499,7 +499,7 @@ JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Company_NMN, 2,
     (name_, "company"),
-    (employeeIds_, "resources", JSONCONS_RW, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NMN>, ns::fromIdsToEmployees<ns::Employee_NMN>),
+    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NMN>, ns::fromIdsToEmployees<ns::Employee_NMN>),
     (rating_, "rating")
 )
 
@@ -510,7 +510,7 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Employee_AMN,
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Company_AMN,
     (name_, "company"),
-    (employeeIds_, "resources", JSONCONS_RW, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AMN>, ns::fromIdsToEmployees<ns::Employee_AMN>)
+    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AMN>, ns::fromIdsToEmployees<ns::Employee_AMN>)
 )
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
@@ -520,7 +520,7 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Company_NGSN, 2,
   (getName, setName, "company"),
-  (getIds, setIds, "resources", JSONCONS_RW, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NGSN>, ns::fromIdsToEmployees<ns::Employee_NGSN>),
+  (getIds, setIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NGSN>, ns::fromIdsToEmployees<ns::Employee_NGSN>),
   (getRating, setRating, "rating")
 )
 
@@ -531,7 +531,7 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee_AGSN,
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company_AGSN,
     (getName, setName, "company"),
-    (getIds, setIds, "resources", JSONCONS_RW, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AGSN>, ns::fromIdsToEmployees<ns::Employee_AGSN>)
+    (getIds, setIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_AGSN>, ns::fromIdsToEmployees<ns::Employee_AGSN>)
 )
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
@@ -541,7 +541,7 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Company_NCGN, 2,
   (getName, "company"),
-  (getIds, "resources", JSONCONS_RW, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NCGN>, ns::fromIdsToEmployees<ns::Employee_NCGN>),
+  (getIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), ns::fromEmployeesToIds<ns::Employee_NCGN>, ns::fromIdsToEmployees<ns::Employee_NCGN>),
   (getRating, "rating")
 )
 
@@ -552,12 +552,12 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Employee_ACGN,
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Company_ACGN,
     (getName, "company"),
-    (getIds, "resources", JSONCONS_RW, jsoncons::always_true{}, ns::fromEmployeesToIds<ns::Employee_ACGN>, ns::fromIdsToEmployees<ns::Employee_ACGN>)
+    (getIds, "resources", JSONCONS_RDWR, jsoncons::always_true{}, ns::fromEmployeesToIds<ns::Employee_ACGN>, ns::fromIdsToEmployees<ns::Employee_ACGN>)
 )
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
     (getName, "name"),
-    (getSocialSecurityNumber, "social_security_number", JSONCONS_RW, jsoncons::always_true{},
+    (getSocialSecurityNumber, "social_security_number", JSONCONS_RDWR, jsoncons::always_true{},
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
@@ -576,7 +576,7 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN, 
   (getName, "name"),
   (getSocialSecurityNumber, "social_security_number", 
-      JSONCONS_RW, jsoncons::always_true(),
+      JSONCONS_RDWR, jsoncons::always_true(),
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
