@@ -314,7 +314,7 @@ namespace jsoncons \
 #define JSONCONS_MEMBER_NAME_IS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params1 && JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_MEMBER_NAME_IS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_MEMBER_NAME_IS_2(Member, Name) !ajson.contains(Name)) return false;
 #define JSONCONS_MEMBER_NAME_IS_3(Member, Name, Mode) JSONCONS_MEMBER_NAME_IS_2(Member, Name)
-#define JSONCONS_MEMBER_NAME_IS_4(Member, Name, Mode, Match) JSONCONS_MEMBER_NAME_IS_5(Member, Name, Mode, Match, , )
+#define JSONCONS_MEMBER_NAME_IS_4(Member, Name, Mode, Match) JSONCONS_MEMBER_NAME_IS_6(Member, Name, Mode, Match, , )
 #define JSONCONS_MEMBER_NAME_IS_5(Member, Name, Mode, Match, From) JSONCONS_MEMBER_NAME_IS_6(Member, Name, Mode, Match, From, )
 #define JSONCONS_MEMBER_NAME_IS_6(Member, Name, Mode, Match, From, Into) !ajson.contains(Name)) return false; \
     {const auto& j = ajson.at(Name); \
