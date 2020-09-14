@@ -498,11 +498,11 @@ namespace jsoncons \
     if (!j.template is<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>() || !Match(j.template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>())) return false;}
 
 #define JSONCONS_CTOR_GETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name) (ajson.contains(Name)) ? (ajson.at(Name)).template as<typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type>() : typename std::decay<decltype(((value_type*)nullptr)->Getter())>::type() ,
+#define JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name) JSONCONS_CTOR_GETTER_NAME_AS_LAST_2(Getter, Name) ,
 #define JSONCONS_CTOR_GETTER_NAME_AS_3(Getter, Name, Mode) Mode(JSONCONS_CTOR_GETTER_NAME_AS_2(Getter, Name))
 #define JSONCONS_CTOR_GETTER_NAME_AS_4(Getter, Name, Mode, Match) JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, Match,,) 
 #define JSONCONS_CTOR_GETTER_NAME_AS_5(Getter, Name, Mode, Match, From) JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, Match, From, ) 
-#define JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, Match, From, Into) Mode(ajson.contains(Name) ? From(ajson.at(Name).template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>()) : From(typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type())) Mode(JSONCONS_COMMA)
+#define JSONCONS_CTOR_GETTER_NAME_AS_6(Getter, Name, Mode, Match, From, Into) JSONCONS_CTOR_GETTER_NAME_AS_LAST_6(Getter,Name,Mode,Match,From,Into) Mode(JSONCONS_COMMA)
 #define JSONCONS_COMMA ,
 
 #define JSONCONS_CTOR_GETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_CTOR_GETTER_NAME_AS_LAST_,JSONCONS_NARGS Seq) Seq)
