@@ -18,6 +18,11 @@
 #include <utility>
 #include <jsoncons/json_type_traits.hpp>
 
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) 
+    #pragma GCC diagnostic push 
+    #pragma GCC diagnostic ignored "-Werror=maybe-uninitialized" 
+#endif            
+
 namespace jsoncons
 {
     #define JSONCONS_RDONLY(X)
@@ -551,7 +556,7 @@ namespace jsoncons \
         static bool is(const Json& ajson) noexcept \
         { \
             if (!ajson.is_object()) return false; \
-            JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_NAME_IS,,,, __VA_ARGS__)\
+                JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_NAME_IS,,,, __VA_ARGS__)\
             return true; \
         } \
         static value_type as(const Json& ajson) \
@@ -1032,5 +1037,9 @@ namespace jsoncons { \
     }; \
 }  \
   /**/
+
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) 
+#pragma GCC diagnostic pop 
+#endif            
 
 #endif
