@@ -199,7 +199,7 @@ namespace ns {
             employeeIds_ = employeeIds;
         }
 
-        jsoncons::optional<double> getRating() const
+        const jsoncons::optional<double>& getRating() const
         {
             return rating_;
         }
@@ -310,7 +310,7 @@ namespace ns {
         jsoncons::optional<double> rating_;
     public:
         Company_NCGN(const std::string& name, const std::vector<uint64_t>& employeeIds,
-                     jsoncons::optional<double> rating = jsoncons::optional<double>())
+                     const jsoncons::optional<double>& rating = jsoncons::optional<double>())
             : name_(name), employeeIds_(employeeIds), rating_(rating)
         {
         }
@@ -324,7 +324,7 @@ namespace ns {
             return employeeIds_;
         }
 
-        jsoncons::optional<double> getRating() const
+        const jsoncons::optional<double>& getRating() const
         {
             return rating_;
         }
