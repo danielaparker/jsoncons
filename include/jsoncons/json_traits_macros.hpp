@@ -18,10 +18,6 @@
 #include <utility>
 #include <jsoncons/json_type_traits.hpp>
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) 
-    #pragma GCC diagnostic ignored "-Wuninitialized"
-#endif            
-
 namespace jsoncons
 {
     #define JSONCONS_RDONLY(X)
