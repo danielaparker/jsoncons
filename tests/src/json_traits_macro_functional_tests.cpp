@@ -467,7 +467,7 @@ namespace ns {
             return (height_ * width_)/2.0;
         }
 
-        const std::string type() const
+        std::string type() const
         {
             return "triangle";
         }
@@ -494,7 +494,133 @@ namespace ns {
             return pi*radius_*radius_;
         }
 
-        const std::string type() const
+        std::string type() const
+        {
+            return "circle";
+        }
+    };                 
+
+    class Shape_AGSN
+    {
+    public:
+        virtual ~Shape_AGSN() = default;
+        virtual double area() const = 0;
+    };
+
+    class Rectangle_AGSN : public Shape_AGSN
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle_AGSN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double getHeight() const
+        {
+            return height_;
+        }
+
+        void setHeight(double value)
+        {
+            height_ = value;
+        }
+
+        double getWidth() const
+        {
+            return width_;
+        }
+
+        void setWidth(double value)
+        {
+            width_ = value;
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+
+        std::string getType() const
+        {
+            return "rectangle";
+        }
+
+        void setType(const std::string&)
+        {
+        }
+    };
+
+    class Triangle_AGSN : public Shape_AGSN
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle_AGSN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double getHeight() const
+        {
+            return height_;
+        }
+
+        void setHeight(double value)
+        {
+            height_ = value;
+        }
+
+        double getWidth() const
+        {
+            return width_;
+        }
+
+        void setWidth(double value)
+        {
+            width_ = value;
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+
+        const std::string getType() const
+        {
+            return "triangle";
+        }
+    };                 
+
+    class Circle_AGSN : public Shape_AGSN
+    { 
+        double radius_;
+
+    public:
+        Circle_AGSN()
+            : radius_(0)
+        {
+        }
+
+        double getRadius() const
+        {
+            return radius_;
+        }
+
+        void setRadius(double value)
+        {
+            radius_ = value;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+
+        const std::string getType() const
         {
             return "circle";
         }
@@ -579,7 +705,7 @@ namespace ns {
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
     (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
-    (height, "height"),
+    (height, "height", JSONCONS_RDWR),
     (width, "width")
 )
 
@@ -595,6 +721,27 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle_ACGN,
 )
 
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_ACGN,ns::Rectangle_ACGN,ns::Triangle_ACGN,ns::Circle_ACGN)
+
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_AGSN,
+    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (getHeight, setHeight, "height"),
+    (getWidth, setWidth, "width")
+)
+/*
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Triangle_AGSN,
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (getHeight, setHeight, "height"),
+    (getWidth, setWidth, "width")
+)
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Circle_AGSN,
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (getRadius, setRadius, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AGSN,ns::Rectangle_AGSN,ns::Triangle_AGSN,ns::Circle_AGSN)
+*/
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Rectangle_AMN,
     (type_,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
