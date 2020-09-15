@@ -546,10 +546,6 @@ namespace ns {
         {
             return "rectangle";
         }
-
-        void setType(const std::string&)
-        {
-        }
     };
 
     class Triangle_AGSN : public Shape_AGSN
@@ -729,11 +725,11 @@ JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_ACGN,ns::Rectangle_ACGN,ns::Triangle_ACGN,
 
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_AGSN,
-    (getType, setType,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
     (getHeight, setHeight, "height"),
     (getWidth, setWidth, "width")
 )
-/*
+
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Triangle_AGSN,
     (getType,,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
     (getHeight, setHeight, "height"),
@@ -746,7 +742,6 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Circle_AGSN,
 )
 
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AGSN,ns::Rectangle_AGSN,ns::Triangle_AGSN,ns::Circle_AGSN)
-*/
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Rectangle_AMN,
     (type_,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
@@ -1122,6 +1117,74 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
             else if constexpr (std::is_same_v<T, ns::Triangle_ACGN>)
                 std::cout << "triangle area: " << shape.area() << '\n';
             else if constexpr (std::is_same_v<T, ns::Circle_ACGN>)
+                std::cout << "circle area: " << shape.area() << '\n';
+        };
+        for (const auto& shape : shapes)
+        {
+            std::visit(visitor, shape);
+        }
+
+        std::string output;
+        encode_json_pretty(shapes, output);
+        std::cout << output << "\n";
+
+    }
+#endif
+} 
+
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 3.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    SECTION("polymorphic test")
+    {
+        auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_AGSN>>>(input);
+        REQUIRE(shapes.size() == 3);
+        for (const auto& shape : shapes)
+        {
+            std::cout << "area: " << shape->area() << "\n";
+        }
+        std::string output;
+
+        encode_json_pretty(shapes, output);
+        std::cout << output << "\n";
+
+        auto j = decode_json<json>(input);
+        REQUIRE((j.is_array() && j.size() == 3));
+        CHECK(j[0].is<ns::Rectangle_AGSN>());
+        CHECK_FALSE(j[0].is<ns::Triangle_AGSN>());
+        CHECK_FALSE(j[0].is<ns::Circle_AGSN>());
+        CHECK(j[1].is<ns::Triangle_AGSN>());
+        CHECK_FALSE(j[1].is<ns::Rectangle_AGSN>());
+        CHECK_FALSE(j[1].is<ns::Circle_AGSN>());
+        CHECK(j[2].is<ns::Circle_AGSN>());
+        CHECK_FALSE(j[2].is<ns::Rectangle_AGSN>());
+        CHECK_FALSE(j[2].is<ns::Triangle_AGSN>());
+
+        auto j2 = decode_json<json>(output);
+        CHECK(j2 == j);
+    }
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+    SECTION("variant test")
+    {
+        using shapes_t = std::variant<ns::Rectangle_AGSN,ns::Triangle_AGSN,ns::Circle_AGSN>;
+        auto shapes = decode_json<std::vector<shapes_t>>(input);
+        REQUIRE(shapes.size() == 3);
+
+        auto visitor = [](auto&& shape) {
+            using T = std::decay_t<decltype(shape)>;
+            if constexpr (std::is_same_v<T, ns::Rectangle_AGSN>)
+                std::cout << "rectangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Triangle_AGSN>)
+                std::cout << "triangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Circle_AGSN>)
                 std::cout << "circle area: " << shape.area() << '\n';
         };
         for (const auto& shape : shapes)
