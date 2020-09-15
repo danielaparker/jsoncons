@@ -81,6 +81,7 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/src/json_traits_name_macro_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_traits_macro_functional_tests.cpp
    ${JSONCONS_TESTS_DIR}/src/json_type_traits_container_tests.cpp
+   ${JSONCONS_TESTS_DIR}/src/tests_main.cpp
 )
 set(JSONCONS_TARGET test_jsoncons)
 add_executable(${JSONCONS_TARGET} EXCLUDE_FROM_ALL ${JSONCONS_TESTS_SOURCES} ${JSONCONS_HEADERS})
