@@ -598,7 +598,7 @@ JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_ACGN,ns::Rectangle_ACGN,ns::Triangle_ACGN,
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Rectangle_AMN,
     (type_,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
-    (height_, "height"),
+    (height_, "height",JSONCONS_RDWR),
     (width_, "width")
 )
 
