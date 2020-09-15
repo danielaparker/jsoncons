@@ -571,7 +571,7 @@ namespace jsoncons \
 } \
   /**/
  
-//if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
+//if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); 
                                                                       
                                                                        
 #define JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ValueType, ...)  \
