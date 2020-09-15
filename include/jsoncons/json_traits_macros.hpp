@@ -276,6 +276,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT, ,,, __VA_ARGS__) \
             return aval; \
@@ -384,6 +385,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT,,,, __VA_ARGS__) \
             return aval; \
@@ -461,6 +463,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
@@ -641,10 +644,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!ajson.is_string()) \
-            { \
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
-            } \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # EnumType)); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
@@ -745,10 +745,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!ajson.is_string()) \
-            { \
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
-            } \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # EnumType)); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
@@ -846,6 +843,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return aval; \
@@ -890,12 +888,12 @@ namespace jsoncons \
     if (!j.template is<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>() || !Match(j.template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Getter()))>::type>())) return false;}
 
 #define JSONCONS_N_GETTER_SETTER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2 || JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) ajson.contains(Name)) aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name) if (ajson.contains(Name)) aval.Setter(ajson.at(Name).template as<typename std::decay<decltype(aval.Getter())>::type>());
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_4(Getter, Setter, Name, Mode) Mode(JSONCONS_N_GETTER_SETTER_NAME_AS_3(Getter, Setter, Name))
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_5(Getter, Setter, Name, Mode, Match) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, , )
 #define JSONCONS_N_GETTER_SETTER_NAME_AS_6(Getter, Setter, Name, Mode, Match, From) JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, From, )
-#define JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, From, Into) ajson.contains(Name)) aval.Setter(From(ajson.at(Name).template as<typename std::decay<decltype(Into(aval.Getter()))>::type>()));
+#define JSONCONS_N_GETTER_SETTER_NAME_AS_7(Getter, Setter, Name, Mode, Match, From, Into) Mode(if (ajson.contains(Name)) aval.Setter(From(ajson.at(Name).template as<typename std::decay<decltype(Into(aval.Getter()))>::type>()));)
 
 #define JSONCONS_N_GETTER_SETTER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_N_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_GETTER_SETTER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_GETTER_SETTER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
@@ -946,6 +944,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
+            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT,,,, __VA_ARGS__) \
             return aval; \
