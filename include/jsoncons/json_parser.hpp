@@ -463,7 +463,7 @@ public:
         check_done(ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec,line_,column()));
+            JSONCONS_THROW(codec_error(ec,line_,column()));
         }
     }
 
@@ -514,7 +514,7 @@ public:
         parse_some(visitor, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec,line_,column()));
+            JSONCONS_THROW(codec_error(ec,line_,column()));
         }
     }
 
@@ -529,7 +529,7 @@ public:
         finish_parse(visitor, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec,line_,column()));
+            JSONCONS_THROW(codec_error(ec,line_,column()));
         }
     }
 
@@ -2567,7 +2567,7 @@ escape_u8:
         finish_parse(visitor, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec,line_,column()));
+            JSONCONS_THROW(codec_error(ec,line_,column()));
         }
     }
 

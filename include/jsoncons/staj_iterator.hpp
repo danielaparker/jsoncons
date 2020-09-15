@@ -137,7 +137,7 @@ namespace jsoncons {
                     view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
                     if (ec)
                     {
-                        JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
+                        JSONCONS_THROW(codec_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
                     }
                 }
             }
@@ -286,7 +286,7 @@ namespace jsoncons {
                     view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
                     if (ec)
                     {
-                        JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
+                        JSONCONS_THROW(codec_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
                     }
                 }
             }

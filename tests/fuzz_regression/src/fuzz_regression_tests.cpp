@@ -505,7 +505,7 @@ TEST_CASE("oss-fuzz issues")
         try {
            json j2 = ubjson::decode_ubjson<json>(is);
         }
-        catch(const jsoncons::ser_error&) 
+        catch(const jsoncons::codec_error&) 
         {
             //std::cout << e.what() << "\n\n";
         }

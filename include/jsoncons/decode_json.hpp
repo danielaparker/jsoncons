@@ -47,7 +47,7 @@ namespace jsoncons {
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -75,7 +75,7 @@ namespace jsoncons {
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -108,7 +108,7 @@ namespace jsoncons {
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -147,7 +147,7 @@ namespace jsoncons {
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -178,7 +178,7 @@ namespace jsoncons {
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }

@@ -12,7 +12,7 @@
 #include <limits> // std::numeric_limits
 #include <memory>
 #include <utility> // std::move
-#include <jsoncons/json_exception.hpp> // jsoncons::ser_error
+#include <jsoncons/json_exception.hpp> // jsoncons::codec_error
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/sink.hpp>
@@ -341,7 +341,7 @@ private:
         auto sink = unicons::validate(sv.begin(), sv.end());
         if (sink.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(ser_error(cbor_errc::invalid_utf8_text_string));
+            JSONCONS_THROW(codec_error(cbor_errc::invalid_utf8_text_string));
         }
 
         if (options_.pack_strings() && sv.size() >= jsoncons::cbor::detail::min_length_for_stringref(next_stringref_))

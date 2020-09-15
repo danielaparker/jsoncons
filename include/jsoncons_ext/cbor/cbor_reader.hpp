@@ -77,7 +77,7 @@ public:
         read(ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec,line(),column()));
+            JSONCONS_THROW(codec_error(ec,line(),column()));
         }
     }
 

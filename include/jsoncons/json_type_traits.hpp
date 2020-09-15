@@ -257,7 +257,7 @@ namespace detail {
         {
             if (!j.is_null())
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_jsoncons_null_type));
+                JSONCONS_THROW(codec_error(convert_errc::not_jsoncons_null_type));
             }
             return jsoncons::null_type();
         }
@@ -471,7 +471,7 @@ namespace detail {
             }
             else 
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(codec_error(convert_errc::not_vector));
             }
         }
 
@@ -499,7 +499,7 @@ namespace detail {
                 auto v = convert.from(j.as_byte_string_view(),j.tag(), ec);
                 if (ec)
                 {
-                    JSONCONS_THROW(ser_error(ec));
+                    JSONCONS_THROW(codec_error(ec));
                 }
                 return v;
             }
@@ -508,13 +508,13 @@ namespace detail {
                 auto v = convert.from(j.as_string_view(),j.tag(), ec);
                 if (ec)
                 {
-                    JSONCONS_THROW(ser_error(ec));
+                    JSONCONS_THROW(codec_error(ec));
                 }
                 return v;
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(codec_error(convert_errc::not_vector));
             }
         }
 
@@ -619,7 +619,7 @@ namespace detail {
             }
             else 
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(codec_error(convert_errc::not_vector));
             }
         }
 
@@ -699,7 +699,7 @@ namespace detail {
             }
             else 
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(codec_error(convert_errc::not_vector));
             }
         }
 
@@ -763,7 +763,7 @@ namespace detail {
             std::array<E, N> buff;
             if (j.size() != N)
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_array));
+                JSONCONS_THROW(codec_error(convert_errc::not_array));
             }
             for (size_t i = 0; i < N; i++)
             {
@@ -827,7 +827,7 @@ namespace detail {
         {
             if (!j.is_object())
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_map));
+                JSONCONS_THROW(codec_error(convert_errc::not_map));
             }
             T result;
             for (const auto& item : j.object_range())
@@ -1267,7 +1267,7 @@ namespace detail {
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_array));
+                JSONCONS_THROW(codec_error(convert_errc::not_array));
             }
         }
         
@@ -1329,7 +1329,7 @@ namespace variant_detail
     typename std::enable_if<N == std::variant_size_v<Variant>, Variant>::type
     as_variant(const Json& /*j*/)
     {
-        JSONCONS_THROW(ser_error(convert_errc::not_variant));
+        JSONCONS_THROW(codec_error(convert_errc::not_variant));
     }
 
     template<std::size_t N, class Json, class Variant, class T, class ... U>
@@ -1661,7 +1661,7 @@ namespace variant_detail
         {
             if (!j.is_null())
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_nullptr));
+                JSONCONS_THROW(codec_error(convert_errc::not_nullptr));
             }
             return nullptr;
         }
@@ -1726,7 +1726,7 @@ namespace variant_detail
                     auto result = from_base16(sv.begin(), sv.end(), bits);
                     if (result.ec != from_base16_errc::success)
                     {
-                        JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                        JSONCONS_THROW(codec_error(convert_errc::not_bitset));
                     }
                 }
                 std::uint8_t byte = 0;
@@ -1739,7 +1739,7 @@ namespace variant_detail
                     {
                         if (pos >= bits.size())
                         {
-                            JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                            JSONCONS_THROW(codec_error(convert_errc::not_bitset));
                         }
                         byte = bits.at(pos++);
                         mask = 0x80;
@@ -1756,7 +1756,7 @@ namespace variant_detail
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                JSONCONS_THROW(codec_error(convert_errc::not_bitset));
             }
         }
 

@@ -300,7 +300,7 @@ try
 {
     json j = json::parse(s, strict_json_parsing());
 }
-catch (const ser_error& e)
+catch (const codec_error& e)
 {
     std::cout << "(2) " << e.what() << std::endl;
 }
@@ -324,7 +324,7 @@ try
     options.max_nesting_depth(20);
     json j = json::parse(s, options);
 }
-catch (const ser_error& e)
+catch (const codec_error& e)
 {
      std::cout << e.what() << std::endl;
 }

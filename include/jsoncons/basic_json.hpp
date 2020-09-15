@@ -2452,7 +2452,7 @@ public:
                 byte_string_type v = convert.from(as_string_view(),tag(),ec);
                 if (ec)
                 {
-                    JSONCONS_THROW(ser_error(ec));
+                    JSONCONS_THROW(codec_error(ec));
                 }
                 return v;
             }
@@ -2856,7 +2856,7 @@ public:
         auto result = unicons::skip_bom(s.begin(), s.end());
         if (result.ec != unicons::encoding_errc())
         {
-            JSONCONS_THROW(ser_error(result.ec));
+            JSONCONS_THROW(codec_error(result.ec));
         }
         std::size_t offset = result.it - s.begin();
         parser.update(s.data()+offset,s.size()-offset);
@@ -3339,7 +3339,7 @@ public:
         dump(s, options, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3352,7 +3352,7 @@ public:
         dump_pretty(s, options, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3363,7 +3363,7 @@ public:
         dump(os, options, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3374,7 +3374,7 @@ public:
         dump_pretty(os, options, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3390,7 +3390,7 @@ public:
         dump(s, line_indent, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3405,7 +3405,7 @@ public:
         dump(s, options, line_indent, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3417,7 +3417,7 @@ public:
         dump(os, line_indent, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3430,7 +3430,7 @@ public:
         dump(os, options, line_indent, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3442,7 +3442,7 @@ public:
         dump(visitor, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec));
+            JSONCONS_THROW(codec_error(ec));
         }
     }
 
@@ -3998,7 +3998,7 @@ public:
                         T v = convert.from(as_string_view(),tag(),ec);
                         if (ec)
                         {
-                            JSONCONS_THROW(ser_error(ec));
+                            JSONCONS_THROW(codec_error(ec));
                         }
                         return v;
                     }
@@ -4007,7 +4007,7 @@ public:
                         T v = convert.from(as_string_view(), hint, ec);
                         if (ec)
                         {
-                            JSONCONS_THROW(ser_error(ec));
+                            JSONCONS_THROW(codec_error(ec));
                         }
                         return T(v.begin(),v.end());
                     }
@@ -4204,7 +4204,7 @@ public:
                 auto s = convert.from(as_byte_string_view(), tag(), alloc, ec);
                 if (ec)
                 {
-                    JSONCONS_THROW(ser_error(ec));
+                    JSONCONS_THROW(codec_error(ec));
                 }
                 return s;
             }

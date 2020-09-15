@@ -14,7 +14,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
         try {
                 json j2 = decode_cbor<json>(is);
         }
-        catch(jsoncons::ser_error e) {}
+        catch(jsoncons::codec_error e) {}
         catch(jsoncons::json_runtime_error<std::runtime_error> e2) {}
 
         return 0;

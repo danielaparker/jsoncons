@@ -877,7 +877,7 @@ namespace jsoncons { namespace jsonpath {
                                     auto temp = resources.create_temp(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
-                                JSONCONS_CATCH(const ser_error&)     
+                                JSONCONS_CATCH(const codec_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
                                     return;
@@ -894,7 +894,7 @@ namespace jsoncons { namespace jsonpath {
                                     auto temp = resources.create_temp(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
-                                JSONCONS_CATCH(const ser_error&)     
+                                JSONCONS_CATCH(const codec_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
                                     return;
@@ -960,7 +960,7 @@ namespace jsoncons { namespace jsonpath {
                                     auto temp = resources.create_temp(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
-                                JSONCONS_CATCH(const ser_error&)     
+                                JSONCONS_CATCH(const codec_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
                                     return;
@@ -979,7 +979,7 @@ namespace jsoncons { namespace jsonpath {
                                     auto temp = resources.create_temp(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
-                                JSONCONS_CATCH(const ser_error&)     
+                                JSONCONS_CATCH(const codec_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
                                     return;
