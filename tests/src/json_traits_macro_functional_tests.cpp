@@ -1289,7 +1289,8 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
         CHECK(output2 == output1);
 
         auto j = decode_json<json>(output2);
-        CHECK(j.is<std::vector<ns::Person_ACGN>>());    }
+        CHECK(j.is<std::vector<ns::Person_ACGN>>());    
+    }
     SECTION("failure")
     {
         std::vector<ns::Person_ACGN> persons1 = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "12345678")};    
