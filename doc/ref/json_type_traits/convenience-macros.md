@@ -217,8 +217,8 @@ in the derived classes.
 `enum_name` - the name of an enum type or enum class type  
 `num_template_params` - for a class template, the number of template parameters  
 `member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
-`field_nameN` - the base name of a class getter or setter with prefix `get` or `set` stripped out.  
-`static const`. Data members that are `const` or `static const` are one-way serialized.  
+`field_nameN` - the base name of a class getter or setter with prefix `get` or `set` stripped out. 
+Data members that are `const` or `static const` are one-way serialized.  
 `getter_nameN` - the getter for a class data member  
 `setter_nameN` - the setter for a class data member  
 `enumeratorN` - an enumerator  
