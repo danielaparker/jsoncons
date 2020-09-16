@@ -16,7 +16,7 @@ GETTER    | Accesses data members through getter functions
 SETTER    | Modifies data members through setter functions
 NAME      | Serialize with provided names (instead of C++ member names)
 
-Square brackets indicates optionality.
+Square brackets indicate optionality.
 
 ```c++
 #include <jsoncons/json_type_traits.hpp>
