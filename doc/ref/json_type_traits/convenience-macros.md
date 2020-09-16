@@ -56,8 +56,8 @@ JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(num_template_params,
 JSONCONS_ENUM_TRAITS(enum_name,enumerator0,enumerator1,...) (9)
 
 JSONCONS_ENUM_NAME_TRAITS(enum_name,
-                           (enumerator0,serialized_name0[,mode,match,from,into]),
-                           (enumerator1,serialized_name1[,mode,match,from,into])...) (10)
+                          (enumerator0,serialized_name0),
+                          (enumerator1,serialized_name1)...) (10)
 
 JSONCONS_N_CTOR_GETTER_TRAITS(class_name,num_mandatory,
                               getter_name0,
