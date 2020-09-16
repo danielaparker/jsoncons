@@ -221,7 +221,7 @@ in the derived classes.
 `static const`. Data members that are `const` or `static const` are one-way serialized.  
 `getter_nameN` - the getter for a class data member  
 `setter_nameN` - the setter for a class data member  
-`enumeratorN - an enumerator
+`enumeratorN` - an enumerator
 `serialized_nameN` - serialized name  
 `mode` - indicates whether a data member is read-write (`JSONCONS_RDWR`) or read-only (`JSONCONS_RDONLY`).
 Read-only data members are serialized but not de-serialized. (since 0.157.0)
