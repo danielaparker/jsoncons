@@ -15,6 +15,7 @@ namespace jsoncons {
     enum class convert_errc
     {
         success = 0,
+        conversion_failed,
         not_utf8,
         not_wide_char,
         not_vector,
@@ -59,6 +60,8 @@ namespace detail {
         {
             switch (static_cast<convert_errc>(ev))
             {
+                case convert_errc::conversion_failed:
+                    return "Unable to convert into the provided type";
                 case convert_errc::not_utf8:
                     return "Cannot convert string to UTF-8";
                 case convert_errc::not_wide_char:

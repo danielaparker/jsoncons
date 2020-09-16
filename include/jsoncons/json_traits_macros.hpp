@@ -276,7 +276,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT, ,,, __VA_ARGS__) \
             return aval; \
@@ -384,7 +384,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT,,,, __VA_ARGS__) \
             return aval; \
@@ -462,7 +462,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # ValueType)); \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_AS, ,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
@@ -561,7 +561,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # ValueType)); \
             return value_type ( JSONCONS_VARIADIC_REP_N(JSONCONS_CTOR_GETTER_NAME_AS,,,, __VA_ARGS__) ); \
         } \
         static Json to_json(const value_type& aval, allocator_type alloc=allocator_type()) \
@@ -643,7 +643,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # EnumType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # EnumType)); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
@@ -664,7 +664,7 @@ namespace jsoncons \
                 } \
                 else \
                 { \
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                    JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
             return it->first; \
@@ -685,7 +685,7 @@ namespace jsoncons \
                 } \
                 else \
                 { \
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                    JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
             return Json(it->second,alloc); \
@@ -744,7 +744,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # EnumType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # EnumType)); \
             const string_view_type s = ajson.template as<string_view_type>(); \
             auto first = get_values().first; \
             auto last = get_values().second; \
@@ -765,7 +765,7 @@ namespace jsoncons \
                 } \
                 else \
                 { \
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                    JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
             return it->first; \
@@ -786,7 +786,7 @@ namespace jsoncons \
                 } \
                 else \
                 { \
-                    JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not an enum")); \
+                    JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not an enum")); \
                 } \
             } \
             return Json(it->second,alloc); \
@@ -842,7 +842,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT, ,GetPrefix,SetPrefix, __VA_ARGS__) \
             return aval; \
@@ -943,7 +943,7 @@ namespace jsoncons \
         } \
         static value_type as(const Json& ajson) \
         { \
-            if (!is(ajson)) JSONCONS_THROW(json_runtime_error<std::runtime_error>("Not a " # ValueType)); \
+            if (!is(ajson)) JSONCONS_THROW(codec_error(convert_errc::conversion_failed, "Not a " # ValueType)); \
             value_type aval{}; \
             JSONCONS_VARIADIC_REP_N(AsT,,,, __VA_ARGS__) \
             return aval; \

@@ -1,4 +1,20 @@
-v0.156.0
+v0.157.0
+--------
+
+Bugs Fixed:
+
+- Fixed issue with jsonpath exception when querying empty string, [\270](https://github.com/danielaparker/jsoncons/issues/270)
+
+Changes:
+
+- The name `ser_error` has been deprecated and renamed to `codec_error`.
+
+- The names `staj_array` and `staj_object` have been deprecated and renamed to 
+`make_staj_array_view` and `make_staj_object_view`
+
+Enhancements:
+ 
+ v0.156.0
 --------
 
 Bugs Fixed:

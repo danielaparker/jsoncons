@@ -961,7 +961,7 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Triangle_NGSN, 3,
 )
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Circle_NGSN, 2,
-    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) {return type == "circle";}),
     (getRadius, setRadius, "radius")
 )
 
