@@ -1060,7 +1060,8 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Company_ACGN,
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
     (getName, "name"),
-    (getSocialSecurityNumber, "social_security_number", JSONCONS_RDWR, jsoncons::always_true{},
+    (getSocialSecurityNumber, "social_security_number", 
+      JSONCONS_RDWR, jsoncons::always_true{},
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
@@ -1079,7 +1080,15 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN, 
   (getName, "name"),
   (getSocialSecurityNumber, "social_security_number", 
-      JSONCONS_RDWR, jsoncons::always_true(),
+      JSONCONS_RDWR, 
+      [] (const jsoncons::optional<std::string>& unvalidated) {
+          if (!unvalidated)
+          {
+              return false;
+          }
+          std::regex myRegex("^(\\d{9})$");
+          return std::regex_match(*unvalidated, myRegex);
+      },
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
@@ -1280,19 +1289,14 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
         CHECK(output2 == output1);
 
         auto j = decode_json<json>(output2);
-        CHECK(j.is<std::vector<ns::Person_ACGN>>());
-    }
+        CHECK(j.is<std::vector<ns::Person_ACGN>>());    }
     SECTION("failure")
     {
         std::vector<ns::Person_ACGN> persons1 = {ns::Person_ACGN("John Smith", "123456789"), ns::Person_ACGN("Jane Doe", "12345678")};    
 
         std::string output1;
         encode_json_pretty(persons1, output1);
-        auto persons2 = decode_json<std::vector<ns::Person_ACGN>>(output1);
-        CHECK(persons2.at(0).getName() == persons1.at(0).getName());
-        CHECK(persons2.at(0).getSocialSecurityNumber() == persons1.at(0).getSocialSecurityNumber());
-        CHECK(persons2.at(1).getName() == persons1.at(1).getName());
-        CHECK_FALSE(persons2.at(1).getSocialSecurityNumber());
+        CHECK_THROWS(decode_json<std::vector<ns::Person_ACGN>>(output1));
     }
 } 
 #endif
