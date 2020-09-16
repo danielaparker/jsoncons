@@ -322,26 +322,24 @@ namespace jsoncons \
     if (!j.template is<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>() || !Match(j.template as<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>())) return false;}
 
 #define JSONCONS_N_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
-#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
+#define JSONCONS_N_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) \
-    {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
-#define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) \
-    Mode(json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member)) ;
+    if (ajson.contains(Name)) {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
+#define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_AS_2(Member, Name))
 #define JSONCONS_N_MEMBER_NAME_AS_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, ,)
 #define JSONCONS_N_MEMBER_NAME_AS_5(Member, Name, Mode, Match, From) JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, )
 #define JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, Into) \
-    Mode(json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>(ajson,Name,From,aval.Member));
+    Mode(if (ajson.contains(Name)) {json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>(ajson,Name,From,aval.Member);})
 
 #define JSONCONS_ALL_MEMBER_NAME_AS(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_AS_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_ALL_MEMBER_NAME_AS_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) \
     json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);
-#define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) \
-    Mode(json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member)) ;
+#define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name))
 #define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, , )
 #define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, From) JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, )
 #define JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, Into) \
-    Mode(json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>(ajson,Name,From,aval.Member));
+    Mode(json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>(ajson,Name,From,aval.Member);)
 
 #define JSONCONS_N_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) if ((num_params-Count) < num_mandatory_params2) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_N_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
@@ -349,7 +347,8 @@ namespace jsoncons \
   {ajson.try_emplace(Name, aval.Member);} \
 else \
   {json_traits_helper<Json>::set_optional_json_member(Name, aval.Member, ajson);}
-#define JSONCONS_N_MEMBER_NAME_TO_JSON_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_TO_JSON_2(Member, Name)
+#define JSONCONS_N_MEMBER_NAME_TO_JSON_3(Member, Name, Mode) JSONCONS_N_MEMBER_NAME_TO_JSON_2(Member, Name)
+#define JSONCONS_N_MEMBER_NAME_TO_JSON_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match,,)
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_5(Member, Name, Mode, Match, From) JSONCONS_N_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, From, )
 #define JSONCONS_N_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, From, Into) \
   {ajson.try_emplace(Name, Into(aval.Member));} \
@@ -359,7 +358,7 @@ else \
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON(P1, P2, P3, Seq, Count) JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_LAST(P1, P2, P3, Seq, Count) JSONCONS_EXPAND(JSONCONS_CONCAT(JSONCONS_ALL_MEMBER_NAME_TO_JSON_,JSONCONS_NARGS Seq) Seq)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_2(Member, Name) ajson.try_emplace(Name, aval.Member);
-#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_3(Member, Name, Mode) Mode(ajson.try_emplace(Name, aval.Member);)
+#define JSONCONS_ALL_MEMBER_NAME_TO_JSON_3(Member, Name, Mode) JSONCONS_ALL_MEMBER_NAME_TO_JSON_2(Member, Name)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match,,)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_5(Member, Name, Mode, Match, From) JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, From,)
 #define JSONCONS_ALL_MEMBER_NAME_TO_JSON_6(Member, Name, Mode, Match, From, Into) ajson.try_emplace(Name, Into(aval.Member));
