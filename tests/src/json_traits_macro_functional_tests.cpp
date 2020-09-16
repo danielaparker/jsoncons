@@ -435,9 +435,10 @@ namespace ns {
             return height_ * width_;
         }
 
-        const std::string type() const
+        const std::string& type() const
         {
-            return "rectangle";
+            static const std::string type_ = "rectangle"; 
+            return type_;
         }
     };
 
@@ -467,9 +468,10 @@ namespace ns {
             return (height_ * width_)/2.0;
         }
 
-        std::string type() const
+        const std::string& type() const
         {
-            return "triangle";
+            static const std::string type_ = "triangle"; 
+            return type_;
         }
     };                 
 
@@ -494,9 +496,10 @@ namespace ns {
             return pi*radius_*radius_;
         }
 
-        std::string type() const
+        const std::string& type() const
         {
-            return "circle";
+            static const std::string type_ = "circle"; 
+            return type_;
         }
     };                 
 
@@ -542,9 +545,10 @@ namespace ns {
             return height_ * width_;
         }
 
-        std::string getType() const
+        const std::string& getType() const
         {
-            return "rectangle";
+            static const std::string type_ = "rectangle"; 
+            return type_;
         }
     };
 
@@ -584,9 +588,10 @@ namespace ns {
             return (height_ * width_)/2.0;
         }
 
-        const std::string getType() const
+        const std::string& getType() const
         {
-            return "triangle";
+            static const std::string type_ = "triangle"; 
+            return type_;
         }
     };                 
 
@@ -616,9 +621,10 @@ namespace ns {
             return pi*radius_*radius_;
         }
 
-        const std::string getType() const
+        const std::string& getType() const
         {
-            return "circle";
+            static const std::string type_ = "circle"; 
+            return type_;
         }
     };                 
 
@@ -664,9 +670,10 @@ namespace ns {
             return height_ * width_;
         }
 
-        std::string getType() const
+        const std::string& getType() const
         {
-            return "rectangle";
+            static const std::string type_ = "rectangle"; 
+            return type_;
         }
     };
 
@@ -706,9 +713,10 @@ namespace ns {
             return (height_ * width_)/2.0;
         }
 
-        const std::string getType() const
+        const std::string& getType() const
         {
-            return "triangle";
+            static const std::string type_ = "triangle"; 
+            return type_;
         }
     };                 
 
@@ -738,9 +746,10 @@ namespace ns {
             return pi*radius_*radius_;
         }
 
-        const std::string getType() const
+        const std::string& getType() const
         {
-            return "circle";
+            static const std::string type_ = "circle"; 
+            return type_;
         }
     };                 
 
