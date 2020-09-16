@@ -45,7 +45,7 @@ TEST_CASE("jtaj_array_view tests")
     {
         json_cursor cursor(s);
 
-        auto view = make_staj_array_view<json>(cursor);
+        auto view = staj_array<json>(cursor);
 
         auto it = view.begin();
         auto end = view.end();
@@ -116,7 +116,7 @@ TEST_CASE("object_iterator test")
     {
         std::istringstream is(s);
         json_cursor cursor(is);
-        auto view = make_staj_object_view<std::string,json>(cursor);
+        auto view = staj_object<std::string,json>(cursor);
 
         auto it = view.begin();
         auto end = view.end();

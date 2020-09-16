@@ -46,7 +46,7 @@ void staj_array_iterator_example()
 
     json_cursor cursor(is);
 
-    auto view = make_staj_array_view<json>(cursor);
+    auto view = staj_array<json>(cursor);
 
     for (const auto& j : view)
     {
@@ -61,7 +61,7 @@ void staj_array_iterator_example2()
 
     json_cursor cursor(is);
 
-    auto view = make_staj_array_view<ns::employee>(cursor);
+    auto view = staj_array<ns::employee>(cursor);
 
     for (const auto& val : view)
     {
@@ -74,7 +74,7 @@ void staj_object_iterator_example()
 {
     json_cursor cursor(object_example);
 
-    auto view = make_staj_object_view<std::string,json>(cursor);
+    auto view = staj_object<std::string,json>(cursor);
 
     for (const auto& kv : view)
     {

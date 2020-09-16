@@ -9,9 +9,6 @@ Changes:
 
 - The name `ser_error` has been deprecated and renamed to `codec_error`.
 
-- The names `staj_array` and `staj_object` have been deprecated and renamed to 
-`make_staj_array_view` and `make_staj_object_view`
-
 Enhancements:
  
  v0.156.0

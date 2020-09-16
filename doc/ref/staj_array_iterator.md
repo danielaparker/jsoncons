@@ -93,7 +93,7 @@ int main()
 
     json_cursor cursor(is);
 
-    auto view = make_staj_array_view<json>(cursor);
+    auto view = staj_array<json>(cursor);
 
     for (const auto& j : view)
     {
@@ -138,7 +138,7 @@ int main()
 
     json_cursor cursor(is);
 
-    auto view = make_staj_array_view<ns::employee>(cursor);
+    auto view = staj_array<ns::employee>(cursor);
 
     for (const auto& val : view)
     {

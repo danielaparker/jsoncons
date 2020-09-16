@@ -91,7 +91,7 @@ int main()
 {
     json_cursor cursor(example);
 
-    auto view = make_staj_object_view<std::string,json>(cursor);
+    auto view = staj_object<std::string,json>(cursor);
 
     for (const auto& kv : view)
     {
