@@ -1882,4 +1882,34 @@ TEST_CASE("jsonpath intersection tests")
     }
 }
 
+TEST_CASE("jsonpath empty string test")
+{
+    std::string input = R"(
+    [
+        {"Bid":"100","Ask":"200","Last":"300"},
+        {"Bid":"100","Last":"300"},
+        {"Bid":"110","Ask":"220"}
+    ]
+    )";
+
+    json root = json::parse(input);
+
+    SECTION("test1")
+    {
+
+        json result = jsonpath::json_query(root,"");
+
+        CHECK(result.is_array());
+        CHECK(result.size() == 0);
+    }
+
+    SECTION("test2")
+    {
+
+        json result = jsonpath::json_query(root,"   ");
+
+        CHECK(result.is_array());
+        CHECK(result.size() == 0);
+    }
+}
 
