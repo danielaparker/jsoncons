@@ -5,8 +5,8 @@ Bugs fixed:
 
 - Fixed issue with jsonpath exception raised when querying empty string, [\#270](https://github.com/danielaparker/jsoncons/issues/270)
 
-- Included pull request [\#273](https://github.com/danielaparker/jsoncons/issues/273) that addresses issue [\#272](https://github.com/danielaparker/jsoncons/issues/272)
-about an errently named macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT128`) introduced in 0.156.0.
+- Included pull request [\#273](https://github.com/danielaparker/jsoncons/issues/273) that fixes issue [\#272](https://github.com/danielaparker/jsoncons/issues/272)
+for a misnamed macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT128`) introduced in 0.156.0.
 
 v0.156.0
 --------
