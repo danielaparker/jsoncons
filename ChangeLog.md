@@ -1,9 +1,19 @@
+v0.156.1
+--------
+
+Bugs fixed:
+
+- Fixed issue with jsonpath exception raised when querying empty string, [\#270](https://github.com/danielaparker/jsoncons/issues/270)
+
+- Included pull request [\#273](https://github.com/danielaparker/jsoncons/issues/273) that addresses issue [\#272](https://github.com/danielaparker/jsoncons/issues/272)
+about an errently named macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT128`) introduced in 0.156.0.
+
 v0.156.0
 --------
 
-Bugs Fixed:
+Bugs fixed:
 
-- Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\263](https://github.com/danielaparker/jsoncons/issues/263)
+- Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\#263](https://github.com/danielaparker/jsoncons/issues/263)
 
 Enhancements:
 
@@ -70,7 +80,7 @@ and `decode_csv` to read from any contiguous character sequence.
 
 Bugs fixed:
 
-- Fixed g++ compile issue with -Wnoexcept compiler flag, [\260](https://github.com/danielaparker/jsoncons/issues/260)
+- Fixed g++ compile issue with -Wnoexcept compiler flag, [\#260](https://github.com/danielaparker/jsoncons/issues/260)
 
 - Fixed issue with creating a patch to remove array elements using `json_patch::from_diff`, 
 [\#261](https://github.com/danielaparker/jsoncons/issues/261)
