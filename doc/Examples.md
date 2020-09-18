@@ -2270,19 +2270,19 @@ namespace ns {
 } // ns
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
-    (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
     (radius, "radius")
 )
 
@@ -2724,19 +2724,19 @@ namespace ns {
 } // namespace ns
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
-    (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
     (radius, "radius")
 )
 

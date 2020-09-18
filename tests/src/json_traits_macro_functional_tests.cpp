@@ -905,19 +905,19 @@ namespace ns {
 } // ns
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
-    (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (height, "height", JSONCONS_RDWR),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle_ACGN,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle_ACGN,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
     (radius, "radius")
 )
 
@@ -925,32 +925,32 @@ JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_ACGN,ns::Rectangle_ACGN,ns::Triangle_ACGN,
 
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_AGSN,
-    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (getHeight, setHeight, "height"),
     (getWidth, setWidth, "width")
 )
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Triangle_AGSN,
-    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (getHeight, setHeight, "height"),
     (getWidth, setWidth, "width")
 )
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Circle_AGSN,
-    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
     (getRadius, setRadius, "radius")
 )
 
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AGSN,ns::Rectangle_AGSN,ns::Triangle_AGSN,ns::Circle_AGSN)
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_NGSN, 3,
-    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (getHeight, setHeight, "height"),
     (getWidth, setWidth, "width")
 )
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Triangle_NGSN, 3,
-    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (getHeight, setHeight, "height"),
     (getWidth, setWidth, "width")
 )
@@ -963,37 +963,37 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Circle_NGSN, 2,
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_NGSN,ns::Rectangle_NGSN,ns::Triangle_NGSN,ns::Circle_NGSN)
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Rectangle_AMN,
-    (type_,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (type_,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (height_, "height",JSONCONS_RDWR),
     (width_, "width")
 )
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Triangle_AMN,
-    (type_,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (height_, "height"),
     (width_, "width")
 )
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Circle_AMN,
-    (type_,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
     (radius_, "radius")
 )
 
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AMN,ns::Rectangle_AMN,ns::Triangle_AMN,ns::Circle_AMN)
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Rectangle_NMN, 3,
-    (type_,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (type_,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (height_, "height"),
     (width_, "width")
 ) 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Triangle_NMN, 3,
-    (type_,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (height_, "height"),
     (width_, "width")
 )
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Circle_NMN, 2,
-    (type_,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
     (radius_, "radius")
 )
 
