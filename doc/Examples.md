@@ -43,6 +43,7 @@
 [Serialize a polymorphic type based on a type member (since 0.157.0)](#G14)  
 [An example with std::variant](#G11)  
 [Type selection and std::variant](#G12)  
+[Serialize a variant based on a type member (since 0.157.0)](#G15)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G13)
 
 ### Construct
@@ -2617,6 +2618,188 @@ ns::Color yellow
 ```
 
 So: types that are more constrained should appear to the left of types that are less constrained.
+
+<div id="G12"/>
+
+#### Serialize a variant based on a type member (since 0.157.0)
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    class Rectangle
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "rectangle"; 
+            return type_;
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+
+    class Circle
+    { 
+        double radius_;
+
+    public:
+        Circle(double radius)
+            : radius_(radius)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+    };                 
+
+} // namespace ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
+    (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (radius, "radius")
+)
+
+int main()
+{
+    using shapes_t = std::variant<ns::Rectangle,ns::Triangle,ns::Circle>;
+
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    auto shapes = jsoncons::decode_json<std::vector<shapes_t>>(input);
+
+    auto visitor = [](auto&& shape) {
+        using T = std::decay_t<decltype(shape)>;
+        if constexpr (std::is_same_v<T, ns::Rectangle>)
+            std::cout << "rectangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Triangle>)
+            std::cout << "triangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Circle>)
+            std::cout << "circle area: " << shape.area() << '\n';
+    };
+
+    std::cout << "(1)\n";
+    for (const auto& shape : shapes)
+    {
+        std::visit(visitor, shape);
+    }
+
+    std::string output;
+    jsoncons::encode_json_pretty(shapes, output);
+    std::cout << "\n(2)\n" << output << "\n";
+}
+```
+Output:
+```
+(1)
+rectangle area: 3.0000000
+triangle area: 4.0000000
+circle area: 3.1415927
+
+(2)
+[
+    {
+        "height": 1.5,
+        "type": "rectangle",
+        "width": 2.0
+    },
+    {
+        "height": 2.0,
+        "type": "triangle",
+        "width": 4.0
+    },
+    {
+        "radius": 1.0,
+        "type": "circle"
+    }
+]
+```
 
 <div id="G13"/>
 

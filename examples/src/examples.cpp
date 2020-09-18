@@ -437,8 +437,6 @@ int main()
 
         jmespath_examples();
 
-        json_traits_variant_examples();
-
         bson_examples();
 
         msgpack_examples();
@@ -460,6 +458,8 @@ int main()
         json_traits_integer_examples();
 
         json_traits_polymorphic_examples();
+
+        json_traits_variant_examples();
     }
     catch (const std::exception& e)
     {
