@@ -116,7 +116,7 @@ namespace ns {
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
     (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
-    (height, "height", JSONCONS_RDWR),
+    (height, "height"),
     (width, "width")
 )
 
