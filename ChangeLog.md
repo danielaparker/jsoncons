@@ -27,7 +27,7 @@ issue with a misnamed macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT
 
 Bugs Fixed:
 
-- Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\263](https://github.com/danielaparker/jsoncons/issues/263)
+- Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\#263](https://github.com/danielaparker/jsoncons/issues/263)
 
 Enhancements:
 
@@ -94,7 +94,7 @@ and `decode_csv` to read from any contiguous character sequence.
 
 Bugs fixed:
 
-- Fixed g++ compile issue with -Wnoexcept compiler flag, [\260](https://github.com/danielaparker/jsoncons/issues/260)
+- Fixed g++ compile issue with -Wnoexcept compiler flag, [\#260](https://github.com/danielaparker/jsoncons/issues/260)
 
 - Fixed issue with creating a patch to remove array elements using `json_patch::from_diff`, 
 [\#261](https://github.com/danielaparker/jsoncons/issues/261)
