@@ -48,6 +48,7 @@ void update_json_in_place_examples();
 void json_traits_tuple_examples();
 void json_traits_bitset_examples();
 void json_traits_integer_examples();
+void json_traits_polymorphic_examples();
 
 void comment_example()
 {
@@ -457,6 +458,8 @@ int main()
         json_traits_bitset_examples();
 
         json_traits_integer_examples();
+
+        json_traits_polymorphic_examples();
     }
     catch (const std::exception& e)
     {

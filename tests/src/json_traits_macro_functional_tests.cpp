@@ -904,11 +904,6 @@ namespace ns {
 } // namespace
 } // ns
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) 
-    #pragma GCC diagnostic push 
-    #pragma GCC diagnostic ignored "-Wuninitialized"
-#endif            
-
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
     (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
     (height, "height", JSONCONS_RDWR),
@@ -1111,10 +1106,6 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN,
       }
    )
 )
-
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) 
-#pragma GCC diagnostic pop 
-#endif            
 
 using namespace jsoncons;
 

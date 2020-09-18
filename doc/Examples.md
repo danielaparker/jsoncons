@@ -40,6 +40,7 @@
 [An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS](#G8)  
 [Serialize a polymorphic type based on the presence of members](#G9)  
 [Ensuring type selection is possible](#G10)  
+[Serialize a polymorphic type based on a type member (since 0.157.0)](#G14)  
 [An example with std::variant](#G11)  
 [Type selection and std::variant](#G12)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G13)
@@ -2156,6 +2157,186 @@ Output:
 (2)
 A bar
 A baz
+```
+
+<div id="G14"/>
+
+#### Serialize a polymorphic type based on a type member (since 0.157.0)
+
+```c++
+namespace ns {
+
+
+    class Shape
+    {
+    public:
+        virtual ~Shape() = default;
+        virtual double area() const = 0;
+    };
+      
+    class Rectangle : public Shape
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "rectangle"; 
+            return type_;
+        }
+    };
+
+    class Triangle : public Shape
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
+        }
+    };                 
+
+    class Circle : public Shape
+    { 
+        double radius_;
+
+    public:
+        Circle(double radius)
+            : radius_(radius)
+        {
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+    };                 
+
+} // ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
+    (type,"type",JSONCONS_RDONLY,[](const std::string& type){return type == "rectangle";}),
+    (height, "height", JSONCONS_RDWR),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "triangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type){return type == "circle";}),
+    (radius, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape,ns::Rectangle,ns::Triangle,ns::Circle)
+
+int main()
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    auto shapes = jsoncons::decode_json<std::vector<std::unique_ptr<ns::Shape>>>(input);
+
+    std::cout << "(1)\n";
+    for (const auto& shape : shapes)
+    {
+        std::cout << typeid(*shape.get()).name() << " area: " << shape->area() << "\n";
+    }
+
+    std::string output;
+
+    jsoncons::encode_json_pretty(shapes, output);
+    std::cout << "\n(2)\n" << output << "\n";
+}
+```
+
+Output:
+```
+(1)
+class `ns::Rectangle area: 3.0000000
+class `ns::Triangle area: 4.0000000
+class `ns::Circle area: 3.1415927
+
+(2)
+[
+    {
+        "height": 1.5,
+        "type": "rectangle",
+        "width": 2.0
+    },
+    {
+        "height": 2.0,
+        "type": "triangle",
+        "width": 4.0
+    },
+    {
+        "radius": 1.0,
+        "type": "circle"
+    }
+]
 ```
 
 <div id="G11"/>
