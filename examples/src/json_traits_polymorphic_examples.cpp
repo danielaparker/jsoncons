@@ -28,6 +28,12 @@ namespace ns {
         {
         }
 
+        const std::string& type() const
+        {
+            static const std::string type_ = "rectangle"; 
+            return type_;
+        }
+
         double height() const
         {
             return height_;
@@ -42,12 +48,6 @@ namespace ns {
         {
             return height_ * width_;
         }
-
-        const std::string& type() const
-        {
-            static const std::string type_ = "rectangle"; 
-            return type_;
-        }
     };
 
     class Triangle : public Shape
@@ -59,6 +59,12 @@ namespace ns {
         Triangle(double height, double width)
             : height_(height), width_(width)
         {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
         }
 
         double height() const
@@ -75,12 +81,6 @@ namespace ns {
         {
             return (height_ * width_)/2.0;
         }
-
-        const std::string& type() const
-        {
-            static const std::string type_ = "triangle"; 
-            return type_;
-        }
     };                 
 
     class Circle : public Shape
@@ -93,6 +93,12 @@ namespace ns {
         {
         }
 
+        const std::string& type() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+
         double radius() const
         {
             return radius_;
@@ -102,12 +108,6 @@ namespace ns {
         {
             constexpr double pi = 3.14159265358979323846;
             return pi*radius_*radius_;
-        }
-
-        const std::string& type() const
-        {
-            static const std::string type_ = "circle"; 
-            return type_;
         }
     };                 
 
