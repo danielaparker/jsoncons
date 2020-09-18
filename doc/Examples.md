@@ -2166,7 +2166,6 @@ A baz
 ```c++
 namespace ns {
 
-
     class Shape
     {
     public:
