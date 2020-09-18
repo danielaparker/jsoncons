@@ -43,7 +43,7 @@
 [Serialize a polymorphic type based on a type member (since 0.157.0)](#G14)  
 [An example with std::variant](#G11)  
 [Type selection and std::variant](#G12)  
-[Serialize a variant based on a type member (since 0.157.0)](#G15)  
+[Serialize a std::variant based on a type member (since 0.157.0)](#G15)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G13)
 
 ### Construct
@@ -2619,9 +2619,9 @@ ns::Color yellow
 
 So: types that are more constrained should appear to the left of types that are less constrained.
 
-<div id="G12"/>
+<div id="G15"/>
 
-#### Serialize a variant based on a type member (since 0.157.0)
+#### Serialize a std::variant based on a type member (since 0.157.0)
 
 ```c++
 #include <jsoncons/json.hpp>
