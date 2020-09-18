@@ -1,16 +1,27 @@
-v0.157.0
+v0.157.0 (master)
 --------
-
-Bugs Fixed:
-
-- Fixed issue with jsonpath exception when querying empty string, [\270](https://github.com/danielaparker/jsoncons/issues/270)
 
 Changes:
 
 - The name `ser_error` has been deprecated and renamed to `codec_error`.
 
 Enhancements:
- 
+
+- The `_NAME_` convenience macros now allow an optional `mode` parameter 
+(`JSONCONS_RDWR` or `JSONCONS_RDONLY`) and three function objects, 
+`match` (value matches expected), `from` (convert from type known to jsoncons) 
+and `into` (convert into type known to jsoncons).
+
+ v0.156.1
+--------
+
+Bugs fixed:
+
+- Fixed issue with jsonpath exception raised when querying empty string, [\#270](https://github.com/danielaparker/jsoncons/issues/270)
+
+- Included pull request [\#273](https://github.com/danielaparker/jsoncons/pull/273) that fixes an 
+issue with a misnamed macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT128`) introduced in 0.156.0.
+
  v0.156.0
 --------
 
