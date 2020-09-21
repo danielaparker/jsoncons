@@ -65,11 +65,6 @@ namespace jsoncons {
             return false;
         }
 
-        static constexpr bool can_convert(const Json& j) noexcept
-        {
-            return is(j);
-        }
-
         static T as(const Json&)
         {
             static_assert(unimplemented<T>::value, "as not implemented");
@@ -81,6 +76,8 @@ namespace jsoncons {
         }
     };
 
+namespace detail {
+
 template<class Json, class T>
 using
 traits_can_convert_t = decltype(json_type_traits<Json,T>::can_convert(Json()));
@@ -89,26 +86,24 @@ template<class Json, class T>
 using
 has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
 
-template <class Json, class Type>
-struct invoke_can_convert
-{
-    template <class J=Json,class T=Type>
-    static
-    typename std::enable_if<has_can_convert<J,T>::value,bool>::type
-    can_convert(const Json& j) noexcept
+    template <class T>
+    struct invoke_can_convert
     {
-        return json_type_traits<Json,T>::can_convert(j);
-    }
-    template <class J=Json,class T=Type>
-    static
-    typename std::enable_if<!has_can_convert<J,T>::value,bool>::type
-    can_convert(const Json& j) noexcept
-    {
-        return json_type_traits<Json,T>::is(j);
-    }
-};
-
-namespace detail {
+        template <class Json>
+        static 
+        typename std::enable_if<has_can_convert<Json,T>::value,bool>::type
+        can_convert(const Json& j) noexcept
+        {
+            return json_type_traits<Json,T>::can_convert(j);
+        }
+        template <class Json>
+        static 
+        typename std::enable_if<!has_can_convert<Json,T>::value,bool>::type
+        can_convert(const Json& j) noexcept
+        {
+            return json_type_traits<Json,T>::is(j);
+        }
+    };
 
     // is_json_type_traits_unspecialized
     template<class Json, class T, class Enable = void>
