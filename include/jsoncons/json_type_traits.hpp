@@ -65,6 +65,11 @@ namespace jsoncons {
             return false;
         }
 
+        static constexpr bool can_convert(const Json& j) noexcept
+        {
+            return is(j);
+        }
+
         static T as(const Json&)
         {
             static_assert(unimplemented<T>::value, "as not implemented");
@@ -75,6 +80,33 @@ namespace jsoncons {
             static_assert(unimplemented<T>::value, "to_json not implemented");
         }
     };
+
+template<class Json, class T>
+using
+traits_can_convert_t = decltype(json_type_traits<Json,T>::can_convert(Json()));
+
+template<class Json, class T>
+using
+has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
+
+template <class Json, class Type>
+struct invoke_can_convert
+{
+    template <class J=Json,class T=Type>
+    static
+    typename std::enable_if<has_can_convert<J,T>::value,bool>::type
+    can_convert(const Json& j) noexcept
+    {
+        return json_type_traits<Json,T>::can_convert(j);
+    }
+    template <class J=Json,class T=Type>
+    static
+    typename std::enable_if<!has_can_convert<J,T>::value,bool>::type
+    can_convert(const Json& j) noexcept
+    {
+        return json_type_traits<Json,T>::is(j);
+    }
+};
 
 namespace detail {
 
