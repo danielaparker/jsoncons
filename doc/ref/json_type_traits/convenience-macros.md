@@ -224,14 +224,16 @@ Data members that are `const` or `static const` are one-way serialized.
 `enumeratorN` - an enumerator  
 `serialized_nameN` - serialized name  
 `mode` - indicates whether a data member is read-write (`JSONCONS_RDWR`) or read-only (`JSONCONS_RDONLY`).
-Read-only data members are serialized but not de-serialized. (since 0.157.0)  
-`match` - a function object that takes a value and returns `true` if the value matches an allowed value,
-`false` otherwise. (since 0.157.0)  
-`from` - a function object that takes an argument whose type has `json_type_traits` specialization and returns a value
-with type of data member. If the two types differ, the function object `to` must be supplied as well. (since 0.157.0)  
-`to` - a function object that takes an argument with type of data member and returns a value
-whose type has `json_type_traits` specialization. The type of `to`'s return value must be the same as that of the argument
-supplied to `from`. (since 0.157.0)  
+Read-only data members are serialized but not de-serialized (since 0.157.0)  
+`match` - a function object that takes a value of type `const T&` and returns `true` if the value matches an allowed value,
+`false` otherwise. If the function object 'to' is also provided, type `T` must be the same as the  return type of `T`,
+otherwise it must be the same as the member type (since 0.157.0)  
+`from` - a function object that takes a value of type 'T' that must have a `json_type_traits` specialization, and returns a value
+that must be the same as the member type. If the function object 'to' is also provided, type `T` must be the same as the  return type of `T`,
+otherwise it must be the same as the member type (since 0.157.0)  
+`to` - a function object that takes a value of type member type, and returns a value of type T
+that must have `json_type_traits` specialization. The type of `to`'s return value must match 
+the type of `from`'s parameter value (since 0.157.0)  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
