@@ -228,10 +228,10 @@ Read-only data members are serialized but not de-serialized (since 0.157.0)
 `match` - a function object that takes a value of type `const T&` and returns `true` if the value matches an allowed value,
 `false` otherwise. If the function object `to` is also provided, type `T` must be the same as the  return type of `T`,
 otherwise it must be the same as the member type (since 0.157.0)  
-`from` - a function object that takes a value of type 'T' that must have a `json_type_traits` specialization, and returns a value
+`from` - a function object that takes a value of type `T` that must have a `json_type_traits` specialization, and returns a value
 that must be the same as the member type. If the function object `to` is also provided, type `T` must be the same as the  return type of `T`,
 otherwise it must be the same as the member type (since 0.157.0)  
-`to` - a function object that takes a value of type member type, and returns a value of type T
+`to` - a function object that takes a value of type member type, and returns a value of type `T`
 that must have `json_type_traits` specialization. The type of `to`'s return value must match 
 the type of `from`'s parameter value (since 0.157.0)  
 `base_class_name` - the name of a base class  
