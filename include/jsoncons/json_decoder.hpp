@@ -150,7 +150,7 @@ public:
 
     Json get_result()
     {
-        JSONCONS_ASSERT(!is_obtained);
+        JSONCONS_ASSERT(!is_obtained_);
         is_valid_ = false;
         is_obtained_ = true;
         return std::move(result_);
