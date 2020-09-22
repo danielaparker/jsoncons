@@ -80,7 +80,6 @@ private:
     std::vector<stack_item,stack_item_allocator_type> item_stack_;
     std::vector<structure_info,structure_info_allocator_type> structure_stack_;
     bool is_valid_;
-    bool is_obtained_;
 
 public:
     json_decoder(const temp_allocator_type& temp_alloc = temp_allocator_type())
@@ -90,9 +89,7 @@ public:
           name_(result_allocator_),
           item_stack_(temp_allocator_),
           structure_stack_(temp_allocator_),
-          is_valid_(false),
-          is_obtained_(false) 
-
+          is_valid_(false) 
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);
@@ -107,9 +104,7 @@ public:
           name_(result_allocator_),
           item_stack_(),
           structure_stack_(),
-          is_valid_(false),
-          is_obtained_(false)  
-
+          is_valid_(false)
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);
@@ -125,9 +120,7 @@ public:
           name_(result_allocator_),
           item_stack_(temp_allocator_),
           structure_stack_(temp_allocator_),
-          is_valid_(false),
-          is_obtained_(false)  
-
+          is_valid_(false)
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);
@@ -137,7 +130,6 @@ public:
     void reset()
     {
         is_valid_ = false;
-        is_obtained_ = false;
         item_stack_.clear();
         structure_stack_.clear();
         structure_stack_.emplace_back(structure_type::root_t, 0);
@@ -150,9 +142,8 @@ public:
 
     Json get_result()
     {
-        JSONCONS_ASSERT(!is_obtained_);
+        JSONCONS_ASSERT(is_valid_);
         is_valid_ = false;
-        is_obtained_ = true;
         return std::move(result_);
     }
 

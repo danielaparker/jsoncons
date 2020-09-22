@@ -485,7 +485,7 @@ template<class CharT,class TempAllocator=std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
 public:
-    using string_view_type = basic_string_view<CharT>;
+    using string_view_type = jsoncons::basic_string_view<CharT>;
     using char_type = CharT;
 private:
     struct string_maps_to_double

@@ -268,7 +268,7 @@ private:
                 more_ = false;
                 return;
             }
-            more_ = visitor.key(basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
+            more_ = visitor.key(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), *this, ec);
         }
     }
 
@@ -328,7 +328,7 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(jsoncons::basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 

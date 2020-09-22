@@ -2883,13 +2883,13 @@ public:
                             const basic_json_decode_options<char_type>& options = basic_json_decode_options<char_type>(), 
                             std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
     {
-        return parse(basic_string_view<char_type>(s), options, err_handler);
+        return parse(jsoncons::basic_string_view<char_type>(s), options, err_handler);
     }
 
     static basic_json parse(const char_type* s, 
                             std::function<bool(json_errc,const ser_context&)> err_handler)
     {
-        return parse(basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
+        return parse(jsoncons::basic_string_view<char_type>(s), basic_json_decode_options<char_type>(), err_handler);
     }
 
     // from stream
@@ -3266,7 +3266,7 @@ public:
                const Allocator& alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
     {
-        auto bytes = span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
+        auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
         construct<byte_string_storage>(tag, bytes.data(), bytes.size(), 0, alloc);
     }
 
@@ -3276,7 +3276,7 @@ public:
                const Allocator& alloc = Allocator(),
                typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
     {
-        auto bytes = span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
+        auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
         construct<byte_string_storage>(semantic_tag::ext, bytes.data(), bytes.size(), ext_tag, alloc);
     }
 

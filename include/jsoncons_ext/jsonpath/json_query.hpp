@@ -26,8 +26,8 @@ namespace jsoncons { namespace jsonpath {
 
     struct slice
     {
-        optional<int64_t> start_;
-        optional<int64_t> stop_;
+        jsoncons::optional<int64_t> start_;
+        jsoncons::optional<int64_t> stop_;
         int64_t step_;
 
         slice()
@@ -35,7 +35,7 @@ namespace jsoncons { namespace jsonpath {
         {
         }
 
-        slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
+        slice(const jsoncons::optional<int64_t>& start, const jsoncons::optional<int64_t>& end, int64_t step) 
             : start_(start), stop_(end), step_(step)
         {
         }

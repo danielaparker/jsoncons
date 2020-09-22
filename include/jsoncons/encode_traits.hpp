@@ -280,7 +280,7 @@ namespace jsoncons {
                            const Json&,
                            std::error_code& ec)
         {
-            encoder.typed_array(span<const value_type>(val), semantic_tag::none, ser_context(), ec);
+            encoder.typed_array(jsoncons::span<const value_type>(val), semantic_tag::none, ser_context(), ec);
         }
     };
 

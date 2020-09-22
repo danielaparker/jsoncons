@@ -127,7 +127,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         Container& column_types)
 {
     using char_type = CharT;
-    const std::map<basic_string_view<CharT>,csv_column_type> type_dictionary =
+    const std::map<jsoncons::basic_string_view<CharT>,csv_column_type> type_dictionary =
     {
 
         {detail::string_literal<char_type>(),csv_column_type::string_t},

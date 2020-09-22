@@ -37,7 +37,7 @@ public:
     using pointer = JsonPointer;
     using argument_type = std::vector<pointer>;
     typedef std::function<Json(const std::vector<argument_type>&, std::error_code&)> function_type;
-    using function_dictionary = std::map<basic_string_view<char_type>,function_type>;
+    using function_dictionary = std::map<jsoncons::basic_string_view<char_type>,function_type>;
 private:
     const function_dictionary functions_ =
     {

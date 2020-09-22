@@ -25,7 +25,7 @@ namespace jsoncons {
         using char_type = CharT;
         using char_traits_type = std::char_traits<char_type>;
 
-        using string_view_type = basic_string_view<char_type,char_traits_type>;
+        using string_view_type = jsoncons::basic_string_view<char_type,char_traits_type>;
 
         basic_json_visitor(basic_json_visitor&&) = default;
 
@@ -359,7 +359,7 @@ namespace jsoncons {
         }
 
         template <class T>
-        bool typed_array(const span<T>& data, 
+        bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag=semantic_tag::none,
                          const ser_context& context=ser_context())
         {
@@ -373,7 +373,7 @@ namespace jsoncons {
         }
 
         template <class T>
-        bool typed_array(const span<T>& data, 
+        bool typed_array(const jsoncons::span<T>& data, 
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code& ec)
@@ -381,7 +381,7 @@ namespace jsoncons {
             return visit_typed_array(data, tag, context, ec);
         }
 
-        bool typed_array(half_arg_t, const span<const uint16_t>& s,
+        bool typed_array(half_arg_t, const jsoncons::span<const uint16_t>& s,
             semantic_tag tag = semantic_tag::none,
             const ser_context& context = ser_context())
         {
@@ -394,7 +394,7 @@ namespace jsoncons {
             return more;
         }
 
-        bool typed_array(half_arg_t, const span<const uint16_t>& s,
+        bool typed_array(half_arg_t, const jsoncons::span<const uint16_t>& s,
                          semantic_tag tag,
                          const ser_context& context,
                          std::error_code& ec)
@@ -402,7 +402,7 @@ namespace jsoncons {
             return visit_typed_array(half_arg, s, tag, context, ec);
         }
 
-        bool begin_multi_dim(const span<const size_t>& shape,
+        bool begin_multi_dim(const jsoncons::span<const size_t>& shape,
                              semantic_tag tag = semantic_tag::multi_dim_row_major,
                              const ser_context& context=ser_context()) 
         {
@@ -415,7 +415,7 @@ namespace jsoncons {
             return more;
         }
 
-        bool begin_multi_dim(const span<const size_t>& shape,
+        bool begin_multi_dim(const jsoncons::span<const size_t>& shape,
                              semantic_tag tag,
                              const ser_context& context,
                              std::error_code& ec) 
@@ -705,7 +705,7 @@ namespace jsoncons {
                                const ser_context& context,
                                std::error_code& ec) = 0;
 
-        virtual bool visit_typed_array(const span<const uint8_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const uint8_t>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -722,7 +722,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const uint16_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const uint16_t>& s, 
                                     semantic_tag tag, 
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -739,7 +739,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const uint32_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const uint32_t>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec) 
@@ -756,7 +756,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const uint64_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const uint64_t>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec) 
@@ -773,7 +773,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const int8_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const int8_t>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -790,7 +790,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const int16_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const int16_t>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -807,7 +807,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const int32_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const int32_t>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -824,7 +824,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const int64_t>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const int64_t>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -842,7 +842,7 @@ namespace jsoncons {
         }
 
         virtual bool visit_typed_array(half_arg_t, 
-                                    const span<const uint16_t>& s, 
+                                    const jsoncons::span<const uint16_t>& s, 
                                     semantic_tag tag, 
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -859,7 +859,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const float>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const float>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -876,7 +876,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_typed_array(const span<const double>& s, 
+        virtual bool visit_typed_array(const jsoncons::span<const double>& s, 
                                     semantic_tag tag,
                                     const ser_context& context, 
                                     std::error_code& ec)  
@@ -893,7 +893,7 @@ namespace jsoncons {
             return more;
         }
 
-        virtual bool visit_begin_multi_dim(const span<const size_t>& shape,
+        virtual bool visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
                                         semantic_tag tag,
                                         const ser_context& context, 
                                         std::error_code& ec) 
@@ -1221,7 +1221,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const uint8_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const uint8_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1232,7 +1232,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const uint16_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const uint16_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1243,7 +1243,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const uint32_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const uint32_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1254,7 +1254,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const uint64_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const uint64_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1265,7 +1265,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const int8_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const int8_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1276,7 +1276,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const int16_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const int16_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1287,7 +1287,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const int32_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const int32_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1298,7 +1298,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const int64_t>& s, 
+        bool visit_typed_array(const jsoncons::span<const int64_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1310,7 +1310,7 @@ namespace jsoncons {
         }
 
         bool visit_typed_array(half_arg_t, 
-                            const span<const uint16_t>& s, 
+                            const jsoncons::span<const uint16_t>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1321,7 +1321,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const float>& s, 
+        bool visit_typed_array(const jsoncons::span<const float>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1332,7 +1332,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_typed_array(const span<const double>& s, 
+        bool visit_typed_array(const jsoncons::span<const double>& s, 
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1343,7 +1343,7 @@ namespace jsoncons {
             return more0 && more1;
         }
 
-        bool visit_begin_multi_dim(const span<const size_t>& shape,
+        bool visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
                                 semantic_tag tag,
                                 const ser_context& context, 
                                 std::error_code& ec) override

@@ -330,7 +330,7 @@ namespace jsoncons {
     private:
         basic_staj_cursor<char_type>* cursor_;
         json_decoder<Json> decoder_;
-        optional<T> value_;
+        jsoncons::optional<T> value_;
     public:
         staj_array_view(basic_staj_cursor<char_type>& cursor) 
             : cursor_(std::addressof(cursor))
@@ -362,7 +362,7 @@ namespace jsoncons {
     private:
         basic_staj_cursor<char_type>* cursor_;
         json_decoder<Json> decoder_;
-        optional<value_type> key_value_;
+        jsoncons::optional<value_type> key_value_;
     public:
         staj_object_view(basic_staj_cursor<char_type>& cursor) 
             : cursor_(std::addressof(cursor))

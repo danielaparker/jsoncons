@@ -108,7 +108,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : visitor_(visitor),
          parser_(options, err_handler, alloc),
          source_(std::forward<Source>(source)),
@@ -126,7 +126,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler, 
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : visitor_(visitor),
          parser_(options, err_handler, alloc),
          buffer_length_(0),

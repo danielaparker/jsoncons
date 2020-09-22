@@ -168,8 +168,8 @@ namespace jmespath {
 
     struct slice
     {
-        optional<int64_t> start_;
-        optional<int64_t> stop_;
+        jsoncons::optional<int64_t> start_;
+        jsoncons::optional<int64_t> stop_;
         int64_t step_;
 
         slice()
@@ -177,7 +177,7 @@ namespace jmespath {
         {
         }
 
-        slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
+        slice(const jsoncons::optional<int64_t>& start, const jsoncons::optional<int64_t>& end, int64_t step) 
             : start_(start), stop_(end), step_(step)
         {
         }
@@ -606,14 +606,14 @@ namespace jmespath {
         // function_base
         class function_base
         {
-            optional<std::size_t> arg_count_;
+            jsoncons::optional<std::size_t> arg_count_;
         public:
-            function_base(optional<std::size_t> arg_count)
+            function_base(jsoncons::optional<std::size_t> arg_count)
                 : arg_count_(arg_count)
             {
             }
 
-            optional<std::size_t> arg_count() const
+            jsoncons::optional<std::size_t> arg_count() const
             {
                 return arg_count_;
             }
@@ -1265,7 +1265,7 @@ namespace jmespath {
         {
         public:
             merge_function()
-                : function_base(optional<std::size_t>())
+                : function_base(jsoncons::optional<std::size_t>())
             {
             }
 
@@ -1802,7 +1802,7 @@ namespace jmespath {
         {
         public:
             not_null_function()
-                : function_base(optional<std::size_t>())
+                : function_base(jsoncons::optional<std::size_t>())
             {
             }
 
@@ -4255,7 +4255,7 @@ namespace jmespath {
                                 ec = jmespath_errc::invalid_number;
                                 return jmespath_expression();
                             }
-                            slic.stop_ = optional<int64_t>(r.value());
+                            slic.stop_ = jsoncons::optional<int64_t>(r.value());
                             buffer.clear();
                         }
                         switch(*p_)

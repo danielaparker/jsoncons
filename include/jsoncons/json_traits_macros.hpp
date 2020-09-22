@@ -612,7 +612,7 @@ namespace jsoncons \
         using value_type = EnumType; \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
-        using string_view_type = basic_string_view<char_type>; \
+        using string_view_type = jsoncons::basic_string_view<char_type>; \
         using allocator_type = typename Json::allocator_type; \
         using mapped_type = std::pair<EnumType,string_type>; \
         \
@@ -713,7 +713,7 @@ namespace jsoncons \
         using value_type = EnumType; \
         using char_type = typename Json::char_type; \
         using string_type = std::basic_string<char_type>; \
-        using string_view_type = basic_string_view<char_type>; \
+        using string_view_type = jsoncons::basic_string_view<char_type>; \
         using allocator_type = typename Json::allocator_type; \
         using mapped_type = std::pair<EnumType,string_type>; \
         \

@@ -153,7 +153,7 @@ class basic_staj_event
     } value_;
     std::size_t length_;
 public:
-    using string_view_type = basic_string_view<CharT>;
+    using string_view_type = jsoncons::basic_string_view<CharT>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
         : event_type_(event_type), tag_(tag), ext_tag_(0), length_(0)
@@ -594,70 +594,70 @@ public:
         return size_;
     }
 
-    span<const uint8_t> data(uint8_array_arg_t) const
+    jsoncons::span<const uint8_t> data(uint8_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint8_value);
-        return span<const uint8_t>(data_.uint8_data_, size_);
+        return jsoncons::span<const uint8_t>(data_.uint8_data_, size_);
     }
 
-    span<const uint16_t> data(uint16_array_arg_t) const
+    jsoncons::span<const uint16_t> data(uint16_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint16_value);
-        return span<const uint16_t>(data_.uint16_data_, size_);
+        return jsoncons::span<const uint16_t>(data_.uint16_data_, size_);
     }
 
-    span<const uint32_t> data(uint32_array_arg_t) const
+    jsoncons::span<const uint32_t> data(uint32_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint32_value);
-        return span<const uint32_t>(data_.uint32_data_, size_);
+        return jsoncons::span<const uint32_t>(data_.uint32_data_, size_);
     }
 
-    span<const uint64_t> data(uint64_array_arg_t) const
+    jsoncons::span<const uint64_t> data(uint64_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::uint64_value);
-        return span<const uint64_t>(data_.uint64_data_, size_);
+        return jsoncons::span<const uint64_t>(data_.uint64_data_, size_);
     }
 
-    span<const int8_t> data(int8_array_arg_t) const
+    jsoncons::span<const int8_t> data(int8_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int8_value);
-        return span<const int8_t>(data_.int8_data_, size_);
+        return jsoncons::span<const int8_t>(data_.int8_data_, size_);
     }
 
-    span<const int16_t> data(int16_array_arg_t) const
+    jsoncons::span<const int16_t> data(int16_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int16_value);
-        return span<const int16_t>(data_.int16_data_, size_);
+        return jsoncons::span<const int16_t>(data_.int16_data_, size_);
     }
 
-    span<const int32_t> data(int32_array_arg_t) const
+    jsoncons::span<const int32_t> data(int32_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int32_value);
-        return span<const int32_t>(data_.int32_data_, size_);
+        return jsoncons::span<const int32_t>(data_.int32_data_, size_);
     }
 
-    span<const int64_t> data(int64_array_arg_t) const
+    jsoncons::span<const int64_t> data(int64_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::int64_value);
-        return span<const int64_t>(data_.int64_data_, size_);
+        return jsoncons::span<const int64_t>(data_.int64_data_, size_);
     }
 
-    span<const uint16_t> data(half_array_arg_t) const
+    jsoncons::span<const uint16_t> data(half_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::half_value);
-        return span<const uint16_t>(data_.uint16_data_, size_);
+        return jsoncons::span<const uint16_t>(data_.uint16_data_, size_);
     }
 
-    span<const float> data(float_array_arg_t) const
+    jsoncons::span<const float> data(float_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::float_value);
-        return span<const float>(data_.float_data_, size_);
+        return jsoncons::span<const float>(data_.float_data_, size_);
     }
 
-    span<const double> data(double_array_arg_t) const
+    jsoncons::span<const double> data(double_array_arg_t) const
     {
         JSONCONS_ASSERT(type_ == typed_array_type::double_value);
-        return span<const double>(data_.double_data_, size_);
+        return jsoncons::span<const double>(data_.double_data_, size_);
     }
 
     friend void swap(typed_array_view& a, typed_array_view& b) noexcept
@@ -681,7 +681,7 @@ private:
 
     staj_cursor_state state_;
     typed_array_view data_;
-    span<const size_t> shape_;
+    jsoncons::span<const size_t> shape_;
     std::size_t index_;
 public:
     basic_staj_visitor()
@@ -828,7 +828,7 @@ public:
             {
                 state_ = staj_cursor_state();
                 this->end_array(ser_context(), ec);
-                shape_ = span<const size_t>();
+                shape_ = jsoncons::span<const size_t>();
                 index_ = 0;
             }
         }
@@ -1089,7 +1089,7 @@ private:
         return !pred_(event_, context);
     }
 
-    bool visit_typed_array(const span<const uint8_t>& v, 
+    bool visit_typed_array(const jsoncons::span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1100,7 +1100,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const uint16_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const uint16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1111,7 +1111,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const uint32_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const uint32_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1122,7 +1122,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const uint64_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const uint64_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1133,7 +1133,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const int8_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int8_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1144,7 +1144,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const int16_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1155,7 +1155,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const int32_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int32_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1166,7 +1166,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const int64_t>& data, 
+    bool visit_typed_array(const jsoncons::span<const int64_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1177,7 +1177,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(half_arg_t, const span<const uint16_t>& data, 
+    bool visit_typed_array(half_arg_t, const jsoncons::span<const uint16_t>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1188,7 +1188,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const float>& data, 
+    bool visit_typed_array(const jsoncons::span<const float>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1199,7 +1199,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 
-    bool visit_typed_array(const span<const double>& data, 
+    bool visit_typed_array(const jsoncons::span<const double>& data, 
                         semantic_tag tag,
                         const ser_context& context,
                         std::error_code& ec) override
@@ -1210,7 +1210,7 @@ private:
         return this->begin_array(tag, context, ec);
     }
 /*
-    bool visit_typed_array(const span<const float128_type>&, 
+    bool visit_typed_array(const jsoncons::span<const float128_type>&, 
                         semantic_tag,
                         const ser_context&,
                         std::error_code&) override
@@ -1218,7 +1218,7 @@ private:
         return true;
     }
 */
-    bool visit_begin_multi_dim(const span<const size_t>& shape,
+    bool visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1256,9 +1256,9 @@ bool staj_to_saj_event(const basic_staj_event<CharT>& ev,
         case staj_event_type::end_object:
             return visitor.end_object(context, ec);
         case staj_event_type::key:
-            return visitor.key(ev.template get<basic_string_view<CharT>>(), context);
+            return visitor.key(ev.template get<jsoncons::basic_string_view<CharT>>(), context);
         case staj_event_type::string_value:
-            return visitor.string_value(ev.template get<basic_string_view<CharT>>(), ev.tag(), context);
+            return visitor.string_value(ev.template get<jsoncons::basic_string_view<CharT>>(), ev.tag(), context);
         case staj_event_type::byte_string_value:
             return visitor.byte_string_value(ev.template get<byte_string_view>(), ev.tag(), context);
         case staj_event_type::null_value:
