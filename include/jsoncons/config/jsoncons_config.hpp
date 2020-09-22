@@ -45,7 +45,7 @@ using std::span;
     using std::optional;
     }
 #elif defined(JSONCONS_HAS_BOOST_OPTIONAL)
-    #include <<boost/optional.hpp>>
+    #include <boost/optional.hpp>
     namespace jsoncons {
     using boost::optional;
     }
