@@ -1316,14 +1316,9 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_ACGN>>>(input);
         REQUIRE(shapes.size() == 3);
-        for (const auto& shape : shapes)
-        {
-            std::cout << "area: " << shape->area() << "\n";
-        }
         std::string output;
 
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1348,7 +1343,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
         auto shapes = decode_json<std::vector<shapes_t>>(input);
         REQUIRE(shapes.size() == 3);
 
-        auto visitor = [](auto&& shape) {
+        /*auto visitor = [](auto&& shape) {
             using T = std::decay_t<decltype(shape)>;
             if constexpr (std::is_same_v<T, ns::Rectangle_ACGN>)
                 std::cout << "rectangle area: " << shape.area() << '\n';
@@ -1360,11 +1355,11 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
         for (const auto& shape : shapes)
         {
             std::visit(visitor, shape);
-        }
+        }*/
 
         std::string output;
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
+        //std::cout << output << "\n";
 
     }
 #endif
@@ -1384,14 +1379,9 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_AGSN>>>(input);
         REQUIRE(shapes.size() == 3);
-        for (const auto& shape : shapes)
-        {
-            std::cout << "area: " << shape->area() << "\n";
-        }
         std::string output;
 
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1416,7 +1406,7 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
         auto shapes = decode_json<std::vector<shapes_t>>(input);
         REQUIRE(shapes.size() == 3);
 
-        auto visitor = [](auto&& shape) {
+        /*auto visitor = [](auto&& shape) {
             using T = std::decay_t<decltype(shape)>;
             if constexpr (std::is_same_v<T, ns::Rectangle_AGSN>)
                 std::cout << "rectangle area: " << shape.area() << '\n';
@@ -1428,11 +1418,11 @@ TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests"
         for (const auto& shape : shapes)
         {
             std::visit(visitor, shape);
-        }
+        }*/
 
         std::string output;
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
+        //std::cout << output << "\n";
 
     }
 #endif
@@ -1452,14 +1442,9 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_NGSN>>>(input);
         REQUIRE(shapes.size() == 3);
-        for (const auto& shape : shapes)
-        {
-            std::cout << "area: " << shape->area() << "\n";
-        }
         std::string output;
 
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1484,7 +1469,7 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
         auto shapes = decode_json<std::vector<shapes_t>>(input);
         REQUIRE(shapes.size() == 3);
 
-        auto visitor = [](auto&& shape) {
+        /*auto visitor = [](auto&& shape) {
             using T = std::decay_t<decltype(shape)>;
             if constexpr (std::is_same_v<T, ns::Rectangle_NGSN>)
                 std::cout << "rectangle area: " << shape.area() << '\n';
@@ -1496,11 +1481,11 @@ TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
         for (const auto& shape : shapes)
         {
             std::visit(visitor, shape);
-        }
+        }*/
 
         std::string output;
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
+        //std::cout << output << "\n";
 
     }
 #endif
@@ -1520,14 +1505,9 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_AMN>>>(input);
         REQUIRE(shapes.size() == 3);
-        for (const auto& shape : shapes)
-        {
-            std::cout << "area: " << shape->area() << "\n";
-        }
         std::string output;
 
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1552,7 +1532,7 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
         auto shapes = decode_json<std::vector<shapes_t>>(input);
         REQUIRE(shapes.size() == 3);
 
-        auto visitor = [](auto&& shape) {
+        /*auto visitor = [](auto&& shape) {
             using T = std::decay_t<decltype(shape)>;
             if constexpr (std::is_same_v<T, ns::Rectangle_AMN>)
                 std::cout << "rectangle area: " << shape.area() << '\n';
@@ -1564,11 +1544,11 @@ TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
         for (const auto& shape : shapes)
         {
             std::visit(visitor, shape);
-        }
+        }*/
 
         std::string output;
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
+        //std::cout << output << "\n";
 
     }
 #endif
@@ -1588,14 +1568,9 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
     {
         auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_NMN>>>(input);
         REQUIRE(shapes.size() == 3);
-        for (const auto& shape : shapes)
-        {
-            std::cout << "area: " << shape->area() << "\n";
-        }
         std::string output;
 
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
 
         auto j = decode_json<json>(input);
         REQUIRE((j.is_array() && j.size() == 3));
@@ -1620,7 +1595,7 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
         auto shapes = decode_json<std::vector<shapes_t>>(input);
         REQUIRE(shapes.size() == 3);
 
-        auto visitor = [](auto&& shape) {
+        /*auto visitor = [](auto&& shape) {
             using T = std::decay_t<decltype(shape)>;
             if constexpr (std::is_same_v<T, ns::Rectangle_NMN>)
                 std::cout << "rectangle area: " << shape.area() << '\n';
@@ -1632,11 +1607,11 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
         for (const auto& shape : shapes)
         {
             std::visit(visitor, shape);
-        }
+        }*/
 
         std::string output;
         encode_json_pretty(shapes, output);
-        std::cout << output << "\n";
+        //std::cout << output << "\n";
 
     }
 #endif
