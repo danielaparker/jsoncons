@@ -810,6 +810,7 @@ A baz
 #include <jsoncons/json.hpp>
 
 namespace ns {
+
     class Employee
     {
         std::string name_;
