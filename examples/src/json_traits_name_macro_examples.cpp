@@ -2,10 +2,7 @@
 // Distributed under Boost license
 
 #include <cassert>
-#include <string>
-#include <vector>
-#include <list>
-#include <iomanip>
+#include <regex>
 #include <jsoncons/json.hpp>
 
 namespace {
@@ -143,13 +140,6 @@ namespace ns {
         std::string name_;
         std::vector<uint64_t> employeeIds_;
     public:
-        Company() = default;
-
-        Company(const std::string& name, const std::vector<uint64_t>& employeeIds)
-            : name_(name), employeeIds_(employeeIds)
-        {
-        }
-
         std::string getName() const
         {
             return name_;
@@ -166,11 +156,25 @@ namespace ns {
         {
             employeeIds_ = employeeIds;
         }
+    };
 
-        friend bool operator==(const Company& lhs, const Company& rhs)
-        {
-            return lhs.name_ == rhs.name_ && lhs.employeeIds_ == rhs.employeeIds_;
-        }
+    class Person 
+    {
+          std::string name_;
+          jsoncons::optional<std::string> socialSecurityNumber_;
+      public:
+          Person(const std::string& name, const jsoncons::optional<std::string>& socialSecurityNumber)
+            : name_(name), socialSecurityNumber_(socialSecurityNumber)
+          {
+          }
+          std::string getName() const
+          {
+              return name_;
+          }
+          jsoncons::optional<std::string> getSsn() const
+          {
+              return socialSecurityNumber_;
+          }
     };
 
     std::vector<uint64_t> fromEmployeesToIds(const std::vector<Employee>& employees)
@@ -221,8 +225,27 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee,
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company,
     (getName, setName, "company"),
-    (getIds, setIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+    (getIds, setIds, "resources", 
+        JSONCONS_RDWR, jsoncons::always_true(), 
         ns::fromEmployeesToIds, ns::toEmployeesFromIds)
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person, 
+  (getName, "name"),
+  (getSsn, "social_security_number", 
+      JSONCONS_RDWR, jsoncons::always_true(),
+      [] (const jsoncons::optional<std::string>& unvalidated) {
+          if (!unvalidated)
+          {
+              return unvalidated;
+          }
+          std::regex myRegex(("^(\\d{9})$"));
+          if (!std::regex_match(*unvalidated, myRegex) ) {
+              return jsoncons::optional<std::string>();
+          }
+          return unvalidated;
+      }
+   )
 )
 
 namespace {
@@ -303,21 +326,70 @@ namespace {
 
     void translate_ids_from_to_employees()
     {
-        std::vector<uint64_t> employeeIds = {1,2};
+        std::string input = R"(
+{
+    "company": "ExampleInc",
+    "resources": [
+        {
+            "employee_name": "John",
+            "employee_surname": "Smith"
+        },
+        {
+            "employee_name": "Jane",
+            "employee_surname": "Doe"
+        }
+    ]
+}
+    )";
 
-        ns::Company company("ExampleInc", employeeIds);
+        auto company = decode_json<ns::Company>(input);
+
+        std::cout << "(1)\n" << company.getName() << "\n";
+        for (auto id : company.getIds())
+        {
+            std::cout << id << "\n";
+        }
+        std::cout << "\n";
 
         std::string output;
         encode_json_pretty(company, output);
-        std::cout << output << "\n\n";
-        auto company2 = decode_json<ns::Company>(output);
+        std::cout << "(2)\n" << output << "\n\n";
+    }
 
-        assert(company2 == company);
+    void filter_member()
+    {
+        std::string input = R"(
+[
+    {
+        "name": "John Smith",
+        "social_security_number": "123456789"
+    },
+    {
+        "name": "Jane Doe",
+        "social_security_number": "12345678"
+    }
+]
+    )";
+
+        auto persons = decode_json<std::vector<ns::Person>>(input);
+
+        std::cout << "(1)\n";
+        for (const auto& person : persons)
+        {
+            std::cout << person.getName() << ", " 
+                      << (person.getSsn() ? *person.getSsn() : "n/a") << "\n";
+        }
+        std::cout << "\n";
+
+        std::string output;
+        encode_json_pretty(persons, output);
+        std::cout << "(2)\n" << output << "\n";
+
     }
 
 } // namespace
 
-void json_traits_macros_named_examples()
+void json_traits_name_macro_examples()
 {
     std::cout << "\njson_type_traits macro named examples\n\n";
 
@@ -325,6 +397,7 @@ void json_traits_macros_named_examples()
 
     json_type_traits_book_examples();
     translate_ids_from_to_employees();
+    filter_member();
 
     std::cout << std::endl;
 }

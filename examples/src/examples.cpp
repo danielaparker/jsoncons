@@ -27,7 +27,7 @@ void json_filter_examples();
 void json_parser_examples();
 void json_reader_examples();
 void json_traits_macros_examples();
-void json_traits_macros_named_examples();
+void json_traits_name_macro_examples();
 void jsonpatch_examples();
 void jsonpath_examples();
 void jsonpointer_examples();
@@ -459,7 +459,7 @@ int main()
 
         json_traits_variant_examples();
 
-        json_traits_macros_named_examples();
+        json_traits_name_macro_examples();
     }
     catch (const std::exception& e)
     {
