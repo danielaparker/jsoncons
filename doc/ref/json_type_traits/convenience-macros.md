@@ -1623,9 +1623,9 @@ namespace ns {
    class Person 
    {
          std::string name_;
-         jsoncons::optional<std::string> socialSecurityNumber_;
+         std::optional<std::string> socialSecurityNumber_;
      public:
-         Person(const std::string& name, const jsoncons::optional<std::string>& socialSecurityNumber)
+         Person(const std::string& name, const std::optional<std::string>& socialSecurityNumber)
            : name_(name), socialSecurityNumber_(socialSecurityNumber)
          {
          }
@@ -1633,7 +1633,7 @@ namespace ns {
          {
              return name_;
          }
-         jsoncons::optional<std::string> getSsn() const
+         std::optional<std::string> getSsn() const
          {
              return socialSecurityNumber_;
          }
@@ -1645,14 +1645,14 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person,
   (getName, "name"),
   (getSsn, "social_security_number", 
       JSONCONS_RDWR, jsoncons::always_true(),
-      [] (const jsoncons::optional<std::string>& unvalidated) {
+      [] (const std::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
               return unvalidated;
           }
           std::regex myRegex(("^(\\d{9})$"));
           if (!std::regex_match(*unvalidated, myRegex) ) {
-              return jsoncons::optional<std::string>();
+              return std::optional<std::string>();
           }
           return unvalidated;
       }
