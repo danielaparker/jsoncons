@@ -419,8 +419,6 @@ int main()
 
         json_traits_macros_examples();
 
-        json_traits_macros_named_examples();
-
         run_cbor_typed_array_examples();
 
         data_model_examples();
@@ -460,6 +458,8 @@ int main()
         json_traits_polymorphic_examples();
 
         json_traits_variant_examples();
+
+        json_traits_macros_named_examples();
     }
     catch (const std::exception& e)
     {

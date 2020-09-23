@@ -100,6 +100,103 @@ namespace ns {
         void setPrice(double value) {price_ = value;}
     };
 
+
+    class Employee
+    {
+        std::string name_;
+        std::string surname_;
+    public:
+        Employee() = default;
+
+        Employee(const std::string& name, const std::string& surname)
+            : name_(name), surname_(surname)
+        {
+        }
+
+        std::string getName() const
+        {
+            return name_;
+        }
+        void setName(const std::string& name)
+        {
+            name_ = name;
+        }
+        std::string getSurname()const
+        {
+            return surname_;
+        }
+        void setSurname(const std::string& surname)
+        {
+            surname_ = surname;
+        }
+
+        friend bool operator<(const Employee& lhs, const Employee& rhs)
+        {
+            if (lhs.surname_ < rhs.surname_)
+                return true;
+            return lhs.name_ < rhs.name_;
+        }
+    };
+
+    class Company 
+    {
+        std::string name_;
+        std::vector<uint64_t> employeeIds_;
+    public:
+        Company() = default;
+
+        Company(const std::string& name, const std::vector<uint64_t>& employeeIds)
+            : name_(name), employeeIds_(employeeIds)
+        {
+        }
+
+        std::string getName() const
+        {
+            return name_;
+        }
+        void setName(const std::string& name)
+        {
+            name_ = name;
+        }
+        const std::vector<uint64_t> getIds() const
+        {
+            return employeeIds_;
+        }
+        void setIds(const std::vector<uint64_t>& employeeIds)
+        {
+            employeeIds_ = employeeIds;
+        }
+
+        friend bool operator==(const Company& lhs, const Company& rhs)
+        {
+            return lhs.name_ == rhs.name_ && lhs.employeeIds_ == rhs.employeeIds_;
+        }
+    };
+
+    std::vector<uint64_t> fromEmployeesToIds(const std::vector<Employee>& employees)
+    {
+        static std::map<Employee, uint64_t> employee_id_map = {{Employee("John", "Smith"), 1},{Employee("Jane", "Doe"), 2}};
+
+        std::vector<uint64_t> ids;
+        for (auto employee : employees)
+        {
+            ids.push_back(employee_id_map.at(employee));
+        }
+        return ids;
+    }
+
+    std::vector<Employee> toEmployeesFromIds(const std::vector<uint64_t>& ids)
+    {
+        static std::map<uint64_t, Employee> id_employee_map = {{1, Employee("John", "Smith")},{2, Employee("Jane", "Doe")}};
+
+        std::vector<Employee> employees;
+        for (auto id : ids)
+        {
+            employees.push_back(id_employee_map.at(id));
+        }
+        return employees;
+    }
+
 } // namespace ns
 } // namespace
 
@@ -116,6 +213,17 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Book4,(getCategory,setCategory,"Categ
                                                  (getAuthor,setAuthor,"Author"),
                                                  (getTitle,setTitle,"Title"),
                                                  (getPrice,setPrice,"Price"))
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee,
+    (getName, setName, "employee_name"),
+    (getSurname, setSurname, "employee_surname")
+)
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company,
+    (getName, setName, "company"),
+    (getIds, setIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+        ns::fromEmployeesToIds, ns::toEmployeesFromIds)
+)
 
 namespace {
 
@@ -193,6 +301,20 @@ namespace {
         std::cout << "\n\n";
     }
 
+    void translate_ids_from_to_employees()
+    {
+        std::vector<uint64_t> employeeIds = {1,2};
+
+        ns::Company company("ExampleInc", employeeIds);
+
+        std::string output;
+        encode_json_pretty(company, output);
+        std::cout << output << "\n\n";
+        auto company2 = decode_json<ns::Company>(output);
+
+        assert(company2 == company);
+    }
+
 } // namespace
 
 void json_traits_macros_named_examples()
@@ -202,6 +324,7 @@ void json_traits_macros_named_examples()
     std::cout << std::setprecision(6);
 
     json_type_traits_book_examples();
+    translate_ids_from_to_employees();
 
     std::cout << std::endl;
 }
