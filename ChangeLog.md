@@ -10,7 +10,7 @@ Enhancements:
 - The `_NAME_` convenience macros now allow an optional `mode` parameter 
 (`JSONCONS_RDWR` or `JSONCONS_RDONLY`) and three function objects, 
 `match` (value matches expected), `from` (convert from type known to jsoncons) 
-and `into` (convert into type known to jsoncons).
+and `into` (convert into type known to jsoncons), [\#267](https://github.com/danielaparker/jsoncons/issues/267)
 
  v0.156.1
 ---------
