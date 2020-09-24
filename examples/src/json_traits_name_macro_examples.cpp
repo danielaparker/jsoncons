@@ -158,25 +158,6 @@ namespace ns {
         }
     };
 
-    class Person 
-    {
-          std::string name_;
-          jsoncons::optional<std::string> socialSecurityNumber_;
-      public:
-          Person(const std::string& name, const jsoncons::optional<std::string>& socialSecurityNumber)
-            : name_(name), socialSecurityNumber_(socialSecurityNumber)
-          {
-          }
-          std::string getName() const
-          {
-              return name_;
-          }
-          jsoncons::optional<std::string> getSsn() const
-          {
-              return socialSecurityNumber_;
-          }
-    };
-
     std::vector<uint64_t> fromEmployeesToIds(const std::vector<Employee>& employees)
     {
         static std::map<Employee, uint64_t> employee_id_map = {{Employee("John", "Smith"), 1},{Employee("Jane", "Doe"), 2}};
@@ -200,6 +181,25 @@ namespace ns {
         }
         return employees;
     }
+
+    class Person 
+    {
+          std::string name_;
+          jsoncons::optional<std::string> socialSecurityNumber_;
+      public:
+          Person(const std::string& name, const jsoncons::optional<std::string>& socialSecurityNumber)
+            : name_(name), socialSecurityNumber_(socialSecurityNumber)
+          {
+          }
+          std::string getName() const
+          {
+              return name_;
+          }
+          jsoncons::optional<std::string> getSsn() const
+          {
+              return socialSecurityNumber_;
+          }
+    };
 
 } // namespace ns
 } // namespace

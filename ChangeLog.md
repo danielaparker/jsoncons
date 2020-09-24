@@ -1,4 +1,4 @@
-v0.157.0 (master)
+v0.157.0 
 --------
 
 Changes:
@@ -13,7 +13,7 @@ Enhancements:
 and `into` (convert into type known to jsoncons).
 
  v0.156.1
---------
+---------
 
 Bugs fixed:
 
@@ -23,7 +23,7 @@ Bugs fixed:
 issue with a misnamed macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT128`) introduced in 0.156.0.
 
  v0.156.0
---------
+---------
 
 Bugs Fixed:
 
