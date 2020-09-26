@@ -31,7 +31,7 @@ void incremental_parsing_example1()
         json j = decoder.get_result();
         std::cout << "(5) " << j << "\n\n";
     }
-    catch (const codec_error& e)
+    catch (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -61,7 +61,7 @@ void incremental_parsing_example2()
         json j = decoder.get_result();
         std::cout << "(5) " << j << "\n";
     }
-    catch (const codec_error& e)
+    catch (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }
@@ -88,7 +88,7 @@ void incremental_parsing_example3()
                              // non-whitespace characters in the input
                              // (there are)
     }
-    catch (const codec_error& e)
+    catch (const ser_error& e)
     {
         std::cout << "(4) " << e.what() << std::endl;
     }
@@ -117,7 +117,7 @@ void parse_nan_replacement_example()
         parser.finish_parse(decoder);
         parser.check_done();
     }
-    catch (const codec_error& e)
+    catch (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }

@@ -9,7 +9,7 @@
 
 #include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/json_exception.hpp> // jsoncons::codec_error
+#include <jsoncons/json_exception.hpp> // jsoncons::ser_error
 
 namespace jsoncons { namespace cbor {
 
@@ -88,9 +88,9 @@ std::error_code make_error_code(cbor_errc e)
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error cbor_error;
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error cbor_decode_error;
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error cbor_reader_errc;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error cbor_error;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error cbor_decode_error;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error cbor_reader_errc;
 #endif
 
 }}

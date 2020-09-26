@@ -343,7 +343,7 @@ namespace msgpack {
             auto sink = unicons::validate(sv.begin(), sv.end());
             if (sink.ec != unicons::conv_errc())
             {
-                JSONCONS_THROW(codec_error(msgpack_errc::invalid_utf8_text_string));
+                JSONCONS_THROW(ser_error(msgpack_errc::invalid_utf8_text_string));
             }
 
             const size_t length = sv.length();

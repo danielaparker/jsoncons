@@ -2006,7 +2006,7 @@ public:
                                 {
                                     push_token(token<Json>(value_term<Json>(Json::parse(buffer))));
                                 }
-                                JSONCONS_CATCH(const codec_error&)     
+                                JSONCONS_CATCH(const ser_error&)     
                                 {
                                     JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                 }
@@ -2042,7 +2042,7 @@ public:
                                     {
                                         push_token(token<Json>(value_term<Json>(Json::parse(buffer))));
                                     }
-                                    JSONCONS_CATCH(const codec_error&)     
+                                    JSONCONS_CATCH(const ser_error&)     
                                     {
                                         JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                     }
@@ -2063,7 +2063,7 @@ public:
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(value_term<Json>(std::move(val))));
                                 }
-                                JSONCONS_CATCH(const codec_error&)     
+                                JSONCONS_CATCH(const ser_error&)     
                                 {
                                     JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                 }
@@ -2112,7 +2112,7 @@ public:
                                     auto val = Json::parse(buffer);
                                     push_token(token<Json>(value_term<Json>(std::move(val))));
                                 }
-                                JSONCONS_CATCH(const codec_error&)     
+                                JSONCONS_CATCH(const ser_error&)     
                                 {
                                     JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                                 }
@@ -2150,7 +2150,7 @@ public:
                                 auto val = Json::parse(buffer);
                                 push_token(token<Json>(value_term<Json>(std::move(val))));
                             }
-                            JSONCONS_CATCH(const codec_error&)     
+                            JSONCONS_CATCH(const ser_error&)     
                             {
                                 JSONCONS_THROW(jsonpath_error(jsonpath_errc::parse_error_in_filter,line_,column_));
                             }

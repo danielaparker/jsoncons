@@ -52,7 +52,7 @@ New code should use the `dump_pretty` overloads instead.
 
 #### Exceptions
 
-Throws [codec_error](codec_error.md) if there is a serialization error. 
+Throws [ser_error](ser_error.md) if there is a serialization error. 
 
 ### Examples
 

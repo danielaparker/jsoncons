@@ -30,7 +30,7 @@ Sends the parse events from the current event to the
 matching completion event to the supplied [visitor](basic_json_visitor.md)
 E.g., if the current event is `begin_object`, sends the `begin_object`
 event and all inbetween events until the matching `end_object` event.
-If a parsing error is encountered, throws a [codec_error](codec_error.md).
+If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
     virtual void read_to(json_visitor& visitor,
                         std::error_code& ec) = 0;
@@ -41,7 +41,7 @@ event and all inbetween events until the matching `end_object` event.
 If a parsing error is encountered, sets `ec`.
 
     virtual void next() = 0;
-Get the next event. If a parsing error is encountered, throws a [codec_error](codec_error.md).
+Get the next event. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
     virtual void next(std::error_code& ec) = 0;
 Get the next event. If a parsing error is encountered, sets `ec`.

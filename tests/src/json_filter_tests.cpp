@@ -140,7 +140,7 @@ TEST_CASE("test_rename_name")
 }]}}
 )");
     }
-    JSONCONS_CATCH (const codec_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         std::cout << e.what() << std::endl;
     }

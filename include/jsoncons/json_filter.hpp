@@ -396,7 +396,7 @@ private:
         auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
         if (result.ec != unicons::conv_errc())
         {
-            JSONCONS_THROW(codec_error(result.ec));
+            JSONCONS_THROW(ser_error(result.ec));
         }
         return destination().string_value(target, tag, context, ec);
     }

@@ -45,7 +45,7 @@ namespace ubjson {
         encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 
@@ -72,7 +72,7 @@ namespace ubjson {
         encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 
@@ -103,7 +103,7 @@ namespace ubjson {
         encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 
@@ -132,7 +132,7 @@ namespace ubjson {
         encode_traits<T,char>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 

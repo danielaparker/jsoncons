@@ -100,7 +100,7 @@ namespace detail {
                         unicons::sequence_generator<const CharT*> g(it, end, unicons::conv_flags::strict);
                         if (g.done() || g.status() != unicons::conv_errc())
                         {
-                            JSONCONS_THROW(codec_error(json_errc::illegal_codepoint));
+                            JSONCONS_THROW(ser_error(json_errc::illegal_codepoint));
                         }
                         uint32_t cp = g.get().codepoint();
                         it += (g.get().length() - 1);

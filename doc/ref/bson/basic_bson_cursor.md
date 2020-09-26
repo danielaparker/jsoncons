@@ -54,7 +54,7 @@ bson_bytes_cursor   |basic_bson_cursor<jsoncons::bytes_source>
                       std::error_code& ec); (4)
 
 Constructors (1) reads from a buffer or stream source and throws a 
-[codec_error](codec_error.md) if a parsing error is encountered while processing the initial event.
+[ser_error](ser_error.md) if a parsing error is encountered while processing the initial event.
 
 Constructors (2)-(4) read from a buffer or stream source and set `ec`
 if a parsing error is encountered while processing the initial event.
@@ -77,7 +77,7 @@ Returns the current [staj_event](basic_staj_event.md).
     void read_to(json_visitor& visitor) override
 Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
-to stop. If a parsing error is encountered, throws a [codec_error](codec_error.md).
+to stop. If a parsing error is encountered, throws a [ser_error](ser_error.md).
 
     void read_to(json_visitor& visitor, std::error_code& ec) override
 Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
@@ -86,7 +86,7 @@ to stop. If a parsing error is encountered, sets `ec`.
 
     void next() override;
 Advances to the next event. If a parsing error is encountered, throws a 
-[codec_error](codec_error.md).
+[ser_error](ser_error.md).
 
     void next(std::error_code& ec) override;
 Advances to the next event. If a parsing error is encountered, sets `ec`.

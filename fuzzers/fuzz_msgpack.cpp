@@ -16,7 +16,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
     try {
        json j2 = msgpack::decode_msgpack<json>(is);
     }
-    catch(jsoncons::codec_error e) {}
+    catch(jsoncons::ser_error e) {}
 
     return 0;
 }

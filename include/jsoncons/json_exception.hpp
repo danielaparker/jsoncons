@@ -98,28 +98,28 @@ namespace jsoncons {
         std::string buffer_;
     };
 
-    class codec_error : public std::system_error, public virtual json_exception
+    class ser_error : public std::system_error, public virtual json_exception
     {
     public:
-        codec_error(std::error_code ec)
+        ser_error(std::error_code ec)
             : std::system_error(ec), line_number_(0), column_number_(0)
         {
         }
-        codec_error(std::error_code ec, const std::string& what_arg)
+        ser_error(std::error_code ec, const std::string& what_arg)
             : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
         {
         }
-        codec_error(std::error_code ec, std::size_t position)
+        ser_error(std::error_code ec, std::size_t position)
             : std::system_error(ec), line_number_(0), column_number_(position)
         {
         }
-        codec_error(std::error_code ec, std::size_t line, std::size_t column)
+        ser_error(std::error_code ec, std::size_t line, std::size_t column)
             : std::system_error(ec), line_number_(line), column_number_(column)
         {
         }
-        codec_error(const codec_error& other) = default;
+        ser_error(const ser_error& other) = default;
 
-        codec_error(codec_error&& other) = default;
+        ser_error(ser_error&& other) = default;
 
         const char* what() const noexcept override
         {
@@ -174,11 +174,11 @@ namespace jsoncons {
     };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error serialization_error;
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error json_parse_exception;
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error parse_exception;
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error parse_error;
-JSONCONS_DEPRECATED_MSG("Instead, use codec_error") typedef codec_error ser_error;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error serialization_error;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error json_parse_exception;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_exception;
+JSONCONS_DEPRECATED_MSG("Instead, use ser_error") typedef ser_error parse_error;
+typedef ser_error codec_error;
 #endif
 
 } // namespace jsoncons

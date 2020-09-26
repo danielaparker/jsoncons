@@ -70,7 +70,7 @@ TEST_CASE("JSONPath Test Suite")
                     j = ojson::parse(is);
                     expected_dictionary[p.path().stem()] = j;
                 }
-                JSONCONS_CATCH (const jsoncons::codec_error& e)
+                JSONCONS_CATCH (const jsoncons::ser_error& e)
                 {
                     std::cerr << e.what() << std::endl;
                     return; 

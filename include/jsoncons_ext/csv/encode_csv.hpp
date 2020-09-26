@@ -35,7 +35,7 @@ namespace csv {
         encode_traits<T,char_type>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 
@@ -58,7 +58,7 @@ namespace csv {
         encode_traits<T,CharT>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 
@@ -87,7 +87,7 @@ namespace csv {
         encode_traits<T,char_type>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 
@@ -112,7 +112,7 @@ namespace csv {
         encode_traits<T,CharT>::encode(val, encoder, json(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
     }
 

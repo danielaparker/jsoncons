@@ -46,7 +46,7 @@ namespace jsoncons {
             bool more = visit_begin_object(tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -59,7 +59,7 @@ namespace jsoncons {
             bool more = visit_begin_object(length, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -70,7 +70,7 @@ namespace jsoncons {
             bool more = visit_end_object(context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -82,7 +82,7 @@ namespace jsoncons {
             bool more = visit_begin_array(tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -95,7 +95,7 @@ namespace jsoncons {
             bool more = visit_begin_array(length, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -106,7 +106,7 @@ namespace jsoncons {
             bool more = visit_end_array(context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -117,7 +117,7 @@ namespace jsoncons {
             bool more = visit_string(name, semantic_tag::none, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -129,7 +129,7 @@ namespace jsoncons {
             bool more = visit_null(tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -142,7 +142,7 @@ namespace jsoncons {
             bool more = visit_bool(value, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -155,7 +155,7 @@ namespace jsoncons {
             bool more = visit_string(value, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -170,7 +170,7 @@ namespace jsoncons {
             bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -185,7 +185,7 @@ namespace jsoncons {
             bool more = visit_byte_string(byte_string_view(reinterpret_cast<const uint8_t*>(b.data()),b.size()), ext_tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -198,7 +198,7 @@ namespace jsoncons {
             bool more = visit_uint64(value, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -211,7 +211,7 @@ namespace jsoncons {
             bool more = visit_int64(value, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -224,7 +224,7 @@ namespace jsoncons {
             bool more = visit_half(value, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -237,7 +237,7 @@ namespace jsoncons {
             bool more = visit_double(value, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -366,7 +366,7 @@ namespace jsoncons {
             bool more = visit_typed_array(data, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -388,7 +388,7 @@ namespace jsoncons {
             bool more = visit_typed_array(half_arg, s, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -409,7 +409,7 @@ namespace jsoncons {
             bool more = visit_begin_multi_dim(shape, tag, context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }
@@ -428,7 +428,7 @@ namespace jsoncons {
             bool more = visit_end_multi_dim(context, ec);
             if (ec)
             {
-                JSONCONS_THROW(codec_error(ec, context.line(), context.column()));
+                JSONCONS_THROW(ser_error(ec, context.line(), context.column()));
             }
             return more;
         }

@@ -14,7 +14,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
                 csv::csv_reader reader1(input, decoder, options);
                 reader1.read();
         }
-        catch (jsoncons::codec_error e) {}
+        catch (jsoncons::ser_error e) {}
         catch (jsoncons::json_runtime_error<std::runtime_error> e) {}
         catch (json_runtime_error<std::invalid_argument> e3) {}
         return 0;

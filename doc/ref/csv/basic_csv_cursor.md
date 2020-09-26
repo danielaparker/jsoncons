@@ -62,7 +62,7 @@ wcsv_cursor    |basic_csv_cursor<wchar_t>
                      std::error_code& ec); (5)
 
 Constructors (1) reads from a character sequence or stream and throws a 
-[codec_error](../codec_error.md) if a parsing error is encountered while processing the initial event.
+[ser_error](../ser_error.md) if a parsing error is encountered while processing the initial event.
 
 Constructors (2)-(5) read from a character sequence or stream and set `ec`
 if a parsing error is encountered while processing the initial event.
@@ -87,7 +87,7 @@ Returns the current [basic_staj_event](../staj_event.md).
     void read_to(json_visitor& visitor) override
 Feeds the current and succeeding [staj events](basic_staj_event.md) through the provided
 [visitor](basic_json_visitor.md), until the visitor indicates
-to stop. If a parsing error is encountered, throws a [codec_error](../codec_error.md).
+to stop. If a parsing error is encountered, throws a [ser_error](../ser_error.md).
 
     void read_to(basic_json_visitor<char_type>& visitor,
                 std::error_code& ec) override
@@ -97,7 +97,7 @@ to stop. If a parsing error is encountered, sets `ec`.
 
     void next() override;
 Advances to the next event. If a parsing error is encountered, throws a 
-[codec_error](../codec_error.md).
+[ser_error](../ser_error.md).
 
     void next(std::error_code& ec) override;
 Advances to the next event. If a parsing error is encountered, sets `ec`.

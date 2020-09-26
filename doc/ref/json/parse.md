@@ -34,16 +34,16 @@ static basic_json parse(InputIt first, InputIt last,
                         std::function<bool(json_errc,const ser_context&)> err_handler); (8)
 ```
 (1) - (2) Parses JSON data from a contiguous character sequence provided by `s` and returns a `basic_json` value. 
-Throws a [codec_error](../codec_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 (3) - (4) Parses JSON data from a null-terminated string and returns a `basic_json` value. 
-Throws a [codec_error](../codec_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 (4) - (5) Parses JSON data from an input stream and returns a `basic_json` value. 
-Throws a [codec_error](../codec_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 (6) - (7) Parses JSON data from the range [`first`,`last`) and returns a `basic_json` value. 
-Throws a [codec_error](../codec_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 #### Parameters
 
@@ -66,7 +66,7 @@ try
 {
     json val = json::parse("[1,2,3,4,]");
 } 
-catch(const jsoncons::codec_error& e) 
+catch(const jsoncons::ser_error& e) 
 {
     std::cout << e.what() << std::endl;
 }

@@ -661,7 +661,7 @@ public:
         parse_some(visitor,ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec,line_,column_));
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 
@@ -1275,7 +1275,7 @@ public:
         finish_parse(ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec,line_,column_));
+            JSONCONS_THROW(ser_error(ec,line_,column_));
         }
     }
 

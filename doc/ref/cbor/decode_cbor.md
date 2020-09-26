@@ -58,7 +58,7 @@ or support [json_type_traits](../json_type_traits.md).
 
 #### Exceptions
 
-Throws a [codec_error](../codec_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails.
 
 ### Examples
 

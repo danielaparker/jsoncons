@@ -46,7 +46,7 @@ Returns a value of type `T`.
 
 #### Exceptions
 
-Throws a [codec_error](codec_error.md) if parsing fails.
+Throws a [ser_error](ser_error.md) if parsing fails.
 
 ### Examples
 

@@ -42,7 +42,7 @@ Member type                         |Definition
 (2) Constructs a `staj_object_iterator` that refers to the first member of the object
     following the current stream event `begin_object`. If there is no such member,
     returns the end iterator. If a parsing error is encountered, throws a 
-    [codec_error](codec_error.md).
+    [ser_error](ser_error.md).
 
 (3) Constructs a `staj_object_iterator` that refers to the first member of the object
     following the current stream event `begin_object`. If there is no such member,

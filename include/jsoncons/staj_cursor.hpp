@@ -226,7 +226,7 @@ public:
         T val = get<T>(ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
         return val;
     }

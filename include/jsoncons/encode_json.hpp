@@ -122,7 +122,7 @@ namespace jsoncons {
         encode_traits<T,CharT>::encode(val, encoder, basic_json<CharT>(), ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
         encoder.flush();
     }
@@ -304,7 +304,7 @@ namespace jsoncons {
         encode_traits<T,CharT>::encode(val, encoder, proto, ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec));
+            JSONCONS_THROW(ser_error(ec));
         }
         encoder.flush();
     }

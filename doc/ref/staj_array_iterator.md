@@ -41,7 +41,7 @@ Member type                         |Definition
 (2) Constructs a `staj_array_iterator` that refers to the first element of the array
     following the current stream event `begin_array`. If there is no such element,
     returns the end iterator. If a parsing error is encountered, throws a 
-    [codec_error](codec_error.md).
+    [ser_error](ser_error.md).
 
 (3) Constructs a `staj_array_iterator` that refers to the first member of the array
     following the current stream event `begin_array`. If there is no such element,

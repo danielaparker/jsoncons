@@ -47,7 +47,7 @@ namespace msgpack {
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -76,7 +76,7 @@ namespace msgpack {
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -105,7 +105,7 @@ namespace msgpack {
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -140,7 +140,7 @@ namespace msgpack {
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }
@@ -171,7 +171,7 @@ namespace msgpack {
         T val = decode_traits<T,char>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(codec_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
         }
         return val;
     }

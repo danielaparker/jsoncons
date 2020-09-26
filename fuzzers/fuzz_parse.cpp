@@ -9,7 +9,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, std::size_t size)
 	try{
 		json val = json::parse(input);
 	}
-	catch(jsoncons::codec_error e) {}
+	catch(jsoncons::ser_error e) {}
 
 	return 0;
 }

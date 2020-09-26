@@ -20,7 +20,7 @@ void test_json_reader_error(const std::string& text, std::error_code ec)
     {
         json::parse(text);
     }
-    JSONCONS_CATCH (const codec_error& e)
+    JSONCONS_CATCH (const ser_error& e)
     {
         if (e.code() != ec)
         {

@@ -139,7 +139,7 @@ Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails
     void read_next()
     void read_next(std::error_code& ec)
 Reads the next JSON text from the stream and reports JSON events to a [basic_json_visitor](basic_json_visitor.md), such as a [json_decoder](json_decoder.md).
-Override (1) throws [codec_error](codec_error.md) if parsing fails.
+Override (1) throws [ser_error](ser_error.md) if parsing fails.
 Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails.
 
     void check_done(); (1)
@@ -169,7 +169,7 @@ try
     reader.read();
     json j = decoder.get_result();
 }
-catch (const codec_error& e)
+catch (const ser_error& e)
 {
     std::cout << e.what() << std::endl;
 }
