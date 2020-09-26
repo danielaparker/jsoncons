@@ -356,7 +356,7 @@ namespace {
         std::cout << "(2)\n" << output << "\n\n";
     }
 
-    void filter_member()
+    void tidy_member()
     {
         std::string input = R"(
 [
@@ -397,7 +397,7 @@ void json_traits_name_macro_examples()
 
     json_type_traits_book_examples();
     translate_ids_from_to_employees();
-    filter_member();
+    tidy_member();
 
     std::cout << std::endl;
 }

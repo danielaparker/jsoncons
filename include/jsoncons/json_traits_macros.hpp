@@ -326,7 +326,8 @@ namespace jsoncons \
 #define JSONCONS_N_MEMBER_NAME_AS_2(Member, Name) \
     if (ajson.contains(Name)) {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);}
 #define JSONCONS_N_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_N_MEMBER_NAME_AS_2(Member, Name))
-#define JSONCONS_N_MEMBER_NAME_AS_4(Member, Name, Mode, Match) JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, ,)
+#define JSONCONS_N_MEMBER_NAME_AS_4(Member, Name, Mode, Match) \
+    Mode(if (ajson.contains(Name)) {json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);})
 #define JSONCONS_N_MEMBER_NAME_AS_5(Member, Name, Mode, Match, From) JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, )
 #define JSONCONS_N_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, Into) \
     Mode(if (ajson.contains(Name)) {json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>(ajson,Name,From,aval.Member);})
@@ -336,7 +337,8 @@ namespace jsoncons \
 #define JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name) \
     json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);
 #define JSONCONS_ALL_MEMBER_NAME_AS_3(Member, Name, Mode) Mode(JSONCONS_ALL_MEMBER_NAME_AS_2(Member, Name))
-#define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, , )
+#define JSONCONS_ALL_MEMBER_NAME_AS_4(Member, Name, Mode, Match) \
+    Mode(json_traits_helper<Json>::set_udt_member(ajson,Name,aval.Member);)
 #define JSONCONS_ALL_MEMBER_NAME_AS_5(Member, Name, Mode, Match, From) JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, )
 #define JSONCONS_ALL_MEMBER_NAME_AS_6(Member, Name, Mode, Match, From, Into) \
     Mode(json_traits_helper<Json>::template set_udt_member<typename std::decay<decltype(Into(((value_type*)nullptr)->Member))>::type>(ajson,Name,From,aval.Member);)

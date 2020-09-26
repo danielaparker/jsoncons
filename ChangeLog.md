@@ -1,3 +1,14 @@
+v0.157.1
+--------
+
+Bugs fixed:
+
+- The macros `JSONCONS_ALL_MEMBER_NAME_TRAITS` and
+`JSONCONS_N_MEMBER_NAME_TRAITS` failed at compile time 
+when provided with exactly two optional member arguments, 
+`JSONCONS_RDWR` followed by a `Match` function object 
+(other cases were fine.) This has been fixed.
+
 v0.157.0 
 --------
 
