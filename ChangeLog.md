@@ -9,6 +9,13 @@ when provided with exactly two optional member arguments,
 `JSONCONS_RDWR` followed by a `Match` function object 
 (other cases were fine.) This has been fixed.
 
+Change reverted:
+
+- The name change `ser_error` to `codec_error` introduced in
+0.157.0 has been reverted back to `ser_error`. Just in case
+anybody used it, the name `codec_error` has been typedefed 
+to `ser_error`.
+
 v0.157.0 
 --------
 
