@@ -776,7 +776,7 @@ public:
 
         size_type n = (size_type)(length() - 1);
         int64_t k1 = basic_type_bits - k;
-        uint64_t mask = (1 << k) - 1;
+        uint64_t mask = (uint64_t(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
             data()[i] >>= k;
