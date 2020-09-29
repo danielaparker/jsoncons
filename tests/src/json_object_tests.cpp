@@ -12,7 +12,7 @@
 #include <iterator>
 
 using namespace jsoncons;
-#if 0
+
 TEST_CASE("json(json_object_arg, first, last)")
 {
     SECTION("copy map into json")
@@ -1217,8 +1217,6 @@ const ojson source = ojson::parse(R"(
     //std::cout << j << std::endl;
 }
 
-#endif
-
 TEST_CASE("test_ojson_merge_or_update_move")
 {
 ojson j = ojson::parse(R"(
@@ -1248,7 +1246,6 @@ ojson source = ojson::parse(R"(
         j.merge_or_update(std::move(source));
         //CHECK(j == expected);
     }
-#if 0
     SECTION("merge or update j from source at pos")
     {
         ojson expected = ojson::parse(R"(
@@ -1263,7 +1260,6 @@ ojson source = ojson::parse(R"(
         CHECK(j.size() == 3);
         CHECK(j == expected);
     }
-#endif
 
     //std::cout << "(1)\n" << j << std::endl;
     //std::cout << "(2)\n" << source << std::endl;

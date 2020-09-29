@@ -1582,7 +1582,9 @@ private:
                 write_tag(40);
                 break;
         }
-        bool more = visit_begin_array(shape.size(), semantic_tag::none, context, ec);
+        bool more = visit_begin_array(2, semantic_tag::none, context, ec);
+        if (more)
+            more = visit_begin_array(shape.size(), semantic_tag::none, context, ec);
         for (auto it = shape.begin(); more && it != shape.end(); ++it)
         {
             more = visit_uint64(*it, semantic_tag::none, context, ec);
