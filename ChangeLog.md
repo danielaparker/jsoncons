@@ -4,6 +4,7 @@ master
 Warnings fixed:
 
 - Fixed C20 deprecated move_iterator access with arrow operator.
+- Fixed PVS-Studio warnings
 
 v0.157.1
 --------
