@@ -2687,7 +2687,7 @@ private:
         {
         case json_parse_state::member_name:
             more_ = visitor.key(sv, *this, ec);
-            state_ = pop_state();
+            pop_state();
             state_ = json_parse_state::expect_colon;
             break;
         case json_parse_state::object:

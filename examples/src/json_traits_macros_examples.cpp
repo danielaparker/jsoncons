@@ -105,7 +105,7 @@ namespace ns {
         double price_;
     public:
         Book4()
-            : price_(0)
+            : category_(), price_(0)
         {
         }
 

@@ -709,18 +709,9 @@ public:
                     {
                         trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                     }
-                    if (!(options_.ignore_empty_values() && buffer_.empty()))
+                    if (options_.ignore_empty_values() && buffer_.empty())
                     {
-                        before_value(ec);
-                        state_ = csv_parse_state::before_unquoted_field;
-                    }
-                    else
-                    {
-                        if (options_.trim_leading() || options_.trim_trailing())
-                        {
-                            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-                        }
-                        if (!(options_.ignore_empty_values() && buffer_.empty()))
+                        /*if (!(options_.ignore_empty_values() && buffer_.empty()))
                         {
                             before_value(ec);
                             state_ = csv_parse_state::before_last_quoted_field;
@@ -728,8 +719,13 @@ public:
                         else
                         {
                             state_ = csv_parse_state::end_record;
-                        }
+                        }*/
                         state_ = csv_parse_state::end_record;
+                    }
+                    else
+                    {
+                        before_value(ec);
+                        state_ = csv_parse_state::before_unquoted_field;
                     }
                     break;
                 case csv_parse_state::before_last_quoted_field:
@@ -1320,7 +1316,7 @@ private:
         switch (stack_.back())
         {
             case csv_mode::header:
-                if (options_.trim_leading_inside_quotes() | options_.trim_trailing_inside_quotes())
+                if (options_.trim_leading_inside_quotes() || options_.trim_trailing_inside_quotes())
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }

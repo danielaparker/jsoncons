@@ -533,6 +533,8 @@ private:
             std::memcpy(data_,val.data_,val.length_*sizeof(char_type));
             data_[length_] = 0;
         }
+       
+        short_string_storage& operator=(const short_string_storage& val) = delete;
 
         uint8_t length() const
         {
@@ -589,6 +591,10 @@ private:
         ~long_string_storage() noexcept
         {
         }
+
+        long_string_storage& operator=(const long_string_storage& val) = delete;
+
+        long_string_storage& operator=(long_string_storage&& val) noexcept = delete;
 
         void swap(long_string_storage& val) noexcept
         {
@@ -5017,19 +5023,17 @@ public:
     {
         switch (encoding_hint)
         {
-            {
-                case byte_string_chars_format::base16:
-                    *this = basic_json(bytes, semantic_tag::base16);
-                    break;
-                case byte_string_chars_format::base64:
-                    *this = basic_json(bytes, semantic_tag::base64);
-                    break;
-                case byte_string_chars_format::base64url:
-                    *this = basic_json(bytes, semantic_tag::base64url);
-                    break;
-                default:
-                    break;
-            }
+            case byte_string_chars_format::base16:
+                *this = basic_json(bytes, semantic_tag::base16);
+                break;
+            case byte_string_chars_format::base64:
+                *this = basic_json(bytes, semantic_tag::base64);
+                break;
+            case byte_string_chars_format::base64url:
+                *this = basic_json(bytes, semantic_tag::base64url);
+                break;
+            default:
+                break;
         }
     }
 

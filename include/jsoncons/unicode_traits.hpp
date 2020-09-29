@@ -1137,44 +1137,40 @@ public:
         begin_ += length_;
         if (begin_ != last_)
         {
-            if (begin_ != last_)
+            Iterator it = begin_;
+
+            uint32_t ch = *it++;
+            /* If we have a surrogate pair, validate to uint32_t it. */
+            if (is_high_surrogate(ch)) 
             {
-
-                Iterator it = begin_;
-
-                uint32_t ch = *it++;
-                /* If we have a surrogate pair, validate to uint32_t it. */
-                if (is_high_surrogate(ch)) 
-                {
-                    /* If the 16 bits following the high surrogate are in the it buffer... */
-                    if (it < last_) {
-                        uint32_t ch2 = *it;
-                        /* If it's a low surrogate, */
-                        if (ch2 >= sur_low_start && ch2 <= sur_low_end) 
-                        {
-                            ++it;
-                            length_ = 2;
-                        } 
-                        else 
-                        {
-                            err_cd_ = conv_errc::unpaired_high_surrogate;
-                        }
+                /* If the 16 bits following the high surrogate are in the it buffer... */
+                if (it < last_) {
+                    uint32_t ch2 = *it;
+                    /* If it's a low surrogate, */
+                    if (ch2 >= sur_low_start && ch2 <= sur_low_end) 
+                    {
+                        ++it;
+                        length_ = 2;
                     } 
                     else 
-                    { 
-                        // We don't have the 16 bits following the high surrogate.
-                        err_cd_ = conv_errc::source_exhausted;
+                    {
+                        err_cd_ = conv_errc::unpaired_high_surrogate;
                     }
                 } 
-                else if (is_low_surrogate(ch)) 
-                {
-                    /* leading low surrogate */
-                    err_cd_ = conv_errc::source_illegal;
+                else 
+                { 
+                    // We don't have the 16 bits following the high surrogate.
+                    err_cd_ = conv_errc::source_exhausted;
                 }
-                else
-                {
-                    length_ = 1;
-                }
+            } 
+            else if (is_low_surrogate(ch)) 
+            {
+                /* leading low surrogate */
+                err_cd_ = conv_errc::source_illegal;
+            }
+            else
+            {
+                length_ = 1;
             }
         }
     }

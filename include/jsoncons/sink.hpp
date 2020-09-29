@@ -211,7 +211,7 @@ namespace jsoncons {
         string_sink(const string_sink&) = delete;
         string_sink& operator=(const string_sink&) = delete;
     public:
-        string_sink(string_sink&& val)
+        string_sink(string_sink&& val) noexcept
             : buf_ptr(nullptr)
         {
             std::swap(buf_ptr,val.buf_ptr);

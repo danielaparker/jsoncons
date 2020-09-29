@@ -177,6 +177,8 @@ private:
             values_[0] = stor.values_[0];
             values_[1] = stor.values_[1];
         }
+
+        short_storage& operator=(const short_storage& stor) = delete;
     };
 
     struct dynamic_storage
@@ -210,7 +212,7 @@ private:
             std::memcpy(data_, stor.data_, stor.length_*sizeof(uint64_t));
         }
 
-        dynamic_storage(dynamic_storage&& stor)
+        dynamic_storage(dynamic_storage&& stor) noexcept
             : is_dynamic_(true), 
               is_negative_(stor.is_negative_),
               length_(stor.length_),

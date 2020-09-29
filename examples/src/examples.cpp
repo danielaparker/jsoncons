@@ -62,9 +62,10 @@ void comment_example()
     )";
 
     // Default
-    json j = json::parse(s);
-    std::cout << "(1) " << j << std::endl;
-
+    {
+        json j = json::parse(s);
+        std::cout << "(1) " << j << std::endl;
+    }
     // Strict
     try
     {

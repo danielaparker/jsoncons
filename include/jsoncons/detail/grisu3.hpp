@@ -57,7 +57,7 @@ diy_fp_t minus(diy_fp_t x, diy_fp_t y)
 {
     assert(x.e == y.e);
     assert(x.f >= y.f);
-    diy_fp_t r = { x.f = x.f - y.f, x.e = x.e };
+    diy_fp_t r = { x.f = x.f - y.f, x.e };
     return r;
 }
 
