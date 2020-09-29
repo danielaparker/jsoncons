@@ -210,6 +210,7 @@ namespace jsoncons {
         // Noncopyable
         string_sink(const string_sink&) = delete;
         string_sink& operator=(const string_sink&) = delete;
+        string_sink& operator=(string_sink&& val) = delete;
     public:
         string_sink(string_sink&& val) noexcept
             : buf_ptr(nullptr)
@@ -221,8 +222,6 @@ namespace jsoncons {
             : buf_ptr(std::addressof(buf))
         {
         }
-
-        string_sink& operator=(string_sink&& val) = default;
 
         void flush()
         {

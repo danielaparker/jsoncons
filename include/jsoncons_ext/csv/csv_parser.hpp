@@ -711,15 +711,6 @@ public:
                     }
                     if (options_.ignore_empty_values() && buffer_.empty())
                     {
-                        /*if (!(options_.ignore_empty_values() && buffer_.empty()))
-                        {
-                            before_value(ec);
-                            state_ = csv_parse_state::before_last_quoted_field;
-                        }
-                        else
-                        {
-                            state_ = csv_parse_state::end_record;
-                        }*/
                         state_ = csv_parse_state::end_record;
                     }
                     else
@@ -1549,7 +1540,7 @@ private:
         {
             case csv_mode::data:
             case csv_mode::subfields:
-                if (options_.trim_leading_inside_quotes() | options_.trim_trailing_inside_quotes())
+                if (options_.trim_leading_inside_quotes() || options_.trim_trailing_inside_quotes())
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }

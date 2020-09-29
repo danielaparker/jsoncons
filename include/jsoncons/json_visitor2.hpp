@@ -819,7 +819,7 @@ namespace jsoncons {
         basic_json_visitor2_to_visitor_adaptor& operator=(const basic_json_visitor2_to_visitor_adaptor&) = delete;
     public:
         explicit basic_json_visitor2_to_visitor_adaptor(const Allocator& alloc = Allocator())
-            : destination_(std::addressof(default_visitor_)), 
+            : default_visitor_(), destination_(std::addressof(default_visitor_)),
               key_(alloc), key_buffer_(alloc), level_stack_(alloc)
         {
             level_stack_.emplace_back(target_t::destination,container_t::root); // root

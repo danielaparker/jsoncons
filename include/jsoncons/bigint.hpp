@@ -108,7 +108,8 @@ private:
         short_storage()
             : is_dynamic_(false), 
               is_negative_(false),
-              length_(0)
+              length_(0),
+              values_{0,0}
         {
         }
 

@@ -248,6 +248,7 @@ namespace jsoncons { namespace jsonpath {
             {
                 path.swap(other.path);
                 val_ptr = other.val_ptr;
+                return *this;
             }
 
         };
@@ -691,8 +692,6 @@ namespace jsoncons { namespace jsonpath {
                                 }
                                 break;
                             }
-
-                            return;
                         };
                         break;
                     }
@@ -710,7 +709,7 @@ namespace jsoncons { namespace jsonpath {
                             }
                             case '(':
                                 state_stack_.back().state = path_state::arg_or_right_paren;
-                                function_name = std::move(buffer);
+                                function_name = buffer;
                                 buffer.clear();
                                 ++p_;
                                 ++column_;
@@ -1110,7 +1109,6 @@ namespace jsoncons { namespace jsonpath {
                             case '[':
                                 selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                                 apply_selectors(resources);
-                                buffer.clear();
                                 slic.start_ = 0;
                                 buffer.clear();
                                 state_stack_.pop_back();

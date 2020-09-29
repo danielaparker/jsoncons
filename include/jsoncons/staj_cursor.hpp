@@ -156,12 +156,12 @@ public:
     using string_view_type = jsoncons::basic_string_view<CharT>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(event_type), tag_(tag), ext_tag_(0), value_(), length_(0)
     {
     }
 
     basic_staj_event(null_type, semantic_tag tag)
-        : event_type_(staj_event_type::null_value), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(staj_event_type::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
     {
     }
 

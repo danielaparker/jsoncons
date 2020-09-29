@@ -511,7 +511,6 @@ private:
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             s.push_back(c);
-                            state = decimal_parse_state::integer;
                             break;
                         case 'e': case 'E':
                             state = decimal_parse_state::exp1;
@@ -691,7 +690,6 @@ private:
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
                             s.push_back(c);
-                            state = hexfloat_parse_state::integer;
                             break;
                         case 'p': case 'P':
                             state = hexfloat_parse_state::exp1;
@@ -1584,8 +1582,7 @@ private:
                 write_tag(40);
                 break;
         }
-        bool more = visit_begin_array(2, semantic_tag::none, context, ec);
-        more = visit_begin_array(shape.size(), semantic_tag::none, context, ec);
+        bool more = visit_begin_array(shape.size(), semantic_tag::none, context, ec);
         for (auto it = shape.begin(); more && it != shape.end(); ++it)
         {
             more = visit_uint64(*it, semantic_tag::none, context, ec);

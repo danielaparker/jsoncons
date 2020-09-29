@@ -195,6 +195,7 @@ public:
          line_(1),
          position_(0),
          mark_position_(0),
+         saved_position_(0),
          begin_input_(nullptr),
          input_end_(nullptr),
          input_ptr_(nullptr),

@@ -570,20 +570,20 @@ private:
         }
 
         long_string_storage(const long_string_storage& val)
-            : storage_(val.storage_), tag_(val.tag_),
+            : storage_(val.storage_), length_(0), tag_(val.tag_),
               s_(val.s_)
         {
         }
 
         long_string_storage(long_string_storage&& val) noexcept
-            : storage_(val.storage_), tag_(val.tag_),
+            : storage_(val.storage_), length_(0), tag_(val.tag_),
               s_(nullptr)
         {
             swap(val);
         }
 
         long_string_storage(const long_string_storage& val, const Allocator& a)
-            : storage_(val.storage_), tag_(val.tag_),
+            : storage_(val.storage_), length_(0), tag_(val.tag_),
               s_(val.s_, a)
         {
         }
@@ -640,20 +640,20 @@ private:
         }
 
         byte_string_storage(const byte_string_storage& val)
-            : storage_(val.storage_), tag_(val.tag_),
+            : storage_(val.storage_), length_(0), tag_(val.tag_),
               s_(val.s_)
         {
         }
 
         byte_string_storage(byte_string_storage&& val) noexcept
-            : storage_(val.storage_), tag_(val.tag_),
+            : storage_(val.storage_), length_(0), tag_(val.tag_),
               s_(nullptr)
         {
             swap(val);
         }
 
         byte_string_storage(const byte_string_storage& val, const Allocator& a)
-            : storage_(val.storage_), tag_(val.tag_),
+            : storage_(val.storage_), length_(0), tag_(val.tag_),
               s_(val.s_, a)
         {
         }
@@ -836,7 +836,7 @@ private:
         }
 
         explicit object_storage(const object_storage& val, const Allocator& a)
-            : storage_(val.storage_), tag_(val.tag_)
+            : storage_(val.storage_), length_(0), tag_(val.tag_)
         {
             create(object_allocator(a), *(val.ptr_), a);
         }
