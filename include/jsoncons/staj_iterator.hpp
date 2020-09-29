@@ -30,6 +30,8 @@ namespace jsoncons {
         using char_type = typename Json::char_type;
 
         staj_array_view<T, Json>* view_;
+        std::exception_ptr eptr_;
+
     public:
         using value_type = T;
         using difference_type = std::ptrdiff_t;
@@ -70,18 +72,37 @@ namespace jsoncons {
             }
         }
 
+        bool has_value() const
+        {
+            return !eptr_;
+        }
+
         ~staj_array_iterator() noexcept
         {
         }
 
         const T& operator*() const
         {
-            return *view_->value_;
+            if (eptr_)
+            {
+                 std::rethrow_exception(eptr_);
+            }
+            else
+            {
+                return *view_->value_;
+            }
         }
 
         const T* operator->() const
         {
-            return view_->value_.operator->();
+            if (eptr_)
+            {
+                 std::rethrow_exception(eptr_);
+            }
+            else
+            {
+                return view_->value_.operator->();
+            }
         }
 
         staj_array_iterator& operator++()
@@ -126,20 +147,11 @@ namespace jsoncons {
 
         void next()
         {
-            using char_type = typename Json::char_type;
-
-            if (!done())
+            std::error_code ec;
+            next(ec);
+            if (ec)
             {
-                view_->cursor_->next();
-                if (!done())
-                {
-                    std::error_code ec;
-                    view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
-                    if (ec)
-                    {
-                        JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
-                    }
-                }
+                JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
             }
         }
 
@@ -156,7 +168,15 @@ namespace jsoncons {
                 }
                 if (!done())
                 {
-                    view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
+                    eptr_ = std::exception_ptr();
+                    JSONCONS_TRY
+                    {
+                        view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
+                    }
+                    JSONCONS_CATCH(...)
+                    {
+                        eptr_ = std::current_exception();
+                    }
                 }
             }
         }

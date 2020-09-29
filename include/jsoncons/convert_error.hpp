@@ -12,6 +12,66 @@
 
 namespace jsoncons {
 
+    class convert_error : public std::system_error, public virtual json_exception
+    {
+        std::string buffer_;
+        std::size_t line_number_;
+        std::size_t column_number_;
+    public:
+        convert_error(std::error_code ec)
+            : std::system_error(ec), line_number_(0), column_number_(0)
+        {
+        }
+        convert_error(std::error_code ec, const std::string& what_arg)
+            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
+        {
+        }
+        convert_error(std::error_code ec, std::size_t position)
+            : std::system_error(ec), line_number_(0), column_number_(position)
+        {
+        }
+        convert_error(std::error_code ec, std::size_t line, std::size_t column)
+            : std::system_error(ec), line_number_(line), column_number_(column)
+        {
+        }
+        convert_error(const convert_error& other) = default;
+
+        convert_error(convert_error&& other) = default;
+
+        const char* what() const noexcept override
+        {
+            JSONCONS_TRY
+            {
+                std::ostringstream os;
+                os << this->code().message();
+                if (line_number_ != 0 && column_number_ != 0)
+                {
+                    os << " at line " << line_number_ << " and column " << column_number_;
+                }
+                else if (column_number_ != 0)
+                {
+                    os << " at position " << column_number_;
+                }
+                const_cast<std::string&>(buffer_) = os.str();
+                return buffer_.c_str();
+            }
+            JSONCONS_CATCH(...)
+            {
+                return std::system_error::what();
+            }
+        }
+
+        std::size_t line() const noexcept
+        {
+            return line_number_;
+        }
+
+        std::size_t column() const noexcept
+        {
+            return column_number_;
+        }
+    };
+
     enum class convert_errc
     {
         success = 0,

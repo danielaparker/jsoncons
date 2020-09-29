@@ -741,7 +741,7 @@ public:
         if ( k )  // 0 < k < basic_type_bits:
         {
             uint64_t k1 = basic_type_bits - k;
-            uint64_t mask = (1 << k) - 1;
+            uint64_t mask = (uint64_t(1) << k) - uint64_t(1);
             resize( length() + 1 );
             for (size_type i = length(); i-- > 0; )
             {
