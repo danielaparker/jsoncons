@@ -54,25 +54,49 @@ namespace jsoncons {
 
     class key_not_found : public std::out_of_range, public virtual json_exception
     {
+        std::string name_;
+        mutable std::string what_;
     public:
         template <class CharT>
         explicit key_not_found(const CharT* key, std::size_t length) noexcept
-            : std::out_of_range("")
+            : std::out_of_range("Key not found")
         {
-            buffer_.append("Key '");
-            unicons::convert(key, key+length, std::back_inserter(buffer_),
-                             unicons::conv_flags::strict);
-            buffer_.append("' not found");
+            JSONCONS_TRY
+            {
+                unicons::convert(key, key+length, std::back_inserter(name_),
+                                 unicons::conv_flags::strict);
+            }
+            JSONCONS_CATCH(const std::exception&)
+            {
+            }
         }
-        ~key_not_found() noexcept
+
+        virtual ~key_not_found() noexcept
         {
         }
+
         const char* what() const noexcept override
         {
-            return buffer_.c_str();
+            if (what_.empty())
+            {
+                JSONCONS_TRY
+                {
+                    what_.append(std::out_of_range::what());
+                    what_.append(": '");
+                    what_.append(name_);
+                    what_.append("'");
+                    return what_.c_str();
+                }
+                JSONCONS_CATCH(...)
+                {
+                    return std::out_of_range::what();
+                }
+            }
+            else
+            {
+                return what_.c_str();
+            }
         }
-    private:
-        std::string buffer_;
     };
 
     class not_an_object : public std::runtime_error, public virtual json_exception

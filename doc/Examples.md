@@ -1417,7 +1417,7 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 ```
 instead. This will cause an exception to be thrown with the message
 ```
-Key 'ssn' not found
+Key not found: 'ssn' 
 ```
 
 <div id="G1"/>
