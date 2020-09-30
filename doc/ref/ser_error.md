@@ -34,7 +34,7 @@ Line numbers start at 1.
 Returns the column number to the end of the text where the exception occurred.
 Column numbers start at 1.
 
-    const char* what() const
+    const char* what() const noexcept
 Constructs an error message, including line and column position
 
 #### Inherited from std::system_error

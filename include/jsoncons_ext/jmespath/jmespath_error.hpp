@@ -12,74 +12,74 @@
 
 namespace jsoncons { namespace jmespath {
 
-class jmespath_error : public std::system_error
-{
-    std::string buffer_;
-    std::size_t line_number_;
-    std::size_t column_number_;
-public: 
-    jmespath_error(std::error_code ec)
-        : std::system_error(ec), line_number_(0), column_number_(0)
+    class jmespath_error : public std::system_error, public virtual json_exception
     {
-    }
-    jmespath_error(std::error_code ec, std::size_t position)
-        : std::system_error(ec), line_number_(0), column_number_(position)
-    {
-    }
-    jmespath_error(std::error_code ec, std::size_t line, std::size_t column)
-        : std::system_error(ec), line_number_(line), column_number_(column)
-    {
-    }
-    jmespath_error(const jmespath_error& other) = default;
-
-    jmespath_error(jmespath_error&& other) = default;
-
-    const char* what() const noexcept override
-    {
-        JSONCONS_TRY
+        std::size_t line_number_;
+        std::size_t column_number_;
+        mutable std::string what_;
+    public:
+        jmespath_error(std::error_code ec)
+            : std::system_error(ec), line_number_(0), column_number_(0)
         {
-            std::ostringstream os;
-            os << std::system_error::what();
-            if (line_number_ != 0 && column_number_ != 0)
-            {
-                os << " at line " << line_number_ << " and column " << column_number_;
-            }
-            else if (column_number_ != 0)
-            {
-                os << " at position " << column_number_;
-            }
-            const_cast<std::string&>(buffer_) = os.str();
-            return buffer_.c_str();
         }
-        JSONCONS_CATCH(...)
+        jmespath_error(std::error_code ec, const std::string& what_arg)
+            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
         {
-            return std::system_error::what();
         }
-    }
+        jmespath_error(std::error_code ec, std::size_t position)
+            : std::system_error(ec), line_number_(0), column_number_(position)
+        {
+        }
+        jmespath_error(std::error_code ec, std::size_t line, std::size_t column)
+            : std::system_error(ec), line_number_(line), column_number_(column)
+        {
+        }
+        jmespath_error(const jmespath_error& other) = default;
 
-    std::size_t line() const noexcept
-    {
-        return line_number_;
-    }
+        jmespath_error(jmespath_error&& other) = default;
 
-    std::size_t column() const noexcept
-    {
-        return column_number_;
-    }
-#if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use line()")
-    std::size_t line_number() const noexcept
-    {
-        return line();
-    }
+        const char* what() const noexcept override
+        {
+            if (what_.empty())
+            {
+                JSONCONS_TRY
+                {
+                    what_.append(std::system_error::what());
+                    if (line_number_ != 0 && column_number_ != 0)
+                    {
+                        what_.append(" at line ");
+                        what_.append(std::to_string(line_number_));
+                        what_.append(" and column ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    else if (column_number_ != 0)
+                    {
+                        what_.append(" at position ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    return what_.c_str();
+                }
+                JSONCONS_CATCH(...)
+                {
+                    return std::system_error::what();
+                }
+            }
+            else
+            {
+                return what_.c_str();
+            }
+        }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use column()")
-    std::size_t column_number() const noexcept
-    {
-        return column();
-    }
-#endif
-};
+        std::size_t line() const noexcept
+        {
+            return line_number_;
+        }
+
+        std::size_t column() const noexcept
+        {
+            return column_number_;
+        }
+    };
 
 enum class jmespath_errc 
 {

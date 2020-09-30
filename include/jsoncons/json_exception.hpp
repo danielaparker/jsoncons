@@ -66,7 +66,7 @@ namespace jsoncons {
                 unicons::convert(key, key+length, std::back_inserter(name_),
                                  unicons::conv_flags::strict);
             }
-            JSONCONS_CATCH(const std::exception&)
+            JSONCONS_CATCH(...)
             {
             }
         }
@@ -101,29 +101,55 @@ namespace jsoncons {
 
     class not_an_object : public std::runtime_error, public virtual json_exception
     {
+        std::string name_;
+        mutable std::string what_;
     public:
         template <class CharT>
         explicit not_an_object(const CharT* key, std::size_t length) noexcept
-            : std::runtime_error("")
+            : std::runtime_error("Attempting to access a member of a value that is not an object")
         {
-            buffer_.append("Attempting to access or modify '");
-            unicons::convert(key, key+length, std::back_inserter(buffer_),
-                             unicons::conv_flags::strict);
-            buffer_.append("' on a value that is not an object");
+            JSONCONS_TRY
+            {
+                unicons::convert(key, key+length, std::back_inserter(name_),
+                                 unicons::conv_flags::strict);
+            }
+            JSONCONS_CATCH(...)
+            {
+            }
         }
-        ~not_an_object() noexcept
+
+        virtual ~not_an_object() noexcept
         {
         }
         const char* what() const noexcept override
         {
-            return buffer_.c_str();
+            if (what_.empty())
+            {
+                JSONCONS_TRY
+                {
+                    what_.append(std::runtime_error::what());
+                    what_.append(": '");
+                    what_.append(name_);
+                    what_.append("'");
+                    return what_.c_str();
+                }
+                JSONCONS_CATCH(...)
+                {
+                    return std::runtime_error::what();
+                }
+            }
+            else
+            {
+                return what_.c_str();
+            }
         }
-    private:
-        std::string buffer_;
     };
 
     class ser_error : public std::system_error, public virtual json_exception
     {
+        std::size_t line_number_;
+        std::size_t column_number_;
+        mutable std::string what_;
     public:
         ser_error(std::error_code ec)
             : std::system_error(ec), line_number_(0), column_number_(0)
@@ -147,24 +173,33 @@ namespace jsoncons {
 
         const char* what() const noexcept override
         {
-            JSONCONS_TRY
+            if (what_.empty())
             {
-                std::ostringstream os;
-                os << this->code().message();
-                if (line_number_ != 0 && column_number_ != 0)
+                JSONCONS_TRY
                 {
-                    os << " at line " << line_number_ << " and column " << column_number_;
+                    what_.append(std::system_error::what());
+                    if (line_number_ != 0 && column_number_ != 0)
+                    {
+                        what_.append(" at line ");
+                        what_.append(std::to_string(line_number_));
+                        what_.append(" and column ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    else if (column_number_ != 0)
+                    {
+                        what_.append(" at position ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    return what_.c_str();
                 }
-                else if (column_number_ != 0)
+                JSONCONS_CATCH(...)
                 {
-                    os << " at position " << column_number_;
+                    return std::system_error::what();
                 }
-                const_cast<std::string&>(buffer_) = os.str();
-                return buffer_.c_str();
             }
-            JSONCONS_CATCH(...)
+            else
             {
-                return std::system_error::what();
+                return what_.c_str();
             }
         }
 
@@ -191,10 +226,6 @@ namespace jsoncons {
             return column();
         }
     #endif
-    private:
-        std::string buffer_;
-        std::size_t line_number_;
-        std::size_t column_number_;
     };
 
 #if !defined(JSONCONS_NO_DEPRECATED)
