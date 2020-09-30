@@ -33,7 +33,15 @@ namespace jsoncons {
         {
             decoder.reset();
             cursor.read_to(decoder, ec);
-            return decoder.get_result().template as<T>();
+            if (decoder.is_valid())
+            {
+                return decoder.get_result().template as<T>();
+            }
+            else
+            {
+                ec = convert_errc::conversion_failed;
+                return T();
+            }
         }
     };
 

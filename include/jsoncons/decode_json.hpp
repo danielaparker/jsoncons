@@ -30,6 +30,10 @@ namespace jsoncons {
         jsoncons::json_decoder<T> decoder;
         basic_json_reader<char_type, string_source<char_type>> reader(s, decoder, options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.context().line(), reader.context().column()));
+        }
         return decoder.get_result();
     }
 
@@ -60,6 +64,10 @@ namespace jsoncons {
         jsoncons::json_decoder<T> decoder;
         basic_json_reader<CharT, stream_source<CharT>> reader(is, decoder, options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -75,7 +83,7 @@ namespace jsoncons {
         T val = decode_traits<T,CharT>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(ser_error(ec, cursor.line(), cursor.column()));
         }
         return val;
     }
@@ -91,6 +99,10 @@ namespace jsoncons {
         jsoncons::json_decoder<T> decoder;
         basic_json_reader<char_type, iterator_source<InputIt>> reader(iterator_source<InputIt>(first,last), decoder, options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -108,7 +120,7 @@ namespace jsoncons {
         T val = decode_traits<T,char_type>::decode(cursor, decoder, ec);
         if (ec)
         {
-            JSONCONS_THROW(ser_error(ec, cursor.context().line(), cursor.context().column()));
+            JSONCONS_THROW(ser_error(ec, cursor.line(), cursor.column()));
         }
         return val;
     }
@@ -128,6 +140,10 @@ namespace jsoncons {
 
         basic_json_reader<char_type, string_source<char_type>,TempAllocator> reader(s, decoder, options, temp_alloc);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -162,6 +178,10 @@ namespace jsoncons {
 
         basic_json_reader<CharT, stream_source<CharT>,TempAllocator> reader(is, decoder, options, temp_alloc);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 

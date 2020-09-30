@@ -6,6 +6,13 @@ Warnings fixed:
 - Fixed C20 deprecated move_iterator access with arrow operator.
 - Fixed PVS-Studio warnings
 
+OSS-Fuzz issues fixed:
+
+- Fixed OSS-Fuzz failed throw issue 25891 affecting `decode_ubjson`
+and potentially other decode functions. This means that decode 
+functions will throw a `ser_error` instead of an `assertion_error`
+in the presence of certain kinds of bad data. 
+
 v0.157.1
 --------
 
