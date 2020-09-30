@@ -177,13 +177,13 @@ TEST_CASE("json validator tests")
     ]
     )";
 
-    SECTION("employee_AMG test")
+    SECTION("employee_AMN test")
     {
         jsoncons::json_cursor cursor(input);
 
         auto view = jsoncons::staj_array<ns::employee_AMN>(cursor);
 
-        REQUIRE_THROWS_WITH(view.begin(), "Unable to convert into the provided type");
+        REQUIRE_THROWS_WITH(view.begin(), "Not a ns::employee_AMN: Unable to convert into the provided type");
     }
 
     SECTION("employee_NMN test")
@@ -192,7 +192,7 @@ TEST_CASE("json validator tests")
 
         auto view = jsoncons::staj_array<ns::employee_NMN>(cursor);
 
-        REQUIRE_THROWS_WITH(view.begin(), "Unable to convert into the provided type");
+        REQUIRE_THROWS_WITH(view.begin(), "Not a ns::employee_NMN: Unable to convert into the provided type");
     }
 
     SECTION("employee_ACGN test")
@@ -201,7 +201,7 @@ TEST_CASE("json validator tests")
 
         auto view = jsoncons::staj_array<ns::employee_ACGN>(cursor);
 
-        REQUIRE_THROWS_WITH(view.begin(), "Unable to convert into the provided type");
+        REQUIRE_THROWS_WITH(view.begin(), "Not a ns::employee_ACGN: Unable to convert into the provided type");
     }
 
     SECTION("employee_NCGN test")
@@ -210,7 +210,7 @@ TEST_CASE("json validator tests")
 
         auto view = jsoncons::staj_array<ns::employee_NCGN>(cursor);
 
-        REQUIRE_THROWS_WITH(view.begin(), "Unable to convert into the provided type");
+        REQUIRE_THROWS_WITH(view.begin(), "Not a ns::employee_NCGN: Unable to convert into the provided type");
     }
 
     SECTION("employee_AGSN test")
@@ -219,7 +219,7 @@ TEST_CASE("json validator tests")
 
         auto view = jsoncons::staj_array<ns::employee_AGSN>(cursor);
 
-        REQUIRE_THROWS_WITH(view.begin(), "Unable to convert into the provided type");
+        REQUIRE_THROWS_WITH(view.begin(),  "Not a ns::employee_AGSN: Unable to convert into the provided type");
     }
 
     SECTION("employee_NGSN test")
@@ -228,7 +228,7 @@ TEST_CASE("json validator tests")
 
         auto view = jsoncons::staj_array<ns::employee_NGSN>(cursor);
 
-        REQUIRE_THROWS_WITH(view.begin(), "Unable to convert into the provided type");
+        REQUIRE_THROWS_WITH(view.begin(),  "Not a ns::employee_NGSN: Unable to convert into the provided type");
     }
 }
 
