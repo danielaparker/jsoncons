@@ -156,12 +156,12 @@ public:
     using string_view_type = jsoncons::basic_string_view<CharT>;
 
     basic_staj_event(staj_event_type event_type, semantic_tag tag = semantic_tag::none)
-        : event_type_(event_type), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(event_type), tag_(tag), ext_tag_(0), value_(), length_(0)
     {
     }
 
     basic_staj_event(null_type, semantic_tag tag)
-        : event_type_(staj_event_type::null_value), tag_(tag), ext_tag_(0), length_(0)
+        : event_type_(staj_event_type::null_value), tag_(tag), ext_tag_(0), value_(), length_(0)
     {
     }
 
@@ -476,9 +476,9 @@ constexpr double_array_arg_t double_array_arg = double_array_arg_t();
 struct float128_array_arg_t {explicit float128_array_arg_t() = default; };
 constexpr float128_array_arg_t float128_array_arg = float128_array_arg_t();
 
-enum typed_array_type {uint8_value=1,uint16_value,uint32_value,uint64_value,
-                      int8_value,int16_value,int32_value,int64_value, 
-                      half_value, float_value,double_value};
+enum class typed_array_type{uint8_value=1,uint16_value,uint32_value,uint64_value,
+                            int8_value,int16_value,int32_value,int64_value, 
+                            half_value, float_value,double_value};
 
 class typed_array_view
 {
@@ -509,7 +509,7 @@ public:
     {
     }
 
-    typed_array_view(typed_array_view&& other)
+    typed_array_view(typed_array_view&& other) noexcept
     {
         swap(*this,other);
     }

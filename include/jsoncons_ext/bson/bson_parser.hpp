@@ -307,7 +307,7 @@ private:
                 }
 
                 std::vector<char> s;
-                std::size_t size = static_cast<std::size_t>(len-1);
+                std::size_t size = static_cast<std::size_t>(len) - static_cast<std::size_t>(1);
                 if (source_reader<Src>::read(source_,s,size) != size)
                 {
                     ec = bson_errc::unexpected_eof;
