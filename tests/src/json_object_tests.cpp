@@ -856,7 +856,7 @@ TEST_CASE("test_value_not_found_and_defaults")
     }
     JSONCONS_CATCH (const std::out_of_range& e)
     {
-        CHECK(e.what() == std::string("Key not found:  'first_aid_certification'"));
+        CHECK(e.what() == std::string("Key not found: 'first_aid_certification'"));
     }
 }
 
