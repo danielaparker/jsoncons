@@ -40,7 +40,7 @@ namespace jsoncons {
             else
             {
                 ec = convert_errc::conversion_failed;
-                return T();
+                return T{};
             }
         }
     };

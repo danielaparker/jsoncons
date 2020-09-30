@@ -190,7 +190,7 @@ namespace detail {
     {
         if (sizeof(T) > count)
         {
-            return T();
+            return T{};
         }
         T val;
         std::memcpy(&val,first,sizeof(T));
@@ -203,7 +203,7 @@ namespace detail {
     {
         if (sizeof(T) > count)
         {
-            return T();
+            return T{};
         }
         T val;
         std::memcpy(&val,first,sizeof(T));
@@ -218,7 +218,7 @@ namespace detail {
     {
         if (sizeof(T) > count)
         {
-            return T();
+            return T{};
         }
         T val;
         std::memcpy(&val,first,sizeof(T));
@@ -231,7 +231,7 @@ namespace detail {
     {
         if (sizeof(T) > count)
         {
-            return T();
+            return T{};
         }
         T val;
         std::memcpy(&val,first,sizeof(T));
