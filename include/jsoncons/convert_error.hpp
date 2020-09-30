@@ -89,6 +89,7 @@ namespace jsoncons {
         not_integer,
         not_signed_integer,
         not_unsigned_integer,
+        not_bigint,
         not_double,
         not_bool,
         not_variant,
@@ -148,6 +149,8 @@ namespace detail {
                     return "Cannot convert to signed integer";
                 case convert_errc::not_unsigned_integer:
                     return "Cannot convert to unsigned integer";
+                case convert_errc::not_bigint:
+                    return "Cannot convert to bigint";
                 case convert_errc::not_double:
                     return "Cannot convert to double";
                 case convert_errc::not_bool:
