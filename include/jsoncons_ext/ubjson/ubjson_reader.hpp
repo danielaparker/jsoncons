@@ -21,7 +21,7 @@
 namespace jsoncons { namespace ubjson {
 
 template <class Src,class Allocator=std::allocator<char>>
-class basic_ubjson_reader : public ser_context
+class basic_ubjson_reader
 {
     basic_ubjson_parser<Src,Allocator> parser_;
     json_visitor& visitor_;
@@ -67,12 +67,12 @@ public:
         }
     }
 
-    std::size_t line() const override
+    std::size_t line() const 
     {
         return parser_.line();
     }
 
-    std::size_t column() const override
+    std::size_t column() const
     {
         return parser_.column();
     }

@@ -161,6 +161,16 @@ public:
         read_internal(ec);
     }
 
+    std::size_t line() const
+    {
+        return parser_.line();
+    }
+
+    std::size_t column() const
+    {
+        return parser_.column();
+    }
+
     bool eof() const
     {
         return eof_;

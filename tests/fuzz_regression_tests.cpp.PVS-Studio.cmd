@@ -1,0 +1,1 @@
+@call "C:\Program Files (x86)\PVS-Studio\x64\PVS-Studio.exe" --cfg "C:\Users\danie\Documents\GitHub\jsoncons\tests\fuzz_regression_tests.cpp.PVS-Studio.cfg"

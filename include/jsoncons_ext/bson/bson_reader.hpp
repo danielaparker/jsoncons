@@ -22,7 +22,7 @@
 namespace jsoncons { namespace bson {
 
 template <class Src,class Allocator=std::allocator<char>>
-class basic_bson_reader : public ser_context
+class basic_bson_reader 
 {
     basic_bson_parser<Src,Allocator> parser_;
     json_visitor& visitor_;
@@ -68,12 +68,12 @@ public:
         }
     }
 
-    std::size_t line() const override
+    std::size_t line() const
     {
         return parser_.line();
     }
 
-    std::size_t column() const override
+    std::size_t column() const
     {
         return parser_.column();
     }
