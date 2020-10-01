@@ -972,6 +972,8 @@ On UNIX:
 
 ## Acknowledgements
 
+jsoncons uses the PVS-Studio static analyzer, provided free for open source projects.
+
 A big thanks to the comp.lang.c++ community for help with implementation details. 
 
 The jsoncons platform dependent binary configuration draws on to the excellent MIT licensed [tinycbor](https://github.com/intel/tinycbor).
