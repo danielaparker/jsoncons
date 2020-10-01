@@ -32,6 +32,10 @@ namespace cbor {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::bytes_source> reader(v, adaptor, options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -62,6 +66,10 @@ namespace cbor {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         cbor_stream_reader reader(is, adaptor, options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
      
@@ -91,6 +99,10 @@ namespace cbor {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<binary_iterator_source<InputIt>> reader(binary_iterator_source<InputIt>(first, last), adaptor, options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -124,6 +136,10 @@ namespace cbor {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::bytes_source,TempAllocator> reader(v, adaptor, options, temp_alloc);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -156,6 +172,10 @@ namespace cbor {
         auto adaptor = make_json_visitor_adaptor<json_visitor>(decoder);
         basic_cbor_reader<jsoncons::binary_stream_source,TempAllocator> reader(is, adaptor, options, temp_alloc);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 

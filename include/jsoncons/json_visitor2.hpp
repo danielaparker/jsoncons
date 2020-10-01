@@ -804,11 +804,11 @@ namespace jsoncons {
         };
         using level_allocator_type = typename std::allocator_traits<Allocator>:: template rebind_alloc<level>;
 
+        basic_default_json_visitor<char_type> default_visitor_;
         basic_json_visitor<char_type>* destination_;
         string_type key_;
         string_type key_buffer_;
         std::vector<level,level_allocator_type> level_stack_;
-        basic_default_json_visitor<char_type> default_visitor_;
 
         const std::basic_string<char> null_k = {'n','u','l','l'};
         const std::basic_string<char> true_k = { 't','r','u','e' };

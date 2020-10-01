@@ -115,7 +115,7 @@ TEST_CASE("json as<T>")
         }
         JSONCONS_CATCH (const std::out_of_range& e)
         {
-            CHECK(e.what() == std::string("Key 'empty' not found"));
+            CHECK(e.what() == std::string("Key not found: 'empty'"));
         }
     }
 }
@@ -842,11 +842,8 @@ TEST_CASE("test_value_not_found_and_defaults")
     }
     JSONCONS_CATCH (const std::out_of_range& e)
     {
-        CHECK(e.what() == std::string("Key 'outdoor_experience' not found"));
+        CHECK(e.what() == std::string("Key not found: 'outdoor_experience'"));
     }
-
-    //REQUIRE_THROWS_AS((obj["outdoor_experience"].as<std::string>()),jsoncons::key_not_found);
-    //REQUIRE_THROWS_WITH((obj["outdoor_experience"].as<std::string>()),"Key 'outdoor_experience' not found");
 
     std::string experience = obj.contains("outdoor_experience") ? obj["outdoor_experience"].as<std::string>() : "";
 
@@ -859,11 +856,8 @@ TEST_CASE("test_value_not_found_and_defaults")
     }
     JSONCONS_CATCH (const std::out_of_range& e)
     {
-        CHECK(e.what() == std::string("Key 'first_aid_certification' not found"));
+        CHECK(e.what() == std::string("Key not found: 'first_aid_certification'"));
     }
-
-    //REQUIRE_THROWS_AS(obj["first_aid_certification"].as<std::string>(),std::out_of_range);
-    //REQUIRE_THROWS_WITH(obj["first_aid_certification"].as<std::string>(),"Key 'first_aid_certification' not found");
 }
 
 TEST_CASE("test_set_override")

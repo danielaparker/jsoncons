@@ -26,6 +26,10 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>> reader(s,decoder,options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -58,6 +62,10 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::stream_source<char_type>> reader(is,decoder,options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -88,6 +96,10 @@ namespace csv {
         jsoncons::json_decoder<T> decoder;
         basic_csv_reader<char_type, iterator_source<InputIt>> reader(iterator_source<InputIt>(first,last), decoder, options);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -125,6 +137,10 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>,TempAllocator> reader(s,decoder,options,temp_alloc);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
@@ -161,6 +177,10 @@ namespace csv {
 
         basic_csv_reader<char_type,jsoncons::string_source<char_type>,TempAllocator> reader(is,decoder,options,temp_alloc);
         reader.read();
+        if (!decoder.is_valid())
+        {
+            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+        }
         return decoder.get_result();
     }
 
