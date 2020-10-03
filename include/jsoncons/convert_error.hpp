@@ -14,9 +14,9 @@ namespace jsoncons {
 
     class convert_error : public std::system_error, public virtual json_exception
     {
-        std::string buffer_;
         std::size_t line_number_;
         std::size_t column_number_;
+        mutable std::string what_;
     public:
         convert_error(std::error_code ec)
             : std::system_error(ec), line_number_(0), column_number_(0)
@@ -40,24 +40,33 @@ namespace jsoncons {
 
         const char* what() const noexcept override
         {
-            JSONCONS_TRY
+            if (what_.empty())
             {
-                std::ostringstream os;
-                os << this->code().message();
-                if (line_number_ != 0 && column_number_ != 0)
+                JSONCONS_TRY
                 {
-                    os << " at line " << line_number_ << " and column " << column_number_;
+                    what_.append(std::system_error::what());
+                    if (line_number_ != 0 && column_number_ != 0)
+                    {
+                        what_.append(" at line ");
+                        what_.append(std::to_string(line_number_));
+                        what_.append(" and column ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    else if (column_number_ != 0)
+                    {
+                        what_.append(" at position ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    return what_.c_str();
                 }
-                else if (column_number_ != 0)
+                JSONCONS_CATCH(...)
                 {
-                    os << " at position " << column_number_;
+                    return std::system_error::what();
                 }
-                const_cast<std::string&>(buffer_) = os.str();
-                return buffer_.c_str();
             }
-            JSONCONS_CATCH(...)
+            else
             {
-                return std::system_error::what();
+                return what_.c_str();
             }
         }
 
