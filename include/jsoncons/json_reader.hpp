@@ -34,7 +34,7 @@ private:
     //std::function<bool(json_errc,const ser_context&)> err_handler_;
 
     // noncopyable and nonmoveable
-    json_utf8_to_other_visitor_adaptor<CharT>(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
+    json_utf8_to_other_visitor_adaptor(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
     json_utf8_to_other_visitor_adaptor<CharT>& operator=(const json_utf8_to_other_visitor_adaptor<CharT>&) = delete;
 
 public:
