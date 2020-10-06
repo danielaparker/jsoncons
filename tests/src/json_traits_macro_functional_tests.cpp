@@ -434,12 +434,6 @@ namespace ns {
         {
             return height_ * width_;
         }
-
-        const std::string& type() const
-        {
-            static const std::string type_ = "rectangle"; 
-            return type_;
-        }
     };
 
     class Triangle_ACGN : public Shape_ACGN
@@ -543,12 +537,6 @@ namespace ns {
         double area() const override
         {
             return height_ * width_;
-        }
-
-        const std::string& getType() const
-        {
-            static const std::string type_ = "rectangle"; 
-            return type_;
         }
     };
 
@@ -669,12 +657,6 @@ namespace ns {
         {
             return height_ * width_;
         }
-
-        const std::string& getType() const
-        {
-            static const std::string type_ = "rectangle"; 
-            return type_;
-        }
     };
 
     class Triangle_NGSN : public Shape_NGSN
@@ -763,7 +745,6 @@ namespace ns {
     class Rectangle_AMN : public Shape_AMN
     {
         JSONCONS_TYPE_TRAITS_FRIEND
-        static const std::string type_;
         double height_;
         double width_;
     public:
@@ -777,8 +758,6 @@ namespace ns {
             return height_ * width_;
         }
     };
-
-    const std::string Rectangle_AMN::type_ = "rectangle";
 
     class Triangle_AMN : public Shape_AMN
     { 
@@ -837,7 +816,6 @@ namespace ns {
     class Rectangle_NMN : public Shape_NMN
     {
         JSONCONS_TYPE_TRAITS_FRIEND
-        static const std::string type_;
         double height_;
         double width_;
     public:
@@ -851,8 +829,6 @@ namespace ns {
             return height_ * width_;
         }
     };
-
-    const std::string Rectangle_NMN::type_ = "rectangle";
 
     class Triangle_NMN : public Shape_NMN
     { 
@@ -900,14 +876,18 @@ namespace ns {
     };                 
 
     const std::string Circle_NMN::type_ = "circle";
+
+    constexpr auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    constexpr auto triangle_marker = [](double) noexcept {return "triangle";};
+    constexpr auto circle_marker = [](double) noexcept {return "circle";};
           
 } // namespace
 } // ns
 
-#if 0
-
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
-    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
+    (height,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
     (height, "height", JSONCONS_RDWR),
     (width, "width")
 )
@@ -927,7 +907,9 @@ JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_ACGN,ns::Rectangle_ACGN,ns::Triangle_ACGN,
 
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_AGSN,
-    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
+    (getHeight, ,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
     (getHeight, setHeight, "height"),
     (getWidth, setWidth, "width")
 )
@@ -946,7 +928,9 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Circle_AGSN,
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AGSN,ns::Rectangle_AGSN,ns::Triangle_AGSN,ns::Circle_AGSN)
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_NGSN, 3,
-    (getType, ,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
+    (getHeight, ,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
     (getHeight, setHeight, "height"),
     (getWidth, setWidth, "width")
 )
@@ -963,15 +947,15 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Circle_NGSN, 2,
 )
 
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_NGSN,ns::Rectangle_NGSN,ns::Triangle_NGSN,ns::Circle_NGSN)
-#endif
+
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Rectangle_AMN,
-    (type_,"type",JSONCONS_RDONLY,
+    (height_,"type",JSONCONS_RDONLY,
         [](const std::string& type) noexcept {return type == "rectangle"; }, 
-        [](const std::string& s) {return s; }),
+        ns::rectangle_marker),
     (height_, "height"),
     (width_, "width")
 )
-#if 0
+
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Triangle_AMN,
     (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (height_, "height"),
@@ -986,7 +970,9 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Circle_AMN,
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AMN,ns::Rectangle_AMN,ns::Triangle_AMN,ns::Circle_AMN)
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Rectangle_NMN, 3,
-    (type_,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
+    (height_,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
     (height_, "height"),
     (width_, "width")
 ) 
@@ -1116,8 +1102,7 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN,
       }
    )
 )
-#endif
-#if 0
+
 using namespace jsoncons;
 
 TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS transform tests")
@@ -1627,4 +1612,4 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
     }
 #endif
 } 
-#endif
+
