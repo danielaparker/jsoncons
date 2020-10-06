@@ -877,9 +877,9 @@ namespace ns {
 
     const std::string Circle_NMN::type_ = "circle";
 
-    constexpr auto rectangle_marker = [](double) noexcept {return "rectangle"; };
-    constexpr auto triangle_marker = [](double) noexcept {return "triangle";};
-    constexpr auto circle_marker = [](double) noexcept {return "circle";};
+    auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    auto triangle_marker = [](double) noexcept {return "triangle";};
+    auto circle_marker = [](double) noexcept {return "circle";};
           
 } // namespace
 } // ns
