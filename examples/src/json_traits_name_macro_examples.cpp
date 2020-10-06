@@ -227,13 +227,14 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company,
     (getName, setName, "company"),
     (getIds, setIds, "resources", 
         JSONCONS_RDWR, jsoncons::always_true(), 
-        ns::fromEmployeesToIds, ns::toEmployeesFromIds)
+        ns::toEmployeesFromIds, ns::fromEmployeesToIds)
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person, 
   (getName, "name"),
   (getSsn, "social_security_number", 
       JSONCONS_RDWR, jsoncons::always_true(),
+      jsoncons::identity(),
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {

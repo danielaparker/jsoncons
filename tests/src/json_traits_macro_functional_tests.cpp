@@ -904,6 +904,8 @@ namespace ns {
 } // namespace
 } // ns
 
+#if 0
+
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
     (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
     (height, "height", JSONCONS_RDWR),
@@ -961,13 +963,15 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Circle_NGSN, 2,
 )
 
 JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_NGSN,ns::Rectangle_NGSN,ns::Triangle_NGSN,ns::Circle_NGSN)
-
+#endif
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Rectangle_AMN,
-    (type_,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
-    (height_, "height",JSONCONS_RDWR),
+    (type_,"type",JSONCONS_RDONLY,
+        [](const std::string& type) noexcept {return type == "rectangle"; }, 
+        [](const std::string& s) {return s; }),
+    (height_, "height"),
     (width_, "width")
 )
-
+#if 0
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Triangle_AMN,
     (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
     (height_, "height"),
@@ -1112,7 +1116,8 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN,
       }
    )
 )
-
+#endif
+#if 0
 using namespace jsoncons;
 
 TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS transform tests")
@@ -1622,4 +1627,4 @@ TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
     }
 #endif
 } 
-
+#endif
