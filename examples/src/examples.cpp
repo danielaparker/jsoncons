@@ -456,11 +456,11 @@ int main()
 
         json_traits_integer_examples();
 
-        json_traits_polymorphic_examples();
-
         json_traits_variant_examples();
 
         json_traits_name_macro_examples();
+
+        json_traits_polymorphic_examples();
     }
     catch (const std::exception& e)
     {
