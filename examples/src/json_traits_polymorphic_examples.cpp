@@ -93,9 +93,9 @@ namespace ns {
         }
     };                 
 
-    const auto rectangle_marker = [](double) noexcept {return "rectangle"; };
-    const auto triangle_marker = [](double) noexcept {return "triangle";};
-    const auto circle_marker = [](double) noexcept {return "circle";};
+    constexpr auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    constexpr auto triangle_marker = [](double) noexcept {return "triangle";};
+    constexpr auto circle_marker = [](double) noexcept {return "circle";};
 
 } // namespace ns
 } // namespace
