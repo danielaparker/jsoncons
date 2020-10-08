@@ -18,7 +18,7 @@ with `jsoncons::identity()` (or `std::identity()` if C++20). For the rationale f
 [\#277](https://github.com/danielaparker/jsoncons/issues/277)
 
 - Conversion errors during decode are now reported with `jsoncons::convert_error`, 
-parsing errors remain `jsoncons::ser_error` (`or std::error_code`) as before
+parsing errors remain `jsoncons::ser_error` (`or std::error_code`) as before.
 
 v0.157.2
 --------
