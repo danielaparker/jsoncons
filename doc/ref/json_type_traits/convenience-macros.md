@@ -235,7 +235,7 @@ differs from type of `memberN` (or return type of `getterN`), and `modeN` is `JS
 but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
 (since 0.157.0)  
 `fromN` - a function object that takes a value of return type of `intoN`, and returns a value
- of type of `memberN` (or return type of `getterN`). (since 0.157.0)  
+ of type of `memberN` (or return type of `getterN`). Only used if `modeN` is `JSONCONS_RDWR`. (since 0.157.0)  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
