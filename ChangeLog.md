@@ -1,4 +1,4 @@
-v0.158.0 (master)
+v0.158.0 
 --------
 
 Bugs fixed:
@@ -17,9 +17,8 @@ need to reverse their order, or if you've provided just a `from` function argume
 with `jsoncons::identity()` (or `std::identity()` if C++20). For the rationale for this change, see
 [\#277](https://github.com/danielaparker/jsoncons/issues/277)
 
-Enhancements:
-
-- New exception type `jsoncons::convert_error`
+- Conversion errors during decode are now reported with `jsoncons::convert_error`, 
+parsing errors remain `jsoncons::ser_error` (`or std::error_code`) as before
 
 v0.157.2
 --------
