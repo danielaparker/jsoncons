@@ -10,7 +10,8 @@
 
 #if defined(JSONCONS_HAS_STD_VARIANT)
 
-namespace { namespace ns {
+namespace { 
+namespace ns {
 
     enum class Color {yellow, red, green, blue};
 
@@ -84,12 +85,6 @@ namespace { namespace ns {
         {
         }
 
-        const std::string& type() const
-        {
-            static const std::string type_ = "rectangle"; 
-            return type_;
-        }
-
         double height() const
         {
             return height_;
@@ -115,12 +110,6 @@ namespace { namespace ns {
         Triangle(double height, double width)
             : height_(height), width_(width)
         {
-        }
-
-        const std::string& type() const
-        {
-            static const std::string type_ = "triangle"; 
-            return type_;
         }
 
         double height() const
@@ -149,12 +138,6 @@ namespace { namespace ns {
         {
         }
 
-        const std::string& type() const
-        {
-            static const std::string type_ = "circle"; 
-            return type_;
-        }
-
         double radius() const
         {
             return radius_;
@@ -166,6 +149,10 @@ namespace { namespace ns {
             return pi*radius_*radius_;
         }
     };                 
+
+    inline constexpr auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    inline constexpr auto triangle_marker = [](double) noexcept {return "triangle";};
+    inline constexpr auto circle_marker = [](double) noexcept {return "circle";};
 
 } // ns
 } // namespace
@@ -183,19 +170,25 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Basket,
                                 (items_, "items"))
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
-    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept {return type == "rectangle";}),
+    (height,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (height,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "triangle";},
+     ns::triangle_marker),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (radius,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "circle";},
+     ns::circle_marker),
     (radius, "radius")
 )
 

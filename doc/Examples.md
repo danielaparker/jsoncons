@@ -40,10 +40,10 @@
 [An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS](#G8)  
 [Serialize a polymorphic type based on the presence of members](#G9)  
 [Ensuring type selection is possible](#G10)  
-[Serialize a polymorphic type based on a type member (since 0.157.0)](#G14)  
+[Decode to a polymorphic type based on a type marker (since 0.157.0)](#G14)  
 [An example with std::variant](#G11)  
 [Type selection and std::variant](#G12)  
-[Serialize a std::variant based on a type member (since 0.157.0)](#G15)  
+[Decode to a std::variant based on a type marker (since 0.158.0)](#G15)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G13)
 
 ### Construct
@@ -2162,7 +2162,7 @@ A baz
 
 <div id="G14"/>
 
-#### Serialize a polymorphic type based on a type member (since 0.157.0)
+#### Decode to a polymorphic type based on a type marker (since 0.157.0)
 
 ```c++
 namespace ns {
@@ -2621,7 +2621,7 @@ So: types that are more constrained should appear to the left of types that are 
 
 <div id="G15"/>
 
-#### Serialize a std::variant based on a type member (since 0.157.0)
+#### Decode to a std::variant based on a type marker (since 0.157.0)
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -2636,12 +2636,6 @@ namespace ns {
         Rectangle(double height, double width)
             : height_(height), width_(width)
         {
-        }
-
-        const std::string& type() const
-        {
-            static const std::string type_ = "rectangle"; 
-            return type_;
         }
 
         double height() const
@@ -2671,12 +2665,6 @@ namespace ns {
         {
         }
 
-        const std::string& type() const
-        {
-            static const std::string type_ = "triangle"; 
-            return type_;
-        }
-
         double height() const
         {
             return height_;
@@ -2703,12 +2691,6 @@ namespace ns {
         {
         }
 
-        const std::string& type() const
-        {
-            static const std::string type_ = "circle"; 
-            return type_;
-        }
-
         double radius() const
         {
             return radius_;
@@ -2721,22 +2703,32 @@ namespace ns {
         }
     };                 
 
+    inline constexpr auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    inline constexpr auto triangle_marker = [](double) noexcept {return "triangle";};
+    inline constexpr auto circle_marker = [](double) noexcept {return "circle";};
+
 } // namespace ns
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
-    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
+    (height,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (height,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "triangle";},
+     ns::triangle_marker),
     (height, "height"),
     (width, "width")
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
-    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (radius,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "circle";},
+     ns::circle_marker),
     (radius, "radius")
 )
 

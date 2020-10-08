@@ -996,7 +996,8 @@ JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Company_NMN, 2,
     (name_, "company"),
-    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), ns::toEmployeesFromIds<ns::Employee_NMN>, ns::fromEmployeesToIds<ns::Employee_NMN>),
+    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds<ns::Employee_NMN>, ns::fromEmployeesToIds<ns::Employee_NMN>),
     (rating_, "rating")
 )
 
@@ -1007,7 +1008,8 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Employee_AMN,
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Company_AMN,
     (name_, "company"),
-    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), ns::toEmployeesFromIds<ns::Employee_AMN>, ns::fromEmployeesToIds<ns::Employee_AMN>)
+    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds<ns::Employee_AMN>, ns::fromEmployeesToIds<ns::Employee_AMN>)
 )
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
