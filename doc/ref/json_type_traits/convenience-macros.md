@@ -232,7 +232,7 @@ otherwise it must be the same as the member type (since 0.157.0)
 and returns a value of type `T` that satisfies `json_type_traits` specialization. If type `T`
 differs from type of `memberN` (or return type of `getterN`), `fromN` must also be provided.
 `intoN` can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
-but it cannot be a lambda expression (at least until C++20), because it is used in an unevaluated context.
+but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
 (since 0.157.0)  
 `fromN` - a function object that takes a value of return type of `intoN`, and returns a value
  of type of `memberN` (or return type of `getterN`). (since 0.157.0)  
