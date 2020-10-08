@@ -986,6 +986,11 @@ class `ns::Circle area: 3.1415927
     }
 ]
 ```
+
+This example maps a `type()` getter to a "type" data member in the JSON.
+However, we can also achieve this without using a `type()` getter at all. 
+Compare with the very similar example [decode to a std::variant based on a type marker](#A9)
+
 <div id="A7"/>
 
 #### An example with std::variant
@@ -1268,7 +1273,13 @@ So: types that are more constrained should appear to the left of types that are 
 
 <div id="A9"/>
 
-#### Decode to a std::variant based on a type marker (since 0.157.0)
+#### Decode to a std::variant based on a type marker (since 0.158.0)
+
+This example is very similar to [decode to a polymorphic type based on a type marker](#A6),
+and in fact the json traits defined for that example would suffice for `std::variant` as well.
+But here we add a wrinkle by omitting the `type()` function in the `Rectangle`, `Triangle` and
+`Circle` classes. More generally, we show how to augment the JSON output with name/value pairs 
+that are not present in the class definitions, and to perform type selection with them.
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -1442,7 +1453,7 @@ circle area: 3.1415927
 
 <div id="A10"/>
 
-#### Transform data member (since 0.157.0)
+#### Transform data member (since 0.158.0)
 
 ```c++
 #include <cassert>
@@ -1607,7 +1618,7 @@ ExampleInc
 
 <div id="A11"/>
 
-#### Tidy data member (since 0.157.0)
+#### Tidy data member (since 0.158.0)
 
 ```c++
 #include <jsoncons/json.hpp>
