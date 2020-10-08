@@ -1,3 +1,26 @@
+v0.158.0 (master)
+--------
+
+Bugs fixed:
+
+- Fixed compilation error with gcc 11, [\#276](https://github.com/danielaparker/jsoncons/pull/276)
+(thanks to Laurent Stacul)
+
+Changes:
+
+- In 0.157.0, the `_NAME_` convenience macros were augmented to allow an optional `mode` parameter 
+(`JSONCONS_RDWR` or `JSONCONS_RDONLY`) and three optional function object parameters, `match` (value matches expected), 
+`from` (convert from type known to jsoncons) and `into` (convert into type known to jsoncons).
+In this release - 0.158.0 - the order of the `from` and `into` function object parameters has been reversed.
+If you've provided `from` and `into` function objects as arguments in your json traits convenience macros, you'll
+need to reverse their order, or if you've provided just a `from` function argument, you'll need to precede it
+with `jsoncons::identity()` (or `std::identity()` if C++20). For the rationale for this change, see
+[\#277](https://github.com/danielaparker/jsoncons/issues/277)
+
+Enhancements:
+
+- New exception type `jsoncons::convert_error`
+
 v0.157.2
 --------
 
