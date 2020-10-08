@@ -72,13 +72,13 @@ namespace jsoncons {
             }
         }
 
+        ~staj_array_iterator() noexcept
+        {
+        }
+
         bool has_value() const
         {
             return !eptr_;
-        }
-
-        ~staj_array_iterator() noexcept
-        {
         }
 
         const T& operator*() const
@@ -144,7 +144,6 @@ namespace jsoncons {
             return view_->cursor_->done() || view_->cursor_->current().event_type() == staj_event_type::end_array;
         }
 
-
         void next()
         {
             std::error_code ec;
@@ -173,7 +172,7 @@ namespace jsoncons {
                     {
                         view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
                     }
-                    JSONCONS_CATCH(...)
+                    JSONCONS_CATCH(const convert_error&)
                     {
                         eptr_ = std::current_exception();
                     }
@@ -191,6 +190,7 @@ namespace jsoncons {
         using char_type = typename Json::char_type;
 
         staj_object_view<Key, T, Json>* view_;
+        std::exception_ptr eptr_;
     public:
         using key_type = std::basic_string<char_type>;
         using value_type = std::pair<key_type,T>;
@@ -238,14 +238,33 @@ namespace jsoncons {
         {
         }
 
+        bool has_value() const
+        {
+            return !eptr_;
+        }
+
         const value_type& operator*() const
         {
-            return *view_->key_value_;
+            if (eptr_)
+            {
+                 std::rethrow_exception(eptr_);
+            }
+            else
+            {
+                return *view_->key_value_;
+            }
         }
 
         const value_type* operator->() const
         {
-            return view_->key_value_.operator->();
+            if (eptr_)
+            {
+                 std::rethrow_exception(eptr_);
+            }
+            else
+            {
+                return view_->key_value_.operator->();
+            }
         }
 
         staj_object_iterator& operator++()
@@ -292,23 +311,11 @@ namespace jsoncons {
 
         void next()
         {
-            using char_type = typename Json::char_type;
-
-            view_->cursor_->next();
-            if (!done())
+            std::error_code ec;
+            next(ec);
+            if (ec)
             {
-                JSONCONS_ASSERT(view_->cursor_->current().event_type() == staj_event_type::key);
-                key_type key = view_->cursor_->current(). template get<key_type>();
-                view_->cursor_->next();
-                if (!done())
-                {
-                    std::error_code ec;
-                    view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
-                    if (ec)
-                    {
-                        JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
-                    }
-                }
+                JSONCONS_THROW(ser_error(ec, view_->cursor_->context().line(), view_->cursor_->context().column()));
             }
         }
 
@@ -332,7 +339,15 @@ namespace jsoncons {
                 }
                 if (!done())
                 {
-                    view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
+                    eptr_ = std::exception_ptr();
+                    JSONCONS_TRY
+                    {
+                        view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
+                    }
+                    JSONCONS_CATCH(const convert_error&)
+                    {
+                        eptr_ = std::current_exception();
+                    }
                 }
             }
         }
