@@ -835,7 +835,7 @@ Output:
 }
 ```
 
-See [staj_array_iterator.md](ref/staj_array_iterator.md) 
+See [staj_array_iterator](ref/staj_array_iterator.md) 
 
 <div id="I5"/> 
 
@@ -877,7 +877,7 @@ Haruki Murakami, Hard-Boiled Wonderland and the End of the World
 Graham Greene, The Comedians
 ```
 
-See [staj_array_iterator.md](ref/staj_array_iterator.md) 
+See [staj_array_iterator](ref/staj_array_iterator.md) 
 
 <div id="G0"/>
 
