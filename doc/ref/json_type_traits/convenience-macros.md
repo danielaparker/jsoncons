@@ -232,7 +232,7 @@ otherwise it must be the same as the member type (since 0.157.0)
 and returns a value of type `T` that satisfies `json_type_traits` specialization. If type `T`
 differs from type of `memberN` (or return type of `getterN`), `fromN` must also be provided.
 (since 0.157.0)  
-`fromN` - a function object that takes a value of type `T` that satisfies `json_type_traits` specialization, and returns a value
+`fromN` - a function object that takes a value of return type of `intoN`, and returns a value
  of type of `memberN` (or return type of `getterN`). (since 0.157.0)  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
