@@ -1643,9 +1643,9 @@ namespace ns {
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person, 
   (getName, "name"),
-  (getSsn, "social_security_number", 
-      JSONCONS_RDWR, jsoncons::always_true(),
-      jsoncons::identity(),
+  (getSsn, "social_security_number",
+      jsoncons::always_true(),
+      jsoncons::identity(), // or std::identity() if C++20
       [] (const std::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
@@ -1675,19 +1675,19 @@ int main()
 ]
     )";
 
-        auto persons = decode_json<std::vector<ns::Person>>(input);
+    auto persons = jsoncons::decode_json<std::vector<ns::Person>>(input);
 
-        std::cout << "(1)\n";
-        for (const auto& person : persons)
-        {
-            std::cout << person.getName() << ", " 
-                      << (person.getSsn() ? *person.getSsn() : "n/a") << "\n";
-        }
-        std::cout << "\n";
+    std::cout << "(1)\n";
+    for (const auto& person : persons)
+    {
+        std::cout << person.getName() << ", " 
+                  << (person.getSsn() ? *person.getSsn() : "n/a") << "\n";
+    }
+    std::cout << "\n";
 
-        std::string output;
-        encode_json_pretty(persons, output);
-        std::cout << "(2)\n" << output << "\n";
+    std::string output;
+    jsoncons::encode_json_pretty(persons, output);
+    std::cout << "(2)\n" << output << "\n";
 }
 ```
 Output:
@@ -1708,4 +1708,3 @@ Jane Doe, n/a
     }
 ]
 ```
-
