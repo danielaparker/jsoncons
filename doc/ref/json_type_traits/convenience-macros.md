@@ -231,6 +231,8 @@ otherwise it must be the same as the member type (since 0.157.0)
 `intoN` - a function object that takes a value of type of `memberN` (or return type of `getterN`)
 and returns a value of type `T` that satisfies `json_type_traits` specialization. If type `T`
 differs from type of `memberN` (or return type of `getterN`), `fromN` must also be provided.
+`intoN` can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
+but it cannot be a lambda expression (at least until C++20), because it is used in an unevaluated context.
 (since 0.157.0)  
 `fromN` - a function object that takes a value of return type of `intoN`, and returns a value
  of type of `memberN` (or return type of `getterN`). (since 0.157.0)  
@@ -1550,8 +1552,8 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee,
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company,
     (getName, setName, "company"),
     (getIds, setIds, "resources", 
-        JSONCONS_RDWR, jsoncons::always_true(), 
-        ns::toEmployeesFromIds, ns::fromEmployeesToIds)
+     JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds, ns::fromEmployeesToIds)
 )
 
 int main()

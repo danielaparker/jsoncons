@@ -226,8 +226,8 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee,
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company,
     (getName, setName, "company"),
     (getIds, setIds, "resources", 
-        JSONCONS_RDWR, jsoncons::always_true(), 
-        ns::toEmployeesFromIds, ns::fromEmployeesToIds)
+     JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds, ns::fromEmployeesToIds)
 )
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person, 
