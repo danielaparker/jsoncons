@@ -835,6 +835,8 @@ Output:
 }
 ```
 
+See [staj_array_iterator.md](ref/staj_array_iterator.md) 
+
 <div id="I5"/> 
 
 #### Iterate over strongly typed items
@@ -875,7 +877,7 @@ Haruki Murakami, Hard-Boiled Wonderland and the End of the World
 Graham Greene, The Comedians
 ```
 
-See [basic_json_cursor](ref/basic_json_cursor.md) 
+See [staj_array_iterator.md](ref/staj_array_iterator.md) 
 
 <div id="G0"/>
 
