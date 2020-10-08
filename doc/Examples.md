@@ -2341,7 +2341,7 @@ class `ns::Circle area: 3.1415927
 
 This example maps a `type()` getter to a "type" data member in the JSON.
 However, we can also achieve this without using a `type()` getter at all. 
-Compare with the very similar example [decode to a std::variant based on a type marker](#G15)
+Compare this with the very similar example [decode to a std::variant based on a type marker](#G15)
 
 <div id="G11"/>
 
