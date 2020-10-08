@@ -22,36 +22,36 @@ Square brackets indicate optionality.
 #include <jsoncons/json_type_traits.hpp>
 
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
-                         member_name0,member_name1,...) (1)
+                         member0,member1,...) (1)
 
 JSONCONS_ALL_MEMBER_TRAITS(class_name,
-                           member_name0,member_name1,...) (2)
+                           member0,member1,...) (2)
 
 JSONCONS_TPL_N_MEMBER_TRAITS(num_template_params,
                              class_name,num_mandatory,
-                             member_name0,member_name1,...) (3)  
+                             member0,member1,...) (3)  
 
 JSONCONS_TPL_ALL_MEMBER_TRAITS(num_template_params,
                                class_name,
-                               member_name0,member_name1,...) (4)
+                               member0,member1,...) (4)
 
 JSONCONS_N_MEMBER_NAME_TRAITS(class_name,num_mandatory,
-                              (member_name0,serialized_name0[,mode,match,from,into]),
-                              (member_name1,serialized_name1[,mode,match,from,into])...) (5)
+                              (member0,serialized_name0[,mode0,match0,into0,from0]),
+                              (member1,serialized_name1[,mode1,match1,into1,from1])...) (5)
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(class_name,
-                                (member_name0,serialized_name0[,mode,match,from,into]),
-                                (member_name1,serialized_name1[,mode,match,from,into])...) (6)
+                                (member0,serialized_name0[,mode0,match0,into0,from0]),
+                                (member1,serialized_name1[,mode1,match1,into1,from1])...) (6)
 
 JSONCONS_TPL_N_MEMBER_NAME_TRAITS(num_template_params,
                                   class_name,num_mandatory,
-                                  (member_name0,serialized_name0[,mode,match,from,into]),
-                                  (member_name1,serialized_name1[,mode,match,from,into])...) (7)
+                                  (member0,serialized_name0[,mode0,match0,into0,from0]),
+                                  (member1,serialized_name1[,mode1,match1,into1,from1])...) (7)
 
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(num_template_params,
                                     class_name,
-                                    (member_name0,serialized_name0[,mode,match,from,into]),
-                                    (member_name1,serialized_name1[,mode,match,from,into])...) (8)
+                                    (member0,serialized_name0[,mode0,match0,into0,from0]),
+                                    (member1,serialized_name1[,mode1,match1,into1,from1])...) (8)
 
 JSONCONS_ENUM_TRAITS(enum_name,enumerator0,enumerator1,...) (9)
 
@@ -60,69 +60,69 @@ JSONCONS_ENUM_NAME_TRAITS(enum_name,
                           (enumerator1,serialized_name1)...) (10)
 
 JSONCONS_N_CTOR_GETTER_TRAITS(class_name,num_mandatory,
-                              getter_name0,
-                              getter_name1,...) (11)
+                              getter0,
+                              getter1,...) (11)
 
 JSONCONS_ALL_CTOR_GETTER_TRAITS(class_name,
-                                getter_name0,getter_name1,...) (12)
+                                getter0,getter1,...) (12)
 
 JSONCONS_TPL_N_CTOR_GETTER_TRAITS(num_template_params,
                                   class_name,num_mandatory,
-                                  getter_name0,getter_name1,...) (13)
+                                  getter0,getter1,...) (13)
 
 JSONCONS_TPL_ALL_CTOR_GETTER_TRAITS(num_template_params,
                                     class_name,
-                                    getter_name0,getter_name1,...) (14)
+                                    getter0,getter1,...) (14)
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(class_name,num_mandatory,
-                                   (getter_name0,serialized_name0[,mode,match,from,into]),
-                                   (getter_name1,serialized_name1[,mode,match,from,into])...) (15)
+                                   (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                   (getter1,serialized_name1[,mode1,match1,into1,from1])...) (15)
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(class_name,
-                                     (getter_name0,serialized_name0[,mode,match,from,into]),
-                                     (getter_name1,serialized_name1[,mode,match,from,into])...) (16)
+                                     (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                     (getter1,serialized_name1[,mode1,match1,into1,from1])...) (16)
 
 JSONCONS_TPL_N_CTOR_GETTER_NAME_TRAITS(num_template_params,
                                        class_name,num_mandatory,
-                                       (getter_name0,serialized_name0[,mode,match,from,into]),
-                                       (getter_name1,serialized_name1[,mode,match,from,into])...) (17)
+                                       (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                       (getter1,serialized_name1[,mode1,match1,into1,from1])...) (17)
 
 JSONCONS_TPL_ALL_CTOR_GETTER_NAME_TRAITS(num_template_params,
                                          class_name,
-                                         (getter_name0,serialized_name0[,mode,match,from,into]),
-                                         (getter_name1,serialized_name1[,mode,match,from,into])...) (18)
+                                         (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                         (getter1,serialized_name1[,mode1,match1,into1,from1])...) (18)
 
 JSONCONS_N_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,num_mandatory,
-                                field_name0,field_name1,...) (19)
+                                property0,property1,...) (19)
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,
-                                  field_name0,field_name1,...) (20)
+                                  property0,property1,...) (20)
 
 JSONCONS_TPL_N_GETTER_SETTER_TRAITS(num_template_params,
                                     class_name,get_prefix,set_prefix,num_mandatory,
-                                    field_name0,field_name1,...) (21)  
+                                    property0,property1,...) (21)  
 
 JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(num_template_params,
                                       class_name,get_prefix,set_prefix,
-                                      field_name0,field_name1,...) (22)
+                                      property0,property1,...) (22)
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(class_name,num_mandatory,
-                                     (getter_name0,setter_name0,serialized_name0[,mode,match,from,into]),
-                                     (getter_name1,setter_name1,serialized_name1[,mode,match,from,into])...) (23)
+                                     (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                     (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (23)
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(class_name,
-                                       (getter_name0,setter_name0,serialized_name0[,mode,match,from,into]),
-                                       (getter_name1,setter_name1,serialized_name1[,mode,match,from,into])...) (24)
+                                       (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                       (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (24)
 
 JSONCONS_TPL_N_GETTER_SETTER_NAME_TRAITS(num_template_params,
                                          class_name,num_mandatory,
-                                         (getter_name0,setter_name0,serialized_name0[,mode,match,from,into]),
-                                         (getter_name1,setter_name1,serialized_name1[,mode,match,from,into])...) (25)
+                                         (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                         (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (25)
 
 JSONCONS_TPL_ALL_GETTER_SETTER_NAME_TRAITS(num_template_params,
                                            class_name,
-                                           (getter_name0,setter_name0,serialized_name0[,mode,match,from,into]),
-                                           (getter_name1,setter_name1,serialized_name1[,mode,match,from,into])...) (26)
+                                           (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                           (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (26)
 
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) (27)
 ```
@@ -147,7 +147,7 @@ class MyClass
 (3)-(4) generate the code to specialize `json_type_traits` for a class template from member data. 
 
 (5)-(8) generate the code to specialize `json_type_traits` for a class from member data.
-The serialized names are the provided names. The sequence of `(member_nameN,serialized_nameN)`
+The serialized names are the provided names. The sequence of `(memberN,serialized_nameN)`
 pairs declares the member name and provided name for each of the class members
 that are part of the sequence.
 When decoding to a C++ data structure, 
@@ -176,7 +176,7 @@ of the get functions are convertible to its parameters, taken in order.
 (13)-(14) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
 
 (15)-(18) generate the code to specialize `json_type_traits` for a class from a constructor and get functions.
-The serialized names are the provided names. The sequence of `(getter_nameN,serialized_nameN)`
+The serialized names are the provided names. The sequence of `(getterN,serialized_nameN)`
 pairs declares the get function and provided name for each of the class members
 that are part of the sequence. 
 When decoding to a C++ data structure, 
@@ -195,7 +195,7 @@ require that all member names be present in the JSON. (21)-(22) generate the cod
 for a class template from get and set functions.
 
 (23)-(26) generate the code to specialize `json_type_traits` for a class from get and set functions.
-The serialized names are the provided names. The sequence of `(getter_nameN,setter_nameN,serialized_nameN)`
+The serialized names are the provided names. The sequence of `(getterN,setterN,serialized_nameN)`
 triples declares the get and set functions and provided name for each of the class members
 that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
@@ -216,24 +216,24 @@ in the derived classes.
 `num_mandatory` - the number of mandatory class data members or accessors  
 `enum_name` - the name of an enum type or enum class type  
 `num_template_params` - for a class template, the number of template parameters  
-`member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
-`field_nameN` - the base name of a class getter or setter with prefix `get` or `set` stripped out. 
+`memberN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
+`propertyN` - the base name of a class getter or setter with prefix `get` or `set` stripped out. 
 Data members that are `const` or `static const` are one-way serialized.  
-`getter_nameN` - the getter for a class data member  
-`setter_nameN` - the setter for a class data member  
+`getterN` - the getter for a class data member  
+`setterN` - the setter for a class data member  
 `enumeratorN` - an enumerator  
 `serialized_nameN` - serialized name  
-`mode` - indicates whether a data member is read-write (`JSONCONS_RDWR`) or read-only (`JSONCONS_RDONLY`).
+`modeN` - indicates whether a data member is read-write (`JSONCONS_RDWR`) or read-only (`JSONCONS_RDONLY`).
 Read-only data members are serialized but not de-serialized (since 0.157.0)  
-`match` - a function object that takes a value of type `const T&` and returns `true` if the value matches an allowed value,
+`matchN` - a function object that takes a value of type `const T&` and returns `true` if the value matches an allowed value,
 `false` otherwise. If the function object `to` is also provided, type `T` must be the same as the  return type of `T`,
 otherwise it must be the same as the member type (since 0.157.0)  
-`from` - a function object that takes a value of type `T` that must have a `json_type_traits` specialization, and returns a value
-that must be the same as the member type. If the function object `to` is also provided, type `T` must be the same as the  return type of `T`,
-otherwise it must be the same as the member type (since 0.157.0)  
-`to` - a function object that takes a value of type member type, and returns a value of type `T`
-that must have `json_type_traits` specialization. The type of `to`'s return value must match 
-the type of `from`'s parameter value (since 0.157.0)  
+`intoN` - a function object that takes a value of type of `memberN` (or return type of `getterN`)
+and returns a value of type `T` that satisfies `json_type_traits` specialization. If type `T`
+differs from type of `memberN` (or return type of `getterN`), `fromN` must also be provided.
+(since 0.157.0)  
+`fromN` - a function object that takes a value of type `T` that satisfies `json_type_traits` specialization, and returns a value
+ of type of `memberN` (or return type of `getterN`). (since 0.157.0)  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
