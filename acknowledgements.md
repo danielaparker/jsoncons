@@ -13,8 +13,8 @@ Android fix)
 
 - [Vitaliy Gusev](https://github.com/gusev-vitaliy) (reported error in json object operator[size_t i])
 
-- [Alex Merry](https://github.com/amerry) for reporting errors with "typename" keyword experienced with gcc and providing 
-workaround for gcc 4.8 regex issues.
+- [Alex Merry](https://github.com/amerry) Reported errors with "typename" keyword experienced with gcc and provided 
+workaround for gcc 4.8 regex issues. Fixed float128 feature macro names #273.
 
 - [Ignatov Serguei](https://github.com/sergign60) (reported issues experienced with gcc for 0.95 and 
 0.96 candidate and helped fix them)
@@ -92,3 +92,5 @@ to fix BSON encoding error
 - [Oleh Derevenko](https://github.com/oleh-derevenko) for [\#244](https://github.com/danielaparker/jsoncons/issues/244) 
 and [\#245](https://github.com/danielaparker/jsoncons/pull/248) 
 to make jsoncons work on QNX Neutrino target. 
+
+- [Laurent Stacul](https://github.com/stac47) Fixed compilation error with gcc 11 #276
