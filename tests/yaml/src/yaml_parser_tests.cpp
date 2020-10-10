@@ -4,6 +4,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons_ext/yaml/yaml_parser.hpp>
+#include <jsoncons_ext/yaml/yaml_parser_impl.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>
