@@ -46,7 +46,7 @@ Returns a value of type `T`.
 
 #### Exceptions
 
-Throws a [ser_error](ser_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails, and a [convert_error](convert_error.md) if type conversion fails.
 
 ### Examples
 

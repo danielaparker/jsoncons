@@ -22,7 +22,7 @@
 namespace jsoncons { namespace cbor {
 
 template <class Src,class Allocator=std::allocator<char>>
-class basic_cbor_reader : public ser_context
+class basic_cbor_reader 
 {
     using char_type = char;
 
@@ -91,12 +91,12 @@ public:
         }
     }
 
-    std::size_t line() const override
+    std::size_t line() const
     {
         return parser_.line();
     }
 
-    std::size_t column() const override
+    std::size_t column() const
     {
         return parser_.column();
     }

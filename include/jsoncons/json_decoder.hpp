@@ -90,7 +90,6 @@ public:
           item_stack_(temp_allocator_),
           structure_stack_(temp_allocator_),
           is_valid_(false) 
-
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);
@@ -105,8 +104,7 @@ public:
           name_(result_allocator_),
           item_stack_(),
           structure_stack_(),
-          is_valid_(false) 
-
+          is_valid_(false)
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);
@@ -122,8 +120,7 @@ public:
           name_(result_allocator_),
           item_stack_(temp_allocator_),
           structure_stack_(temp_allocator_),
-          is_valid_(false) 
-
+          is_valid_(false)
     {
         item_stack_.reserve(1000);
         structure_stack_.reserve(100);
@@ -145,6 +142,7 @@ public:
 
     Json get_result()
     {
+        JSONCONS_ASSERT(is_valid_);
         is_valid_ = false;
         return std::move(result_);
     }

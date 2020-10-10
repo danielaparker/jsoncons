@@ -511,7 +511,6 @@ private:
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
                             s.push_back(c);
-                            state = decimal_parse_state::integer;
                             break;
                         case 'e': case 'E':
                             state = decimal_parse_state::exp1;
@@ -691,7 +690,6 @@ private:
                     {
                         case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':case 'a':case 'b':case 'c':case 'd':case 'e':case 'f':case 'A':case 'B':case 'C':case 'D':case 'E':case 'F':
                             s.push_back(c);
-                            state = hexfloat_parse_state::integer;
                             break;
                         case 'p': case 'P':
                             state = hexfloat_parse_state::exp1;
@@ -1230,7 +1228,7 @@ private:
         return true;
     }
 
-    bool visit_typed_array(const span<const uint8_t>& v, 
+    bool visit_typed_array(const jsoncons::span<const uint8_t>& v, 
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1264,7 +1262,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const uint16_t>& data,  
+    bool visit_typed_array(const jsoncons::span<const uint16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1294,7 +1292,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const uint32_t>& data,  
+    bool visit_typed_array(const jsoncons::span<const uint32_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1324,7 +1322,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const uint64_t>& data,  
+    bool visit_typed_array(const jsoncons::span<const uint64_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1354,7 +1352,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const int8_t>& data,  
+    bool visit_typed_array(const jsoncons::span<const int8_t>& data,  
                         semantic_tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1382,7 +1380,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const int16_t>& data,  
+    bool visit_typed_array(const jsoncons::span<const int16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1412,7 +1410,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const int32_t>& data,  
+    bool visit_typed_array(const jsoncons::span<const int32_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1442,7 +1440,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const int64_t>& data,  
+    bool visit_typed_array(const jsoncons::span<const int64_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1472,7 +1470,7 @@ private:
         }
     }
 
-    bool visit_typed_array(half_arg_t, const span<const uint16_t>& data,  
+    bool visit_typed_array(half_arg_t, const jsoncons::span<const uint16_t>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1502,7 +1500,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const float>& data,  
+    bool visit_typed_array(const jsoncons::span<const float>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1532,7 +1530,7 @@ private:
         }
     }
 
-    bool visit_typed_array(const span<const double>& data,  
+    bool visit_typed_array(const jsoncons::span<const double>& data,  
                         semantic_tag tag,
                         const ser_context& context, 
                         std::error_code& ec) override
@@ -1562,7 +1560,7 @@ private:
         }
     }
 /*
-    bool visit_typed_array(const span<const float128_type>&, 
+    bool visit_typed_array(const jsoncons::span<const float128_type>&, 
                         semantic_tag,
                         const ser_context&, 
                         std::error_code&) override
@@ -1570,7 +1568,7 @@ private:
         return true;
     }
 */
-    bool visit_begin_multi_dim(const span<const size_t>& shape,
+    bool visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
                             semantic_tag tag,
                             const ser_context& context, 
                             std::error_code& ec) override
@@ -1585,7 +1583,8 @@ private:
                 break;
         }
         bool more = visit_begin_array(2, semantic_tag::none, context, ec);
-        more = visit_begin_array(shape.size(), semantic_tag::none, context, ec);
+        if (more)
+            more = visit_begin_array(shape.size(), semantic_tag::none, context, ec);
         for (auto it = shape.begin(); more && it != shape.end(); ++it)
         {
             more = visit_uint64(*it, semantic_tag::none, context, ec);

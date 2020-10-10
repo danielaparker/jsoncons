@@ -12,11 +12,12 @@
 #include <cstdint>
 #include <regex>
 #include <jsoncons/json.hpp>
+#include <functional>
 
 namespace {
 namespace ns {
  
-    class Person_NCGN 
+    class Person_NCGN   
     {
           std::string name_;
           jsoncons::optional<std::string> socialSecurityNumber_;
@@ -198,7 +199,7 @@ namespace ns {
             employeeIds_ = employeeIds;
         }
 
-        jsoncons::optional<double> getRating() const
+        const jsoncons::optional<double>& getRating() const
         {
             return rating_;
         }
@@ -309,7 +310,7 @@ namespace ns {
         jsoncons::optional<double> rating_;
     public:
         Company_NCGN(const std::string& name, const std::vector<uint64_t>& employeeIds,
-                     jsoncons::optional<double> rating = jsoncons::optional<double>())
+                     const jsoncons::optional<double>& rating = jsoncons::optional<double>())
             : name_(name), employeeIds_(employeeIds), rating_(rating)
         {
         }
@@ -323,7 +324,7 @@ namespace ns {
             return employeeIds_;
         }
 
-        jsoncons::optional<double> getRating() const
+        const jsoncons::optional<double>& getRating() const
         {
             return rating_;
         }
@@ -377,19 +378,6 @@ namespace ns {
     };
 
     template <class Employee>
-    std::vector<Employee> fromIdsToEmployees(const std::vector<uint64_t>& ids)
-    {
-        static std::map<uint64_t, Employee> id_employee_map = {{1, Employee("John", "Smith")},{2, Employee("Jane", "Doe")}};
-
-        std::vector<Employee> employees;
-        for (auto id : ids)
-        {
-            employees.push_back(id_employee_map.at(id));
-        }
-        return employees;
-    }
-
-    template <class Employee>
     std::vector<uint64_t> fromEmployeesToIds(const std::vector<Employee>& employees)
     {
         static std::map<Employee, uint64_t> employee_id_map = {{Employee("John", "Smith"), 1},{Employee("Jane", "Doe"), 2}};
@@ -402,8 +390,604 @@ namespace ns {
         return ids;
     }
 
+    template <class Employee>
+    std::vector<Employee> toEmployeesFromIds(const std::vector<uint64_t>& ids)
+    {
+        static std::map<uint64_t, Employee> id_employee_map = {{1, Employee("John", "Smith")},{2, Employee("Jane", "Doe")}};
+
+        std::vector<Employee> employees;
+        for (auto id : ids)
+        {
+            employees.push_back(id_employee_map.at(id));
+        }
+        return employees;
+    }
+
+    class Shape_ACGN
+    {
+    public:
+        virtual ~Shape_ACGN() = default;
+        virtual double area() const = 0;
+    };
+      
+    class Rectangle_ACGN : public Shape_ACGN
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle_ACGN(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle_ACGN : public Shape_ACGN
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle_ACGN(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
+        }
+    };                 
+
+    class Circle_ACGN : public Shape_ACGN
+    { 
+        double radius_;
+
+    public:
+        Circle_ACGN(double radius)
+            : radius_(radius)
+        {
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+    };                 
+
+    class Shape_AGSN
+    {
+    public:
+        virtual ~Shape_AGSN() = default;
+        virtual double area() const = 0;
+    };
+
+    class Rectangle_AGSN : public Shape_AGSN
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle_AGSN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double getHeight() const
+        {
+            return height_;
+        }
+
+        void setHeight(double value)
+        {
+            height_ = value;
+        }
+
+        double getWidth() const
+        {
+            return width_;
+        }
+
+        void setWidth(double value)
+        {
+            width_ = value;
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle_AGSN : public Shape_AGSN
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle_AGSN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double getHeight() const
+        {
+            return height_;
+        }
+
+        void setHeight(double value)
+        {
+            height_ = value;
+        }
+
+        double getWidth() const
+        {
+            return width_;
+        }
+
+        void setWidth(double value)
+        {
+            width_ = value;
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+
+        const std::string& getType() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
+        }
+    };                 
+
+    class Circle_AGSN : public Shape_AGSN
+    { 
+        double radius_;
+
+    public:
+        Circle_AGSN()
+            : radius_(0)
+        {
+        }
+
+        double getRadius() const
+        {
+            return radius_;
+        }
+
+        void setRadius(double value)
+        {
+            radius_ = value;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+
+        const std::string& getType() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+    };                 
+
+    class Shape_NGSN
+    {
+    public:
+        virtual ~Shape_NGSN() = default;
+        virtual double area() const = 0;
+    };
+
+    class Rectangle_NGSN : public Shape_NGSN
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle_NGSN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double getHeight() const
+        {
+            return height_;
+        }
+
+        void setHeight(double value)
+        {
+            height_ = value;
+        }
+
+        double getWidth() const
+        {
+            return width_;
+        }
+
+        void setWidth(double value)
+        {
+            width_ = value;
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle_NGSN : public Shape_NGSN
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle_NGSN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double getHeight() const
+        {
+            return height_;
+        }
+
+        void setHeight(double value)
+        {
+            height_ = value;
+        }
+
+        double getWidth() const
+        {
+            return width_;
+        }
+
+        void setWidth(double value)
+        {
+            width_ = value;
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+
+        const std::string& getType() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
+        }
+    };                 
+
+    class Circle_NGSN : public Shape_NGSN
+    { 
+        double radius_;
+
+    public:
+        Circle_NGSN()
+            : radius_(0)
+        {
+        }
+
+        double getRadius() const
+        {
+            return radius_;
+        }
+
+        void setRadius(double value)
+        {
+            radius_ = value;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+
+        const std::string& getType() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+    };                 
+
+    class Shape_AMN
+    {
+    public:
+        virtual ~Shape_AMN() = default;
+        virtual double area() const = 0;
+    };
+
+    class Rectangle_AMN : public Shape_AMN
+    {
+        JSONCONS_TYPE_TRAITS_FRIEND
+        double height_;
+        double width_;
+    public:
+        Rectangle_AMN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle_AMN : public Shape_AMN
+    { 
+        JSONCONS_TYPE_TRAITS_FRIEND
+        static const std::string type_;
+        double height_;
+        double width_;
+
+    public:
+        Triangle_AMN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+
+    const std::string Triangle_AMN::type_ = "triangle";
+
+    class Circle_AMN : public Shape_AMN
+    { 
+        JSONCONS_TYPE_TRAITS_FRIEND
+        static const std::string type_;
+        double radius_;
+
+    public:
+        Circle_AMN()
+            : radius_(0)
+        {
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+    };                 
+
+    const std::string Circle_AMN::type_ = "circle";
+
+    class Shape_NMN
+    {
+    public:
+        virtual ~Shape_NMN() = default;
+        virtual double area() const = 0;
+    };
+
+    class Rectangle_NMN : public Shape_NMN
+    {
+        JSONCONS_TYPE_TRAITS_FRIEND
+        double height_;
+        double width_;
+    public:
+        Rectangle_NMN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle_NMN : public Shape_NMN
+    { 
+        JSONCONS_TYPE_TRAITS_FRIEND
+        static const std::string type_;
+        double height_;
+        double width_;
+
+    public:
+        Triangle_NMN()
+            : height_(0), width_(0)
+        {
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+
+    const std::string Triangle_NMN::type_ = "triangle";
+
+    class Circle_NMN : public Shape_NMN
+    { 
+        JSONCONS_TYPE_TRAITS_FRIEND
+        static const std::string type_;
+        double radius_;
+
+    public:
+        Circle_NMN()
+            : radius_(0)
+        {
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+    };                 
+
+    const std::string Circle_NMN::type_ = "circle";
+
+    const auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    const auto triangle_marker = [](double) noexcept {return "triangle";};
+    const auto circle_marker = [](double) noexcept {return "circle";};
+          
 } // namespace
 } // ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle_ACGN,
+    (height,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
+    (height, "height", JSONCONS_RDWR),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle_ACGN,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle_ACGN,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (radius, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_ACGN,ns::Rectangle_ACGN,ns::Triangle_ACGN,ns::Circle_ACGN)
+
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_AGSN,
+    (getHeight, ,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
+    (getHeight, setHeight, "height"),
+    (getWidth, setWidth, "width")
+)
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Triangle_AGSN,
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (getHeight, setHeight, "height"),
+    (getWidth, setWidth, "width")
+)
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Circle_AGSN,
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (getRadius, setRadius, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AGSN,ns::Rectangle_AGSN,ns::Triangle_AGSN,ns::Circle_AGSN)
+
+JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Rectangle_NGSN, 3,
+    (getHeight, ,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
+    (getHeight, setHeight, "height"),
+    (getWidth, setWidth, "width")
+)
+
+JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Triangle_NGSN, 3,
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (getHeight, setHeight, "height"),
+    (getWidth, setWidth, "width")
+)
+
+JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Circle_NGSN, 2,
+    (getType,,"type", JSONCONS_RDONLY, [](const std::string& type) {return type == "circle";}),
+    (getRadius, setRadius, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_NGSN,ns::Rectangle_NGSN,ns::Triangle_NGSN,ns::Circle_NGSN)
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Rectangle_AMN,
+    (height_,"type",JSONCONS_RDONLY,
+        [](const std::string& type) noexcept {return type == "rectangle"; }, 
+        ns::rectangle_marker),
+    (height_, "height"),
+    (width_, "width")
+)
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Triangle_AMN,
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (height_, "height"),
+    (width_, "width")
+)
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Circle_AMN,
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (radius_, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_AMN,ns::Rectangle_AMN,ns::Triangle_AMN,ns::Circle_AMN)
+
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Rectangle_NMN, 3,
+    (height_,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
+    (height_, "height"),
+    (width_, "width")
+) 
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Triangle_NMN, 3,
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (height_, "height"),
+    (width_, "width")
+)
+
+JSONCONS_N_MEMBER_NAME_TRAITS(ns::Circle_NMN, 2,
+    (type_,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (radius_, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape_NMN,ns::Rectangle_NMN,ns::Triangle_NMN,ns::Circle_NMN)
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
     (name_, "employee_name"),
@@ -412,7 +996,8 @@ JSONCONS_N_MEMBER_NAME_TRAITS(ns::Employee_NMN, 2,
 
 JSONCONS_N_MEMBER_NAME_TRAITS(ns::Company_NMN, 2,
     (name_, "company"),
-    (employeeIds_, "resources", ns::fromEmployeesToIds<ns::Employee_NMN>, ns::fromIdsToEmployees<ns::Employee_NMN>),
+    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds<ns::Employee_NMN>, ns::fromEmployeesToIds<ns::Employee_NMN>),
     (rating_, "rating")
 )
 
@@ -423,7 +1008,8 @@ JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Employee_AMN,
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Company_AMN,
     (name_, "company"),
-    (employeeIds_, "resources", ns::fromEmployeesToIds<ns::Employee_AMN>, ns::fromIdsToEmployees<ns::Employee_AMN>)
+    (employeeIds_, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds<ns::Employee_AMN>, ns::fromEmployeesToIds<ns::Employee_AMN>)
 )
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
@@ -433,7 +1019,8 @@ JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Employee_NGSN, 2,
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(ns::Company_NGSN, 2,
   (getName, setName, "company"),
-  (getIds, setIds, "resources", ns::fromEmployeesToIds<ns::Employee_NGSN>, ns::fromIdsToEmployees<ns::Employee_NGSN>),
+  (getIds, setIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+   ns::toEmployeesFromIds<ns::Employee_NGSN>, ns::fromEmployeesToIds<ns::Employee_NGSN>),
   (getRating, setRating, "rating")
 )
 
@@ -444,7 +1031,8 @@ JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee_AGSN,
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company_AGSN,
     (getName, setName, "company"),
-    (getIds, setIds, "resources", ns::fromEmployeesToIds<ns::Employee_AGSN>, ns::fromIdsToEmployees<ns::Employee_AGSN>)
+    (getIds, setIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds<ns::Employee_AGSN>, ns::fromEmployeesToIds<ns::Employee_AGSN>)
 )
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
@@ -454,7 +1042,8 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Employee_NCGN, 2,
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Company_NCGN, 2,
   (getName, "company"),
-  (getIds, "resources", ns::fromEmployeesToIds<ns::Employee_NCGN>, ns::fromIdsToEmployees<ns::Employee_NCGN>),
+  (getIds, "resources", JSONCONS_RDWR, jsoncons::always_true(), 
+   ns::toEmployeesFromIds<ns::Employee_NCGN>, ns::fromEmployeesToIds<ns::Employee_NCGN>),
   (getRating, "rating")
 )
 
@@ -465,19 +1054,22 @@ JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Employee_ACGN,
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Company_ACGN,
     (getName, "company"),
-    (getIds, "resources", ns::fromEmployeesToIds<ns::Employee_ACGN>, ns::fromIdsToEmployees<ns::Employee_ACGN>)
+    (getIds, "resources", JSONCONS_RDWR, jsoncons::always_true{}, 
+     ns::toEmployeesFromIds<ns::Employee_ACGN>, ns::fromEmployeesToIds<ns::Employee_ACGN>)
 )
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
-  (getName, "name"),
-  (getSocialSecurityNumber, "social_security_number",
+    (getName, "name"),
+    (getSocialSecurityNumber, "social_security_number", 
+      JSONCONS_RDWR, jsoncons::always_true{},
+      jsoncons::identity(),
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
               return unvalidated;
           }
           std::regex myRegex(("^(\\d{9})$"));
-          if (!std::regex_match(unvalidated.value(), myRegex) ) {
+          if (!std::regex_match(*unvalidated, myRegex) ) {
               throw std::runtime_error("Invalid social security number");
           }
           return jsoncons::optional<std::string>(unvalidated);
@@ -488,14 +1080,24 @@ JSONCONS_N_CTOR_GETTER_NAME_TRAITS(ns::Person_NCGN, 2,
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person_ACGN, 
   (getName, "name"),
-  (getSocialSecurityNumber, "social_security_number",
+  (getSocialSecurityNumber, "social_security_number", 
+      JSONCONS_RDWR, 
+      [] (const jsoncons::optional<std::string>& unvalidated) {
+          if (!unvalidated)
+          {
+              return false;
+          }
+          std::regex myRegex("^(\\d{9})$");
+          return std::regex_match(*unvalidated, myRegex);
+      },
+      jsoncons::identity(),
       [] (const jsoncons::optional<std::string>& unvalidated) {
           if (!unvalidated)
           {
               return unvalidated;
           }
           std::regex myRegex(("^(\\d{9})$"));
-          if (!std::regex_match(unvalidated.value(), myRegex) ) {
+          if (!std::regex_match(*unvalidated, myRegex) ) {
               return jsoncons::optional<std::string>();
           }
           return unvalidated;
@@ -685,7 +1287,7 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
         CHECK(output2 == output1);
 
         auto j = decode_json<json>(output2);
-        CHECK(j.is<std::vector<ns::Person_ACGN>>());
+        CHECK(j.is<std::vector<ns::Person_ACGN>>());    
     }
     SECTION("failure")
     {
@@ -693,11 +1295,323 @@ TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS validation tests")
 
         std::string output1;
         encode_json_pretty(persons1, output1);
-        auto persons2 = decode_json<std::vector<ns::Person_ACGN>>(output1);
-        CHECK(persons2.at(0).getName() == persons1.at(0).getName());
-        CHECK(persons2.at(0).getSocialSecurityNumber() == persons1.at(0).getSocialSecurityNumber());
-        CHECK(persons2.at(1).getName() == persons1.at(1).getName());
-        CHECK_FALSE(persons2.at(1).getSocialSecurityNumber());
+        CHECK_THROWS(decode_json<std::vector<ns::Person_ACGN>>(output1));
     }
 } 
 #endif
+
+TEST_CASE("JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS polymorphic and variant tests")
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 3.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    SECTION("polymorphic test")
+    {
+        auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_ACGN>>>(input);
+        REQUIRE(shapes.size() == 3);
+        std::string output;
+
+        encode_json_pretty(shapes, output);
+
+        auto j = decode_json<json>(input);
+        REQUIRE((j.is_array() && j.size() == 3));
+        CHECK(j[0].is<ns::Rectangle_ACGN>());
+        CHECK_FALSE(j[0].is<ns::Triangle_ACGN>());
+        CHECK_FALSE(j[0].is<ns::Circle_ACGN>());
+        CHECK(j[1].is<ns::Triangle_ACGN>());
+        CHECK_FALSE(j[1].is<ns::Rectangle_ACGN>());
+        CHECK_FALSE(j[1].is<ns::Circle_ACGN>());
+        CHECK(j[2].is<ns::Circle_ACGN>());
+        CHECK_FALSE(j[2].is<ns::Rectangle_ACGN>());
+        CHECK_FALSE(j[2].is<ns::Triangle_ACGN>());
+
+        auto j2 = decode_json<json>(output);
+        CHECK(j2 == j);
+    }
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+    SECTION("variant test")
+    {
+        using shapes_t = std::variant<ns::Rectangle_ACGN,ns::Triangle_ACGN,ns::Circle_ACGN>;
+        auto shapes = decode_json<std::vector<shapes_t>>(input);
+        REQUIRE(shapes.size() == 3);
+
+        /*auto visitor = [](auto&& shape) {
+            using T = std::decay_t<decltype(shape)>;
+            if constexpr (std::is_same_v<T, ns::Rectangle_ACGN>)
+                std::cout << "rectangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Triangle_ACGN>)
+                std::cout << "triangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Circle_ACGN>)
+                std::cout << "circle area: " << shape.area() << '\n';
+        };
+        for (const auto& shape : shapes)
+        {
+            std::visit(visitor, shape);
+        }*/
+
+        std::string output;
+        encode_json_pretty(shapes, output);
+        //std::cout << output << "\n";
+
+    }
+#endif
+} 
+
+TEST_CASE("JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 3.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    SECTION("polymorphic test")
+    {
+        auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_AGSN>>>(input);
+        REQUIRE(shapes.size() == 3);
+        std::string output;
+
+        encode_json_pretty(shapes, output);
+
+        auto j = decode_json<json>(input);
+        REQUIRE((j.is_array() && j.size() == 3));
+        CHECK(j[0].is<ns::Rectangle_AGSN>());
+        CHECK_FALSE(j[0].is<ns::Triangle_AGSN>());
+        CHECK_FALSE(j[0].is<ns::Circle_AGSN>());
+        CHECK(j[1].is<ns::Triangle_AGSN>());
+        CHECK_FALSE(j[1].is<ns::Rectangle_AGSN>());
+        CHECK_FALSE(j[1].is<ns::Circle_AGSN>());
+        CHECK(j[2].is<ns::Circle_AGSN>());
+        CHECK_FALSE(j[2].is<ns::Rectangle_AGSN>());
+        CHECK_FALSE(j[2].is<ns::Triangle_AGSN>());
+
+        auto j2 = decode_json<json>(output);
+        CHECK(j2 == j);
+    }
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+    SECTION("variant test")
+    {
+        using shapes_t = std::variant<ns::Rectangle_AGSN,ns::Triangle_AGSN,ns::Circle_AGSN>;
+        auto shapes = decode_json<std::vector<shapes_t>>(input);
+        REQUIRE(shapes.size() == 3);
+
+        /*auto visitor = [](auto&& shape) {
+            using T = std::decay_t<decltype(shape)>;
+            if constexpr (std::is_same_v<T, ns::Rectangle_AGSN>)
+                std::cout << "rectangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Triangle_AGSN>)
+                std::cout << "triangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Circle_AGSN>)
+                std::cout << "circle area: " << shape.area() << '\n';
+        };
+        for (const auto& shape : shapes)
+        {
+            std::visit(visitor, shape);
+        }*/
+
+        std::string output;
+        encode_json_pretty(shapes, output);
+        //std::cout << output << "\n";
+
+    }
+#endif
+} 
+
+TEST_CASE("JSONCONS_N_GETTER_SETTER_NAME_TRAITS polymorphic and variant tests")
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 3.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    SECTION("polymorphic test")
+    {
+        auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_NGSN>>>(input);
+        REQUIRE(shapes.size() == 3);
+        std::string output;
+
+        encode_json_pretty(shapes, output);
+
+        auto j = decode_json<json>(input);
+        REQUIRE((j.is_array() && j.size() == 3));
+        CHECK(j[0].is<ns::Rectangle_NGSN>());
+        CHECK_FALSE(j[0].is<ns::Triangle_NGSN>());
+        CHECK_FALSE(j[0].is<ns::Circle_NGSN>());
+        CHECK(j[1].is<ns::Triangle_NGSN>());
+        CHECK_FALSE(j[1].is<ns::Rectangle_NGSN>());
+        CHECK_FALSE(j[1].is<ns::Circle_NGSN>());
+        CHECK(j[2].is<ns::Circle_NGSN>());
+        CHECK_FALSE(j[2].is<ns::Rectangle_NGSN>());
+        CHECK_FALSE(j[2].is<ns::Triangle_NGSN>());
+
+        auto j2 = decode_json<json>(output);
+        CHECK(j2 == j);
+    }
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+    SECTION("variant test")
+    {
+        using shapes_t = std::variant<ns::Rectangle_NGSN,ns::Triangle_NGSN,ns::Circle_NGSN>;
+        auto shapes = decode_json<std::vector<shapes_t>>(input);
+        REQUIRE(shapes.size() == 3);
+
+        /*auto visitor = [](auto&& shape) {
+            using T = std::decay_t<decltype(shape)>;
+            if constexpr (std::is_same_v<T, ns::Rectangle_NGSN>)
+                std::cout << "rectangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Triangle_NGSN>)
+                std::cout << "triangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Circle_NGSN>)
+                std::cout << "circle area: " << shape.area() << '\n';
+        };
+        for (const auto& shape : shapes)
+        {
+            std::visit(visitor, shape);
+        }*/
+
+        std::string output;
+        encode_json_pretty(shapes, output);
+        //std::cout << output << "\n";
+
+    }
+#endif
+} 
+
+TEST_CASE("JSONCONS_ALL_MEMBER_NAME_TRAITS polymorphic and variant tests")
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 3.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    SECTION("polymorphic test")
+    {
+        auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_AMN>>>(input);
+        REQUIRE(shapes.size() == 3);
+        std::string output;
+
+        encode_json_pretty(shapes, output);
+
+        auto j = decode_json<json>(input);
+        REQUIRE((j.is_array() && j.size() == 3));
+        CHECK(j[0].is<ns::Rectangle_AMN>());
+        CHECK_FALSE(j[0].is<ns::Triangle_AMN>());
+        CHECK_FALSE(j[0].is<ns::Circle_AMN>());
+        CHECK(j[1].is<ns::Triangle_AMN>());
+        CHECK_FALSE(j[1].is<ns::Rectangle_AMN>());
+        CHECK_FALSE(j[1].is<ns::Circle_AMN>());
+        CHECK(j[2].is<ns::Circle_AMN>());
+        CHECK_FALSE(j[2].is<ns::Rectangle_AMN>());
+        CHECK_FALSE(j[2].is<ns::Triangle_AMN>());
+
+        auto j2 = decode_json<json>(output);
+        CHECK(j2 == j);
+    }
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+    SECTION("variant test")
+    {
+        using shapes_t = std::variant<ns::Rectangle_AMN,ns::Triangle_AMN,ns::Circle_AMN>;
+        auto shapes = decode_json<std::vector<shapes_t>>(input);
+        REQUIRE(shapes.size() == 3);
+
+        /*auto visitor = [](auto&& shape) {
+            using T = std::decay_t<decltype(shape)>;
+            if constexpr (std::is_same_v<T, ns::Rectangle_AMN>)
+                std::cout << "rectangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Triangle_AMN>)
+                std::cout << "triangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Circle_AMN>)
+                std::cout << "circle area: " << shape.area() << '\n';
+        };
+        for (const auto& shape : shapes)
+        {
+            std::visit(visitor, shape);
+        }*/
+
+        std::string output;
+        encode_json_pretty(shapes, output);
+        //std::cout << output << "\n";
+
+    }
+#endif
+} 
+
+TEST_CASE("JSONCONS_N_MEMBER_NAME_TRAITS polymorphic and variant tests")
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 3.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    SECTION("polymorphic test")
+    {
+        auto shapes = decode_json<std::vector<std::unique_ptr<ns::Shape_NMN>>>(input);
+        REQUIRE(shapes.size() == 3);
+        std::string output;
+
+        encode_json_pretty(shapes, output);
+
+        auto j = decode_json<json>(input);
+        REQUIRE((j.is_array() && j.size() == 3));
+        CHECK(j[0].is<ns::Rectangle_NMN>());
+        CHECK_FALSE(j[0].is<ns::Triangle_NMN>());
+        CHECK_FALSE(j[0].is<ns::Circle_NMN>());
+        CHECK(j[1].is<ns::Triangle_NMN>());
+        CHECK_FALSE(j[1].is<ns::Rectangle_NMN>());
+        CHECK_FALSE(j[1].is<ns::Circle_NMN>());
+        CHECK(j[2].is<ns::Circle_NMN>());
+        CHECK_FALSE(j[2].is<ns::Rectangle_NMN>());
+        CHECK_FALSE(j[2].is<ns::Triangle_NMN>());
+
+        auto j2 = decode_json<json>(output);
+        CHECK(j2 == j);
+    }
+
+#if defined(JSONCONS_HAS_STD_VARIANT)
+    SECTION("variant test")
+    {
+        using shapes_t = std::variant<ns::Rectangle_NMN,ns::Triangle_NMN,ns::Circle_NMN>;
+        auto shapes = decode_json<std::vector<shapes_t>>(input);
+        REQUIRE(shapes.size() == 3);
+
+        /*auto visitor = [](auto&& shape) {
+            using T = std::decay_t<decltype(shape)>;
+            if constexpr (std::is_same_v<T, ns::Rectangle_NMN>)
+                std::cout << "rectangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Triangle_NMN>)
+                std::cout << "triangle area: " << shape.area() << '\n';
+            else if constexpr (std::is_same_v<T, ns::Circle_NMN>)
+                std::cout << "circle area: " << shape.area() << '\n';
+        };
+        for (const auto& shape : shapes)
+        {
+            std::visit(visitor, shape);
+        }*/
+
+        std::string output;
+        encode_json_pretty(shapes, output);
+        //std::cout << output << "\n";
+
+    }
+#endif
+} 
+

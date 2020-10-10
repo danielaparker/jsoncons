@@ -108,7 +108,8 @@ private:
         short_storage()
             : is_dynamic_(false), 
               is_negative_(false),
-              length_(0)
+              length_(0),
+              values_{0,0}
         {
         }
 
@@ -177,6 +178,8 @@ private:
             values_[0] = stor.values_[0];
             values_[1] = stor.values_[1];
         }
+
+        short_storage& operator=(const short_storage& stor) = delete;
     };
 
     struct dynamic_storage
@@ -210,7 +213,7 @@ private:
             std::memcpy(data_, stor.data_, stor.length_*sizeof(uint64_t));
         }
 
-        dynamic_storage(dynamic_storage&& stor)
+        dynamic_storage(dynamic_storage&& stor) noexcept
             : is_dynamic_(true), 
               is_negative_(stor.is_negative_),
               length_(stor.length_),
@@ -741,7 +744,7 @@ public:
         if ( k )  // 0 < k < basic_type_bits:
         {
             uint64_t k1 = basic_type_bits - k;
-            uint64_t mask = (1 << k) - 1;
+            uint64_t mask = (uint64_t(1) << k) - uint64_t(1);
             resize( length() + 1 );
             for (size_type i = length(); i-- > 0; )
             {
@@ -776,7 +779,7 @@ public:
 
         size_type n = (size_type)(length() - 1);
         int64_t k1 = basic_type_bits - k;
-        uint64_t mask = (1 << k) - 1;
+        uint64_t mask = (uint64_t(1) << k) - 1;
         for (size_type i = 0; i <= n; i++)
         {
             data()[i] >>= k;
@@ -1584,7 +1587,7 @@ private:
             common_stor_.is_negative_ = false;
         }
     }
-
+ 
     static uint64_t next_power_of_two(uint64_t n) {
         n = n - 1;
         n |= n >> 1;

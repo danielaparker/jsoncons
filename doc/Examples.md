@@ -40,8 +40,10 @@
 [An example using JSONCONS_ENUM_TRAITS and JSONCONS_ALL_CTOR_GETTER_TRAITS](#G8)  
 [Serialize a polymorphic type based on the presence of members](#G9)  
 [Ensuring type selection is possible](#G10)  
+[Decode to a polymorphic type based on a type marker (since 0.157.0)](#G14)  
 [An example with std::variant](#G11)  
 [Type selection and std::variant](#G12)  
+[Decode to a std::variant based on a type marker (since 0.158.0)](#G15)  
 [Convert JSON numbers to/from boost multiprecision numbers](#G13)
 
 ### Construct
@@ -833,6 +835,8 @@ Output:
 }
 ```
 
+See [staj_array_iterator](ref/staj_array_iterator.md) 
+
 <div id="I5"/> 
 
 #### Iterate over strongly typed items
@@ -873,7 +877,7 @@ Haruki Murakami, Hard-Boiled Wonderland and the End of the World
 Graham Greene, The Comedians
 ```
 
-See [basic_json_cursor](ref/basic_json_cursor.md) 
+See [staj_array_iterator](ref/staj_array_iterator.md) 
 
 <div id="G0"/>
 
@@ -1415,7 +1419,7 @@ JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 ```
 instead. This will cause an exception to be thrown with the message
 ```
-Key 'ssn' not found
+Key not found: 'ssn' 
 ```
 
 <div id="G1"/>
@@ -2158,6 +2162,189 @@ A bar
 A baz
 ```
 
+<div id="G14"/>
+
+#### Decode to a polymorphic type based on a type marker (since 0.157.0)
+
+```c++
+namespace ns {
+
+    class Shape
+    {
+    public:
+        virtual ~Shape() = default;
+        virtual double area() const = 0;
+    };
+      
+    class Rectangle : public Shape
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "rectangle"; 
+            return type_;
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle : public Shape
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+
+    class Circle : public Shape
+    { 
+        double radius_;
+
+    public:
+        Circle(double radius)
+            : radius_(radius)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+    };                 
+
+} // ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
+    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (radius, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape,ns::Rectangle,ns::Triangle,ns::Circle)
+
+int main()
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    auto shapes = jsoncons::decode_json<std::vector<std::unique_ptr<ns::Shape>>>(input);
+
+    std::cout << "(1)\n";
+    for (const auto& shape : shapes)
+    {
+        std::cout << typeid(*shape.get()).name() << " area: " << shape->area() << "\n";
+    }
+
+    std::string output;
+
+    jsoncons::encode_json_pretty(shapes, output);
+    std::cout << "\n(2)\n" << output << "\n";
+}
+```
+
+Output:
+```
+(1)
+class `ns::Rectangle area: 3.0000000
+class `ns::Triangle area: 4.0000000
+class `ns::Circle area: 3.1415927
+
+(2)
+[
+    {
+        "height": 1.5,
+        "type": "rectangle",
+        "width": 2.0
+    },
+    {
+        "height": 2.0,
+        "type": "triangle",
+        "width": 4.0
+    },
+    {
+        "radius": 1.0,
+        "type": "circle"
+    }
+]
+```
+
+This example maps a `type()` getter to a "type" data member in the JSON.
+However, we can also achieve this without using a `type()` getter at all. 
+Compare with the very similar example [decode to a std::variant based on a type marker](#G15)
+
 <div id="G11"/>
 
 #### An example with std::variant
@@ -2437,6 +2624,186 @@ ns::Color yellow
 ```
 
 So: types that are more constrained should appear to the left of types that are less constrained.
+
+<div id="G15"/>
+
+#### Decode to a std::variant based on a type marker (since 0.158.0)
+
+This example is very similar to [decode to a polymorphic type based on a type marker](#G14),
+and in fact the json traits defined for that example would do for `std::variant` as well.
+But here we add a wrinkle by omitting the `type()` function in the `Rectangle`, `Triangle` and
+`Circle` classes. More generally, we show how to augment the JSON output with name/value pairs 
+that are not present in the class definitions, and to perform type selection with them.
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    class Rectangle
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+
+    class Circle
+    { 
+        double radius_;
+
+    public:
+        Circle(double radius)
+            : radius_(radius)
+        {
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+    };                 
+
+    inline constexpr auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    inline constexpr auto triangle_marker = [](double) noexcept {return "triangle";};
+    inline constexpr auto circle_marker = [](double) noexcept {return "circle";};
+
+} // namespace ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
+    (height,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
+    (height,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "triangle";},
+     ns::triangle_marker),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
+    (radius,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "circle";},
+     ns::circle_marker),
+    (radius, "radius")
+)
+
+int main()
+{
+    using shapes_t = std::variant<ns::Rectangle,ns::Triangle,ns::Circle>;
+
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    auto shapes = jsoncons::decode_json<std::vector<shapes_t>>(input);
+
+    auto visitor = [](auto&& shape) {
+        using T = std::decay_t<decltype(shape)>;
+        if constexpr (std::is_same_v<T, ns::Rectangle>)
+            std::cout << "rectangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Triangle>)
+            std::cout << "triangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Circle>)
+            std::cout << "circle area: " << shape.area() << '\n';
+    };
+
+    std::cout << "(1)\n";
+    for (const auto& shape : shapes)
+    {
+        std::visit(visitor, shape);
+    }
+
+    std::string output;
+    jsoncons::encode_json_pretty(shapes, output);
+    std::cout << "\n(2)\n" << output << "\n";
+}
+```
+Output:
+```
+(1)
+rectangle area: 3.0000000
+triangle area: 4.0000000
+circle area: 3.1415927
+
+(2)
+[
+    {
+        "height": 1.5,
+        "type": "rectangle",
+        "width": 2.0
+    },
+    {
+        "height": 2.0,
+        "type": "triangle",
+        "width": 4.0
+    },
+    {
+        "radius": 1.0,
+        "type": "circle"
+    }
+]
+```
 
 <div id="G13"/>
 

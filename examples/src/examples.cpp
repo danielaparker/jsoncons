@@ -27,7 +27,7 @@ void json_filter_examples();
 void json_parser_examples();
 void json_reader_examples();
 void json_traits_macros_examples();
-void json_traits_macros_named_examples();
+void json_traits_name_macro_examples();
 void jsonpatch_examples();
 void jsonpath_examples();
 void jsonpointer_examples();
@@ -48,6 +48,7 @@ void update_json_in_place_examples();
 void json_traits_tuple_examples();
 void json_traits_bitset_examples();
 void json_traits_integer_examples();
+void json_traits_polymorphic_examples();
 
 void comment_example()
 {
@@ -61,9 +62,10 @@ void comment_example()
     )";
 
     // Default
-    json j = json::parse(s);
-    std::cout << "(1) " << j << std::endl;
-
+    {
+        json j = json::parse(s);
+        std::cout << "(1) " << j << std::endl;
+    }
     // Strict
     try
     {
@@ -418,8 +420,6 @@ int main()
 
         json_traits_macros_examples();
 
-        json_traits_macros_named_examples();
-
         run_cbor_typed_array_examples();
 
         data_model_examples();
@@ -435,8 +435,6 @@ int main()
         run_cbor_typed_array_examples();
 
         jmespath_examples();
-
-        json_traits_variant_examples();
 
         bson_examples();
 
@@ -457,6 +455,12 @@ int main()
         json_traits_bitset_examples();
 
         json_traits_integer_examples();
+
+        json_traits_name_macro_examples();
+
+        json_traits_polymorphic_examples();
+
+        json_traits_variant_examples();
     }
     catch (const std::exception& e)
     {

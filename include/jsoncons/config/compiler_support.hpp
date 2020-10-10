@@ -263,7 +263,7 @@
 #if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
 #if (__clang_major__ >= 4) && defined(__has_include)
 #if __has_include(<quadmath.h>)
-#  define BOOST_HAS_FLOAT128
+#  define JSONCONS_HAS_FLOAT128
 #endif
 #endif
 #endif
@@ -271,7 +271,7 @@
 
 #if defined(__GNUC__)
 #if defined(_GLIBCXX_USE_FLOAT128) 
-# define BOOST_HAS_FLOAT128
+# define JSONCONS_HAS_FLOAT128
 #endif
 #endif
 
@@ -279,7 +279,7 @@
 #if (defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)) && !defined(_CRAYC)
 #if (__clang_major__ >= 4) && defined(__has_include)
 #if __has_include(<quadmath.h>)
-#  define BOOST_HAS_FLOAT128
+#  define JSONCONS_HAS_FLOAT128
 #endif
 #endif
 #endif

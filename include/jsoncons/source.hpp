@@ -241,7 +241,7 @@ namespace jsoncons {
     {
     public:
         using value_type = CharT;
-        using string_view_type = basic_string_view<value_type>;
+        using string_view_type = jsoncons::basic_string_view<value_type>;
     private:
         const value_type* data_;
         const value_type* current_;

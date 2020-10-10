@@ -78,6 +78,33 @@ namespace jsoncons {
 
 namespace detail {
 
+template<class Json, class T>
+using
+traits_can_convert_t = decltype(json_type_traits<Json,T>::can_convert(Json()));
+
+template<class Json, class T>
+using
+has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
+
+    template <class T>
+    struct invoke_can_convert
+    {
+        template <class Json>
+        static 
+        typename std::enable_if<has_can_convert<Json,T>::value,bool>::type
+        can_convert(const Json& j) noexcept
+        {
+            return json_type_traits<Json,T>::can_convert(j);
+        }
+        template <class Json>
+        static 
+        typename std::enable_if<!has_can_convert<Json,T>::value,bool>::type
+        can_convert(const Json& j) noexcept
+        {
+            return json_type_traits<Json,T>::is(j);
+        }
+    };
+
     // is_json_type_traits_unspecialized
     template<class Json, class T, class Enable = void>
     struct is_json_type_traits_unspecialized : std::false_type {};
@@ -257,7 +284,7 @@ namespace detail {
         {
             if (!j.is_null())
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_jsoncons_null_type));
+                JSONCONS_THROW(convert_error(convert_errc::not_jsoncons_null_type));
             }
             return jsoncons::null_type();
         }
@@ -471,7 +498,7 @@ namespace detail {
             }
             else 
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(convert_error(convert_errc::not_vector));
             }
         }
 
@@ -499,7 +526,7 @@ namespace detail {
                 auto v = convert.from(j.as_byte_string_view(),j.tag(), ec);
                 if (ec)
                 {
-                    JSONCONS_THROW(ser_error(ec));
+                    JSONCONS_THROW(convert_error(ec));
                 }
                 return v;
             }
@@ -508,13 +535,13 @@ namespace detail {
                 auto v = convert.from(j.as_string_view(),j.tag(), ec);
                 if (ec)
                 {
-                    JSONCONS_THROW(ser_error(ec));
+                    JSONCONS_THROW(convert_error(ec));
                 }
                 return v;
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(convert_error(convert_errc::not_vector));
             }
         }
 
@@ -619,7 +646,7 @@ namespace detail {
             }
             else 
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(convert_error(convert_errc::not_vector));
             }
         }
 
@@ -699,7 +726,7 @@ namespace detail {
             }
             else 
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_vector));
+                JSONCONS_THROW(convert_error(convert_errc::not_vector));
             }
         }
 
@@ -763,7 +790,7 @@ namespace detail {
             std::array<E, N> buff;
             if (j.size() != N)
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_array));
+                JSONCONS_THROW(convert_error(convert_errc::not_array));
             }
             for (size_t i = 0; i < N; i++)
             {
@@ -827,7 +854,7 @@ namespace detail {
         {
             if (!j.is_object())
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_map));
+                JSONCONS_THROW(convert_error(convert_errc::not_map));
             }
             T result;
             for (const auto& item : j.object_range())
@@ -1207,7 +1234,7 @@ namespace detail {
                 case json_type::string_value:
                     if (!jsoncons::detail::is_base10(j.as_string_view().data(), j.as_string_view().length()))
                     {
-                        JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bigint"));
+                        JSONCONS_THROW(convert_error(convert_errc::not_bigint));
                     }
                     return basic_bigint<Allocator>::from_string(j.as_string_view().data(), j.as_string_view().length());
                 case json_type::half_value:
@@ -1218,7 +1245,7 @@ namespace detail {
                 case json_type::uint64_value:
                     return basic_bigint<Allocator>(j.template as<uint64_t>());
                 default:
-                    JSONCONS_THROW(json_runtime_error<std::domain_error>("Not a bigint"));
+                    JSONCONS_THROW(convert_error(convert_errc::not_bigint));
             }
         }
         
@@ -1267,7 +1294,7 @@ namespace detail {
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_array));
+                JSONCONS_THROW(convert_error(convert_errc::not_array));
             }
         }
         
@@ -1329,7 +1356,7 @@ namespace variant_detail
     typename std::enable_if<N == std::variant_size_v<Variant>, Variant>::type
     as_variant(const Json& /*j*/)
     {
-        JSONCONS_THROW(ser_error(convert_errc::not_variant));
+        JSONCONS_THROW(convert_error(convert_errc::not_variant));
     }
 
     template<std::size_t N, class Json, class Variant, class T, class ... U>
@@ -1661,7 +1688,7 @@ namespace variant_detail
         {
             if (!j.is_null())
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_nullptr));
+                JSONCONS_THROW(convert_error(convert_errc::not_nullptr));
             }
             return nullptr;
         }
@@ -1726,7 +1753,7 @@ namespace variant_detail
                     auto result = from_base16(sv.begin(), sv.end(), bits);
                     if (result.ec != from_base16_errc::success)
                     {
-                        JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                        JSONCONS_THROW(convert_error(convert_errc::not_bitset));
                     }
                 }
                 std::uint8_t byte = 0;
@@ -1739,7 +1766,7 @@ namespace variant_detail
                     {
                         if (pos >= bits.size())
                         {
-                            JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                            JSONCONS_THROW(convert_error(convert_errc::not_bitset));
                         }
                         byte = bits.at(pos++);
                         mask = 0x80;
@@ -1756,7 +1783,7 @@ namespace variant_detail
             }
             else
             {
-                JSONCONS_THROW(ser_error(convert_errc::not_bitset));
+                JSONCONS_THROW(convert_error(convert_errc::not_bitset));
             }
         }
 

@@ -46,6 +46,10 @@ or support [json_type_traits](../json_type_traits.md).
 Functions (1)-(3) perform encodings using the default json type `basic_json<CharT>`.
 Functions (4)-(5) are the same except `temp_alloc` is used to allocate temporary work areas.
 
+#### Exceptions
+
+Throws a [ser_error](ser_error.md) if parsing fails, and a [convert_error](convert_error.md) if type conversion fails.Throws a [ser_error](ser_error.md) if parsing fails, and a [convert_error](convert_error.md) if type conversion fails, and a [convert_error](convert_error.md) if type conversion fails.
+
 ### Examples
 
 #### Map with string-tuple pairs

@@ -32,10 +32,16 @@ Member type                         |Definition
 Returns the allocator associated with the json value.
 
     bool is_valid() const
-Checks if the `deserializer` contains a valid `basic_json` value. Initially `is_valid()` is false, becomes `true` when a json event event is received, and becomes false when `get_result()` is called.
+Checks if the decoder contains a valid `basic_json` value. 
+Initially `is_valid()` is false, becomes `true` when a `basic_json`
+value has been received, and becomes false when `get_result()` is called.
 
     Json get_result()
-Returns the json value `v` stored in the `deserializer` as `std::move(v)`. If before calling this function `is_valid()` is false, the behavior is undefined. After `get_result()` is called, 'is_valid()' becomes false.
+Returns the json value `v` stored in the decoder as `std::move(v)`.
+If before calling this function `is_valid()` is false, an `assertion_error` is thrown.
+After `get_result()` is called, 'is_valid()' becomes false.
+Once the result has been retrieved, `get_result` cannot be called again until
+another `basic_json` value has been received.
 
 ### Examples
 

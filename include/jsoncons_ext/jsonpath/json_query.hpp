@@ -26,8 +26,8 @@ namespace jsoncons { namespace jsonpath {
 
     struct slice
     {
-        optional<int64_t> start_;
-        optional<int64_t> stop_;
+        jsoncons::optional<int64_t> start_;
+        jsoncons::optional<int64_t> stop_;
         int64_t step_;
 
         slice()
@@ -35,7 +35,7 @@ namespace jsoncons { namespace jsonpath {
         {
         }
 
-        slice(const optional<int64_t>& start, const optional<int64_t>& end, int64_t step) 
+        slice(const jsoncons::optional<int64_t>& start, const jsoncons::optional<int64_t>& end, int64_t step) 
             : start_(start), stop_(end), step_(step)
         {
         }
@@ -248,6 +248,7 @@ namespace jsoncons { namespace jsonpath {
             {
                 path.swap(other.path);
                 val_ptr = other.val_ptr;
+                return *this;
             }
 
         };
@@ -540,7 +541,7 @@ namespace jsoncons { namespace jsonpath {
         {
             Json result = typename Json::array();
 
-            if (stack_.size() > 0)
+            if (!stack_.empty())
             {
                 result.reserve(stack_.back().size());
                 for (const auto& p : stack_.back())
@@ -555,7 +556,7 @@ namespace jsoncons { namespace jsonpath {
         {
             std::vector<pointer> result;
 
-            if (stack_.size() > 0)
+            if (!stack_.empty())
             {
                 result.reserve(stack_.back().size());
                 for (const auto& p : stack_.back())
@@ -589,7 +590,7 @@ namespace jsoncons { namespace jsonpath {
         Json get_normalized_paths() const
         {
             Json result = typename Json::array();
-            if (stack_.size() > 0)
+            if (!stack_.empty())
             {
                 result.reserve(stack_.back().size());
                 for (const auto& p : stack_.back())
@@ -603,7 +604,7 @@ namespace jsoncons { namespace jsonpath {
         template <class T>
         void replace(T&& new_value)
         {
-            if (stack_.size() > 0)
+            if (!stack_.empty())
             {
                 for (std::size_t i = 0; i < stack_.back().size(); ++i)
                 {
@@ -691,8 +692,6 @@ namespace jsoncons { namespace jsonpath {
                                 }
                                 break;
                             }
-
-                            return;
                         };
                         break;
                     }
@@ -710,7 +709,7 @@ namespace jsoncons { namespace jsonpath {
                             }
                             case '(':
                                 state_stack_.back().state = path_state::arg_or_right_paren;
-                                function_name = std::move(buffer);
+                                function_name = buffer;
                                 buffer.clear();
                                 ++p_;
                                 ++column_;
@@ -1110,7 +1109,6 @@ namespace jsoncons { namespace jsonpath {
                             case '[':
                                 selectors_.push_back(jsoncons::make_unique<name_selector>(buffer));
                                 apply_selectors(resources);
-                                buffer.clear();
                                 slic.start_ = 0;
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1685,11 +1683,25 @@ namespace jsoncons { namespace jsonpath {
                 return;
             }
 
-            JSONCONS_ASSERT(state_stack_.size() == 2);
-            state_stack_.pop_back(); 
-
-            JSONCONS_ASSERT(state_stack_.back().state == path_state::start);
-            state_stack_.pop_back();
+            switch (state_stack_.back().state)
+            {
+                case path_state::start:
+                {
+                    JSONCONS_ASSERT(!stack_.empty());
+                    stack_.clear();
+                    JSONCONS_ASSERT(state_stack_.size() == 1);
+                    state_stack_.pop_back();
+                    break;
+                }
+                default:
+                {
+                    JSONCONS_ASSERT(state_stack_.size() == 2);
+                    state_stack_.pop_back(); 
+                    JSONCONS_ASSERT(state_stack_.back().state == path_state::start);
+                    state_stack_.pop_back();
+                    break;
+                }
+            }
         }
 
         void end_all()

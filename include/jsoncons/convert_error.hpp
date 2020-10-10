@@ -12,9 +12,79 @@
 
 namespace jsoncons {
 
+    class convert_error : public std::system_error, public virtual json_exception
+    {
+        std::size_t line_number_;
+        std::size_t column_number_;
+        mutable std::string what_;
+    public:
+        convert_error(std::error_code ec)
+            : std::system_error(ec), line_number_(0), column_number_(0)
+        {
+        }
+        convert_error(std::error_code ec, const std::string& what_arg)
+            : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
+        {
+        }
+        convert_error(std::error_code ec, std::size_t position)
+            : std::system_error(ec), line_number_(0), column_number_(position)
+        {
+        }
+        convert_error(std::error_code ec, std::size_t line, std::size_t column)
+            : std::system_error(ec), line_number_(line), column_number_(column)
+        {
+        }
+        convert_error(const convert_error& other) = default;
+
+        convert_error(convert_error&& other) = default;
+
+        const char* what() const noexcept override
+        {
+            if (what_.empty())
+            {
+                JSONCONS_TRY
+                {
+                    what_.append(std::system_error::what());
+                    if (line_number_ != 0 && column_number_ != 0)
+                    {
+                        what_.append(" at line ");
+                        what_.append(std::to_string(line_number_));
+                        what_.append(" and column ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    else if (column_number_ != 0)
+                    {
+                        what_.append(" at position ");
+                        what_.append(std::to_string(column_number_));
+                    }
+                    return what_.c_str();
+                }
+                JSONCONS_CATCH(...)
+                {
+                    return std::system_error::what();
+                }
+            }
+            else
+            {
+                return what_.c_str();
+            }
+        }
+
+        std::size_t line() const noexcept
+        {
+            return line_number_;
+        }
+
+        std::size_t column() const noexcept
+        {
+            return column_number_;
+        }
+    };
+
     enum class convert_errc
     {
         success = 0,
+        conversion_failed,
         not_utf8,
         not_wide_char,
         not_vector,
@@ -28,6 +98,7 @@ namespace jsoncons {
         not_integer,
         not_signed_integer,
         not_unsigned_integer,
+        not_bigint,
         not_double,
         not_bool,
         not_variant,
@@ -59,6 +130,8 @@ namespace detail {
         {
             switch (static_cast<convert_errc>(ev))
             {
+                case convert_errc::conversion_failed:
+                    return "Unable to convert into the provided type";
                 case convert_errc::not_utf8:
                     return "Cannot convert string to UTF-8";
                 case convert_errc::not_wide_char:
@@ -85,6 +158,8 @@ namespace detail {
                     return "Cannot convert to signed integer";
                 case convert_errc::not_unsigned_integer:
                     return "Cannot convert to unsigned integer";
+                case convert_errc::not_bigint:
+                    return "Cannot convert to bigint";
                 case convert_errc::not_double:
                     return "Cannot convert to double";
                 case convert_errc::not_bool:

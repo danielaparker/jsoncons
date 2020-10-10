@@ -54,7 +54,7 @@ or support [json_type_traits](../json_type_traits.md).
 
 #### Exceptions
 
-Throws a [ser_error](../ser_error.md) if parsing fails.
+Throws a [ser_error](../ser_error.md) if parsing fails, and a [convert_error](convert_error.md) if type conversion fails.
 
 ### See also
 

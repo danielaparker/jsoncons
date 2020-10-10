@@ -1,9 +1,88 @@
-v0.156.0
+v0.158.0 
 --------
+
+Bugs fixed:
+
+- Fixed compilation error with gcc 11, [\#276](https://github.com/danielaparker/jsoncons/pull/276)
+(thanks to Laurent Stacul)
+
+Changes:
+
+- In 0.157.0, the `_NAME_` convenience macros were augmented to allow an optional `mode` parameter 
+(`JSONCONS_RDWR` or `JSONCONS_RDONLY`) and three optional function object parameters, `match` (value matches expected), 
+`from` (convert from type known to jsoncons) and `into` (convert into type known to jsoncons).
+In this release - 0.158.0 - the order of the `from` and `into` function object parameters has been reversed.
+If you've provided `from` and `into` function objects as arguments in your json traits convenience macros, you'll
+need to reverse their order, or if you've provided just a `from` function argument, you'll need to precede it
+with `jsoncons::identity()` (or `std::identity()` if C++20). For the rationale for this change, see
+[\#277](https://github.com/danielaparker/jsoncons/issues/277)
+
+- Conversion errors during decode are now reported more consistently as `jsoncons::convert_error`, 
+parsing errors remain `jsoncons::ser_error` (`or std::error_code`) as before.
+
+v0.157.2
+--------
+
+Warnings fixed:
+
+- Fixed C20 deprecated move_iterator access with arrow operator.
+- Fixed PVS-Studio warnings
+
+OSS-Fuzz issues fixed:
+
+- Fixed OSS-Fuzz failed throw issue 25891 affecting `decode_ubjson`
+and potentially other decode functions. This means that decode 
+functions will throw a `ser_error` instead of an `assertion_error`
+in the presence of certain kinds of bad data. 
+
+v0.157.1
+--------
+
+Bugs fixed:
+
+- The macros `JSONCONS_ALL_MEMBER_NAME_TRAITS` and
+`JSONCONS_N_MEMBER_NAME_TRAITS` failed at compile time 
+when provided with exactly two optional member arguments, 
+`JSONCONS_RDWR` followed by a `Match` function object 
+(other cases were fine.) This has been fixed.
+
+Change reverted:
+
+- The name change `ser_error` to `codec_error` introduced in
+0.157.0 has been reverted back to `ser_error`. Just in case
+anybody used it, the name `codec_error` has been typedefed 
+to `ser_error`.
+
+v0.157.0 
+--------
+
+Changes:
+
+- The name `ser_error` has been deprecated and renamed to `codec_error`.
+
+Enhancements:
+
+- The `_NAME_` convenience macros now allow an optional `mode` parameter 
+(`JSONCONS_RDWR` or `JSONCONS_RDONLY`) and three function objects, 
+`match` (value matches expected), `from` (convert from type known to jsoncons) 
+and `into` (convert into type known to jsoncons), [\#267](https://github.com/danielaparker/jsoncons/issues/267)
+
+ v0.156.1
+---------
+
+Bugs fixed:
+
+- Fixed issue with jsonpath exception raised when querying empty string, [\#270](https://github.com/danielaparker/jsoncons/issues/270)
+
+- Included pull request [\#273](https://github.com/danielaparker/jsoncons/pull/273) that fixes an 
+issue with a misnamed macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT128`) introduced in 0.156.0.
+
+ v0.156.0
+---------
 
 Bugs Fixed:
 
-- Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\263](https://github.com/danielaparker/jsoncons/issues/263)
+- Fixed issue with JSONCONS_N_MEMBER_NAME_TRAITS macro, [\#263](https://github.com/danielaparker/jsoncons/issues/263)
 
 Enhancements:
 
@@ -70,7 +149,7 @@ and `decode_csv` to read from any contiguous character sequence.
 
 Bugs fixed:
 
-- Fixed g++ compile issue with -Wnoexcept compiler flag, [\260](https://github.com/danielaparker/jsoncons/issues/260)
+- Fixed g++ compile issue with -Wnoexcept compiler flag, [\#260](https://github.com/danielaparker/jsoncons/issues/260)
 
 - Fixed issue with creating a patch to remove array elements using `json_patch::from_diff`, 
 [\#261](https://github.com/danielaparker/jsoncons/issues/261)

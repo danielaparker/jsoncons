@@ -50,7 +50,7 @@ private:
     basic_csv_cursor& operator=(const basic_csv_cursor&) = delete;
 
 public:
-    using string_view_type = basic_string_view<CharT>;
+    using string_view_type = jsoncons::basic_string_view<CharT>;
 
     // Constructors that throw parse exceptions
 
@@ -59,7 +59,7 @@ public:
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
@@ -80,7 +80,7 @@ public:
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
          buffer_(alloc),
@@ -88,7 +88,7 @@ public:
          eof_(false),
          begin_(false)
     {
-        basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {
@@ -146,7 +146,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
-                     typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
@@ -168,7 +168,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
-                     typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
          eof_(false),
@@ -176,7 +176,7 @@ public:
          buffer_length_(0),
          begin_(false)
     {
-        basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {
@@ -362,7 +362,7 @@ public:
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(filter),
@@ -384,7 +384,7 @@ public:
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(filter),
          buffer_(alloc),
@@ -392,7 +392,7 @@ public:
          eof_(false),
          begin_(false)
     {
-        basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {
@@ -458,7 +458,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
-                     typename std::enable_if<!std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(filter),
@@ -482,7 +482,7 @@ public:
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
-                     typename std::enable_if<std::is_constructible<basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(filter),
          eof_(false),
@@ -490,7 +490,7 @@ public:
          buffer_length_(0),
          begin_(false)
     {
-        basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicons::skip_bom(sv.begin(), sv.end());
         if (result.ec != unicons::encoding_errc())
         {

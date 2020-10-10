@@ -16,6 +16,7 @@
 **/vs2013
 **/temp
 **/build
+*PVS-Studio*
 examples/output
 
 examples/build/cmake/build_llvm.sh

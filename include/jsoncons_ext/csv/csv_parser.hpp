@@ -485,7 +485,7 @@ template<class CharT,class TempAllocator=std::allocator<char>>
 class basic_csv_parser : public ser_context
 {
 public:
-    using string_view_type = basic_string_view<CharT>;
+    using string_view_type = jsoncons::basic_string_view<CharT>;
     using char_type = CharT;
 private:
     struct string_maps_to_double
@@ -709,27 +709,14 @@ public:
                     {
                         trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
                     }
-                    if (!(options_.ignore_empty_values() && buffer_.empty()))
+                    if (options_.ignore_empty_values() && buffer_.empty())
                     {
-                        before_value(ec);
-                        state_ = csv_parse_state::before_unquoted_field;
+                        state_ = csv_parse_state::end_record;
                     }
                     else
                     {
-                        if (options_.trim_leading() || options_.trim_trailing())
-                        {
-                            trim_string_buffer(options_.trim_leading(),options_.trim_trailing());
-                        }
-                        if (!(options_.ignore_empty_values() && buffer_.empty()))
-                        {
-                            before_value(ec);
-                            state_ = csv_parse_state::before_last_quoted_field;
-                        }
-                        else
-                        {
-                            state_ = csv_parse_state::end_record;
-                        }
-                        state_ = csv_parse_state::end_record;
+                        before_value(ec);
+                        state_ = csv_parse_state::before_unquoted_field;
                     }
                     break;
                 case csv_parse_state::before_last_quoted_field:
@@ -1320,7 +1307,7 @@ private:
         switch (stack_.back())
         {
             case csv_mode::header:
-                if (options_.trim_leading_inside_quotes() | options_.trim_trailing_inside_quotes())
+                if (options_.trim_leading_inside_quotes() || options_.trim_trailing_inside_quotes())
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }
@@ -1553,7 +1540,7 @@ private:
         {
             case csv_mode::data:
             case csv_mode::subfields:
-                if (options_.trim_leading_inside_quotes() | options_.trim_trailing_inside_quotes())
+                if (options_.trim_leading_inside_quotes() || options_.trim_trailing_inside_quotes())
                 {
                     trim_string_buffer(options_.trim_leading_inside_quotes(),options_.trim_trailing_inside_quotes());
                 }

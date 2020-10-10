@@ -127,7 +127,7 @@ void parse_column_types(const std::basic_string<CharT>& types,
                         Container& column_types)
 {
     using char_type = CharT;
-    const std::map<basic_string_view<CharT>,csv_column_type> type_dictionary =
+    const std::map<jsoncons::basic_string_view<CharT>,csv_column_type> type_dictionary =
     {
 
         {detail::string_literal<char_type>(),csv_column_type::string_t},
@@ -401,26 +401,12 @@ public:
 
     string_type nan_to_num() const
     {
-        if (enable_nan_to_num_)
-        {
-            return nan_to_num_;
-        }
-        else
-        {
-            return nan_to_num_; // empty string
-        }
+        return nan_to_num_; 
     }
 
     string_type inf_to_num() const
     {
-        if (enable_inf_to_num_)
-        {
-            return inf_to_num_;
-        }
-        else
-        {
-            return inf_to_num_; // empty string
-        }
+        return inf_to_num_; 
     }
 
     string_type neginf_to_num() const
@@ -438,32 +424,18 @@ public:
         }
         else
         {
-            return neginf_to_num_; // empty string
+            return neginf_to_num_; 
         }
     }
 
     string_type nan_to_str() const
     {
-        if (enable_nan_to_str_)
-        {
-            return nan_to_str_;
-        }
-        else
-        {
-            return nan_to_str_; // empty string
-        }
+        return nan_to_str_;
     }
 
     string_type inf_to_str() const
     {
-        if (enable_inf_to_str_)
-        {
-            return inf_to_str_;
-        }
-        else
-        {
-            return inf_to_str_; // empty string
-        }
+        return inf_to_str_; 
     }
 
     string_type neginf_to_str() const

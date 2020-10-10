@@ -369,7 +369,7 @@ private:
                     {
                         case jsoncons::cbor::detail::cbor_major_type::text_string:
                         {
-                            handle_string(visitor, basic_string_view<char>(str.s.data(),str.s.length()),ec);
+                            handle_string(visitor, jsoncons::basic_string_view<char>(str.s.data(),str.s.length()),ec);
                             if (ec)
                             {
                                 return;
@@ -450,7 +450,7 @@ private:
                     more_ = false;
                     return;
                 }
-                handle_string(visitor, basic_string_view<char>(text_buffer_.data(),text_buffer_.length()),ec);
+                handle_string(visitor, jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()),ec);
                 if (ec)
                 {
                     return;
@@ -1425,7 +1425,7 @@ private:
         }
     }
 
-    void handle_string(json_visitor2& visitor, const basic_string_view<char>& v, std::error_code& ec)
+    void handle_string(json_visitor2& visitor, const jsoncons::basic_string_view<char>& v, std::error_code& ec)
     {
         semantic_tag tag = semantic_tag::none;
         if (other_tags_[item_tag])
@@ -1547,7 +1547,7 @@ private:
                     }
                     uint8_t* data = reinterpret_cast<uint8_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size();
-                    more_ = visitor.typed_array(span<const uint8_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x44:
@@ -1561,7 +1561,7 @@ private:
                     }
                     uint8_t* data = reinterpret_cast<uint8_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size();
-                    more_ = visitor.typed_array(span<const uint8_t>(data,size), semantic_tag::clamped, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const uint8_t>(data,size), semantic_tag::clamped, *this, ec);
                     break;
                 }
                 case 0x41:
@@ -1581,14 +1581,14 @@ private:
                     uint16_t* data = reinterpret_cast<uint16_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
 
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<uint16_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x42:
@@ -1607,14 +1607,14 @@ private:
 
                     uint32_t* data = reinterpret_cast<uint32_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<uint32_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const uint32_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const uint32_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x43:
@@ -1633,14 +1633,14 @@ private:
 
                     uint64_t* data = reinterpret_cast<uint64_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<uint64_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const uint64_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const uint64_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x48:
@@ -1654,7 +1654,7 @@ private:
                     }
                     int8_t* data = reinterpret_cast<int8_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size();
-                    more_ = visitor.typed_array(span<const int8_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const int8_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x49:
@@ -1673,14 +1673,14 @@ private:
 
                     int16_t* data = reinterpret_cast<int16_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<int16_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const int16_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const int16_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x4a:
@@ -1699,14 +1699,14 @@ private:
 
                     int32_t* data = reinterpret_cast<int32_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<int32_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const int32_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const int32_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x4b:
@@ -1725,14 +1725,14 @@ private:
 
                     int64_t* data = reinterpret_cast<int64_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<int64_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const int64_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const int64_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x50:
@@ -1751,14 +1751,14 @@ private:
 
                     uint16_t* data = reinterpret_cast<uint16_t*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<uint16_t>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(half_arg, span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(half_arg, jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x51:
@@ -1777,14 +1777,14 @@ private:
 
                     float* data = reinterpret_cast<float*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<float>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const float>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const float>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 case 0x52:
@@ -1804,14 +1804,14 @@ private:
                     double* data = reinterpret_cast<double*>(typed_array_.data());
                     std::size_t size = typed_array_.size()/bytes_per_elem;
 
-                    if (e != jsoncons::detail::endian::native)
+                    if (e != jsoncons::endian::native)
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
                             data[i] = jsoncons::detail::byte_swap<double>(data[i]);
                         }
                     }
-                    more_ = visitor.typed_array(span<const double>(data,size), semantic_tag::none, *this, ec);
+                    more_ = visitor.typed_array(jsoncons::span<const double>(data,size), semantic_tag::none, *this, ec);
                     break;
                 }
                 default:

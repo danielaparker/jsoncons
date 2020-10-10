@@ -16,111 +16,113 @@ GETTER    | Accesses data members through getter functions
 SETTER    | Modifies data members through setter functions
 NAME      | Serialize with provided names (instead of C++ member names)
 
+Square brackets indicate optionality.
+
 ```c++
 #include <jsoncons/json_type_traits.hpp>
 
 JSONCONS_N_MEMBER_TRAITS(class_name,num_mandatory,
-                         member_name0,member_name1,...) (1)
+                         member0,member1,...) (1)
 
 JSONCONS_ALL_MEMBER_TRAITS(class_name,
-                           member_name0,member_name1,...) (2)
+                           member0,member1,...) (2)
 
 JSONCONS_TPL_N_MEMBER_TRAITS(num_template_params,
                              class_name,num_mandatory,
-                             member_name0,member_name1,...) (3)  
+                             member0,member1,...) (3)  
 
 JSONCONS_TPL_ALL_MEMBER_TRAITS(num_template_params,
                                class_name,
-                               member_name0,member_name1,...) (4)
+                               member0,member1,...) (4)
 
 JSONCONS_N_MEMBER_NAME_TRAITS(class_name,num_mandatory,
-                              (member_name0,serialized_name0),
-                              (member_name1,serialized_name1)...) (5)
+                              (member0,serialized_name0[,mode0,match0,into0,from0]),
+                              (member1,serialized_name1[,mode1,match1,into1,from1])...) (5)
 
 JSONCONS_ALL_MEMBER_NAME_TRAITS(class_name,
-                                (member_name0,serialized_name0),
-                                (member_name1,serialized_name1)...) (6)
+                                (member0,serialized_name0[,mode0,match0,into0,from0]),
+                                (member1,serialized_name1[,mode1,match1,into1,from1])...) (6)
 
 JSONCONS_TPL_N_MEMBER_NAME_TRAITS(num_template_params,
                                   class_name,num_mandatory,
-                                  (member_name0,serialized_name0),
-                                  (member_name1,serialized_name1)...) (7)
+                                  (member0,serialized_name0[,mode0,match0,into0,from0]),
+                                  (member1,serialized_name1[,mode1,match1,into1,from1])...) (7)
 
 JSONCONS_TPL_ALL_MEMBER_NAME_TRAITS(num_template_params,
                                     class_name,
-                                    (member_name0,serialized_name0),
-                                    (member_name1,serialized_name1)...) (8)
+                                    (member0,serialized_name0[,mode0,match0,into0,from0]),
+                                    (member1,serialized_name1[,mode1,match1,into1,from1])...) (8)
 
 JSONCONS_ENUM_TRAITS(enum_name,enumerator0,enumerator1,...) (9)
 
 JSONCONS_ENUM_NAME_TRAITS(enum_name,
-                           (enumerator0,serialized_name0),
-                           (enumerator1,serialized_name1)...) (10)
+                          (enumerator0,serialized_name0),
+                          (enumerator1,serialized_name1)...) (10)
 
 JSONCONS_N_CTOR_GETTER_TRAITS(class_name,num_mandatory,
-                              getter_name0,
-                              getter_name1,...) (11)
+                              getter0,
+                              getter1,...) (11)
 
 JSONCONS_ALL_CTOR_GETTER_TRAITS(class_name,
-                                getter_name0,getter_name1,...) (12)
+                                getter0,getter1,...) (12)
 
 JSONCONS_TPL_N_CTOR_GETTER_TRAITS(num_template_params,
                                   class_name,num_mandatory,
-                                  getter_name0,getter_name1,...) (13)
+                                  getter0,getter1,...) (13)
 
 JSONCONS_TPL_ALL_CTOR_GETTER_TRAITS(num_template_params,
                                     class_name,
-                                    getter_name0,getter_name1,...) (14)
+                                    getter0,getter1,...) (14)
 
 JSONCONS_N_CTOR_GETTER_NAME_TRAITS(class_name,num_mandatory,
-                                   (getter_name0,serialized_name0),
-                                   (getter_name1,serialized_name1)...) (15)
+                                   (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                   (getter1,serialized_name1[,mode1,match1,into1,from1])...) (15)
 
 JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(class_name,
-                                     (getter_name0,serialized_name0),
-                                     (getter_name1,serialized_name1)...) (16)
+                                     (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                     (getter1,serialized_name1[,mode1,match1,into1,from1])...) (16)
 
 JSONCONS_TPL_N_CTOR_GETTER_NAME_TRAITS(num_template_params,
                                        class_name,num_mandatory,
-                                       (getter_name0,serialized_name0),
-                                       (getter_name1,serialized_name1)...) (17)
+                                       (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                       (getter1,serialized_name1[,mode1,match1,into1,from1])...) (17)
 
 JSONCONS_TPL_ALL_CTOR_GETTER_NAME_TRAITS(num_template_params,
                                          class_name,
-                                         (getter_name0,serialized_name0),
-                                         (getter_name1,serialized_name1)...) (18)
+                                         (getter0,serialized_name0[,mode0,match0,into0,from0]),
+                                         (getter1,serialized_name1[,mode1,match1,into1,from1])...) (18)
 
 JSONCONS_N_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,num_mandatory,
-                                field_name0,field_name1,...) (19)
+                                property0,property1,...) (19)
 
 JSONCONS_ALL_GETTER_SETTER_TRAITS(class_name,get_prefix,set_prefix,
-                                  field_name0,field_name1,...) (20)
+                                  property0,property1,...) (20)
 
 JSONCONS_TPL_N_GETTER_SETTER_TRAITS(num_template_params,
                                     class_name,get_prefix,set_prefix,num_mandatory,
-                                    field_name0,field_name1,...) (21)  
+                                    property0,property1,...) (21)  
 
 JSONCONS_TPL_ALL_GETTER_SETTER_TRAITS(num_template_params,
                                       class_name,get_prefix,set_prefix,
-                                      field_name0,field_name1,...) (22)
+                                      property0,property1,...) (22)
 
 JSONCONS_N_GETTER_SETTER_NAME_TRAITS(class_name,num_mandatory,
-                                     (getter_name0,setter_name0,serialized_name0),
-                                     (getter_name1,setter_name1,serialized_name1)...) (23)
+                                     (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                     (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (23)
 
 JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(class_name,
-                                       (getter_name0,setter_name0,serialized_name0),
-                                       (getter_name1,setter_name1,serialized_name1)...) (24)
+                                       (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                       (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (24)
 
 JSONCONS_TPL_N_GETTER_SETTER_NAME_TRAITS(num_template_params,
                                          class_name,num_mandatory,
-                                         (getter_name0,setter_name0,serialized_name0),
-                                         (getter_name1,setter_name1,serialized_name1)...) (25)
+                                         (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                         (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (25)
 
 JSONCONS_TPL_ALL_GETTER_SETTER_NAME_TRAITS(num_template_params,
                                            class_name,
-                                           (getter_name0,setter_name0,serialized_name0),
-                                           (getter_name1,setter_name1,serialized_name1)...) (26)
+                                           (getter0,setter0,serialized_name0[,mode0,match0,into0,from0]),
+                                           (getter1,setter1,serialized_name1[,mode1,match1,into1,from1])...) (26)
 
 JSONCONS_POLYMORPHIC_TRAITS(base_class_name,derived_class_name0,derived_class_name1,...) (27)
 ```
@@ -145,7 +147,7 @@ class MyClass
 (3)-(4) generate the code to specialize `json_type_traits` for a class template from member data. 
 
 (5)-(8) generate the code to specialize `json_type_traits` for a class from member data.
-The serialized names are the provided names. The sequence of `(member_nameN,serialized_nameN)`
+The serialized names are the provided names. The sequence of `(memberN,serialized_nameN)`
 pairs declares the member name and provided name for each of the class members
 that are part of the sequence.
 When decoding to a C++ data structure, 
@@ -174,7 +176,7 @@ of the get functions are convertible to its parameters, taken in order.
 (13)-(14) generate the code to specialize `json_type_traits` for a class template from a constructor and get functions.  
 
 (15)-(18) generate the code to specialize `json_type_traits` for a class from a constructor and get functions.
-The serialized names are the provided names. The sequence of `(getter_nameN,serialized_nameN)`
+The serialized names are the provided names. The sequence of `(getterN,serialized_nameN)`
 pairs declares the get function and provided name for each of the class members
 that are part of the sequence. 
 When decoding to a C++ data structure, 
@@ -193,7 +195,7 @@ require that all member names be present in the JSON. (21)-(22) generate the cod
 for a class template from get and set functions.
 
 (23)-(26) generate the code to specialize `json_type_traits` for a class from get and set functions.
-The serialized names are the provided names. The sequence of `(getter_nameN,setter_nameN,serialized_nameN)`
+The serialized names are the provided names. The sequence of `(getterN,setterN,serialized_nameN)`
 triples declares the get and set functions and provided name for each of the class members
 that are part of the sequence. When decoding to a C++ data structure, 
 (23) and (25) require that the first `num_mandatory` member names be present in the JSON,
@@ -214,13 +216,26 @@ in the derived classes.
 `num_mandatory` - the number of mandatory class data members or accessors  
 `enum_name` - the name of an enum type or enum class type  
 `num_template_params` - for a class template, the number of template parameters  
-`member_nameN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
-`static const`. Data members that are `const` or `static const` are one-way serialized.  
-`getter_nameN` - the getter for a class data member  
-`(enumeratorN,serialized_nameN)` - an enumerator and corresponding serialized name  
-`(getter_nameN,serialized_nameN)` - the getter for a class data member and corresponding serialized name  
-`field_nameN` - the base name of a class getter or setter with prefix `get` or `set` stripped out.  
-`(getter_nameN,setter_nameN,serialized_nameN)` - the getter and setter for a class data member, and corresponding serialized name  
+`memberN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
+`propertyN` - the base name of a class getter or setter with prefix `get` or `set` stripped out. 
+Data members that are `const` or `static const` are one-way serialized.  
+`getterN` - the getter for a class data member  
+`setterN` - the setter for a class data member  
+`enumeratorN` - an enumerator  
+`serialized_nameN` - serialized name  
+`modeN` - indicates whether a data member is read-write (`JSONCONS_RDWR`) or read-only (`JSONCONS_RDONLY`).
+Read-only data members are serialized but not de-serialized (since 0.157.0)  
+`matchN` - a function object that takes a value of type `const T&` and returns `true` if the value matches an allowed value,
+`false` otherwise. If the function object `to` is also provided, type `T` must be the same as the  return type of `T`,
+otherwise it must be the same as the member type (since 0.157.0)  
+`intoN` - a function object that takes a value of type of `memberN` (or return type of `getterN`)
+and returns a value of type `T` that satisfies `json_type_traits` specialization. If type `T`
+differs from type of `memberN` (or return type of `getterN`), and `modeN` is `JSONCONS_RDWR`, `fromN` must also be provided.
+`intoN` can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
+but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
+(since 0.157.0)  
+`fromN` - a function object that takes a value of return type of `intoN`, and returns a value
+ of type of `memberN` (or return type of `getterN`). Only used if `modeN` is `JSONCONS_RDWR`. (since 0.157.0)  
 `base_class_name` - the name of a base class  
 `derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
@@ -237,6 +252,12 @@ All of the `json_type_traits` specializations for type `T` generated by the conv
 [Example with std::shared_ptr, std::unique_ptr and std::optional](#A3)  
 [Serialize a polymorphic type based on the presence of members](#A4)  
 [Ensuring type selection is possible](#A5)  
+[Decode to a polymorphic type based on a type marker (since 0.157.0)](#A6)  
+[An example with std::variant](#A7)  
+[Type selection and std::variant](#A8)  
+[Decode to a std::variant based on a type marker (since 0.158.0)](#A9)  
+[Transform data member (since 0.157.0)](#A10)  
+[Tidy data member (since 0.157.0)](#A11)
 
 <div id="A1"/> 
 
@@ -787,3 +808,908 @@ A bar
 A baz
 ```
 
+<div id="A6"/>
+
+#### Decode to a polymorphic type based on a type marker (since 0.157.0)
+
+```c++
+namespace ns {
+
+    class Shape
+    {
+    public:
+        virtual ~Shape() = default;
+        virtual double area() const = 0;
+    };
+      
+    class Rectangle : public Shape
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "rectangle"; 
+            return type_;
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle : public Shape
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "triangle"; 
+            return type_;
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const override
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+
+    class Circle : public Shape
+    { 
+        double radius_;
+
+    public:
+        Circle(double radius)
+            : radius_(radius)
+        {
+        }
+
+        const std::string& type() const
+        {
+            static const std::string type_ = "circle"; 
+            return type_;
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const override
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+    };                 
+
+} // ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
+    (type,"type",JSONCONS_RDONLY,[](const std::string& type) noexcept{return type == "rectangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "triangle";}),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
+    (type,"type", JSONCONS_RDONLY, [](const std::string& type) noexcept {return type == "circle";}),
+    (radius, "radius")
+)
+
+JSONCONS_POLYMORPHIC_TRAITS(ns::Shape,ns::Rectangle,ns::Triangle,ns::Circle)
+
+int main()
+{
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    auto shapes = jsoncons::decode_json<std::vector<std::unique_ptr<ns::Shape>>>(input);
+
+    std::cout << "(1)\n";
+    for (const auto& shape : shapes)
+    {
+        std::cout << typeid(*shape.get()).name() << " area: " << shape->area() << "\n";
+    }
+
+    std::string output;
+
+    jsoncons::encode_json_pretty(shapes, output);
+    std::cout << "\n(2)\n" << output << "\n";
+}
+```
+
+Output:
+```
+(1)
+class `ns::Rectangle area: 3.0000000
+class `ns::Triangle area: 4.0000000
+class `ns::Circle area: 3.1415927
+
+(2)
+[
+    {
+        "height": 1.5,
+        "type": "rectangle",
+        "width": 2.0
+    },
+    {
+        "height": 2.0,
+        "type": "triangle",
+        "width": 4.0
+    },
+    {
+        "radius": 1.0,
+        "type": "circle"
+    }
+]
+```
+
+This example maps a `type()` getter to a "type" data member in the JSON.
+However, we can also achieve this without using a `type()` getter at all. 
+Compare with the very similar example [decode to a std::variant based on a type marker](#A9)
+
+<div id="A7"/>
+
+#### An example with std::variant
+
+This example assumes C++17 language support and jsoncons v0.154.0 or later.
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    enum class Color {yellow, red, green, blue};
+
+    inline
+    std::ostream& operator<<(std::ostream& os, Color val)
+    {
+        switch (val)
+        {
+            case Color::yellow: os << "yellow"; break;
+            case Color::red: os << "red"; break;
+            case Color::green: os << "green"; break;
+            case Color::blue: os << "blue"; break;
+        }
+        return os;
+    }
+
+    class Fruit 
+    {
+    private:
+        JSONCONS_TYPE_TRAITS_FRIEND
+        std::string name_;
+        Color color_;
+    public:
+        friend std::ostream& operator<<(std::ostream& os, const Fruit& val)
+        {
+            os << "name: " << val.name_ << ", color: " << val.color_ << "\n";
+            return os;
+        }
+    };
+
+    class Fabric 
+    {
+    private:
+      JSONCONS_TYPE_TRAITS_FRIEND
+      int size_;
+      std::string material_;
+    public:
+        friend std::ostream& operator<<(std::ostream& os, const Fabric& val)
+        {
+            os << "size: " << val.size_ << ", material: " << val.material_ << "\n";
+            return os;
+        }
+    };
+
+    class Basket {
+     private:
+      JSONCONS_TYPE_TRAITS_FRIEND
+      std::string owner_;
+      std::vector<std::variant<Fruit, Fabric>> items_;
+
+    public:
+        std::string owner() const
+        {
+            return owner_;
+        }
+
+        std::vector<std::variant<Fruit, Fabric>> items() const
+        {
+            return items_;
+        }
+    };
+
+} // ns
+} // namespace
+
+JSONCONS_ENUM_NAME_TRAITS(ns::Color, (yellow, "YELLOW"), (red, "RED"), (green, "GREEN"), (blue, "BLUE"))
+
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fruit,
+                                (name_, "name"),
+                                (color_, "color"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Fabric,
+                                (size_, "size"),
+                                (material_, "material"))
+JSONCONS_ALL_MEMBER_NAME_TRAITS(ns::Basket,
+                                (owner_, "owner"),
+                                (items_, "items"))
+
+int main()
+{
+    std::string input = R"(
+{
+  "owner": "Rodrigo",
+  "items": [
+    {
+      "name": "banana",
+      "color": "YELLOW"
+    },
+    {
+      "size": 40,
+      "material": "wool"
+    },
+    {
+      "name": "apple",
+      "color": "RED"
+    },
+    {
+      "size": 40,
+      "material": "cotton"
+    }
+  ]
+}
+    )";
+
+    ns::Basket basket = jsoncons::decode_json<ns::Basket>(input);
+    std::cout << basket.owner() << "\n\n";
+
+    std::cout << "(1)\n";
+    for (const auto& var : basket.items()) 
+    {
+        std::visit([](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, ns::Fruit>)
+                std::cout << "Fruit " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Fabric>)
+                std::cout << "Fabric " << arg << '\n';
+        }, var);
+    }
+
+    std::string output;
+    jsoncons::encode_json_pretty(basket, output);
+    std::cout << "(2)\n" << output << "\n\n";
+}
+```
+Output:
+```
+Rodrigo
+
+(1)
+Fruit name: banana, color: yellow
+
+Fabric size: 28, material: wool
+
+Fruit name: apple, color: red
+
+Fabric size: 28, material: cotton
+
+(2)
+{
+    "items": [
+        {
+            "color": "YELLOW",
+            "name": "banana"
+        },
+        {
+            "material": "wool",
+            "size": 40
+        },
+        {
+            "color": "RED",
+            "name": "apple"
+        },
+        {
+            "material": "cotton",
+            "size": 40
+        }
+    ],
+    "owner": "Rodrigo"
+}
+```
+
+<div id="A8"/>
+
+#### Type selection and std::variant
+
+For classes supported through the convenience macros, e.g. `Fruit` and `Fabric` from the previous example, 
+the type selection strategy is the same as for polymorphic types, and is based 
+on the presence of mandatory members in the classes. More generally, 
+the type selection strategy is based on the `json_type_traits<Json,T>::is(const Json& j)` 
+function, checking each type in the variant from left to right, and stopping when 
+`json_type_traits<Json,T>::is(j)` returns `true`. 
+
+Now consider 
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    enum class Color {yellow, red, green, blue};
+
+} // ns
+
+JSONCONS_ENUM_NAME_TRAITS(ns::Color, (yellow, "YELLOW"), (red, "RED"), (green, "GREEN"), (blue, "BLUE"))
+
+int main()
+{
+    using variant_type  = std::variant<int, double, bool, std::string, ns::Color>;
+
+    std::vector<variant_type> vars = {100, 10.1, false, std::string("Hello World"), ns::Color::yellow};
+
+    std::string buffer;
+    jsoncons::encode_json_pretty(vars, buffer);
+
+    std::cout << "(1)\n" << buffer << "\n\n";
+
+    auto vars2 = jsoncons::decode_json<std::vector<variant_type>>(buffer);
+
+    auto visitor = [](auto&& arg) {
+            using T = std::decay_t<decltype(arg)>;
+            if constexpr (std::is_same_v<T, int>)
+                std::cout << "int " << arg << '\n';
+            else if constexpr (std::is_same_v<T, double>)
+                std::cout << "double " << arg << '\n';
+            else if constexpr (std::is_same_v<T, bool>)
+                std::cout << "bool " << arg << '\n';
+            else if constexpr (std::is_same_v<T, std::string>)
+                std::cout << "std::string " << arg << '\n';
+            else if constexpr (std::is_same_v<T, ns::Color>)
+                std::cout << "ns::Color " << arg << '\n';
+        };
+
+    std::cout << "(2)\n";
+    for (const auto& item : vars2)
+    {
+        std::visit(visitor, item);
+    }
+    std::cout << "\n";
+}
+```
+Output:
+```
+(1)
+[
+    100,
+    10.1,
+    false,
+    "Hello World",
+    "YELLOW"
+]
+
+(2)
+int 100
+double 10.1
+bool false
+std::string Hello World
+std::string YELLOW
+```
+
+Encode is fine. But when decoding, jsoncons checks if the JSON string "YELLOW" is a `std::string` 
+before it checks whether it is an `ns::Color`, and since the answer is yes, 
+it is stored in the variant as a `std::string`.
+
+But if we switch the order of `ns::Color` and `std::string` in the variant definition, viz.
+
+```c++
+ using variant_type  = std::variant<int, double, bool, ns::Color, std::string>;
+```
+strings containing  the text "YELLOW", "RED", "GREEN", or "BLUE" are detected to be `ns::Color`, and the others `std::string`.  
+
+And the output becomes
+```
+(1)
+[
+    100,
+    10.1,
+    false,
+    "Hello World",
+    "YELLOW"
+]
+
+(2)
+int 100
+double 10.1
+bool false
+std::string Hello World
+ns::Color yellow
+```
+
+So: types that are more constrained should appear to the left of types that are less constrained.
+
+<div id="A9"/>
+
+#### Decode to a std::variant based on a type marker (since 0.158.0)
+
+This example is very similar to [decode to a polymorphic type based on a type marker](#A6),
+and in fact the json traits defined for that example would do for `std::variant` as well.
+But here we add a wrinkle by omitting the `type()` function in the `Rectangle`, `Triangle` and
+`Circle` classes. More generally, we show how to augment the JSON output with name/value pairs 
+that are not present in the class definitions, and to perform type selection with them.
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    class Rectangle
+    {
+        double height_;
+        double width_;
+    public:
+        Rectangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const
+        {
+            return height_ * width_;
+        }
+    };
+
+    class Triangle
+    { 
+        double height_;
+        double width_;
+
+    public:
+        Triangle(double height, double width)
+            : height_(height), width_(width)
+        {
+        }
+
+        double height() const
+        {
+            return height_;
+        }
+
+        double width() const
+        {
+            return width_;
+        }
+
+        double area() const
+        {
+            return (height_ * width_)/2.0;
+        }
+    };                 
+
+    class Circle
+    { 
+        double radius_;
+
+    public:
+        Circle(double radius)
+            : radius_(radius)
+        {
+        }
+
+        double radius() const
+        {
+            return radius_;
+        }
+
+        double area() const
+        {
+            constexpr double pi = 3.14159265358979323846;
+            return pi*radius_*radius_;
+        }
+    };                 
+
+    inline constexpr auto rectangle_marker = [](double) noexcept {return "rectangle"; };
+    inline constexpr auto triangle_marker = [](double) noexcept {return "triangle";};
+    inline constexpr auto circle_marker = [](double) noexcept {return "circle";};
+
+} // namespace ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Rectangle,
+    (height,"type",JSONCONS_RDONLY,
+     [](const std::string& type) noexcept{return type == "rectangle";},
+     ns::rectangle_marker),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Triangle,
+    (height,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "triangle";},
+     ns::triangle_marker),
+    (height, "height"),
+    (width, "width")
+)
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Circle,
+    (radius,"type", JSONCONS_RDONLY, 
+     [](const std::string& type) noexcept {return type == "circle";},
+     ns::circle_marker),
+    (radius, "radius")
+)
+
+int main()
+{
+    using shapes_t = std::variant<ns::Rectangle,ns::Triangle,ns::Circle>;
+
+    std::string input = R"(
+[
+    {"type" : "rectangle", "width" : 2.0, "height" : 1.5 },
+    {"type" : "triangle", "width" : 4.0, "height" : 2.0 },
+    {"type" : "circle", "radius" : 1.0 }
+]
+    )";
+
+    auto shapes = jsoncons::decode_json<std::vector<shapes_t>>(input);
+
+    auto visitor = [](auto&& shape) {
+        using T = std::decay_t<decltype(shape)>;
+        if constexpr (std::is_same_v<T, ns::Rectangle>)
+            std::cout << "rectangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Triangle>)
+            std::cout << "triangle area: " << shape.area() << '\n';
+        else if constexpr (std::is_same_v<T, ns::Circle>)
+            std::cout << "circle area: " << shape.area() << '\n';
+    };
+
+    std::cout << "(1)\n";
+    for (const auto& shape : shapes)
+    {
+        std::visit(visitor, shape);
+    }
+
+    std::string output;
+    jsoncons::encode_json_pretty(shapes, output);
+    std::cout << "\n(2)\n" << output << "\n";
+}
+```
+Output:
+```
+(1)
+rectangle area: 3.0000000
+triangle area: 4.0000000
+circle area: 3.1415927
+
+(2)
+[
+    {
+        "height": 1.5,
+        "type": "rectangle",
+        "width": 2.0
+    },
+    {
+        "height": 2.0,
+        "type": "triangle",
+        "width": 4.0
+    },
+    {
+        "radius": 1.0,
+        "type": "circle"
+    }
+]
+```
+
+<div id="A10"/>
+
+#### Transform data member (since 0.158.0)
+
+```c++
+#include <cassert>
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+    class Employee
+    {
+        std::string name_;
+        std::string surname_;
+    public:
+        Employee() = default;
+
+        Employee(const std::string& name, const std::string& surname)
+            : name_(name), surname_(surname)
+        {
+        }
+
+        std::string getName() const
+        {
+            return name_;
+        }
+        void setName(const std::string& name)
+        {
+            name_ = name;
+        }
+        std::string getSurname()const
+        {
+            return surname_;
+        }
+        void setSurname(const std::string& surname)
+        {
+            surname_ = surname;
+        }
+
+        friend bool operator<(const Employee& lhs, const Employee& rhs)
+        {
+            if (lhs.surname_ < rhs.surname_)
+                return true;
+            return lhs.name_ < rhs.name_;
+        }
+    };
+
+    class Company 
+    {
+        std::string name_;
+        std::vector<uint64_t> employeeIds_;
+    public:
+        std::string getName() const
+        {
+            return name_;
+        }
+        void setName(const std::string& name)
+        {
+            name_ = name;
+        }
+        const std::vector<uint64_t> getIds() const
+        {
+            return employeeIds_;
+        }
+        void setIds(const std::vector<uint64_t>& employeeIds)
+        {
+            employeeIds_ = employeeIds;
+        }
+    };
+
+    std::vector<uint64_t> fromEmployeesToIds(const std::vector<Employee>& employees)
+    {
+        static std::map<Employee, uint64_t> employee_id_map = {{Employee("John", "Smith"), 1},{Employee("Jane", "Doe"), 2}};
+
+        std::vector<uint64_t> ids;
+        for (auto employee : employees)
+        {
+            ids.push_back(employee_id_map.at(employee));
+        }
+        return ids;
+    }
+
+    std::vector<Employee> toEmployeesFromIds(const std::vector<uint64_t>& ids)
+    {
+        static std::map<uint64_t, Employee> id_employee_map = {{1, Employee("John", "Smith")},{2, Employee("Jane", "Doe")}};
+
+        std::vector<Employee> employees;
+        for (auto id : ids)
+        {
+            employees.push_back(id_employee_map.at(id));
+        }
+        return employees;
+    }
+
+} // namespace ns
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Employee,
+    (getName, setName, "employee_name"),
+    (getSurname, setSurname, "employee_surname")
+)
+
+JSONCONS_ALL_GETTER_SETTER_NAME_TRAITS(ns::Company,
+    (getName, setName, "company"),
+    (getIds, setIds, "resources", 
+     JSONCONS_RDWR, jsoncons::always_true(), 
+     ns::toEmployeesFromIds, ns::fromEmployeesToIds)
+)
+
+int main()
+{
+    std::string input = R"(
+{
+    "company": "ExampleInc",
+    "resources": [
+        {
+            "employee_name": "John",
+            "employee_surname": "Smith"
+        },
+        {
+            "employee_name": "Jane",
+            "employee_surname": "Doe"
+        }
+    ]
+}
+    )";
+
+    auto company = decode_json<ns::Company>(input);
+
+    std::cout << "(1)\n" << company.getName() << "\n";
+    for (auto id : company.getIds())
+    {
+        std::cout << id << "\n";
+    }
+    std::cout << "\n";
+
+    std::string output;
+    encode_json_pretty(company, output);
+    std::cout << "(2)\n" << output << "\n\n";
+}
+```
+
+Output:
+
+```
+(1)
+ExampleInc
+1
+2
+
+(2)
+{
+    "company": "ExampleInc",
+    "resources": [
+        {
+            "employee_name": "John",
+            "employee_surname": "Smith"
+        },
+        {
+            "employee_name": "Jane",
+            "employee_surname": "Doe"
+        }
+    ]
+}
+```
+
+<div id="A11"/>
+
+#### Tidy data member (since 0.158.0)
+
+```c++
+#include <jsoncons/json.hpp>
+
+namespace ns {
+
+   class Person 
+   {
+         std::string name_;
+         std::optional<std::string> socialSecurityNumber_;
+     public:
+         Person(const std::string& name, const std::optional<std::string>& socialSecurityNumber)
+           : name_(name), socialSecurityNumber_(socialSecurityNumber)
+         {
+         }
+         std::string getName() const
+         {
+             return name_;
+         }
+         std::optional<std::string> getSsn() const
+         {
+             return socialSecurityNumber_;
+         }
+   };
+
+} // namespace ns
+
+JSONCONS_ALL_CTOR_GETTER_NAME_TRAITS(ns::Person, 
+  (getName, "name"),
+  (getSsn, "social_security_number",
+      jsoncons::always_true(),
+      jsoncons::identity(), // or std::identity() if C++20
+      [] (const std::optional<std::string>& unvalidated) {
+          if (!unvalidated)
+          {
+              return unvalidated;
+          }
+          std::regex myRegex(("^(\\d{9})$"));
+          if (!std::regex_match(*unvalidated, myRegex) ) {
+              return std::optional<std::string>();
+          }
+          return unvalidated;
+      }
+   )
+)
+
+int main()
+{
+        std::string input = R"(
+[
+    {
+        "name": "John Smith",
+        "social_security_number": "123456789"
+    },
+    {
+        "name": "Jane Doe",
+        "social_security_number": "12345678"
+    }
+]
+    )";
+
+    auto persons = jsoncons::decode_json<std::vector<ns::Person>>(input);
+
+    std::cout << "(1)\n";
+    for (const auto& person : persons)
+    {
+        std::cout << person.getName() << ", " 
+                  << (person.getSsn() ? *person.getSsn() : "n/a") << "\n";
+    }
+    std::cout << "\n";
+
+    std::string output;
+    jsoncons::encode_json_pretty(persons, output);
+    std::cout << "(2)\n" << output << "\n";
+}
+```
+Output:
+```
+(1)
+John Smith, 123456789
+Jane Doe, n/a
+
+(2)
+[
+    {
+        "name": "John Smith",
+        "social_security_number": "123456789"
+    },
+    {
+        "name": "Jane Doe",
+        "social_security_number": null
+    }
+]
+```

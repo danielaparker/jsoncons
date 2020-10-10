@@ -33,6 +33,10 @@ namespace jsoncons {
         {
             decoder.reset();
             cursor.read_to(decoder, ec);
+            if (!decoder.is_valid())
+            {
+                JSONCONS_THROW(ser_error(convert_errc::conversion_failed, cursor.context().line(), cursor.context().column()));
+            }
             return decoder.get_result().template as<T>();
         }
     };
@@ -274,7 +278,7 @@ namespace jsoncons {
             return true;
         }
 
-        bool visit_typed_array(const span<const value_type>& data,  
+        bool visit_typed_array(const jsoncons::span<const value_type>& data,  
                             semantic_tag,
                             const ser_context&,
                             std::error_code&) override
@@ -526,7 +530,7 @@ namespace jsoncons {
                     ec = json_errc::expected_key;
                     return val;
                 }
-                auto s = cursor.current().template get<basic_string_view<typename Json::char_type>>(ec);
+                auto s = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
                 if (ec) return val;
                 auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 cursor.next(ec);
