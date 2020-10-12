@@ -533,6 +533,113 @@ namespace yaml {
             }
         }
 
+        bool parse_document_start(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        {
+            switch (*input_ptr_)
+            {
+                JSONCONS_ILLEGAL_CONTROL_CHARACTER:
+                    if (!err_handler_(yaml_errc::illegal_control_character, *this))
+                    {
+                        ec = yaml_errc::illegal_control_character;
+                        return false;
+                    }
+                    break;
+                case '\r': 
+                    push_state(state_);
+                    ++input_ptr_;
+                    ++position_;
+                    state_ = json_parse_state::cr;
+                    break; 
+                case '\n': 
+                    ++input_ptr_;
+                    ++line_;
+                    ++position_;
+                    mark_position_ = position_;
+                    break;   
+                case ' ':case '\t':
+                    skip_space();
+                    break;
+                case '/': 
+                    ++input_ptr_;
+                    ++position_;
+                    push_state(state_);
+                    state_ = json_parse_state::slash;
+                    break;
+                case '{':
+                    begin_object(visitor, ec);
+                    if (ec) return false;
+                    ++input_ptr_;
+                    ++position_;
+                    break;
+                case '[':
+                    begin_array(visitor, ec);
+                    if (ec) return false;
+                    ++input_ptr_;
+                    ++position_;
+                    break;
+                case '\"':
+                    state_ = json_parse_state::string;
+                    ++input_ptr_;
+                    ++position_;
+                    string_buffer_.clear();
+                    parse_string(visitor, ec);
+                    if (ec) return false;
+                    break;
+                case '-':
+                    string_buffer_.clear();
+                    string_buffer_.push_back('-');
+                    ++input_ptr_;
+                    ++position_;
+                    state_ = json_parse_state::minus;
+                    parse_number(visitor, ec);
+                    if (ec) {return false;}
+                    break;
+                case '0': 
+                    string_buffer_.clear();
+                    string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                    state_ = json_parse_state::zero;
+                    ++input_ptr_;
+                    ++position_;
+                    parse_number(visitor, ec);
+                    if (ec) {return false;}
+                    break;
+                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
+                    string_buffer_.clear();
+                    string_buffer_.push_back(static_cast<char>(*input_ptr_));
+                    ++input_ptr_;
+                    ++position_;
+                    state_ = json_parse_state::integer;
+                    parse_number(visitor, ec);
+                    if (ec) {return false;}
+                    break;
+                case 'n':
+                    parse_null(visitor, ec);
+                    if (ec) {return false;}
+                    break;
+                case 't':
+                    parse_true(visitor, ec);
+                    if (ec) {return false;}
+                    break;
+                case 'f':
+                    parse_false(visitor, ec);
+                    if (ec) {return false;}
+                    break;
+                case '}':
+                    err_handler_(yaml_errc::unexpected_right_brace, *this);
+                    ec = yaml_errc::unexpected_right_brace;
+                    return false;
+                case ']':
+                    err_handler_(yaml_errc::unexpected_right_bracket, *this);
+                    ec = yaml_errc::unexpected_right_bracket;
+                    return false;
+                default:
+                    err_handler_(yaml_errc::syntax_error, *this);
+                    ec = yaml_errc::syntax_error;
+                    return false;
+            }
+            return true;
+        }
+
         void parse_some_(basic_json_visitor<CharT>& visitor, std::error_code& ec)
         {
             if (state_ == json_parse_state::before_done)
@@ -586,6 +693,13 @@ namespace yaml {
             {
                 switch (state_)
                 {
+                    case json_parse_state::start: 
+                        if (!parse_document_start(visitor, ec))
+                        {
+                            more_ = false;
+                            return;
+                        }
+                        break;
                     case json_parse_state::before_done:
                         visitor.flush();
                         done_ = true;
@@ -605,116 +719,6 @@ namespace yaml {
                             default:
                                 state_ = pop_state();
                                 break;
-                        }
-                        break;
-                    case json_parse_state::start: 
-                        {
-                            switch (*input_ptr_)
-                            {
-                                JSONCONS_ILLEGAL_CONTROL_CHARACTER:
-                                    more_ = err_handler_(yaml_errc::illegal_control_character, *this);
-                                    if (!more_)
-                                    {
-                                        ec = yaml_errc::illegal_control_character;
-                                        return;
-                                    }
-                                    break;
-                                case '\r': 
-                                    push_state(state_);
-                                    ++input_ptr_;
-                                    ++position_;
-                                    state_ = json_parse_state::cr;
-                                    break; 
-                                case '\n': 
-                                    ++input_ptr_;
-                                    ++line_;
-                                    ++position_;
-                                    mark_position_ = position_;
-                                    break;   
-                                case ' ':case '\t':
-                                    skip_space();
-                                    break;
-                                case '/': 
-                                    ++input_ptr_;
-                                    ++position_;
-                                    push_state(state_);
-                                    state_ = json_parse_state::slash;
-                                    break;
-                                case '{':
-                                    begin_object(visitor, ec);
-                                    if (ec) return;
-                                    ++input_ptr_;
-                                    ++position_;
-                                    break;
-                                case '[':
-                                    begin_array(visitor, ec);
-                                    if (ec) return;
-                                    ++input_ptr_;
-                                    ++position_;
-                                    break;
-                                case '\"':
-                                    state_ = json_parse_state::string;
-                                    ++input_ptr_;
-                                    ++position_;
-                                    string_buffer_.clear();
-                                    parse_string(visitor, ec);
-                                    if (ec) return;
-                                    break;
-                                case '-':
-                                    string_buffer_.clear();
-                                    string_buffer_.push_back('-');
-                                    ++input_ptr_;
-                                    ++position_;
-                                    state_ = json_parse_state::minus;
-                                    parse_number(visitor, ec);
-                                    if (ec) {return;}
-                                    break;
-                                case '0': 
-                                    string_buffer_.clear();
-                                    string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                                    state_ = json_parse_state::zero;
-                                    ++input_ptr_;
-                                    ++position_;
-                                    parse_number(visitor, ec);
-                                    if (ec) {return;}
-                                    break;
-                                case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8': case '9':
-                                    string_buffer_.clear();
-                                    string_buffer_.push_back(static_cast<char>(*input_ptr_));
-                                    ++input_ptr_;
-                                    ++position_;
-                                    state_ = json_parse_state::integer;
-                                    parse_number(visitor, ec);
-                                    if (ec) {return;}
-                                    break;
-                                case 'n':
-                                    parse_null(visitor, ec);
-                                    if (ec) {return;}
-                                    break;
-                                case 't':
-                                    parse_true(visitor, ec);
-                                    if (ec) {return;}
-                                    break;
-                                case 'f':
-                                    parse_false(visitor, ec);
-                                    if (ec) {return;}
-                                    break;
-                                case '}':
-                                    err_handler_(yaml_errc::unexpected_right_brace, *this);
-                                    ec = yaml_errc::unexpected_right_brace;
-                                    more_ = false;
-                                    return;
-                                case ']':
-                                    err_handler_(yaml_errc::unexpected_right_bracket, *this);
-                                    ec = yaml_errc::unexpected_right_bracket;
-                                    more_ = false;
-                                    return;
-                                default:
-                                    err_handler_(yaml_errc::syntax_error, *this);
-                                    ec = yaml_errc::syntax_error;
-                                    more_ = false;
-                                    return;
-                            }
                         }
                         break;
 
