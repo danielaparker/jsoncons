@@ -301,8 +301,8 @@ private:
     }
 };
 
-template <class From,class To>
-class json_visitor_adaptor_base : public From
+template <class From,class To,class Enable=void>
+class json_visitor_adaptor : public From
 {
 public:
     using typename From::string_view_type;
@@ -310,17 +310,22 @@ private:
     To* destination_;
 
     // noncopyable
-    json_visitor_adaptor_base(const json_visitor_adaptor_base&) = delete;
-    json_visitor_adaptor_base& operator=(const json_visitor_adaptor_base&) = delete;
+    json_visitor_adaptor(const json_visitor_adaptor&) = delete;
+    json_visitor_adaptor& operator=(const json_visitor_adaptor&) = delete;
 public:
-    json_visitor_adaptor_base(To& visitor)
+
+    json_visitor_adaptor()
+        : destination_(nullptr)
+    {
+    }
+    json_visitor_adaptor(To& visitor)
         : destination_(std::addressof(visitor))
     {
     }
 
     // moveable
-    json_visitor_adaptor_base(json_visitor_adaptor_base&&) = default;
-    json_visitor_adaptor_base& operator=(json_visitor_adaptor_base&&) = default;
+    json_visitor_adaptor(json_visitor_adaptor&&) = default;
+    json_visitor_adaptor& operator=(json_visitor_adaptor&&) = default;
 
     To& destination()
     {
@@ -371,6 +376,33 @@ private:
     bool visit_end_array(const ser_context& context, std::error_code& ec) override
     {
         return destination_->end_array(context, ec);
+    }
+
+    bool visit_key(const string_view_type& name,
+                 const ser_context& context,
+                 std::error_code& ec) override
+    {
+        std::basic_string<typename To::char_type> target;
+        auto result = unicons::convert(name.begin(),name.end(),std::back_inserter(target),unicons::conv_flags::strict);
+        if (result.ec != unicons::conv_errc())
+        {
+            ec = result.ec;
+        }
+        return destination().key(target, context, ec);
+    }
+
+    bool visit_string(const string_view_type& value,
+                      semantic_tag tag,
+                      const ser_context& context,
+                      std::error_code& ec) override
+    {
+        std::basic_string<typename To::char_type> target;
+        auto result = unicons::convert(value.begin(),value.end(),std::back_inserter(target),unicons::conv_flags::strict);
+        if (result.ec != unicons::conv_errc())
+        {
+            JSONCONS_THROW(ser_error(result.ec));
+        }
+        return destination().string_value(target, tag, context, ec);
     }
 
     bool visit_byte_string(const byte_string_view& b, 
@@ -525,58 +557,9 @@ private:
 };
 
 template <class From,class To,class Enable=void>
-class json_visitor_adaptor 
+class json_visitor_adaptor : public basic_json_filter<typename From::char_type>
 {
-};
-
-template <class From,class To>
-class json_visitor_adaptor<From,To,typename std::enable_if<jsoncons::detail::is_narrow_character<typename From::char_type>::value &&
-                                                           jsoncons::detail::is_narrow_character<typename To::char_type>::value>::type> : public json_visitor_adaptor_base<From,To>
-{
-    using supertype = json_visitor_adaptor_base<From,To>;
-    using to_char_type = typename To::char_type;
-    using from_char_type = typename From::char_type;
-public:
-    using typename From::string_view_type;
-    using supertype::destination;
-private:
-
-    // noncopyable
-    json_visitor_adaptor(const json_visitor_adaptor&) = delete;
-    json_visitor_adaptor& operator=(const json_visitor_adaptor&) = delete;
-public:
-    json_visitor_adaptor(To& visitor)
-        : supertype(visitor)
-    {
-    }
-
-    // moveable
-    json_visitor_adaptor(json_visitor_adaptor&&) = default;
-    json_visitor_adaptor& operator=(json_visitor_adaptor&&) = default;
-
-private:
-
-    bool visit_key(const string_view_type& key,
-                 const ser_context& context,
-                 std::error_code& ec) override
-    {
-        return destination().key(string_view_type(reinterpret_cast<const to_char_type*>(key.data()),key.size()), context, ec);
-    }
-
-    bool visit_string(const string_view_type& value,
-                      semantic_tag tag,
-                      const ser_context& context,
-                      std::error_code& ec) override
-    {
-        return destination().string_value(string_view_type(reinterpret_cast<const to_char_type*>(value.data()),value.size()), tag, context, ec);
-    }
-};
-
-template <class From,class To>
-class json_visitor_adaptor<From,To,typename std::enable_if<!(jsoncons::detail::is_narrow_character<typename From::char_type>::value &&
-                                                             jsoncons::detail::is_narrow_character<typename To::char_type>::value)>::type> : public json_visitor_adaptor_base<From,To>
-{
-    using supertype = json_visitor_adaptor_base<From,To>;
+    using supertype = basic_json_filter<typename From::char_type>;
 public:
     using typename From::string_view_type;
     using supertype::destination;
@@ -624,7 +607,38 @@ private:
         return destination().string_value(target, tag, context, ec);
     }
 };
+/*
+template <class From,class To>
+class json_visitor_adaptor<From,To,typename std::enable_if<std::is_convertible<To*,From*>::value>::type>
+{
+public:
+    using char_type = typename From::char_type;
+    using char_traits_type = typename From::char_traits_type;
+    using string_view_type = typename From::string_view_type;
+private:
+    To* destination_;
+public:
+    json_visitor_adaptor()
+        : destination_(nullptr)
+    {
+    }
+    json_visitor_adaptor(To& visitor)
+        : destination_(std::addressof(visitor))
+    {
+    }
 
+    operator From&() { return *destination_; }
+
+    // moveable
+    json_visitor_adaptor(json_visitor_adaptor&&) = default;
+    json_visitor_adaptor& operator=(json_visitor_adaptor&&) = default;
+
+    To& destination()
+    {
+        return *destination_;
+    }
+};
+*/
 template <class From,class To>
 json_visitor_adaptor<From,To> make_json_visitor_adaptor(To& to)
 {
