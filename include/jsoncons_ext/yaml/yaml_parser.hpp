@@ -28,7 +28,51 @@
         case 0x17:case 0x18:case 0x19:case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:case 0x1f 
 
 namespace jsoncons {
+
 namespace yaml {
+
+    /** The stream encoding. */
+    enum class encoding_type {
+        // Let the parser choose the encoding
+        YAML_ANY_ENCODING,
+        // The default UTF-8 encoding
+        YAML_UTF8_ENCODING,
+        // The UTF-16-LE encoding with BOM
+        YAML_UTF16LE_ENCODING,
+        // The UTF-16-BE encoding with BOM
+        YAML_UTF16BE_ENCODING
+    };
+
+    /** Scalar styles. */
+    enum class scalar_style_t {
+        /** Let the emitter choose the style. */
+        YAML_ANY_SCALAR_STYLE,
+
+        /** The plain scalar style. */
+        YAML_PLAIN_SCALAR_STYLE,
+
+        /** The single-quoted scalar style. */
+        YAML_SINGLE_QUOTED_SCALAR_STYLE,
+        /** The double-quoted scalar style. */
+        YAML_DOUBLE_QUOTED_SCALAR_STYLE,
+
+        /** The literal scalar style. */
+        YAML_LITERAL_SCALAR_STYLE,
+        /** The folded scalar style. */
+        YAML_FOLDED_SCALAR_STYLE
+    };
+
+    /** The pointer position. */
+    struct mark_t {
+        /** The position index. */
+        size_t index;
+
+        /** The position line. */
+        size_t line;
+
+        /** The position column. */
+        size_t column;
+    };
 
     enum class json_parse_state : uint8_t 
     {
@@ -105,13 +149,85 @@ namespace yaml {
         }
     };
 
-    template <class CharT, class TempAllocator = std::allocator<char>>
+    template <class TempAllocator = std::allocator<char>>
     class basic_yaml_parser : public ser_context
     {
     public:
-        using char_type = CharT;
-        using string_view_type = typename basic_json_visitor<CharT>::string_view_type;
+        using char_type = unsigned char; // utf8
+        using string_view_type = typename basic_json_visitor<char_type>::string_view_type;
     private:
+
+        enum class token_type
+        {
+            no_token,
+            stream_start_token,
+            stream_end_token,
+            version_directive_token,
+            tag_directive_token,
+            document_start_token,
+            document_end_token,
+            block_sequence_start_token,
+            block_mapping_start_token,
+            block_end_token,
+            flow_sequence_start_token,
+            flow_sequence_end_token,
+            flow_mapping_start_token,
+            flow_mapping_end_token,
+            block_entry_token,
+            flow_entry_token,
+            key_token,
+            value_token,
+            alias_token,
+            anchor_token,
+            tag_token,
+            scalar_token
+        };
+
+        struct token
+        {
+            token_type type;
+
+            union {
+
+                struct {
+                    encoding_type encoding;
+                } stream_start;
+
+                struct {
+                    char_type *value;
+                } alias;
+
+                struct {
+                    char_type *value;
+                } anchor;
+
+                struct {
+                    char_type *handle;
+                    char_type *suffix;
+                } tag;
+
+                struct {
+                    char_type *value;
+                    size_t length;
+                    scalar_style_t style;
+                } scalar;
+
+                struct {
+                    int major;
+                    int minor;
+                } version_directive;
+
+                struct {
+                    char_type *handle;
+                    char_type *prefix;
+                } tag_directive;
+
+            } data;
+
+            mark_t start_mark;  // The beginning of the token        
+            mark_t end_mark;  // The end of the token
+        };
+
         struct string_maps_to_double
         {
             string_view_type s;
@@ -123,13 +239,13 @@ namespace yaml {
         };
 
         using temp_allocator_type = TempAllocator;
-        using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT>;
+        using char_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<char_type>;
         using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<json_parse_state>;
 
         static constexpr size_t initial_string_buffer_capacity_ = 1024;
         static constexpr int default_initial_stack_capacity_ = 100;
 
-        basic_yaml_decode_options<CharT> options_;
+        basic_yaml_decode_options<char_type> options_;
 
         std::function<bool(yaml_errc,const ser_context&)> err_handler_;
         int initial_stack_capacity_;
@@ -140,14 +256,14 @@ namespace yaml {
         std::size_t position_;
         std::size_t mark_position_;
         std::size_t saved_position_;
-        const CharT* begin_input_;
-        const CharT* input_end_;
-        const CharT* input_ptr_;
+        const char_type* begin_input_;
+        const char_type* input_end_;
+        const char_type* input_ptr_;
         json_parse_state state_;
         bool more_;
         bool done_;
 
-        std::basic_string<CharT,std::char_traits<CharT>,char_allocator_type> string_buffer_;
+        std::basic_string<char_type,std::char_traits<char_type>,char_allocator_type> string_buffer_;
         jsoncons::detail::to_double_t to_double_;
 
         std::vector<json_parse_state,parse_state_allocator_type> state_stack_;
@@ -159,23 +275,23 @@ namespace yaml {
 
     public:
         basic_yaml_parser(const TempAllocator& alloc = TempAllocator())
-            : basic_yaml_parser(basic_yaml_decode_options<CharT>(), default_json_parsing(), alloc)
+            : basic_yaml_parser(basic_yaml_decode_options<char_type>(), default_json_parsing(), alloc)
         {
         }
 
         basic_yaml_parser(std::function<bool(yaml_errc,const ser_context&)> err_handler, 
                           const TempAllocator& alloc = TempAllocator())
-            : basic_yaml_parser(basic_yaml_decode_options<CharT>(), err_handler, alloc)
+            : basic_yaml_parser(basic_yaml_decode_options<char_type>(), err_handler, alloc)
         {
         }
 
-        basic_yaml_parser(const basic_yaml_decode_options<CharT>& options, 
+        basic_yaml_parser(const basic_yaml_decode_options<char_type>& options, 
                           const TempAllocator& alloc = TempAllocator())
             : basic_yaml_parser(options, default_json_parsing(), alloc)
         {
         }
 
-        basic_yaml_parser(const basic_yaml_decode_options<CharT>& options,
+        basic_yaml_parser(const basic_yaml_decode_options<char_type>& options,
                           std::function<bool(yaml_errc,const ser_context&)> err_handler, 
                           const TempAllocator& alloc = TempAllocator())
            : options_(options),
@@ -247,7 +363,7 @@ namespace yaml {
 
         void skip_space()
         {
-            const CharT* local_input_end = input_end_;
+            const char_type* local_input_end = input_end_;
             while (input_ptr_ != local_input_end) 
             {
                 switch (*input_ptr_)
@@ -277,7 +393,7 @@ namespace yaml {
 
         void skip_whitespace()
         {
-            const CharT* local_input_end = input_end_;
+            const char_type* local_input_end = input_end_;
 
             while (input_ptr_ != local_input_end) 
             {
@@ -317,7 +433,7 @@ namespace yaml {
             }
         }
 
-        void begin_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void begin_object(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             if (JSONCONS_UNLIKELY(++nesting_depth_ > options_.max_nesting_depth()))
             {
@@ -334,7 +450,7 @@ namespace yaml {
             more_ = visitor.begin_object(semantic_tag::none, *this, ec);
         }
 
-        void end_object(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void end_object(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             if (JSONCONS_UNLIKELY(nesting_depth_ < 1))
             {
@@ -374,7 +490,7 @@ namespace yaml {
             }
         }
 
-        void begin_array(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void begin_array(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             if (++nesting_depth_ > options_.max_nesting_depth())
             {
@@ -391,7 +507,7 @@ namespace yaml {
             more_ = visitor.begin_array(semantic_tag::none, *this, ec);
         }
 
-        void end_array(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void end_array(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             if (nesting_depth_ < 1)
             {
@@ -463,7 +579,7 @@ namespace yaml {
         {
             for (; input_ptr_ != input_end_; ++input_ptr_)
             {
-                CharT curr_char_ = *input_ptr_;
+                char_type curr_char_ = *input_ptr_;
                 switch (curr_char_)
                 {
                     case '\n':
@@ -493,14 +609,14 @@ namespace yaml {
             update(sv.data(),sv.length());
         }
 
-        void update(const CharT* data, std::size_t length)
+        void update(const char_type* data, std::size_t length)
         {
             begin_input_ = data;
             input_end_ = data + length;
             input_ptr_ = begin_input_;
         }
 
-        void parse_some(basic_json_visitor<CharT>& visitor)
+        void parse_some(basic_json_visitor<char_type>& visitor)
         {
             std::error_code ec;
             parse_some(visitor, ec);
@@ -510,12 +626,12 @@ namespace yaml {
             }
         }
 
-        void parse_some(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void parse_some(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             parse_some_(visitor, ec);
         }
 
-        void finish_parse(basic_json_visitor<CharT>& visitor)
+        void finish_parse(basic_json_visitor<char_type>& visitor)
         {
             std::error_code ec;
             finish_parse(visitor, ec);
@@ -525,7 +641,7 @@ namespace yaml {
             }
         }
 
-        void finish_parse(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void finish_parse(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             while (!finished())
             {
@@ -533,7 +649,7 @@ namespace yaml {
             }
         }
 
-        bool parse_document_start(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        bool parse_document_start(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             switch (*input_ptr_)
             {
@@ -640,7 +756,7 @@ namespace yaml {
             return true;
         }
 
-        void parse_some_(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void parse_some_(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             if (state_ == json_parse_state::before_done)
             {
@@ -650,7 +766,7 @@ namespace yaml {
                 more_ = false;
                 return;
             }
-            const CharT* local_input_end = input_end_;
+            const char_type* local_input_end = input_end_;
 
             if (input_ptr_ == local_input_end && more_)
             {
@@ -1571,7 +1687,7 @@ namespace yaml {
             }
         }
 
-        void parse_true(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void parse_true(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             saved_position_ = position_;
             if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 4))
@@ -1606,7 +1722,7 @@ namespace yaml {
             }
         }
 
-        void parse_null(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void parse_null(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             saved_position_ = position_;
             if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 4))
@@ -1641,7 +1757,7 @@ namespace yaml {
             }
         }
 
-        void parse_false(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void parse_false(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             saved_position_ = position_;
             if (JSONCONS_LIKELY(input_end_ - input_ptr_ >= 5))
@@ -1676,10 +1792,10 @@ namespace yaml {
             }
         }
 
-        void parse_number(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void parse_number(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             saved_position_ = position_ - 1;
-            const CharT* local_input_end = input_end_;
+            const char_type* local_input_end = input_end_;
 
             switch (state_)
             {
@@ -2094,11 +2210,11 @@ namespace yaml {
             JSONCONS_UNREACHABLE();               
         }
 
-        void parse_string(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void parse_string(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             saved_position_ = position_ - 1;
-            const CharT* local_input_end = input_end_;
-            const CharT* sb = input_ptr_;
+            const char_type* local_input_end = input_end_;
+            const char_type* sb = input_ptr_;
 
             switch (state_)
             {
@@ -2570,7 +2686,7 @@ namespace yaml {
         }
     private:
 
-        void end_integer_value(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void end_integer_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             if (string_buffer_[0] == '-')
             {
@@ -2582,7 +2698,7 @@ namespace yaml {
             }
         }
 
-        void end_negative_value(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void end_negative_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             auto result = jsoncons::detail::to_integer_unchecked<int64_t>(string_buffer_.data(), string_buffer_.length());
             if (result)
@@ -2596,7 +2712,7 @@ namespace yaml {
             after_value(ec);
         }
 
-        void end_positive_value(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void end_positive_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             auto result = jsoncons::detail::to_integer_unchecked<uint64_t>(string_buffer_.data(), string_buffer_.length());
             if (result)
@@ -2610,7 +2726,7 @@ namespace yaml {
             after_value(ec);
         }
 
-        void end_fraction_value(basic_json_visitor<CharT>& visitor, std::error_code& ec)
+        void end_fraction_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
         {
             JSONCONS_TRY
             {
@@ -2638,7 +2754,7 @@ namespace yaml {
             after_value(ec);
         }
 
-        void end_string_value(const CharT* s, std::size_t length, basic_json_visitor<CharT>& visitor, std::error_code& ec) 
+        void end_string_value(const char_type* s, std::size_t length, basic_json_visitor<char_type>& visitor, std::error_code& ec) 
         {
             string_view_type sv(s, length);
             auto result = unicons::validate(s,s+length);
@@ -2781,8 +2897,7 @@ namespace yaml {
         }
     };
 
-    using yaml_parser = basic_yaml_parser<char>;
-    using wyaml_parser = basic_yaml_parser<wchar_t>;
+    using yaml_parser = basic_yaml_parser<>;
 
 } // namespace yaml
 } // namespace jsoncons

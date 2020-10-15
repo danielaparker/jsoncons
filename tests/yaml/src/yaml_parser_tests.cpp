@@ -35,7 +35,7 @@ bill-to: &id001
 
         parser.reset();
 
-        parser.update(input.data(),input.length());
+        parser.update(reinterpret_cast<const unsigned char*>(input.data()),input.length());
         parser.parse_some(decoder);
         parser.finish_parse(decoder);
         CHECK(parser.done());

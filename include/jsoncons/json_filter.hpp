@@ -20,20 +20,24 @@ public:
     using typename basic_json_visitor<CharT>::char_type;
     using typename basic_json_visitor<CharT>::string_view_type;
 private:
-    basic_json_visitor<char_type>& destination_;
+    basic_json_visitor<char_type>* destination_;
 
-    // noncopyable and nonmoveable
+    // noncopyable 
     basic_json_filter(const basic_json_filter&) = delete;
     basic_json_filter& operator=(const basic_json_filter&) = delete;
 public:
     basic_json_filter(basic_json_visitor<char_type>& visitor)
-        : destination_(visitor)
+        : destination_(std::addressof(visitor))
     {
     }
 
+    // moveable
+    basic_json_filter(basic_json_filter&&) = default;
+    basic_json_filter& operator=(basic_json_filter&&) = default;
+
     basic_json_visitor<char_type>& destination()
     {
-        return destination_;
+        return *destination_;
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -65,44 +69,44 @@ public:
 private:
     void visit_flush() override
     {
-        destination_.flush();
+        destination_->flush();
     }
 
     bool visit_begin_object(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.begin_object(tag, context, ec);
+        return destination_->begin_object(tag, context, ec);
     }
 
     bool visit_begin_object(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.begin_object(length, tag, context, ec);
+        return destination_->begin_object(length, tag, context, ec);
     }
 
     bool visit_end_object(const ser_context& context, std::error_code& ec) override
     {
-        return destination_.end_object(context, ec);
+        return destination_->end_object(context, ec);
     }
 
     bool visit_begin_array(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.begin_array(tag, context, ec);
+        return destination_->begin_array(tag, context, ec);
     }
 
     bool visit_begin_array(std::size_t length, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.begin_array(length, tag, context, ec);
+        return destination_->begin_array(length, tag, context, ec);
     }
 
     bool visit_end_array(const ser_context& context, std::error_code& ec) override
     {
-        return destination_.end_array(context, ec);
+        return destination_->end_array(context, ec);
     }
 
     bool visit_key(const string_view_type& name,
                  const ser_context& context,
                  std::error_code& ec) override
     {
-        return destination_.key(name, context, ec);
+        return destination_->key(name, context, ec);
     }
 
     bool visit_string(const string_view_type& value,
@@ -110,7 +114,7 @@ private:
                       const ser_context& context,
                       std::error_code& ec) override
     {
-        return destination_.string_value(value, tag, context, ec);
+        return destination_->string_value(value, tag, context, ec);
     }
 
     bool visit_byte_string(const byte_string_view& b, 
@@ -118,7 +122,7 @@ private:
                            const ser_context& context,
                            std::error_code& ec) override
     {
-        return destination_.byte_string_value(b, tag, context, ec);
+        return destination_->byte_string_value(b, tag, context, ec);
     }
 
     bool visit_byte_string(const byte_string_view& b, 
@@ -126,37 +130,37 @@ private:
                            const ser_context& context,
                            std::error_code& ec) override
     {
-        return destination_.byte_string_value(b, ext_tag, context, ec);
+        return destination_->byte_string_value(b, ext_tag, context, ec);
     }
 
     bool visit_uint64(uint64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.uint64_value(value, tag, context, ec);
+        return destination_->uint64_value(value, tag, context, ec);
     }
 
     bool visit_int64(int64_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.int64_value(value, tag, context, ec);
+        return destination_->int64_value(value, tag, context, ec);
     }
 
     bool visit_half(uint16_t value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.half_value(value, tag, context, ec);
+        return destination_->half_value(value, tag, context, ec);
     }
 
     bool visit_double(double value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.double_value(value, tag, context, ec);
+        return destination_->double_value(value, tag, context, ec);
     }
 
     bool visit_bool(bool value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.bool_value(value, tag, context, ec);
+        return destination_->bool_value(value, tag, context, ec);
     }
 
     bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
-        return destination_.null_value(tag, context, ec);
+        return destination_->null_value(tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const uint8_t>& s, 
@@ -164,7 +168,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const uint16_t>& s, 
@@ -172,7 +176,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const uint32_t>& s, 
@@ -180,7 +184,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const uint64_t>& s, 
@@ -188,7 +192,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const int8_t>& s, 
@@ -196,7 +200,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const int16_t>& s, 
@@ -204,7 +208,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const int32_t>& s, 
@@ -212,7 +216,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const int64_t>& s, 
@@ -220,7 +224,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(half_arg_t, 
@@ -229,7 +233,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(half_arg, s, tag, context, ec);
+        return destination_->typed_array(half_arg, s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const float>& s, 
@@ -237,7 +241,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_typed_array(const jsoncons::span<const double>& s, 
@@ -245,7 +249,7 @@ private:
                         const ser_context& context, 
                         std::error_code& ec) override
     {
-        return destination_.typed_array(s, tag, context, ec);
+        return destination_->typed_array(s, tag, context, ec);
     }
 
     bool visit_begin_multi_dim(const jsoncons::span<const size_t>& shape,
@@ -253,13 +257,13 @@ private:
                             const ser_context& context, 
                             std::error_code& ec) override
     {
-        return destination_.begin_multi_dim(shape, tag, context, ec);
+        return destination_->begin_multi_dim(shape, tag, context, ec);
     }
 
     bool visit_end_multi_dim(const ser_context& context,
                           std::error_code& ec) override
     {
-        return destination_.end_multi_dim(context, ec);
+        return destination_->end_multi_dim(context, ec);
     }
 };
 
@@ -309,11 +313,6 @@ private:
     json_visitor_adaptor(const json_visitor_adaptor&) = delete;
     json_visitor_adaptor& operator=(const json_visitor_adaptor&) = delete;
 public:
-
-    json_visitor_adaptor()
-        : destination_(nullptr)
-    {
-    }
     json_visitor_adaptor(To& visitor)
         : destination_(std::addressof(visitor))
     {
