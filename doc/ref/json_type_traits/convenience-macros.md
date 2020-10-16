@@ -1451,6 +1451,22 @@ circle area: 3.1415927
 ]
 ```
 
+Note the mapping to the "type" member, in particular, for the rectangle,
+
+```c++
+(height,"type",JSONCONS_RDONLY,
+ [](const std::string& type) noexcept{return type == "rectangle";},
+ ns::rectangle_marker),
+```
+
+There are two things to observe. First, the class member being mapped,
+here `height`, can be any member, we don't actually use it. Instead,  
+we use the function object `ns::rectangle_marker` to ouput the value
+"rectangle" with the key "type". Second, the function argument in
+this position cannot be a lambda expression (at least until C++20), 
+because jsoncons uses it in an unevaluated context, so it is
+provided as a variable containing a lambda expression instead.
+
 <div id="A10"/>
 
 #### Transform data member (since 0.158.0)
