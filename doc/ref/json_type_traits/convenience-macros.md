@@ -16,7 +16,9 @@ GETTER    | Accesses data members through getter functions
 SETTER    | Modifies data members through setter functions
 NAME      | Serialize with provided names (instead of C++ member names)
 
-Square brackets indicate optionality.
+The `_NAME_` macros are the most general. They allow optional
+parameters that affect data member mappings. Optionality is
+indicated by square brackets.
 
 ```c++
 #include <jsoncons/json_type_traits.hpp>
