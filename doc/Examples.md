@@ -1417,7 +1417,7 @@ If all members of the JSON data must be present, use
 ```
 JSONCONS_ALL_MEMBER_TRAITS(ns::Person, name, surname, ssn, age)
 ```
-instead. This will cause an exception to be thrown with the message
+instead. This will cause a [jsoncons::convert_error](ref/convert_error.md) to be thrown with the message
 ```
 Key not found: 'ssn' 
 ```
