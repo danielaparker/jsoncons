@@ -3,6 +3,7 @@
 
 #include <string>
 #include <fstream>
+#include <cmath>
 #include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
@@ -110,6 +111,18 @@ namespace {
 
         std::cout << ("2\n") << pretty_print(j) << "\n";
     }
+
+    void json_replace_example3()
+    {
+        std::ifstream is("./input/booklist.json");
+        json booklist = json::parse(is);
+
+        // make a discount on all books
+        jsonpath::json_replace(booklist, "$.store.book[*].price",
+                [](const json& price) { return std::round(price.as<double>() - 1.0); });
+        std::cout << pretty_print(booklist);
+    }
+
 
     void jsonpath_complex_examples()
     {
@@ -276,6 +289,7 @@ void jsonpath_examples()
     std::cout << "\nJsonPath examples\n\n";
     json_replace_example1();
     json_replace_example2();
+    json_replace_example3();
     jsonpath_complex_examples();
     jsonpath_union();
     json_query_examples();

@@ -669,6 +669,17 @@ namespace impl {
     template<class T>
     using
     is_constructible_from_string = is_detected<construct_from_string_t,T>;
+
+    // is_function_object
+
+    template<class FunctionObject, class Arg>
+        using
+        function_object_t = decltype(std::declval<FunctionObject>()(std::declval<Arg>()));
+
+    template<class FunctionObject, class Arg>
+        using
+        is_function_object = jsoncons::detail::is_detected<function_object_t, FunctionObject, Arg>;
+
 } // detail
 } // jsoncons
 

@@ -131,12 +131,23 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json, class T>
-    void json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
+    typename std::enable_if<!jsoncons::detail::is_function_object<T,Json>::value,void>::type
+    json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
     {
         jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
         jsoncons::jsonpath::detail::jsonpath_resources<Json> resources;
         evaluator.evaluate(resources, root, path);
         evaluator.replace(std::forward<T>(new_value));
+    }
+
+    template<class Json, class Op>
+    typename std::enable_if<jsoncons::detail::is_function_object<Op,Json>::value,void>::type
+    json_replace(Json& root, const typename Json::string_view_type& path, Op op)
+    {
+        jsoncons::jsonpath::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+        jsoncons::jsonpath::detail::jsonpath_resources<Json> resources;
+        evaluator.evaluate(resources, root, path);
+        evaluator.replace_fn(op);
     }
 
     namespace detail {
@@ -599,6 +610,18 @@ namespace jsoncons { namespace jsonpath {
                 }
             }
             return result;
+        }
+
+        template<class Op>
+        void replace_fn(Op op)
+        {
+            if (!stack_.empty())
+            {
+                for (std::size_t i = 0; i < stack_.back().size(); ++i)
+                {
+                    *(stack_.back()[i].val_ptr) = op(*(stack_.back()[i].val_ptr));
+                }
+            }
         }
 
         template <class T>
