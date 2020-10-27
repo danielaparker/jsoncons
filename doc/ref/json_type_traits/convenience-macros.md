@@ -277,7 +277,7 @@ where <code>Type</code> is the type of <code>memberN</code> (<code>_MEMBER_</cod
 or <code>Type</code> (if not).
 <code>intoN</code> can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
 but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
-(since 0.157.0).</td> 
+(since 0.157.0)</td> 
   </tr>
   <tr>
     <td><code>fromN</code></td>
