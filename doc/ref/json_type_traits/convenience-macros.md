@@ -225,40 +225,74 @@ in the derived classes.
   </tr>
   <tr>
     <td><code>enum_name</code></td>
-    <td>The name of an enum type or enum class type</td> 
+    <td>The name of an enum type or enum class type.</td> 
+  </tr>
+  <tr>
+    <td><code>num_template_params</code></td>
+    <td>For a class template, the number of template parameters.</td> 
+  </tr>
+  <tr>
+    <td><code>memberN</code></td>
+    <td>The name of a class data member. Class data members are normally modifiable, but may be <code>const</code> or <code>static const</code>.
+        Data members that are <code>const</code> or <code>static const</code> are one-way serialized.</td> 
+  </tr>
+  <tr>
+    <td><code>propertyN</code></td>
+    <td>The base name of a class getter or setter with prefix <code>get</code> or <code>set</code> stripped out.</td> 
+  </tr>
+  <tr>
+    <td><code>getterN</code></td>
+    <td>The getter for a class data member.</td> 
+  </tr>
+  <tr>
+    <td><code>setterN</code></td>
+    <td>The setter for a class data member.</td> 
+  </tr>
+  <tr>
+    <td><code>enumeratorN</code></td>
+    <td>An enumerator.</td> 
+  </tr>
+  <tr>
+    <td><code>serialized_nameN</code></td>
+    <td>Serialized name.</td> 
+  </tr>
+  <tr>
+    <td><code>modeN</code></td>
+    <td>Indicates whether a data member is read-write (<code>JSONCONS_RDWR</code>) or read-only (<code>JSONCONS_RDONLY</code>).
+Read-only data members are serialized but not de-serialized. (since 0.157.0)</td> 
+  </tr>
+  <tr>
+    <td><code>matchN</code></td>
+    <td>A function object that takes a value of type <code>const T&</code> and returns <code>true</code> if the value matches an allowed value,
+<code>false</code> otherwise. If the function object <code>to</code> is also provided, type <code>T</code> must be the same as the  return type of <code>T</code>,
+otherwise it must be the same as the member type (since 0.157.0).</td> 
+  </tr>
+  <tr>
+    <td><code>intoN</code></td>
+    <td>A unary function object with signature equivalent to
+<code>
+Ret fun(const Type& a);
+</code>
+where <code>Type</code> is the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>), and <code>Ret</code> is the return type of <code>fromN</code> (if provided)
+or <code>Type</code> (if not).
+<code>intoN</code> can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
+but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
+(since 0.157.0).</td> 
+  </tr>
+  <tr>
+    <td>fromN<code></code></td>
+    <td>A function object that takes a value of return type of <code>intoN</code>, and returns a value
+ of type of <code>memberN</code> (or return type of <code>getterN</code>). Only used if <code>modeN</code> is <code>JSONCONS_RDWR</code>. (since 0.157.0)</td> 
+  </tr>
+  <tr>
+    <td><code>base_class_name</code></td>
+    <td>The name of a base class.</td> 
+  </tr>
+  <tr>
+    <td><code>derived_class_nameN</code></td>
+    <td>A class that is derived from the base class, and that has a <code>json_type_traits<Json,derived_class_nameN></code> specialization.</td> 
   </tr>
 </table>
-
-`class_name` - the name of a class or struct  
-`num_mandatory` - the number of mandatory class data members or accessors  
-`enum_name` - the name of an enum type or enum class type  
-`num_template_params` - for a class template, the number of template parameters  
-`memberN` - the name of a class data member. Class data members are normally modifiable, but may be `const` or
-`propertyN` - the base name of a class getter or setter with prefix `get` or `set` stripped out. 
-Data members that are `const` or `static const` are one-way serialized.  
-`getterN` - the getter for a class data member  
-`setterN` - the setter for a class data member  
-`enumeratorN` - an enumerator  
-`serialized_nameN` - serialized name  
-`modeN` - indicates whether a data member is read-write (`JSONCONS_RDWR`) or read-only (`JSONCONS_RDONLY`).
-Read-only data members are serialized but not de-serialized (since 0.157.0)  
-`matchN` - a function object that takes a value of type `const T&` and returns `true` if the value matches an allowed value,
-`false` otherwise. If the function object `to` is also provided, type `T` must be the same as the  return type of `T`,
-otherwise it must be the same as the member type (since 0.157.0)  
-`intoN` - a unary function object.
-The signature of `intoN` should be equivalent to
-```c++
-Ret fun(const Type& a);
-```
-where `Type` is the type of `memberN` (`_MEMBER_` traits) or the return type of `getterN` (`_GETTER_ traits`), and `Ret` is the return type of `fromN` (if provided)
-or `Type` (if not).
-`intoN` can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
-but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
-(since 0.157.0)  
-`fromN` - a function object that takes a value of return type of `intoN`, and returns a value
- of type of `memberN` (or return type of `getterN`). Only used if `modeN` is `JSONCONS_RDWR`. (since 0.157.0)  
-`base_class_name` - the name of a base class  
-`derived_class_nameN` - a class that is derived from the base class, and that has a `json_type_traits<Json,derived_class_nameN>` specialization.  
 
 These macro declarations must be placed at global scope, outside any namespace blocks, and `class_name`, 
 `base_class_name` and `derived_class_nameN` must be a fully namespace qualified names.
