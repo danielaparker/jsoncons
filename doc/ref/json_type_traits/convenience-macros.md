@@ -280,7 +280,7 @@ but because it is used in an unevaluated context, it cannot be a lambda expressi
 (since 0.157.0).</td> 
   </tr>
   <tr>
-    <td>fromN<code></code></td>
+    <td><code>fromN</code></td>
     <td>A function object that takes a value of return type of <code>intoN</code>, and returns a value
  of type of <code>memberN</code> (or return type of <code>getterN</code>). Only used if <code>modeN</code> is <code>JSONCONS_RDWR</code>. (since 0.157.0)</td> 
   </tr>
