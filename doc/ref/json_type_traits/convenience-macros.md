@@ -238,7 +238,7 @@ in the derived classes.
   </tr>
   <tr>
     <td><code>propertyN</code></td>
-    <td>The base name of a class getter or setter with any get or set prefix stripped out.</td> 
+    <td>The base name of a class getter or setter, with any get or set prefix stripped out.</td> 
   </tr>
   <tr>
     <td><code>getterN</code></td>
