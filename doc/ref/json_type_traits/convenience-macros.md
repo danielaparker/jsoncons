@@ -275,7 +275,7 @@ Ret fun(const Type& a);
 </code><br/><br/>
 where <code>Type</code> is the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>), and <code>Ret</code> is the return type of <code>fromN</code> (if provided)
 or <code>Type</code> (if not).
-<code>intoN</code> can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
+<code>intoN</code> can be a free function, a struct object with <code>operator()</code> defined, or a variable containing a lambda expression,
 but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
 (since 0.157.0)</td> 
   </tr>
