@@ -273,7 +273,7 @@ where <code>Type</code> matches the return type of function object <code>intoN</
 and if not, the type of <code>memberN</code> (<code>_MEMBER_</code> traits) 
 or the return type of an accessor (<code>_GETTER_ traits</code>).
 It returns <code>true</code> if the argument provided matches an allowed value,
-<code>false</code> otherwise. <code>Type</code> must have <code>json_type_traits</code> specialization. (since 0.157.0)</td> 
+<code>false</code> otherwise. (since 0.157.0)</td> 
   </tr>
   <tr>
     <td><code>intoN</code></td>
