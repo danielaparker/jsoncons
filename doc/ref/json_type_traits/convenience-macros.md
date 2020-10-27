@@ -214,12 +214,17 @@ in the derived classes.
 
 #### Parameters
 
-<table style="border-collapse: collapse; border: none;">
-    <tr style="border: none;">
-        <td style="border: none;"><code>class_name</code></td>
-        <td style="border: none;">The name of a class or struct</code></td>
+<table class="tab">
+    <tr>
+        <td><code>class_name</code></td>
+        <td>The name of a class or struct</code></td>
     </tr>
 </table>    
+<style>
+.tab {border-collapse:collapse;}
+.tab .first {border-bottom:1px solid #EEE;}
+.tab .second {border-top:1px solid #CCC;box-shadow: inset 0 1px 0 #CCC;}?
+</style>
 
 `class_name` - the name of a class or struct  
 `num_mandatory` - the number of mandatory class data members or accessors  
