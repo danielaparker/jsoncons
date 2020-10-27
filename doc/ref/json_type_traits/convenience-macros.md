@@ -222,8 +222,8 @@ in the derived classes.
 </table>    
 <style>
 .tab {border-collapse:collapse;}
-.tab .first {border-bottom:1px solid #EEE;}
-.tab .second {border-top:1px solid #CCC;box-shadow: inset 0 1px 0 #CCC;}?
+.tab .first {border-bottom:0px solid #EEE;}
+.tab .second {border-top:0px solid #CCC;box-shadow: inset 0 0px 0 #CCC;}?
 </style>
 
 `class_name` - the name of a class or struct  
