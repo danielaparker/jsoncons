@@ -222,7 +222,7 @@ in the derived classes.
 </table>    
 <style>
 tr, td, th {
-    border: 0px
+    border: none
 }
 </style>
 
