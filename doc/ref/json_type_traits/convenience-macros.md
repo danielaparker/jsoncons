@@ -275,7 +275,8 @@ It returns <code>true</code> if the argument provided matches an allowed value,
   </tr>
   <tr>
     <td><code>intoN</code></td>
-    <td>A function object having signature equivalent to
+    <td>A function object that converts a user value into a type that has <code>json_type_traits</code> specialization. 
+It must have function call signature equivalent to
 <br/><br/><code>
 Ret fun(const Type& a);
 </code><br/><br/>
@@ -287,7 +288,8 @@ but because it is used in an unevaluated context, it cannot be a lambda expressi
   </tr>
   <tr>
     <td><code>fromN</code></td>
-    <td>A function object having signature equivalent to
+    <td>A function object that obtains a user value from a type that has <code>json_type_traits</code> specialization. 
+It must have function call signature equivalent to
 <br/><br/><code>
 Ret fun(const Type& a);
 </code><br/><br/>
