@@ -288,7 +288,7 @@ but because it is used in an unevaluated context, it cannot be a lambda expressi
   </tr>
   <tr>
     <td><code>fromN</code></td>
-    <td>A function object that obtains a user value from a type that has <code>json_type_traits</code> specialization. 
+    <td>A function object that gets a user value from a type that has <code>json_type_traits</code> specialization. 
 It must have function call signature equivalent to
 <br/><br/><code>
 Ret fun(const Type& a);
