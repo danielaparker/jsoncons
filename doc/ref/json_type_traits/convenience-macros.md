@@ -267,7 +267,7 @@ Read-only data members are serialized but not de-serialized. (since 0.157.0)</td
 <br/><br/><code>
 bool fun(const Type& a);
 </code><br/><br/>
-where <code>Type</code> is the parameter type of function object <code>fromN</code>, if provided,
+where <code>Type</code> is the return type of function object <code>intoN</code>, if provided,
 and if not, the type of <code>memberN</code> (<code>_MEMBER_</code> traits) 
 or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>).
 It returns <code>true</code> if the <code>a</code> matches an allowed value,
