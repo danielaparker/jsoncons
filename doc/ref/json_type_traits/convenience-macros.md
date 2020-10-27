@@ -263,7 +263,9 @@ Read-only data members are serialized but not de-serialized. (since 0.157.0)</td
   </tr>
   <tr>
     <td><code>matchN</code></td>
-    <td>A function object having signature equivalent to
+    <td>A function object that checks if a type that has <code>json_type_traits</code> specialization
+can be converted into a user value. 
+It must have function call signature equivalent to
 <br/><br/><code>
 bool fun(const Type& a);
 </code><br/><br/>
