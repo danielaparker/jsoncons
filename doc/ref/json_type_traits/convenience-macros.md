@@ -213,6 +213,11 @@ conveniences macros (1)-(26), the type selection strategy is based on the presen
 in the derived classes.
 
 #### Parameters
+<style>
+table, tr, td, th {
+    border: 0px
+}
+</style>
 
 <table class="tab">
     <tr>
@@ -220,11 +225,6 @@ in the derived classes.
         <td>The name of a class or struct</code></td>
     </tr>
 </table>    
-<style>
-.tab {border-collapse:collapse;}
-.tab .first {border-bottom:0px solid #EEE;}
-.tab .second {border-top:0px solid #CCC;box-shadow: inset 0 0px 0 #CCC;}?
-</style>
 
 `class_name` - the name of a class or struct  
 `num_mandatory` - the number of mandatory class data members or accessors  
