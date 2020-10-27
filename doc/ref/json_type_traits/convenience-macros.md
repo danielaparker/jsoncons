@@ -285,7 +285,7 @@ but because it is used in an unevaluated context, it cannot be a lambda expressi
 <br/><br/><code>
 Ret fun(const Type& a);
 </code><br/><br/>
-where <code>Type</code> is the return type of the function object <code>intoN</code> 
+where <code>Type</code> is the parameter type of the function object <code>intoN</code> 
 and <code>Ret</code> is the  is the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>).
 Only used if <code>modeN</code> is <code>JSONCONS_RDWR</code>. (since 0.157.0)</td> 
   </tr>
