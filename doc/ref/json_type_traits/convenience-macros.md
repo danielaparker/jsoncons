@@ -269,10 +269,10 @@ otherwise it must be the same as the member type (since 0.157.0).</td>
   </tr>
   <tr>
     <td><code>intoN</code></td>
-    <td>A unary function object having signature equivalent to
-<code>
+    <td>A function object having signature equivalent to
+<br/><code>
 Ret fun(const Type& a);
-</code>
+</code><br/>
 where <code>Type</code> is the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>), and <code>Ret</code> is the return type of <code>fromN</code> (if provided)
 or <code>Type</code> (if not).
 <code>intoN</code> can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
@@ -281,10 +281,10 @@ but because it is used in an unevaluated context, it cannot be a lambda expressi
   </tr>
   <tr>
     <td><code>fromN</code></td>
-    <td>A unary function object having signature equivalent to
-<code>
+    <td>A function object having signature equivalent to
+<br/><code>
 Ret fun(const Type& a);
-</code>
+</code><br/>
 where <code>Type</code> is the return type of the function object <code>intoN</code> 
 and <code>Ret</code> is the  is the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>).
 Only used if <code>modeN</code> is <code>JSONCONS_RDWR</code>. (since 0.157.0)</td> 
