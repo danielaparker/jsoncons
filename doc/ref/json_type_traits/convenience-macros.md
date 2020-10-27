@@ -214,6 +214,13 @@ in the derived classes.
 
 #### Parameters
 
+<table style="border-collapse: collapse; border: none;">
+    <tr style="border: none;">
+        <td style="border: none;"><code>class_name</code></td>
+        <td style="border: none;">The name of a class or struct</code></td>
+    </tr>
+</table>    
+
 `class_name` - the name of a class or struct  
 `num_mandatory` - the number of mandatory class data members or accessors  
 `enum_name` - the name of an enum type or enum class type  
