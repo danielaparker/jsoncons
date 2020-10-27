@@ -270,7 +270,7 @@ bool fun(const Type& a);
 where <code>Type</code> is the return type of function object <code>intoN</code>, if provided,
 and if not, the type of <code>memberN</code> (<code>_MEMBER_</code> traits) 
 or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>).
-It returns <code>true</code> if the <code>a</code> matches an allowed value,
+It returns <code>true</code> if the argument provided matches an allowed value,
 <code>false</code> otherwise. (since 0.157.0)</td> 
   </tr>
   <tr>
