@@ -269,7 +269,7 @@ otherwise it must be the same as the member type (since 0.157.0).</td>
   </tr>
   <tr>
     <td><code>intoN</code></td>
-    <td>A unary function object with signature equivalent to
+    <td>A unary function object having signature equivalent to
 <code>
 Ret fun(const Type& a);
 </code>
@@ -281,8 +281,13 @@ but because it is used in an unevaluated context, it cannot be a lambda expressi
   </tr>
   <tr>
     <td><code>fromN</code></td>
-    <td>A function object that takes a value of return type of <code>intoN</code>, and returns a value
- of type of <code>memberN</code> (or return type of <code>getterN</code>). Only used if <code>modeN</code> is <code>JSONCONS_RDWR</code>. (since 0.157.0)</td> 
+    <td>A unary function object having signature equivalent to
+<code>
+Ret fun(const Type& a);
+</code>
+where <code>Type</code> is the return type of the function object <code>intoN</code> 
+and <code>Ret</code> is the  is the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>).
+Only used if <code>modeN</code> is <code>JSONCONS_RDWR</code>. (since 0.157.0)</td> 
   </tr>
   <tr>
     <td><code>base_class_name</code></td>
