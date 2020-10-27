@@ -269,7 +269,7 @@ It must have function call signature equivalent to
 <br/><br/><code>
 bool fun(const Type& a);
 </code><br/><br/>
-where <code>Type</code> is the return type of function object <code>intoN</code>, if provided,
+where <code>Type</code> matches the return type of function object <code>intoN</code>, if provided,
 and if not, the type of <code>memberN</code> (<code>_MEMBER_</code> traits) 
 or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>).
 It returns <code>true</code> if the argument provided matches an allowed value,
@@ -282,7 +282,7 @@ It must have function call signature equivalent to
 <br/><br/><code>
 Ret fun(const Type& a);
 </code><br/><br/>
-where <code>Type</code> is the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>), and <code>Ret</code> is the parameter type of function object <code>fromN</code> (if provided)
+where <code>Type</code> matches the type of <code>memberN</code> (<code>_MEMBER_</code> traits) or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>), and <code>Ret</code> is the parameter type of function object <code>fromN</code> (if provided)
 or <code>Type</code> (if not).
 It can be a free function, a struct object with <code>operator()</code> defined, or a variable containing a lambda expression,
 but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
