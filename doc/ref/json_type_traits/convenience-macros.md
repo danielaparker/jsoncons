@@ -213,8 +213,9 @@ conveniences macros (1)-(26), the type selection strategy is based on the presen
 in the derived classes.
 
 #### Parameters
+
 <style>
-table, tr, td, th {
+tr, td, th {
     border: 0px
 }
 </style>
