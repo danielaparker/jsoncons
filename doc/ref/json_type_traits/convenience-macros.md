@@ -220,12 +220,12 @@ in the derived classes.
     <td>The name of a class or struct.</td> 
   </tr>
   <tr>
-    <td><code>num_mandatory</code></td>
-    <td>The number of mandatory class data members or accessors.</td> 
-  </tr>
-  <tr>
     <td><code>enum_name</code></td>
     <td>The name of an enum type or enum class type.</td> 
+  </tr>
+  <tr>
+    <td><code>num_mandatory</code></td>
+    <td>The number of mandatory class data members or accessors.</td> 
   </tr>
   <tr>
     <td><code>num_template_params</code></td>
