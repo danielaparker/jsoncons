@@ -214,6 +214,11 @@ in the derived classes.
 
 #### Parameters
 
+| | | |
+|-|-|-|
+|__Bold Key__| Value1 |
+| Normal Key | Value2 |
+
 `class_name` - the name of a class or struct  
 `num_mandatory` - the number of mandatory class data members or accessors  
 `enum_name` - the name of an enum type or enum class type  
