@@ -214,17 +214,14 @@ in the derived classes.
 
 #### Parameters
 
-<table class="tab">
-    <tr>
-        <td><code>class_name</code></td>
-        <td>The name of a class or struct</code></td>
-    </tr>
-</table>    
-<style>
-tr, td, th {
-    border: none
-}
-</style>
+----------- ------- --------------- -------------------------
+   First    row                12.0 Example of a row that
+                                    spans multiple lines.
+
+  Second    row                 5.0 Here's another one. Note
+                                    the blank line between
+                                    rows.
+----------- ------- --------------- -------------------------
 
 `class_name` - the name of a class or struct  
 `num_mandatory` - the number of mandatory class data members or accessors  
