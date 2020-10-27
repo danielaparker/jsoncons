@@ -5138,6 +5138,20 @@ namespace jmespath {
         return result;
     }
 
+    template <class Json>
+    jmespath_expression make_jmespath_expression(const string_view_type& expr)
+    {
+        return jmespath_expression<Json>::compile(expr);
+    }
+
+    template <class Json>
+    jmespath_expression make_jmespath_expression(const string_view_type& expr,
+                                                 std::error_code& ec)
+    {
+        return jmespath_expression<Json>::compile(expr, ec);
+    }
+
+
 } // namespace jmespath
 } // namespace jsoncons
 

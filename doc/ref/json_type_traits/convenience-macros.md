@@ -230,9 +230,13 @@ Read-only data members are serialized but not de-serialized (since 0.157.0)
 `matchN` - a function object that takes a value of type `const T&` and returns `true` if the value matches an allowed value,
 `false` otherwise. If the function object `to` is also provided, type `T` must be the same as the  return type of `T`,
 otherwise it must be the same as the member type (since 0.157.0)  
-`intoN` - a function object that takes a value of type of `memberN` (or return type of `getterN`)
-and returns a value of type `T` that satisfies `json_type_traits` specialization. If type `T`
-differs from type of `memberN` (or return type of `getterN`), and `modeN` is `JSONCONS_RDWR`, `fromN` must also be provided.
+`intoN` - a unary function object.
+The signature of `intoN` should be equivalent to
+```c++
+Ret fun(const Type& a);
+```
+where `Type` is the type of `memberN` (`_MEMBER_` traits) or the return type of `getterN` (`_GETTER_ traits`), and `Ret` is the return type of `fromN` (if provided)
+or `Type` (if not).
 `intoN` can be a free function, a struct object with the operator() defined, or a variable containing a lambda expression,
 but because it is used in an unevaluated context, it cannot be a lambda expression (at least until C++20).
 (since 0.157.0)  
