@@ -263,9 +263,15 @@ Read-only data members are serialized but not de-serialized. (since 0.157.0)</td
   </tr>
   <tr>
     <td><code>matchN</code></td>
-    <td>A function object that takes a value of type <code>const T&</code> and returns <code>true</code> if the value matches an allowed value,
-<code>false</code> otherwise. If the function object <code>to</code> is also provided, type <code>T</code> must be the same as the  return type of <code>T</code>,
-otherwise it must be the same as the member type (since 0.157.0).</td> 
+    <td>A function object having signature equivalent to
+<br/><br/><code>
+bool fun(const Type& a);
+</code><br/><br/>
+where <code>Type</code> is the parameter type of <code>fromN</code> (if provided)
+the type of <code>memberN</code> (<code>_MEMBER_</code> traits) 
+or the return type of <code>getterN</code> (<code>_GETTER_ traits</code>).
+It returns <code>true</code> if the <code>a</code> matches an allowed value,
+<code>false</code> otherwise. (since 0.157.0)</td> 
   </tr>
   <tr>
     <td><code>intoN</code></td>
