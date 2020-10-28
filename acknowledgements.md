@@ -94,3 +94,5 @@ and [\#245](https://github.com/danielaparker/jsoncons/pull/248)
 to make jsoncons work on QNX Neutrino target. 
 
 - [Laurent Stacul](https://github.com/stac47) Fixed compilation error with gcc 11 #276
+
+- [wbangna](https://github.com/wbangna) Contributed [\#279](https://github.com/danielaparker/jsoncons/pull/279)

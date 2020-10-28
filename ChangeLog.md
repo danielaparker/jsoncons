@@ -1,3 +1,12 @@
+master
+------
+
+Enhancements:
+
+- New override for `jsonpath::json_replace` that searches for all values that match a JSONPath expression and replaces them with the result of a given function, see [\#279](https://github.com/danielaparker/jsoncons/pull/279)
+
+- New factory function `jmespath::make_jmespath_expression` to create compiled JMESPath expressions.
+
 v0.158.0 
 --------
 
