@@ -24,7 +24,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
     <td>Searches for all values that match a JMESPath expression</td> 
   </tr>
   <tr>
-    <td><a href="make_jmespath_expression.md">search</a></td>
+    <td><a href="make_jmespath_expression.md">make_jmespath_expression</a></td>
     <td>Returns a compiled JMESPath expression for later evaluation. (since 0.159.0)</td> 
   </tr>
 </table>
