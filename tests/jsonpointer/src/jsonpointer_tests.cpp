@@ -235,7 +235,7 @@ TEST_CASE("jsonpointer path tests")
 {
     SECTION("/a~1b")
     {
-        jsonpointer::json_ptr ptr("/a~1b");
+        jsonpointer::json_pointer ptr("/a~1b");
 
         auto it = ptr.begin();
         auto end = ptr.end();
@@ -246,7 +246,7 @@ TEST_CASE("jsonpointer path tests")
     }
     SECTION("/a~1b")
     {
-        jsonpointer::json_ptr ptr("/m~0n");
+        jsonpointer::json_pointer ptr("/m~0n");
 
         auto it = ptr.begin();
         auto end = ptr.end();
@@ -257,7 +257,7 @@ TEST_CASE("jsonpointer path tests")
     }
     SECTION("/0/1")
     {
-        jsonpointer::json_ptr ptr("/0/1");
+        jsonpointer::json_pointer ptr("/0/1");
 
         auto it = ptr.begin();
         auto end = ptr.end();
@@ -282,7 +282,7 @@ TEST_CASE("jsonpointer concatenation")
 
     SECTION("path append a/b")
     {
-        jsonpointer::json_ptr ptr;
+        jsonpointer::json_pointer ptr;
         ptr /= "a/b";
         ptr /= "0";
 
@@ -300,11 +300,11 @@ TEST_CASE("jsonpointer concatenation")
 
     SECTION("concatenate two paths")
     {
-        jsonpointer::json_ptr ptr1;
+        jsonpointer::json_pointer ptr1;
         ptr1 /= "m~n";
-        jsonpointer::json_ptr ptr2;
+        jsonpointer::json_pointer ptr2;
         ptr2 /= "1";
-        jsonpointer::json_ptr ptr = ptr1 + ptr2;
+        jsonpointer::json_pointer ptr = ptr1 + ptr2;
 
         auto it = ptr.begin();
         auto end = ptr.end();

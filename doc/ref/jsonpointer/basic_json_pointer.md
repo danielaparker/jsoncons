@@ -1,20 +1,20 @@
-### jsoncons::jsonpointer::basic_json_ptr
+### jsoncons::jsonpointer::basic_json_pointer
 
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template <class CharT>
-class basic_json_ptr
+class basic_json_pointer
 ```
 
 Two specializations for common character types are defined:
 
 Type      |Definition
 ----------|------------------------------
-json_ptr   |`basic_json_ptr<char>`
-wjson_ptr  |`basic_json_ptr<wchar_t>`
+json_pointer   |`basic_json_pointer<char>`
+wjson_pointer  |`basic_json_pointer<wchar_t>`
 
-Objects of type `basic_json_ptr` represent a JSON Pointer.
+Objects of type `basic_json_pointer` represent a JSON Pointer.
 
 #### Member types
 Type        |Definition
@@ -27,30 +27,30 @@ iterator    | An alias to `const_iterator`
 
 #### Constructors
 
-    basic_json_ptr();
+    basic_json_pointer();
 
-    explicit basic_json_ptr(const string_type& pointer);
+    explicit basic_json_pointer(const string_type& pointer);
 
-    explicit basic_json_ptr(string_type&& pointer);
+    explicit basic_json_pointer(string_type&& pointer);
 
-    explicit basic_json_ptr(const CharT* s);
+    explicit basic_json_pointer(const CharT* s);
 
-    basic_json_ptr(const basic_json_ptr&);
+    basic_json_pointer(const basic_json_pointer&);
 
-    basic_json_ptr(basic_json_ptr&&) noexcept;
+    basic_json_pointer(basic_json_pointer&&) noexcept;
 
 #### operator=
 
-    basic_json_ptr& operator=(const basic_json_ptr&);
+    basic_json_pointer& operator=(const basic_json_pointer&);
 
-    basic_json_ptr& operator=(basic_json_ptr&&);
+    basic_json_pointer& operator=(basic_json_pointer&&);
 
 #### Modifiers
 
-    basic_json_ptr& operator/=(const string_type& s)
+    basic_json_pointer& operator/=(const string_type& s)
 First, appends the JSON Pointer separator `/`. Then appends the token s, escaping any `/` or `~` characters.
 
-    basic_json_ptr& operator+=(const basic_json_ptr& ptr)
+    basic_json_pointer& operator+=(const basic_json_pointer& ptr)
 Concatenates the current pointer and the specified pointer `ptr`. 
 
 #### Iterators
@@ -69,18 +69,18 @@ Checks if the pointer is empty
 Access the JSON Pointer pointer as a string view.
 
 #### Non-member functions
-    basic_json_ptr<CharT> operator/(const basic_json_ptr<CharT>& lhs, const string_type& rhs);
-Concatenates a JSON Pointer pointer and a token. Effectively returns basic_json_ptr<CharT>(lhs) /= rhs.
+    basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const string_type& rhs);
+Concatenates a JSON Pointer pointer and a token. Effectively returns basic_json_pointer<CharT>(lhs) /= rhs.
 
-    basic_json_ptr<CharT> operator+( const basic_json_ptr<CharT>& lhs, const basic_json_ptr<CharT>& rhs );
-Concatenates two JSON Pointers. Effectively returns basic_json_ptr<CharT>(lhs) += rhs.
+    basic_json_pointer<CharT> operator+( const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs );
+Concatenates two JSON Pointers. Effectively returns basic_json_pointer<CharT>(lhs) += rhs.
 
-    bool operator==(const basic_json_ptr<CharT>& lhs, const basic_json_ptr<CharT>& rhs);
+    bool operator==(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
-    bool operator!=(const basic_json_ptr<CharT>& lhs, const basic_json_ptr<CharT>& rhs);
+    bool operator!=(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
     std::basic_ostream<CharT>&
-    operator<<(std::basic_ostream<CharT>& os, const basic_json_ptr<CharT>& ptr);
+    operator<<(std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& ptr);
 Performs stream output
 
 ### Examples
@@ -96,7 +96,7 @@ namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    jsonpointer::json_ptr ptr("/store/book/1/author");
+    jsonpointer::json_pointer ptr("/store/book/1/author");
 
     std::cout << "(1) " << ptr << "\n\n";
 
@@ -130,7 +130,7 @@ namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    jsonpointer::json_ptr ptr;
+    jsonpointer::json_pointer ptr;
 
     ptr /= "a/b";
     ptr /= "";
@@ -167,9 +167,9 @@ namespace jsonpointer = jsoncons::jsonpointer;
 
 int main()
 {
-    jsonpointer::json_ptr ptr("/a~1b");
+    jsonpointer::json_pointer ptr("/a~1b");
 
-    ptr += jsonpointer::json_ptr("//m~0n");
+    ptr += jsonpointer::json_pointer("//m~0n");
 
     std::cout << "(1) " << ptr << "\n\n";
 

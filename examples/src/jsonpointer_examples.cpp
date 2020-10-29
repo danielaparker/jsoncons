@@ -377,7 +377,7 @@ namespace {
            }
         )");
 
-        jsonpointer::json_ptr ptr;
+        jsonpointer::json_pointer ptr;
         ptr /= "m~n";
         ptr /= "1";
 
@@ -396,7 +396,7 @@ namespace {
 
     void jsonpointer_address_iterator_example()
     {
-        jsonpointer::json_ptr ptr("/store/book/1/author");
+        jsonpointer::json_pointer ptr("/store/book/1/author");
 
         std::cout << "(1) " << ptr << "\n\n";
 
@@ -411,7 +411,7 @@ namespace {
 
     void jsonpointer_address_append_tokens()
     {
-        jsonpointer::json_ptr ptr;
+        jsonpointer::json_pointer ptr;
 
         ptr /= "a/b";
         ptr /= "";
@@ -430,9 +430,9 @@ namespace {
 
     void jsonpointer_address_concatenate()
     {
-        jsonpointer::json_ptr ptr("/a~1b");
+        jsonpointer::json_pointer ptr("/a~1b");
 
-        ptr += jsonpointer::json_ptr("//m~0n");
+        ptr += jsonpointer::json_pointer("//m~0n");
 
         std::cout << "(1) " << ptr << "\n\n";
 

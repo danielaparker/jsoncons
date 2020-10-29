@@ -142,7 +142,7 @@ Output:
 (2) "Sayings of the Century"
 ```
 
-#### Using jsonpointer::json_ptr with jsonpointer::get 
+#### Using jsonpointer::json_pointer with jsonpointer::get 
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -160,7 +160,7 @@ int main()
        }
     )");
 
-    jsonpointer::json_ptr ptr;
+    jsonpointer::json_pointer ptr;
     ptr /= "m~n";
     ptr /= "1";
 
@@ -265,5 +265,5 @@ Output:
 
 ### See also
 
-[basic_json_ptr](basic_json_ptr.md)
+[basic_json_pointer](basic_json_pointer.md)
 

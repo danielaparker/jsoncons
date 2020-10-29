@@ -32,9 +32,9 @@ enum class pointer_state
 
 } // detail
 
-    // json_ptr_iterator
+    // json_pointer_iterator
     template <class InputIt>
-    class json_ptr_iterator
+    class json_pointer_iterator
     {
         using char_type = typename std::iterator_traits<InputIt>::value_type;
         using string_type = std::basic_string<char_type>;
@@ -55,28 +55,28 @@ enum class pointer_state
         using reference = const value_type&;
         using iterator_category = std::input_iterator_tag;
 
-        json_ptr_iterator(base_iterator first, base_iterator last)
-            : json_ptr_iterator(first, last, first)
+        json_pointer_iterator(base_iterator first, base_iterator last)
+            : json_pointer_iterator(first, last, first)
         {
             std::error_code ec;
             increment(ec);
         }
 
-        json_ptr_iterator(base_iterator first, base_iterator last, base_iterator current)
+        json_pointer_iterator(base_iterator first, base_iterator last, base_iterator current)
             : path_ptr_(first), end_input_(last), p_(current), q_(current), state_(jsonpointer::detail::pointer_state::start),
               line_(0), column_(0)
         {
         }
 
-        json_ptr_iterator(const json_ptr_iterator&) = default;
+        json_pointer_iterator(const json_pointer_iterator&) = default;
 
-        json_ptr_iterator(json_ptr_iterator&&) = default;
+        json_pointer_iterator(json_pointer_iterator&&) = default;
 
-        json_ptr_iterator& operator=(const json_ptr_iterator&) = default;
+        json_pointer_iterator& operator=(const json_pointer_iterator&) = default;
 
-        json_ptr_iterator& operator=(json_ptr_iterator&&) = default;
+        json_pointer_iterator& operator=(json_pointer_iterator&&) = default;
 
-        json_ptr_iterator& operator++()
+        json_pointer_iterator& operator++()
         {
             std::error_code ec;
             increment(ec);
@@ -87,7 +87,7 @@ enum class pointer_state
             return *this;
         }
 
-        json_ptr_iterator& increment(std::error_code& ec)
+        json_pointer_iterator& increment(std::error_code& ec)
         {
             q_ = p_;
             buffer_.clear();
@@ -151,9 +151,9 @@ enum class pointer_state
             return *this;
         }
 
-        json_ptr_iterator operator++(int) // postfix increment
+        json_pointer_iterator operator++(int) // postfix increment
         {
-            json_ptr_iterator temp(*this);
+            json_pointer_iterator temp(*this);
             ++(*this);
             return temp;
         }
@@ -163,11 +163,11 @@ enum class pointer_state
             return buffer_;
         }
 
-        friend bool operator==(const json_ptr_iterator& it1, const json_ptr_iterator& it2)
+        friend bool operator==(const json_pointer_iterator& it1, const json_pointer_iterator& it2)
         {
             return it1.q_ == it2.q_;
         }
-        friend bool operator!=(const json_ptr_iterator& it1, const json_ptr_iterator& it2)
+        friend bool operator!=(const json_pointer_iterator& it1, const json_pointer_iterator& it2)
         {
             return !(it1 == it2);
         }
@@ -199,10 +199,10 @@ enum class pointer_state
         return result;
     }
 
-    // basic_json_ptr
+    // basic_json_pointer
 
     template <class CharT>
-    class basic_json_ptr
+    class basic_json_pointer
     {
     public:
         std::basic_string<CharT> path_;
@@ -211,34 +211,34 @@ enum class pointer_state
         using char_type = CharT;
         using string_type = std::basic_string<char_type>;
         using string_view_type = jsoncons::basic_string_view<char_type>;
-        using const_iterator = json_ptr_iterator<typename string_type::const_iterator>;
+        using const_iterator = json_pointer_iterator<typename string_type::const_iterator>;
         using iterator = const_iterator;
 
         // Constructors
-        basic_json_ptr()
+        basic_json_pointer()
         {
         }
-        explicit basic_json_ptr(const string_type& s)
+        explicit basic_json_pointer(const string_type& s)
             : path_(s)
         {
         }
-        explicit basic_json_ptr(string_type&& s)
+        explicit basic_json_pointer(string_type&& s)
             : path_(std::move(s))
         {
         }
-        explicit basic_json_ptr(const CharT* s)
+        explicit basic_json_pointer(const CharT* s)
             : path_(s)
         {
         }
 
-        basic_json_ptr(const basic_json_ptr&) = default;
+        basic_json_pointer(const basic_json_pointer&) = default;
 
-        basic_json_ptr(basic_json_ptr&&) = default;
+        basic_json_pointer(basic_json_pointer&&) = default;
 
         // operator=
-        basic_json_ptr& operator=(const basic_json_ptr&) = default;
+        basic_json_pointer& operator=(const basic_json_pointer&) = default;
 
-        basic_json_ptr& operator=(basic_json_ptr&&) = default;
+        basic_json_pointer& operator=(basic_json_pointer&&) = default;
 
         // Modifiers
 
@@ -247,7 +247,7 @@ enum class pointer_state
             path_.clear();
         }
 
-        basic_json_ptr& operator/=(const string_type& s)
+        basic_json_pointer& operator/=(const string_type& s)
         {
             path_.push_back('/');
             path_.append(escape_string(s));
@@ -255,7 +255,7 @@ enum class pointer_state
             return *this;
         }
 
-        basic_json_ptr& operator+=(const basic_json_ptr& p)
+        basic_json_pointer& operator+=(const basic_json_pointer& p)
         {
             path_.append(p.path_);
             return *this;
@@ -288,45 +288,49 @@ enum class pointer_state
         }
 
         // Non-member functions
-        friend basic_json_ptr<CharT> operator/(const basic_json_ptr<CharT>& lhs, const string_type& rhs)
+        friend basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const string_type& rhs)
         {
-            basic_json_ptr<CharT> p(lhs);
+            basic_json_pointer<CharT> p(lhs);
             p /= rhs;
             return p;
         }
 
-        friend basic_json_ptr<CharT> operator+( const basic_json_ptr<CharT>& lhs, const basic_json_ptr<CharT>& rhs )
+        friend basic_json_pointer<CharT> operator+( const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs )
         {
-            basic_json_ptr<CharT> p(lhs);
+            basic_json_pointer<CharT> p(lhs);
             p += rhs;
             return p;
         }
 
-        friend bool operator==( const basic_json_ptr& lhs, const basic_json_ptr& rhs )
+        friend bool operator==( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
         {
             return lhs.path_ == rhs.path_;
         }
 
-        friend bool operator!=( const basic_json_ptr& lhs, const basic_json_ptr& rhs )
+        friend bool operator!=( const basic_json_pointer& lhs, const basic_json_pointer& rhs )
         {
             return lhs.path_ != rhs.path_;
         }
 
         friend std::basic_ostream<CharT>&
-        operator<<( std::basic_ostream<CharT>& os, const basic_json_ptr<CharT>& p )
+        operator<<( std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& p )
         {
             os << p.path_;
             return os;
         }
     };
 
-    using json_ptr = basic_json_ptr<char>;
-    using wjson_ptr = basic_json_ptr<wchar_t>;
+    using json_pointer = basic_json_pointer<char>;
+    using wjson_pointer = basic_json_pointer<wchar_t>;
 
     #if !defined(JSONCONS_NO_DEPRECATED)
     template<class CharT>
-    using basic_address = basic_json_ptr<CharT>;
-    JSONCONS_DEPRECATED_MSG("Instead, use json_ptr") typedef json_ptr address;
+    using basic_address = basic_json_pointer<CharT>;
+    template<class CharT>
+    using basic_json_ptr = basic_json_pointer<CharT>;
+    JSONCONS_DEPRECATED_MSG("Instead, use json_pointer") typedef json_pointer address;
+    JSONCONS_DEPRECATED_MSG("Instead, use json_pointer") typedef json_pointer json_ptr;
+    JSONCONS_DEPRECATED_MSG("Instead, use wjson_pointer") typedef json_pointer wjson_ptr;
     #endif
 
     namespace detail {
@@ -642,8 +646,8 @@ enum class pointer_state
         {
             current_.push_back(root);
 
-            json_ptr_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
-            json_ptr_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
             while (it != end)
             {
                 buffer_ = *it;
@@ -1069,7 +1073,7 @@ enum class pointer_state
         for (const auto& item: value.object_range())
         {
             Json* part = &result;
-            basic_json_ptr<char_type> ptr(item.key());
+            basic_json_pointer<char_type> ptr(item.key());
             std::size_t index = 0;
             for (auto it = ptr.begin(); it != ptr.end(); )
             {
@@ -1136,7 +1140,7 @@ enum class pointer_state
         for (const auto& item: value.object_range())
         {
             Json* part = &result;
-            basic_json_ptr<char_type> ptr(item.key());
+            basic_json_pointer<char_type> ptr(item.key());
             for (auto it = ptr.begin(); it != ptr.end(); )
             {
                 auto s = *it;
