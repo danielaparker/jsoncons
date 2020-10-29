@@ -11,8 +11,10 @@ Two specializations for common character types are defined:
 
 Type      |Definition
 ----------|------------------------------
-json_pointer   |`basic_json_pointer<char>`
-wjson_pointer  |`basic_json_pointer<wchar_t>`
+json_pointer   |`basic_json_pointer<char>` (since 0.159.0)
+json_ptr       |`basic_json_pointer<char>` (until 0.159.0)
+wjson_pointer  |`basic_json_pointer<wchar_t>` (since 0.159.0)
+wjson_ptr      |`basic_json_pointer<wchar_t>` (unitl 0.159.0)
 
 Objects of type `basic_json_pointer` represent a JSON Pointer.
 

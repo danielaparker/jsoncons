@@ -3,7 +3,7 @@ master
 
 Changes:
 
-- In the jsonpointer extension, the names `json_ptr` and `wjson_ptr` have been deprecated and
+- In the jsonpointer extension, the type names `json_ptr` and `wjson_ptr` have been deprecated and
 renamed to `json_pointer` and `wjson_pointer`. 
 
 Enhancements:

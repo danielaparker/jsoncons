@@ -130,7 +130,9 @@ int main()
        }
     )");
 
-    jsonpointer::json_pointer ptr;
+    jsonpointer::json_pointer ptr; // (since 0.159.0)
+    // jsonpointer::json_ptr ptr; // (until 0.159.0)
+
     ptr /= "m~n";
     ptr /= "1";
 
