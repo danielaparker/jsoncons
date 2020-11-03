@@ -16,7 +16,7 @@ byte string|
 array|
 object|
 
-In addition, jsoncons supports semantic tagging of values, llows it to preserve 
+In addition, jsoncons supports semantic tagging of values, allows it to preserve 
 these type semantics when parsing JSON-like data formats such as CBOR that have them.
 
 Tag|Description
