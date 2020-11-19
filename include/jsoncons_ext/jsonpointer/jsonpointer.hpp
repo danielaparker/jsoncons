@@ -247,10 +247,22 @@ enum class pointer_state
             path_.clear();
         }
 
-        basic_json_pointer& operator/=(const string_type& s)
+        basic_json_pointer& operator/=(const string_type& s) 
         {
             path_.push_back('/');
             path_.append(escape_string(s));
+
+            return *this;
+        }
+
+        template <class IntegerType>
+        typename std::enable_if<jsoncons::detail::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        operator/=(IntegerType val)
+        {
+            string_type s;
+            jsoncons::detail::from_integer(val, s);
+            path_.push_back('/');
+            path_.append(s);
 
             return *this;
         }
@@ -319,6 +331,15 @@ enum class pointer_state
             return os;
         }
     };
+
+    template <class CharT,class IntegerType>
+    typename std::enable_if<jsoncons::detail::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
+    operator/(const basic_json_pointer<CharT>& lhs, IntegerType rhs)
+    {
+        basic_json_pointer<CharT> p(lhs);
+        p /= rhs;
+        return p;
+    }
 
     using json_pointer = basic_json_pointer<char>;
     using wjson_pointer = basic_json_pointer<wchar_t>;
