@@ -285,7 +285,7 @@ struct cmp_eq
         {
             return false;
         }
-        for (size_t i = 0; i < lhs.result().size(); ++i)
+        for (std::size_t i = 0; i < lhs.result().size(); ++i)
         {
             if (lhs.result()[i] != rhs.result()[i])
             {
@@ -402,7 +402,7 @@ struct cmp_pipepipe
         {
             return false;
         }
-        for (size_t i = 0; i < lhs.result().size(); ++i)
+        for (std::size_t i = 0; i < lhs.result().size(); ++i)
         {
             if (!(*this)(lhs.result()[i], rhs.result()[i]))
             {
@@ -463,7 +463,7 @@ struct cmp_ampamp
         {
             return false;
         }
-        for (size_t i = 0; i < lhs.result().size(); ++i)
+        for (std::size_t i = 0; i < lhs.result().size(); ++i)
         {
             if (!(*this)(lhs.result()[i], rhs.result()[i]))
             {

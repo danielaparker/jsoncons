@@ -78,7 +78,7 @@ void encode_decode_large_typed_array()
     std::ios_base::fmtflags f( std::cout.flags() );
 
     std::vector<float> x(15000000);
-    for (size_t i = 0; i < x.size(); ++i)
+    for (std::size_t i = 0; i < x.size(); ++i)
     {
         x[i] = static_cast<float>(i);
     }

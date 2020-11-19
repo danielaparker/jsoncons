@@ -3033,11 +3033,11 @@ Construct a 3-dimensional 4 x 3 x 2 json array with all elements initialized to 
 ```c++
 json j = json::make_array<3>(4, 3, 2, 0.0);
 double val = 1.0;
-for (size_t i = 0; i < a.size(); ++i)
+for (std::size_t i = 0; i < a.size(); ++i)
 {
-    for (size_t j = 0; j < j[i].size(); ++j)
+    for (std::size_t j = 0; j < j[i].size(); ++j)
     {
-        for (size_t k = 0; k < j[i][j].size(); ++k)
+        for (std::size_t k = 0; k < j[i][j].size(); ++k)
         {
             j[i][j][k] = val;
             val += 1.0;

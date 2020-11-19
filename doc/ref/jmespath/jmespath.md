@@ -24,7 +24,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
     <td>Searches for all values that match a JMESPath expression</td> 
   </tr>
   <tr>
-    <td><a href="make_jmespath_expression.md">make_jmespath_expression</a></td>
+    <td><a href="make_jmespath_expression.md">make_expression</a></td>
     <td>Returns a compiled JMESPath expression for later evaluation. (since 0.159.0)</td> 
   </tr>
 </table>
@@ -115,7 +115,7 @@ int main()
         }        
     )";
 
-    auto expr = jmespath::make_jmespath_expression<json>("people[?age > `20`].[name, age]"); // since 0.159.0
+    auto expr = jmespath::make_expression<json>("people[?age > `20`].[name, age]"); // since 0.159.0
     // auto expr = jmespath::jmespath_expression<json>::compile("people[?age > `20`].[name, age]"); // until 0.159.0
 
     json doc = json::parse(jtext);

@@ -792,7 +792,7 @@ has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
             {
                 JSONCONS_THROW(convert_error(convert_errc::not_array));
             }
-            for (size_t i = 0; i < N; i++)
+            for (std::size_t i = 0; i < N; i++)
             {
                 buff[i] = j[i].template as<E>();
             }
@@ -1286,7 +1286,7 @@ has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
             if (j.is_array())
             {
                 std::valarray<T> v(j.size());
-                for (size_t i = 0; i < j.size(); ++i)
+                for (std::size_t i = 0; i < j.size(); ++i)
                 {
                     v[i] = j[i].template as<T>();
                 }

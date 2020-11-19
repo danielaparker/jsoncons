@@ -476,7 +476,7 @@ namespace jmespath {
 
             virtual reference evaluate(reference lhs, reference rhs, eval_context&, std::error_code& ec) const = 0;
 
-            virtual std::string to_string(size_t indent = 0) const
+            virtual std::string to_string(std::size_t indent = 0) const
             {
                 std::string s;
                 for (std::size_t i = 0; i <= indent; ++i)
@@ -5139,14 +5139,14 @@ namespace jmespath {
     }
 
     template <class Json>
-    jmespath_expression<Json> make_jmespath_expression(const typename json::string_view_type& expr)
+    jmespath_expression<Json> make_expression(const typename json::string_view_type& expr)
     {
         return jmespath_expression<Json>::compile(expr);
     }
 
     template <class Json>
-    jmespath_expression<Json> make_jmespath_expression(const typename json::string_view_type& expr,
-                                                       std::error_code& ec)
+    jmespath_expression<Json> make_expression(const typename json::string_view_type& expr,
+                                              std::error_code& ec)
     {
         return jmespath_expression<Json>::compile(expr, ec);
     }

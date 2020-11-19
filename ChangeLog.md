@@ -6,11 +6,13 @@ Changes:
 - In the jsonpointer extension, the type names `json_ptr` and `wjson_ptr` have been deprecated and
 renamed to `json_pointer` and `wjson_pointer`. 
 
+- The json_pointer operators `/=` and `/` now support integers.
+
 Enhancements:
 
 - New override for `jsonpath::json_replace` that searches for all values that match a JSONPath expression and replaces them with the result of a given function, see [\#279](https://github.com/danielaparker/jsoncons/pull/279)
 
-- New factory function `jmespath::make_jmespath_expression` to create compiled JMESPath expressions.
+- New factory function `jmespath::make_expression` to create compiled JMESPath expressions.
 
 v0.158.0 
 --------

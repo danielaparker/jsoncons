@@ -19,7 +19,7 @@ TEST_CASE("json array deeply nested tests")
     {
         json doc(json_array_arg);
         json* ref = &doc;
-        for (size_t j = 0; j < 10000; ++j)
+        for (std::size_t j = 0; j < 10000; ++j)
         {
             json val(json_array_arg, semantic_tag::none);
             ref->push_back(val);
@@ -34,7 +34,7 @@ TEST_CASE("json_object deeply nested tests")
     {
         json doc(json_object_arg);
         json* ref = &doc;
-        for (size_t j = 0; j < 10000; ++j)
+        for (std::size_t j = 0; j < 10000; ++j)
         {
             json val(json_object_arg, semantic_tag::none);
             ref->try_emplace("0",val);
@@ -45,7 +45,7 @@ TEST_CASE("json_object deeply nested tests")
     {
         ojson doc(json_object_arg);
         ojson* ref = &doc;
-        for (size_t j = 0; j < 10000; ++j)
+        for (std::size_t j = 0; j < 10000; ++j)
         {
             ojson val(json_object_arg, semantic_tag::none);
             ref->try_emplace("0",val);

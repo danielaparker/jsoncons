@@ -730,7 +730,7 @@ private:
         }
 
         array_storage(const array& val, semantic_tag tag, const Allocator& a)
-            : storage_(val.storage_), length_(0), tag_(val.tag_)
+            : storage_(val.storage_), length_(0), tag_(tag)
         {
             create(array_allocator(a), val, a);
         }
@@ -817,7 +817,7 @@ private:
         }
 
         explicit object_storage(const object& val, semantic_tag tag, const Allocator& a)
-            : storage_(val.storage_), length_(0), tag_(val.tag_)
+            : storage_(val.storage_), length_(0), tag_(tag)
         {
             create(object_allocator(a), val, a);
         }

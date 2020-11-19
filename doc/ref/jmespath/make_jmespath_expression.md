@@ -1,14 +1,14 @@
-### jsoncons::jmespath::make_jmespath_expression
+### jsoncons::jmespath::make_expression
 
 ```c++
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
 template <class Json>
-jmespath_expression<Json> make_jmespath_expression(const typename json::string_view_type& expr); (1)
+jmespath_expression<Json> make_expression(const typename json::string_view_type& expr); (1)
 
 template <class Json>
-jmespath_expression<Json> make_jmespath_expression(const typename json::string_view_type& expr,
-                                                   std::error_code& ec); (2)
+jmespath_expression<Json> make_expression(const typename json::string_view_type& expr,
+                                          std::error_code& ec); (2)
 ```
 
 Returns a compiled JMESPath expression for later evaluation.

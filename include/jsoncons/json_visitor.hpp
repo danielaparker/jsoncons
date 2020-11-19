@@ -1391,7 +1391,7 @@ namespace jsoncons {
             return true;
         }
 
-        bool visit_begin_object(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        bool visit_begin_object(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
             std::cout << visit_begin_object_name << length << std::endl; 
             return true;
@@ -1402,7 +1402,7 @@ namespace jsoncons {
             std::cout << visit_end_object_name << std::endl; 
             return true;
         }
-        bool visit_begin_array(size_t length, semantic_tag, const ser_context&, std::error_code&) override
+        bool visit_begin_array(std::size_t length, semantic_tag, const ser_context&, std::error_code&) override
         {
             std::cout << visit_begin_array_name << length << std::endl; 
             return true;
