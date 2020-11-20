@@ -1,6 +1,11 @@
 master
 ------
 
+Bugs fixed:
+
+- Fixed clang 11 compile issues [\#284](https://github.com/danielaparker/jsoncons/issues/284)
+and  [\#285](https://github.com/danielaparker/jsoncons/issues/285).
+
 Changes:
 
 - In the jsonpointer extension, the type names `json_ptr` and `wjson_ptr` have been deprecated and
