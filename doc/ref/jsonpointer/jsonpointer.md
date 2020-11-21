@@ -134,7 +134,8 @@ int main()
     // jsonpointer::json_ptr ptr; // (until 0.159.0)
 
     ptr /= "m~n";
-    ptr /= "1";
+    ptr /= 1; // (since 0.159.0)
+    //ptr /= "1"; // (until 0.159.0)
 
     std::cout << "(1) " << ptr << "\n\n";
 

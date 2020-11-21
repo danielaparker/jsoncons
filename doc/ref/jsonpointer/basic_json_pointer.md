@@ -52,6 +52,10 @@ iterator    | An alias to `const_iterator`
     basic_json_pointer& operator/=(const string_type& s)
 First, appends the JSON Pointer separator `/`. Then appends the token s, escaping any `/` or `~` characters.
 
+    template <class IntegerType>
+    basic_json_pointer& operator/=(IntegerType index) 
+First, appends the JSON Pointer separator `/`. Then appends the token `index`.
+
     basic_json_pointer& operator+=(const basic_json_pointer& ptr)
 Concatenates the current pointer and the specified pointer `ptr`. 
 
@@ -71,8 +75,12 @@ Checks if the pointer is empty
 Access the JSON Pointer pointer as a string view.
 
 #### Non-member functions
-    basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const string_type& rhs);
-Concatenates a JSON Pointer pointer and a token. Effectively returns basic_json_pointer<CharT>(lhs) /= rhs.
+    basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, const basic_string<CharT>& s);
+Concatenates a JSON Pointer pointer and a string. Effectively returns basic_json_pointer<CharT>(lhs) /= s.
+
+    template <class CharT,class IntegerType>
+    basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, IntegerType index);
+Concatenates a JSON Pointer pointer and an index. Effectively returns basic_json_pointer<CharT>(lhs) /= index.
 
     basic_json_pointer<CharT> operator+( const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs );
 Concatenates two JSON Pointers. Effectively returns basic_json_pointer<CharT>(lhs) += rhs.
