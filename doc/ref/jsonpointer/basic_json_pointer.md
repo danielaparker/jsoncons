@@ -55,6 +55,7 @@ First, appends the JSON Pointer separator `/`. Then appends the token s, escapin
     template <class IntegerType>
     basic_json_pointer& operator/=(IntegerType index) 
 First, appends the JSON Pointer separator `/`. Then appends the token `index`.
+This overload only participates in overload resolution if IntegerType is an integer type.
 
     basic_json_pointer& operator+=(const basic_json_pointer& ptr)
 Concatenates the current pointer and the specified pointer `ptr`. 
@@ -81,16 +82,20 @@ Concatenates a JSON Pointer pointer and a string. Effectively returns basic_json
     template <class CharT,class IntegerType>
     basic_json_pointer<CharT> operator/(const basic_json_pointer<CharT>& lhs, IntegerType index);
 Concatenates a JSON Pointer pointer and an index. Effectively returns basic_json_pointer<CharT>(lhs) /= index.
+This overload only participates in overload resolution if IntegerType is an integer type.
 
+    template <class CharT,class IntegerType>
     basic_json_pointer<CharT> operator+( const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs );
 Concatenates two JSON Pointers. Effectively returns basic_json_pointer<CharT>(lhs) += rhs.
 
+    template <class CharT,class IntegerType>
     bool operator==(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
+    template <class CharT,class IntegerType>
     bool operator!=(const basic_json_pointer<CharT>& lhs, const basic_json_pointer<CharT>& rhs);
 
-    std::basic_ostream<CharT>&
-    operator<<(std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& ptr);
+    template <class CharT,class IntegerType>
+    std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, const basic_json_pointer<CharT>& ptr);
 Performs stream output
 
 ### Examples
