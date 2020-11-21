@@ -295,7 +295,6 @@ namespace jsoncons {
                             if (item.size() > 0) // non-empty object or array
                             {
                                 elements_.push_back(std::move(item));
-                                assert(item.size() == 0);
                             }
                         }
                         current.clear();                           
@@ -308,7 +307,6 @@ namespace jsoncons {
                             if (kv.value().size() > 0) // non-empty object or array
                             {
                                 elements_.push_back(std::move(kv.value()));
-                                assert(kv.value().size() == 0);
                             }
                         }
                         current.clear();                           
@@ -1201,7 +1199,6 @@ namespace jsoncons {
                     if (kv.value().size() > 0)
                     {
                         temp.emplace_back(std::move(kv.value()));
-                        assert(kv.value().size() == 0);
                     }
                 }
             }
@@ -1894,7 +1891,6 @@ namespace jsoncons {
                     if (kv.value().size() > 0)
                     {
                         temp.emplace_back(std::move(kv.value()));
-                        assert(kv.value().size() == 0);
                     }
                 }
             }
