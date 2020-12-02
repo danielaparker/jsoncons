@@ -128,7 +128,7 @@ Error count: 2
 #### Using a URIResolver to resolve references to schemas defined in external files
 
 In this example, the main schema defines a reference using
-the `$ref` property to a second schema define in the file `name.json`,
+the `$ref` property to a second schema defined in the file `name.json`,
 shown below:
 
 ```json
@@ -148,7 +148,8 @@ shown below:
     "type": "string"
 }
 ```
-You need to provide a `URIResolver` to resolve the reference into a JSON Schema document.
+You need to provide a `URIResolver` to tell jsoncons how to resolve the reference into a 
+JSON Schema document.
 
 ```c++
 #include <jsoncons/json.hpp>
