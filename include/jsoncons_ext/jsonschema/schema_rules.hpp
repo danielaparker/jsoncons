@@ -90,18 +90,14 @@ namespace jsonschema {
     };
 
     template <class Json>
-    void add(Json& patch, const jsoncons::jsonpointer::json_pointer& ptr, const Json& default_value)
+    void update_patch(Json& patch, const jsoncons::jsonpointer::json_pointer& ptr, const Json& default_value)
     {
-        Json* p = std::addressof(patch);
-        for (const auto& key : ptr) 
-        {
-            if (!p->contains(key)) 
-            {
-                p->try_emplace(key,Json());
-            }
-            p = std::addressof(p->at(key));
-        }
-        p->insert_or_assign(ptr.string(), default_value);
+        Json j;
+        j.try_emplace("op", "add"); 
+        j.try_emplace("path", ptr.string()); 
+        j.try_emplace("value", default_value); 
+
+        patch.push_back(std::move(j));
     }
 
     // string rule
@@ -819,13 +815,13 @@ namespace jsonschema {
             {
                 const auto finding = instance.find(prop.first);
                 if (finding == instance.object_range().end()) 
-                { // if the prop is not in the instance
+                { 
+                    // If property is not in instance
                     const auto& default_value = prop.second->get_default_value(ptr, instance, reporter);
                     if (!default_value.is_null()) 
-                    { // if default value is available
-                        //patch.add((ptr / prop.first), default_value);
-                        //jsoncons::jsonpointer::add(patch, (ptr/prop.first).string(), default_value);
-                        add(patch, ptr / prop.first, default_value);
+                    { 
+                        // If default value is available, update patch
+                        update_patch(patch, ptr / prop.first, default_value);
                     }
                 }
             }

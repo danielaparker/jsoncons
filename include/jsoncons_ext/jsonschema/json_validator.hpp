@@ -80,7 +80,7 @@ namespace jsonschema {
         validate(const Json& instance, const Reporter& reporter) const
         {
             jsoncons::jsonpointer::json_pointer ptr;
-            Json patch;
+            Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
             root_->validate(ptr, instance, adaptor, patch);

@@ -27,9 +27,18 @@ class json_validator
   </tr>
   <tr>
     <td>reporter</td>
-    <td>A function object with the signature of <code>reporter</code> being equivelent to <code>void fun(const validation_error& e)</code>
+    <td>A function object with the signature of <code>reporter</code> being equivelent to 
+    <code>
+           void fun(const validation_error& e)
+    </code>
   </tr>
 </table>
+
+#### Return value
+
+Returns a JSONPatch document that may be applied to the input JSON
+to fill in missing properties that have "default" values in the
+schema.
 
 #### Exceptions
 
