@@ -111,7 +111,8 @@ namespace jsonschema {
         }
     };
 
-    json default_resolver(const jsoncons::uri& uri)
+    inline
+    json default_uri_resolver(const jsoncons::uri& uri)
     {
         if (uri.path() == "/draft-07/schema") 
         {
@@ -527,7 +528,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        schema_loader<Json> loader(default_resolver);
+        schema_loader<Json> loader(default_uri_resolver);
         loader.load(schema);
 
         return loader.get_schema();
