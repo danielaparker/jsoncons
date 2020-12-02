@@ -196,7 +196,7 @@ namespace jsonschema {
     class subschema
     {
     public:
-        using pointer_type = subschema<Json>*;
+        using schema_pointer = subschema<Json>*;
 
         virtual ~subschema() = default;
 

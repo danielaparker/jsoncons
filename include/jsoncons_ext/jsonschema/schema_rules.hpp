@@ -29,44 +29,46 @@ namespace jsonschema {
     class schema_builder
     {
     public:
-        virtual subschema<Json>* build(const Json& schema,
-                                       const std::vector<std::string>& keys,
-                                       const std::vector<uri_wrapper>& uris) = 0;
-        virtual subschema<Json>* make_required_rule(const std::vector<std::string>& r) = 0;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        virtual subschema<Json>* make_null_rule() = 0;
+        virtual schema_pointer build(const Json& schema,
+                                     const std::vector<std::string>& keys,
+                                     const std::vector<uri_wrapper>& uris) = 0;
+        virtual schema_pointer make_required_rule(const std::vector<std::string>& r) = 0;
 
-        virtual subschema<Json>* make_true_rule() = 0;
+        virtual schema_pointer make_null_rule() = 0;
 
-        virtual subschema<Json>* make_false_rule() = 0;
+        virtual schema_pointer make_true_rule() = 0;
 
-        virtual subschema<Json>* make_object_rule(const Json& sch, 
+        virtual schema_pointer make_false_rule() = 0;
+
+        virtual schema_pointer make_object_rule(const Json& sch, 
                                                   const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual subschema<Json>* make_array_rule(const Json& sch,
+        virtual schema_pointer make_array_rule(const Json& sch,
                                                  const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual subschema<Json>* make_string_rule(const Json& sch) = 0;
+        virtual schema_pointer make_string_rule(const Json& sch) = 0;
 
-        virtual subschema<Json>* make_boolean_rule() = 0;
+        virtual schema_pointer make_boolean_rule() = 0;
 
-        virtual subschema<Json>* make_integer_rule(const Json& sch, std::set<std::string>& keywords) = 0;
+        virtual schema_pointer make_integer_rule(const Json& sch, std::set<std::string>& keywords) = 0;
 
-        virtual subschema<Json>* make_number_rule(const Json& sch, std::set<std::string>& keywords) = 0;
+        virtual schema_pointer make_number_rule(const Json& sch, std::set<std::string>& keywords) = 0;
 
-        virtual subschema<Json>* make_not_rule(const Json& schema,
+        virtual schema_pointer make_not_rule(const Json& schema,
                                                const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual subschema<Json>* make_all_of_rule(const Json& schema,
+        virtual schema_pointer make_all_of_rule(const Json& schema,
                                                   const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual subschema<Json>* make_any_of_rule(const Json& schema,
+        virtual schema_pointer make_any_of_rule(const Json& schema,
                                           const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual subschema<Json>* make_one_of_rule(const Json& schema,
+        virtual schema_pointer make_one_of_rule(const Json& schema,
                                                   const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual subschema<Json>* make_type_rule(const Json& schema,
+        virtual schema_pointer make_type_rule(const Json& schema,
                                                 const std::vector<uri_wrapper>& uris) = 0;
     };
 
@@ -125,7 +127,7 @@ namespace jsonschema {
     template <class Json>
     class string_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_length_;
         jsoncons::optional<std::size_t> min_length_;
@@ -235,9 +237,9 @@ namespace jsonschema {
     private:
 
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
-                      const Json& instance, 
-                      Json&, 
-                      error_reporter& reporter) const override
+                         const Json& instance, 
+                         Json&, 
+                         error_reporter& reporter) const override
         {
             std::string content;
             if (content_encoding_)
@@ -323,9 +325,9 @@ namespace jsonschema {
     template <class Json>
     class not_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        pointer_type rule_;
+        schema_pointer rule_;
 
     public:
         not_rule()
@@ -343,9 +345,9 @@ namespace jsonschema {
     private:
 
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
-                      const Json& instance, 
-                      Json& result, 
-                      error_reporter& reporter) const final
+                         const Json& instance, 
+                         Json& result, 
+                         error_reporter& reporter) const final
         {
             local_error_reporter local_reporter;
             rule_->validate(ptr, instance, result, local_reporter);
@@ -430,9 +432,9 @@ namespace jsonschema {
     template <class Json,class Criterion>
     class combining_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        std::vector<pointer_type> subschemas_;
+        std::vector<schema_pointer> subschemas_;
 
     public:
         combining_rule(schema_builder<Json>* builder,
@@ -478,7 +480,7 @@ namespace jsonschema {
     template <class Json,class T>
     class number_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         jsoncons::optional<T> maximum_;
         jsoncons::optional<T> minimum_;
@@ -570,7 +572,7 @@ namespace jsonschema {
     class null_rule : public subschema<Json>
     {
     public:
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         null_rule() = default;
     private:
@@ -587,7 +589,7 @@ namespace jsonschema {
     class boolean_rule : public subschema<Json>
     {
     public:
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         boolean_rule() = default;
     private:
@@ -601,7 +603,7 @@ namespace jsonschema {
     class true_rule : public subschema<Json>
     {
     public:
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         true_rule() = default;
     private:
@@ -614,7 +616,7 @@ namespace jsonschema {
     class false_rule : public subschema<Json>
     {
     public:
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         false_rule() = default;
     private:
@@ -627,7 +629,7 @@ namespace jsonschema {
     template <class Json>
     class required_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         const std::vector<std::string> required_;
 
@@ -651,21 +653,21 @@ namespace jsonschema {
     template <class Json>
     class object_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_properties_;
         jsoncons::optional<std::size_t> min_properties_;
         std::vector<std::string> required_;
 
-        std::map<std::string, pointer_type> properties_;
+        std::map<std::string, schema_pointer> properties_;
     #if defined(JSONCONS_HAS_STD_REGEX)
-        std::vector<std::pair<std::regex, pointer_type>> pattern_properties_;
+        std::vector<std::pair<std::regex, schema_pointer>> pattern_properties_;
     #endif
-        pointer_type additional_properties_;
+        schema_pointer additional_properties_;
 
-        std::map<std::string, pointer_type> dependencies_;
+        std::map<std::string, schema_pointer> dependencies_;
 
-        pointer_type property_names_;
+        schema_pointer property_names_;
 
     public:
         object_rule(schema_builder<Json>* builder,
@@ -751,8 +753,8 @@ namespace jsonschema {
     private:
 
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
-                      const Json& instance, Json& result, 
-                      error_reporter& reporter) const override
+                         const Json& instance, Json& result, 
+                         error_reporter& reporter) const override
         {
             if (max_properties_ && instance.size() > *max_properties_)
             {
@@ -836,15 +838,15 @@ namespace jsonschema {
     template <class Json>
     class array_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_items_;
         jsoncons::optional<std::size_t> min_items_;
         bool unique_items_ = false;
-        pointer_type items_schema_;
-        std::vector<pointer_type> items_;
-        pointer_type additional_items_;
-        pointer_type contains_;
+        schema_pointer items_schema_;
+        std::vector<schema_pointer> items_;
+        schema_pointer additional_items_;
+        schema_pointer contains_;
 
     public:
         array_rule(schema_builder<Json>* builder, 
@@ -950,7 +952,7 @@ namespace jsonschema {
                 auto item = items_.cbegin();
                 for (const auto& i : instance.array_range()) 
                 {
-                    pointer_type item_validator = nullptr;
+                    schema_pointer item_validator = nullptr;
                     if (item == items_.cend())
                         item_validator = additional_items_;
                     else 
@@ -988,11 +990,11 @@ namespace jsonschema {
     template <class Json>
     class conditional_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        pointer_type if_;
-        pointer_type then_;
-        pointer_type else_;
+        schema_pointer if_;
+        schema_pointer then_;
+        schema_pointer else_;
 
     public:
         conditional_rule(schema_builder<Json>* builder,
@@ -1049,7 +1051,7 @@ namespace jsonschema {
     template <class Json>
     class enum_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         Json enum_;
 
@@ -1060,9 +1062,9 @@ namespace jsonschema {
         }
     private:
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
-                      const Json& instance, 
-                      Json&, 
-                      error_reporter& reporter) const final
+                         const Json& instance, 
+                         Json&, 
+                         error_reporter& reporter) const final
         {
             bool in_range = false;
             for (const auto& item : enum_.array_range())
@@ -1086,7 +1088,7 @@ namespace jsonschema {
     template <class Json>
     class const_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         Json const_;
 
@@ -1097,9 +1099,9 @@ namespace jsonschema {
         }
     private:
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
-                      const Json& instance, 
-                      Json&, 
-                      error_reporter& reporter) const final
+                         const Json& instance, 
+                         Json&, 
+                         error_reporter& reporter) const final
         {
             if (const_ != instance)
                 reporter.error(validation_error(ptr.string(), "Instance is not const", "const"));
@@ -1109,13 +1111,13 @@ namespace jsonschema {
     template <class Json>
     class type_rule : public subschema<Json>
     {
-        using pointer_type = subschema<Json>::pointer_type;
+        using schema_pointer = typename subschema<Json>::schema_pointer;
 
         Json default_value_;
-        std::vector<pointer_type> type_mapping_;
+        std::vector<schema_pointer> type_mapping_;
         jsoncons::optional<enum_rule<Json>> enum_;
         jsoncons::optional<const_rule<Json>> const_;
-        std::vector<pointer_type> combined_;
+        std::vector<schema_pointer> combined_;
         jsoncons::optional<conditional_rule<Json>> conditional_;
         std::vector<std::string> expected_types_;
 

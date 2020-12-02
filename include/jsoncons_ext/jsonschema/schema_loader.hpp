@@ -32,8 +32,10 @@ namespace jsonschema {
     template <class Json>
     class reference_schema : public subschema<Json>
     {
+        using schema_pointer = typename subschema<Json>::schema_pointer;
+
         const std::string id_;
-        subschema<Json>* referred_schema_;
+        schema_pointer referred_schema_;
 
     public:
         reference_schema(const std::string& id)
@@ -41,7 +43,7 @@ namespace jsonschema {
 
         const std::string& id() const { return id_; }
 
-        void set_referred_schema(subschema<Json>* target) { referred_schema_ = target; }
+        void set_referred_schema(schema_pointer target) { referred_schema_ = target; }
 
     private:
 
@@ -81,13 +83,15 @@ namespace jsonschema {
     template <class Json>
     class json_schema : public subschema<Json>
     {
+        using schema_pointer = typename subschema<Json>::schema_pointer;
+
         friend class schema_loader<Json>;
 
         std::vector<std::unique_ptr<subschema<Json>>> subschemas_;
-        subschema<Json>* root_;
+        schema_pointer root_;
     public:
         json_schema(std::vector<std::unique_ptr<subschema<Json>>>&& subschemas,
-                    subschema<Json>* root)
+                    schema_pointer root)
             : subschemas_(std::move(subschemas)), root_(root)
         {
             if (root_ == nullptr)
@@ -122,15 +126,17 @@ namespace jsonschema {
     template <class Json>
     class schema_loader : public schema_builder<Json>
     {
+        using schema_pointer = typename subschema<Json>::schema_pointer;
+
         struct subschema_registry
         {
-            std::map<std::string, subschema<Json>*> schemas; // schemas
+            std::map<std::string, schema_pointer> schemas; // schemas
             std::map<std::string, reference_schema<Json>*> unresolved; // unresolved references
             std::map<std::string, Json> unprocessed_keywords;
         };
 
         uri_resolver<Json> resolver_;
-        subschema<Json>* root_;
+        schema_pointer root_;
 
         // Owns all schemas
         std::vector<std::unique_ptr<subschema<Json>>> subschemas_;
@@ -155,7 +161,7 @@ namespace jsonschema {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), root_);
         }
 
-        subschema<Json>* make_required_rule(const std::vector<std::string>& r) override
+        schema_pointer make_required_rule(const std::vector<std::string>& r) override
         {
             auto sch_orig = jsoncons::make_unique<required_rule<Json>>(r);
             auto sch = sch_orig.get();
@@ -163,7 +169,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_null_rule() override
+        schema_pointer make_null_rule() override
         {
             auto sch_orig = jsoncons::make_unique<null_rule<Json>>();
             auto sch = sch_orig.get();
@@ -171,7 +177,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_true_rule() override
+        schema_pointer make_true_rule() override
         {
             auto sch_orig = jsoncons::make_unique<true_rule<Json>>();
             auto sch = sch_orig.get();
@@ -179,7 +185,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_false_rule() override
+        schema_pointer make_false_rule() override
         {
             auto sch_orig = jsoncons::make_unique<false_rule<Json>>();
             auto sch = sch_orig.get();
@@ -187,7 +193,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_object_rule(const Json& schema,
+        schema_pointer make_object_rule(const Json& schema,
                                           const std::vector<uri_wrapper>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<object_rule<Json>>(this, schema, uris);
@@ -196,7 +202,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_array_rule(const Json& schema,
+        schema_pointer make_array_rule(const Json& schema,
                                           const std::vector<uri_wrapper>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<array_rule<Json>>(this, schema, uris);
@@ -205,7 +211,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_string_rule(const Json& schema) override
+        schema_pointer make_string_rule(const Json& schema) override
         {
             auto sch_orig = jsoncons::make_unique<string_rule<Json>>(schema);
             auto sch = sch_orig.get();
@@ -213,7 +219,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_boolean_rule() override
+        schema_pointer make_boolean_rule() override
         {
             auto sch_orig = jsoncons::make_unique<boolean_rule<Json>>();
             auto sch = sch_orig.get();
@@ -221,7 +227,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_integer_rule(const Json& schema, std::set<std::string>& keywords) override
+        schema_pointer make_integer_rule(const Json& schema, std::set<std::string>& keywords) override
         {
             auto sch_orig = jsoncons::make_unique<number_rule<Json,int64_t>>(schema, keywords);
             auto sch = sch_orig.get();
@@ -229,7 +235,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_number_rule(const Json& schema, std::set<std::string>& keywords) override
+        schema_pointer make_number_rule(const Json& schema, std::set<std::string>& keywords) override
         {
             auto sch_orig = jsoncons::make_unique<number_rule<Json,double>>(schema, keywords);
             auto sch = sch_orig.get();
@@ -237,7 +243,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_not_rule(const Json& schema,
+        schema_pointer make_not_rule(const Json& schema,
                                        const std::vector<uri_wrapper>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<not_rule<Json>>(this, schema, uris);
@@ -246,7 +252,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_all_of_rule(const Json& schema,
+        schema_pointer make_all_of_rule(const Json& schema,
                                           const std::vector<uri_wrapper>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<combining_rule<Json,all_of_criterion<Json>>>(this, schema, uris);
@@ -255,7 +261,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_any_of_rule(const Json& schema,
+        schema_pointer make_any_of_rule(const Json& schema,
                                           const std::vector<uri_wrapper>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<combining_rule<Json,any_of_criterion<Json>>>(this, schema, uris);
@@ -264,7 +270,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_one_of_rule(const Json& schema,
+        schema_pointer make_one_of_rule(const Json& schema,
                                           const std::vector<uri_wrapper>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<combining_rule<Json,one_of_criterion<Json>>>(this, schema, uris);
@@ -273,7 +279,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* make_type_rule(const Json& schema,
+        schema_pointer make_type_rule(const Json& schema,
                                         const std::vector<uri_wrapper>& uris) override
         {
             auto sch_orig = jsoncons::make_unique<type_rule<Json>>(this, schema, uris);
@@ -282,7 +288,7 @@ namespace jsonschema {
             return sch;
         }
 
-        subschema<Json>* build(const Json& schema,
+        schema_pointer build(const Json& schema,
                                const std::vector<std::string>& keys,
                                const std::vector<uri_wrapper>& uris) override
         {
@@ -304,7 +310,7 @@ namespace jsonschema {
                 }
             }
 
-            subschema<Json>* sch = nullptr;
+            schema_pointer sch = nullptr;
 
             // boolean schema
             if (schema.type() == json_type::bool_value)
@@ -418,7 +424,7 @@ namespace jsonschema {
 
     private:
 
-        void insert(const uri_wrapper& uri, subschema<Json>* s)
+        void insert(const uri_wrapper& uri, schema_pointer s)
         {
             auto& file = get_or_create_file(std::string(uri.base()));
             auto schemas_it = file.schemas.lower_bound(std::string(uri.fragment()));
@@ -466,7 +472,7 @@ namespace jsonschema {
             }
         }
 
-        subschema<Json>* get_or_create_reference(const uri_wrapper& uri)
+        schema_pointer get_or_create_reference(const uri_wrapper& uri)
         {
             auto &file = get_or_create_file(std::string(uri.base()));
 
