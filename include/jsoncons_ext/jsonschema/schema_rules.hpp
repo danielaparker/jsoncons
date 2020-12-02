@@ -90,12 +90,12 @@ namespace jsonschema {
     };
 
     template <class Json>
-    void update_patch(Json& patch, const jsoncons::jsonpointer::json_pointer& ptr, const Json& default_value)
+    void update_patch(Json& patch, const jsoncons::jsonpointer::json_pointer& ptr, Json&& default_value)
     {
         Json j;
         j.try_emplace("op", "add"); 
         j.try_emplace("path", ptr.string()); 
-        j.try_emplace("value", default_value); 
+        j.try_emplace("value", std::forward<Json>(default_value)); 
 
         patch.push_back(std::move(j));
     }
@@ -352,9 +352,9 @@ namespace jsonschema {
                 reporter.error(validation_error(ptr.string(), "Instance must not be valid against schema", "not"));
         }
 
-        const Json& get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
-                                 const Json& instance, 
-                                 error_reporter& reporter) const override
+        jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
+                                                   const Json& instance, 
+                                                   error_reporter& reporter) const override
         {
             return rule_->get_default_value(ptr, instance, reporter);
         }
@@ -803,10 +803,10 @@ namespace jsonschema {
                 // finally, check "additionalProperties" 
                 if (!a_prop_or_pattern_matched && additional_properties_) 
                 {
-                    local_error_reporter additional_prop_err;
-                    additional_properties_->validate(ptr / property.key(), property.value(), additional_prop_err, patch);
-                    if (additional_prop_err)
-                        reporter.error(validation_error(ptr.string(), "Validation failed for additional property \"" + property.key() + "\". " + additional_prop_err.message_, "additionalProperties"));
+                    local_error_reporter local_reporter;
+                    additional_properties_->validate(ptr / property.key(), property.value(), local_reporter, patch);
+                    if (local_reporter)
+                        reporter.error(validation_error(ptr.string(), "Validation failed for additional property \"" + property.key() + "\". " + local_reporter.message_, "additionalProperties"));
                 }
             }
 
@@ -817,11 +817,11 @@ namespace jsonschema {
                 if (finding == instance.object_range().end()) 
                 { 
                     // If property is not in instance
-                    const auto& default_value = prop.second->get_default_value(ptr, instance, reporter);
-                    if (!default_value.is_null()) 
+                    auto default_value = prop.second->get_default_value(ptr, instance, reporter);
+                    if (default_value) 
                     { 
                         // If default value is available, update patch
-                        update_patch(patch, ptr / prop.first, default_value);
+                        update_patch(patch, ptr / prop.first, std::move(*default_value));
                     }
                 }
             }
@@ -895,9 +895,12 @@ namespace jsonschema {
                             additional_items_ = builder->build(attr_add->value(), {"additionalItems"}, uris);
                         }
 
-                    } else if (it->value().type() == json_type::object_value ||
+                    } 
+                    else if (it->value().type() == json_type::object_value ||
                                it->value().type() == json_type::bool_value)
+                    {
                         items_schema_ = builder->build(it->value(), {"items"}, uris);
+                    }
 
                 }
             }
@@ -1141,7 +1144,9 @@ namespace jsonschema {
 
             auto it = sch.find("type");
             if (it == sch.object_range().end()) 
+            {
                 initialize_type_mapping(builder, "", sch, uris, known_keywords);
+            }
             else 
             {
                 switch (it->value().type()) 
@@ -1271,7 +1276,9 @@ namespace jsonschema {
             }
         }
 
-        const Json& get_default_value(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&) const override
+        jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer&, 
+                                                   const Json&,
+                                                   error_reporter&) const override
         {
             return default_value_;
         }

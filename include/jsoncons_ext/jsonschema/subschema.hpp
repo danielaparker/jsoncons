@@ -208,10 +208,9 @@ namespace jsonschema {
             do_validate(ptr,instance,reporter,patch);
         }
 
-        virtual const Json& get_default_value(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&) const
+        virtual jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&) const
         {
-            static const Json null_default = Json::null();
-            return null_default;
+            return jsoncons::optional<Json>();
         }
 
     private:

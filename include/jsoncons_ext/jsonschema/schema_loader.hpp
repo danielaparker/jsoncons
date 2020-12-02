@@ -61,16 +61,14 @@ namespace jsonschema {
             referred_schema_->validate(ptr, instance, reporter, patch);
         }
 
-        const Json& get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
-                                      const Json& instance, 
-                                      error_reporter& reporter) const override
+        jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
+                                                   const Json& instance, 
+                                                   error_reporter& reporter) const override
         {
-            static const Json null_default = Json::null();
-
             if (!referred_schema_)
             {
                 reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + id_, ""));
-                return null_default;
+                return jsoncons::optional<Json>();
             }
 
             return referred_schema_->get_default_value(ptr, instance, reporter);
