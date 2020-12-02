@@ -75,7 +75,9 @@ TEST_CASE("jsonschema-tests")
     SECTION("compliance")
     {
         jsonschema_tests("./jsonschema/input/compliance/draft7/additionalItems.json");
+#ifdef JSONCONS_HAS_STD_REGEX
         jsonschema_tests("./jsonschema/input/compliance/draft7/additionalProperties.json");
+#endif
         jsonschema_tests("./jsonschema/input/compliance/draft7/allOf.json");
         jsonschema_tests("./jsonschema/input/compliance/draft7/anyOf.json");
         jsonschema_tests("./jsonschema/input/compliance/draft7/boolean_schema.json");
@@ -110,8 +112,8 @@ TEST_CASE("jsonschema-tests")
 #ifdef JSONCONS_HAS_STD_REGEX
         jsonschema_tests("./jsonschema/input/compliance/draft7/pattern.json");
         jsonschema_tests("./jsonschema/input/compliance/draft7/patternProperties.json");
-#endif
         jsonschema_tests("./jsonschema/input/compliance/draft7/properties.json");
+#endif
 
         jsonschema_tests("./jsonschema/input/compliance/draft7/propertyNames.json");
 
