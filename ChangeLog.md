@@ -1,3 +1,11 @@
+master
+------
+
+Enhancements:
+
+- Added jsonschema extension that implements the JSON Schema [Draft 7](https://json-schema.org/specification-links.html#draft-7) 
+specification for validating input JSON, [\#280](https://github.com/danielaparker/jsoncons/issues/280)
+
 v0.159.0
 --------
 
