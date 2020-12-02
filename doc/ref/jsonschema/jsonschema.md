@@ -244,6 +244,11 @@ Error count: 1
 #### Defaults
 
 ```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
+#include <fstream>
+
 int main() 
 {
     // JSON Schema

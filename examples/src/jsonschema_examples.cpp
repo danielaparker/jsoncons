@@ -1,9 +1,6 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <string>
-#include <fstream>
-#include <cassert>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
