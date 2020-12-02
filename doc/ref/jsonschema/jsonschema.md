@@ -6,7 +6,7 @@ The jsonschema extension implements the JSON Schema [Draft 7](https://json-schem
 
 The jsonschema extension supports JSON Schema draft 7.
 
-The currently supported [formats](https://json-schema.org/understanding-json-schema/reference/string.html#format) 
+The supported [formats](https://json-schema.org/understanding-json-schema/reference/string.html#format) 
 in the JSON Schema specification are:
 
 |                      | Draft 7            |
