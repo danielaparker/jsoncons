@@ -28,9 +28,9 @@ class json_validator
   <tr>
     <td>reporter</td>
     <td>A function object with the signature of <code>reporter</code> being equivelent to 
-    <code>
+    <pre>
            void fun(const validation_error& e)
-    </code>
+    </pre>
   </tr>
 </table>
 
