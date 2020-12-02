@@ -489,43 +489,43 @@ TEST_CASE("CBOR stringref tag 1")
         {
             auto it = j[0].object_range().begin();
             std::string key1;
-            from_base64url(it->key().begin(),it->key().end(),key1);
+            decode_base64url(it->key().begin(),it->key().end(),key1);
             CHECK(key1 == std::string("rank"));
             ++it;
             std::string key2;
-            from_base64url(it->key().begin(),it->key().end(),key2);
+            decode_base64url(it->key().begin(),it->key().end(),key2);
             CHECK(key2 == std::string("count"));
             ++it;
             std::string key3;
-            from_base64url(it->key().begin(),it->key().end(),key3);
+            decode_base64url(it->key().begin(),it->key().end(),key3);
             CHECK(key3 == std::string("name"));
         }
         {
             auto it = j[1].object_range().begin();
             std::string key3;
-            from_base64url(it->key().begin(),it->key().end(),key3);
+            decode_base64url(it->key().begin(),it->key().end(),key3);
             CHECK(key3 == std::string("name"));
             ++it;
             std::string key2;
-            from_base64url(it->key().begin(),it->key().end(),key2);
+            decode_base64url(it->key().begin(),it->key().end(),key2);
             CHECK(key2 == std::string("count"));
             ++it;
             std::string key1;
-            from_base64url(it->key().begin(),it->key().end(),key1);
+            decode_base64url(it->key().begin(),it->key().end(),key1);
             CHECK(key1 == std::string("rank"));
         }
         {
             auto it = j[2].object_range().begin();
             std::string key3;
-            from_base64url(it->key().begin(),it->key().end(),key3);
+            decode_base64url(it->key().begin(),it->key().end(),key3);
             CHECK(key3 == std::string("name"));
             ++it;
             std::string key2;
-            from_base64url(it->key().begin(),it->key().end(),key2);
+            decode_base64url(it->key().begin(),it->key().end(),key2);
             CHECK(key2 == std::string("count"));
             ++it;
             std::string key1;
-            from_base64url(it->key().begin(),it->key().end(),key1);
+            decode_base64url(it->key().begin(),it->key().end(),key1);
             CHECK(key1 == std::string("rank"));
         }
     }

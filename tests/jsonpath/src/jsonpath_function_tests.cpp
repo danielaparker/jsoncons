@@ -150,8 +150,8 @@ TEST_CASE("jsonpath function tests")
 
         CHECK(result == expected);
     }
-#if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
-// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
+
+#if defined(JSONCONS_HAS_STD_REGEX)
     SECTION("tokenize")
     {
         json j("The cat sat on the mat");

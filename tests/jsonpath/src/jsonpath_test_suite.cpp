@@ -29,24 +29,24 @@ void jsonpath_tests(const std::string& fpath)
     }
 
     ojson tests = ojson::parse(is);
-    for (const auto& test : tests.array_range())
+    for (const auto& test_group : tests.array_range())
     {
-        const ojson& root = test["given"];
+        const ojson& root = test_group["given"];
 
-        for (const auto& item : test["cases"].array_range())
+        for (const auto& test_case : test_group["cases"].array_range())
         {
-            std::string expr = item["expression"].as<std::string>();
+            std::string expr = test_case["expression"].as<std::string>();
             try
             {
                 ojson actual = jsonpath::json_query(root, expr);
-                if (item.contains("result"))
+                if (test_case.contains("result"))
                 {
-                    const ojson& expected = item["result"];
+                    const ojson& expected = test_case["result"];
                     if (actual != expected)
                     {
-                        if (item.contains("comment"))
+                        if (test_case.contains("comment"))
                         {
-                            std::cout << "\n" << item["comment"] << "\n";
+                            std::cout << "\n" << test_case["comment"] << "\n";
                         }
                         std::cout << "Input:\n" << pretty_print(root) << "\n\n";
                         std::cout << "Expression: " << expr << "\n\n";
@@ -55,13 +55,13 @@ void jsonpath_tests(const std::string& fpath)
                     }
                     CHECK(actual == expected);
                 }
-                else if (item.contains("error"))
+                else if (test_case.contains("error"))
                 {
-                    if (item.contains("comment"))
+                    if (test_case.contains("comment"))
                     {
-                        std::cout << "Comment: " << item["comment"] << "\n";
+                        std::cout << "Comment: " << test_case["comment"] << "\n";
                     }
-                    std::cout << "Error: " << item["error"] << "\n\n";
+                    std::cout << "Error: " << test_case["error"] << "\n\n";
                     std::cout << "Input:\n" << pretty_print(root) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Actual: " << pretty_print(actual) << "\n\n";
@@ -71,13 +71,13 @@ void jsonpath_tests(const std::string& fpath)
             }
             catch (const std::exception& e)
             {
-                if (item.contains("result"))
+                if (test_case.contains("result"))
                 {
-                    const ojson& expected = item["result"];
+                    const ojson& expected = test_case["result"];
                     std::cout << e.what() << "\n";
-                    if (item.contains("comment"))
+                    if (test_case.contains("comment"))
                     {
-                        std::cout << "Comment: " << item["comment"] << "\n\n";
+                        std::cout << "Comment: " << test_case["comment"] << "\n\n";
                     }
                     std::cout << "Input\n" << pretty_print(root) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
@@ -98,10 +98,9 @@ TEST_CASE("jsonpath-tests")
     }
     SECTION("compliance")
     {
-    #if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
-    // GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
+#if defined(JSONCONS_HAS_STD_REGEX)
         jsonpath_tests("./jsonpath/input/compliance/jsonpath-regex-tests.json");
-    #endif
+#endif
         jsonpath_tests("./jsonpath/input/compliance/basic.json"); 
         jsonpath_tests("./jsonpath/input/compliance/slice.json");
         jsonpath_tests("./jsonpath/input/compliance/jsonpath-tests.json");

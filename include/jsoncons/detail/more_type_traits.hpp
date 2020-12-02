@@ -671,6 +671,7 @@ namespace impl {
     is_constructible_from_string = is_detected<construct_from_string_t,T>;
 
     // is_function_object
+    // is_function_object_exact
 
     template<class FunctionObject, class Arg>
         using
@@ -678,7 +679,11 @@ namespace impl {
 
     template<class FunctionObject, class Arg>
         using
-        is_function_object = jsoncons::detail::is_detected<function_object_t, FunctionObject, Arg>;
+        is_function_object = is_detected<function_object_t, FunctionObject, Arg>;
+
+    template<class FunctionObject, class T, class Arg>
+    using
+    is_function_object_exact = is_detected_exact<T,function_object_t, FunctionObject, Arg>;
 
 } // detail
 } // jsoncons

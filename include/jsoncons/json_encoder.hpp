@@ -720,7 +720,7 @@ namespace detail {
                 case byte_string_chars_format::base16:
                 {
                     sink_.push_back('\"');
-                    std::size_t length = to_base16(b.begin(),b.end(),sink_);
+                    std::size_t length = encode_base16(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     column_ += (length + 2);
                     break;
@@ -728,7 +728,7 @@ namespace detail {
                 case byte_string_chars_format::base64:
                 {
                     sink_.push_back('\"');
-                    std::size_t length = to_base64(b.begin(), b.end(), sink_);
+                    std::size_t length = encode_base64(b.begin(), b.end(), sink_);
                     sink_.push_back('\"');
                     column_ += (length + 2);
                     break;
@@ -736,7 +736,7 @@ namespace detail {
                 case byte_string_chars_format::base64url:
                 {
                     sink_.push_back('\"');
-                    std::size_t length = to_base64url(b.begin(),b.end(),sink_);
+                    std::size_t length = encode_base64url(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     column_ += (length + 2);
                     break;
@@ -950,7 +950,7 @@ namespace detail {
                         sink_.push_back('~');
                         ++column_;
                     }
-                    std::size_t length = to_base64(v.begin(), v.end(), sink_);
+                    std::size_t length = encode_base64(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     column_ += (length+2);
                     break;
@@ -973,7 +973,7 @@ namespace detail {
                         sink_.push_back('~');
                         ++column_;
                     }
-                    std::size_t length = to_base64url(v.begin(), v.end(), sink_);
+                    std::size_t length = encode_base64url(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     column_ += (length+2);
                     break;
@@ -1257,7 +1257,7 @@ namespace detail {
                     {
                         sink_.push_back('~');
                     }
-                    to_base64(v.begin(), v.end(), sink_);
+                    encode_base64(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     break;
                 }
@@ -1278,7 +1278,7 @@ namespace detail {
                     {
                         sink_.push_back('~');
                     }
-                    to_base64url(v.begin(), v.end(), sink_);
+                    encode_base64url(v.begin(), v.end(), sink_);
                     sink_.push_back('\"');
                     break;
                 }
@@ -1355,21 +1355,21 @@ namespace detail {
                 case byte_string_chars_format::base16:
                 {
                     sink_.push_back('\"');
-                    to_base16(b.begin(),b.end(),sink_);
+                    encode_base16(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     break;
                 }
                 case byte_string_chars_format::base64:
                 {
                     sink_.push_back('\"');
-                    to_base64(b.begin(), b.end(), sink_);
+                    encode_base64(b.begin(), b.end(), sink_);
                     sink_.push_back('\"');
                     break;
                 }
                 case byte_string_chars_format::base64url:
                 {
                     sink_.push_back('\"');
-                    to_base64url(b.begin(),b.end(),sink_);
+                    encode_base64url(b.begin(),b.end(),sink_);
                     sink_.push_back('\"');
                     break;
                 }

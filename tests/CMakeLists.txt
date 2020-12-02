@@ -159,6 +159,8 @@ set(JSONCONS_TESTS_SOURCES
    ${JSONCONS_TESTS_DIR}/jsonpath/src/jsonpath_tests.cpp
    ${JSONCONS_TESTS_DIR}/jsonpointer/src/jsonpointer_flatten_tests.cpp
    ${JSONCONS_TESTS_DIR}/jsonpointer/src/jsonpointer_tests.cpp
+   ${JSONCONS_TESTS_DIR}/jsonschema/src/format_checker_tests.cpp
+   ${JSONCONS_TESTS_DIR}/jsonschema/src/jsonschema_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/decode_msgpack_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/encode_msgpack_tests.cpp
    ${JSONCONS_TESTS_DIR}/msgpack/src/msgpack_bitset_traits_tests.cpp

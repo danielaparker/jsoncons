@@ -85,8 +85,8 @@ namespace jsoncons {
             {
                 case semantic_tag::base16:
                 {
-                    auto res = from_base16(s.begin(), s.end(), bytes);
-                    if (res.ec != from_base16_errc::success)
+                    auto res = decode_base16(s.begin(), s.end(), bytes);
+                    if (res.ec != convert_errc::success)
                     {
                         ec = convert_errc::not_byte_string;
                     }
@@ -94,12 +94,12 @@ namespace jsoncons {
                 }
                 case semantic_tag::base64:
                 {
-                    from_base64(s.begin(), s.end(), bytes);
+                    decode_base64(s.begin(), s.end(), bytes);
                     break;
                 }
                 case semantic_tag::base64url:
                 {
-                    from_base64url(s.begin(), s.end(), bytes);
+                    decode_base64url(s.begin(), s.end(), bytes);
                     break;
                 }
                 default:
@@ -111,7 +111,6 @@ namespace jsoncons {
         }
 
         template <class CharT>
-        JSONCONS_CPP14_CONSTEXPR 
         typename std::enable_if<detail::is_wide_character<CharT>::value>::type
         from_(Into& bytes, const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
@@ -157,7 +156,6 @@ namespace jsoncons {
             return s;
         }
 
-        JSONCONS_CPP14_CONSTEXPR 
         Into from(double val, semantic_tag, std::error_code&) const
         {
             Into s;
@@ -166,7 +164,6 @@ namespace jsoncons {
             return s;
         }
 
-        JSONCONS_CPP14_CONSTEXPR 
         Into from(double val, semantic_tag, const allocator_type& alloc, std::error_code&) const
         {
             Into s(alloc);
@@ -175,7 +172,6 @@ namespace jsoncons {
             return s;
         }
 
-        JSONCONS_CPP14_CONSTEXPR 
         Into from(half_arg_t, uint16_t val, semantic_tag, std::error_code&) const
         {
             Into s;
@@ -185,7 +181,6 @@ namespace jsoncons {
             return s;
         }
 
-        JSONCONS_CPP14_CONSTEXPR 
         Into from(half_arg_t, uint16_t val, semantic_tag, const allocator_type& alloc, std::error_code&) const
         {
             Into s(alloc);
@@ -268,19 +263,18 @@ namespace jsoncons {
             switch (tag)
             {
                 case semantic_tag::base64:
-                    to_base64(bytes.begin(), bytes.end(), s);
+                    encode_base64(bytes.begin(), bytes.end(), s);
                     break;
                 case semantic_tag::base16:
-                    to_base16(bytes.begin(), bytes.end(), s);
+                    encode_base16(bytes.begin(), bytes.end(), s);
                     break;
                 default:
-                    to_base64url(bytes.begin(), bytes.end(), s);
+                    encode_base64url(bytes.begin(), bytes.end(), s);
                     break;
             }
         }
 
         template <class ChT = char_type>
-        JSONCONS_CPP14_CONSTEXPR
         typename std::enable_if<!jsoncons::detail::is_byte<ChT>::value>::type
         from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
         {

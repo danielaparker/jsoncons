@@ -1,0 +1,39 @@
+### jsoncons::jsonschema::json_validator
+
+```c++
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+
+template <class Json>
+class json_validator
+```
+
+#### Constructor
+
+    json_validator(std::shared_ptr<json_schema<Json>> schema);
+
+#### Member functions
+
+    Json validate(const Json& instance) const; // (1)
+
+    template <class Reporter>
+    Json validate(const Json& instance, const Reporter& reporter) const; // (2)
+
+#### Parameters
+
+<table>
+  <tr>
+    <td>instance</td>
+    <td>Input Json</td> 
+  </tr>
+  <tr>
+    <td>reporter</td>
+    <td>A function object with the signature of <code>reporter</code> being equivelent to <code>void fun(const validation_error& e)</code>
+  </tr>
+</table>
+
+#### Exceptions
+
+(1) Throws a [validation_error](validation_error.md) for the first schema violation.
+
+(2) `reporter` is called for each schema violation
+

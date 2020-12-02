@@ -254,6 +254,14 @@ namespace detail {
 #define JSONCONS_CSTRING(CharT, name, ...) \
     static constexpr CharT name[] = { __VA_ARGS__,0};
 
+#if defined(__clang__) 
+#define JSONCONS_HAS_STD_REGEX 1
+#elif (defined(__GNUC__) && (__GNUC__ == 4)) && (defined(__GNUC__) && __GNUC_MINOR__ < 9)
+// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
+#else
+#define JSONCONS_HAS_STD_REGEX 1
+#endif
+
 #endif // JSONCONS_CONFIG_JSONCONS_CONFIG_HPP
 
 

@@ -25,24 +25,24 @@ void jmespath_tests(const std::string& fpath)
     REQUIRE(is);
 
     json tests = json::parse(is);
-    for (const auto& test : tests.array_range())
+    for (const auto& test_group : tests.array_range())
     {
-        const json& root = test["given"];
+        const json& root = test_group["given"];
 
-        for (const auto& item : test["cases"].array_range())
+        for (const auto& test_case : test_group["cases"].array_range())
         {
-            std::string expr = item["expression"].as<std::string>();
+            std::string expr = test_case["expression"].as<std::string>();
             try
             {
                 json actual = jmespath::search(root, expr);
-                if (item.contains("result"))
+                if (test_case.contains("result"))
                 {
-                    const json& expected = item["result"];
+                    const json& expected = test_case["result"];
                     if (actual != expected)
                     {
-                        if (item.contains("comment"))
+                        if (test_case.contains("comment"))
                         {
-                            std::cout << "\n" << item["comment"] << "\n";
+                            std::cout << "\n" << test_case["comment"] << "\n";
                         }
                         std::cout << "Input:\n" << pretty_print(root) << "\n\n";
                         std::cout << "Expression: " << expr << "\n\n";
@@ -51,13 +51,13 @@ void jmespath_tests(const std::string& fpath)
                     }
                     CHECK(actual == expected);
                 }
-                else if (item.contains("error"))
+                else if (test_case.contains("error"))
                 {
-                    if (item.contains("comment"))
+                    if (test_case.contains("comment"))
                     {
-                        std::cout << "Comment: " << item["comment"] << "\n";
+                        std::cout << "Comment: " << test_case["comment"] << "\n";
                     }
-                    std::cout << "Error: " << item["error"] << "\n\n";
+                    std::cout << "Error: " << test_case["error"] << "\n\n";
                     std::cout << "Input:\n" << pretty_print(root) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Actual: " << pretty_print(actual) << "\n\n";
@@ -67,13 +67,13 @@ void jmespath_tests(const std::string& fpath)
             }
             catch (const std::exception& e)
             {
-                if (item.contains("result"))
+                if (test_case.contains("result"))
                 {
-                    const json& expected = item["result"];
+                    const json& expected = test_case["result"];
                     std::cout << e.what() << "\n";
-                    if (item.contains("comment"))
+                    if (test_case.contains("comment"))
                     {
-                        std::cout << "Comment: " << item["comment"] << "\n\n";
+                        std::cout << "Comment: " << test_case["comment"] << "\n\n";
                     }
                     std::cout << "Input\n" << pretty_print(root) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";

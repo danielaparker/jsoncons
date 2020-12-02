@@ -177,8 +177,7 @@ private:
                     return Json(v);
                 }
         }
-#if !(defined(__GNUC__) && (__GNUC__ == 4 && __GNUC_MINOR__ < 9))
-// GCC 4.8 has broken regex support: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53631
+#if defined(JSONCONS_HAS_STD_REGEX)
         ,{
             tokenize_literal<char_type>(),[](const std::vector<argument_type>& args, std::error_code& ec) -> Json
                 {

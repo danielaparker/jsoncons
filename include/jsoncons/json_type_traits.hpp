@@ -1725,8 +1725,8 @@ namespace variant_detail
             {
                 jsoncons::string_view sv = j.as_string_view();
                 null_back_insertable_byte_container cont;
-                auto result = from_base16(sv.begin(), sv.end(), cont);
-                return result.ec == from_base16_errc::success ? true : false;
+                auto result = decode_base16(sv.begin(), sv.end(), cont);
+                return result.ec == convert_errc::success ? true : false;
             }
             return false;
         }
@@ -1750,8 +1750,8 @@ namespace variant_detail
                 else
                 {
                     jsoncons::string_view sv = j.as_string_view();
-                    auto result = from_base16(sv.begin(), sv.end(), bits);
-                    if (result.ec != from_base16_errc::success)
+                    auto result = decode_base16(sv.begin(), sv.end(), bits);
+                    if (result.ec != convert_errc::success)
                     {
                         JSONCONS_THROW(convert_error(convert_errc::not_bitset));
                     }

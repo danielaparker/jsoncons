@@ -1094,13 +1094,13 @@ namespace jsoncons {
                 switch (tag)
                 {
                     case semantic_tag::base64:
-                        to_base64(value.begin(), value.end(), key_);
+                        encode_base64(value.begin(), value.end(), key_);
                         break;
                     case semantic_tag::base16:
-                        to_base16(value.begin(), value.end(),key_);
+                        encode_base16(value.begin(), value.end(),key_);
                         break;
                     default:
-                        to_base64url(value.begin(), value.end(),key_);
+                        encode_base64url(value.begin(), value.end(),key_);
                         break;
                 }
             }
@@ -1159,7 +1159,7 @@ namespace jsoncons {
             if (level_stack_.back().is_key() || level_stack_.back().target() == target_t::buffer)
             {
                 key_.clear();
-                to_base64url(value.begin(), value.end(),key_);
+                encode_base64url(value.begin(), value.end(),key_);
             }
 
             if (level_stack_.back().is_key())

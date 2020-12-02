@@ -104,7 +104,17 @@ namespace jsoncons {
         not_variant,
         not_nullptr,
         not_jsoncons_null_type,
-        not_bitset
+        not_bitset,
+        not_base64,
+        not_base64url,
+        not_base16
+    };
+
+    template <class InputIt>
+    struct decode_result 
+    {
+        InputIt it;
+        convert_errc ec;
     };
 }
 
@@ -172,8 +182,14 @@ namespace detail {
                     return "Cannot convert to jsoncons::null_type";
                 case convert_errc::not_bitset:
                     return "Cannot convert to std::bitset";
+                case convert_errc::not_base64:
+                    return "Input is not a base64 encoded string";
+                case convert_errc::not_base64url:
+                    return "Input is not a base64url encoded string";
+                case convert_errc::not_base16:
+                    return "Input is not a base16 encoded string";
                 default:
-                    return "Unknown convert error";
+                    return "Unknown conversion error";
             }
         }
     };
