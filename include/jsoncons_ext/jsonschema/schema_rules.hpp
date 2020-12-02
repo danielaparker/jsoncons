@@ -219,13 +219,7 @@ namespace jsonschema {
                 } 
                 else
                 {
-                    auto default_check = [format](const jsoncons::jsonpointer::json_pointer&,
-                                                  const std::string&,
-                                                  error_reporter&) -> void
-                    {
-                        JSONCONS_THROW(schema_error("JSON Schema string format \"" + format + "\" not supported"));
-                    };
-                    format_check_ = default_check;
+                    // Not supported - ignore
                 }
             }
         }

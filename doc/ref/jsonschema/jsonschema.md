@@ -6,8 +6,7 @@ The jsonschema extension implements the JSON Schema [Draft 7](https://json-schem
 
 The jsonschema extension supports JSON Schema draft 7.
 
-The supported [formats](https://json-schema.org/understanding-json-schema/reference/string.html#format) 
-in the JSON Schema specification are:
+The validator understands the following [format types](https://json-schema.org/understanding-json-schema/reference/string.html#format):
 
 |                      | Draft 7            |
 |----------------------|--------------------|
@@ -19,6 +18,8 @@ in the JSON Schema specification are:
 | ipv4                 | :heavy_check_mark: |
 | ipv6                 | :heavy_check_mark: |
 | regex                | :heavy_check_mark: |
+
+Any other format type is ignored.
 
 ### Classes
 <table border="0">
