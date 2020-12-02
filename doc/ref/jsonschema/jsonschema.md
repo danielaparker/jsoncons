@@ -11,14 +11,14 @@ in the JSON Schema specification are:
 
 |                      | Draft 7            |
 |----------------------|--------------------|
-| date                 | :white_check_mark: |
-| time                 | :white_check_mark: |
-| date-time            | :white_check_mark: |
-| email                | :white_check_mark: |
-| hostname             | :white_check_mark: |
-| ipv4                 | :white_check_mark: |
-| ipv6                 | :white_check_mark: |
-| regex                | :white_check_mark: |
+| date                 | :heavy_check_mark: |
+| time                 | :heavy_check_mark: |
+| date-time            | :heavy_check_mark: |
+| email                | :heavy_check_mark: |
+| hostname             | :heavy_check_mark: |
+| ipv4                 | :heavy_check_mark: |
+| ipv6                 | :heavy_check_mark: |
+| regex                | :heavy_check_mark: |
 
 ### Classes
 <table border="0">
