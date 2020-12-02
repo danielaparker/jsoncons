@@ -77,22 +77,29 @@ namespace {
     }
        )");
 
-        // Will throw schema_error if JSON Schema loading fails
-        auto schema_doc = jsonschema::make_schema(schema);
-
-        std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_error& e)
+        try
         {
-            ++error_count;
+            // Will throw schema_error if JSON Schema loading fails
+            auto schema_doc = jsonschema::make_schema(schema);
+
+            std::size_t error_count = 0;
+            auto reporter = [&error_count](const jsonschema::validation_error& e)
+            {
+                ++error_count;
+                std::cout << e.what() << "\n";
+            };
+
+            jsonschema::json_validator<json> validator(schema_doc);
+
+            // Will call reporter for each schema violation
+            validator.validate(data, reporter);
+
+            std::cout << "\nError count: " << error_count << "\n\n";
+        }
+        catch (const std::exception& e)
+        {
             std::cout << e.what() << "\n";
-        };
-
-        jsonschema::json_validator<json> validator(schema_doc);
-
-        // Will call reporter for each schema violation
-        validator.validate(data, reporter);
-
-        std::cout << "\nError count: " << error_count << "\n\n";
+        }
     }
 
     json resolver(const jsoncons::uri& uri)
@@ -131,22 +138,29 @@ namespace {
     }
         )");
 
-        // Will throw schema_error if JSON Schema loading fails
-        auto schema_doc = jsonschema::make_schema(schema, resolver);
-
-        std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_error& e)
+        try
         {
-            ++error_count;
-            std::cout << e.what() << "\n";
-        };
+            // Will throw schema_error if JSON Schema loading fails
+            auto schema_doc = jsonschema::make_schema(schema, resolver);
 
-        jsonschema::json_validator<json> validator(schema_doc);
+            std::size_t error_count = 0;
+            auto reporter = [&error_count](const jsonschema::validation_error& e)
+            {
+                ++error_count;
+                std::cout << e.what() << "\n";
+            };
 
-        // Will call reporter for each schema violation
-        validator.validate(data, reporter);
+            jsonschema::json_validator<json> validator(schema_doc);
 
-        std::cout << "\nError count: " << error_count << "\n\n";
+            // Will call reporter for each schema violation
+            validator.validate(data, reporter);
+
+            std::cout << "\nError count: " << error_count << "\n\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << '\n';
+        }
     }
 
     void defaults_example() 
@@ -164,24 +178,31 @@ namespace {
 }
     )");
 
-        // Data
-        json data = json::parse("{}");
+        try
+        {
+            // Data
+            json data = json::parse("{}");
 
-        // will throw schema_error if JSON Schema loading fails 
-        auto schema_doc = jsonschema::make_schema(schema, resolver); 
+            // will throw schema_error if JSON Schema loading fails 
+            auto schema_doc = jsonschema::make_schema(schema, resolver); 
 
-        jsonschema::json_validator<json> validator(schema_doc); 
+            jsonschema::json_validator<json> validator(schema_doc); 
 
-        // will throw validation_error when a schema violation happens 
-        json patch = validator.validate(data); 
+            // will throw validation_error when a schema violation happens 
+            json patch = validator.validate(data); 
 
-        std::cout << "Patch: " << patch << "\n";
+            std::cout << "Patch: " << patch << "\n";
 
-        std::cout << "Original data: " << data << "\n";
+            std::cout << "Original data: " << data << "\n";
 
-        jsonpatch::apply_patch(data, patch);
+            jsonpatch::apply_patch(data, patch);
 
-        std::cout << "Patched data: " << data << "\n\n";
+            std::cout << "Patched data: " << data << "\n\n";
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+        }
     }
 
 } // namespace
