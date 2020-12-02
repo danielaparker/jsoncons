@@ -202,10 +202,10 @@ namespace jsonschema {
 
         void validate(const jsoncons::jsonpointer::json_pointer &ptr, 
                       const Json& instance, 
-                      Json& result, 
-                      error_reporter& reporter) const 
+                      error_reporter& reporter, 
+                      Json& patch) const 
         {
-            do_validate(ptr,instance,result,reporter);
+            do_validate(ptr,instance,reporter,patch);
         }
 
         virtual const Json& get_default_value(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&) const
@@ -217,8 +217,8 @@ namespace jsonschema {
     private:
         virtual void do_validate(const jsoncons::jsonpointer::json_pointer &ptr, 
                                  const Json& instance, 
-                                 Json& result, 
-                                 error_reporter& reporter) const = 0;
+                                 error_reporter& reporter, 
+                                 Json& patch) const = 0;
     };
 
 } // namespace jsonschema

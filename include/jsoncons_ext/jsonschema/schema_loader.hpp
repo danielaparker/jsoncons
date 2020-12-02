@@ -49,8 +49,8 @@ namespace jsonschema {
 
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
                          const Json& instance, 
-                         Json& result, 
-                         error_reporter& reporter) const override
+                         error_reporter& reporter, 
+                         Json& patch) const override
         {
             if (!referred_schema_)
             {
@@ -58,7 +58,7 @@ namespace jsonschema {
                 return;
             }
 
-            referred_schema_->validate(ptr, instance, result, reporter);
+            referred_schema_->validate(ptr, instance, reporter, patch);
         }
 
         const Json& get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
@@ -105,11 +105,11 @@ namespace jsonschema {
     private:
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
                          const Json& instance, 
-                         Json& result, 
-                         error_reporter& reporter) const 
+                         error_reporter& reporter, 
+                         Json& patch) const 
         {
             JSONCONS_ASSERT(root_ != nullptr);
-            root_->validate(ptr, instance, result, reporter);
+            root_->validate(ptr, instance, reporter, patch);
         }
     };
 
