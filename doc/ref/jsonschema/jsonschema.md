@@ -6,6 +6,20 @@ The jsonschema extension implements the JSON Schema [Draft 7](https://json-schem
 
 The jsonschema extension supports JSON Schema draft 7.
 
+The currently supported [formats](https://json-schema.org/understanding-json-schema/reference/string.html#format) 
+in the JSON Schema specification are:
+
+|                      | Draft 7            |
+|----------------------|--------------------|
+| date                 | :white_check_mark: |
+| time                 | :white_check_mark: |
+| date-time            | :white_check_mark: |
+| email                | :white_check_mark: |
+| hostname             | :white_check_mark: |
+| ipv4                 | :white_check_mark: |
+| ipv6                 | :white_check_mark: |
+| regex                | :white_check_mark: |
+
 ### Classes
 <table border="0">
   <tr>
