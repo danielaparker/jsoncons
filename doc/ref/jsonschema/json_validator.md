@@ -18,6 +18,12 @@ class json_validator
     template <class Reporter>
     Json validate(const Json& instance, const Reporter& reporter) const; // (2)
 
+(1) Validates input JSON against a JSON Schema with a default error reporter
+that throws upon the first schema violation.
+
+(2) Validates input JSON against a JSON Schema with a provided error reporter
+that is called for each schema violation.
+
 #### Parameters
 
 <table>
@@ -29,7 +35,7 @@ class json_validator
     <td>reporter</td>
     <td>A function object with the signature of <code>reporter</code> being equivelent to 
     <pre>
-           void fun(const validation_error& e)</pre>
+           void fun(const validation_error& e)</pre></td>
   </tr>
 </table>
 

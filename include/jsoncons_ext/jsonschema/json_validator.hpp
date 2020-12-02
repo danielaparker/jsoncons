@@ -67,14 +67,18 @@ namespace jsonschema {
 
         ~json_validator() = default;
 
-        // validate a Json-document based on the root-schema
+        // Validate input JSON against a JSON Schema with a default throwing error reporter
         Json validate(const Json& instance) const
         {
-            default_error_reporter err;
-            return validate(instance, err);
+            default_error_reporter reporter;
+            jsoncons::jsonpointer::json_pointer ptr;
+            Json patch(json_array_arg);
+
+            root_->validate(ptr, instance, reporter, patch);
+            return patch;
         }
 
-        // validate a Json-document based on the root-schema with a custom error-handler
+        // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
         typename std::enable_if<jsoncons::detail::is_function_object_exact<Reporter,void,validation_error>::value,Json>::type
         validate(const Json& instance, const Reporter& reporter) const

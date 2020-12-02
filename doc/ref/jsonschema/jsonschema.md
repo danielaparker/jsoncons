@@ -48,10 +48,11 @@ and the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
+// for brevity
 using jsoncons::json;
-namespace jsonschema = jsoncons::jsonschema; // for brevity
+namespace jsonschema = jsoncons::jsonschema; 
 
-int main()
+int main() 
 {
     // JSON Schema
     json schema = json::parse(R"(
@@ -115,7 +116,8 @@ int main()
 }
    )");
 
-    auto sch = jsonschema::make_schema(schema);
+    // Will throw schema_error if JSON Schema loading fails
+    auto schema_doc = jsonschema::make_schema(schema);
 
     std::size_t error_count = 0;
     auto reporter = [&error_count](const jsonschema::validation_error& e)
@@ -124,10 +126,12 @@ int main()
         std::cout << e.what() << "\n";
     };
 
-    jsonschema::json_validator<json> validator(sch);
+    jsonschema::json_validator<json> validator(schema_doc);
+
+    // Will call reporter for each schema violation
     validator.validate(data, reporter);
 
-    std::cout << "\nError count: " << error_count << "\n";
+    std::cout << "\nError count: " << error_count << "\n\n";
 }
 ```
 
@@ -170,32 +174,26 @@ JSON Schema document.
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 #include <fstream>
 
+// for brevity
 using jsoncons::json;
-namespace jsonschema = jsoncons::jsonschema; // for brevity
+namespace jsonschema = jsoncons::jsonschema; 
 
 json resolver(const jsoncons::uri& uri)
 {
-    if (uri.path() == "/draft-07/schema")
-    {
-        return jsoncons::jsonschema::json_schema_draft7::get_schema();
-    }
-    else
-    {
-        std::cout << uri.string() << ", " << uri.path() << "\n\n";
+    std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
 
-        std::string pathname = /* path_to_directory */;
-        pathname += std::string(uri.path());
+    std::string pathname = /* path_to_directory */;
+    pathname += std::string(uri.path());
 
-        std::fstream is(pathname.c_str());
-        if (!is)
-            throw jsonschema::schema_error("Could not open " + std::string(uri.base()) + " for schema loading\n");
+    std::fstream is(pathname.c_str());
+    if (!is)
+        throw jsonschema::schema_error("Could not open " + std::string(uri.base()) + " for schema loading\n");
 
-        return json::parse(is);
-    }
+    return json::parse(is);        
 }
 
 int main()
-{
+{ 
     // JSON Schema
     json schema = json::parse(R"(
 {
@@ -216,7 +214,8 @@ int main()
 }
     )");
 
-    auto sch = jsonschema::make_schema(schema, resolver);
+    // Will throw schema_error if JSON Schema loading fails
+    auto schema_doc = jsonschema::make_schema(schema, resolver);
 
     std::size_t error_count = 0;
     auto reporter = [&error_count](const jsonschema::validation_error& e)
@@ -225,15 +224,64 @@ int main()
         std::cout << e.what() << "\n";
     };
 
-    jsonschema::json_validator<json> validator(sch);
+    jsonschema::json_validator<json> validator(schema_doc);
+
+    // Will call reporter for each schema violation
     validator.validate(data, reporter);
 
-    std::cout << "\nError count: " << error_count << "\n";
+    std::cout << "\nError count: " << error_count << "\n\n";
 }
 ```
 Output:
 ```
-http://localhost:1234/name.json, /name.json
+uri: http://localhost:1234/name.json, path: /name.json
 
 /name: No subschema matched, but one of them is required to match
+
+Error count: 1
+```
+
+#### Defaults
+
+```c++
+int main() 
+{
+    // JSON Schema
+    json schema = json::parse(R"(
+{
+    "properties": {
+        "bar": {
+            "type": "string",
+            "minLength": 4,
+            "default": "bad"
+        }
+    }
+}
+    )");
+
+    // Data
+    json data = json::parse("{}");
+
+    // will throw schema_error if JSON Schema loading fails 
+    auto schema_doc = jsonschema::make_schema(schema, resolver); 
+
+    jsonschema::json_validator<json> validator(schema_doc); 
+
+    // will throw validation_error on first encountered schema violation 
+    json patch = validator.validate(data); 
+
+    std::cout << "Patch: " << patch << "\n";
+
+    std::cout << "Original data: " << data << "\n";
+
+    jsonpatch::apply_patch(data, patch);
+
+    std::cout << "Patched data: " << data << "\n\n";
+}
+```
+Output:
+```
+Patch: [{"op":"add","path":"/bar","value":"bad"}]
+Original data: {}
+Patched data: {"bar":"bad"}
 ```
