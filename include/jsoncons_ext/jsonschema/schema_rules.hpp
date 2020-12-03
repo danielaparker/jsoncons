@@ -72,17 +72,14 @@ namespace jsonschema {
                                                 const std::vector<uri_wrapper>& uris) = 0;
     };
 
-    struct local_error_reporter : public error_reporter
+    struct collecting_error_reporter : public error_reporter
     {
         std::vector<validation_error> errors;
-
-        std::string message_;
 
     private:
         void do_error(const validation_error& e) override
         {
             errors.push_back(e);
-            message_ = e.what();
         }
     };
 
@@ -336,7 +333,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json& patch) const final
         {
-            local_error_reporter local_reporter;
+            collecting_error_reporter local_reporter;
             rule_->validate(ptr, instance, local_reporter, patch);
 
             if (local_reporter.errors.empty())
@@ -363,11 +360,11 @@ namespace jsonschema {
         static bool is_complete(const Json&, 
                                 const jsoncons::jsonpointer::json_pointer& ptr, 
                                 error_reporter& reporter, 
-                                const local_error_reporter& local_reporter, 
+                                const collecting_error_reporter& local_reporter, 
                                 std::size_t)
         {
             if (!local_reporter.errors.empty())
-                reporter.error(validation_error(ptr.string(), "At least one subschema failed to match, but all are required to match. " + local_reporter.message_, "allOf"));
+                reporter.error(validation_error(ptr.string(), "At least one subschema failed to match, but all are required to match. ", "allOf", local_reporter.errors));
             return !local_reporter.errors.empty();
         }
     };
@@ -384,7 +381,7 @@ namespace jsonschema {
         static bool is_complete(const Json&, 
                                 const jsoncons::jsonpointer::json_pointer&, 
                                 error_reporter&, 
-                                const local_error_reporter&, 
+                                const collecting_error_reporter&, 
                                 std::size_t count)
         {
             return count == 1;
@@ -403,7 +400,7 @@ namespace jsonschema {
         static bool is_complete(const Json&, 
                                 const jsoncons::jsonpointer::json_pointer& ptr, 
                                 error_reporter& reporter, 
-                                const local_error_reporter&, 
+                                const collecting_error_reporter&, 
                                 std::size_t count)
         {
             if (count > 1)
@@ -446,7 +443,7 @@ namespace jsonschema {
         {
             size_t count = 0;
 
-            local_error_reporter local_reporter;
+            collecting_error_reporter local_reporter;
             for (auto& s : subschemas_) 
             {
                 std::size_t mark = local_reporter.errors.size();
@@ -460,7 +457,7 @@ namespace jsonschema {
 
             if (count == 0)
             {
-                reporter.error(validation_error(ptr.string(), "No subschema matched, but one of them is required to match", "combined"));
+                reporter.error(validation_error(ptr.string(), "No subschema matched, but one of them is required to match", "combined", local_reporter.errors));
             }
         }
     };
@@ -635,7 +632,7 @@ namespace jsonschema {
             {
                 if (instance.find(key) == instance.object_range().end())
                 {
-                    reporter.error(validation_error(ptr.string(), "Required key \"" + key + "\" not found", "required"));
+                    reporter.error(validation_error(ptr.string(), "Required property \"" + key + "\" not found", "required"));
                 }
             }
         }
@@ -795,10 +792,10 @@ namespace jsonschema {
                 // finally, check "additionalProperties" 
                 if (!a_prop_or_pattern_matched && additional_properties_) 
                 {
-                    local_error_reporter local_reporter;
+                    collecting_error_reporter local_reporter;
                     additional_properties_->validate(ptr / property.key(), property.value(), local_reporter, patch);
                     if (!local_reporter.errors.empty())
-                        reporter.error(validation_error(ptr.string(), "Validation failed for additional property \"" + property.key() + "\". " + local_reporter.message_, "additionalProperties"));
+                        reporter.error(validation_error(ptr.string(), "Additional property \"" + property.key() + "\" found but was invalid.", "additionalProperties"));
                 }
             }
 
@@ -921,8 +918,8 @@ namespace jsonschema {
 
             if (min_items_ && instance.size() < *min_items_)
             {
-                std::string message("Expected minimum item count: " + std::to_string(*min_items_));
-                message.append(", found: " + std::to_string(instance.size()));
+                std::string message("Expected at least " + std::to_string(*min_items_));
+                message.append(" items but found " + std::to_string(instance.size()));
                 reporter.error(validation_error(ptr.string(), message, "minItems"));
             }
 
@@ -969,7 +966,7 @@ namespace jsonschema {
             if (contains_) 
             {
                 bool contained = false;
-                local_error_reporter local_reporter;
+                collecting_error_reporter local_reporter;
                 for (const auto& item : instance.array_range()) 
                 {
                     std::size_t mark = local_reporter.errors.size();
@@ -981,7 +978,7 @@ namespace jsonschema {
                     }
                 }
                 if (!contained)
-                    reporter.error(validation_error(ptr.string(), "Expected at least one array item to match \"contains\" schema", "contains"));
+                    reporter.error(validation_error(ptr.string(), "Expected at least one array item to match \"contains\" schema", "contains", local_reporter.errors));
             }
         }
     };
@@ -1028,7 +1025,7 @@ namespace jsonschema {
         {
             if (if_) 
             {
-                local_error_reporter local_reporter;
+                collecting_error_reporter local_reporter;
 
                 if_->validate(ptr, instance, local_reporter, patch);
                 if (local_reporter.errors.empty()) 
