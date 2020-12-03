@@ -184,8 +184,8 @@ shown below:
     "type": "string"
 }
 ```
-You need to provide a `URIResolver` to tell jsoncons how to resolve the reference into a 
-JSON Schema document.
+jsoncons needs to know how to resolve a reference to this file into a JSON Schema document,
+and for that you need to provide a `URIResolver`.
 
 ```c++
 #include <jsoncons/json.hpp>
