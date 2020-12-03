@@ -76,18 +76,12 @@ namespace jsonschema {
     {
         std::vector<validation_error> errors;
 
-        bool error_{false};
         std::string message_;
-
-        operator bool() const { return error_; }
 
     private:
         void do_error(const validation_error& e) override
         {
             errors.push_back(e);
-            if (*this)
-                return;
-            error_ = true;
             message_ = e.what();
         }
     };
@@ -372,9 +366,9 @@ namespace jsonschema {
                                 const local_error_reporter& local_reporter, 
                                 std::size_t)
         {
-            if (local_reporter)
+            if (!local_reporter.errors.empty())
                 reporter.error(validation_error(ptr.string(), "At least one subschema failed to match, but all are required to match. " + local_reporter.message_, "allOf"));
-            return local_reporter;
+            return !local_reporter.errors.empty();
         }
     };
 
@@ -452,11 +446,12 @@ namespace jsonschema {
         {
             size_t count = 0;
 
+            local_error_reporter local_reporter;
             for (auto& s : subschemas_) 
             {
-                local_error_reporter local_reporter;
+                std::size_t mark = local_reporter.errors.size();
                 s->validate(ptr, instance, local_reporter, patch);
-                if (!local_reporter)
+                if (mark == local_reporter.errors.size())
                     count++;
 
                 if (Criterion::is_complete(instance, ptr, reporter, local_reporter, count))
@@ -802,7 +797,7 @@ namespace jsonschema {
                 {
                     local_error_reporter local_reporter;
                     additional_properties_->validate(ptr / property.key(), property.value(), local_reporter, patch);
-                    if (local_reporter)
+                    if (!local_reporter.errors.empty())
                         reporter.error(validation_error(ptr.string(), "Validation failed for additional property \"" + property.key() + "\". " + local_reporter.message_, "additionalProperties"));
                 }
             }
@@ -974,11 +969,12 @@ namespace jsonschema {
             if (contains_) 
             {
                 bool contained = false;
+                local_error_reporter local_reporter;
                 for (const auto& item : instance.array_range()) 
                 {
-                    local_error_reporter local_reporter;
+                    std::size_t mark = local_reporter.errors.size();
                     contains_->validate(ptr, item, local_reporter, patch);
-                    if (!local_reporter) 
+                    if (mark == local_reporter.errors.size()) 
                     {
                         contained = true;
                         break;
@@ -1035,7 +1031,7 @@ namespace jsonschema {
                 local_error_reporter local_reporter;
 
                 if_->validate(ptr, instance, local_reporter, patch);
-                if (!local_reporter) 
+                if (local_reporter.errors.empty()) 
                 {
                     if (then_)
                         then_->validate(ptr, instance, reporter, patch);
