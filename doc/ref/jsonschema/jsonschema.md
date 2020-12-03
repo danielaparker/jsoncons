@@ -274,6 +274,11 @@ Error count: 1
 #include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
 #include <fstream>
 
+// for brevity
+using jsoncons::json;
+namespace jsonschema = jsoncons::jsonschema; 
+namespace jsonpatch = jsoncons::jsonpatch; 
+
 int main() 
 {
     // JSON Schema
