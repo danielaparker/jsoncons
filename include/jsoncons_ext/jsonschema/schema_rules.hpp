@@ -74,6 +74,8 @@ namespace jsonschema {
 
     struct local_error_reporter : public error_reporter
     {
+        std::vector<validation_error> errors;
+
         bool error_{false};
         std::string message_;
 
@@ -82,6 +84,7 @@ namespace jsonschema {
     private:
         void do_error(const validation_error& e) override
         {
+            errors.push_back(e);
             if (*this)
                 return;
             error_ = true;
@@ -342,7 +345,7 @@ namespace jsonschema {
             local_error_reporter local_reporter;
             rule_->validate(ptr, instance, local_reporter, patch);
 
-            if (!local_reporter)
+            if (local_reporter.errors.empty())
                 reporter.error(validation_error(ptr.string(), "Instance must not be valid against schema", "not"));
         }
 

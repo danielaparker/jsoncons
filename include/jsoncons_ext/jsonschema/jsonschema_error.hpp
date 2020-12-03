@@ -32,16 +32,36 @@ namespace jsonschema {
         std::string pointer_to_violation_;
         std::string keyword_;
         std::string schema_location_;
+        std::vector<validation_error> nested_errors_;
         mutable std::string what_;
     public:
         validation_error(const std::string& pointer_to_violation,
-            const std::string& message,
-            const std::string& keyword,
-            const std::string& schema_location = "")
+                         const std::string& message,
+                         const std::string& keyword)
             : std::runtime_error(message),
-            pointer_to_violation_(pointer_to_violation), keyword_(keyword),
-            schema_location_(schema_location)
+            pointer_to_violation_(pointer_to_violation), 
+            keyword_(keyword)
         {
+        }
+        validation_error(const std::string& pointer_to_violation,
+                         const std::string& message,
+                         const std::string& keyword,
+                         const std::vector<validation_error>& nested_errors)
+            : std::runtime_error(message),
+              pointer_to_violation_(pointer_to_violation), 
+              keyword_(keyword),
+              nested_errors_(nested_errors)
+        {
+        }
+
+        std::string message() const
+        {
+            return std::runtime_error::what();
+        }
+
+        const std::vector<validation_error>& nested_errors() const
+        {
+            return nested_errors_;
         }
 
         const char* what() const noexcept override
