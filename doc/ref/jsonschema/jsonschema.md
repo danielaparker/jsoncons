@@ -130,7 +130,7 @@ int main()
     try
     {
         // Will throw schema_error if JSON Schema loading fails
-        auto schema_doc = jsonschema::make_schema(schema);
+        auto sch = jsonschema::make_schema(schema);
 
         std::size_t error_count = 0;
         auto reporter = [&error_count](const jsonschema::validation_error& e)
@@ -139,7 +139,7 @@ int main()
             std::cout << e.what() << "\n";
         };
 
-        jsonschema::json_validator<json> validator(schema_doc);
+        jsonschema::json_validator<json> validator(sch);
 
         // Will call reporter for each schema violation
         validator.validate(data, reporter);
@@ -235,7 +235,7 @@ int main()
     try
     {
        // Will throw schema_error if JSON Schema loading fails
-       auto schema_doc = jsonschema::make_schema(schema, resolver);
+       auto sch = jsonschema::make_schema(schema, resolver);
 
        std::size_t error_count = 0;
        auto reporter = [&error_count](const jsonschema::validation_error& e)
@@ -244,7 +244,7 @@ int main()
            std::cout << e.what() << "\n";
        };
 
-       jsonschema::json_validator<json> validator(schema_doc);
+       jsonschema::json_validator<json> validator(sch);
 
        // Will call reporter for each schema violation
        validator.validate(data, reporter);
@@ -295,9 +295,9 @@ int main()
     try
     {
        // will throw schema_error if JSON Schema loading fails 
-       auto schema_doc = jsonschema::make_schema(schema, resolver); 
+       auto sch = jsonschema::make_schema(schema, resolver); 
 
-       jsonschema::json_validator<json> validator(schema_doc); 
+       jsonschema::json_validator<json> validator(sch); 
 
        // will throw validation_error on first encountered schema violation 
        json patch = validator.validate(data); 
