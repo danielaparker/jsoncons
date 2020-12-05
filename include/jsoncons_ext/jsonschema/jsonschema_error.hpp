@@ -37,19 +37,23 @@ namespace jsonschema {
     public:
         validation_error(const std::string& pointer_to_violation,
                          const std::string& message,
-                         const std::string& keyword)
+                         const std::string& keyword,
+                         const std::string& location)
             : std::runtime_error(message),
             pointer_to_violation_(pointer_to_violation), 
-            keyword_(keyword)
+            keyword_(keyword),
+            schema_location_(location)
         {
         }
         validation_error(const std::string& pointer_to_violation,
                          const std::string& message,
                          const std::string& keyword,
+                         const std::string& location,
                          const std::vector<validation_error>& nested_errors)
             : std::runtime_error(message),
               pointer_to_violation_(pointer_to_violation), 
               keyword_(keyword),
+              schema_location_(location),
               nested_errors_(nested_errors)
         {
         }
@@ -57,6 +61,11 @@ namespace jsonschema {
         std::string message() const
         {
             return std::runtime_error::what();
+        }
+
+        const std::string& schema_location() const
+        {
+            return schema_location_;
         }
 
         const std::vector<validation_error>& nested_errors() const

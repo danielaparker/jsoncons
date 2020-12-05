@@ -34,27 +34,33 @@ namespace jsonschema {
         virtual schema_pointer build(const Json& schema,
                                      const std::vector<std::string>& keys,
                                      const std::vector<uri_wrapper>& uris) = 0;
-        virtual schema_pointer make_required_rule(const std::vector<std::string>& r) = 0;
+        virtual schema_pointer make_required_rule(const std::vector<uri_wrapper>& uris,
+                                                  const std::vector<std::string>& r) = 0;
 
-        virtual schema_pointer make_null_rule() = 0;
+        virtual schema_pointer make_null_rule(const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual schema_pointer make_true_rule() = 0;
+        virtual schema_pointer make_true_rule(const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual schema_pointer make_false_rule() = 0;
+        virtual schema_pointer make_false_rule(const std::vector<uri_wrapper>& uris) = 0;
 
         virtual schema_pointer make_object_rule(const Json& sch, 
                                                   const std::vector<uri_wrapper>& uris) = 0;
 
         virtual schema_pointer make_array_rule(const Json& sch,
-                                                 const std::vector<uri_wrapper>& uris) = 0;
+                                               const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual schema_pointer make_string_rule(const Json& sch) = 0;
+        virtual schema_pointer make_string_rule(const Json& sch,
+                                                const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual schema_pointer make_boolean_rule() = 0;
+        virtual schema_pointer make_boolean_rule(const std::vector<uri_wrapper>& uris) = 0;
 
-        virtual schema_pointer make_integer_rule(const Json& sch, std::set<std::string>& keywords) = 0;
+        virtual schema_pointer make_integer_rule(const Json& sch, 
+                                                 const std::vector<uri_wrapper>& uris, 
+                                                 std::set<std::string>& keywords) = 0;
 
-        virtual schema_pointer make_number_rule(const Json& sch, std::set<std::string>& keywords) = 0;
+        virtual schema_pointer make_number_rule(const Json& sch, 
+                                                const std::vector<uri_wrapper>& uris, 
+                                                std::set<std::string>& keywords) = 0;
 
         virtual schema_pointer make_not_rule(const Json& schema,
                                                const std::vector<uri_wrapper>& uris) = 0;
@@ -109,7 +115,7 @@ namespace jsonschema {
 
             if (ec)
             {
-                reporter.error(validation_error(ptr.string(), std::string("Content is not JSON: ") + ec.message(), "contentMediaType"));
+                reporter.error(validation_error(ptr.string(), std::string("Content is not JSON: ") + ec.message(), "contentMediaType", "foo"));
             }
         }
     }
@@ -133,8 +139,8 @@ namespace jsonschema {
         jsoncons::optional<std::string> content_media_type_;
 
     public:
-        string_rule(const Json& sch)
-            : max_length_(), min_length_(), 
+        string_rule(const Json& sch, const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris), max_length_(), min_length_(), 
     #if defined(JSONCONS_HAS_STD_REGEX)
               pattern_(),
     #endif
@@ -234,12 +240,12 @@ namespace jsonschema {
                     auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
                     if (retval.ec != jsoncons::convert_errc::success)
                     {
-                        reporter.error(validation_error(ptr.string(), "Content is not a base64 string", "contentEncoding"));
+                        reporter.error(validation_error(ptr.string(), "Content is not a base64 string", "contentEncoding", this->schema_location()));
                     }
                 }
                 else if (!content_encoding_->empty())
                 {
-                    reporter.error(validation_error(ptr.string(), "unable to check for contentEncoding '" + *content_encoding_ + "'", "contentEncoding"));
+                    reporter.error(validation_error(ptr.string(), "unable to check for contentEncoding '" + *content_encoding_ + "'", "contentEncoding", this->schema_location()));
                 }
             }
             else
@@ -253,7 +259,7 @@ namespace jsonschema {
             } 
             else if (instance.type() == json_type::byte_string_value) 
             {
-                reporter.error(validation_error(ptr.string(), "Expected string, but is byte string", "contentMediaType"));
+                reporter.error(validation_error(ptr.string(), "Expected string, but is byte string", "contentMediaType", this->schema_location()));
             }
 
             if (instance.type() != json_type::string_value) 
@@ -267,7 +273,7 @@ namespace jsonschema {
                 if (length < *min_length_) 
                 {
                     reporter.error(validation_error(ptr.string(), std::string("Expected minLength: ") + std::to_string(*min_length_)
-                                              + ", actual: " + std::to_string(length), "minLength"));
+                                              + ", actual: " + std::to_string(length), "minLength", this->schema_location()));
                 }
             }
 
@@ -277,7 +283,7 @@ namespace jsonschema {
                 if (length > *max_length_)
                 {
                     reporter.error(validation_error(ptr.string(), std::string("Expected maxLength: ") + std::to_string(*max_length_)
-                        + ", actual: " + std::to_string(length), "maxLength"));
+                        + ", actual: " + std::to_string(length), "maxLength", this->schema_location()));
                 }
             }
 
@@ -291,7 +297,7 @@ namespace jsonschema {
                     message.append("\" does not match pattern \"");
                     message.append(pattern_string_);
                     message.append("\"");
-                    reporter.error(validation_error(ptr.string(), message, "pattern"));
+                    reporter.error(validation_error(ptr.string(), message, "pattern", this->schema_location()));
                 }
             }
 
@@ -314,14 +320,10 @@ namespace jsonschema {
         schema_pointer rule_;
 
     public:
-        not_rule()
-            : rule_(nullptr)
-        {
-        }
-
         not_rule(schema_builder<Json>* builder,
                  const Json& sch,
                  const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris)
         {
             rule_ = builder->build(sch, {"not"}, uris);
         }
@@ -337,7 +339,7 @@ namespace jsonschema {
             rule_->validate(ptr, instance, local_reporter, patch);
 
             if (local_reporter.errors.empty())
-                reporter.error(validation_error(ptr.string(), "Instance must not be valid against schema", "not"));
+                reporter.error(validation_error(ptr.string(), "Instance must not be valid against schema", "not", this->schema_location()));
         }
 
         jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
@@ -364,7 +366,7 @@ namespace jsonschema {
                                 std::size_t)
         {
             if (!local_reporter.errors.empty())
-                reporter.error(validation_error(ptr.string(), "At least one subschema failed to match, but all are required to match. ", "allOf", local_reporter.errors));
+                reporter.error(validation_error(ptr.string(), "At least one subschema failed to match, but all are required to match. ", "allOf", "foo", local_reporter.errors));
             return !local_reporter.errors.empty();
         }
     };
@@ -407,7 +409,7 @@ namespace jsonschema {
             {
                 std::string message(std::to_string(count));
                 message.append(" subschemas matched, but exactly one is required to match");
-                reporter.error(validation_error(ptr.string(), message, "oneOf"));
+                reporter.error(validation_error(ptr.string(), message, "oneOf", "foo"));
             }
             return count > 1;
         }
@@ -424,6 +426,7 @@ namespace jsonschema {
         combining_rule(schema_builder<Json>* builder,
                        const Json& sch,
                        const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris)
         {
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
@@ -457,7 +460,7 @@ namespace jsonschema {
 
             if (count == 0)
             {
-                reporter.error(validation_error(ptr.string(), "No subschema matched, but one of them is required to match", "combined", local_reporter.errors));
+                reporter.error(validation_error(ptr.string(), "No subschema matched, but one of them is required to match", "combined", this->schema_location(), local_reporter.errors));
             }
         }
     };
@@ -474,8 +477,10 @@ namespace jsonschema {
         jsoncons::optional<double> multiple_of_;
 
     public:
-        number_rule(const Json& sch, std::set<std::string>& keywords)
-            : maximum_(), minimum_(),exclusive_maximum_(false), exclusive_minimum_(false), multiple_of_()
+        number_rule(const Json& sch, 
+                    const std::vector<uri_wrapper>& uris, 
+                    std::set<std::string>& keywords)
+            : subschema<Json>(uris), maximum_(), minimum_(),exclusive_maximum_(false), exclusive_minimum_(false), multiple_of_()
         {
             auto it = sch.find("maximum");
             if (it != sch.object_range().end()) 
@@ -525,24 +530,24 @@ namespace jsonschema {
             T value = instance.template as<T>(); // conversion of Json to value_type
             if (Json(value) != instance)
             {
-                reporter.error(validation_error(ptr.string(), "Instance is not a number", "number"));
+                reporter.error(validation_error(ptr.string(), "Instance is not a number", "number", this->schema_location()));
             }
 
             if (multiple_of_ && value != 0) // zero is multiple of everything
                 if (violates_multiple_of(value))
                 {
-                    reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf"));
+                    reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf", this->schema_location()));
                 }
 
             if (maximum_)
                 if ((exclusive_maximum_ && value >= *maximum_) ||
                     value > *maximum_)
-                    reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum"));
+                    reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum", this->schema_location()));
 
             if (minimum_)
                 if ((exclusive_minimum_ && value <= *minimum_) ||
                     value < *minimum_)
-                    reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum"));
+                    reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum", this->schema_location()));
         }
 
         // multipleOf - if the remainder of the division is 0 -> OK
@@ -562,13 +567,16 @@ namespace jsonschema {
     public:
         using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        null_rule() = default;
+        null_rule(const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris)
+        {
+        }
     private:
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, const Json& instance, error_reporter& reporter, Json&) const override
         {
             if (!instance.is_null())
             {
-                reporter.error(validation_error(ptr.string(), "Expected to be null", "null"));
+                reporter.error(validation_error(ptr.string(), "Expected to be null", "null", this->schema_location()));
             }
         }
     };
@@ -579,7 +587,10 @@ namespace jsonschema {
     public:
         using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        boolean_rule() = default;
+        boolean_rule(const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris)
+        {
+        }
     private:
         void do_validate(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&, Json&) const override
         {
@@ -593,7 +604,10 @@ namespace jsonschema {
     public:
         using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        true_rule() = default;
+        true_rule(const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris)
+        {
+        }
     private:
         void do_validate(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&, Json&) const override
         {
@@ -606,11 +620,14 @@ namespace jsonschema {
     public:
         using schema_pointer = typename subschema<Json>::schema_pointer;
 
-        false_rule() = default;
+        false_rule(const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris)
+        {
+        }
     private:
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, const Json&, error_reporter& reporter, Json&) const override
         {
-            reporter.error(validation_error(ptr.string(), "False schema always fails", "false"));
+            reporter.error(validation_error(ptr.string(), "False schema always fails", "false", this->schema_location()));
         }
     };
 
@@ -622,8 +639,9 @@ namespace jsonschema {
         const std::vector<std::string> required_;
 
     public:
-        required_rule(const std::vector<std::string>& r)
-            : required_(r) {}
+        required_rule(const std::vector<uri_wrapper>& uris,
+                      const std::vector<std::string>& r)
+            : subschema<Json>(uris), required_(r) {}
     private:
 
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, const Json& instance, error_reporter& reporter, Json&) const override final
@@ -632,7 +650,7 @@ namespace jsonschema {
             {
                 if (instance.find(key) == instance.object_range().end())
                 {
-                    reporter.error(validation_error(ptr.string(), "Required property \"" + key + "\" not found", "required"));
+                    reporter.error(validation_error(ptr.string(), "Required property \"" + key + "\" not found", "required", this->schema_location()));
                 }
             }
         }
@@ -661,7 +679,7 @@ namespace jsonschema {
         object_rule(schema_builder<Json>* builder,
                     const Json& sch,
                     const std::vector<uri_wrapper>& uris)
-            : max_properties_(), min_properties_(), 
+            : subschema<Json>(uris), max_properties_(), min_properties_(), 
               additional_properties_(nullptr),
               property_names_(nullptr)
         {
@@ -720,8 +738,8 @@ namespace jsonschema {
                     {
                     case json_type::array_value:
                         dependencies_.emplace(dep.key(),
-                                              builder->make_required_rule(
-                                                  dep.value().template as<std::vector<std::string>>()));
+                                              builder->make_required_rule(uris,
+                                                                          dep.value().template as<std::vector<std::string>>()));
                         break;
                     
                     default:
@@ -749,19 +767,19 @@ namespace jsonschema {
             {
                 std::string message("Maximum properties: " + std::to_string(*max_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_error(ptr.string(), message, "maxProperties"));
+                reporter.error(validation_error(ptr.string(), message, "maxProperties", this->schema_location()));
             }
 
             if (min_properties_ && instance.size() < *min_properties_)
             {
                 std::string message("Minimum properties: " + std::to_string(*min_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_error(ptr.string(), message, "minProperties"));
+                reporter.error(validation_error(ptr.string(), message, "minProperties", this->schema_location()));
             }
 
             for (auto& key : required_)
                 if (instance.find(key) == instance.object_range().end())
-                    reporter.error(validation_error(ptr.string(), "Required key \"" + key + "\" not found", "required"));
+                    reporter.error(validation_error(ptr.string(), "Required property \"" + key + "\" not found", "required", this->schema_location()));
 
             for (const auto& property : instance.object_range()) 
             {
@@ -795,7 +813,7 @@ namespace jsonschema {
                     collecting_error_reporter local_reporter;
                     additional_properties_->validate(ptr / property.key(), property.value(), local_reporter, patch);
                     if (!local_reporter.errors.empty())
-                        reporter.error(validation_error(ptr.string(), "Additional property \"" + property.key() + "\" found but was invalid.", "additionalProperties"));
+                        reporter.error(validation_error(ptr.string(), "Additional property \"" + property.key() + "\" found but was invalid.", "additionalProperties", additional_properties_->schema_location()));
                 }
             }
 
@@ -841,7 +859,7 @@ namespace jsonschema {
         array_rule(schema_builder<Json>* builder, 
                    const Json& sch, 
                    const std::vector<uri_wrapper>& uris)
-            : max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
+            : subschema<Json>(uris), max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
         {
             {
                 auto it = sch.find("maxItems");
@@ -913,14 +931,14 @@ namespace jsonschema {
             {
                 std::string message("Expected maximum item count: " + std::to_string(*max_items_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_error(ptr.string(), message, "maxItems"));
+                reporter.error(validation_error(ptr.string(), message, "maxItems", this->schema_location()));
             }
 
             if (min_items_ && instance.size() < *min_items_)
             {
                 std::string message("Expected at least " + std::to_string(*min_items_));
                 message.append(" items but found " + std::to_string(instance.size()));
-                reporter.error(validation_error(ptr.string(), message, "minItems"));
+                reporter.error(validation_error(ptr.string(), message, "minItems", this->schema_location()));
             }
 
             if (unique_items_) 
@@ -929,7 +947,7 @@ namespace jsonschema {
                 {
                     auto v = std::find(it + 1, instance.object_range().end(), *it);
                     if (v != instance.object_range().end())
-                        reporter.error(validation_error(ptr.string(), "Array items are not unique", "uniqueItems"));
+                        reporter.error(validation_error(ptr.string(), "Array items are not unique", "uniqueItems", this->schema_location()));
                 }
             }
 
@@ -978,7 +996,7 @@ namespace jsonschema {
                     }
                 }
                 if (!contained)
-                    reporter.error(validation_error(ptr.string(), "Expected at least one array item to match \"contains\" schema", "contains", local_reporter.errors));
+                    reporter.error(validation_error(ptr.string(), "Expected at least one array item to match \"contains\" schema", "contains", this->schema_location(), local_reporter.errors));
             }
         }
     };
@@ -997,7 +1015,7 @@ namespace jsonschema {
                          const Json& sch_if,
                          const Json& sch,
                          const std::vector<uri_wrapper>& uris)
-            : if_(nullptr), then_(nullptr), else_(nullptr)
+            : subschema<Json>(uris), if_(nullptr), then_(nullptr), else_(nullptr)
         {
             auto then_it = sch.find("then");
             auto else_it = sch.find("else");
@@ -1052,8 +1070,9 @@ namespace jsonschema {
         Json enum_;
 
     public:
-        enum_rule(const Json& sch)
-            : enum_(sch)
+        enum_rule(const Json& sch,
+                  const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris), enum_(sch)
         {
         }
     private:
@@ -1074,7 +1093,7 @@ namespace jsonschema {
 
             if (!in_range)
             {
-                reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " is not a valid enum value", "enum"));
+                reporter.error(validation_error(ptr.string(), instance.template as<std::string>() + " is not a valid enum value", "enum", this->schema_location()));
             }
         }
     };
@@ -1089,8 +1108,8 @@ namespace jsonschema {
         Json const_;
 
     public:
-        const_rule(const Json& sch)
-            : const_(sch)
+        const_rule(const Json& sch, const std::vector<uri_wrapper>& uris)
+            : subschema<Json>(uris), const_(sch)
         {
         }
     private:
@@ -1100,7 +1119,7 @@ namespace jsonschema {
                          Json&) const final
         {
             if (const_ != instance)
-                reporter.error(validation_error(ptr.string(), "Instance is not const", "const"));
+                reporter.error(validation_error(ptr.string(), "Instance is not const", "const", this->schema_location()));
         }
     };
 
@@ -1126,7 +1145,7 @@ namespace jsonschema {
         type_rule(schema_builder<Json>* builder,
                   const Json& sch,
                   const std::vector<uri_wrapper>& uris)
-            : default_value_(jsoncons::null_type()), 
+            : subschema<Json>(uris), default_value_(jsoncons::null_type()), 
               type_mapping_((uint8_t)(json_type::object_value)+1), 
               enum_(), const_()
         {
@@ -1173,13 +1192,13 @@ namespace jsonschema {
             it = sch.find("enum");
             if (it != sch.object_range().end()) 
             {
-                enum_ = enum_rule<Json >(it->value());
+                enum_ = enum_rule<Json >(it->value(), uris);
             }
 
             it = sch.find("const");
             if (it != sch.object_range().end()) 
             {
-                const_ = const_rule<Json>(it->value());
+                const_ = const_rule<Json>(it->value(), uris);
             }
 
             it = sch.find("not");
@@ -1243,7 +1262,7 @@ namespace jsonschema {
                 }
                 ss << ", found " << instance.type();
 
-                reporter.error(validation_error(ptr.string(), ss.str(), "type"));
+                reporter.error(validation_error(ptr.string(), ss.str(), "type", this->schema_location()));
             }
 
             if (enum_)
@@ -1281,7 +1300,7 @@ namespace jsonschema {
         {
             if (type.empty() || type == "null")
             {
-                type_mapping_[(uint8_t)json_type::null_value] = builder->make_null_rule();
+                type_mapping_[(uint8_t)json_type::null_value] = builder->make_null_rule(uris);
             }
             if (type.empty() || type == "object")
             {
@@ -1293,23 +1312,23 @@ namespace jsonschema {
             }
             if (type.empty() || type == "string")
             {
-                type_mapping_[(uint8_t)json_type::string_value] = builder->make_string_rule(sch);
+                type_mapping_[(uint8_t)json_type::string_value] = builder->make_string_rule(sch, uris);
                 // For binary types
                 type_mapping_[(uint8_t) json_type::byte_string_value] = type_mapping_[(uint8_t) json_type::string_value];
             }
             if (type.empty() || type == "boolean")
             {
-                type_mapping_[(uint8_t)json_type::bool_value] = builder->make_boolean_rule();
+                type_mapping_[(uint8_t)json_type::bool_value] = builder->make_boolean_rule(uris);
             }
             if (type.empty() || type == "integer")
             {
-                type_mapping_[(uint8_t)json_type::int64_value] = builder->make_integer_rule(sch, keywords);
+                type_mapping_[(uint8_t)json_type::int64_value] = builder->make_integer_rule(sch, uris, keywords);
                 type_mapping_[(uint8_t)json_type::uint64_value] = type_mapping_[(uint8_t)json_type::int64_value];
                 type_mapping_[(uint8_t)json_type::double_value] = type_mapping_[(uint8_t)json_type::int64_value];
             }
             if (type.empty() || type == "number")
             {
-                type_mapping_[(uint8_t)json_type::double_value] = builder->make_number_rule(sch, keywords);
+                type_mapping_[(uint8_t)json_type::double_value] = builder->make_number_rule(sch, uris, keywords);
                 type_mapping_[(uint8_t)json_type::int64_value] = type_mapping_[(uint8_t)json_type::double_value];
                 type_mapping_[(uint8_t)json_type::uint64_value] = type_mapping_[(uint8_t)json_type::double_value];
             }

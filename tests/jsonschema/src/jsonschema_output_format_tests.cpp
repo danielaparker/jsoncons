@@ -59,10 +59,10 @@ TEST_CASE("jsonschema output format tests")
 
         auto reporter = [](const jsonschema::validation_error& e)
         {
-            std::cout << e.what() << "\n";
+            std::cout << e.what() << ", " << e.schema_location() << "\n";
             for (const auto& nested : e.nested_errors())
             {
-                std::cout << nested.what() << "\n";
+                std::cout << "    " << nested.what() << ", " << e.schema_location() << "\n";
             }
 
         };

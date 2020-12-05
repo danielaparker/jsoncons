@@ -841,7 +841,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value,date_time_type::date))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date string", "date"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date string", "date", "foo"));
         }
     }
 
@@ -851,7 +851,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::time))        
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 time string", "time"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 time string", "time", "foo"));
         }
     }
 
@@ -861,7 +861,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::date_time))        
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date-time string", "date-time"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date-time string", "date-time", "foo"));
         }
     }
 
@@ -871,7 +871,7 @@ namespace jsonschema {
     {
         if (!validate_email_rfc5322(value))        
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid email address as defined by RFC 5322", "email"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid email address as defined by RFC 5322", "email", "foo"));
         }
     } 
 
@@ -881,7 +881,7 @@ namespace jsonschema {
     {
         if (!validate_hostname_rfc1034(value))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A", "hostname"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A", "hostname", "foo"));
         }
     } 
 
@@ -891,7 +891,7 @@ namespace jsonschema {
     {
         if (!validate_ipv4_rfc2673(value))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673", "ipv4"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673", "ipv4", "foo"));
         }
     } 
 
@@ -901,7 +901,7 @@ namespace jsonschema {
     {
         if (!validate_ipv6_rfc2373(value))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373", "ipv6"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373", "ipv6", "foo"));
         }
     } 
 
@@ -916,7 +916,7 @@ namespace jsonschema {
         } 
         catch (const std::exception& e) 
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what(), "pattern"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what(), "pattern", "foo"));
         }
 #endif
     } 

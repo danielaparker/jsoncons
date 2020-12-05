@@ -195,8 +195,20 @@ namespace jsonschema {
     template <class Json>
     class subschema
     {
+        std::string schema_location_;
     public:
         using schema_pointer = subschema<Json>*;
+
+        subschema(const std::string& uri)
+        {
+            schema_location_ = uri;
+        }
+
+        subschema(const std::vector<uri_wrapper>& uris)
+        {
+            JSONCONS_ASSERT(!uris.empty());
+            schema_location_ = uris.back().string();
+        }
 
         virtual ~subschema() = default;
 
@@ -206,6 +218,11 @@ namespace jsonschema {
                       Json& patch) const 
         {
             do_validate(ptr,instance,reporter,patch);
+        }
+
+        const std::string& schema_location() const
+        {
+            return schema_location_;
         }
 
         virtual jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&) const
