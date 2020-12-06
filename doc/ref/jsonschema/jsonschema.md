@@ -261,7 +261,7 @@ Output:
 ```
 uri: http://localhost:1234/name.json, path: /name.json
 
-/name: No subschema matched, but one of them is required to match
+/name: No rule matched, but one of them is required to match
 
 Error count: 1
 ```

@@ -831,82 +831,106 @@ namespace jsonschema {
     }
 
     // format checkers
-    using format_checker = std::function<void(const jsoncons::jsonpointer::json_pointer& ptr, 
+    using format_checker = std::function<void(const subschema& schema,
+                                              const jsoncons::jsonpointer::json_pointer& ptr, 
                                               const std::string&, 
                                               error_reporter& reporter)>;
 
     inline
-    void rfc3339_date_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string& value,
+    void rfc3339_date_check(const subschema& schema,
+                            const jsoncons::jsonpointer::json_pointer& ptr, 
+                            const std::string& value,
                             error_reporter& reporter)
     {
         if (!validate_date_time_rfc3339(value,date_time_type::date))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date string", "date", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date string", "date", 
+                                            schema.absolute_keyword_location()));
         }
     }
 
     inline
-    void rfc3339_time_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string &value,
+    void rfc3339_time_check(const subschema& schema,
+                            const jsoncons::jsonpointer::json_pointer& ptr, 
+                            const std::string &value,
                             error_reporter& reporter)
     {
         if (!validate_date_time_rfc3339(value, date_time_type::time))        
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 time string", "time", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 time string", "time", 
+                                            schema.absolute_keyword_location()));
         }
     }
 
     inline
-    void rfc3339_date_time_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string &value,
+    void rfc3339_date_time_check(const subschema& schema,
+                                 const jsoncons::jsonpointer::json_pointer& ptr, 
+                                 const std::string &value,
                                  error_reporter& reporter)
     {
         if (!validate_date_time_rfc3339(value, date_time_type::date_time))        
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date-time string", "date-time", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a RFC 3339 date-time string", "date-time", 
+                                            schema.absolute_keyword_location()));
         }
     }
 
     inline
-    void email_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string& value,
+    void email_check(const subschema& schema,
+                     const jsoncons::jsonpointer::json_pointer& ptr, 
+                     const std::string& value,
                      error_reporter& reporter) 
     {
         if (!validate_email_rfc5322(value))        
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid email address as defined by RFC 5322", "email", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid email address as defined by RFC 5322", "email", 
+                                            schema.absolute_keyword_location()));
         }
     } 
 
     inline
-    void hostname_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string& value,
+    void hostname_check(const subschema& schema,
+                        const jsoncons::jsonpointer::json_pointer& ptr, 
+                        const std::string& value,
                         error_reporter& reporter) 
     {
         if (!validate_hostname_rfc1034(value))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A", "hostname", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A", "hostname", 
+                                            schema.absolute_keyword_location()));
         }
     } 
 
     inline
-    void ipv4_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string& value,
+    void ipv4_check(const subschema& schema,
+                    const jsoncons::jsonpointer::json_pointer& ptr, 
+                    const std::string& value,
                     error_reporter& reporter) 
     {
         if (!validate_ipv4_rfc2673(value))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673", "ipv4", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673", "ipv4", 
+                                            schema.absolute_keyword_location()));
         }
     } 
 
     inline
-    void ipv6_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string& value,
+    void ipv6_check(const subschema& schema,
+                    const jsoncons::jsonpointer::json_pointer& ptr, 
+                    const std::string& value,
                     error_reporter& reporter) 
     {
         if (!validate_ipv6_rfc2373(value))
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373", "ipv6", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373", "ipv6", 
+                                            schema.absolute_keyword_location()));
         }
     } 
 
     inline
-    void regex_check(const jsoncons::jsonpointer::json_pointer& ptr, const std::string& value,
+    void regex_check(const subschema& schema,
+                     const jsoncons::jsonpointer::json_pointer& ptr, 
+                     const std::string& value,
                      error_reporter& reporter) 
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
@@ -916,7 +940,8 @@ namespace jsonschema {
         } 
         catch (const std::exception& e) 
         {
-            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what(), "pattern", "foo"));
+            reporter.error(validation_error(ptr.string(), "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what(), "pattern", 
+                                            schema.absolute_keyword_location()));
         }
 #endif
     } 

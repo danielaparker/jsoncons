@@ -63,7 +63,7 @@ namespace jsonschema {
             return std::runtime_error::what();
         }
 
-        const std::string& schema_location() const
+        const std::string& absolute_keyword_location() const
         {
             return schema_location_;
         }

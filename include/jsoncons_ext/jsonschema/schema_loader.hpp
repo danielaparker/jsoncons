@@ -30,17 +30,15 @@ namespace jsonschema {
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
-    class reference_schema : public subschema<Json>
+    class reference_schema : public rule<Json>
     {
-        using schema_pointer = typename subschema<Json>::schema_pointer;
+        using schema_pointer = typename rule<Json>::schema_pointer;
 
         schema_pointer referred_schema_;
 
     public:
         reference_schema(const std::string& id)
-            : subschema<Json>(id), referred_schema_(nullptr) {}
-
-        const std::string& id() const { return this->schema_location(); }
+            : rule<Json>(id), referred_schema_(nullptr) {}
 
         void set_referred_schema(schema_pointer target) { referred_schema_ = target; }
 
@@ -53,7 +51,7 @@ namespace jsonschema {
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + this->schema_location(), "", this->schema_location()));
+                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return;
             }
 
@@ -66,7 +64,7 @@ namespace jsonschema {
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + this->schema_location(), "", this->schema_location()));
+                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return jsoncons::optional<Json>();
             }
 
@@ -80,14 +78,14 @@ namespace jsonschema {
     template <class Json>
     class json_schema
     {
-        using schema_pointer = typename subschema<Json>::schema_pointer;
+        using schema_pointer = typename rule<Json>::schema_pointer;
 
         friend class schema_loader<Json>;
 
-        std::vector<std::unique_ptr<subschema<Json>>> subschemas_;
+        std::vector<std::unique_ptr<rule<Json>>> subschemas_;
         schema_pointer root_;
     public:
-        json_schema(std::vector<std::unique_ptr<subschema<Json>>>&& subschemas,
+        json_schema(std::vector<std::unique_ptr<rule<Json>>>&& subschemas,
                     schema_pointer root)
             : subschemas_(std::move(subschemas)), root_(root)
         {
@@ -124,7 +122,7 @@ namespace jsonschema {
     template <class Json>
     class schema_loader : public schema_builder<Json>
     {
-        using schema_pointer = typename subschema<Json>::schema_pointer;
+        using schema_pointer = typename rule<Json>::schema_pointer;
 
         struct subschema_registry
         {
@@ -137,7 +135,7 @@ namespace jsonschema {
         schema_pointer root_;
 
         // Owns all schemas
-        std::vector<std::unique_ptr<subschema<Json>>> subschemas_;
+        std::vector<std::unique_ptr<rule<Json>>> subschemas_;
 
         // Map location to subschema_registry
         std::map<std::string, subschema_registry> subschema_registries_;
@@ -293,26 +291,10 @@ namespace jsonschema {
         }
 
         schema_pointer build(const Json& schema,
-                               const std::vector<std::string>& keys,
-                               const std::vector<uri_wrapper>& uris) override
+                             const std::vector<std::string>& keys,
+                             const std::vector<uri_wrapper>& uris) override
         {
-            // Exclude uri's that are not plain name identifiers
-            std::vector<uri_wrapper> new_uris;
-            for (const auto& uri : uris)
-            {
-                if (!uri.has_identifier())
-                    new_uris.push_back(uri);
-            }
-
-            // Append the keys for this sub-schema to the uri's
-            for (const auto& key : keys)
-            {
-                for (auto& uri : new_uris)
-                {
-                    auto new_u = uri.append(key);
-                    uri = uri_wrapper(new_u);
-                }
-            }
+            std::vector<uri_wrapper> new_uris = update_uris(keys, uris);
 
             schema_pointer sch = nullptr;
 
