@@ -35,7 +35,7 @@ namespace jsonschema {
                                      const std::vector<std::string>& keys,
                                      const std::vector<uri_wrapper>& uris) = 0;
         virtual schema_pointer make_required_rule(const std::vector<uri_wrapper>& uris,
-                                                  const std::vector<std::string>& r) = 0;
+                                                  const std::vector<std::string>& items) = 0;
 
         virtual schema_pointer make_null_rule(const std::vector<uri_wrapper>& uris) = 0;
 
@@ -636,12 +636,20 @@ namespace jsonschema {
     {
         using schema_pointer = typename rule<Json>::schema_pointer;
 
-        const std::vector<std::string> required_;
+        std::vector<std::string> required_;
 
     public:
         required_rule(const std::vector<uri_wrapper>& uris,
-                      const std::vector<std::string>& r)
-            : rule<Json>(uris), required_(r) {}
+                      const std::vector<std::string>& items)
+            : rule<Json>(uris), required_(items) {}
+        required_rule(const uri_wrapper& uri,
+                      const std::vector<std::string>& items)
+            : rule<Json>(uri.string()), required_(items) {}
+
+        required_rule(const required_rule&) = delete;
+        required_rule(required_rule&&) = default;
+        required_rule& operator=(const required_rule&) = delete;
+        required_rule& operator=(required_rule&&) = default;
     private:
 
         void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, const Json& instance, error_reporter& reporter, Json&) const override final
@@ -663,7 +671,7 @@ namespace jsonschema {
 
         jsoncons::optional<std::size_t> max_properties_;
         jsoncons::optional<std::size_t> min_properties_;
-        std::vector<std::string> required_;
+        jsoncons::optional<required_rule<Json>> required_;
 
         std::map<std::string, schema_pointer> properties_;
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -698,7 +706,8 @@ namespace jsonschema {
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                required_ = it->value().template as<std::vector<std::string>>();
+                required_ = required_rule<Json>(uris.back().append("required"), 
+                                                it->value().template as<std::vector<std::string>>());
             }
 
             it = sch.find("properties");
@@ -785,9 +794,8 @@ namespace jsonschema {
                 reporter.error(validation_error(ptr.string(), message, "minProperties", this->absolute_keyword_location()));
             }
 
-            for (auto& key : required_)
-                if (instance.find(key) == instance.object_range().end())
-                    reporter.error(validation_error(ptr.string(), "Required property \"" + key + "\" not found", "required", this->absolute_keyword_location()));
+            if (required_)
+                required_->validate(ptr, instance, reporter, patch);
 
             for (const auto& property : instance.object_range()) 
             {

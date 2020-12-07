@@ -207,6 +207,13 @@ namespace jsonschema {
             schema_location_ = uris.back().string();
         }
 
+        subschema(const subschema&) = delete;
+        subschema(subschema&&) = default;
+        subschema& operator=(const subschema&) = delete;
+        subschema& operator=(subschema&&) = default;
+
+        virtual ~subschema() = default;
+
         const std::string& absolute_keyword_location() const
         {
             return schema_location_;
@@ -230,7 +237,10 @@ namespace jsonschema {
         {
         }
 
-        virtual ~rule() = default;
+        rule(const rule&) = delete;
+        rule(rule&&) = default;
+        rule& operator=(const rule&) = delete;
+        rule& operator=(rule&&) = default;
 
         void validate(const jsoncons::jsonpointer::json_pointer &ptr, 
                       const Json& instance, 
