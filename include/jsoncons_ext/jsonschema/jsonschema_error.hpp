@@ -29,31 +29,31 @@ namespace jsonschema {
 
     class validation_error : public std::runtime_error, public virtual json_exception
     {
-        std::string pointer_to_violation_;
+        std::string instance_location_;
         std::string keyword_;
-        std::string schema_location_;
+        std::string absolute_keyword_location_;
         std::vector<validation_error> nested_errors_;
         mutable std::string what_;
     public:
-        validation_error(const std::string& pointer_to_violation,
+        validation_error(const std::string& instance_location,
                          const std::string& message,
                          const std::string& keyword,
                          const std::string& location)
             : std::runtime_error(message),
-            pointer_to_violation_(pointer_to_violation), 
+            instance_location_(instance_location), 
             keyword_(keyword),
-            schema_location_(location)
+            absolute_keyword_location_(location)
         {
         }
-        validation_error(const std::string& pointer_to_violation,
+        validation_error(const std::string& instance_location,
                          const std::string& message,
                          const std::string& keyword,
                          const std::string& location,
                          const std::vector<validation_error>& nested_errors)
             : std::runtime_error(message),
-              pointer_to_violation_(pointer_to_violation), 
+              instance_location_(instance_location), 
               keyword_(keyword),
-              schema_location_(location),
+              absolute_keyword_location_(location),
               nested_errors_(nested_errors)
         {
         }
@@ -65,7 +65,7 @@ namespace jsonschema {
 
         const std::string& absolute_keyword_location() const
         {
-            return schema_location_;
+            return absolute_keyword_location_;
         }
 
         const std::vector<validation_error>& nested_errors() const
@@ -79,7 +79,7 @@ namespace jsonschema {
             {
                 JSONCONS_TRY
                 {
-                    what_.append(pointer_to_violation_);
+                    what_.append(instance_location_);
                     what_.append(": ");
                     what_.append(std::runtime_error::what());
                     return what_.c_str();

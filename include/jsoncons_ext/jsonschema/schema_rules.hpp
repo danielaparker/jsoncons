@@ -748,10 +748,6 @@ namespace jsonschema {
                         case json_type::array_value:
                         {
                             auto new_uris = update_uris({"required"},uris);
-                            for (auto item : new_uris)
-                            {
-                                std::cout << "required uri" << item.string() << "\n";
-                            }
                             dependencies_.emplace(dep.key(),
                                                   builder->make_required_rule(new_uris,
                                                                               dep.value().template as<std::vector<std::string>>()));

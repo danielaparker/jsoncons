@@ -123,6 +123,29 @@ namespace jsonschema {
             return wrapper;
         }
 
+        uri_wrapper append(std::size_t index) const
+        {
+            if (has_identifier())
+                return *this;
+
+            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
+            pointer /= index;
+
+            jsoncons::uri new_uri(uri_.scheme(),
+                                  uri_.userinfo(),
+                                  uri_.host(),
+                                  uri_.port(),
+                                  uri_.path(),
+                                  uri_.query(),
+                                  pointer.string());
+
+            uri_wrapper wrapper;
+            wrapper.uri_ = new_uri;
+            wrapper.identifier_ = pointer.string();
+
+            return wrapper;
+        }
+
         std::string string() const
         {
             std::string s = uri_.string();

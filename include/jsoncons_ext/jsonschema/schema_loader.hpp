@@ -294,10 +294,6 @@ namespace jsonschema {
                              const std::vector<std::string>& keys,
                              const std::vector<uri_wrapper>& uris) override
         {
-            if (schema.contains("$id"))
-            {
-                std::cout << schema.at("$id") << "\n";
-            }
             std::vector<uri_wrapper> new_uris = update_uris(keys, uris);
 
             schema_pointer sch = nullptr;
@@ -316,19 +312,16 @@ namespace jsonschema {
                     break;
                 case json_type::object_value:
                 {
-                    std::cout << "object\n";
                     auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
                     if (it != schema.object_range().end()) 
                     {
                         std::string id = it->value().template as<std::string>(); 
-                        std::cout << "Found id: " << id << "\n";
                         // Add it to the list if it is not there already
                         if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
                         {
                             uri_wrapper relative(id); 
                             uri_wrapper new_uri = relative.resolve(new_uris.back());
                             new_uris.push_back(new_uri.string()); 
-                            std::cout << new_uri.string() << " has been added\n";
                         }
                     }
 
@@ -348,10 +341,6 @@ namespace jsonschema {
                     } 
                     else 
                     {
-                        for (const auto& item : new_uris)
-                        {
-                            std::cout << "make_type_rule uri: " << item.string() << "\n";
-                        }
                         sch = make_type_rule(schema, new_uris);
                     }
                     break;
