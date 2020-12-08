@@ -51,7 +51,7 @@ namespace jsonschema {
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
+                reporter.error(validation_event(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace jsonschema {
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
+                reporter.error(validation_event(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return jsoncons::optional<Json>();
             }
 

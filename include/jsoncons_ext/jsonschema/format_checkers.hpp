@@ -844,7 +844,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value,date_time_type::date))
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a RFC 3339 date string", "date", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a RFC 3339 date string", "date", 
                                             schema.absolute_keyword_location()));
         }
     }
@@ -857,7 +857,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::time))        
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a RFC 3339 time string", "time", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a RFC 3339 time string", "time", 
                                             schema.absolute_keyword_location()));
         }
     }
@@ -870,7 +870,7 @@ namespace jsonschema {
     {
         if (!validate_date_time_rfc3339(value, date_time_type::date_time))        
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a RFC 3339 date-time string", "date-time", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a RFC 3339 date-time string", "date-time", 
                                             schema.absolute_keyword_location()));
         }
     }
@@ -883,7 +883,7 @@ namespace jsonschema {
     {
         if (!validate_email_rfc5322(value))        
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a valid email address as defined by RFC 5322", "email", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a valid email address as defined by RFC 5322", "email", 
                                             schema.absolute_keyword_location()));
         }
     } 
@@ -896,7 +896,7 @@ namespace jsonschema {
     {
         if (!validate_hostname_rfc1034(value))
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A", "hostname", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a valid hostname as defined by RFC 3986 Appendix A", "hostname", 
                                             schema.absolute_keyword_location()));
         }
     } 
@@ -909,7 +909,7 @@ namespace jsonschema {
     {
         if (!validate_ipv4_rfc2673(value))
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673", "ipv4", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a valid IPv4 address as defined by RFC 2673", "ipv4", 
                                             schema.absolute_keyword_location()));
         }
     } 
@@ -922,7 +922,7 @@ namespace jsonschema {
     {
         if (!validate_ipv6_rfc2373(value))
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373", "ipv6", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a valid IPv6 address as defined by RFC 2373", "ipv6", 
                                             schema.absolute_keyword_location()));
         }
     } 
@@ -940,7 +940,7 @@ namespace jsonschema {
         } 
         catch (const std::exception& e) 
         {
-            reporter.error(validation_error(instance_location.string(), "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what(), "pattern", 
+            reporter.error(validation_event(instance_location.string(), "\"" + value + "\" is not a valid ECMAScript regular expression. " + e.what(), "pattern", 
                                             schema.absolute_keyword_location()));
         }
 #endif

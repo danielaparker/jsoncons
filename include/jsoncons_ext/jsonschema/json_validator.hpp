@@ -25,13 +25,13 @@ namespace jsonschema {
     struct default_error_reporter : public error_reporter
     {
     private:
-        void do_error(const validation_error& e) override
+        void do_error(const validation_event& e) override
         {
             JSONCONS_THROW(e);
         }
     };
 
-    using error_reporter_t = std::function<void(const validation_error& e)>;
+    using error_reporter_t = std::function<void(const validation_event& e)>;
 
     struct error_reporter_adaptor : public error_reporter
     {
@@ -42,7 +42,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_error(const validation_error& e) override
+        void do_error(const validation_event& e) override
         {
             reporter_(e);
         }
@@ -80,7 +80,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<jsoncons::detail::is_function_object_exact<Reporter,void,validation_error>::value,Json>::type
+        typename std::enable_if<jsoncons::detail::is_function_object_exact<Reporter,void,validation_event>::value,Json>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
             uri_wrapper instance_location("#");

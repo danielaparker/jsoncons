@@ -35,7 +35,7 @@ that is called for each schema violation.
     <td>reporter</td>
     <td>A function object with the signature of <code>reporter</code> being equivelent to 
     <pre>
-           void fun(const validation_error& e)</pre></td>
+           void fun(const validation_event& e)</pre></td>
   </tr>
 </table>
 
@@ -47,7 +47,7 @@ schema.
 
 #### Exceptions
 
-(1) Throws a [validation_error](validation_error.md) for the first schema violation.
+(1) Throws a [validation_event](validation_event.md) for the first schema violation.
 
 (2) `reporter` is called for each schema violation
 

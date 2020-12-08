@@ -27,43 +27,36 @@ namespace jsonschema {
         }  
     };
 
-    class validation_error : public std::exception, public virtual json_exception
+    class validation_event 
     {
         std::string instance_location_;
-        std::string message_;
+        std::string error_;
         std::string keyword_;
         std::string absolute_keyword_location_;
-        std::vector<validation_error> nested_errors_;
-        std::string what_;
+        std::vector<validation_event> nested_errors_;
     public:
-        validation_error(const std::string& instance_location,
-                         const std::string& message,
+        validation_event(const std::string& instance_location,
+                         const std::string& error,
                          const std::string& keyword,
                          const std::string& absolute_keyword_location)
             : instance_location_(instance_location),
-              message_(message), 
+              error_(error), 
               keyword_(keyword),
               absolute_keyword_location_(absolute_keyword_location)
         {
-            what_.append(instance_location);
-            what_.append(": ");
-            what_.append(message);
         }
 
-        validation_error(const std::string& instance_location,
-                         const std::string& message,
+        validation_event(const std::string& instance_location,
+                         const std::string& error,
                          const std::string& keyword,
                          const std::string& absolute_keyword_location,
-                         const std::vector<validation_error>& nested_errors)
+                         const std::vector<validation_event>& nested_errors)
             : instance_location_(instance_location), 
-              message_(message),
+              error_(error),
               keyword_(keyword),
               absolute_keyword_location_(absolute_keyword_location),
               nested_errors_(nested_errors)
         {
-            what_.append(instance_location_);
-            what_.append(": ");
-            what_.append(message_);
         }
 
         const std::string& instance_location() const
@@ -71,9 +64,9 @@ namespace jsonschema {
             return instance_location_;
         }
 
-        const std::string& message() const
+        const std::string& error() const
         {
-            return message_;
+            return error_;
         }
 
         const std::string& absolute_keyword_location() const
@@ -86,14 +79,9 @@ namespace jsonschema {
             return keyword_;
         }
 
-        const std::vector<validation_error>& nested_errors() const
+        const std::vector<validation_event>& nested_errors() const
         {
             return nested_errors_;
-        }
-
-        const char* what() const noexcept override
-        {
-            return what_.c_str();
         }
     };
 

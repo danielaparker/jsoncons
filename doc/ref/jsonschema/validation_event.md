@@ -1,18 +1,18 @@
-### jsoncons::jsonschema::validation_error
+### jsoncons::jsonschema::validation_event
 
 ```c++
-#include <jsoncons_ext/jsonschema/jsonvalidation_error.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
 ```
 
 <br>
 
-`jsoncons::jsonschema::validation_error` defines an exception type for reporting failures in jsonschema operations.
+`jsoncons::jsonschema::validation_event` defines an exception type for reporting failures in jsonschema operations.
 
-![validation_error](./diagrams/validation_error.png)
+![validation_event](./diagrams/validation_error.png)
 
 #### Constructors
 
-    validation_error(const std::string& pointer_to_violation,
+    validation_event(const std::string& pointer_to_violation,
                      const std::string& message,
                      const std::string& keyword);
 

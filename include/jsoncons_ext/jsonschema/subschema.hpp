@@ -206,13 +206,13 @@ namespace jsonschema {
     public:
         virtual ~error_reporter() = default;
 
-        void error(const validation_error& e)
+        void error(const validation_event& e)
         {
             do_error(e);
         }
 
     private:
-        virtual void do_error(const validation_error& /* e */) = 0;
+        virtual void do_error(const validation_event& /* e */) = 0;
     };
 
     class subschema
