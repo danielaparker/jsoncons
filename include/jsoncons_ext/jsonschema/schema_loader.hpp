@@ -44,31 +44,31 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const uri_wrapper& ptr, 
+        void do_validate(const uri_wrapper& instance_location, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
+                reporter.error(validation_error(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return;
             }
 
-            referred_schema_->validate(ptr, instance, reporter, patch);
+            referred_schema_->validate(instance_location, instance, reporter, patch);
         }
 
-        jsoncons::optional<Json> get_default_value(const uri_wrapper& ptr, 
+        jsoncons::optional<Json> get_default_value(const uri_wrapper& instance_location, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
+                reporter.error(validation_error(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return jsoncons::optional<Json>();
             }
 
-            return referred_schema_->get_default_value(ptr, instance, reporter);
+            return referred_schema_->get_default_value(instance_location, instance, reporter);
         }
     };
 
@@ -98,13 +98,13 @@ namespace jsonschema {
         json_schema& operator=(const json_schema&) = delete;
         json_schema& operator=(json_schema&&) = default;
     
-        void validate(const uri_wrapper& ptr, 
+        void validate(const uri_wrapper& instance_location, 
                       const Json& instance, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {
             JSONCONS_ASSERT(root_ != nullptr);
-            root_->validate(ptr, instance, reporter, patch);
+            root_->validate(instance_location, instance, reporter, patch);
         }
     };
 

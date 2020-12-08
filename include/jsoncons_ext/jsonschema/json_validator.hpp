@@ -71,10 +71,10 @@ namespace jsonschema {
         Json validate(const Json& instance) const
         {
             default_error_reporter reporter;
-            uri_wrapper ptr("#");
+            uri_wrapper instance_location("#");
             Json patch(json_array_arg);
 
-            root_->validate(ptr, instance, reporter, patch);
+            root_->validate(instance_location, instance, reporter, patch);
             return patch;
         }
 
@@ -83,11 +83,11 @@ namespace jsonschema {
         typename std::enable_if<jsoncons::detail::is_function_object_exact<Reporter,void,validation_error>::value,Json>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
-            uri_wrapper ptr("#");
+            uri_wrapper instance_location("#");
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
-            root_->validate(ptr, instance, adaptor, patch);
+            root_->validate(instance_location, instance, adaptor, patch);
             return patch;
         }
     };

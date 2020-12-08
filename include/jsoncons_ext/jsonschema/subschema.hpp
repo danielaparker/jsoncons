@@ -265,12 +265,12 @@ namespace jsonschema {
         rule& operator=(const rule&) = delete;
         rule& operator=(rule&&) = default;
 
-        void validate(const uri_wrapper& ptr, 
+        void validate(const uri_wrapper& instance_location, 
                       const Json& instance, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {
-            do_validate(ptr,instance,reporter,patch);
+            do_validate(instance_location,instance,reporter,patch);
         }
 
         virtual jsoncons::optional<Json> get_default_value(const uri_wrapper&, const Json&, error_reporter&) const
@@ -279,7 +279,7 @@ namespace jsonschema {
         }
 
     private:
-        virtual void do_validate(const uri_wrapper& ptr, 
+        virtual void do_validate(const uri_wrapper& instance_location, 
                                  const Json& instance, 
                                  error_reporter& reporter, 
                                  Json& patch) const = 0;

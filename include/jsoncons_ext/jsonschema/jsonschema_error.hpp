@@ -27,40 +27,53 @@ namespace jsonschema {
         }  
     };
 
-    class validation_error : public std::runtime_error, public virtual json_exception
+    class validation_error : public std::exception, public virtual json_exception
     {
         std::string instance_location_;
+        std::string message_;
         std::string keyword_;
         std::string absolute_keyword_location_;
         std::vector<validation_error> nested_errors_;
-        mutable std::string what_;
+        std::string what_;
     public:
         validation_error(const std::string& instance_location,
                          const std::string& message,
                          const std::string& keyword,
-                         const std::string& location)
-            : std::runtime_error(message),
-            instance_location_(instance_location), 
-            keyword_(keyword),
-            absolute_keyword_location_(location)
+                         const std::string& absolute_keyword_location)
+            : instance_location_(instance_location),
+              message_(message), 
+              keyword_(keyword),
+              absolute_keyword_location_(absolute_keyword_location)
         {
+            what_.append(instance_location);
+            what_.append(": ");
+            what_.append(message);
         }
+
         validation_error(const std::string& instance_location,
                          const std::string& message,
                          const std::string& keyword,
-                         const std::string& location,
+                         const std::string& absolute_keyword_location,
                          const std::vector<validation_error>& nested_errors)
-            : std::runtime_error(message),
-              instance_location_(instance_location), 
+            : instance_location_(instance_location), 
+              message_(message),
               keyword_(keyword),
-              absolute_keyword_location_(location),
+              absolute_keyword_location_(absolute_keyword_location),
               nested_errors_(nested_errors)
         {
+            what_.append(instance_location_);
+            what_.append(": ");
+            what_.append(message_);
         }
 
-        std::string message() const
+        std::string instance_location() const
         {
-            return std::runtime_error::what();
+            return instance_location_;
+        }
+
+        const std::string& message() const
+        {
+            return message_;
         }
 
         const std::string& absolute_keyword_location() const
@@ -73,33 +86,15 @@ namespace jsonschema {
             return nested_errors_;
         }
 
-        const char* what() const noexcept override
-        {
-            if (what_.empty())
-            {
-                JSONCONS_TRY
-                {
-                    what_.append(instance_location_);
-                    what_.append(": ");
-                    what_.append(std::runtime_error::what());
-                    return what_.c_str();
-                }
-                JSONCONS_CATCH(...)
-                {
-                    return std::runtime_error::what();
-                }
-            }
-            else
-            {
-                return what_.c_str();
-            }
-        }
-
         const std::string& keyword() const
         {
             return keyword_;
         }
 
+        const char* what() const noexcept override
+        {
+            return what_.c_str();
+        }
     };
 
 } // namespace jsonschema
