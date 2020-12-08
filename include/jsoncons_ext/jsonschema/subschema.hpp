@@ -244,26 +244,26 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class rule : public subschema
+    class schema_keyword : public subschema
     {
         std::string schema_location_;
     public:
-        using schema_pointer = rule<Json>*;
+        using schema_pointer = schema_keyword<Json>*;
 
-        rule(const std::string& uri)
+        schema_keyword(const std::string& uri)
             : subschema(uri)
         {
         }
 
-        rule(const std::vector<uri_wrapper>& uris)
+        schema_keyword(const std::vector<uri_wrapper>& uris)
             : subschema(uris)
         {
         }
 
-        rule(const rule&) = delete;
-        rule(rule&&) = default;
-        rule& operator=(const rule&) = delete;
-        rule& operator=(rule&&) = default;
+        schema_keyword(const schema_keyword&) = delete;
+        schema_keyword(schema_keyword&&) = default;
+        schema_keyword& operator=(const schema_keyword&) = delete;
+        schema_keyword& operator=(schema_keyword&&) = default;
 
         void validate(const uri_wrapper& instance_location, 
                       const Json& instance, 
