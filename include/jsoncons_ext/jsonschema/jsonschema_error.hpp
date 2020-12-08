@@ -66,7 +66,7 @@ namespace jsonschema {
             what_.append(message_);
         }
 
-        std::string instance_location() const
+        const std::string& instance_location() const
         {
             return instance_location_;
         }
@@ -81,14 +81,14 @@ namespace jsonschema {
             return absolute_keyword_location_;
         }
 
-        const std::vector<validation_error>& nested_errors() const
-        {
-            return nested_errors_;
-        }
-
         const std::string& keyword() const
         {
             return keyword_;
+        }
+
+        const std::vector<validation_error>& nested_errors() const
+        {
+            return nested_errors_;
         }
 
         const char* what() const noexcept override
