@@ -44,7 +44,7 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const override
@@ -58,7 +58,7 @@ namespace jsonschema {
             referred_schema_->validate(ptr, instance, reporter, patch);
         }
 
-        jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
+        jsoncons::optional<Json> get_default_value(const uri_wrapper& ptr, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
@@ -98,7 +98,7 @@ namespace jsonschema {
         json_schema& operator=(const json_schema&) = delete;
         json_schema& operator=(json_schema&&) = default;
     
-        void validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void validate(const uri_wrapper& ptr, 
                       const Json& instance, 
                       error_reporter& reporter, 
                       Json& patch) const 

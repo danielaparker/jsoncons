@@ -90,7 +90,7 @@ namespace jsonschema {
     };
 
     template <class Json>
-    void update_patch(Json& patch, const jsoncons::jsonpointer::json_pointer& ptr, Json&& default_value)
+    void update_patch(Json& patch, const uri_wrapper& ptr, Json&& default_value)
     {
         Json j;
         j.try_emplace("op", "add"); 
@@ -103,7 +103,7 @@ namespace jsonschema {
     // string rule
 
     template <class Json>
-    void content_media_type_check(const jsoncons::jsonpointer::json_pointer& ptr, const Json&, 
+    void content_media_type_check(const uri_wrapper& ptr, const Json&, 
                                   const std::string& content_media_type, const std::string& content,
                                   error_reporter& reporter)
     {
@@ -226,7 +226,7 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter,
                          Json&) const override
@@ -330,7 +330,7 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const final
@@ -342,7 +342,7 @@ namespace jsonschema {
                 reporter.error(validation_error(ptr.string(), "Instance must not be valid against schema", "not", this->absolute_keyword_location()));
         }
 
-        jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
+        jsoncons::optional<Json> get_default_value(const uri_wrapper& ptr, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
@@ -360,7 +360,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const jsoncons::jsonpointer::json_pointer& ptr, 
+                                const uri_wrapper& ptr, 
                                 error_reporter& reporter, 
                                 const collecting_error_reporter& local_reporter, 
                                 std::size_t)
@@ -381,7 +381,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const jsoncons::jsonpointer::json_pointer&, 
+                                const uri_wrapper&, 
                                 error_reporter&, 
                                 const collecting_error_reporter&, 
                                 std::size_t count)
@@ -400,7 +400,7 @@ namespace jsonschema {
         }
 
         static bool is_complete(const Json&, 
-                                const jsoncons::jsonpointer::json_pointer& ptr, 
+                                const uri_wrapper& ptr, 
                                 error_reporter& reporter, 
                                 const collecting_error_reporter&, 
                                 std::size_t count)
@@ -439,7 +439,7 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const final
@@ -522,7 +522,7 @@ namespace jsonschema {
 
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json&) const override
@@ -572,7 +572,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, const Json& instance, error_reporter& reporter, Json&) const override
+        void do_validate(const uri_wrapper& ptr, const Json& instance, error_reporter& reporter, Json&) const override
         {
             if (!instance.is_null())
             {
@@ -592,7 +592,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&, Json&) const override
+        void do_validate(const uri_wrapper&, const Json&, error_reporter&, Json&) const override
         {
         }
 
@@ -609,7 +609,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&, Json&) const override
+        void do_validate(const uri_wrapper&, const Json&, error_reporter&, Json&) const override
         {
         }
     };
@@ -625,7 +625,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, const Json&, error_reporter& reporter, Json&) const override
+        void do_validate(const uri_wrapper& ptr, const Json&, error_reporter& reporter, Json&) const override
         {
             reporter.error(validation_error(ptr.string(), "False schema always fails", "false", this->absolute_keyword_location()));
         }
@@ -652,7 +652,7 @@ namespace jsonschema {
         required_rule& operator=(required_rule&&) = default;
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, const Json& instance, error_reporter& reporter, Json&) const override final
+        void do_validate(const uri_wrapper& ptr, const Json& instance, error_reporter& reporter, Json&) const override final
         {
             for (const auto& key : required_)
             {
@@ -771,7 +771,7 @@ namespace jsonschema {
         }
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const override
@@ -805,7 +805,7 @@ namespace jsonschema {
                 if (properties_it != properties_.end()) 
                 {
                     a_prop_or_pattern_matched = true;
-                    properties_it->second->validate(ptr / property.key(), property.value(), reporter, patch);
+                    properties_it->second->validate(ptr.append(property.key()), property.value(), reporter, patch);
                 }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -815,7 +815,7 @@ namespace jsonschema {
                     if (std::regex_search(property.key(), schema_pp.first)) 
                     {
                         a_prop_or_pattern_matched = true;
-                        schema_pp.second->validate(ptr / property.key(), property.value(), reporter, patch);
+                        schema_pp.second->validate(ptr.append(property.key()), property.value(), reporter, patch);
                     }
     #endif
 
@@ -823,7 +823,7 @@ namespace jsonschema {
                 if (!a_prop_or_pattern_matched && additional_properties_) 
                 {
                     collecting_error_reporter local_reporter;
-                    additional_properties_->validate(ptr / property.key(), property.value(), local_reporter, patch);
+                    additional_properties_->validate(ptr.append(property.key()), property.value(), local_reporter, patch);
                     if (!local_reporter.errors.empty())
                         reporter.error(validation_error(ptr.string(), "Additional property \"" + property.key() + "\" found but was invalid.", "additionalProperties", additional_properties_->absolute_keyword_location()));
                 }
@@ -840,7 +840,7 @@ namespace jsonschema {
                     if (default_value) 
                     { 
                         // If default value is available, update patch
-                        update_patch(patch, ptr / prop.first, std::move(*default_value));
+                        update_patch(patch, ptr.append(prop.first), std::move(*default_value));
                     }
                 }
             }
@@ -849,7 +849,7 @@ namespace jsonschema {
             {
                 auto prop = instance.find(dep.first);
                 if (prop != instance.object_range().end())                                    // if dependency-property is present in instance
-                    dep.second->validate(ptr / dep.first, instance, reporter, patch); // validate
+                    dep.second->validate(ptr.append(dep.first), instance, reporter, patch); // validate
             }
         }
     };
@@ -934,7 +934,7 @@ namespace jsonschema {
         }
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const override
@@ -968,7 +968,7 @@ namespace jsonschema {
             {
                 for (const auto& i : instance.array_range()) 
                 {
-                    items_schema_->validate(ptr / index, i, reporter, patch);
+                    items_schema_->validate(ptr.append(index), i, reporter, patch);
                     index++;
                 }
             }
@@ -989,7 +989,7 @@ namespace jsonschema {
                     if (!item_validator)
                         break;
 
-                    item_validator->validate(ptr / index, i, reporter, patch);
+                    item_validator->validate(ptr.append(index), i, reporter, patch);
                 }
             }
 
@@ -1048,7 +1048,7 @@ namespace jsonschema {
             }
         }
     private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const final
@@ -1088,7 +1088,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter,
                          Json&) const final
@@ -1125,7 +1125,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter,
                          Json&) const final
@@ -1245,7 +1245,7 @@ namespace jsonschema {
         }
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& ptr, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const override final
@@ -1297,7 +1297,7 @@ namespace jsonschema {
             }
         }
 
-        jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer&, 
+        jsoncons::optional<Json> get_default_value(const uri_wrapper&, 
                                                    const Json&,
                                                    error_reporter&) const override
         {
