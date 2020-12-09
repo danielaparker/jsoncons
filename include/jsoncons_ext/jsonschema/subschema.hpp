@@ -67,6 +67,11 @@ namespace jsonschema {
             return uri_.path();
         }
 
+        bool is_absolute() const
+        {
+            return uri_.is_absolute();
+        }
+
         std::string pointer() const
         {
             return identifier_;
@@ -215,27 +220,21 @@ namespace jsonschema {
         virtual void do_error(const validation_output& /* e */) = 0;
     };
 
-    class subschema
+    class schema_keyword
     {
         std::string absolute_keyword_location_;
     public:
-        subschema(const std::string& uri)
+        schema_keyword(const std::string& uri)
             : absolute_keyword_location_(uri)
         {
         }
 
-        subschema(const std::vector<uri_wrapper>& uris)
-        {
-            JSONCONS_ASSERT(!uris.empty());
-            absolute_keyword_location_ = uris.back().string();
-        }
+        schema_keyword(const schema_keyword&) = delete;
+        schema_keyword(schema_keyword&&) = default;
+        schema_keyword& operator=(const schema_keyword&) = delete;
+        schema_keyword& operator=(schema_keyword&&) = default;
 
-        subschema(const subschema&) = delete;
-        subschema(subschema&&) = default;
-        subschema& operator=(const subschema&) = delete;
-        subschema& operator=(subschema&&) = default;
-
-        virtual ~subschema() = default;
+        virtual ~schema_keyword() = default;
 
         const std::string& absolute_keyword_location() const
         {
@@ -244,26 +243,20 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class schema_keyword : public subschema
+    class keyword_validator : public schema_keyword
     {
-        std::string absolute_keyword_location_;
     public:
-        using schema_pointer = schema_keyword<Json>*;
+        using schema_pointer = keyword_validator<Json>*;
 
-        schema_keyword(const std::string& uri)
-            : subschema(uri)
+        keyword_validator(const std::string& uri)
+            : schema_keyword(uri)
         {
         }
 
-        schema_keyword(const std::vector<uri_wrapper>& uris)
-            : subschema(uris)
-        {
-        }
-
-        schema_keyword(const schema_keyword&) = delete;
-        schema_keyword(schema_keyword&&) = default;
-        schema_keyword& operator=(const schema_keyword&) = delete;
-        schema_keyword& operator=(schema_keyword&&) = default;
+        keyword_validator(const keyword_validator&) = delete;
+        keyword_validator(keyword_validator&&) = default;
+        keyword_validator& operator=(const keyword_validator&) = delete;
+        keyword_validator& operator=(keyword_validator&&) = default;
 
         void validate(const uri_wrapper& instance_location, 
                       const Json& instance, 

@@ -831,13 +831,13 @@ namespace jsonschema {
     }
 
     // format checkers
-    using format_checker = std::function<void(const subschema& schema,
+    using format_checker = std::function<void(const schema_keyword& schema,
                                               const uri_wrapper& instance_location, 
                                               const std::string&, 
                                               error_reporter& reporter)>;
 
     inline
-    void rfc3339_date_check(const subschema& schema,
+    void rfc3339_date_check(const schema_keyword& schema,
                             const uri_wrapper& instance_location, 
                             const std::string& value,
                             error_reporter& reporter)
@@ -850,7 +850,7 @@ namespace jsonschema {
     }
 
     inline
-    void rfc3339_time_check(const subschema& schema,
+    void rfc3339_time_check(const schema_keyword& schema,
                             const uri_wrapper& instance_location, 
                             const std::string &value,
                             error_reporter& reporter)
@@ -863,7 +863,7 @@ namespace jsonschema {
     }
 
     inline
-    void rfc3339_date_time_check(const subschema& schema,
+    void rfc3339_date_time_check(const schema_keyword& schema,
                                  const uri_wrapper& instance_location, 
                                  const std::string &value,
                                  error_reporter& reporter)
@@ -876,7 +876,7 @@ namespace jsonschema {
     }
 
     inline
-    void email_check(const subschema& schema,
+    void email_check(const schema_keyword& schema,
                      const uri_wrapper& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
@@ -889,7 +889,7 @@ namespace jsonschema {
     } 
 
     inline
-    void hostname_check(const subschema& schema,
+    void hostname_check(const schema_keyword& schema,
                         const uri_wrapper& instance_location, 
                         const std::string& value,
                         error_reporter& reporter) 
@@ -902,7 +902,7 @@ namespace jsonschema {
     } 
 
     inline
-    void ipv4_check(const subschema& schema,
+    void ipv4_check(const schema_keyword& schema,
                     const uri_wrapper& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
@@ -915,7 +915,7 @@ namespace jsonschema {
     } 
 
     inline
-    void ipv6_check(const subschema& schema,
+    void ipv6_check(const schema_keyword& schema,
                     const uri_wrapper& instance_location, 
                     const std::string& value,
                     error_reporter& reporter) 
@@ -928,7 +928,7 @@ namespace jsonschema {
     } 
 
     inline
-    void regex_check(const subschema& schema,
+    void regex_check(const schema_keyword& schema,
                      const uri_wrapper& instance_location, 
                      const std::string& value,
                      error_reporter& reporter) 
