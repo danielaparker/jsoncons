@@ -51,17 +51,17 @@ namespace {
 
             for (const auto& test_case : test_group["tests"].array_range()) 
             {
-                auto reporter = [&test_case](const jsonschema::validation_output& e)
+                auto reporter = [&test_case](const jsonschema::validation_output& o)
                 {
                     CHECK_FALSE(test_case["valid"].as<bool>());
                     if (test_case["valid"].as<bool>())
                     {
                         std::cout << "  Test case: " << test_case["description"] << "\n";
-                        std::cout << "  Failed: " << e.instance_location() << ": " << e.message() << "\n";
+                        std::cout << "  Failed: " << o.instance_location() << ": " << o.message() << "\n";
                     }
                     else
                     {
-                        //std::cout << e.what() << "\n";
+                        //std::cout << o.what() << "\n";
                     }
                 };
                 validator.validate(test_case.at("data"), reporter);

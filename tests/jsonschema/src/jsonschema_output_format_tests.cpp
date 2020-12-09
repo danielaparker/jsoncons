@@ -57,10 +57,10 @@ TEST_CASE("jsonschema output format tests")
         auto sch = jsonschema::make_schema(schema);
         jsonschema::json_validator<json> validator(sch);
 
-        auto reporter = [](const jsonschema::validation_output& e)
+        auto reporter = [](const jsonschema::validation_output& o)
         {
-            std::cout << e.instance_location() << ": " << e.message() << ", " << e.absolute_keyword_location() << "\n";
-            for (const auto& nested : e.nested_errors())
+            std::cout << o.instance_location() << ": " << o.message() << ", " << o.absolute_keyword_location() << "\n";
+            for (const auto& nested : o.nested_errors())
             {
                 std::cout << "    " << nested.message() << "\n";
             }
