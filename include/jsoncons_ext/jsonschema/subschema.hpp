@@ -211,9 +211,9 @@ namespace jsonschema {
     public:
         virtual ~error_reporter() = default;
 
-        void error(const validation_output& e)
+        void error(const validation_output& o)
         {
-            do_error(e);
+            do_error(o);
         }
 
     private:

@@ -25,13 +25,13 @@ namespace jsonschema {
     struct default_error_reporter : public error_reporter
     {
     private:
-        void do_error(const validation_output& e) override
+        void do_error(const validation_output& o) override
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(e.message()));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(o.message()));
         }
     };
 
-    using error_reporter_t = std::function<void(const validation_output& e)>;
+    using error_reporter_t = std::function<void(const validation_output& o)>;
 
     struct error_reporter_adaptor : public error_reporter
     {

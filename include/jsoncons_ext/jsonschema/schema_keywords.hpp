@@ -83,9 +83,9 @@ namespace jsonschema {
         std::vector<validation_output> errors;
 
     private:
-        void do_error(const validation_output& e) override
+        void do_error(const validation_output& o) override
         {
-            errors.push_back(e);
+            errors.push_back(o);
         }
     };
 
