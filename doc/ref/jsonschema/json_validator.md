@@ -35,9 +35,8 @@ that is called for each schema violation.
     <td>reporter</td>
     <td>A function object with signature equivelent to 
     <pre>
-           void fun(const validation_output& o)
-    </pre>
-where the parameter <code>o</code> has type [validation_output](validation_output.md).</td> 
+           void fun(const validation_output& o)</pre>
+where the parameter <code>o</code> has type <a href="validation_output.md">validation_output</a>.</td> 
   </tr>
 </table>
 
