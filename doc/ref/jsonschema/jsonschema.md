@@ -134,7 +134,7 @@ int main()
         auto reporter = [&error_count](const jsonschema::validation_output& o)
         {
             ++error_count;
-            std::cout << e.instance_location() << ": " << e.message() << "\n";
+            std::cout << o.instance_location() << ": " << o.message() << "\n";
         };
 
         jsonschema::json_validator<json> validator(sch);
@@ -239,7 +239,7 @@ int main()
        auto reporter = [&error_count](const jsonschema::validation_output& o)
        {
            ++error_count;
-            std::cout << e.instance_location() << ": " << e.message() << "\n";
+            std::cout << o.instance_location() << ": " << o.message() << "\n";
        };
 
        jsonschema::json_validator<json> validator(sch);
