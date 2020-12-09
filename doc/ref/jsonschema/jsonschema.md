@@ -43,9 +43,7 @@ Any other format type is ignored.
 The JSON Schema Specification includes the ["default" keyword](https://json-schema.org/understanding-json-schema/reference/generic.html)  
 for specifying a default value, but doesn't prescribe how implementations should use it during validation.
 Some implementations ignore the default keyword, others support updating the input JSON to fill in a default value 
-for a missing key/value pair. This implementation follows the approach of
-[JSON schema validator for JSON for Modern C++ ](https://github.com/pboettch/json-schema-validator),
-which returns a JSONPatch document that may be further applied to the input JSON to add the
+for a missing key/value pair. This implementation returns a JSONPatch document that may be further applied to the input JSON to add the
 missing key/value pairs.
   
 ### Examples
