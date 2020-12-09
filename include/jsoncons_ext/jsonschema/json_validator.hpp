@@ -27,7 +27,7 @@ namespace jsonschema {
     private:
         void do_error(const validation_event& e) override
         {
-            JSONCONS_THROW(e);
+            JSONCONS_THROW(std::invalid_argument(e.message()));
         }
     };
 

@@ -57,7 +57,7 @@ namespace {
                     if (test_case["valid"].as<bool>())
                     {
                         std::cout << "  Test case: " << test_case["description"] << "\n";
-                        std::cout << "  Failed: " << e.error() << "\n";
+                        std::cout << "  Failed: " << e.instance_location() << ": " << e.message() << "\n";
                     }
                     else
                     {

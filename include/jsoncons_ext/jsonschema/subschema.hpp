@@ -217,17 +217,17 @@ namespace jsonschema {
 
     class subschema
     {
-        std::string schema_location_;
+        std::string absolute_keyword_location_;
     public:
         subschema(const std::string& uri)
-            : schema_location_(uri)
+            : absolute_keyword_location_(uri)
         {
         }
 
         subschema(const std::vector<uri_wrapper>& uris)
         {
             JSONCONS_ASSERT(!uris.empty());
-            schema_location_ = uris.back().string();
+            absolute_keyword_location_ = uris.back().string();
         }
 
         subschema(const subschema&) = delete;
@@ -239,14 +239,14 @@ namespace jsonschema {
 
         const std::string& absolute_keyword_location() const
         {
-            return schema_location_;
+            return absolute_keyword_location_;
         }
     };
 
     template <class Json>
     class schema_keyword : public subschema
     {
-        std::string schema_location_;
+        std::string absolute_keyword_location_;
     public:
         using schema_pointer = schema_keyword<Json>*;
 

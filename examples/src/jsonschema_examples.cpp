@@ -86,7 +86,7 @@ namespace {
             auto reporter = [&error_count](const jsonschema::validation_event& e)
             {
                 ++error_count;
-                std::cout << e.what() << "\n";
+                std::cout << e.instance_location() << ": " << e.message() << "\n";
             };
 
             jsonschema::json_validator<json> validator(sch);
@@ -147,7 +147,7 @@ namespace {
             auto reporter = [&error_count](const jsonschema::validation_event& e)
             {
                 ++error_count;
-                std::cout << e.what() << "\n";
+                std::cout << e.instance_location() << ": " << e.message() << "\n";
             };
 
             jsonschema::json_validator<json> validator(sch);

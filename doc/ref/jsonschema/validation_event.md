@@ -6,22 +6,22 @@
 
 <br>
 
-`jsoncons::jsonschema::validation_event` defines an exception type for reporting failures in jsonschema operations.
-
-![validation_event](./diagrams/validation_error.png)
-
-#### Constructors
-
-    validation_event(const std::string& pointer_to_violation,
-                     const std::string& message,
-                     const std::string& keyword);
+`jsoncons::jsonschema::validation_event` defines an event type for reporting failures in jsonschema operations.
 
 #### Member functions
 
-    const char* what() const noexcept;
-Returns an error message
+    const std::string& instance_location() const
+The location of the JSON value within the instance being validated,
+expressed as a URI fragment-encoded JSON Pointer.
 
-    const std::string& keyword() const;
-Returns the JSON Schema keyword that occurred in the schema and was violated by the input JSON.
+    const std::string& message() const
+An error message that is produced by the validation.
 
+    const std::string& absolute_keyword_location() const
+The absolute, dereferenced location of the validating keyword,
+expressed as an absolute URI using the canonical URI of the 
+relevant schema.
+
+    const std::vector<validation_event>& nested_errors() const
+Returns a list of nested errors
 

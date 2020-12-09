@@ -30,29 +30,29 @@ namespace jsonschema {
     class validation_event 
     {
         std::string instance_location_;
-        std::string error_;
+        std::string message_;
         std::string keyword_;
         std::string absolute_keyword_location_;
         std::vector<validation_event> nested_errors_;
     public:
         validation_event(const std::string& instance_location,
-                         const std::string& error,
+                         const std::string& message,
                          const std::string& keyword,
                          const std::string& absolute_keyword_location)
             : instance_location_(instance_location),
-              error_(error), 
+              message_(message), 
               keyword_(keyword),
               absolute_keyword_location_(absolute_keyword_location)
         {
         }
 
         validation_event(const std::string& instance_location,
-                         const std::string& error,
+                         const std::string& message,
                          const std::string& keyword,
                          const std::string& absolute_keyword_location,
                          const std::vector<validation_event>& nested_errors)
             : instance_location_(instance_location), 
-              error_(error),
+              message_(message),
               keyword_(keyword),
               absolute_keyword_location_(absolute_keyword_location),
               nested_errors_(nested_errors)
@@ -64,9 +64,9 @@ namespace jsonschema {
             return instance_location_;
         }
 
-        const std::string& error() const
+        const std::string& message() const
         {
-            return error_;
+            return message_;
         }
 
         const std::string& absolute_keyword_location() const
