@@ -37,7 +37,7 @@ that is called for each schema violation.
     <pre>
            void fun(const validation_output& o)</pre></td>
     </pre>
-where the parameter <code>o</code> has type [validation_output](validation_output.md). 
+where the parameter <code>o</code> has type [validation_output](validation_output.md).</td> 
   </tr>
 </table>
 
