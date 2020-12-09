@@ -1,4 +1,4 @@
-### jsoncons::jsonschema::validation_event
+### jsoncons::jsonschema::validation_output
 
 ```c++
 #include <jsoncons_ext/jsonschema/jsonschema_error.hpp>
@@ -6,7 +6,7 @@
 
 <br>
 
-`jsoncons::jsonschema::validation_event` defines an event type for reporting failures in jsonschema operations.
+`jsoncons::jsonschema::validation_output` defines an event type for reporting failures in jsonschema operations.
 
 #### Member functions
 
@@ -22,6 +22,6 @@ The absolute, dereferenced location of the validating keyword,
 expressed as an absolute URI using the canonical URI of the 
 relevant schema.
 
-    const std::vector<validation_event>& nested_errors() const
+    const std::vector<validation_output>& nested_errors() const
 Returns a list of nested errors
 

@@ -35,7 +35,7 @@ that is called for each schema violation.
     <td>reporter</td>
     <td>A function object with the signature of <code>reporter</code> being equivelent to 
     <pre>
-           void fun(const validation_event& e)</pre></td>
+           void fun(const validation_output& e)</pre></td>
   </tr>
 </table>
 
