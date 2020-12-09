@@ -133,10 +133,10 @@ int main()
         auto sch = jsonschema::make_schema(schema);
 
         std::size_t error_count = 0;
-        auto reporter = [&error_count](const jsonschema::validation_error& e)
+        auto reporter = [&error_count](const jsonschema::validation_output& e)
         {
             ++error_count;
-            std::cout << e.what() << "\n";
+            std::cout << e.instance_location() << ": " << e.message() << "\n";
         };
 
         jsonschema::json_validator<json> validator(sch);
@@ -155,8 +155,8 @@ int main()
 
 Output:
 ```
-/vegetables/1/veggieLike: Expected boolean, found string
-/vegetables/3: Required key "veggieLike" not found
+#/vegetables/1/veggieLike: Expected boolean, found string
+#/vegetables/3: Required key "veggieLike" not found
 
 Error count: 2
 ```
@@ -238,10 +238,10 @@ int main()
        auto sch = jsonschema::make_schema(schema, resolver);
 
        std::size_t error_count = 0;
-       auto reporter = [&error_count](const jsonschema::validation_error& e)
+       auto reporter = [&error_count](const jsonschema::validation_output& e)
        {
            ++error_count;
-           std::cout << e.what() << "\n";
+            std::cout << e.instance_location() << ": " << e.message() << "\n";
        };
 
        jsonschema::json_validator<json> validator(sch);
@@ -259,9 +259,7 @@ int main()
 ```
 Output:
 ```
-uri: http://localhost:1234/name.json, path: /name.json
-
-/name: No subschema matched, but one of them is required to match
+#/name: No rule matched, but one of them is required to match
 
 Error count: 1
 ```
@@ -304,7 +302,7 @@ int main()
 
        jsonschema::json_validator<json> validator(sch); 
 
-       // will throw validation_error on first encountered schema violation 
+       // will throw validation_output on first encountered schema violation 
        json patch = validator.validate(data); 
 
        std::cout << "Patch: " << patch << "\n";

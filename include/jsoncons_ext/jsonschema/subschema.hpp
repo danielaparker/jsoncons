@@ -123,6 +123,29 @@ namespace jsonschema {
             return wrapper;
         }
 
+        uri_wrapper append(std::size_t index) const
+        {
+            if (has_identifier())
+                return *this;
+
+            jsoncons::jsonpointer::json_pointer pointer(std::string(uri_.fragment()));
+            pointer /= index;
+
+            jsoncons::uri new_uri(uri_.scheme(),
+                                  uri_.userinfo(),
+                                  uri_.host(),
+                                  uri_.port(),
+                                  uri_.path(),
+                                  uri_.query(),
+                                  pointer.string());
+
+            uri_wrapper wrapper;
+            wrapper.uri_ = new_uri;
+            wrapper.identifier_ = pointer.string();
+
+            return wrapper;
+        }
+
         std::string string() const
         {
             std::string s = uri_.string();
@@ -183,42 +206,108 @@ namespace jsonschema {
     public:
         virtual ~error_reporter() = default;
 
-        void error(const validation_error& e)
+        void error(const validation_output& e)
         {
             do_error(e);
         }
 
     private:
-        virtual void do_error(const validation_error& /* e */) = 0;
+        virtual void do_error(const validation_output& /* e */) = 0;
     };
 
-    template <class Json>
     class subschema
     {
+        std::string absolute_keyword_location_;
     public:
-        using schema_pointer = subschema<Json>*;
+        subschema(const std::string& uri)
+            : absolute_keyword_location_(uri)
+        {
+        }
+
+        subschema(const std::vector<uri_wrapper>& uris)
+        {
+            JSONCONS_ASSERT(!uris.empty());
+            absolute_keyword_location_ = uris.back().string();
+        }
+
+        subschema(const subschema&) = delete;
+        subschema(subschema&&) = default;
+        subschema& operator=(const subschema&) = delete;
+        subschema& operator=(subschema&&) = default;
 
         virtual ~subschema() = default;
 
-        void validate(const jsoncons::jsonpointer::json_pointer &ptr, 
+        const std::string& absolute_keyword_location() const
+        {
+            return absolute_keyword_location_;
+        }
+    };
+
+    template <class Json>
+    class schema_keyword : public subschema
+    {
+        std::string absolute_keyword_location_;
+    public:
+        using schema_pointer = schema_keyword<Json>*;
+
+        schema_keyword(const std::string& uri)
+            : subschema(uri)
+        {
+        }
+
+        schema_keyword(const std::vector<uri_wrapper>& uris)
+            : subschema(uris)
+        {
+        }
+
+        schema_keyword(const schema_keyword&) = delete;
+        schema_keyword(schema_keyword&&) = default;
+        schema_keyword& operator=(const schema_keyword&) = delete;
+        schema_keyword& operator=(schema_keyword&&) = default;
+
+        void validate(const uri_wrapper& instance_location, 
                       const Json& instance, 
                       error_reporter& reporter, 
                       Json& patch) const 
         {
-            do_validate(ptr,instance,reporter,patch);
+            do_validate(instance_location,instance,reporter,patch);
         }
 
-        virtual jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer&, const Json&, error_reporter&) const
+        virtual jsoncons::optional<Json> get_default_value(const uri_wrapper&, const Json&, error_reporter&) const
         {
             return jsoncons::optional<Json>();
         }
 
     private:
-        virtual void do_validate(const jsoncons::jsonpointer::json_pointer &ptr, 
+        virtual void do_validate(const uri_wrapper& instance_location, 
                                  const Json& instance, 
                                  error_reporter& reporter, 
                                  Json& patch) const = 0;
     };
+
+    inline
+    std::vector<uri_wrapper> update_uris(const std::vector<std::string>& keys,
+                                         const std::vector<uri_wrapper>& uris)
+    {
+        // Exclude uri's that are not plain name identifiers
+        std::vector<uri_wrapper> new_uris;
+        for (const auto& uri : uris)
+        {
+            if (!uri.has_identifier())
+                new_uris.push_back(uri);
+        }
+
+        // Append the keys for this sub-schema to the uri's
+        for (const auto& key : keys)
+        {
+            for (auto& uri : new_uris)
+            {
+                auto new_u = uri.append(key);
+                uri = uri_wrapper(new_u);
+            }
+        }
+        return new_uris;
+    }
 
 } // namespace jsonschema
 } // namespace jsoncons

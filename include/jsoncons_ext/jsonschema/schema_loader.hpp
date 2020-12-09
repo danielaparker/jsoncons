@@ -12,7 +12,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/subschema.hpp>
-#include <jsoncons_ext/jsonschema/schema_rules.hpp>
+#include <jsoncons_ext/jsonschema/schema_keywords.hpp>
 #include <jsoncons_ext/jsonschema/json_schema_draft7.hpp>
 #include <cassert>
 #include <set>
@@ -30,48 +30,45 @@ namespace jsonschema {
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
-    class reference_schema : public subschema<Json>
+    class reference_schema : public schema_keyword<Json>
     {
-        using schema_pointer = typename subschema<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
-        const std::string id_;
         schema_pointer referred_schema_;
 
     public:
         reference_schema(const std::string& id)
-            : id_(id), referred_schema_(nullptr) {}
-
-        const std::string& id() const { return id_; }
+            : schema_keyword<Json>(id), referred_schema_(nullptr) {}
 
         void set_referred_schema(schema_pointer target) { referred_schema_ = target; }
 
     private:
 
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
+        void do_validate(const uri_wrapper& instance_location, 
                          const Json& instance, 
                          error_reporter& reporter, 
                          Json& patch) const override
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + id_, ""));
+                reporter.error(validation_output(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return;
             }
 
-            referred_schema_->validate(ptr, instance, reporter, patch);
+            referred_schema_->validate(instance_location, instance, reporter, patch);
         }
 
-        jsoncons::optional<Json> get_default_value(const jsoncons::jsonpointer::json_pointer& ptr, 
+        jsoncons::optional<Json> get_default_value(const uri_wrapper& instance_location, 
                                                    const Json& instance, 
                                                    error_reporter& reporter) const override
         {
             if (!referred_schema_)
             {
-                reporter.error(validation_error(ptr.string(), "Unresolved schema reference " + id_, ""));
+                reporter.error(validation_output(instance_location.string(), "Unresolved schema reference " + this->absolute_keyword_location(), "", this->absolute_keyword_location()));
                 return jsoncons::optional<Json>();
             }
 
-            return referred_schema_->get_default_value(ptr, instance, reporter);
+            return referred_schema_->get_default_value(instance_location, instance, reporter);
         }
     };
 
@@ -79,16 +76,16 @@ namespace jsonschema {
     class schema_loader;
 
     template <class Json>
-    class json_schema : public subschema<Json>
+    class json_schema
     {
-        using schema_pointer = typename subschema<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         friend class schema_loader<Json>;
 
-        std::vector<std::unique_ptr<subschema<Json>>> subschemas_;
+        std::vector<std::unique_ptr<schema_keyword<Json>>> subschemas_;
         schema_pointer root_;
     public:
-        json_schema(std::vector<std::unique_ptr<subschema<Json>>>&& subschemas,
+        json_schema(std::vector<std::unique_ptr<schema_keyword<Json>>>&& subschemas,
                     schema_pointer root)
             : subschemas_(std::move(subschemas)), root_(root)
         {
@@ -100,14 +97,14 @@ namespace jsonschema {
         json_schema(json_schema&&) = default;
         json_schema& operator=(const json_schema&) = delete;
         json_schema& operator=(json_schema&&) = default;
-    private:
-        void do_validate(const jsoncons::jsonpointer::json_pointer& ptr, 
-                         const Json& instance, 
-                         error_reporter& reporter, 
-                         Json& patch) const 
+    
+        void validate(const uri_wrapper& instance_location, 
+                      const Json& instance, 
+                      error_reporter& reporter, 
+                      Json& patch) const 
         {
             JSONCONS_ASSERT(root_ != nullptr);
-            root_->validate(ptr, instance, reporter, patch);
+            root_->validate(instance_location, instance, reporter, patch);
         }
     };
 
@@ -125,7 +122,7 @@ namespace jsonschema {
     template <class Json>
     class schema_loader : public schema_builder<Json>
     {
-        using schema_pointer = typename subschema<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         struct subschema_registry
         {
@@ -138,7 +135,7 @@ namespace jsonschema {
         schema_pointer root_;
 
         // Owns all schemas
-        std::vector<std::unique_ptr<subschema<Json>>> subschemas_;
+        std::vector<std::unique_ptr<schema_keyword<Json>>> subschemas_;
 
         // Map location to subschema_registry
         std::map<std::string, subschema_registry> subschema_registries_;
@@ -160,209 +157,200 @@ namespace jsonschema {
             return std::make_shared<json_schema<Json>>(std::move(subschemas_), root_);
         }
 
-        schema_pointer make_required_rule(const std::vector<std::string>& r) override
+        schema_pointer make_required_keyword(const std::vector<uri_wrapper>& uris,
+                                          const std::vector<std::string>& r) override
         {
-            auto sch_orig = jsoncons::make_unique<required_rule<Json>>(r);
+            auto sch_orig = jsoncons::make_unique<required_keyword<Json>>(uris, r);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
-        schema_pointer make_null_rule() override
+        schema_pointer make_null_keyword(const std::vector<uri_wrapper>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<null_rule<Json>>();
+            auto sch_orig = jsoncons::make_unique<null_keyword<Json>>(uris);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
-        schema_pointer make_true_rule() override
+        schema_pointer make_true_keyword(const std::vector<uri_wrapper>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<true_rule<Json>>();
+            auto sch_orig = jsoncons::make_unique<true_keyword<Json>>(uris);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
-        schema_pointer make_false_rule() override
+        schema_pointer make_false_keyword(const std::vector<uri_wrapper>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<false_rule<Json>>();
+            auto sch_orig = jsoncons::make_unique<false_keyword<Json>>(uris);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
-        schema_pointer make_object_rule(const Json& schema,
+        schema_pointer make_object_keyword(const Json& schema,
                                           const std::vector<uri_wrapper>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<object_rule<Json>>(this, schema, uris);
+            auto sch_orig = jsoncons::make_unique<object_keyword<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
-        schema_pointer make_array_rule(const Json& schema,
-                                          const std::vector<uri_wrapper>& uris) override
-        {
-            auto sch_orig = jsoncons::make_unique<array_rule<Json>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_string_rule(const Json& schema) override
-        {
-            auto sch_orig = jsoncons::make_unique<string_rule<Json>>(schema);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_boolean_rule() override
-        {
-            auto sch_orig = jsoncons::make_unique<boolean_rule<Json>>();
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_integer_rule(const Json& schema, std::set<std::string>& keywords) override
-        {
-            auto sch_orig = jsoncons::make_unique<number_rule<Json,int64_t>>(schema, keywords);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_number_rule(const Json& schema, std::set<std::string>& keywords) override
-        {
-            auto sch_orig = jsoncons::make_unique<number_rule<Json,double>>(schema, keywords);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_not_rule(const Json& schema,
+        schema_pointer make_array_keyword(const Json& schema,
                                        const std::vector<uri_wrapper>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<not_rule<Json>>(this, schema, uris);
+            auto sch_orig = jsoncons::make_unique<array_keyword<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
-        schema_pointer make_all_of_rule(const Json& schema,
-                                          const std::vector<uri_wrapper>& uris) override
-        {
-            auto sch_orig = jsoncons::make_unique<combining_rule<Json,all_of_criterion<Json>>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_any_of_rule(const Json& schema,
-                                          const std::vector<uri_wrapper>& uris) override
-        {
-            auto sch_orig = jsoncons::make_unique<combining_rule<Json,any_of_criterion<Json>>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_one_of_rule(const Json& schema,
-                                          const std::vector<uri_wrapper>& uris) override
-        {
-            auto sch_orig = jsoncons::make_unique<combining_rule<Json,one_of_criterion<Json>>>(this, schema, uris);
-            auto sch = sch_orig.get();
-            subschemas_.emplace_back(std::move(sch_orig));
-            return sch;
-        }
-
-        schema_pointer make_type_rule(const Json& schema,
+        schema_pointer make_string_keyword(const Json& schema,
                                         const std::vector<uri_wrapper>& uris) override
         {
-            auto sch_orig = jsoncons::make_unique<type_rule<Json>>(this, schema, uris);
+            auto sch_orig = jsoncons::make_unique<string_keyword<Json>>(schema, uris);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_boolean_keyword(const std::vector<uri_wrapper>& uris) override
+        {
+            auto sch_orig = jsoncons::make_unique<boolean_keyword<Json>>(uris);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_integer_keyword(const Json& schema, 
+                                         const std::vector<uri_wrapper>& uris, 
+                                         std::set<std::string>& keywords) override
+        {
+            auto sch_orig = jsoncons::make_unique<number_keyword<Json,int64_t>>(schema, uris, keywords);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_number_keyword(const Json& schema, 
+                                        const std::vector<uri_wrapper>& uris, 
+                                        std::set<std::string>& keywords) override
+        {
+            auto sch_orig = jsoncons::make_unique<number_keyword<Json,double>>(schema, uris, keywords);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_not_keyword(const Json& schema,
+                                       const std::vector<uri_wrapper>& uris) override
+        {
+            auto sch_orig = jsoncons::make_unique<not_keyword<Json>>(this, schema, uris);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_all_of_keyword(const Json& schema,
+                                          const std::vector<uri_wrapper>& uris) override
+        {
+            auto sch_orig = jsoncons::make_unique<combining_keyword<Json,all_of_criterion<Json>>>(this, schema, uris);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_any_of_keyword(const Json& schema,
+                                          const std::vector<uri_wrapper>& uris) override
+        {
+            auto sch_orig = jsoncons::make_unique<combining_keyword<Json,any_of_criterion<Json>>>(this, schema, uris);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_one_of_keyword(const Json& schema,
+                                          const std::vector<uri_wrapper>& uris) override
+        {
+            auto sch_orig = jsoncons::make_unique<combining_keyword<Json,one_of_criterion<Json>>>(this, schema, uris);
+            auto sch = sch_orig.get();
+            subschemas_.emplace_back(std::move(sch_orig));
+            return sch;
+        }
+
+        schema_pointer make_type_keyword(const Json& schema,
+                                      const std::vector<uri_wrapper>& uris) override
+        {
+            auto sch_orig = jsoncons::make_unique<type_keyword<Json>>(this, schema, uris);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
         }
 
         schema_pointer build(const Json& schema,
-                               const std::vector<std::string>& keys,
-                               const std::vector<uri_wrapper>& uris) override
+                             const std::vector<std::string>& keys,
+                             const std::vector<uri_wrapper>& uris) override
         {
-            // Exclude uri's that are not plain name identifiers
-            std::vector<uri_wrapper> sub_uris;
-            for (const auto& uri : uris)
-            {
-                if (!uri.has_identifier())
-                    sub_uris.push_back(uri);
-            }
-
-            // Append the keys for this sub-schema to the uri's
-            for (const auto& key : keys)
-            {
-                for (auto& uri : sub_uris)
-                {
-                    auto new_u = uri.append(key);
-                    uri = uri_wrapper(new_u);
-                }
-            }
+            std::vector<uri_wrapper> new_uris = update_uris(keys, uris);
 
             schema_pointer sch = nullptr;
 
-            // boolean schema
-            if (schema.type() == json_type::bool_value)
+            switch (schema.type())
             {
-                if (schema.template as<bool>())
-                {
-                    sch = make_true_rule();
-                }
-                else
-                {
-                    sch = make_false_rule();
-                }
-            }
-            else if (schema.type() == json_type::object_value) 
-            {
-                auto it = schema.find("$id"); // if $id is found, this schema can be referenced by the id
-                if (it != schema.object_range().end()) 
-                {
-                    if (std::find(sub_uris.begin(),
-                                  sub_uris.end(),
-                                  it->value().template as<std::string>()) == sub_uris.end())
+                case json_type::bool_value:
+                    if (schema.template as<bool>())
                     {
-                        uri_wrapper relative(it->value().template as<std::string>()); 
-                        uri_wrapper new_uri = relative.resolve(sub_uris.back());
-                        sub_uris.push_back(new_uri.string()); // so add it to the list if it is not there already
+                        sch = make_true_keyword(new_uris);
                     }
-                }
-
-                it = schema.find("definitions");
-                if (it != schema.object_range().end()) 
+                    else
+                    {
+                        sch = make_false_keyword(new_uris);
+                    }
+                    break;
+                case json_type::object_value:
                 {
-                    for (const auto& def : it->value().object_range())
-                        build(def.value(), {"definitions", def.key()}, sub_uris);
-                }
+                    auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
+                    if (it != schema.object_range().end()) 
+                    {
+                        std::string id = it->value().template as<std::string>(); 
+                        // Add it to the list if it is not there already
+                        if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
+                        {
+                            uri_wrapper relative(id); 
+                            uri_wrapper new_uri = relative.resolve(new_uris.back());
+                            new_uris.push_back(new_uri.string()); 
+                        }
+                    }
 
-                it = schema.find("$ref");
-                if (it != schema.object_range().end()) // this schema is a reference
-                { 
-                    uri_wrapper relative(it->value().template as<std::string>()); 
-                    uri_wrapper id = relative.resolve(sub_uris.back());
-                    sch = get_or_create_reference(id);
-                } 
-                else 
-                {
-                    sch = make_type_rule(schema, sub_uris);
+                    it = schema.find("definitions");
+                    if (it != schema.object_range().end()) 
+                    {
+                        for (const auto& def : it->value().object_range())
+                            build(def.value(), {"definitions", def.key()}, new_uris);
+                    }
+
+                    it = schema.find("$ref");
+                    if (it != schema.object_range().end()) // this schema is a reference
+                    { 
+                        uri_wrapper relative(it->value().template as<std::string>()); 
+                        uri_wrapper id = relative.resolve(new_uris.back());
+                        sch = get_or_create_reference(id);
+                    } 
+                    else 
+                    {
+                        sch = make_type_keyword(schema, new_uris);
+                    }
+                    break;
                 }
-            } 
-            else 
-            {
-                JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + sub_uris[0].string() + ", expected: boolean or object"));
+                default:
+                    JSONCONS_THROW(schema_error("invalid JSON-type for a schema for " + new_uris[0].string() + ", expected: boolean or object"));
+                    break;
             }
 
-            for (const auto& uri : sub_uris) 
+            for (const auto& uri : new_uris) 
             { 
                 insert(uri, sch);
 
@@ -441,6 +429,7 @@ namespace jsonschema {
             {
                 unresolved_it->second->set_referred_schema(s);
                 file.unresolved.erase(unresolved_it);
+
             }
         }
 
@@ -509,6 +498,7 @@ namespace jsonschema {
                 auto p = file.unresolved.insert(ref,
                                               {std::string(uri.fragment()), orig.get()})
                     ->second; // unresolved, create new reference
+                
                 subschemas_.emplace_back(std::move(orig));
                 return p;
             }

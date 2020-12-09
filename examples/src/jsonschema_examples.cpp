@@ -83,10 +83,10 @@ namespace {
             auto sch = jsonschema::make_schema(schema);
 
             std::size_t error_count = 0;
-            auto reporter = [&error_count](const jsonschema::validation_error& e)
+            auto reporter = [&error_count](const jsonschema::validation_output& e)
             {
                 ++error_count;
-                std::cout << e.what() << "\n";
+                std::cout << e.instance_location() << ": " << e.message() << "\n";
             };
 
             jsonschema::json_validator<json> validator(sch);
@@ -144,10 +144,10 @@ namespace {
             auto sch = jsonschema::make_schema(schema, resolver);
 
             std::size_t error_count = 0;
-            auto reporter = [&error_count](const jsonschema::validation_error& e)
+            auto reporter = [&error_count](const jsonschema::validation_output& e)
             {
                 ++error_count;
-                std::cout << e.what() << "\n";
+                std::cout << e.instance_location() << ": " << e.message() << "\n";
             };
 
             jsonschema::json_validator<json> validator(sch);
@@ -188,7 +188,7 @@ namespace {
 
             jsonschema::json_validator<json> validator(sch); 
 
-            // will throw validation_error when a schema violation happens 
+            // will throw validation_output when a schema violation happens 
             json patch = validator.validate(data); 
 
             std::cout << "Patch: " << patch << "\n";

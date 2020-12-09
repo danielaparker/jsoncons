@@ -25,13 +25,13 @@ namespace jsonschema {
     struct default_error_reporter : public error_reporter
     {
     private:
-        void do_error(const validation_error& e) override
+        void do_error(const validation_output& e) override
         {
-            JSONCONS_THROW(e);
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(e.message()));
         }
     };
 
-    using error_reporter_t = std::function<void(const validation_error& e)>;
+    using error_reporter_t = std::function<void(const validation_output& e)>;
 
     struct error_reporter_adaptor : public error_reporter
     {
@@ -42,7 +42,7 @@ namespace jsonschema {
         {
         }
     private:
-        void do_error(const validation_error& e) override
+        void do_error(const validation_output& e) override
         {
             reporter_(e);
         }
@@ -71,23 +71,23 @@ namespace jsonschema {
         Json validate(const Json& instance) const
         {
             default_error_reporter reporter;
-            jsoncons::jsonpointer::json_pointer ptr;
+            uri_wrapper instance_location("#");
             Json patch(json_array_arg);
 
-            root_->validate(ptr, instance, reporter, patch);
+            root_->validate(instance_location, instance, reporter, patch);
             return patch;
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<jsoncons::detail::is_function_object_exact<Reporter,void,validation_error>::value,Json>::type
+        typename std::enable_if<jsoncons::detail::is_function_object_exact<Reporter,void,validation_output>::value,Json>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
-            jsoncons::jsonpointer::json_pointer ptr;
+            uri_wrapper instance_location("#");
             Json patch(json_array_arg);
 
             error_reporter_adaptor adaptor(reporter);
-            root_->validate(ptr, instance, adaptor, patch);
+            root_->validate(instance_location, instance, adaptor, patch);
             return patch;
         }
     };
