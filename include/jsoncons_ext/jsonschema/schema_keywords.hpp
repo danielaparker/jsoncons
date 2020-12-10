@@ -32,10 +32,10 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         virtual schema_pointer build(const Json& schema,
-                                     const std::vector<std::string>& keys,
-                                     const std::vector<uri_wrapper>& uris) = 0;
+                                     const std::vector<uri_wrapper>& uris,
+                                     const std::vector<std::string>& keys) = 0;
         virtual schema_pointer make_required_keyword(const std::vector<uri_wrapper>& uris,
-                                                  const std::vector<std::string>& items) = 0;
+                                                     const std::vector<std::string>& items) = 0;
 
         virtual schema_pointer make_null_keyword(const std::vector<uri_wrapper>& uris) = 0;
 
@@ -325,7 +325,7 @@ namespace jsonschema {
                  const std::vector<uri_wrapper>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
-            rule_ = builder->build(sch, {"not"}, uris);
+            rule_ = builder->build(sch, uris, {"not"});
         }
 
     private:
@@ -431,7 +431,7 @@ namespace jsonschema {
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                subschemas_.push_back(builder->build(subsch, {Criterion::key(), std::to_string(c++)}, uris));
+                subschemas_.push_back(builder->build(subsch, uris, {Criterion::key(), std::to_string(c++)}));
             }
 
             // Validate value of allOf, anyOf, and oneOf "MUST be a non-empty array"
@@ -717,7 +717,7 @@ namespace jsonschema {
                     properties_.emplace(
                         std::make_pair(
                             prop.key(),
-                            builder->build(prop.value(), {"properties", prop.key()}, uris)));
+                            builder->build(prop.value(), uris, {"properties", prop.key()})));
             }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -728,14 +728,14 @@ namespace jsonschema {
                     pattern_properties_.push_back(
                         std::make_pair(
                             std::regex(prop.key(), std::regex::ECMAScript),
-                            builder->build(prop.value(), {prop.key()}, uris)));
+                            builder->build(prop.value(), uris, {prop.key()})));
             }
     #endif
 
             it = sch.find("additionalProperties");
             if (it != sch.object_range().end()) 
             {
-                additional_properties_ = builder->build(it->value(), {"additionalProperties"}, uris);
+                additional_properties_ = builder->build(it->value(), uris, {"additionalProperties"});
             }
 
             it = sch.find("dependencies");
@@ -756,7 +756,7 @@ namespace jsonschema {
                         default:
                         {
                             dependencies_.emplace(dep.key(),
-                                                  builder->build(dep.value(), {"dependencies", dep.key()}, uris));
+                                                  builder->build(dep.value(), uris, {"dependencies", dep.key()}));
                             break;
                         }
                     }
@@ -766,7 +766,7 @@ namespace jsonschema {
             auto property_names_it = sch.find("propertyNames");
             if (property_names_it != sch.object_range().end()) 
             {
-                property_names_ = builder->build(property_names_it->value(), {"propertyNames"}, uris);
+                property_names_ = builder->build(property_names_it->value(), uris, {"propertyNames"});
             }
         }
     private:
@@ -848,7 +848,7 @@ namespace jsonschema {
             for (const auto& dep : dependencies_) 
             {
                 auto prop = instance.find(dep.first);
-                if (prop != instance.object_range().end())                                    // if dependency-property is present in instance
+                if (prop != instance.object_range().end()) // if dependency-property is present in instance
                     dep.second->validate(instance_location.append(dep.first), instance, reporter, patch); // validate
             }
         }
@@ -906,19 +906,19 @@ namespace jsonschema {
                     {
                         size_t c = 0;
                         for (const auto& subsch : it->value().array_range())
-                            items_.push_back(builder->build(subsch, {"items", std::to_string(c++)}, uris));
+                            items_.push_back(builder->build(subsch, uris, {"items", std::to_string(c++)}));
 
                         auto attr_add = sch.find("additionalItems");
                         if (attr_add != sch.object_range().end()) 
                         {
-                            additional_items_ = builder->build(attr_add->value(), {"additionalItems"}, uris);
+                            additional_items_ = builder->build(attr_add->value(), uris, {"additionalItems"});
                         }
 
                     } 
                     else if (it->value().type() == json_type::object_value ||
                                it->value().type() == json_type::bool_value)
                     {
-                        items_schema_ = builder->build(it->value(), {"items"}, uris);
+                        items_schema_ = builder->build(it->value(), uris, {"items"});
                     }
 
                 }
@@ -928,7 +928,7 @@ namespace jsonschema {
                 auto it = sch.find("contains");
                 if (it != sch.object_range().end()) 
                 {
-                    contains_ = builder->build(it->value(), {"contains"}, uris);
+                    contains_ = builder->build(it->value(), uris, {"contains"});
                 }
             }
         }
@@ -1034,16 +1034,16 @@ namespace jsonschema {
 
             if (then_it != sch.object_range().end() || else_it != sch.object_range().end()) 
             {
-                if_ = builder->build(sch_if, {"if"}, uris);
+                if_ = builder->build(sch_if, uris, {"if"});
 
                 if (then_it != sch.object_range().end()) 
                 {
-                    then_ = builder->build(then_it->value(), {"then"}, uris);
+                    then_ = builder->build(then_it->value(), uris, {"then"});
                 }
 
                 if (else_it != sch.object_range().end()) 
                 {
-                    else_ = builder->build(else_it->value(), {"else"}, uris);
+                    else_ = builder->build(else_it->value(), uris, {"else"});
                 }
             }
         }
