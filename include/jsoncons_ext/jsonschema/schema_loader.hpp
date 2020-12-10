@@ -294,7 +294,7 @@ namespace jsonschema {
                              const std::vector<std::string>& keys,
                              const std::vector<uri_wrapper>& uris) override
         {
-            std::vector<uri_wrapper> new_uris = update_uris(keys, uris);
+            std::vector<uri_wrapper> new_uris = update_uris(schema, uris, keys);
 
             schema_pointer sch = nullptr;
 
@@ -312,20 +312,7 @@ namespace jsonschema {
                     break;
                 case json_type::object_value:
                 {
-                    auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
-                    if (it != schema.object_range().end()) 
-                    {
-                        std::string id = it->value().template as<std::string>(); 
-                        // Add it to the list if it is not there already
-                        if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
-                        {
-                            uri_wrapper relative(id); 
-                            uri_wrapper new_uri = relative.resolve(new_uris.back());
-                            new_uris.push_back(new_uri.string()); 
-                        }
-                    }
-
-                    it = schema.find("definitions");
+                    auto it = schema.find("definitions");
                     if (it != schema.object_range().end()) 
                     {
                         for (const auto& def : it->value().object_range())
