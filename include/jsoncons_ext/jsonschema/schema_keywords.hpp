@@ -868,13 +868,87 @@ namespace jsonschema {
         }
     };
 
+    // min_items_keyword
+
+    template <class Json>
+    class min_items_keyword : public keyword_validator<Json>
+    {
+        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+
+        std::size_t min_items_;
+
+    public:
+        min_items_keyword(const std::string& absolute_keyword_location,
+                          std::size_t min_items)
+            : keyword_validator<Json>(absolute_keyword_location),
+              min_items_(min_items)
+        {
+        }
+
+        min_items_keyword(const min_items_keyword&) = delete;
+        min_items_keyword(min_items_keyword&&) = default;
+        min_items_keyword& operator=(const min_items_keyword&) = delete;
+        min_items_keyword& operator=(min_items_keyword&&) = default;
+    private:
+
+        void do_validate(const uri_wrapper& instance_location, 
+                         const Json& instance, 
+                         error_reporter& reporter, 
+                         Json& patch) const final
+        {
+            if (instance.size() < min_items_)
+            {
+                std::string message("Expected at least " + std::to_string(min_items_));
+                message.append(" items but found " + std::to_string(instance.size()));
+                reporter.error(validation_output(instance_location.string(), message, "minItems", this->absolute_keyword_location()));
+            }
+        }
+    };
+
+    // max_items_keyword
+
+    template <class Json>
+    class max_items_keyword : public keyword_validator<Json>
+    {
+        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+
+        std::size_t max_items_;
+
+    public:
+        max_items_keyword(const std::string& absolute_keyword_location,
+                          std::size_t max_items)
+            : keyword_validator<Json>(absolute_keyword_location),
+              max_items_(max_items)
+        {
+        }
+
+        max_items_keyword(const max_items_keyword&) = delete;
+        max_items_keyword(max_items_keyword&&) = default;
+        max_items_keyword& operator=(const max_items_keyword&) = delete;
+        max_items_keyword& operator=(max_items_keyword&&) = default;
+    private:
+
+        void do_validate(const uri_wrapper& instance_location, 
+                         const Json& instance, 
+                         error_reporter& reporter, 
+                         Json& patch) const final
+        {
+            if (instance.size() > max_items_)
+            {
+                std::string message("Expected maximum item count: " + std::to_string(max_items_));
+                message.append(", found: " + std::to_string(instance.size()));
+                reporter.error(validation_output(instance_location.string(), message, "maxItems", this->absolute_keyword_location()));
+            }
+        }
+    };
+
     template <class Json>
     class array_keyword : public keyword_validator<Json>
     {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
-        jsoncons::optional<std::size_t> max_items_;
-        jsoncons::optional<std::size_t> min_items_;
+        jsoncons::optional<max_items_keyword<Json>> max_items_keyword_;
+        jsoncons::optional<min_items_keyword<Json>> min_items_keyword_;
         bool unique_items_ = false;
         schema_pointer items_schema_;
         std::vector<schema_pointer> items_;
@@ -885,13 +959,15 @@ namespace jsonschema {
         array_keyword(schema_builder<Json>* builder, 
                    const Json& sch, 
                    const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+              max_items_keyword_(), min_items_keyword_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
         {
             {
                 auto it = sch.find("maxItems");
                 if (it != sch.object_range().end()) 
                 {
-                    max_items_ = it->value().template as<std::size_t>();
+                    max_items_keyword_ = max_items_keyword<Json>(make_absolute_keyword_location(uris, "maxItems"), 
+                                                           it->value().template as<std::size_t>());
                 }
             }
 
@@ -899,7 +975,8 @@ namespace jsonschema {
                 auto it = sch.find("minItems");
                 if (it != sch.object_range().end()) 
                 {
-                    min_items_ = it->value().template as<std::size_t>();
+                    min_items_keyword_ = min_items_keyword<Json>(make_absolute_keyword_location(uris, "minItems"), 
+                                                           it->value().template as<std::size_t>());
                 }
             }
 
@@ -953,18 +1030,14 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json& patch) const override
         {
-            if (max_items_ && instance.size() > *max_items_)
+            if (max_items_keyword_)
             {
-                std::string message("Expected maximum item count: " + std::to_string(*max_items_));
-                message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "maxItems", this->absolute_keyword_location()));
+                max_items_keyword_->validate(instance_location, instance, reporter, patch);
             }
 
-            if (min_items_ && instance.size() < *min_items_)
+            if (min_items_keyword_)
             {
-                std::string message("Expected at least " + std::to_string(*min_items_));
-                message.append(" items but found " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "minItems", this->absolute_keyword_location()));
+                min_items_keyword_->validate(instance_location, instance, reporter, patch);
             }
 
             if (unique_items_) 

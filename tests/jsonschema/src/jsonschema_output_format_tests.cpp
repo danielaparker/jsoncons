@@ -36,7 +36,8 @@ TEST_CASE("jsonschema output format tests")
   },
   "type": "array",
   "items": { "$ref": "#/$defs/point" },
-  "minItems": 3
+  "minItems": 3,
+  "maxItems": 1
 }
 
         )");
@@ -59,12 +60,30 @@ TEST_CASE("jsonschema output format tests")
 
         auto reporter = [](const jsonschema::validation_output& o)
         {
-            std::cout << o.instance_location() << ": " << o.message() << ", " << o.absolute_keyword_location() << "\n";
-            for (const auto& nested : o.nested_errors())
+            if (o.keyword() == "minItems")
             {
-                std::cout << "    " << nested.message() << "\n";
+                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/minItems"));
             }
-
+            else if (o.keyword() == "maxItems")
+            {
+                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/maxItems"));
+            }
+            else if (o.keyword() == "required")
+            {
+                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/$defs/point/required"));
+            }
+            else if (o.keyword() == "additionalProperties")
+            {
+                CHECK(o.absolute_keyword_location() == std::string("https://example.com/polygon#/$defs/point/additionalProperties"));
+            }
+            else
+            {
+                std::cout << o.keyword() << ", " << o.instance_location() << ": " << o.message() << ", " << o.absolute_keyword_location() << "\n";
+                for (const auto& nested : o.nested_errors())
+                {
+                    std::cout << "    " << nested.message() << "\n";
+                }
+            }
         };
         validator.validate(instance, reporter);
 
