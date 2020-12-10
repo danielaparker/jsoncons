@@ -120,6 +120,20 @@ namespace jsonschema {
         }
     }
 
+    inline
+    std::string make_absolute_keyword_location(const std::vector<uri_wrapper>& uris,
+                                               const std::string& keyword)
+    {
+        for (auto it = uris.rbegin(); it != uris.rend(); ++it)
+        {
+            if (!it->has_identifier() && it->is_absolute())
+            {
+                return it->append(keyword).string();
+            }
+        }
+        return "";
+    }
+
     template <class Json>
     class string_keyword : public keyword_validator<Json>
     {
@@ -636,15 +650,14 @@ namespace jsonschema {
     {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
-        std::vector<std::string> required_;
+        std::vector<std::string> items_;
 
     public:
         required_keyword(const std::vector<uri_wrapper>& uris,
-                      const std::vector<std::string>& items)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), required_(items) {}
-        required_keyword(const uri_wrapper& uri,
-                      const std::vector<std::string>& items)
-            : keyword_validator<Json>(uri.is_absolute() ? uri.string() : ""), required_(items) {}
+                         const std::vector<std::string>& items)
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), items_(items) {}
+        required_keyword(const std::string& absolute_keyword_location, const std::vector<std::string>& items)
+            : keyword_validator<Json>(absolute_keyword_location), items_(items) {}
 
         required_keyword(const required_keyword&) = delete;
         required_keyword(required_keyword&&) = default;
@@ -654,7 +667,7 @@ namespace jsonschema {
 
         void do_validate(const uri_wrapper& instance_location, const Json& instance, error_reporter& reporter, Json&) const override final
         {
-            for (const auto& key : required_)
+            for (const auto& key : items_)
             {
                 if (instance.find(key) == instance.object_range().end())
                 {
@@ -706,8 +719,9 @@ namespace jsonschema {
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                required_ = required_keyword<Json>(uris.back().append("required"), 
-                                                it->value().template as<std::vector<std::string>>());
+                auto location = make_absolute_keyword_location(uris, "required");
+                required_ = required_keyword<Json>(location, 
+                                                   it->value().template as<std::vector<std::string>>());
             }
 
             it = sch.find("properties");
@@ -747,10 +761,10 @@ namespace jsonschema {
                     {
                         case json_type::array_value:
                         {
-                            auto new_uris = update_uris(dep.value(), uris, {"required"});
+                            auto location = make_absolute_keyword_location(uris, "required");
                             dependencies_.emplace(dep.key(),
-                                                  builder->make_required_keyword(new_uris,
-                                                                              dep.value().template as<std::vector<std::string>>()));
+                                                  builder->make_required_keyword({location},
+                                                                                 dep.value().template as<std::vector<std::string>>()));
                             break;
                         }
                         default:
