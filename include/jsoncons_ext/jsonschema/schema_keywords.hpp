@@ -560,17 +560,19 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const override
         {
-            T value = instance.template as<T>(); // conversion of Json to value_type
+            T value = instance.template as<T>(); 
             if (Json(value) != instance)
             {
                 reporter.error(validation_output(instance_location.string(), "Instance is not a number", "number", this->absolute_keyword_location()));
             }
 
-            if (multiple_of_ && value != 0) // zero is multiple of everything
-                if (violates_multiple_of(value))
+            if (multiple_of_ && value != 0) // exclude zero
+            {
+                if (!is_multiple_of(value, *multiple_of_))
                 {
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf", absolute_multiple_of_location_));
                 }
+            }
 
             if (maximum_)
             {
@@ -597,12 +599,11 @@ namespace jsonschema {
             }
         }
 
-        // multipleOf - if the remainder of the division is 0 -> OK
-        bool violates_multiple_of(T x) const
+        static bool is_multiple_of(T x, double multiple_of) 
         {
-            double res = std::remainder(x, *multiple_of_);
+            double res = std::remainder(x, multiple_of);
             double eps = std::nextafter(x, 0) - x;
-            return std::fabs(res) > std::fabs(eps);
+            return std::fabs(res) < std::fabs(eps);
         }
     };
 
@@ -1015,7 +1016,7 @@ namespace jsonschema {
 
             if (unique_items_) 
             {
-                if (!array_is_unique(instance))
+                if (!array_has_unique_items(instance))
                 {
                     reporter.error(validation_output(instance_location.string(), "Array items are not unique", "uniqueItems", this->absolute_keyword_location()));
                 }
@@ -1070,7 +1071,7 @@ namespace jsonschema {
             }
         }
 
-        static bool array_is_unique(const Json& a) 
+        static bool array_has_unique_items(const Json& a) 
         {
             for (auto it = a.array_range().begin(); it != a.array_range().end(); ++it) 
             {
