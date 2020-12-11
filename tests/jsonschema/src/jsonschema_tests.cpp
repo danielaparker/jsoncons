@@ -21,7 +21,7 @@ namespace {
     {
         if (uri.path() == "/draft-07/schema") 
         {
-            return jsoncons::jsonschema::json_schema_draft7::get_schema();
+            return jsoncons::jsonschema::json_schema_draft7<json>::get_schema();
         }
         else
         {

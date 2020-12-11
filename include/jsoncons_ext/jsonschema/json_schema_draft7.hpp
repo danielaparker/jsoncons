@@ -12,11 +12,12 @@
 namespace jsoncons {
 namespace jsonschema {
     
+    template <class Json>
     struct json_schema_draft7
     {
-        static json get_schema() 
+        static Json get_schema() 
         {
-            static json schema = json::parse(R"(
+            static Json schema = Json::parse(R"(
     {
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$id": "http://json-schema.org/draft-07/schema#",

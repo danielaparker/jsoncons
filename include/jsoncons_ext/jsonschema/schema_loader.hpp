@@ -108,16 +108,19 @@ namespace jsonschema {
         }
     };
 
-    inline
-    json default_uri_resolver(const jsoncons::uri& uri)
+    template <class Json>
+    struct default_uri_resolver
     {
-        if (uri.path() == "/draft-07/schema") 
+        Json operator()(const jsoncons::uri& uri)
         {
-            return jsoncons::jsonschema::json_schema_draft7::get_schema();
-        }
+            if (uri.path() == "/draft-07/schema") 
+            {
+                return jsoncons::jsonschema::json_schema_draft7<Json>::get_schema();
+            }
 
-        JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + std::string(uri.base())));
-    }
+            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + std::string(uri.base())));
+        }
+    };
 
     template <class Json>
     class schema_loader : public schema_builder<Json>
@@ -505,7 +508,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        schema_loader<Json> loader(default_uri_resolver);
+        schema_loader<Json> loader{default_uri_resolver<Json>()};
         loader.load(schema);
 
         return loader.get_schema();

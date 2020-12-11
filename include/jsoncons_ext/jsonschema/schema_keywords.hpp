@@ -894,7 +894,7 @@ namespace jsonschema {
         void do_validate(const uri_wrapper& instance_location, 
                          const Json& instance, 
                          error_reporter& reporter, 
-                         Json& patch) const final
+                         Json&) const final
         {
             if (instance.size() < min_items_)
             {
@@ -931,7 +931,7 @@ namespace jsonschema {
         void do_validate(const uri_wrapper& instance_location, 
                          const Json& instance, 
                          error_reporter& reporter, 
-                         Json& patch) const final
+                         Json&) const final
         {
             if (instance.size() > max_items_)
             {
