@@ -496,15 +496,16 @@ namespace jsonschema {
 
         jsoncons::optional<T> maximum_;
         jsoncons::optional<T> minimum_;
-        bool exclusive_maximum_;
-        bool exclusive_minimum_;
+        jsoncons::optional<T> exclusive_maximum_;
+        jsoncons::optional<T> exclusive_minimum_;
         jsoncons::optional<double> multiple_of_;
 
     public:
         number_keyword(const Json& sch, 
                     const std::vector<uri_wrapper>& uris, 
                     std::set<std::string>& keywords)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), maximum_(), minimum_(),exclusive_maximum_(false), exclusive_minimum_(false), multiple_of_()
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+              maximum_(), minimum_(),exclusive_maximum_(), exclusive_minimum_(), multiple_of_()
         {
             auto it = sch.find("maximum");
             if (it != sch.object_range().end()) 
@@ -523,16 +524,14 @@ namespace jsonschema {
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
-                exclusive_maximum_ = true;
-                maximum_ = it->value().template as<T>();
+                exclusive_maximum_ = it->value().template as<T>();
                 keywords.insert("exclusiveMaximum");
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
-                minimum_ = it->value().template as<T>();
-                exclusive_minimum_ = true;
+                exclusive_minimum_ = it->value().template as<T>();
                 keywords.insert("exclusiveMinimum");
             }
 
@@ -564,14 +563,28 @@ namespace jsonschema {
                 }
 
             if (maximum_)
-                if ((exclusive_maximum_ && value >= *maximum_) ||
-                    value > *maximum_)
+            {
+                if (value > *maximum_)
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum", this->absolute_keyword_location()));
+            }
 
             if (minimum_)
-                if ((exclusive_minimum_ && value <= *minimum_) ||
-                    value < *minimum_)
+            {
+                if (value < *minimum_)
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum", this->absolute_keyword_location()));
+            }
+
+            if (exclusive_maximum_)
+            {
+                if (value >= *exclusive_maximum_)
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*exclusive_maximum_), "exclusiveMaximum", this->absolute_keyword_location()));
+            }
+
+            if (exclusive_minimum_)
+            {
+                if (value <= *exclusive_minimum_)
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*exclusive_minimum_), "exclusiveMinimum", this->absolute_keyword_location()));
+            }
         }
 
         // multipleOf - if the remainder of the division is 0 -> OK
