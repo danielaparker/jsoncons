@@ -601,9 +601,9 @@ namespace jsonschema {
 
         static bool is_multiple_of(T x, double multiple_of) 
         {
-            double res = std::remainder(x, multiple_of);
+            double rem = std::remainder(x, multiple_of);
             double eps = std::nextafter(x, 0) - x;
-            return std::fabs(res) < std::fabs(eps);
+            return std::fabs(rem) < std::fabs(eps);
         }
     };
 
