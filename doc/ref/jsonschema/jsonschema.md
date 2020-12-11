@@ -300,7 +300,7 @@ int main()
 
        jsonschema::json_validator<json> validator(sch); 
 
-       // will throw a std::invalid_argument exception on first encountered schema violation 
+       // will throw a validation_error on first encountered schema violation 
        json patch = validator.validate(data); 
 
        std::cout << "Patch: " << patch << "\n";
