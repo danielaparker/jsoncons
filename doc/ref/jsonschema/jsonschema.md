@@ -4,9 +4,9 @@ The jsonschema extension implements the JSON Schema [Draft 7](https://json-schem
 
 ### Compliance level
 
-The jsonschema extension supports JSON Schema draft 7.
+The jsoncons implementation passes all [draft 7 required tests](https://github.com/json-schema-org/JSON-Schema-Test-Suite/tree/master/tests/draft7).
 
-The validator understands the following [format types](https://json-schema.org/understanding-json-schema/reference/string.html#format):
+In addition, the validator understands the following optional [format types](https://json-schema.org/understanding-json-schema/reference/string.html#format):
 
 |                      | Draft 7            |
 |----------------------|--------------------|
