@@ -986,10 +986,10 @@ namespace jsonschema {
 
             if (unique_items_) 
             {
-                for (auto it = instance.object_range().cbegin(); it != instance.object_range().cend(); ++it) 
+                for (auto it = instance.array_range().cbegin(); it != instance.array_range().cend(); ++it) 
                 {
-                    auto v = std::find(it + 1, instance.object_range().end(), *it);
-                    if (v != instance.object_range().end())
+                    auto v = std::find(it + 1, instance.array_range().end(), *it);
+                    if (v != instance.array_range().end())
                         reporter.error(validation_output(instance_location.string(), "Array items are not unique", "uniqueItems", this->absolute_keyword_location()));
                 }
             }

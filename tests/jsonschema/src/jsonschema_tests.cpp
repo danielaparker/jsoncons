@@ -124,7 +124,7 @@ TEST_CASE("jsonschema-tests")
 
         jsonschema_tests("./jsonschema/input/compliance/draft7/type.json");
 
-        //jsonschema_tests("./jsonschema/input/compliance/draft7/uniqueItems.json"); 
+        jsonschema_tests("./jsonschema/input/compliance/draft7/uniqueItems.json"); 
 
         // format tests
         jsonschema_tests("./jsonschema/input/compliance/draft7/optional/format/date.json");
