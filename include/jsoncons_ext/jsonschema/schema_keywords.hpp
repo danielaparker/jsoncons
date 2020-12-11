@@ -147,12 +147,15 @@ namespace jsonschema {
     #if defined(JSONCONS_HAS_STD_REGEX)
         jsoncons::optional<std::regex> pattern_;
         std::string pattern_string_;
+        std::string absolute_pattern_location_;
     #endif
 
         format_checker format_check_;
 
         jsoncons::optional<std::string> content_encoding_;
+        std::string absolute_content_encoding_location_;
         jsoncons::optional<std::string> content_media_type_;
+        std::string absolute_content_media_type_location_;
 
     public:
         string_keyword(const Json& sch, const std::vector<uri_wrapper>& uris)
@@ -180,6 +183,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 content_encoding_ = it->value().template as<std::string>();
+                absolute_content_encoding_location_ = make_absolute_keyword_location(uris, "contentEncoding");
                 // If "contentEncoding" is set to "binary", a Json value
                 // of type json_type::byte_string_value is accepted.
             }
@@ -188,6 +192,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 content_media_type_ = it->value().template as<std::string>();
+                absolute_content_media_type_location_ = make_absolute_keyword_location(uris, "contentMediaType");
             }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -196,6 +201,7 @@ namespace jsonschema {
             {
                 pattern_string_ = it->value().template as<std::string>();
                 pattern_ = std::regex(it->value().template as<std::string>(),std::regex::ECMAScript);
+                absolute_pattern_location_ = make_absolute_keyword_location(uris, "pattern");
             }
     #endif
 
@@ -258,12 +264,12 @@ namespace jsonschema {
                     auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
                     if (retval.ec != jsoncons::convert_errc::success)
                     {
-                        reporter.error(validation_output(instance_location.string(), "Content is not a base64 string", "contentEncoding", this->absolute_keyword_location()));
+                        reporter.error(validation_output(instance_location.string(), "Content is not a base64 string", "contentEncoding", absolute_content_encoding_location_));
                     }
                 }
                 else if (!content_encoding_->empty())
                 {
-                    reporter.error(validation_output(instance_location.string(), "unable to check for contentEncoding '" + *content_encoding_ + "'", "contentEncoding", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), "unable to check for contentEncoding '" + *content_encoding_ + "'", "contentEncoding", absolute_content_encoding_location_));
                 }
             }
             else
@@ -277,7 +283,7 @@ namespace jsonschema {
             } 
             else if (instance.type() == json_type::byte_string_value) 
             {
-                reporter.error(validation_output(instance_location.string(), "Expected string, but is byte string", "contentMediaType", this->absolute_keyword_location()));
+                reporter.error(validation_output(instance_location.string(), "Expected string, but is byte string", "contentMediaType", absolute_content_media_type_location_));
             }
 
             if (instance.type() != json_type::string_value) 
@@ -315,7 +321,7 @@ namespace jsonschema {
                     message.append("\" does not match pattern \"");
                     message.append(pattern_string_);
                     message.append("\"");
-                    reporter.error(validation_output(instance_location.string(), message, "pattern", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), message, "pattern", absolute_pattern_location_));
                 }
             }
 
