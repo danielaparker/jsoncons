@@ -717,7 +717,9 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_properties_;
+        std::string absolute_max_properties_location_;
         jsoncons::optional<std::size_t> min_properties_;
+        std::string absolute_min_properties_location_;
         jsoncons::optional<required_keyword<Json>> required_;
 
         std::map<std::string, schema_pointer> properties_;
@@ -734,7 +736,8 @@ namespace jsonschema {
         object_keyword(schema_builder<Json>* builder,
                     const Json& sch,
                     const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), max_properties_(), min_properties_(), 
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+              max_properties_(), min_properties_(), 
               additional_properties_(nullptr),
               property_names_(nullptr)
         {
@@ -742,12 +745,14 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 max_properties_ = it->value().template as<std::size_t>();
+                absolute_max_properties_location_ = make_absolute_keyword_location(uris, "maxProperties");
             }
 
             it = sch.find("minProperties");
             if (it != sch.object_range().end()) 
             {
                 min_properties_ = it->value().template as<std::size_t>();
+                absolute_min_properties_location_ = make_absolute_keyword_location(uris, "minProperties");
             }
 
             it = sch.find("required");
@@ -828,14 +833,14 @@ namespace jsonschema {
             {
                 std::string message("Maximum properties: " + std::to_string(*max_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "maxProperties", this->absolute_keyword_location()));
+                reporter.error(validation_output(instance_location.string(), message, "maxProperties", absolute_max_properties_location_));
             }
 
             if (min_properties_ && instance.size() < *min_properties_)
             {
                 std::string message("Minimum properties: " + std::to_string(*min_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "minProperties", this->absolute_keyword_location()));
+                reporter.error(validation_output(instance_location.string(), message, "minProperties", absolute_min_properties_location_));
             }
 
             if (required_)
