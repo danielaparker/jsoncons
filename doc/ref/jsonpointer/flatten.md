@@ -16,7 +16,7 @@ Json unflatten(const Json& value, unflatten_options options = unflatten_options:
 
 - (until 0.160.0) The values are primitive (string, number, boolean, or null). Empty objects or arrays become null.   
 
-- (since 0.160.0) The values are string, number, boolean, null, empty object (`{}`) or empty array (`[]`). 
+- (since 0.160.0) The values can be string, number, boolean, null, empty object (`{}`) or empty array (`[]`). 
 
 (2) unflattens a json object of JSON Pointer-value pairs. There is no unique solution,
 an integer appearing in a path could be an array index or it could be an object key.
