@@ -188,7 +188,7 @@ namespace {
 
             jsonschema::json_validator<json> validator(sch); 
 
-            // will throw a std::invalid_argument exception when a schema violation happens 
+            // will throw a validation_error when a schema violation happens 
             json patch = validator.validate(data); 
 
             std::cout << "Patch: " << patch << "\n";

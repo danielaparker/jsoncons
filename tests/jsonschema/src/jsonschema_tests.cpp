@@ -21,7 +21,7 @@ namespace {
     {
         if (uri.path() == "/draft-07/schema") 
         {
-            return jsoncons::jsonschema::json_schema_draft7::get_schema();
+            return jsoncons::jsonschema::json_schema_draft7<json>::get_schema();
         }
         else
         {
@@ -124,7 +124,7 @@ TEST_CASE("jsonschema-tests")
 
         jsonschema_tests("./jsonschema/input/compliance/draft7/type.json");
 
-        //jsonschema_tests("./jsonschema/input/compliance/draft7/uniqueItems.json"); 
+        jsonschema_tests("./jsonschema/input/compliance/draft7/uniqueItems.json"); 
 
         // format tests
         jsonschema_tests("./jsonschema/input/compliance/draft7/optional/format/date.json");

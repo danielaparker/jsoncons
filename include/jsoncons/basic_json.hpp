@@ -4090,7 +4090,7 @@ public:
             case storage_kind::uint64_value:
                 return as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<IntegerType>::max)());
             case storage_kind::json_const_pointer:
-                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+                return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:
                 return false;
         }
@@ -4113,7 +4113,7 @@ public:
             case storage_kind::uint64_value:
                 return as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<IntegerType>::max)());
             case storage_kind::json_const_pointer:
-                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+                return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:
                 return false;
         }
@@ -4130,7 +4130,7 @@ public:
             case storage_kind::uint64_value:
                 return as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)();
             case storage_kind::json_const_pointer:
-                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+                return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:
                 return false;
         }
@@ -4153,7 +4153,7 @@ public:
             case storage_kind::uint64_value:
                 return as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)();
             case storage_kind::json_const_pointer:
-                return cast<json_const_pointer_storage>().value()->template as_integer<IntegerType>();
+                return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:
                 return false;
         }

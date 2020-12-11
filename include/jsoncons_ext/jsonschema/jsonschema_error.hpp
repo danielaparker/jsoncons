@@ -27,6 +27,20 @@ namespace jsonschema {
         }  
     };
 
+    class validation_error : public std::runtime_error, public virtual json_exception
+    {
+    public:
+        validation_error(const std::string& message)
+            : std::runtime_error(message)
+        {
+        }
+
+        const char* what() const noexcept override
+        {
+            return std::runtime_error::what();
+        }  
+    };
+
     class validation_output 
     {
         std::string instance_location_;

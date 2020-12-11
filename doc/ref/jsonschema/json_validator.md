@@ -48,7 +48,7 @@ schema.
 
 #### Exceptions
 
-(1) Throws a [std::invalid_argument](https://en.cppreference.com/w/cpp/error/invalid_argument) for the first schema violation.
+(1) Throws a [validation_error](validation_error.md) for the first schema violation.
 
 (2) `reporter` is called for each schema violation
 

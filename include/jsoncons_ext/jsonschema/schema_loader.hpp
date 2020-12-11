@@ -108,16 +108,19 @@ namespace jsonschema {
         }
     };
 
-    inline
-    json default_uri_resolver(const jsoncons::uri& uri)
+    template <class Json>
+    struct default_uri_resolver
     {
-        if (uri.path() == "/draft-07/schema") 
+        Json operator()(const jsoncons::uri& uri)
         {
-            return jsoncons::jsonschema::json_schema_draft7::get_schema();
-        }
+            if (uri.path() == "/draft-07/schema") 
+            {
+                return jsoncons::jsonschema::json_schema_draft7<Json>::get_schema();
+            }
 
-        JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + std::string(uri.base())));
-    }
+            JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + std::string(uri.base())));
+        }
+    };
 
     template <class Json>
     class schema_loader : public schema_builder<Json>
@@ -291,10 +294,10 @@ namespace jsonschema {
         }
 
         schema_pointer build(const Json& schema,
-                             const std::vector<std::string>& keys,
-                             const std::vector<uri_wrapper>& uris) override
+                             const std::vector<uri_wrapper>& uris,
+                             const std::vector<std::string>& keys) override
         {
-            std::vector<uri_wrapper> new_uris = update_uris(keys, uris);
+            std::vector<uri_wrapper> new_uris = update_uris(schema, uris, keys);
 
             schema_pointer sch = nullptr;
 
@@ -312,24 +315,11 @@ namespace jsonschema {
                     break;
                 case json_type::object_value:
                 {
-                    auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
-                    if (it != schema.object_range().end()) 
-                    {
-                        std::string id = it->value().template as<std::string>(); 
-                        // Add it to the list if it is not there already
-                        if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
-                        {
-                            uri_wrapper relative(id); 
-                            uri_wrapper new_uri = relative.resolve(new_uris.back());
-                            new_uris.push_back(new_uri.string()); 
-                        }
-                    }
-
-                    it = schema.find("definitions");
+                    auto it = schema.find("definitions");
                     if (it != schema.object_range().end()) 
                     {
                         for (const auto& def : it->value().object_range())
-                            build(def.value(), {"definitions", def.key()}, new_uris);
+                            build(def.value(), new_uris, {"definitions", def.key()});
                     }
 
                     it = schema.find("$ref");
@@ -366,7 +356,7 @@ namespace jsonschema {
         void load(const Json& sch)
         {
             subschema_registries_.clear();
-            root_ = build(sch, {}, {{"#"}});
+            root_ = build(sch, {{"#"}}, {});
 
             // load all external schemas that have not already been loaded
 
@@ -386,7 +376,7 @@ namespace jsonschema {
                         if (resolver_) 
                         {
                             Json external_schema = resolver_(loc);
-                            build(external_schema, {}, {{loc}});
+                            build(external_schema, {{loc}}, {});
                             ++loaded_count;
                         } 
                         else 
@@ -447,7 +437,7 @@ namespace jsonschema {
                 // is there a reference looking for this unknown-keyword, which is thus no longer a unknown keyword but a schema
                 auto unresolved = file.unresolved.find(fragment);
                 if (unresolved != file.unresolved.end())
-                    build(value, {}, {{new_uri}});
+                    build(value, {{new_uri}}, {});
                 else // no, nothing ref'd it, keep for later
                     file.unprocessed_keywords[fragment] = value;
 
@@ -480,7 +470,7 @@ namespace jsonschema {
                 if (unprocessed_keywords_it != file.unprocessed_keywords.end()) 
                 {
                     auto &subsch = unprocessed_keywords_it->second; 
-                    auto s = build(subsch, {}, {{uri}});       //  A JSON Schema MUST be an object or a boolean.
+                    auto s = build(subsch, {{uri}}, {});       //  A JSON Schema MUST be an object or a boolean.
                     file.unprocessed_keywords.erase(unprocessed_keywords_it);
                     return s;
                 }
@@ -518,7 +508,7 @@ namespace jsonschema {
     template <class Json>
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
-        schema_loader<Json> loader(default_uri_resolver);
+        schema_loader<Json> loader{default_uri_resolver<Json>()};
         loader.load(schema);
 
         return loader.get_schema();

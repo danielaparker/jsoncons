@@ -278,9 +278,10 @@ namespace jsonschema {
                                  Json& patch) const = 0;
     };
 
-    inline
-    std::vector<uri_wrapper> update_uris(const std::vector<std::string>& keys,
-                                         const std::vector<uri_wrapper>& uris)
+    template <class Json>
+    std::vector<uri_wrapper> update_uris(const Json& schema,
+                                         const std::vector<uri_wrapper>& uris,
+                                         const std::vector<std::string>& keys)
     {
         // Exclude uri's that are not plain name identifiers
         std::vector<uri_wrapper> new_uris;
@@ -299,6 +300,22 @@ namespace jsonschema {
                 uri = uri_wrapper(new_u);
             }
         }
+        if (schema.type() == json_type::object_value)
+        {
+            auto it = schema.find("$id"); // If $id is found, this schema can be referenced by the id
+            if (it != schema.object_range().end()) 
+            {
+                std::string id = it->value().template as<std::string>(); 
+                // Add it to the list if it is not there already
+                if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
+                {
+                    uri_wrapper relative(id); 
+                    uri_wrapper new_uri = relative.resolve(new_uris.back());
+                    new_uris.push_back(new_uri.string()); 
+                }
+            }
+        }
+
         return new_uris;
     }
 

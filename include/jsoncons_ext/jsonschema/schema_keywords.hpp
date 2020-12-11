@@ -32,10 +32,10 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         virtual schema_pointer build(const Json& schema,
-                                     const std::vector<std::string>& keys,
-                                     const std::vector<uri_wrapper>& uris) = 0;
+                                     const std::vector<uri_wrapper>& uris,
+                                     const std::vector<std::string>& keys) = 0;
         virtual schema_pointer make_required_keyword(const std::vector<uri_wrapper>& uris,
-                                                  const std::vector<std::string>& items) = 0;
+                                                     const std::vector<std::string>& items) = 0;
 
         virtual schema_pointer make_null_keyword(const std::vector<uri_wrapper>& uris) = 0;
 
@@ -120,23 +120,42 @@ namespace jsonschema {
         }
     }
 
+    inline
+    std::string make_absolute_keyword_location(const std::vector<uri_wrapper>& uris,
+                                               const std::string& keyword)
+    {
+        for (auto it = uris.rbegin(); it != uris.rend(); ++it)
+        {
+            if (!it->has_identifier() && it->is_absolute())
+            {
+                return it->append(keyword).string();
+            }
+        }
+        return "";
+    }
+
     template <class Json>
     class string_keyword : public keyword_validator<Json>
     {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_length_;
+        std::string absolute_max_length_location_;
         jsoncons::optional<std::size_t> min_length_;
+        std::string absolute_min_length_location_;
 
     #if defined(JSONCONS_HAS_STD_REGEX)
         jsoncons::optional<std::regex> pattern_;
         std::string pattern_string_;
+        std::string absolute_pattern_location_;
     #endif
 
         format_checker format_check_;
 
         jsoncons::optional<std::string> content_encoding_;
+        std::string absolute_content_encoding_location_;
         jsoncons::optional<std::string> content_media_type_;
+        std::string absolute_content_media_type_location_;
 
     public:
         string_keyword(const Json& sch, const std::vector<uri_wrapper>& uris)
@@ -150,18 +169,21 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 max_length_ = it->value().template as<std::size_t>();
+                absolute_max_length_location_ = make_absolute_keyword_location(uris, "maxLength");
             }
 
             it = sch.find("minLength");
             if (it != sch.object_range().end()) 
             {
                 min_length_ = it->value().template as<std::size_t>();
+                absolute_min_length_location_ = make_absolute_keyword_location(uris, "minLength");
             }
 
             it = sch.find("contentEncoding");
             if (it != sch.object_range().end()) 
             {
                 content_encoding_ = it->value().template as<std::string>();
+                absolute_content_encoding_location_ = make_absolute_keyword_location(uris, "contentEncoding");
                 // If "contentEncoding" is set to "binary", a Json value
                 // of type json_type::byte_string_value is accepted.
             }
@@ -170,6 +192,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 content_media_type_ = it->value().template as<std::string>();
+                absolute_content_media_type_location_ = make_absolute_keyword_location(uris, "contentMediaType");
             }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -178,6 +201,7 @@ namespace jsonschema {
             {
                 pattern_string_ = it->value().template as<std::string>();
                 pattern_ = std::regex(it->value().template as<std::string>(),std::regex::ECMAScript);
+                absolute_pattern_location_ = make_absolute_keyword_location(uris, "pattern");
             }
     #endif
 
@@ -240,12 +264,12 @@ namespace jsonschema {
                     auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
                     if (retval.ec != jsoncons::convert_errc::success)
                     {
-                        reporter.error(validation_output(instance_location.string(), "Content is not a base64 string", "contentEncoding", this->absolute_keyword_location()));
+                        reporter.error(validation_output(instance_location.string(), "Content is not a base64 string", "contentEncoding", absolute_content_encoding_location_));
                     }
                 }
                 else if (!content_encoding_->empty())
                 {
-                    reporter.error(validation_output(instance_location.string(), "unable to check for contentEncoding '" + *content_encoding_ + "'", "contentEncoding", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), "unable to check for contentEncoding '" + *content_encoding_ + "'", "contentEncoding", absolute_content_encoding_location_));
                 }
             }
             else
@@ -259,7 +283,7 @@ namespace jsonschema {
             } 
             else if (instance.type() == json_type::byte_string_value) 
             {
-                reporter.error(validation_output(instance_location.string(), "Expected string, but is byte string", "contentMediaType", this->absolute_keyword_location()));
+                reporter.error(validation_output(instance_location.string(), "Expected string, but is byte string", "contentMediaType", absolute_content_media_type_location_));
             }
 
             if (instance.type() != json_type::string_value) 
@@ -273,7 +297,7 @@ namespace jsonschema {
                 if (length < *min_length_) 
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected minLength: ") + std::to_string(*min_length_)
-                                              + ", actual: " + std::to_string(length), "minLength", this->absolute_keyword_location()));
+                                              + ", actual: " + std::to_string(length), "minLength", absolute_min_length_location_));
                 }
             }
 
@@ -283,7 +307,7 @@ namespace jsonschema {
                 if (length > *max_length_)
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected maxLength: ") + std::to_string(*max_length_)
-                        + ", actual: " + std::to_string(length), "maxLength", this->absolute_keyword_location()));
+                        + ", actual: " + std::to_string(length), "maxLength", absolute_max_length_location_));
                 }
             }
 
@@ -297,7 +321,7 @@ namespace jsonschema {
                     message.append("\" does not match pattern \"");
                     message.append(pattern_string_);
                     message.append("\"");
-                    reporter.error(validation_output(instance_location.string(), message, "pattern", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), message, "pattern", absolute_pattern_location_));
                 }
             }
 
@@ -325,7 +349,7 @@ namespace jsonschema {
                  const std::vector<uri_wrapper>& uris)
             : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
-            rule_ = builder->build(sch, {"not"}, uris);
+            rule_ = builder->build(sch, uris, {"not"});
         }
 
     private:
@@ -431,7 +455,7 @@ namespace jsonschema {
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
             {
-                subschemas_.push_back(builder->build(subsch, {Criterion::key(), std::to_string(c++)}, uris));
+                subschemas_.push_back(builder->build(subsch, uris, {Criterion::key(), std::to_string(c++)}));
             }
 
             // Validate value of allOf, anyOf, and oneOf "MUST be a non-empty array"
@@ -471,21 +495,28 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         jsoncons::optional<T> maximum_;
+        std::string absolute_maximum_location_;
         jsoncons::optional<T> minimum_;
-        bool exclusive_maximum_;
-        bool exclusive_minimum_;
+        std::string absolute_minimum_location_;
+        jsoncons::optional<T> exclusive_maximum_;
+        std::string absolute_exclusive_maximum_location_;
+        jsoncons::optional<T> exclusive_minimum_;
+        std::string absolute_exclusive_minimum_location_;
         jsoncons::optional<double> multiple_of_;
+        std::string absolute_multiple_of_location_;
 
     public:
         number_keyword(const Json& sch, 
                     const std::vector<uri_wrapper>& uris, 
                     std::set<std::string>& keywords)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), maximum_(), minimum_(),exclusive_maximum_(false), exclusive_minimum_(false), multiple_of_()
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+              maximum_(), minimum_(),exclusive_maximum_(), exclusive_minimum_(), multiple_of_()
         {
             auto it = sch.find("maximum");
             if (it != sch.object_range().end()) 
             {
                 maximum_ = it->value().template as<T>();
+                absolute_maximum_location_ = make_absolute_keyword_location(uris,"maximum");
                 keywords.insert("maximum");
             }
 
@@ -493,22 +524,23 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 minimum_ = it->value().template as<T>();
+                absolute_minimum_location_ = make_absolute_keyword_location(uris,"minimum");
                 keywords.insert("minimum");
             }
 
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
-                exclusive_maximum_ = true;
-                maximum_ = it->value().template as<T>();
+                exclusive_maximum_ = it->value().template as<T>();
+                absolute_exclusive_maximum_location_ = make_absolute_keyword_location(uris,"exclusiveMaximum");
                 keywords.insert("exclusiveMaximum");
             }
 
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
-                minimum_ = it->value().template as<T>();
-                exclusive_minimum_ = true;
+                exclusive_minimum_ = it->value().template as<T>();
+                absolute_exclusive_minimum_location_ = make_absolute_keyword_location(uris,"exclusiveMinimum");
                 keywords.insert("exclusiveMinimum");
             }
 
@@ -516,6 +548,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 multiple_of_ = it->value().template as<double>();
+                absolute_multiple_of_location_ = make_absolute_keyword_location(uris,"multipleOf");
                 keywords.insert("multipleOf");
             }
         }
@@ -527,35 +560,50 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const override
         {
-            T value = instance.template as<T>(); // conversion of Json to value_type
+            T value = instance.template as<T>(); 
             if (Json(value) != instance)
             {
                 reporter.error(validation_output(instance_location.string(), "Instance is not a number", "number", this->absolute_keyword_location()));
             }
 
-            if (multiple_of_ && value != 0) // zero is multiple of everything
-                if (violates_multiple_of(value))
+            if (multiple_of_ && value != 0) // exclude zero
+            {
+                if (!is_multiple_of(value, *multiple_of_))
                 {
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf", absolute_multiple_of_location_));
                 }
+            }
 
             if (maximum_)
-                if ((exclusive_maximum_ && value >= *maximum_) ||
-                    value > *maximum_)
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum", this->absolute_keyword_location()));
+            {
+                if (value > *maximum_)
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum", absolute_maximum_location_));
+            }
 
             if (minimum_)
-                if ((exclusive_minimum_ && value <= *minimum_) ||
-                    value < *minimum_)
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum", this->absolute_keyword_location()));
+            {
+                if (value < *minimum_)
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum", absolute_minimum_location_));
+            }
+
+            if (exclusive_maximum_)
+            {
+                if (value >= *exclusive_maximum_)
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*exclusive_maximum_), "exclusiveMaximum", absolute_exclusive_maximum_location_));
+            }
+
+            if (exclusive_minimum_)
+            {
+                if (value <= *exclusive_minimum_)
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*exclusive_minimum_), "exclusiveMinimum", absolute_exclusive_minimum_location_));
+            }
         }
 
-        // multipleOf - if the remainder of the division is 0 -> OK
-        bool violates_multiple_of(T x) const
+        static bool is_multiple_of(T x, double multiple_of) 
         {
-            double res = std::remainder(x, *multiple_of_);
+            double rem = std::remainder(x, multiple_of);
             double eps = std::nextafter(x, 0) - x;
-            return std::fabs(res) > std::fabs(eps);
+            return std::fabs(rem) < std::fabs(eps);
         }
     };
 
@@ -636,15 +684,14 @@ namespace jsonschema {
     {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
-        std::vector<std::string> required_;
+        std::vector<std::string> items_;
 
     public:
         required_keyword(const std::vector<uri_wrapper>& uris,
-                      const std::vector<std::string>& items)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), required_(items) {}
-        required_keyword(const uri_wrapper& uri,
-                      const std::vector<std::string>& items)
-            : keyword_validator<Json>(uri.is_absolute() ? uri.string() : ""), required_(items) {}
+                         const std::vector<std::string>& items)
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), items_(items) {}
+        required_keyword(const std::string& absolute_keyword_location, const std::vector<std::string>& items)
+            : keyword_validator<Json>(absolute_keyword_location), items_(items) {}
 
         required_keyword(const required_keyword&) = delete;
         required_keyword(required_keyword&&) = default;
@@ -654,7 +701,7 @@ namespace jsonschema {
 
         void do_validate(const uri_wrapper& instance_location, const Json& instance, error_reporter& reporter, Json&) const override final
         {
-            for (const auto& key : required_)
+            for (const auto& key : items_)
             {
                 if (instance.find(key) == instance.object_range().end())
                 {
@@ -670,7 +717,9 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_properties_;
+        std::string absolute_max_properties_location_;
         jsoncons::optional<std::size_t> min_properties_;
+        std::string absolute_min_properties_location_;
         jsoncons::optional<required_keyword<Json>> required_;
 
         std::map<std::string, schema_pointer> properties_;
@@ -687,7 +736,8 @@ namespace jsonschema {
         object_keyword(schema_builder<Json>* builder,
                     const Json& sch,
                     const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), max_properties_(), min_properties_(), 
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+              max_properties_(), min_properties_(), 
               additional_properties_(nullptr),
               property_names_(nullptr)
         {
@@ -695,19 +745,22 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 max_properties_ = it->value().template as<std::size_t>();
+                absolute_max_properties_location_ = make_absolute_keyword_location(uris, "maxProperties");
             }
 
             it = sch.find("minProperties");
             if (it != sch.object_range().end()) 
             {
                 min_properties_ = it->value().template as<std::size_t>();
+                absolute_min_properties_location_ = make_absolute_keyword_location(uris, "minProperties");
             }
 
             it = sch.find("required");
             if (it != sch.object_range().end()) 
             {
-                required_ = required_keyword<Json>(uris.back().append("required"), 
-                                                it->value().template as<std::vector<std::string>>());
+                auto location = make_absolute_keyword_location(uris, "required");
+                required_ = required_keyword<Json>(location, 
+                                                   it->value().template as<std::vector<std::string>>());
             }
 
             it = sch.find("properties");
@@ -717,7 +770,7 @@ namespace jsonschema {
                     properties_.emplace(
                         std::make_pair(
                             prop.key(),
-                            builder->build(prop.value(), {"properties", prop.key()}, uris)));
+                            builder->build(prop.value(), uris, {"properties", prop.key()})));
             }
 
     #if defined(JSONCONS_HAS_STD_REGEX)
@@ -728,14 +781,14 @@ namespace jsonschema {
                     pattern_properties_.push_back(
                         std::make_pair(
                             std::regex(prop.key(), std::regex::ECMAScript),
-                            builder->build(prop.value(), {prop.key()}, uris)));
+                            builder->build(prop.value(), uris, {prop.key()})));
             }
     #endif
 
             it = sch.find("additionalProperties");
             if (it != sch.object_range().end()) 
             {
-                additional_properties_ = builder->build(it->value(), {"additionalProperties"}, uris);
+                additional_properties_ = builder->build(it->value(), uris, {"additionalProperties"});
             }
 
             it = sch.find("dependencies");
@@ -747,16 +800,16 @@ namespace jsonschema {
                     {
                         case json_type::array_value:
                         {
-                            auto new_uris = update_uris({"required"},uris);
+                            auto location = make_absolute_keyword_location(uris, "required");
                             dependencies_.emplace(dep.key(),
-                                                  builder->make_required_keyword(new_uris,
-                                                                              dep.value().template as<std::vector<std::string>>()));
+                                                  builder->make_required_keyword({location},
+                                                                                 dep.value().template as<std::vector<std::string>>()));
                             break;
                         }
                         default:
                         {
                             dependencies_.emplace(dep.key(),
-                                                  builder->build(dep.value(), {"dependencies", dep.key()}, uris));
+                                                  builder->build(dep.value(), uris, {"dependencies", dep.key()}));
                             break;
                         }
                     }
@@ -766,7 +819,7 @@ namespace jsonschema {
             auto property_names_it = sch.find("propertyNames");
             if (property_names_it != sch.object_range().end()) 
             {
-                property_names_ = builder->build(property_names_it->value(), {"propertyNames"}, uris);
+                property_names_ = builder->build(property_names_it->value(), uris, {"propertyNames"});
             }
         }
     private:
@@ -780,14 +833,14 @@ namespace jsonschema {
             {
                 std::string message("Maximum properties: " + std::to_string(*max_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "maxProperties", this->absolute_keyword_location()));
+                reporter.error(validation_output(instance_location.string(), message, "maxProperties", absolute_max_properties_location_));
             }
 
             if (min_properties_ && instance.size() < *min_properties_)
             {
                 std::string message("Minimum properties: " + std::to_string(*min_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "minProperties", this->absolute_keyword_location()));
+                reporter.error(validation_output(instance_location.string(), message, "minProperties", absolute_min_properties_location_));
             }
 
             if (required_)
@@ -848,11 +901,13 @@ namespace jsonschema {
             for (const auto& dep : dependencies_) 
             {
                 auto prop = instance.find(dep.first);
-                if (prop != instance.object_range().end())                                    // if dependency-property is present in instance
+                if (prop != instance.object_range().end()) // if dependency-property is present in instance
                     dep.second->validate(instance_location.append(dep.first), instance, reporter, patch); // validate
             }
         }
     };
+
+    // array_keyword
 
     template <class Json>
     class array_keyword : public keyword_validator<Json>
@@ -860,7 +915,9 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_items_;
+        std::string absolute_max_items_location_;
         jsoncons::optional<std::size_t> min_items_;
+        std::string absolute_min_items_location_;
         bool unique_items_ = false;
         schema_pointer items_schema_;
         std::vector<schema_pointer> items_;
@@ -871,13 +928,15 @@ namespace jsonschema {
         array_keyword(schema_builder<Json>* builder, 
                    const Json& sch, 
                    const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
+            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+              max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
         {
             {
                 auto it = sch.find("maxItems");
                 if (it != sch.object_range().end()) 
                 {
                     max_items_ = it->value().template as<std::size_t>();
+                    absolute_max_items_location_ = make_absolute_keyword_location(uris, "maxItems");
                 }
             }
 
@@ -886,6 +945,7 @@ namespace jsonschema {
                 if (it != sch.object_range().end()) 
                 {
                     min_items_ = it->value().template as<std::size_t>();
+                    absolute_min_items_location_ = make_absolute_keyword_location(uris, "minItems");
                 }
             }
 
@@ -906,19 +966,19 @@ namespace jsonschema {
                     {
                         size_t c = 0;
                         for (const auto& subsch : it->value().array_range())
-                            items_.push_back(builder->build(subsch, {"items", std::to_string(c++)}, uris));
+                            items_.push_back(builder->build(subsch, uris, {"items", std::to_string(c++)}));
 
                         auto attr_add = sch.find("additionalItems");
                         if (attr_add != sch.object_range().end()) 
                         {
-                            additional_items_ = builder->build(attr_add->value(), {"additionalItems"}, uris);
+                            additional_items_ = builder->build(attr_add->value(), uris, {"additionalItems"});
                         }
 
                     } 
                     else if (it->value().type() == json_type::object_value ||
                                it->value().type() == json_type::bool_value)
                     {
-                        items_schema_ = builder->build(it->value(), {"items"}, uris);
+                        items_schema_ = builder->build(it->value(), uris, {"items"});
                     }
 
                 }
@@ -928,7 +988,7 @@ namespace jsonschema {
                 auto it = sch.find("contains");
                 if (it != sch.object_range().end()) 
                 {
-                    contains_ = builder->build(it->value(), {"contains"}, uris);
+                    contains_ = builder->build(it->value(), uris, {"contains"});
                 }
             }
         }
@@ -939,27 +999,31 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json& patch) const override
         {
-            if (max_items_ && instance.size() > *max_items_)
+            if (max_items_)
             {
-                std::string message("Expected maximum item count: " + std::to_string(*max_items_));
-                message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "maxItems", this->absolute_keyword_location()));
+                if (instance.size() > *max_items_)
+                {
+                    std::string message("Expected maximum item count: " + std::to_string(*max_items_));
+                    message.append(", found: " + std::to_string(instance.size()));
+                    reporter.error(validation_output(instance_location.string(), message, "maxItems", absolute_max_items_location_));
+                }
             }
 
-            if (min_items_ && instance.size() < *min_items_)
+            if (min_items_)
             {
-                std::string message("Expected at least " + std::to_string(*min_items_));
-                message.append(" items but found " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "minItems", this->absolute_keyword_location()));
+                if (instance.size() < *min_items_)
+                {
+                    std::string message("Expected minimum item count: " + std::to_string(*min_items_));
+                    message.append(", found: " + std::to_string(instance.size()));
+                    reporter.error(validation_output(instance_location.string(), message, "minItems", absolute_min_items_location_));
+                }
             }
 
             if (unique_items_) 
             {
-                for (auto it = instance.object_range().cbegin(); it != instance.object_range().cend(); ++it) 
+                if (!array_has_unique_items(instance))
                 {
-                    auto v = std::find(it + 1, instance.object_range().end(), *it);
-                    if (v != instance.object_range().end())
-                        reporter.error(validation_output(instance_location.string(), "Array items are not unique", "uniqueItems", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), "Array items are not unique", "uniqueItems", this->absolute_keyword_location()));
                 }
             }
 
@@ -1011,6 +1075,21 @@ namespace jsonschema {
                     reporter.error(validation_output(instance_location.string(), "Expected at least one array item to match \"contains\" schema", "contains", this->absolute_keyword_location(), local_reporter.errors));
             }
         }
+
+        static bool array_has_unique_items(const Json& a) 
+        {
+            for (auto it = a.array_range().begin(); it != a.array_range().end(); ++it) 
+            {
+                for (auto jt = it+1; jt != a.array_range().end(); ++jt) 
+                {
+                    if (*it == *jt) 
+                    {
+                        return false; // contains duplicates 
+                    }
+                }
+            }
+            return true; // elements are unique
+        }
     };
 
     template <class Json>
@@ -1034,16 +1113,16 @@ namespace jsonschema {
 
             if (then_it != sch.object_range().end() || else_it != sch.object_range().end()) 
             {
-                if_ = builder->build(sch_if, {"if"}, uris);
+                if_ = builder->build(sch_if, uris, {"if"});
 
                 if (then_it != sch.object_range().end()) 
                 {
-                    then_ = builder->build(then_it->value(), {"then"}, uris);
+                    then_ = builder->build(then_it->value(), uris, {"then"});
                 }
 
                 if (else_it != sch.object_range().end()) 
                 {
-                    else_ = builder->build(else_it->value(), {"else"}, uris);
+                    else_ = builder->build(else_it->value(), uris, {"else"});
                 }
             }
         }
