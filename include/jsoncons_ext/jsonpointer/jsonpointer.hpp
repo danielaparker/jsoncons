@@ -973,7 +973,8 @@ enum class pointer_state
                 if (parent_value.empty())
                 {
                     // Flatten empty array to null
-                    result.try_emplace(parent_key, null_type{});
+                    //result.try_emplace(parent_key, null_type{});
+                    result[parent_key] = parent_value;
                 }
                 else
                 {
@@ -993,7 +994,8 @@ enum class pointer_state
                 if (parent_value.empty())
                 {
                     // Flatten empty object to null
-                    result.try_emplace(parent_key, null_type{});
+                    //result.try_emplace(parent_key, null_type{});
+                    result[parent_key] = parent_value;
                 }
                 else
                 {
@@ -1038,7 +1040,7 @@ enum class pointer_state
     template<class Json>
     Json safe_unflatten (Json& value)
     {
-        if (!value.is_object())
+        if (!value.is_object() || value.empty())
         {
             return value;
         }

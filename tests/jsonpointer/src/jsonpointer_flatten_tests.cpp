@@ -16,7 +16,7 @@
 #include <new>
 
 using namespace jsoncons;
-TEST_CASE("jsonpointer unflatten tests 1")
+/*TEST_CASE("jsonpointer unflatten tests 1")
 {
     SECTION("test 1")
     {
@@ -149,6 +149,38 @@ TEST_CASE("flatten test")
         CHECK(unflattened == input);
         //std::cout << pretty_print(unflattened) << "\n";
 
+    }
+}*/
+
+TEST_CASE("jsonpointer flatten/unflatten empty array and empty object")
+{
+    /*SECTION("object with empty array or object")
+    {
+        json input = json::parse(R"(
+    {
+        "foo": [],
+        "bar": {}
+    }    
+        )");
+
+        json flattened = jsonpointer::flatten(input);
+        json unflattened = jsonpointer::unflatten(flattened);
+        CHECK(unflattened == input);
+    }*/
+    SECTION("array with empty array or object")
+    {
+        json input = json::parse(R"(
+    [
+        [],
+        {}
+    ]    
+        )");
+
+        json flattened = jsonpointer::flatten(input);
+        json unflattened = jsonpointer::unflatten(flattened);
+        std::cout << flattened << "\n";
+        std::cout << unflattened << "\n";
+        CHECK(unflattened == input);
     }
 }
 

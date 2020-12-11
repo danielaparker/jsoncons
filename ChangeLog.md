@@ -6,6 +6,16 @@ Enhancements:
 - Added jsonschema extension that implements the JSON Schema [Draft 7](https://json-schema.org/specification-links.html#draft-7) 
 specification for validating input JSON, [\#280](https://github.com/danielaparker/jsoncons/issues/280)
 
+Changes:
+
+- Until 0.160.0, `jsonpointer::flatten`, when applied to an
+an empty array or empty object, would produce a flattened value 
+of `null` rather than `[]` or `{}`. Since 0.160.0, it will
+produce `[]` or `{}`. For example, given `{"bar":{},"foo":[]}`,
+the flattened output was {"/bar":null,"/foo":null}, but is now 
+`{"/bar":{},"/foo":[]}`. `jsonpointer::unflatten` will now return 
+the original object.  
+
 v0.159.0
 --------
 
