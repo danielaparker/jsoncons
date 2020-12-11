@@ -1015,11 +1015,9 @@ namespace jsonschema {
 
             if (unique_items_) 
             {
-                for (auto it = instance.array_range().cbegin(); it != instance.array_range().cend(); ++it) 
+                if (!array_is_unique(instance))
                 {
-                    auto v = std::find(it + 1, instance.array_range().end(), *it);
-                    if (v != instance.array_range().end())
-                        reporter.error(validation_output(instance_location.string(), "Array items are not unique", "uniqueItems", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), "Array items are not unique", "uniqueItems", this->absolute_keyword_location()));
                 }
             }
 
@@ -1070,6 +1068,21 @@ namespace jsonschema {
                 if (!contained)
                     reporter.error(validation_output(instance_location.string(), "Expected at least one array item to match \"contains\" schema", "contains", this->absolute_keyword_location(), local_reporter.errors));
             }
+        }
+
+        static bool array_is_unique(const Json& a) 
+        {
+            for (auto it = a.array_range().begin(); it != a.array_range().end(); ++it) 
+            {
+                for (auto jt = it+1; jt != a.array_range().end(); ++jt) 
+                {
+                    if (*it == *jt) 
+                    {
+                        return false; // contains duplicates 
+                    }
+                }
+            }
+            return true; // elements are unique
         }
     };
 
