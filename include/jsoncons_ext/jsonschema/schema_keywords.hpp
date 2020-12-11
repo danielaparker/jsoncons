@@ -495,10 +495,15 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         jsoncons::optional<T> maximum_;
+        std::string absolute_maximum_location_;
         jsoncons::optional<T> minimum_;
+        std::string absolute_minimum_location_;
         jsoncons::optional<T> exclusive_maximum_;
+        std::string absolute_exclusive_maximum_location_;
         jsoncons::optional<T> exclusive_minimum_;
+        std::string absolute_exclusive_minimum_location_;
         jsoncons::optional<double> multiple_of_;
+        std::string absolute_multiple_of_location_;
 
     public:
         number_keyword(const Json& sch, 
@@ -511,6 +516,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 maximum_ = it->value().template as<T>();
+                absolute_maximum_location_ = make_absolute_keyword_location(uris,"maximum");
                 keywords.insert("maximum");
             }
 
@@ -518,6 +524,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 minimum_ = it->value().template as<T>();
+                absolute_minimum_location_ = make_absolute_keyword_location(uris,"minimum");
                 keywords.insert("minimum");
             }
 
@@ -525,6 +532,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 exclusive_maximum_ = it->value().template as<T>();
+                absolute_exclusive_maximum_location_ = make_absolute_keyword_location(uris,"exclusiveMaximum");
                 keywords.insert("exclusiveMaximum");
             }
 
@@ -532,6 +540,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 exclusive_minimum_ = it->value().template as<T>();
+                absolute_exclusive_minimum_location_ = make_absolute_keyword_location(uris,"exclusiveMinimum");
                 keywords.insert("exclusiveMinimum");
             }
 
@@ -539,6 +548,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 multiple_of_ = it->value().template as<double>();
+                absolute_multiple_of_location_ = make_absolute_keyword_location(uris,"multipleOf");
                 keywords.insert("multipleOf");
             }
         }
@@ -559,31 +569,31 @@ namespace jsonschema {
             if (multiple_of_ && value != 0) // zero is multiple of everything
                 if (violates_multiple_of(value))
                 {
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf", absolute_multiple_of_location_));
                 }
 
             if (maximum_)
             {
                 if (value > *maximum_)
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum", absolute_maximum_location_));
             }
 
             if (minimum_)
             {
                 if (value < *minimum_)
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum", absolute_minimum_location_));
             }
 
             if (exclusive_maximum_)
             {
                 if (value >= *exclusive_maximum_)
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*exclusive_maximum_), "exclusiveMaximum", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*exclusive_maximum_), "exclusiveMaximum", absolute_exclusive_maximum_location_));
             }
 
             if (exclusive_minimum_)
             {
                 if (value <= *exclusive_minimum_)
-                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*exclusive_minimum_), "exclusiveMinimum", this->absolute_keyword_location()));
+                    reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*exclusive_minimum_), "exclusiveMinimum", absolute_exclusive_minimum_location_));
             }
         }
 
