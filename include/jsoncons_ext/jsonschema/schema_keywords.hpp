@@ -140,7 +140,9 @@ namespace jsonschema {
         using schema_pointer = typename keyword_validator<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_length_;
+        std::string absolute_max_length_location_;
         jsoncons::optional<std::size_t> min_length_;
+        std::string absolute_min_length_location_;
 
     #if defined(JSONCONS_HAS_STD_REGEX)
         jsoncons::optional<std::regex> pattern_;
@@ -164,12 +166,14 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 max_length_ = it->value().template as<std::size_t>();
+                absolute_max_length_location_ = make_absolute_keyword_location(uris, "maxLength");
             }
 
             it = sch.find("minLength");
             if (it != sch.object_range().end()) 
             {
                 min_length_ = it->value().template as<std::size_t>();
+                absolute_min_length_location_ = make_absolute_keyword_location(uris, "minLength");
             }
 
             it = sch.find("contentEncoding");
@@ -287,7 +291,7 @@ namespace jsonschema {
                 if (length < *min_length_) 
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected minLength: ") + std::to_string(*min_length_)
-                                              + ", actual: " + std::to_string(length), "minLength", this->absolute_keyword_location()));
+                                              + ", actual: " + std::to_string(length), "minLength", absolute_min_length_location_));
                 }
             }
 
@@ -297,7 +301,7 @@ namespace jsonschema {
                 if (length > *max_length_)
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected maxLength: ") + std::to_string(*max_length_)
-                        + ", actual: " + std::to_string(length), "maxLength", this->absolute_keyword_location()));
+                        + ", actual: " + std::to_string(length), "maxLength", absolute_max_length_location_));
                 }
             }
 
