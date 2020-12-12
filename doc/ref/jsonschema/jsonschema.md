@@ -181,8 +181,8 @@ second schema defined in the file shown below, `name.json`,
     "type": "string"
 }
 ```
-jsoncons needs to know how to resolve a reference to this file into a JSON Schema document,
-and for that you need to provide a `URIResolver`.
+jsoncons needs to know how to turn a reference to this file into a JSON Schema document,
+and for that it needs you to provide a `URIResolver`.
 
 ```c++
 #include <jsoncons/json.hpp>
