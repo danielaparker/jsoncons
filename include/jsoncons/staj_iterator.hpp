@@ -172,7 +172,7 @@ namespace jsoncons {
                     {
                         view_->value_ = decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec);
                     }
-                    JSONCONS_CATCH(const convert_error&)
+                    JSONCONS_CATCH(const conv_error&)
                     {
                         eptr_ = std::current_exception();
                     }
@@ -344,7 +344,7 @@ namespace jsoncons {
                     {
                         view_->key_value_ = value_type(std::move(key),decode_traits<T,char_type>::decode(*view_->cursor_, view_->decoder_, ec));
                     }
-                    JSONCONS_CATCH(const convert_error&)
+                    JSONCONS_CATCH(const conv_error&)
                     {
                         eptr_ = std::current_exception();
                     }

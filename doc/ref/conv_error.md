@@ -1,4 +1,4 @@
-### jsoncons::convert_error
+### jsoncons::conv_error
 
 ```c++
 #include <jsoncons/json_exception.hpp>
@@ -6,23 +6,23 @@
 
 <br>
 
-`jsoncons::convert_error` defines an exception type for reporting serialization and deserialization failures.
+`jsoncons::conv_error` defines an exception type for reporting serialization and deserialization failures.
 
-![convert_error](./diagrams/convert_error.png)
+![conv_error](./diagrams/conv_error.png)
 
 std::exception
 
 #### Constructors
 
-    convert_error(std::error_code ec);
+    conv_error(std::error_code ec);
 
-    convert_error(std::error_code ec, std::size_t position);
+    conv_error(std::error_code ec, std::size_t position);
 
-    convert_error(std::error_code ec,
+    conv_error(std::error_code ec,
                         std::size_t line,
                         std::size_t column);
 
-    convert_error(const convert_error& other);
+    conv_error(const conv_error& other);
 
 #### Member functions
 
@@ -56,9 +56,9 @@ int main()
     {
         jsoncons::json j = jsoncons::json::parse(s);
     } 
-    catch(const jsoncons::convert_error& e) 
+    catch(const jsoncons::conv_error& e) 
     {
-        std::cout << "Caught convert_error with category " 
+        std::cout << "Caught conv_error with category " 
                   << e.code().category().name() 
                   << ", code " << e.code().value() 
                   << " and message " << e.what() << std::endl;
@@ -68,5 +68,5 @@ int main()
 
 Output:
 ```
-Caught convert_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
+Caught conv_error with category json_input, code 1 and message Unexpected value separator ',' at line 1 and column 10
 ```

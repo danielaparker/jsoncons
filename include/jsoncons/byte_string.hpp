@@ -20,7 +20,7 @@
 #include <utility> // std::move
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/json_exception.hpp>
-#include <jsoncons/convert_error.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
 
 namespace jsoncons {
@@ -104,7 +104,7 @@ namespace detail {
         {
             if (!f(*first))
             {
-                return decode_result<InputIt>{first, convert_errc::conversion_failed};
+                return decode_result<InputIt>{first, conv_errc::conversion_failed};
             }
 
             a4[i++] = *first++; 
@@ -142,7 +142,7 @@ namespace detail {
                 result.push_back(a3[j]);
             }
         }
-        return decode_result<InputIt>{last, convert_errc::success};
+        return decode_result<InputIt>{last, conv_errc::success};
     }
 
 } // namespace detail
@@ -229,7 +229,7 @@ namespace detail {
         auto retval = jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, 
                                                               is_base64url<typename std::iterator_traits<InputIt>::value_type>, 
                                                               result);
-        return retval.ec == convert_errc::success ? retval : decode_result<InputIt>{retval.it, convert_errc::not_base64url};
+        return retval.ec == conv_errc::success ? retval : decode_result<InputIt>{retval.it, conv_errc::not_base64url};
     }
 
     template <class InputIt, class Container>
@@ -257,7 +257,7 @@ namespace detail {
         auto retval = jsoncons::detail::decode_base64_generic(first, last, reverse_alphabet, 
                                                              is_base64<typename std::iterator_traits<InputIt>::value_type>, 
                                                              result);
-        return retval.ec == convert_errc::success ? retval : decode_result<InputIt>{retval.it, convert_errc::not_base64};
+        return retval.ec == conv_errc::success ? retval : decode_result<InputIt>{retval.it, conv_errc::not_base64};
     }
 
     template <class InputIt,class Container>
@@ -267,7 +267,7 @@ namespace detail {
         std::size_t len = std::distance(first,last);
         if (len & 1) 
         {
-            return decode_result<InputIt>{first, convert_errc::not_base16};
+            return decode_result<InputIt>{first, conv_errc::not_base16};
         }
 
         InputIt it = first;
@@ -285,7 +285,7 @@ namespace detail {
             } 
             else 
             {
-                return decode_result<InputIt>{first, convert_errc::not_base16};
+                return decode_result<InputIt>{first, conv_errc::not_base16};
             }
 
             auto b = *it++;
@@ -299,12 +299,12 @@ namespace detail {
             } 
             else 
             {
-                return decode_result<InputIt>{first, convert_errc::not_base16};
+                return decode_result<InputIt>{first, conv_errc::not_base16};
             }
 
             result.push_back(val);
         }
-        return decode_result<InputIt>{last, convert_errc::success};
+        return decode_result<InputIt>{last, conv_errc::success};
     }
 
     struct byte_traits

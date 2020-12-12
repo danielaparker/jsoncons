@@ -11,7 +11,7 @@
 #include <jsoncons/detail/more_type_traits.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons/convert_error.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/write_number.hpp> // from_integer
 
 namespace jsoncons {
@@ -86,9 +86,9 @@ namespace jsoncons {
                 case semantic_tag::base16:
                 {
                     auto res = decode_base16(s.begin(), s.end(), bytes);
-                    if (res.ec != convert_errc::success)
+                    if (res.ec != conv_errc::success)
                     {
-                        ec = convert_errc::not_byte_string;
+                        ec = conv_errc::not_byte_string;
                     }
                     break;
                 }
@@ -104,7 +104,7 @@ namespace jsoncons {
                 }
                 default:
                 {
-                    ec = convert_errc::not_byte_string;
+                    ec = conv_errc::not_byte_string;
                     break;
                 }
             }
@@ -118,7 +118,7 @@ namespace jsoncons {
             auto retval = unicons::convert(s.begin(), s.end(), std::back_inserter(u));
             if (retval.ec != unicons::conv_errc())
             {
-                ec = convert_errc::not_utf8;
+                ec = conv_errc::not_utf8;
                 return;
             }
             from_(bytes, jsoncons::string_view(u), tag, ec);
@@ -284,7 +284,7 @@ namespace jsoncons {
             auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));
             if (retval.ec != unicons::conv_errc())
             {
-                ec = convert_errc::not_wide_char;
+                ec = conv_errc::not_wide_char;
             }
         }
 

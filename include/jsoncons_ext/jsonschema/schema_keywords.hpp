@@ -262,7 +262,7 @@ namespace jsonschema {
                 {
                     auto s = instance.template as<jsoncons::string_view>();
                     auto retval = jsoncons::decode_base64(s.begin(), s.end(), content);
-                    if (retval.ec != jsoncons::convert_errc::success)
+                    if (retval.ec != jsoncons::conv_errc::success)
                     {
                         reporter.error(validation_output(instance_location.string(), "Content is not a base64 string", "contentEncoding", absolute_content_encoding_location_));
                     }

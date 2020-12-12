@@ -4,39 +4,39 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_CONVERT_ERROR_HPP
-#define JSONCONS_CONVERT_ERROR_HPP
+#ifndef JSONCONS_CONV_ERROR_HPP
+#define JSONCONS_CONV_ERROR_HPP
 
 #include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons {
 
-    class convert_error : public std::system_error, public virtual json_exception
+    class conv_error : public std::system_error, public virtual json_exception
     {
         std::size_t line_number_;
         std::size_t column_number_;
         mutable std::string what_;
     public:
-        convert_error(std::error_code ec)
+        conv_error(std::error_code ec)
             : std::system_error(ec), line_number_(0), column_number_(0)
         {
         }
-        convert_error(std::error_code ec, const std::string& what_arg)
+        conv_error(std::error_code ec, const std::string& what_arg)
             : std::system_error(ec, what_arg), line_number_(0), column_number_(0)
         {
         }
-        convert_error(std::error_code ec, std::size_t position)
+        conv_error(std::error_code ec, std::size_t position)
             : std::system_error(ec), line_number_(0), column_number_(position)
         {
         }
-        convert_error(std::error_code ec, std::size_t line, std::size_t column)
+        conv_error(std::error_code ec, std::size_t line, std::size_t column)
             : std::system_error(ec), line_number_(line), column_number_(column)
         {
         }
-        convert_error(const convert_error& other) = default;
+        conv_error(const conv_error& other) = default;
 
-        convert_error(convert_error&& other) = default;
+        conv_error(conv_error&& other) = default;
 
         const char* what() const noexcept override
         {
@@ -81,7 +81,7 @@ namespace jsoncons {
         }
     };
 
-    enum class convert_errc
+    enum class conv_errc
     {
         success = 0,
         conversion_failed,
@@ -114,13 +114,18 @@ namespace jsoncons {
     struct decode_result 
     {
         InputIt it;
-        convert_errc ec;
+        conv_errc ec;
     };
-}
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+JSONCONS_DEPRECATED_MSG("Instead, use conv_error") typedef conv_error convert_error;
+#endif
+
+} // namespace jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::convert_errc> : public true_type
+    struct is_error_code_enum<jsoncons::conv_errc> : public true_type
     {
     };
 }
@@ -128,7 +133,7 @@ namespace std {
 namespace jsoncons {
 
 namespace detail {
-    class convert_error_category_impl
+    class conv_error_category_impl
        : public std::error_category
     {
     public:
@@ -138,55 +143,55 @@ namespace detail {
         }
         std::string message(int ev) const override
         {
-            switch (static_cast<convert_errc>(ev))
+            switch (static_cast<conv_errc>(ev))
             {
-                case convert_errc::conversion_failed:
+                case conv_errc::conversion_failed:
                     return "Unable to convert into the provided type";
-                case convert_errc::not_utf8:
+                case conv_errc::not_utf8:
                     return "Cannot convert string to UTF-8";
-                case convert_errc::not_wide_char:
+                case conv_errc::not_wide_char:
                     return "Cannot convert string to wide characters";
-                case convert_errc::not_vector:
+                case conv_errc::not_vector:
                     return "Cannot convert to vector";
-                case convert_errc::not_array:
+                case conv_errc::not_array:
                     return "Cannot convert to std::array";
-                case convert_errc::not_map:
+                case conv_errc::not_map:
                     return "Cannot convert to map";
-                case convert_errc::not_pair:
+                case conv_errc::not_pair:
                     return "Cannot convert to std::pair";
-                case convert_errc::not_string:
+                case conv_errc::not_string:
                     return "Cannot convert to string";
-                case convert_errc::not_string_view:
+                case conv_errc::not_string_view:
                     return "Cannot convert to string_view";
-                case convert_errc::not_byte_string:
+                case conv_errc::not_byte_string:
                     return "Cannot convert to byte_string";
-                case convert_errc::not_byte_string_view:
+                case conv_errc::not_byte_string_view:
                     return "Cannot convert to byte_string_view";
-                case convert_errc::not_integer:
+                case conv_errc::not_integer:
                     return "Cannot convert to integer";
-                case convert_errc::not_signed_integer:
+                case conv_errc::not_signed_integer:
                     return "Cannot convert to signed integer";
-                case convert_errc::not_unsigned_integer:
+                case conv_errc::not_unsigned_integer:
                     return "Cannot convert to unsigned integer";
-                case convert_errc::not_bigint:
+                case conv_errc::not_bigint:
                     return "Cannot convert to bigint";
-                case convert_errc::not_double:
+                case conv_errc::not_double:
                     return "Cannot convert to double";
-                case convert_errc::not_bool:
+                case conv_errc::not_bool:
                     return "Cannot convert to bool";
-                case convert_errc::not_variant:
+                case conv_errc::not_variant:
                     return "Cannot convert to std::variant";
-                case convert_errc::not_nullptr:
+                case conv_errc::not_nullptr:
                     return "Cannot convert to std::nullptr_t";
-                case convert_errc::not_jsoncons_null_type:
+                case conv_errc::not_jsoncons_null_type:
                     return "Cannot convert to jsoncons::null_type";
-                case convert_errc::not_bitset:
+                case conv_errc::not_bitset:
                     return "Cannot convert to std::bitset";
-                case convert_errc::not_base64:
+                case conv_errc::not_base64:
                     return "Input is not a base64 encoded string";
-                case convert_errc::not_base64url:
+                case conv_errc::not_base64url:
                     return "Input is not a base64url encoded string";
-                case convert_errc::not_base16:
+                case conv_errc::not_base16:
                     return "Input is not a base16 encoded string";
                 default:
                     return "Unknown conversion error";
@@ -196,16 +201,16 @@ namespace detail {
 } // detail
 
 extern inline
-const std::error_category& convert_error_category()
+const std::error_category& conv_error_category()
 {
-  static detail::convert_error_category_impl instance;
+  static detail::conv_error_category_impl instance;
   return instance;
 }
 
 inline 
-std::error_code make_error_code(convert_errc result)
+std::error_code make_error_code(conv_errc result)
 {
-    return std::error_code(static_cast<int>(result),convert_error_category());
+    return std::error_code(static_cast<int>(result),conv_error_category());
 }
 
 }

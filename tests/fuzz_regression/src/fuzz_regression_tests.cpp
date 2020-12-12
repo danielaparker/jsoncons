@@ -461,7 +461,7 @@ TEST_CASE("oss-fuzz issues")
                 reader.next(ec);
             }
         }
-        CHECK(ec == convert_errc::not_string);
+        CHECK(ec == conv_errc::not_string);
     }
 
     // Fuzz target: fuzz_cbor_encoder

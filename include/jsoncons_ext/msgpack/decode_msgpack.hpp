@@ -33,7 +33,7 @@ namespace msgpack {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
         return decoder.get_result();
     }
@@ -67,7 +67,7 @@ namespace msgpack {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
         return decoder.get_result();
     }
@@ -100,7 +100,7 @@ namespace msgpack {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
         return decoder.get_result();
     }
@@ -137,7 +137,7 @@ namespace msgpack {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
         return decoder.get_result();
     }
@@ -173,7 +173,7 @@ namespace msgpack {
         reader.read();
         if (!decoder.is_valid())
         {
-            JSONCONS_THROW(ser_error(convert_errc::conversion_failed, reader.line(), reader.column()));
+            JSONCONS_THROW(ser_error(conv_errc::conversion_failed, reader.line(), reader.column()));
         }
         return decoder.get_result();
     }

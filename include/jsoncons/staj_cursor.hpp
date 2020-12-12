@@ -273,7 +273,7 @@ public:
             }
             default:
             {
-                ec = convert_errc::not_string;
+                ec = conv_errc::not_string;
                 return T{};
             }
         }
@@ -291,7 +291,7 @@ public:
             s = T(value_.string_data_, length_);
             break;
         default:
-            ec = convert_errc::not_string_view;
+            ec = conv_errc::not_string_view;
             break;        
         }
         return s;
@@ -308,7 +308,7 @@ public:
                 s = T(value_.byte_string_data_, length_);
                 break;
             default:
-                ec = convert_errc::not_byte_string_view;
+                ec = conv_errc::not_byte_string_view;
                 break;
         }
         return s;
@@ -327,7 +327,7 @@ public:
             case staj_event_type::string_value:
                 return conv.from(jsoncons::basic_string_view<CharT>(value_.string_data_, length_), tag(), ec);
             default:
-                ec = convert_errc::not_byte_string;
+                ec = conv_errc::not_byte_string;
                 return T{};
         }
     }
@@ -343,7 +343,7 @@ public:
                 auto result = jsoncons::detail::to_integer<IntegerType>(value_.string_data_, length_);
                 if (!result)
                 {
-                    ec = convert_errc::not_integer;
+                    ec = conv_errc::not_integer;
                     return IntegerType();
                 }
                 return result.value();
@@ -359,7 +359,7 @@ public:
             case staj_event_type::bool_value:
                 return static_cast<IntegerType>(value_.bool_value_ ? 1 : 0);
             default:
-                ec = convert_errc::not_integer;
+                ec = conv_errc::not_integer;
                 return IntegerType();
         }
     }
@@ -418,7 +418,7 @@ private:
                 return static_cast<double>(x);
             }
             default:
-                ec = convert_errc::not_double;
+                ec = conv_errc::not_double;
                 return double();
         }
     }
@@ -436,7 +436,7 @@ private:
             case staj_event_type::uint64_value:
                 return value_.uint64_value_ != 0;
             default:
-                ec = convert_errc::not_bool;
+                ec = conv_errc::not_bool;
                 return bool();
         }
     }
@@ -1290,7 +1290,7 @@ public:
     {
         if (!(current().event_type() == staj_event_type::begin_array || current().event_type() == staj_event_type::byte_string_value))
         {
-            ec = convert_errc::not_vector;
+            ec = conv_errc::not_vector;
         }
     }
 

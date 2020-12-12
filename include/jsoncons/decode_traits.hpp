@@ -16,7 +16,7 @@
 #include <jsoncons/json_decoder.hpp>
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_cursor.hpp>
-#include <jsoncons/convert_error.hpp>
+#include <jsoncons/conv_error.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
 
 namespace jsoncons {
@@ -35,7 +35,7 @@ namespace jsoncons {
             cursor.read_to(decoder, ec);
             if (!decoder.is_valid())
             {
-                JSONCONS_THROW(ser_error(convert_errc::conversion_failed, cursor.context().line(), cursor.context().column()));
+                JSONCONS_THROW(ser_error(conv_errc::conversion_failed, cursor.context().line(), cursor.context().column()));
             }
             return decoder.get_result().template as<T>();
         }
@@ -117,7 +117,7 @@ namespace jsoncons {
             }
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::not_pair;
+                ec = conv_errc::not_pair;
                 return value_type();
             }
             cursor.next(ec); // skip past array
@@ -136,7 +136,7 @@ namespace jsoncons {
 
             if (cursor.current().event_type() != staj_event_type::end_array)
             {
-                ec = convert_errc::not_pair;
+                ec = conv_errc::not_pair;
                 return value_type();
             }
             return std::make_pair(v1, v2);
@@ -168,7 +168,7 @@ namespace jsoncons {
             }
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::not_vector;
+                ec = conv_errc::not_vector;
                 return v;
             }
             cursor.next(ec);
@@ -190,7 +190,7 @@ namespace jsoncons {
         using value_type = typename T::value_type;
 
         typed_array_visitor(T& v)
-            : default_json_visitor(false,convert_errc::not_vector), v_(v), level_(0)
+            : default_json_visitor(false,conv_errc::not_vector), v_(v), level_(0)
         {
         }
     private:
@@ -200,7 +200,7 @@ namespace jsoncons {
         {      
             if (++level_ != 1)
             {
-                ec = convert_errc::not_vector;
+                ec = conv_errc::not_vector;
                 return false;
             }
             return true;
@@ -213,7 +213,7 @@ namespace jsoncons {
         {
             if (++level_ != 1)
             {
-                ec = convert_errc::not_vector;
+                ec = conv_errc::not_vector;
                 return false;
             }
             v_.reserve(size);
@@ -225,7 +225,7 @@ namespace jsoncons {
         {
             if (level_ != 1)
             {
-                ec = convert_errc::not_vector;
+                ec = conv_errc::not_vector;
                 return false;
             }
             return false;
@@ -337,7 +337,7 @@ namespace jsoncons {
                 }
                 default:
                 {
-                    ec = convert_errc::not_vector;
+                    ec = conv_errc::not_vector;
                     return T{};
                 }
             }
@@ -376,7 +376,7 @@ namespace jsoncons {
                 }
                 default:
                 {
-                    ec = convert_errc::not_vector;
+                    ec = conv_errc::not_vector;
                     return T{};
                 }
             }
@@ -408,7 +408,7 @@ namespace jsoncons {
             }
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::not_vector;
+                ec = conv_errc::not_vector;
                 return v;
             }
             cursor.next(ec);
@@ -442,7 +442,7 @@ namespace jsoncons {
             v.fill(T{});
             if (cursor.current().event_type() != staj_event_type::begin_array)
             {
-                ec = convert_errc::not_vector;
+                ec = conv_errc::not_vector;
                 return v;
             }
             cursor.next(ec);
@@ -476,7 +476,7 @@ namespace jsoncons {
             T val;
             if (cursor.current().event_type() != staj_event_type::begin_object)
             {
-                ec = convert_errc::not_map;
+                ec = conv_errc::not_map;
                 return val;
             }
             cursor.next(ec);
@@ -518,7 +518,7 @@ namespace jsoncons {
             T val;
             if (cursor.current().event_type() != staj_event_type::begin_object)
             {
-                ec = convert_errc::not_map;
+                ec = conv_errc::not_map;
                 return val;
             }
             cursor.next(ec);

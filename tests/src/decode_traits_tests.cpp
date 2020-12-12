@@ -129,7 +129,7 @@ TEST_CASE("decode_traits std::pair")
         json_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
-        CHECK(ec == convert_errc::not_pair);
+        CHECK(ec == conv_errc::not_pair);
     }
 }
 
