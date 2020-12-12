@@ -31,14 +31,16 @@ void jsonpath_tests(const std::string& fpath)
     ojson tests = ojson::parse(is);
     for (const auto& test_group : tests.array_range())
     {
-        const ojson& root = test_group["given"];
+        const ojson& instance = test_group["given"];
 
         for (const auto& test_case : test_group["cases"].array_range())
         {
             std::string expr = test_case["expression"].as<std::string>();
             try
             {
-                ojson actual = jsonpath_new::json_query(root, expr);
+                auto expression = jsoncons::jsonpath_new::make_expression<ojson>(jsoncons::string_view(expr));
+                ojson actual = expression.evaluate(instance);
+                //ojson actual = jsonpath_new::json_query(instance, expr);
                 if (test_case.contains("result"))
                 {
                     const ojson& expected = test_case["result"];
@@ -48,7 +50,7 @@ void jsonpath_tests(const std::string& fpath)
                         {
                             std::cout << "\n" << test_case["comment"] << "\n";
                         }
-                        std::cout << "Input:\n" << pretty_print(root) << "\n\n";
+                        std::cout << "Input:\n" << pretty_print(instance) << "\n\n";
                         std::cout << "Expression: " << expr << "\n\n";
                         std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                         std::cout << "Expected: " << pretty_print(expected) << "\n\n";
@@ -62,7 +64,7 @@ void jsonpath_tests(const std::string& fpath)
                         std::cout << "Comment: " << test_case["comment"] << "\n";
                     }
                     std::cout << "Error: " << test_case["error"] << "\n\n";
-                    std::cout << "Input:\n" << pretty_print(root) << "\n\n";
+                    std::cout << "Input:\n" << pretty_print(instance) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                     CHECK(false);
@@ -79,7 +81,7 @@ void jsonpath_tests(const std::string& fpath)
                     {
                         std::cout << "Comment: " << test_case["comment"] << "\n\n";
                     }
-                    std::cout << "Input\n" << pretty_print(root) << "\n\n";
+                    std::cout << "Input\n" << pretty_print(instance) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Expected: " << expected << "\n\n";
                     CHECK(false);

@@ -661,6 +661,7 @@ namespace jsoncons { namespace jsonpath_new {
                 ec = jsonpath_errc::unidentified_error;
             }
         }
+
         class jsonpath_expression
         {
             jsonpath_resources<Json> resources_;
@@ -705,19 +706,22 @@ namespace jsoncons { namespace jsonpath_new {
                 //}
                 //eval_context dynamic_storage;
                 //return deep_copy(*evaluate_tokens(instance, selectors_, dynamic_storage, ec));
-                return Json(true);
+                Json result(json_array_arg);
+                result.emplace_back(true);
+                return result;
             }
 
             static jsonpath_expression compile(const string_view_type& expr)
             {
+                jsonpath_resources<Json> resources;
                 jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
                 std::error_code ec;
-                //jsonpath_expression result = evaluator.compile(expr.data(), expr.size(), ec);
+                auto selectors = evaluator.compile(resources, expr.data(), expr.size(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(jsonpath_error(ec, evaluator.line(), evaluator.column()));
                 }
-                return jsonpath_expression();
+                return jsonpath_expression(std::move(resources), std::move(selectors));
             }
 
             static jsonpath_expression compile(const string_view_type& expr,
@@ -728,7 +732,17 @@ namespace jsoncons { namespace jsonpath_new {
                 return jsonpath_expression();
             }
         };
-     
+
+        std::vector<std::unique_ptr<selector_base>> compile(jsonpath_resources<Json>& resources,
+                                                            const char_type* path, 
+                                                            std::size_t length,
+                                                            std::error_code& ec)
+        {
+            Json instance;
+            evaluate(resources, instance, path, length, ec);
+            return std::move(selectors_);
+        }
+
         void evaluate(jsonpath_resources<Json>& resources,
                       reference root, 
                       const char_type* path, 
@@ -795,7 +809,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case ' ':case '\t':case '\r':case '\n':
                             {
                                 selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                                apply_selectors(resources);
+                                //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 advance_past_space_character();
@@ -815,7 +829,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 if (buffer.size() > 0)
                                 {
                                     selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                                    apply_selectors(resources);
+                                    //apply_selectors(resources);
                                     buffer.clear();
                                 }
                                 slic.start_ = 0;
@@ -831,7 +845,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 if (buffer.size() > 0)
                                 {
                                     selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                                    apply_selectors(resources);
+                                    //apply_selectors(resources);
                                     buffer.clear();
                                 }
                                 state_stack_.back().state = path_state::dot;
@@ -1202,14 +1216,14 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '[':
                                 selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                                apply_selectors(resources);
+                                //apply_selectors(resources);
                                 slic.start_ = 0;
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
                             case '.':
                                 selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                                apply_selectors(resources);
+                                //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1223,7 +1237,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '\'':
                                 selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                                apply_selectors(resources);
+                                //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1252,7 +1266,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '\"':
                                 selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                                apply_selectors(resources);
+                                //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1762,7 +1776,7 @@ namespace jsoncons { namespace jsonpath_new {
                 case path_state::unquoted_name2: 
                 {
                     selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
-                    apply_selectors(resources);
+                    //apply_selectors(resources);
                     buffer.clear();
                     state_stack_.pop_back(); // unquoted_name
                     break;
@@ -1959,6 +1973,22 @@ namespace jsoncons { namespace jsonpath_new {
         }
     };
 
+    }
+
+    template <class Json>
+    using jsonpath_expression = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, const Json&, detail::VoidPathConstructor<Json>>::jsonpath_expression;
+
+    template <class Json>
+    jsonpath_expression<Json> make_expression(const typename json::string_view_type& expr)
+    {
+        return jsonpath_expression<Json>::compile(expr);
+    }
+
+    template <class Json>
+    jsonpath_expression<Json> make_expression(const typename json::string_view_type& expr,
+                                              std::error_code& ec)
+    {
+        return jsonpath_expression<Json>::compile(expr, ec);
     }
 
 } // namespace jsonpath_new
