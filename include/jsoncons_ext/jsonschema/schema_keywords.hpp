@@ -151,6 +151,7 @@ namespace jsonschema {
     #endif
 
         format_checker format_check_;
+        std::string absolute_format_location_;
 
         jsoncons::optional<std::string> content_encoding_;
         std::string absolute_content_encoding_location_;
@@ -208,6 +209,7 @@ namespace jsonschema {
             it = sch.find("format");
             if (it != sch.object_range().end()) 
             {
+                absolute_pattern_location_ = make_absolute_keyword_location(uris, "format");
                 std::string format = it->value().template as<std::string>();
                 if (format == "date-time")
                 {
@@ -329,7 +331,7 @@ namespace jsonschema {
 
             if (format_check_ != nullptr) 
             {
-                format_check_(*this, instance_location, content, reporter);
+                format_check_(absolute_format_location_, instance_location, content, reporter);
             }
         }
     };
