@@ -161,9 +161,8 @@ Error count: 2
 
 #### Using a URIResolver to resolve references to schemas defined in external files
 
-In this example, the main schema defines a reference using
-the `$ref` property to a second schema defined in the file `name.json`,
-shown below:
+In this example, the main schema defines a reference using the `$ref` property to a 
+second schema defined in the file shown below, `name.json`,
 
 ```json
 {
