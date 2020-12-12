@@ -292,7 +292,7 @@ namespace jsonschema {
             if (it != schema.object_range().end()) 
             {
                 std::string id = it->value().template as<std::string>(); 
-                // Add it to the list if it is not there already
+                // Add it to the list if it is not already there
                 if (std::find(new_uris.begin(), new_uris.end(), id) == new_uris.end())
                 {
                     uri_wrapper relative(id); 
