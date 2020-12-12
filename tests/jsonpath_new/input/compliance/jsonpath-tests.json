@@ -1,0 +1,445 @@
+[
+    // + operator
+    {
+        "given" : [{"key1": 100,"key2": 100},{"key1": 105,"key2": 200}],
+        "cases" : [
+            {
+                "comment" : "set plus value",
+                "expression" : "$[?((@.key1 + 110) == 210)]",
+                "result" : [{"key1": 100,"key2": 100}]
+            }
+        ]
+    },
+    {
+        "given" : [{"key1": 100,"key2": 100},{"key1": 105,"key2": 200}],
+        "cases" : [
+            {
+                "comment" : "value plus set",
+                "expression" : "$[?((110 + @.key1) == 210)]",
+                "result" : [{"key1": 100,"key2": 100}]
+            }
+        ]
+    },
+    {
+        "given" : [{"key1": 100,"key2": 100},{"key1": 105,"key2": 200}],
+        "cases" : [
+            {
+                "comment" : "set plus set",
+                "expression" : "$[?((@.key1 + @.key2) == 200)]",
+                "result" : [{"key1": 100,"key2": 100}]
+            }
+        ]
+    },
+
+    // < operator
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set less than value",
+                "expression" : "$[?(@.key<42)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter value less than empty set",
+                "expression" : "$[?(42 < @.key)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set less than empty set",
+                "expression" : "$[?(@.other < @.key)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"key1": 0,"key2": 20}, {"key1": 10,"key2": 9}],
+        "cases" : [
+            {
+                "comment" : "Filter non-empty set less than non-empty set",
+                "expression" : "$[?(@.key1 < @.key2)]",
+                "result" : [{"key1": 0,"key2": 20}]
+            }
+        ]
+    },
+    // > operator
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set greater than value",
+                "expression" : "$[?(@.key>42)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter value greater than empty set",
+                "expression" : "$[?(42 > @.key)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set greater than empty set",
+                "expression" : "$[?(@.other > @.key)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"key1": 0,"key2": 20}, {"key1": 10,"key2": 9}],
+        "cases" : [
+            {
+                "comment" : "Filter non-empty set greater than non-empty set",
+                "expression" : "$[?(@.key1 > @.key2)]",
+                "result" : [{"key1": 10,"key2": 9}]
+            }
+        ]
+    },
+    // <= operator
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set less than or equal value",
+                "expression" : "$[?(@.key<=42)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter value less than or equal empty set",
+                "expression" : "$[?(42 <= @.key)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set less than or equal empty set",
+                "expression" : "$[?(@.other <= @.key)]",
+                "result" : [{"some": "value"}]
+            }
+        ]
+    },
+    {
+        "given" : [{"key1": 0,"key2": 20}, {"key1": 10,"key2": 9}],
+        "cases" : [
+            {
+                "comment" : "Filter non-empty set less than or equal non-empty set",
+                "expression" : "$[?(@.key1 <= @.key2)]",
+                "result" : [{"key1": 0,"key2": 20}]
+            }
+        ]
+    },
+    // >= operator
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set greater than or equal value",
+                "expression" : "$[?(@.key>=42)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter value greater than or equal empty set",
+                "expression" : "$[?(42 >= @.key)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter empty set greater than or equal empty set",
+                "expression" : "$[?(@.other >= @.key)]",
+                "result" : [{"some": "value"}]
+            }
+        ]
+    },
+    {
+        "given" : [{"key1": 0,"key2": 20}, {"key1": 10,"key2": 9}],
+        "cases" : [
+            {
+                "comment" : "Filter non-empty set greater than or equal non-empty set",
+                "expression" : "$[?(@.key1 >= @.key2)]",
+                "result" : [{"key1": 10,"key2": 9}]
+            }
+        ]
+    },
+
+    // Tests from https://github.com/cburgmer/json-path-comparison
+    {
+        "given" : { "key": "value", "another key": {"complex": "string", "primitives": [0, 1]}},
+        "cases" : [
+            {
+                "comment" : "jsonpath recursive descent with *",
+                "expression" : "$..*",
+                "result" : ["value",{"complex" : "string","primitives" : [0,1]},"string",[0,1],0,1]
+            }
+        ]
+    },
+    {
+        "given" : ["first", "second", "third"],
+        "cases" : [
+            {
+                "comment" : "Array index last",
+                "expression" : "$[-1]",
+                "result" : ["third"]
+            }
+        ]
+    },
+    {
+        "given" : [{"key": 0}, {"key": 42}, {"key": -1}, {"key": 41}, {"key": 43}, {"key": 42.0001}, {"key": 41.9999}, {"key": 100}, {"some": "value"}],
+        "cases" : [
+            {
+                "comment" : "Filter less than",
+                "expression" : "$[?(@.key<42)]",
+                "result" : [{"key": 0}, {"key": -1}, {"key": 41}, {"key": 41.9999}]
+            }
+        ]
+    },
+    {
+        "given" : [40,null,42],
+        "cases" : [
+            {
+                "comment" : "Wildcard bracket notation on null value array",
+                "expression" : "$[*]",
+                "result" : [40,null,42]
+            }
+        ]
+    },
+    {
+        "given" : { "some": "string","int": 42,"object": {"key": "value"},"array": [0, 1]},
+        "cases" : [
+            {
+                "comment" : "Wildcard bracket notation on object",
+                "expression" : "$[*]",
+                "result" : ["string",42,{"key": "value"},[0,1]]
+            }
+        ]
+    },
+    {
+        "given" : [{"bar": [{"baz": "hello"}]}],
+        "cases" : [
+            {
+                "comment" : "Wildcard bracket notation with key on nested objects",
+                "expression" : "$[*].bar[*].baz",
+                "result" : ["hello"]
+            }
+        ]
+    },
+    {
+        "given" : ["string",42,{"key": "value"},[0, 1]],
+        "cases" : [
+            {
+                "comment" : "Wildcard dot notation on array",
+                "expression" : "$.*",
+                "result" : ["string",42,{"key": "value"},[0,1]]
+            }
+        ]
+    },
+    {
+        "given" : { "some": "string","int": 42,"object": {"key": "value"},"array": [0, 1]},
+        "cases" : [
+            {
+                "comment" : "Wildcard dot notation on object",
+                "expression" : "$.*",
+                "result" : ["string",42,{"key": "value"},[0,1]]
+            }
+        ]
+    },
+    {
+        "given" : ["first", "second", "third"],
+        "cases" : [
+            {
+                "comment" : "Union with spaces",
+                "expression" : "$[ 0 , 1 ]",
+                "result" : ["first","second"]
+            }
+        ]
+    },
+    {
+        "given" : {"": 42, "''": 123, "\"\"": 222},
+        "cases" : [
+            {
+                "comment" : "Bracket notation with empty string",
+                "expression" : "$['']",
+                "result" : [42]
+            },
+            {
+                "comment" : "Bracket notation with empty string doubled quoted",
+                "expression" : "$[\"\"]",
+                "result" : [42]
+            }
+        ]
+    },
+    {
+        "given" : {"0": "value"},
+        "cases" : [
+            {
+                "comment" : "Bracket notation with number on object",
+                "expression" : "$[0]",
+                "result" : ["value"] // jsoncons allows unquoted names in square brackets
+            }
+        ]
+    },
+    {
+        "given" : [2, "a", 4, 5, 100, "nice"],
+        "cases" : [
+            {
+                "comment" : "Array slice with negative start and end and range of -1",
+                "expression" : "$[-4:-5]",
+                "result" : [] 
+            },
+            {
+                "comment" : "Array slice with negative start and end and range of 0",
+                "expression" : "$[-4:-4]",
+                "result" : [] 
+            },
+            {
+                "comment" : "Array slice with negative start and end and range of 1",
+                "expression" : "$[-4:-3]",
+                "result" : [4] 
+            },
+            {
+                "comment" : "Array slice with negative start and positive end and range of -1",
+                "expression" : "$[-4:1]",
+                "result" : [] 
+            }
+        ]
+    },
+    {
+        "given" : ["first", "second", "third", "forth", "fifth"],
+        "cases" : [
+            {
+                "comment" : "Last item",
+                "expression" : "$[-1]",
+                "result" : ["fifth"]
+            },
+            {
+                "comment" : "Last two items",
+                "expression" : "$[-2:]",
+                "result" : ["forth", "fifth"]
+            },
+            {
+                "comment" : "All items except the last two",
+                "expression" : "$[:-2]",
+                "result" : ["first", "second", "third"]
+            },
+            {
+                "comment" : "All items, reversed",
+                "expression" : "$[::-1]",
+                "result" : ["fifth","forth","third","second","first"]
+            },
+            {
+                "comment" : "First two items, reversed",
+                "expression" : "$[1::-1]",
+                "result" : ["second","first"]
+            },
+            {
+                "comment" : "Last two items, reversed",
+                "expression" : "$[:-3:-1]",
+                "result" : ["fifth","forth"]
+            },
+            {
+                "comment" : "All items except the last two, reversed",
+                "expression" : "$[-3::-1]",
+                "result" : ["third","second","first"]
+            },
+            {
+                "comment" : "array index",
+                "expression" : "$[2]",
+                "result" : ["third"]
+            },
+            {
+                "comment" : "Array index slice start end step 0",
+                "expression" : "$[0:3:0]",
+                "error" : "Slice step cannot be zero at line 1 and column 8"
+            },
+            {
+                "comment" : "Array slice with negative step",
+                "expression" : "$[3:0:-2]",
+                "result" : ["forth","second"] 
+            },
+            {
+                "comment" : "Array slice with negative step on partially overlapping array",
+                "expression" : "$[7:3:-1]",
+                "result" : ["fifth"] 
+            },
+            {
+                "comment" : "Array slice with negative step and start greater than end",
+                "expression" : "$[0:3:-2]",
+                "result" : [] 
+            },
+            {
+                "comment" : "Array slice with negative step and start greater than end",
+                "expression" : "$[0:3:-2]",
+                "result" : [] 
+            },
+            {
+                "comment" : "Array slice with negative step and start greater than end",
+                "expression" : "$[::-2]",
+                "result" : ["fifth","third","first"] 
+            },
+            {
+                "comment" : "Array slice with open end",
+                "expression" : "$[1:]",
+                "result" : ["second", "third", "forth", "fifth"]
+            },
+            {
+                "comment" : "Array slice with open end and negative step",
+                "expression" : "$[3::-1]",
+                "result" : ["forth","third","second","first"]
+            },
+            {
+                "comment" : "Array slice with open start",
+                "expression" : "$[:2]",
+                "result" : ["first", "second"]
+            }
+        ]
+    },
+    {
+        "given" : ["first", "second"],
+        "cases" : [
+            {
+                "comment" : "Array slice with open start and end",
+                "expression" : "$[:]",
+                "result" : ["first", "second"]
+            },
+            {
+                "comment" : "Array slice with open start and end and step empty",
+                "expression" : "$[::]",
+                "result" : ["first", "second"]
+            }
+        ]
+    }
+]

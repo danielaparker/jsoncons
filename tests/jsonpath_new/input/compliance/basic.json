@@ -1,0 +1,44 @@
+[
+    {
+        "given" : {"key": "value"},
+        "cases" : [
+            {
+                "comment" : "dot notation",
+                "expression" : "$.key",
+                "result" : ["value"]
+            }
+        ]
+    },
+    {
+        "given" : {
+             "one": {"key": "value"},
+             "two": {"some": "more", "key": "other value"},
+             "two.some": "42"
+         },
+        "cases" : [
+            {
+                "comment" : "dot notation",
+                "expression" : "$.two.some",
+                "result" : ["more"]
+            }
+        ]
+    },
+    {
+        "given" : {
+           "key": "value",
+           "\"key\"": 42
+         },
+        "cases" : [
+            {
+                "comment" : "Dot notation with double quotes",
+                "expression" : "$.\"key\"",
+                "result" : ["value"]
+            },
+            {
+                "comment" : "Dot notation with single quotes",
+                "expression" : "$.'key'",
+                "result" : ["value"]
+            }
+        ]
+    }
+]

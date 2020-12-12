@@ -1,0 +1,25 @@
+[
+    {
+        "given" : [
+            {"name": "hullo world"},
+            {"name": "hello world"},
+            {"name": "yes hello world"},
+            {"name": "HELLO WORLD"},
+            {"name": "good bye"}
+        ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with regular expression",
+                "expression" : "$[?(@.name=~/hello.*/)]",
+                "result" : [
+                    {
+                        "name": "hello world"
+                    },
+                    {
+                        "name": "yes hello world"
+                    }
+                ]
+            }
+        ]
+    }
+]
