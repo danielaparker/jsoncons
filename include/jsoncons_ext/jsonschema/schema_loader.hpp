@@ -30,15 +30,15 @@ namespace jsonschema {
     using uri_resolver = std::function<Json(const jsoncons::uri & /*id*/)>;
 
     template <class Json>
-    class reference_schema : public keyword_validator<Json>
+    class reference_schema : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         schema_pointer referred_schema_;
 
     public:
         reference_schema(const std::string& id)
-            : keyword_validator<Json>(id), referred_schema_(nullptr) {}
+            : schema_keyword<Json>(id), referred_schema_(nullptr) {}
 
         void set_referred_schema(schema_pointer target) { referred_schema_ = target; }
 
@@ -78,14 +78,14 @@ namespace jsonschema {
     template <class Json>
     class json_schema
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         friend class schema_loader<Json>;
 
-        std::vector<std::unique_ptr<keyword_validator<Json>>> subschemas_;
+        std::vector<std::unique_ptr<schema_keyword<Json>>> subschemas_;
         schema_pointer root_;
     public:
-        json_schema(std::vector<std::unique_ptr<keyword_validator<Json>>>&& subschemas,
+        json_schema(std::vector<std::unique_ptr<schema_keyword<Json>>>&& subschemas,
                     schema_pointer root)
             : subschemas_(std::move(subschemas)), root_(root)
         {
@@ -125,7 +125,7 @@ namespace jsonschema {
     template <class Json>
     class schema_loader : public schema_builder<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         struct subschema_registry
         {
@@ -138,7 +138,7 @@ namespace jsonschema {
         schema_pointer root_;
 
         // Owns all schemas
-        std::vector<std::unique_ptr<keyword_validator<Json>>> subschemas_;
+        std::vector<std::unique_ptr<schema_keyword<Json>>> subschemas_;
 
         // Map location to subschema_registry
         std::map<std::string, subschema_registry> subschema_registries_;

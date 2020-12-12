@@ -49,14 +49,14 @@ namespace jsonschema {
         std::string absolute_keyword_location_;
         std::vector<validation_output> nested_errors_;
     public:
-        validation_output(const std::string& instance_location,
-                         const std::string& message,
-                         const std::string& keyword,
-                         const std::string& absolute_keyword_location)
-            : instance_location_(instance_location),
-              message_(message), 
-              keyword_(keyword),
-              absolute_keyword_location_(absolute_keyword_location)
+        validation_output(std::string instance_location,
+                          std::string message,
+                          std::string keyword,
+                          std::string absolute_keyword_location)
+            : instance_location_(std::move(instance_location)),
+              message_(std::move(message)), 
+              keyword_(std::move(keyword)),
+              absolute_keyword_location_(std::move(absolute_keyword_location))
         {
         }
 

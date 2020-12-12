@@ -29,7 +29,7 @@ namespace jsonschema {
     class schema_builder
     {
     public:
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         virtual schema_pointer build(const Json& schema,
                                      const std::vector<uri_wrapper>& uris,
@@ -100,7 +100,7 @@ namespace jsonschema {
         patch.push_back(std::move(j));
     }
 
-    // string keyword_validator
+    // string schema_keyword
 
     template <class Json>
     void content_media_type_check(const uri_wrapper& instance_location, const Json&, 
@@ -135,9 +135,9 @@ namespace jsonschema {
     }
 
     template <class Json>
-    class string_keyword : public keyword_validator<Json>
+    class string_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_length_;
         std::string absolute_max_length_location_;
@@ -160,7 +160,7 @@ namespace jsonschema {
 
     public:
         string_keyword(const Json& sch, const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), max_length_(), min_length_(), 
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), max_length_(), min_length_(), 
     #if defined(JSONCONS_HAS_STD_REGEX)
               pattern_(),
     #endif
@@ -323,7 +323,7 @@ namespace jsonschema {
                     message.append("\" does not match pattern \"");
                     message.append(pattern_string_);
                     message.append("\"");
-                    reporter.error(validation_output(instance_location.string(), message, "pattern", absolute_pattern_location_));
+                    reporter.error(validation_output(instance_location.string(), std::move(message), "pattern", absolute_pattern_location_));
                 }
             }
 
@@ -339,9 +339,9 @@ namespace jsonschema {
     // not_keyword
 
     template <class Json>
-    class not_keyword : public keyword_validator<Json>
+    class not_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         schema_pointer rule_;
 
@@ -349,7 +349,7 @@ namespace jsonschema {
         not_keyword(schema_builder<Json>* builder,
                  const Json& sch,
                  const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
             rule_ = builder->build(sch, uris, {"not"});
         }
@@ -392,7 +392,7 @@ namespace jsonschema {
                                 std::size_t)
         {
             if (!local_reporter.errors.empty())
-                reporter.error(validation_output(instance_location.string(), "At least one keyword_validator failed to match, but all are required to match. ", "allOf", "foo", local_reporter.errors));
+                reporter.error(validation_output(instance_location.string(), "At least one schema_keyword failed to match, but all are required to match. ", "allOf", "foo", local_reporter.errors));
             return !local_reporter.errors.empty();
         }
     };
@@ -435,16 +435,16 @@ namespace jsonschema {
             {
                 std::string message(std::to_string(count));
                 message.append(" subschemas matched, but exactly one is required to match");
-                reporter.error(validation_output(instance_location.string(), message, "oneOf", "foo"));
+                reporter.error(validation_output(instance_location.string(), std::move(message), "oneOf", "foo"));
             }
             return count > 1;
         }
     };
 
     template <class Json,class Criterion>
-    class combining_keyword : public keyword_validator<Json>
+    class combining_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         std::vector<schema_pointer> subschemas_;
 
@@ -452,7 +452,7 @@ namespace jsonschema {
         combining_keyword(schema_builder<Json>* builder,
                        const Json& sch,
                        const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
             size_t c = 0;
             for (const auto& subsch : sch.array_range())
@@ -486,15 +486,15 @@ namespace jsonschema {
 
             if (count == 0)
             {
-                reporter.error(validation_output(instance_location.string(), "No keyword_validator matched, but one of them is required to match", "combined", this->absolute_keyword_location(), local_reporter.errors));
+                reporter.error(validation_output(instance_location.string(), "No schema_keyword matched, but one of them is required to match", "combined", this->absolute_keyword_location(), local_reporter.errors));
             }
         }
     };
 
     template <class Json,class T>
-    class number_keyword : public keyword_validator<Json>
+    class number_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         jsoncons::optional<T> maximum_;
         std::string absolute_maximum_location_;
@@ -511,7 +511,7 @@ namespace jsonschema {
         number_keyword(const Json& sch, 
                     const std::vector<uri_wrapper>& uris, 
                     std::set<std::string>& keywords)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
               maximum_(), minimum_(),exclusive_maximum_(), exclusive_minimum_(), multiple_of_()
         {
             auto it = sch.find("maximum");
@@ -612,13 +612,13 @@ namespace jsonschema {
     // null_keyword
 
     template <class Json>
-    class null_keyword : public keyword_validator<Json>
+    class null_keyword : public schema_keyword<Json>
     {
     public:
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         null_keyword(const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
@@ -632,13 +632,13 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class boolean_keyword : public keyword_validator<Json>
+    class boolean_keyword : public schema_keyword<Json>
     {
     public:
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         boolean_keyword(const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
@@ -649,13 +649,13 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class true_keyword : public keyword_validator<Json>
+    class true_keyword : public schema_keyword<Json>
     {
     public:
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         true_keyword(const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
@@ -665,13 +665,13 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class false_keyword : public keyword_validator<Json>
+    class false_keyword : public schema_keyword<Json>
     {
     public:
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         false_keyword(const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : "")
         {
         }
     private:
@@ -682,18 +682,18 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class required_keyword : public keyword_validator<Json>
+    class required_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         std::vector<std::string> items_;
 
     public:
         required_keyword(const std::vector<uri_wrapper>& uris,
                          const std::vector<std::string>& items)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), items_(items) {}
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), items_(items) {}
         required_keyword(const std::string& absolute_keyword_location, const std::vector<std::string>& items)
-            : keyword_validator<Json>(absolute_keyword_location), items_(items) {}
+            : schema_keyword<Json>(absolute_keyword_location), items_(items) {}
 
         required_keyword(const required_keyword&) = delete;
         required_keyword(required_keyword&&) = default;
@@ -714,9 +714,9 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class object_keyword : public keyword_validator<Json>
+    class object_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_properties_;
         std::string absolute_max_properties_location_;
@@ -738,7 +738,7 @@ namespace jsonschema {
         object_keyword(schema_builder<Json>* builder,
                     const Json& sch,
                     const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
               max_properties_(), min_properties_(), 
               additional_properties_(nullptr),
               property_names_(nullptr)
@@ -835,14 +835,14 @@ namespace jsonschema {
             {
                 std::string message("Maximum properties: " + std::to_string(*max_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "maxProperties", absolute_max_properties_location_));
+                reporter.error(validation_output(instance_location.string(), std::move(message), "maxProperties", absolute_max_properties_location_));
             }
 
             if (min_properties_ && instance.size() < *min_properties_)
             {
                 std::string message("Minimum properties: " + std::to_string(*min_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
-                reporter.error(validation_output(instance_location.string(), message, "minProperties", absolute_min_properties_location_));
+                reporter.error(validation_output(instance_location.string(), std::move(message), "minProperties", absolute_min_properties_location_));
             }
 
             if (required_)
@@ -912,9 +912,9 @@ namespace jsonschema {
     // array_keyword
 
     template <class Json>
-    class array_keyword : public keyword_validator<Json>
+    class array_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         jsoncons::optional<std::size_t> max_items_;
         std::string absolute_max_items_location_;
@@ -930,7 +930,7 @@ namespace jsonschema {
         array_keyword(schema_builder<Json>* builder, 
                    const Json& sch, 
                    const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
               max_items_(), min_items_(), items_schema_(nullptr), additional_items_(nullptr), contains_(nullptr)
         {
             {
@@ -1007,7 +1007,7 @@ namespace jsonschema {
                 {
                     std::string message("Expected maximum item count: " + std::to_string(*max_items_));
                     message.append(", found: " + std::to_string(instance.size()));
-                    reporter.error(validation_output(instance_location.string(), message, "maxItems", absolute_max_items_location_));
+                    reporter.error(validation_output(instance_location.string(), std::move(message), "maxItems", absolute_max_items_location_));
                 }
             }
 
@@ -1017,7 +1017,7 @@ namespace jsonschema {
                 {
                     std::string message("Expected minimum item count: " + std::to_string(*min_items_));
                     message.append(", found: " + std::to_string(instance.size()));
-                    reporter.error(validation_output(instance_location.string(), message, "minItems", absolute_min_items_location_));
+                    reporter.error(validation_output(instance_location.string(), std::move(message), "minItems", absolute_min_items_location_));
                 }
             }
 
@@ -1095,9 +1095,9 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class conditional_keyword : public keyword_validator<Json>
+    class conditional_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         schema_pointer if_;
         schema_pointer then_;
@@ -1108,7 +1108,7 @@ namespace jsonschema {
                          const Json& sch_if,
                          const Json& sch,
                          const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), if_(nullptr), then_(nullptr), else_(nullptr)
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), if_(nullptr), then_(nullptr), else_(nullptr)
         {
             auto then_it = sch.find("then");
             auto else_it = sch.find("else");
@@ -1156,16 +1156,16 @@ namespace jsonschema {
     // enum_keyword
 
     template <class Json>
-    class enum_keyword : public keyword_validator<Json>
+    class enum_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         Json enum_;
 
     public:
         enum_keyword(const Json& sch,
                   const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), enum_(sch)
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), enum_(sch)
         {
         }
     private:
@@ -1194,15 +1194,15 @@ namespace jsonschema {
     // const_keyword
 
     template <class Json>
-    class const_keyword : public keyword_validator<Json>
+    class const_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         Json const_;
 
     public:
         const_keyword(const Json& sch, const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), const_(sch)
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), const_(sch)
         {
         }
     private:
@@ -1217,9 +1217,9 @@ namespace jsonschema {
     };
 
     template <class Json>
-    class type_keyword : public keyword_validator<Json>
+    class type_keyword : public schema_keyword<Json>
     {
-        using schema_pointer = typename keyword_validator<Json>::schema_pointer;
+        using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
         Json default_value_;
         std::vector<schema_pointer> type_mapping_;
@@ -1238,7 +1238,7 @@ namespace jsonschema {
         type_keyword(schema_builder<Json>* builder,
                      const Json& sch,
                      const std::vector<uri_wrapper>& uris)
-            : keyword_validator<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), default_value_(jsoncons::null_type()), 
+            : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), default_value_(jsoncons::null_type()), 
               type_mapping_((uint8_t)(json_type::object_value)+1), 
               enum_(), const_()
         {

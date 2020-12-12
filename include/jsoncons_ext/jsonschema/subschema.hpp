@@ -220,12 +220,15 @@ namespace jsonschema {
         virtual void do_error(const validation_output& /* e */) = 0;
     };
 
-    class schema_keyword
+    template <class Json>
+    class schema_keyword 
     {
         std::string absolute_keyword_location_;
     public:
-        schema_keyword(const std::string& uri)
-            : absolute_keyword_location_(uri)
+        using schema_pointer = schema_keyword<Json>*;
+
+        schema_keyword(const std::string& absolute_keyword_location)
+            : absolute_keyword_location_(absolute_keyword_location)
         {
         }
 
@@ -240,23 +243,6 @@ namespace jsonschema {
         {
             return absolute_keyword_location_;
         }
-    };
-
-    template <class Json>
-    class keyword_validator : public schema_keyword
-    {
-    public:
-        using schema_pointer = keyword_validator<Json>*;
-
-        keyword_validator(const std::string& uri)
-            : schema_keyword(uri)
-        {
-        }
-
-        keyword_validator(const keyword_validator&) = delete;
-        keyword_validator(keyword_validator&&) = default;
-        keyword_validator& operator=(const keyword_validator&) = delete;
-        keyword_validator& operator=(keyword_validator&&) = default;
 
         void validate(const uri_wrapper& instance_location, 
                       const Json& instance, 
