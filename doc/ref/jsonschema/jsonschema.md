@@ -34,7 +34,7 @@ Any other format type is ignored.
 <table border="0">
   <tr>
     <td><a href="make_schema.md">make_schema</a></td>
-    <td>Loads a JSON Schema and returns a <code>shared_ptr</code> to a <code>json_schema</code>. 
+    <td>Loads a JSON Schema and returns a shared pointer to a <code>json_schema</code>. 
   </tr>
 </table>
   
