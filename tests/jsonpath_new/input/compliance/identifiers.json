@@ -6,7 +6,8 @@
         "cases": [
             {
                 "expression": "$.__L",
-                "result": [true]
+                "result": [true],
+                "normalized-path-expression" : "$['__L']"
             }
         ]
     }/*,

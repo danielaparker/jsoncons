@@ -300,47 +300,12 @@ namespace jsoncons { namespace jsonpath_new {
                         const string_type& path, reference val,
                         node_set& nodes) override
             {
-                if (val.is_object() && val.contains(identifier_))
+                if (val.is_object())
                 {
-                    nodes.emplace_back(PathCons()(path,identifier_),std::addressof(val.at(identifier_)));
-                }
-                else if (val.is_array())
-                {
-                    auto r = jsoncons::detail::to_integer_decimal<int64_t>(identifier_.data(), identifier_.size());
-                    if (r)
+                    auto it = val.find(identifier_);
+                    if (it != val.object_range().end())
                     {
-                        std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + r.value());
-                        if (index < val.size())
-                        {
-                            nodes.emplace_back(PathCons()(path,index),std::addressof(val[index]));
-                        }
-                    }
-                    else if (identifier_ == length_literal<char_type>() && val.size() > 0)
-                    {
-                        pointer ptr = resources.create_temp(val.size());
-                        nodes.emplace_back(PathCons()(path, identifier_), ptr);
-                    }
-                }
-                else if (val.is_string())
-                {
-                    string_view_type sv = val.as_string_view();
-                    auto r = jsoncons::detail::to_integer_decimal<int64_t>(identifier_.data(), identifier_.size());
-                    if (r)
-                    {
-                        std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : 
-                                                               static_cast<std::size_t>(static_cast<int64_t>(sv.size()) + r.value());
-                        auto sequence = unicons::sequence_at(sv.data(), sv.data() + sv.size(), index);
-                        if (sequence.length() > 0)
-                        {
-                            pointer ptr = resources.create_temp(sequence.begin(),sequence.length());
-                            nodes.emplace_back(PathCons()(path, index), ptr);
-                        }
-                    }
-                    else if (identifier_ == length_literal<char_type>() && sv.size() > 0)
-                    {
-                        std::size_t count = unicons::u32_length(sv.begin(),sv.end());
-                        pointer ptr = resources.create_temp(count);
-                        nodes.emplace_back(PathCons()(path, identifier_), ptr);
+                        nodes.emplace_back(PathCons()(path,identifier_),std::addressof(it->value()));
                     }
                 }
             }
@@ -706,8 +671,26 @@ namespace jsoncons { namespace jsonpath_new {
                 //}
                 //eval_context dynamic_storage;
                 //return deep_copy(*evaluate_tokens(instance, selectors_, dynamic_storage, ec));
+
+                jsonpath_resources<Json> dynamic_resources;
+
+                std::vector<node_type> nodes;
+                string_type path;
                 Json result(json_array_arg);
-                result.emplace_back(true);
+
+                if (!selectors_.empty())
+                {
+                    selectors_[0]->select(dynamic_resources, path, instance, nodes);
+                }
+                if (!nodes.empty())
+                {
+                    //result.reserve(nodes.back().size());
+                    //for (const auto& p : nodes.back())
+                    //{
+                    //    result.push_back(*(p.val_ptr));
+                    //}
+                    result.push_back(*(nodes[0].val_ptr));
+                }
                 return result;
             }
 
