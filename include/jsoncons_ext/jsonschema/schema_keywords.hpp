@@ -209,7 +209,7 @@ namespace jsonschema {
             it = sch.find("format");
             if (it != sch.object_range().end()) 
             {
-                absolute_pattern_location_ = make_absolute_keyword_location(uris, "format");
+                absolute_format_location_ = make_absolute_keyword_location(uris, "format");
                 std::string format = it->value().template as<std::string>();
                 if (format == "date-time")
                 {
