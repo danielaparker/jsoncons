@@ -663,7 +663,7 @@ namespace jsoncons { namespace jsonpath_new {
                 return result;
             }
 
-            Json evaluate(reference instance, std::error_code& ec)
+            Json evaluate(reference instance, std::error_code& )
             {
                 //if (selectors_.empty())
                 //{
