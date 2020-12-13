@@ -1,0 +1,38 @@
+[
+    {
+        "given" : [
+          "first",
+          {
+              "key": [
+                  "first nested",
+                  {
+                      "more": [
+                          {
+                              "nested": ["deepest", "second"]
+                          },
+                          ["more", "values"]
+                      ]
+                  }
+              ]
+          }
+      ],
+        "cases" : [
+            {
+                "comment" : "Bracket notation after recursive descent",
+                "expression" : "$..[0]",
+                "result" : [
+                 "deepest",
+                 "first nested",
+                 "first",
+                 "more",
+                 {
+                   "nested": [
+                     "deepest",
+                     "second"
+                   ]
+                 }
+               ]
+            }
+        ]
+    }
+]

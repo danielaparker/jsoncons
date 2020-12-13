@@ -650,10 +650,6 @@ namespace jsoncons { namespace jsonpath_new {
 
             Json evaluate(reference instance)
             {
-                if (selectors_.empty())
-                {
-                    return Json::null();
-                }
                 std::error_code ec;
                 Json result = evaluate(instance, ec);
                 if (ec)
@@ -675,21 +671,27 @@ namespace jsoncons { namespace jsonpath_new {
 
                 if (!selectors_.empty())
                 {
-                    output_stack.emplace_back(path,std::addressof(instance));
-                    for (std::size_t i = 1; 
+                    stack.emplace_back(path,std::addressof(instance));
+                    for (std::size_t i = 0; 
                          i < selectors_.size();
                          ++i)
                     {
+                        for (auto& item : stack)
+                        {
+                            output_stack.push_back(std::move(item));
+                        }
+                        stack.clear();
                         selectors_[i]->select(dynamic_resources, path, *(output_stack.back().val_ptr), stack);
-                        auto val = std::move(stack.back());
-                        stack.pop_back();
-                        output_stack.emplace_back(std::move(val));
+                        if (stack.empty())
+                        {
+                            break;
+                        }
                     }
                 }
-                if (!output_stack.empty())
+                if (!stack.empty())
                 {
-                    result.reserve(output_stack.size());
-                    for (const auto& p : output_stack)
+                    result.reserve(stack.size());
+                    for (const auto& p : stack)
                     {
                         result.push_back(*(p.val_ptr));
                     }
