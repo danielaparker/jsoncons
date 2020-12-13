@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         "given" : {"key": "value"},
         "cases" : [
             {
@@ -8,7 +8,7 @@
                 "result" : ["value"]
             }
         ]
-    },
+    },*/
     {
         "given" : {
              "one": {"key": "value"},
@@ -22,7 +22,7 @@
                 "result" : ["more"]
             }
         ]
-    },
+    }/*,
     {
         "given" : {
            "key": "value",
@@ -40,5 +40,5 @@
                 "result" : ["value"]
             }
         ]
-    }
+    }*/
 ]

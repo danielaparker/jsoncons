@@ -665,31 +665,34 @@ namespace jsoncons { namespace jsonpath_new {
 
             Json evaluate(reference instance, std::error_code& )
             {
-                //if (selectors_.empty())
-                //{
-                //    return Json::null();
-                //}
-                //eval_context dynamic_storage;
-                //return deep_copy(*evaluate_tokens(instance, selectors_, dynamic_storage, ec));
-
                 jsonpath_resources<Json> dynamic_resources;
 
-                std::vector<node_type> nodes;
+                std::vector<node_type> output_stack;
+                std::vector<node_type> stack;
                 string_type path;
+                path.push_back('$');
                 Json result(json_array_arg);
 
                 if (!selectors_.empty())
                 {
-                    selectors_[0]->select(dynamic_resources, path, instance, nodes);
+                    output_stack.emplace_back(path,std::addressof(instance));
+                    for (std::size_t i = 1; 
+                         i < selectors_.size();
+                         ++i)
+                    {
+                        selectors_[i]->select(dynamic_resources, path, *(output_stack.back().val_ptr), stack);
+                        auto val = std::move(stack.back());
+                        stack.pop_back();
+                        output_stack.emplace_back(std::move(val));
+                    }
                 }
-                if (!nodes.empty())
+                if (!output_stack.empty())
                 {
-                    //result.reserve(nodes.back().size());
-                    //for (const auto& p : nodes.back())
-                    //{
-                    //    result.push_back(*(p.val_ptr));
-                    //}
-                    result.push_back(*(nodes[0].val_ptr));
+                    result.reserve(output_stack.size());
+                    for (const auto& p : output_stack)
+                    {
+                        result.push_back(*(p.val_ptr));
+                    }
                 }
                 return result;
             }
