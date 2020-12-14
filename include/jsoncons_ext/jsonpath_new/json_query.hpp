@@ -284,6 +284,11 @@ namespace jsoncons { namespace jsonpath_new {
             {
                 return false;
             }
+
+            virtual bool is_recursive_descent() const
+            {
+                return false;
+            }
         };
 
         class identifier_selector final : public selector_base
@@ -308,6 +313,22 @@ namespace jsoncons { namespace jsonpath_new {
                         nodes.emplace_back(PathCons()(path,identifier_),std::addressof(it->value()));
                     }
                 }
+            }
+        };
+
+        class recursive_descent_selector final : public selector_base
+        {
+        public:
+
+            void select(jsonpath_resources<Json>& resources,
+                        const string_type& path, reference val,
+                        node_set& nodes) override
+            {
+            }
+
+            bool is_recursive_descent() const override
+            {
+                return true;
             }
         };
 
@@ -665,24 +686,78 @@ namespace jsoncons { namespace jsonpath_new {
 
                 std::vector<node_type> output_stack;
                 std::vector<node_type> stack;
+                std::vector<node_type> collected;
                 string_type path;
                 path.push_back('$');
                 Json result(json_array_arg);
+                bool is_recursive_descent = false;
 
                 if (!selectors_.empty())
                 {
                     stack.emplace_back(path,std::addressof(instance));
                     for (std::size_t i = 0; 
                          i < selectors_.size();
-                         ++i)
+                         )
                     {
                         for (auto& item : stack)
                         {
                             output_stack.push_back(std::move(item));
                         }
                         stack.clear();
-                        selectors_[i]->select(dynamic_resources, path, *(output_stack.back().val_ptr), stack);
-                        if (stack.empty())
+                        for (auto& item : output_stack)
+                        {
+                            selectors_[i]->select(dynamic_resources, path, *(item.val_ptr), stack);
+                        }
+
+                        if (!stack.empty() && !is_recursive_descent)
+                        {
+                            output_stack.clear();
+                            ++i;
+                        }
+                        else if (is_recursive_descent && output_stack.empty())
+                        {
+                            output_stack.clear();
+                            for (auto& item : collected)
+                            {
+                                output_stack.emplace_back(item.path,item.val_ptr);
+                                stack.push_back(std::move(item));
+                            }
+                            collected.clear();
+                            is_recursive_descent = false;
+                            ++i;
+                        }
+                        else if (is_recursive_descent)
+                        {
+                            for (auto& item : stack)
+                            {
+                                collected.emplace_back(item.path,item.val_ptr);
+                            }
+                            stack.clear();
+                            for (auto& item : output_stack)
+                            {
+                                if (item.val_ptr->is_object())
+                                {
+                                    for (auto& val : item.val_ptr->object_range())
+                                    {
+                                        stack.emplace_back(val.key(),std::addressof(val.value()));
+                                    }
+                                }
+                                else if (item.val_ptr->is_array())
+                                {
+                                    for (auto& val : item.val_ptr->array_range())
+                                    {
+                                        stack.emplace_back("",std::addressof(val));
+                                    }
+                                }
+                            }
+                            output_stack.clear();
+                        }
+                        else if (selectors_[i]->is_recursive_descent())
+                        {
+                            is_recursive_descent = true;
+                            ++i;
+                        }
+                        else if (!is_recursive_descent)
                         {
                             break;
                         }
@@ -1098,6 +1173,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '.':
+                                selectors_.push_back(jsoncons::make_unique<recursive_descent_selector>());
                                 state_stack_.back().is_recursive_descent = true;
                                 ++p_;
                                 ++column_;

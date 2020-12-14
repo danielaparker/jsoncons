@@ -103,11 +103,11 @@ TEST_CASE("jsonpath-tests")
 #if defined(JSONCONS_HAS_STD_REGEX)
         //jsonpath_tests("./jsonpath_new/input/compliance/jsonpath-regex-tests.json");
 #endif
-        jsonpath_tests("./jsonpath_new/input/compliance/basic.json"); 
+        //jsonpath_tests("./jsonpath_new/input/compliance/basic.json"); 
         //jsonpath_tests("./jsonpath_new/input/compliance/slice.json");
         //jsonpath_tests("./jsonpath_new/input/compliance/jsonpath-tests.json");
         //jsonpath_tests("./jsonpath_new/input/compliance/identifiers.json");
-        //jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
+        jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
     }
 }
 
