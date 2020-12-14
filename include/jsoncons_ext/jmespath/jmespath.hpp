@@ -286,7 +286,7 @@ namespace jmespath {
         key_val_expr,
         number,
         digit,
-        right_bracket_or_slice_expression,
+        index_or_slice_expression,
         bracket_specifier,
         bracket_specifier_or_multi_select_list,
         filter,
@@ -4115,7 +4115,7 @@ namespace jmespath {
                                 break;
                             // number
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = path_state::right_bracket_or_slice_expression;
+                                state_stack_.back() = path_state::index_or_slice_expression;
                                 state_stack_.emplace_back(path_state::number);
                                 break;
                             default:
@@ -4195,7 +4195,7 @@ namespace jmespath {
                         }
                         break;
 
-                    case path_state::right_bracket_or_slice_expression:
+                    case path_state::index_or_slice_expression:
                         switch(*p_)
                         {
                             case ']':

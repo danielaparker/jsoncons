@@ -4,7 +4,7 @@
      "cases": [
          {
             "expression": "$.foo.bar[0]",
-            "result": "zero"
+            "result": ["zero"]
          }/*,
          {
             "expression": "foo.bar[1]",

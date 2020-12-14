@@ -168,11 +168,14 @@ namespace jsoncons { namespace jsonpath_new {
         bracketed_double_quoted_name,
         bracketed_name_or_path,
         bracketed_wildcard_or_path,
-        wildcard_or_rpath_or_slice_or_filter,
-        slice_end_or_end_step,
-        slice_end,
-        slice_step,
-        slice_step2,
+
+        bracket_specifier,
+        index_or_slice_expression,
+        number,
+        digit,
+        rhs_slice_expression_start,
+        rhs_slice_expression_stop,
+
         comma_or_right_bracket,
         path_or_function_name,
         function,
@@ -928,7 +931,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 slic.start_ = 0;
                                 buffer.clear();
 
-                                state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
+                                state_stack_.back().state = path_state::bracket_specifier;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1221,7 +1224,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '[': // [ can follow ..
-                                state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
+                                state_stack_.back().state = path_state::bracket_specifier;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1276,7 +1279,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case '[':
-                                state_stack_.emplace_back(path_state::wildcard_or_rpath_or_slice_or_filter, state_stack_.back());
+                                state_stack_.emplace_back(path_state::bracket_specifier, state_stack_.back());
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1392,7 +1395,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case ',':
                                 state_stack_.back().is_union = true;
-                                state_stack_.back().state = path_state::wildcard_or_rpath_or_slice_or_filter;
+                                state_stack_.back().state = path_state::bracket_specifier;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1407,7 +1410,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 return;
                         }
                         break;
-                    case path_state::wildcard_or_rpath_or_slice_or_filter:
+                    case path_state::bracket_specifier:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -1433,11 +1436,9 @@ namespace jsoncons { namespace jsonpath_new {
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
                                 break;                   
                             }
-                            case ':':
-                                slic = slice{};
-                                buffer.clear();
-                                state_stack_.back().state = path_state::comma_or_right_bracket;
-                                state_stack_.emplace_back(path_state::slice_end_or_end_step, state_stack_.back());
+                            case ':': // slice_expression
+                                state_stack_.back().state = path_state::rhs_slice_expression_start ;
+                                state_stack_.emplace_back(path_state::number);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1459,8 +1460,12 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 break;
+                            // number
+                            case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                                state_stack_.back() = state_item(path_state::index_or_slice_expression);
+                                state_stack_.emplace_back(path_state::number);
+                                break;
                             default:
-                                slic = slice();
                                 buffer.clear();
                                 buffer.push_back(*p_);
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
@@ -1470,6 +1475,154 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                         }
                         break;
+
+                    case path_state::number:
+                        switch(*p_)
+                        {
+                            case '-':
+                                buffer.push_back(*p_);
+                                state_stack_.back() = state_item(path_state::digit);
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                state_stack_.back() = state_item(path_state::digit);
+                                break;
+                        }
+                        break;
+                    case path_state::digit:
+                        switch(*p_)
+                        {
+                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                state_stack_.pop_back(); // digit
+                                break;
+                        }
+                        break;
+                    case path_state::index_or_slice_expression:
+                        switch(*p_)
+                        {
+                            case ']':
+                            {
+                                if (buffer.empty())
+                                {
+                                    ec = jsonpath_errc::invalid_number;
+                                    return;
+                                }
+                                else
+                                {
+                                    auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                                    if (!r)
+                                    {
+                                        ec = jsonpath_errc::invalid_number;
+                                        return;
+                                    }
+                                    selectors_.push_back(jsoncons::make_unique<index_selector>(r.value()));
+
+                                    buffer.clear();
+                                }
+                                state_stack_.pop_back(); // bracket_specifier
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            case ':':
+                            {
+                                if (!buffer.empty())
+                                {
+                                    auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                                    if (!r)
+                                    {
+                                        ec = jsonpath_errc::invalid_number;
+                                        return;
+                                    }
+                                    slic.start_ = r.value();
+                                    buffer.clear();
+                                }
+                                state_stack_.back() = state_item(path_state::rhs_slice_expression_start);
+                                state_stack_.emplace_back(path_state::number);
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            default:
+                                ec = jsonpath_errc::expected_right_bracket;
+                                return;
+                        }
+                        break;
+                    case path_state::rhs_slice_expression_start:
+                    {
+                        if (!buffer.empty())
+                        {
+                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            if (!r)
+                            {
+                                ec = jsonpath_errc::invalid_number;
+                                return;
+                            }
+                            slic.stop_ = jsoncons::optional<int64_t>(r.value());
+                            buffer.clear();
+                        }
+                        switch(*p_)
+                        {
+                            case ']':
+                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
+                                slic = slice{};
+                                state_stack_.pop_back(); // bracket_specifier2
+                                ++p_;
+                                ++column_;
+                                break;
+                            case ':':
+                                state_stack_.back() = state_item(path_state::rhs_slice_expression_stop);
+                                state_stack_.emplace_back(path_state::number);
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::expected_right_bracket;
+                                return;
+                        }
+                        break;
+                    }
+                    case path_state::rhs_slice_expression_stop:
+                    {
+                        if (!buffer.empty())
+                        {
+                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            if (!r)
+                            {
+                                ec = jsonpath_errc::invalid_number;
+                                return;
+                            }
+                            if (r.value() == 0)
+                            {
+                                ec = jsonpath_errc::step_cannot_be_zero;
+                                return;
+                            }
+                            slic.step_ = r.value();
+                            buffer.clear();
+                        }
+                        switch(*p_)
+                        {
+                            case ']':
+                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
+                                buffer.clear();
+                                slic = slice{};
+                                state_stack_.pop_back(); // rhs_slice_expression_stop
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::expected_right_bracket;
+                                return;
+                        }
+                        break;
+                    }
+
                     case path_state::bracketed_unquoted_name:
                         switch (*p_)
                         {
@@ -1495,20 +1648,6 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
 
-                            case ':':
-                            {
-                                auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
-                                if (!r)
-                                {
-                                    ec = jsonpath_errc::expected_slice_start;
-                                    return;
-                                }
-                                slic.start_ = r.value();
-                                state_stack_.back().state = path_state::slice_end_or_end_step;
-                                ++p_;
-                                ++column_;
-                                break;
-                            }
                             case '.':
                             case '[':
                             case ',': 
@@ -1677,133 +1816,6 @@ namespace jsoncons { namespace jsonpath_new {
                         }
                         ++p_;
                         ++column_;
-                        break;
-                    case path_state::slice_end_or_end_step:
-                        switch (*p_)
-                        {
-                            case '-':
-                                buffer.clear();
-                                buffer.push_back(*p_);
-                                state_stack_.back().state = path_state::slice_end;
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                buffer.clear();
-                                buffer.push_back(*p_);
-                                state_stack_.back().state = path_state::slice_end;
-                                ++p_;
-                                ++column_;
-                                break;
-                            case ':':
-                                state_stack_.back().state = path_state::slice_step;
-                                ++p_;
-                                ++column_;
-                                break;
-                            case ',':
-                            case ']':
-                            {
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
-                                state_stack_.pop_back();
-                                break;
-                            }
-                            default:
-                                ec = jsonpath_errc::expected_minus_or_digit_or_colon_or_comma_or_right_bracket;
-                                return;
-                        }
-                        break;
-                    case path_state::slice_end:
-                        switch (*p_)
-                        {
-                            case ':':
-                            {
-                                auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
-                                if (!r)
-                                {
-                                    ec = jsonpath_errc::expected_slice_end;
-                                    return;
-                                }
-                                slic.stop_ = jsoncons::optional<int64_t>(r.value());
-                                buffer.clear();
-                                state_stack_.back().state = path_state::slice_step;
-                                ++p_;
-                                ++column_;
-                                break;
-                            }
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                                break;
-                            case ',':
-                            case ']':
-                            {
-                                auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
-                                if (!r || r.value() == 0)
-                                {
-                                    ec = jsonpath_errc::expected_slice_end;
-                                    return;
-                                }
-                                slic.stop_ = jsoncons::optional<int64_t>(r.value());
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
-                                state_stack_.pop_back();
-                                break;
-                            }
-                            default:
-                                ec = jsonpath_errc::expected_digit_or_colon_or_comma_or_right_bracket;
-                                return;
-                        }
-                        break;
-                    case path_state::slice_step:
-                        switch (*p_)
-                        {
-                            case '-':
-                                buffer.clear();
-                                state_stack_.back().state = path_state::slice_step2;
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                buffer.clear();
-                                state_stack_.back().state = path_state::slice_step2;
-                                break;
-                        }
-                        break;
-                    case path_state::slice_step2:
-                        switch (*p_)
-                        {
-                            case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                                break;
-                            case ',':
-                            case ']':
-                            {
-                                if (!buffer.empty())
-                                {
-                                    auto r = jsoncons::detail::to_integer_decimal<int64_t>(buffer.data(), buffer.size());
-                                    if (!r)
-                                    {
-                                        ec = jsonpath_errc::expected_slice_step;
-                                        return;
-                                    }
-                                    if (r.value() == 0)
-                                    {
-                                        ec = jsonpath_errc::step_cannot_be_zero;
-                                        return;
-                                    }
-                                    slic.step_ = r.value();
-                                }
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
-                                state_stack_.pop_back();
-                                break;
-                            }
-                            default:
-                                ec = jsonpath_errc::expected_minus_or_digit_or_comma_or_right_bracket;
-                                return;
-                        }
                         break;
                     case path_state::bracketed_single_quoted_name:
                         switch (*p_)
