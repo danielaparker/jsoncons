@@ -168,14 +168,12 @@ namespace jsoncons { namespace jsonpath_new {
         bracketed_double_quoted_name,
         bracketed_name_or_path,
         bracketed_wildcard_or_path,
-
         bracket_specifier,
         index_or_slice_expression,
         number,
         digit,
         rhs_slice_expression_start,
         rhs_slice_expression_stop,
-
         comma_or_right_bracket,
         path_or_function_name,
         function,
@@ -278,19 +276,49 @@ namespace jsoncons { namespace jsonpath_new {
 
         class selector_base
         {
+            bool is_recursive_descent_;
+            bool is_projection_;
+            bool is_filter_;
         public:
+
+            selector_base()
+                : is_recursive_descent_(false), 
+                  is_projection_(false), 
+                  is_filter_(false)
+            {
+            }
+
+            selector_base(bool is_recursive_descent,
+                          bool is_projection,
+                          bool is_filter)
+                : is_recursive_descent_(is_recursive_descent), 
+                  is_projection_(is_projection), 
+                  is_filter_(is_filter)
+            {
+            }
+
             virtual ~selector_base() noexcept = default;
+
+            bool is_recursive_descent() const
+            {
+                return is_recursive_descent_;
+            }
+
+            bool is_projection() const 
+            {
+                return is_projection_;
+            }
+
+            bool is_filter() const
+            {
+                return is_filter_;
+            }
+
             virtual void select(jsonpath_resources<Json>& resources,
                                 const string_type& path, reference val, node_set& nodes) = 0;
 
-            virtual bool is_filter() const
+            virtual void add_expression(std::unique_ptr<selector_base>&&) 
             {
-                return false;
-            }
-
-            virtual bool is_recursive_descent() const
-            {
-                return false;
             }
         };
 
@@ -352,16 +380,15 @@ namespace jsoncons { namespace jsonpath_new {
         class recursive_descent_selector final : public selector_base
         {
         public:
+            recursive_descent_selector()
+                : selector_base(true, false, false)
+            {
+            }
 
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, reference val,
                         node_set& nodes) override
             {
-            }
-
-            bool is_recursive_descent() const override
-            {
-                return true;
             }
         };
 
@@ -432,13 +459,8 @@ namespace jsoncons { namespace jsonpath_new {
              jsonpath_filter_expr<Json> result_;
         public:
             filter_selector(const jsonpath_filter_expr<Json>& result)
-                : result_(result)
+                : selector_base(false, false, true), result_(result)
             {
-            }
-
-            bool is_filter() const override
-            {
-                return true;
             }
 
             void select(jsonpath_resources<Json>& resources,
