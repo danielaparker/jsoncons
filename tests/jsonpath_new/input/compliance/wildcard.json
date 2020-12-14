@@ -1,0 +1,39 @@
+[
+    /*{
+        "given" : [
+                "string",
+                42,
+                {
+                    "key": "value"
+                },
+                [0, 1]
+            ],
+        "cases" : [
+            {
+                "comment" : "Bracket notation with wildcard on array",
+                "expression" : "$[*]",
+                "result" : [
+                    "string",
+                    42,
+                    {
+                      "key": "value"
+                    },
+                    [
+                      0,
+                      1
+                    ]
+                  ]
+            }
+        ]
+    },*/
+    {
+        "given" : [{"bar": [42]}],
+        "cases" : [
+            {
+                "comment" : "Bracket notation with wildcard after dot notation after bracket notation with wildcard",
+                "expression" : "$[*].bar[*]",
+                "result" : [42]
+            }
+        ]
+    }
+]

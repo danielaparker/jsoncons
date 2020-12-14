@@ -279,6 +279,7 @@ namespace jsoncons { namespace jsonpath_new {
             bool is_recursive_descent_;
             bool is_projection_;
             bool is_filter_;
+            std::size_t precedence_level_;
         public:
 
             selector_base()
@@ -290,10 +291,12 @@ namespace jsoncons { namespace jsonpath_new {
 
             selector_base(bool is_recursive_descent,
                           bool is_projection,
-                          bool is_filter)
+                          bool is_filter,
+                          std::size_t precedence_level = 0)
                 : is_recursive_descent_(is_recursive_descent), 
                   is_projection_(is_projection), 
-                  is_filter_(is_filter)
+                  is_filter_(is_filter),
+                  precedence_level_(precedence_level)
             {
             }
 
@@ -314,6 +317,16 @@ namespace jsoncons { namespace jsonpath_new {
                 return is_filter_;
             }
 
+            std::size_t precedence_level() const
+            {
+                return precedence_level_;
+            }
+
+            bool is_right_associative() const
+            {
+                return true;
+            }
+
             virtual void select(jsonpath_resources<Json>& resources,
                                 const string_type& path, reference val, node_set& nodes) = 0;
 
@@ -332,7 +345,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
+            void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
                         node_set& nodes) override
             {
@@ -356,7 +369,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
+            void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
                         node_set& nodes) override
             {
@@ -385,10 +398,93 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
+            void select(jsonpath_resources<Json>& /*resources*/,
+                        const string_type& /*path*/, 
+                        reference /*val*/,
+                        node_set& /*nodes*/) override
+            {
+            }
+        };
+
+        // projection_base
+        class projection_base : public selector_base
+        {
+        protected:
+            std::vector<std::unique_ptr<selector_base>> selectors_;
+        public:
+            projection_base(std::size_t precedence_level)
+                : selector_base(false, true, false, precedence_level)
+            {
+            }
+
+            void add_expression(std::unique_ptr<selector_base>&& expr) override
+            {
+                if (!selectors_.empty() && selectors_.back()->is_projection() && 
+                    (expr->precedence_level() < selectors_.back()->precedence_level() ||
+                     (expr->precedence_level() == selectors_.back()->precedence_level() && expr->is_right_associative())))
+                {
+                    selectors_.back()->add_expression(std::move(expr));
+                }
+                else
+                {
+                    selectors_.emplace_back(std::move(expr));
+                }
+            }
+
+            void apply_expressions(jsonpath_resources<Json>& resources,
+                                   const string_type& path, 
+                                   reference val,
+                                   node_set& nodes) const
+            {
+                if (!val.is_array())
+                {
+                    return;
+                }
+                if (selectors_.empty())
+                {
+                    for (auto& item : val.array_range())
+                    {
+                        nodes.emplace_back(path, std::addressof(item));
+                    }
+                }
+                else
+                {
+                    node_set collect;
+                    for (auto& item : val.array_range())
+                    {
+                        collect.emplace_back(path, std::addressof(item));
+                    }
+                    for (auto& selector : selectors_)
+                    {
+                        node_set temp;
+                        for (auto& item : collect)
+                        {
+                            selector->select(resources, path, *(item.val_ptr), temp);
+                        }
+                        collect = temp;
+                    }
+                    for (auto& item : collect)
+                    {
+                        nodes.emplace_back(std::move(item));
+                    }
+                }
+            }
+        };
+
+        class wildcard_selector final : public projection_base
+        {
+        private:
+        public:
+            wildcard_selector()
+                : projection_base(11)
+            {
+            }
+
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, reference val,
                         node_set& nodes) override
             {
+                this->apply_expressions(resources, path, val, nodes);
             }
         };
 
@@ -402,9 +498,10 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
-                        const string_type& path, reference val, 
-                        node_set& nodes) override
+            void select(jsonpath_resources<Json>& /*resources*/,
+                        const string_type& /*path*/, 
+                        reference /*val*/, 
+                        node_set& /*nodes*/) override
             {
 /*
                 std::error_code ec;
@@ -430,9 +527,10 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
-                        const string_type& path, reference val, 
-                        node_set& nodes) override
+            void select(jsonpath_resources<Json>& /*resources*/,
+                        const string_type& /*path*/, 
+                        reference /*val*/, 
+                        node_set& /*nodes*/) override
             {
 /*
                 auto index = result_.eval(resources, val);
@@ -463,9 +561,10 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
-                        const string_type& path, reference val, 
-                        node_set& nodes) override
+            void select(jsonpath_resources<Json>& /*resources*/,
+                        const string_type& /*path*/, 
+                        reference /*val*/, 
+                        node_set& /*nodes*/) override
             {
                 //std::cout << "filter_selector select ";
                 /*
@@ -503,8 +602,9 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             void select(jsonpath_resources<Json>&,
-                        const string_type& path, reference val,
-                        node_set& nodes) override
+                        const string_type& /*path*/, 
+                        reference /*val*/,
+                        node_set& /*nodes*/) override
             {
                 /*
                 if (val.is_array())
@@ -926,7 +1026,8 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case ' ':case '\t':case '\r':case '\n':
                             {
-                                selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -946,7 +1047,7 @@ namespace jsoncons { namespace jsonpath_new {
                             {
                                 if (buffer.size() > 0)
                                 {
-                                    selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                    add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                     //apply_selectors(resources);
                                     buffer.clear();
                                 }
@@ -962,7 +1063,7 @@ namespace jsoncons { namespace jsonpath_new {
                             {
                                 if (buffer.size() > 0)
                                 {
-                                    selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                    add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                     //apply_selectors(resources);
                                     buffer.clear();
                                 }
@@ -973,8 +1074,8 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             case '*':
                             {
-                                end_all();
-                                transfer_nodes();
+                                //end_all();
+                                //transfer_nodes();
                                 state_stack_.back().state = path_state::dot;
                                 ++p_;
                                 ++column_;
@@ -1228,7 +1329,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '.':
-                                selectors_.push_back(jsoncons::make_unique<recursive_descent_selector>());
+                                add_selector(jsoncons::make_unique<recursive_descent_selector>());
                                 state_stack_.back().is_recursive_descent = true;
                                 ++p_;
                                 ++column_;
@@ -1263,8 +1364,8 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '*':
-                                end_all();
-                                transfer_nodes();
+                                //end_all();
+                                //transfer_nodes();
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -1334,14 +1435,14 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '[':
-                                selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                 //apply_selectors(resources);
                                 slic.start_ = 0;
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
                             case '.':
-                                selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1355,7 +1456,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\'':
-                                selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1384,7 +1485,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\"':
-                                selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1422,7 +1523,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case ']':
-                                apply_selectors(resources);
+                                //apply_selectors(resources);
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -1444,7 +1545,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources, root, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                selectors_.push_back(jsoncons::make_unique<expr_selector>(result));
+                                add_selector(jsoncons::make_unique<expr_selector>(result));
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
                                 break;
                             }
@@ -1454,7 +1555,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources,root,p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                selectors_.push_back(jsoncons::make_unique<filter_selector>(result));
+                                add_selector(jsoncons::make_unique<filter_selector>(result));
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
                                 break;                   
                             }
@@ -1543,7 +1644,7 @@ namespace jsoncons { namespace jsonpath_new {
                                         ec = jsonpath_errc::invalid_number;
                                         return;
                                     }
-                                    selectors_.push_back(jsoncons::make_unique<index_selector>(r.value()));
+                                    add_selector(jsoncons::make_unique<index_selector>(r.value()));
 
                                     buffer.clear();
                                 }
@@ -1592,7 +1693,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch(*p_)
                         {
                             case ']':
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
+                                add_selector(jsoncons::make_unique<slice_selector>(slic));
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 ++p_;
@@ -1631,7 +1732,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch(*p_)
                         {
                             case ']':
-                                selectors_.push_back(jsoncons::make_unique<slice_selector>(slic));
+                                add_selector(jsoncons::make_unique<slice_selector>(slic));
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack_.pop_back(); // rhs_slice_expression_stop
@@ -1701,7 +1802,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case ',': 
                             case ']': 
-                                selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1732,7 +1833,8 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case ',': 
                             case ']': 
-                                end_all();
+                                add_selector(jsoncons::make_unique<wildcard_selector>());
+                                //end_all();
                                 state_stack_.pop_back();
                                 break;
                             default:
@@ -1759,7 +1861,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case ']': 
                                 if (!buffer.empty())
                                 {
-                                    selectors_.push_back(jsoncons::make_unique<path_selector>(buffer));
+                                    add_selector(jsoncons::make_unique<path_selector>(buffer));
                                     buffer.clear();
                                 }
                                 state_stack_.pop_back();
@@ -1903,7 +2005,7 @@ namespace jsoncons { namespace jsonpath_new {
                 case path_state::unquoted_name: 
                 case path_state::unquoted_name2: 
                 {
-                    selectors_.push_back(jsoncons::make_unique<identifier_selector>(buffer));
+                    add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                     //apply_selectors(resources);
                     buffer.clear();
                     state_stack_.pop_back(); // unquoted_name
@@ -1985,96 +2087,6 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 
-        void apply_selectors(jsonpath_resources<Json>& resources)
-        {
-            //std::cout << "apply_selectors count: " << selectors_.size() << "\n";
-            if (selectors_.size() > 0)
-            {
-                for (auto& node : stack_.back())
-                {
-                    //std::cout << "apply selector to:\n" << pretty_print(*(node.val_ptr)) << "\n";
-                    for (auto& selector : selectors_)
-                    {
-                        apply_selector(resources, node.path, *(node.val_ptr), *selector, true);
-                    }
-                }
-                selectors_.clear();
-            }
-            transfer_nodes();
-        }
-
-        void apply_selector(jsonpath_resources<Json>& resources,
-                            const string_type& path, 
-                            reference val, 
-                            selector_base& selector, 
-                            bool process)
-        {
-            if (process)
-            {
-                selector.select(resources, path, val, nodes_);
-            }
-            //std::cout << "*it: " << val << "\n";
-            //std::cout << "apply_selectors 1 done\n";
-            if (state_stack_.back().is_recursive_descent)
-            {
-                //std::cout << "is_recursive_descent\n";
-                if (val.is_object())
-                {
-                    //std::cout << "is_object\n";
-                    for (auto& nvp : val.object_range())
-                    {
-                        if (nvp.value().is_array() || nvp.value().is_object())
-                        {                        
-                            apply_selector(resources, PathCons()(path,nvp.key()), nvp.value(), selector, true);
-                        } 
-                    }
-                }
-                else if (val.is_array())
-                {
-                    //std::cout << "is_array\n";
-                    auto first = val.array_range().begin();
-                    auto last = val.array_range().end();
-                    for (auto it = first; it != last; ++it)
-                    {
-                        if (it->is_array())
-                        {
-                            apply_selector(resources, PathCons()(path,it - first), *it,selector, true);
-                            //std::cout << "*it: " << *it << "\n";
-                        }
-                        else if (it->is_object())
-                        {
-                            apply_selector(resources, PathCons()(path,it - first), *it, selector, !selector.is_filter());
-                        }
-                    }
-                }
-            }
-        }
-
-        void transfer_nodes()
-        {
-            if (state_stack_.back().is_union)
-            {
-                std::set<node_type, node_less> index;
-                std::vector<node_type> temp;
-                for (const auto& node : nodes_)
-                {
-                    if (index.count(node) == 0)
-                    {
-                        temp.emplace_back(node);
-                        index.emplace(node);
-                    }
-                }
-                stack_.emplace_back(std::move(temp));
-            }
-            else
-            {
-                stack_.push_back(std::move(nodes_));
-            }
-            nodes_.clear();
-            state_stack_.back().is_recursive_descent = false;
-            state_stack_.back().is_union = false;
-        }
-
         void advance_past_space_character()
         {
             switch (*p_)
@@ -2099,6 +2111,22 @@ namespace jsoncons { namespace jsonpath_new {
                     break;
             }
         }
+
+        void add_selector(std::unique_ptr<selector_base>&& selector)
+        {
+            //selectors_.push_back(std::move(selector));
+            if (!selectors_.empty() && selectors_.back()->is_projection() && 
+                (selector->precedence_level() < selectors_.back()->precedence_level() ||
+                (selector->precedence_level() == selectors_.back()->precedence_level() && selector->is_right_associative())))
+            {
+                selectors_.back()->add_expression(std::move(selector));
+            }
+            else
+            {
+                selectors_.emplace_back(std::move(selector));
+            }
+        }
+
     };
 
     }
