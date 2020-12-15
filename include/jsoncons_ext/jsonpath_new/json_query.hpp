@@ -1071,6 +1071,7 @@ namespace jsoncons { namespace jsonpath_new {
                             {
                                 //end_all();
                                 //transfer_nodes();
+                                add_selector(jsoncons::make_unique<wildcard_selector>());
                                 state_stack_.back().state = path_state::dot;
                                 ++p_;
                                 ++column_;
@@ -1361,6 +1362,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case '*':
                                 //end_all();
                                 //transfer_nodes();
+                                add_selector(jsoncons::make_unique<wildcard_selector>());
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;

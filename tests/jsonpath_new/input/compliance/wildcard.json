@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         "given" : [
                 "string",
                 42,
@@ -35,5 +35,32 @@
                 "result" : [42]
             }
         ]
-    }
-]
+    },
+    */
+    {
+        "given" : [
+                   "string",
+                   42,
+                   {
+                       "key": "value"
+                   },
+                   [0, 1]
+                ],
+        "cases" : [
+            {
+                "comment" : "Dot notation with wildcard on array",
+                "expression" : "$.*",
+                "result" : [
+                    "string",
+                    42,
+                    {
+                      "key": "value"
+                    },
+                    [
+                      0,
+                      1
+                    ]
+                  ]
+            }
+        ]
+    }]
