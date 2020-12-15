@@ -1,5 +1,5 @@
 [
-    /*{
+    {
         "given" : ["first", "second", "third", "forth", "fifth"],
         "cases" : [
             {
@@ -68,7 +68,7 @@
                 "result" : ["ey","bee"]
             }
         ]
-    },*/ 
+    }, 
     {
      "given": {
        "foo": [{"a": 1}, {"a": 2}, {"a": 3}],
@@ -77,7 +77,7 @@
        "baz": 50
      },
      "cases": [
-       /*{
+       {
          "expression": "$.foo[:2].a",
          "result": [1, 2]
        },
@@ -88,14 +88,6 @@
        {
          "expression": "$.foo[:2].a.b",
          "result": []
-       },
-       {
-         "expression": "$.bar[::-1]",
-         "result": [3, 2, 1]
-       },
-       {
-         "expression": "$.bar[::-1].a",
-         "result": [3, 2, 1]
        },
        {
          "expression": "$.bar[::-1].a.b",
@@ -109,34 +101,7 @@
        {
          "expression": "$.baz[:2].a",
          "result": []
-       }*/
-     ]
-   },
-   {
-     "given": {"bar":[{"a": {"b": 1}}, {"a": {"b": 2}},
-   	    {"a": {"b": 3}}]},
-     "cases": [
-       /*{
-         "expression": "$.bar",
-         "result": [[{"a":{"b":1}},{"a":{"b":2}},{"a":{"b":3}}]]
-       },
-       {
-         "expression": "$.bar[0]",
-         "result": [{"a":{"b":1}}]
-       },
-       {
-         "expression": "$.bar[0:3]",
-         "result": [{"a":{"b":1}},{"a":{"b":2}},{"a":{"b":3}}]
-       },*/
-       {
-         "expression": "$.bar[::-1]",
-         "result": [{"a":{"b":3}},{"a":{"b":2}},{"a":{"b":1}}]
        }
-       /*,
-       {
-         "expression": "$.bar[::-1]",
-         "result": [{"a": {"b": 3}},{"a": {"b": 2}},{"a": {"b": 1}}]
-       }*/
      ]
    }
 ]

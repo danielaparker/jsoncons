@@ -43,7 +43,7 @@ void jsonpath_tests(const std::string& fpath)
                 if (test_case.contains("result"))
                 {
                     const ojson& expected = test_case["result"];
-                    std::cout << "actual\n:" << actual << "\n";
+                    //std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
                     {
                         if (test_case.contains("comment"))
