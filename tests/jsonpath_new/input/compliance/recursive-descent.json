@@ -17,7 +17,7 @@
                 "result" : ["top","value","something",{"key":"russian dolls"},"russian dolls"]
             }
         ]
-    }/*,
+    },
     {
         "given" : [
           "first",
@@ -39,19 +39,8 @@
             {
                 "comment" : "Bracket notation after recursive descent",
                 "expression" : "$..[0]",
-                "result" : [
-                 "deepest",
-                 "first nested",
-                 "first",
-                 "more",
-                 {
-                   "nested": [
-                     "deepest",
-                     "second"
-                   ]
-                 }
-               ]
+                "result" : ["first","first nested",{"nested":["deepest","second"]},"more","deepest"]
             }
         ]
-    }*/
+    }
 ]
