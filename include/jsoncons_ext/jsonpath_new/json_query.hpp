@@ -586,17 +586,17 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class slice_selector final : public selector_base
+        class slice_selector final : public projection_base
         {
         private:
             slice slice_;
         public:
             slice_selector(const slice& slic)
-                : slice_(slic) 
+                : projection_base(11), slice_(slic) 
             {
             }
 
-            void select(jsonpath_resources<Json>&,
+            void select(jsonpath_resources<Json>& resources,
                         const string_type& path, 
                         reference val,
                         node_set& nodes) override
@@ -620,7 +620,8 @@ namespace jsoncons { namespace jsonpath_new {
                         for (int64_t i = start; i < end; i += step)
                         {
                             std::size_t j = static_cast<std::size_t>(i);
-                            nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
+                            //nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
+                            this->apply_expressions(resources, path, val[j], nodes);
                         }
                     }
                     else if (step < 0)
@@ -638,7 +639,8 @@ namespace jsoncons { namespace jsonpath_new {
                             std::size_t j = static_cast<std::size_t>(i);
                             if (j < val.size())
                             {
-                                nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
+                                //nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
+                                this->apply_expressions(resources, path, val[j], nodes);
                             }
                         }
                     }
@@ -1045,7 +1047,6 @@ namespace jsoncons { namespace jsonpath_new {
                                     //apply_selectors(resources);
                                     buffer.clear();
                                 }
-                                slic.start_ = 0;
                                 buffer.clear();
 
                                 state_stack_.back().state = path_state::bracket_specifier;
@@ -1431,7 +1432,6 @@ namespace jsoncons { namespace jsonpath_new {
                             case '[':
                                 add_selector(jsoncons::make_unique<identifier_selector>(buffer));
                                 //apply_selectors(resources);
-                                slic.start_ = 0;
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
