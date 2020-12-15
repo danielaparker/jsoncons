@@ -1069,8 +1069,6 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             case '*':
                             {
-                                //end_all();
-                                //transfer_nodes();
                                 add_selector(jsoncons::make_unique<wildcard_selector>());
                                 state_stack_.back().state = path_state::dot;
                                 ++p_;
@@ -1360,8 +1358,6 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '*':
-                                //end_all();
-                                //transfer_nodes();
                                 add_selector(jsoncons::make_unique<wildcard_selector>());
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1830,7 +1826,6 @@ namespace jsoncons { namespace jsonpath_new {
                             case ',': 
                             case ']': 
                                 add_selector(jsoncons::make_unique<wildcard_selector>());
-                                //end_all();
                                 state_stack_.pop_back();
                                 break;
                             default:
@@ -2034,51 +2029,6 @@ namespace jsoncons { namespace jsonpath_new {
                     JSONCONS_ASSERT(state_stack_.back().state == path_state::start);
                     state_stack_.pop_back();
                     break;
-                }
-            }
-        }
-
-        void end_all()
-        {
-            for (const auto& node : stack_.back())
-            {
-                const auto& path = node.path;
-                pointer p = node.val_ptr;
-                end_all(path, *p);
-            }
-        }
-
-        void end_all(const string_type& path, reference val)
-        {
-            if (val.is_array())
-            {
-                for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
-                {
-                    nodes_.emplace_back(PathCons()(path,it - val.array_range().begin()),std::addressof(*it));
-                }
-            }
-            else if (val.is_object())
-            {
-                for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
-                {
-                    nodes_.emplace_back(PathCons()(path,it->key()),std::addressof(it->value()));
-                }
-            }
-            if (state_stack_.back().is_recursive_descent)
-            {
-                if (val.is_array())
-                {
-                    for (auto it = val.array_range().begin(); it != val.array_range().end(); ++it)
-                    {
-                        end_all(PathCons()(path, it - val.array_range().begin()),*it);
-                    }
-                }
-                else if (val.is_object())
-                {
-                    for (auto it = val.object_range().begin(); it != val.object_range().end(); ++it)
-                    {
-                        end_all(PathCons()(path,it->key()),it->value());
-                    }
                 }
             }
         }
