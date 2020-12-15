@@ -1,4 +1,4 @@
-
+// Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
 #if defined(_MSC_VER)
@@ -40,10 +40,10 @@ void jsonpath_tests(const std::string& fpath)
             {
                 auto expression = jsoncons::jsonpath_new::make_expression<ojson>(jsoncons::string_view(expr));
                 ojson actual = expression.evaluate(instance);
-                //ojson actual = jsonpath_new::json_query(instance, expr);
                 if (test_case.contains("result"))
                 {
                     const ojson& expected = test_case["result"];
+                    std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
                     {
                         if (test_case.contains("comment"))

@@ -436,32 +436,20 @@ namespace jsoncons { namespace jsonpath_new {
                                    reference val,
                                    node_set& nodes) const
             {
-                if (!val.is_array())
-                {
-                    return;
-                }
                 if (selectors_.empty())
                 {
-                    for (auto& item : val.array_range())
-                    {
-                        nodes.emplace_back(path, std::addressof(item));
-                    }
+                    nodes.emplace_back(path, std::addressof(val));
                 }
                 else
                 {
                     node_set collect;
-                    for (auto& item : val.array_range())
-                    {
-                        collect.emplace_back(path, std::addressof(item));
-                    }
+                    collect.emplace_back(path,std::addressof(val));
                     for (auto& selector : selectors_)
                     {
                         node_set temp;
                         for (auto& item : collect)
-                        {
                             selector->select(resources, path, *(item.val_ptr), temp);
-                        }
-                        collect = temp;
+                        collect = std::move(temp);
                     }
                     for (auto& item : collect)
                     {
@@ -484,7 +472,14 @@ namespace jsoncons { namespace jsonpath_new {
                         const string_type& path, reference val,
                         node_set& nodes) override
             {
-                this->apply_expressions(resources, path, val, nodes);
+                if (!val.is_array())
+                {
+                    return;
+                }
+                for (auto& item : val.array_range())
+                {
+                    this->apply_expressions(resources, path, item, nodes);
+                }
             }
         };
 
@@ -602,11 +597,10 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             void select(jsonpath_resources<Json>&,
-                        const string_type& /*path*/, 
-                        reference /*val*/,
-                        node_set& /*nodes*/) override
+                        const string_type& path, 
+                        reference val,
+                        node_set& nodes) override
             {
-                /*
                 if (val.is_array())
                 {
                     auto start = slice_.get_start(val.size());
@@ -648,7 +642,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                         }
                     }
-                }*/
+                }
             }
         };
 
