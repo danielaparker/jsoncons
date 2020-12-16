@@ -24,6 +24,148 @@
 
 namespace jsoncons { namespace jsonpath_new {
 
+    // token
+
+    enum class path_token_type
+    {
+        current_node,
+        recursive_descent,
+        lparen,
+        rparen,
+        begin_multi_select_list,
+        end_multi_select_list,
+        begin_filter,
+        end_filter,
+        separator,
+        literal,
+        selector,
+        function,
+        begin_function,
+        end_function,
+        argument,
+        begin_expression_type,
+        end_expression_type,
+        end_of_expression
+    };
+
+    struct literal_arg_t
+    {
+        explicit literal_arg_t() = default;
+    };
+    constexpr literal_arg_t literal_arg{};
+
+    struct recursive_descent_arg_t
+    {
+        explicit recursive_descent_arg_t() = default;
+    };
+    constexpr recursive_descent_arg_t recursive_descent_arg{};
+
+    struct begin_expression_type_arg_t
+    {
+        explicit begin_expression_type_arg_t() = default;
+    };
+    constexpr begin_expression_type_arg_t begin_expression_type_arg{};
+
+    struct end_expression_type_arg_t
+    {
+        explicit end_expression_type_arg_t() = default;
+    };
+    constexpr end_expression_type_arg_t end_expression_type_arg{};
+
+    struct end_of_expression_arg_t
+    {
+        explicit end_of_expression_arg_t() = default;
+    };
+    constexpr end_of_expression_arg_t end_of_expression_arg{};
+
+    struct separator_arg_t
+    {
+        explicit separator_arg_t() = default;
+    };
+    constexpr separator_arg_t separator_arg{};
+
+    struct lparen_arg_t
+    {
+        explicit lparen_arg_t() = default;
+    };
+    constexpr lparen_arg_t lparen_arg{};
+
+    struct rparen_arg_t
+    {
+        explicit rparen_arg_t() = default;
+    };
+    constexpr rparen_arg_t rparen_arg{};
+
+    struct begin_multi_select_list_arg_t
+    {
+        explicit begin_multi_select_list_arg_t() = default;
+    };
+    constexpr begin_multi_select_list_arg_t begin_multi_select_list_arg{};
+
+    struct end_multi_select_list_arg_t
+    {
+        explicit end_multi_select_list_arg_t() = default;
+    };
+    constexpr end_multi_select_list_arg_t end_multi_select_list_arg{};
+
+    struct begin_filter_arg_t
+    {
+        explicit begin_filter_arg_t() = default;
+    };
+    constexpr begin_filter_arg_t begin_filter_arg{};
+
+    struct end_filter_arg_t
+    {
+        explicit end_filter_arg_t() = default;
+    };
+    constexpr end_filter_arg_t end_filter_arg{};
+
+    struct current_node_arg_t
+    {
+        explicit current_node_arg_t() = default;
+    };
+    constexpr current_node_arg_t current_node_arg{};
+
+    struct end_function_arg_t
+    {
+        explicit end_function_arg_t() = default;
+    };
+    constexpr end_function_arg_t end_function_arg{};
+
+    struct begin_function_arg_t
+    {
+        explicit begin_function_arg_t() = default;
+    };
+    constexpr begin_function_arg_t begin_function_arg{};
+
+    struct argument_arg_t
+    {
+        explicit argument_arg_t() = default;
+    };
+    constexpr argument_arg_t argument_arg{};
+
+    // function_base
+    class function_base
+    {
+        jsoncons::optional<std::size_t> arg_count_;
+    public:
+        function_base(jsoncons::optional<std::size_t> arg_count)
+            : arg_count_(arg_count)
+        {
+        }
+
+        jsoncons::optional<std::size_t> arg_count() const
+        {
+            return arg_count_;
+        }
+
+        virtual ~function_base() = default;
+
+        //virtual reference evaluate(std::vector<parameter>& args, 
+        //                           eval_context&, 
+        //                           std::error_code& ec) const = 0;
+    };  
+
     struct slice
     {
         jsoncons::optional<int64_t> start_;
@@ -278,36 +420,27 @@ namespace jsoncons { namespace jsonpath_new {
 
         class selector_base
         {
-            bool is_recursive_descent_;
             bool is_projection_;
             bool is_filter_;
             std::size_t precedence_level_;
         public:
 
             selector_base()
-                : is_recursive_descent_(false), 
-                  is_projection_(false), 
+                : is_projection_(false), 
                   is_filter_(false)
             {
             }
 
-            selector_base(bool is_recursive_descent,
-                          bool is_projection,
+            selector_base(bool is_projection,
                           bool is_filter,
                           std::size_t precedence_level = 0)
-                : is_recursive_descent_(is_recursive_descent), 
-                  is_projection_(is_projection), 
+                : is_projection_(is_projection), 
                   is_filter_(is_filter),
                   precedence_level_(precedence_level)
             {
             }
 
             virtual ~selector_base() noexcept = default;
-
-            bool is_recursive_descent() const
-            {
-                return is_recursive_descent_;
-            }
 
             bool is_projection() const 
             {
@@ -332,26 +465,264 @@ namespace jsoncons { namespace jsonpath_new {
             virtual void select(jsonpath_resources<Json>& resources,
                                 const string_type& path, reference val, node_set& nodes) = 0;
 
-            virtual void add_expression(std::unique_ptr<selector_base>&&) 
+            virtual void add_selector(std::unique_ptr<selector_base>&&) 
             {
             }
         };
+
+        class token
+        {
+        public:
+            path_token_type type_;
+
+            union
+            {
+                std::unique_ptr<selector_base> selector_;
+                function_base* function_;
+                Json value_;
+            };
+        public:
+
+            token(current_node_arg_t) noexcept
+                : type_(path_token_type::current_node)
+            {
+            }
+
+            token(begin_function_arg_t) noexcept
+                : type_(path_token_type::begin_function)
+            {
+            }
+
+            token(end_function_arg_t) noexcept
+                : type_(path_token_type::end_function)
+            {
+            }
+
+            token(separator_arg_t) noexcept
+                : type_(path_token_type::separator)
+            {
+            }
+
+            token(lparen_arg_t) noexcept
+                : type_(path_token_type::lparen)
+            {
+            }
+
+            token(rparen_arg_t) noexcept
+                : type_(path_token_type::rparen)
+            {
+            }
+
+            token(end_of_expression_arg_t) noexcept
+                : type_(path_token_type::end_of_expression)
+            {
+            }
+
+            token(begin_multi_select_list_arg_t) noexcept
+                : type_(path_token_type::begin_multi_select_list)
+            {
+            }
+
+            token(end_multi_select_list_arg_t) noexcept
+                : type_(path_token_type::end_multi_select_list)
+            {
+            }
+
+            token(begin_filter_arg_t) noexcept
+                : type_(path_token_type::begin_filter)
+            {
+            }
+
+            token(end_filter_arg_t) noexcept
+                : type_(path_token_type::end_filter)
+            {
+            }
+
+            token(std::unique_ptr<selector_base>&& expression)
+                : type_(path_token_type::selector)
+            {
+                new (&selector_) std::unique_ptr<selector_base>(std::move(expression));
+            }
+
+            token(function_base* function) noexcept
+                : type_(path_token_type::function),
+                  function_(function)
+            {
+            }
+
+            token(argument_arg_t) noexcept
+                : type_(path_token_type::argument)
+            {
+            }
+
+            token(begin_expression_type_arg_t) noexcept
+                : type_(path_token_type::begin_expression_type)
+            {
+            }
+
+            token(end_expression_type_arg_t) noexcept
+                : type_(path_token_type::end_expression_type)
+            {
+            }
+
+            token(recursive_descent_arg_t) noexcept
+                : type_(path_token_type::recursive_descent)
+            {
+            }
+
+            token(literal_arg_t, Json&& value) noexcept
+                : type_(path_token_type::literal), value_(std::move(value))
+            {
+            }
+
+            token(token&& other) noexcept
+            {
+                construct(std::forward<token>(other));
+            }
+
+            token& operator=(token&& other)
+            {
+                if (&other != this)
+                {
+                    if (type_ == other.type_)
+                    {
+                        switch (type_)
+                        {
+                            case path_token_type::selector:
+                                selector_ = std::move(other.selector_);
+                                break;
+                            case path_token_type::function:
+                                function_ = other.function_;
+                                break;
+                            case path_token_type::literal:
+                                value_ = std::move(other.value_);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        destroy();
+                        construct(std::forward<token>(other));
+                    }
+                }
+                return *this;
+            }
+
+            ~token() noexcept
+            {
+                destroy();
+            }
+
+            path_token_type type() const
+            {
+                return type_;
+            }
+
+            bool is_lparen() const
+            {
+                return type_ == path_token_type::lparen; 
+            }
+
+            bool is_rparen() const
+            {
+                return type_ == path_token_type::rparen; 
+            }
+
+            bool is_current_node() const
+            {
+                return type_ == path_token_type::current_node; 
+            }
+
+            bool is_projection() const
+            {
+                return type_ == path_token_type::selector && selector_->is_projection(); 
+            }
+
+            bool is_expression() const
+            {
+                return type_ == path_token_type::selector; 
+            }
+
+            bool is_recursive_descent() const
+            {
+                return type_ == path_token_type::recursive_descent; 
+            }
+
+            std::size_t precedence_level() const
+            {
+                switch(type_)
+                {
+                    case path_token_type::selector:
+                        return selector_->precedence_level();
+                    default:
+                        return 0;
+                }
+            }
+
+            bool is_right_associative() const
+            {
+                switch(type_)
+                {
+                    case path_token_type::selector:
+                        return selector_->is_right_associative();
+                    default:
+                        return false;
+                }
+            }
+
+            void construct(token&& other)
+            {
+                type_ = other.type_;
+                switch (type_)
+                {
+                    case path_token_type::selector:
+                        new (&selector_) std::unique_ptr<selector_base>(std::move(other.selector_));
+                        break;
+                    case path_token_type::function:
+                        function_ = other.function_;
+                        break;
+                    case path_token_type::literal:
+                        new (&value_) Json(std::move(other.value_));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            void destroy() noexcept 
+            {
+                switch(type_)
+                {
+                    case path_token_type::selector:
+                        selector_.~unique_ptr();
+                        break;
+                    case path_token_type::literal:
+                        value_.~Json();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+
     public:
         class jsonpath_expression
         {
-            std::vector<std::unique_ptr<selector_base>> selectors_;
+            std::vector<token> tokens_;
         public:
             jsonpath_expression()
             {
             }
 
             jsonpath_expression(jsonpath_expression&& expr)
-                : selectors_(std::move(expr.selectors_))
+                : tokens_(std::move(expr.tokens_))
             {
             }
 
-            jsonpath_expression(std::vector<std::unique_ptr<selector_base>>&& selectors)
-                : selectors_(std::move(selectors))
+            jsonpath_expression(std::vector<token>&& tokens)
+                : tokens_(std::move(tokens))
             {
             }
 
@@ -383,11 +754,11 @@ namespace jsoncons { namespace jsonpath_new {
                 Json result(json_array_arg);
                 bool is_recursive_descent = false;
 
-                if (!selectors_.empty())
+                if (!tokens_.empty())
                 {
                     stack.emplace_back(path,std::addressof(instance));
                     for (std::size_t i = 0; 
-                         i < selectors_.size();
+                         i < tokens_.size();
                          )
                     {
                         for (auto& item : stack)
@@ -397,7 +768,14 @@ namespace jsoncons { namespace jsonpath_new {
                         stack.clear();
                         for (auto& item : output_stack)
                         {
-                            selectors_[i]->select(dynamic_resources, path, *(item.val_ptr), stack);
+                            switch (tokens_[i].type())
+                            { 
+                                case path_token_type::selector:
+                                    tokens_[i].selector_->select(dynamic_resources, path, *(item.val_ptr), stack);
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
 
                         if (!stack.empty() && !is_recursive_descent)
@@ -443,7 +821,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             output_stack.clear();
                         }
-                        else if (selectors_[i]->is_recursive_descent())
+                        else if (tokens_[i].is_recursive_descent())
                         {
                             is_recursive_descent = true;
                             ++i;
@@ -469,12 +847,12 @@ namespace jsoncons { namespace jsonpath_new {
             {
                 jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
                 std::error_code ec;
-                auto selectors = evaluator.compile(resources, expr.data(), expr.size(), ec);
+                auto tokens = evaluator.compile(resources, expr.data(), expr.size(), ec);
                 if (ec)
                 {
                     JSONCONS_THROW(jsonpath_error(ec, evaluator.line(), evaluator.column()));
                 }
-                return jsonpath_expression(std::move(selectors));
+                return jsonpath_expression(std::move(tokens));
             }
 
             static jsonpath_expression compile(jsonpath_resources<Json>& resources, 
@@ -542,22 +920,6 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class recursive_descent_selector final : public selector_base
-        {
-        public:
-            recursive_descent_selector()
-                : selector_base(true, false, false)
-            {
-            }
-
-            void select(jsonpath_resources<Json>& /*resources*/,
-                        const string_type& /*path*/, 
-                        reference /*val*/,
-                        node_set& /*nodes*/) override
-            {
-            }
-        };
-
         // projection_base
         class projection_base : public selector_base
         {
@@ -565,17 +927,17 @@ namespace jsoncons { namespace jsonpath_new {
             std::vector<std::unique_ptr<selector_base>> selectors_;
         public:
             projection_base(std::size_t precedence_level)
-                : selector_base(false, true, false, precedence_level)
+                : selector_base(true, false, precedence_level)
             {
             }
 
-            void add_expression(std::unique_ptr<selector_base>&& expr) override
+            void add_selector(std::unique_ptr<selector_base>&& expr) override
             {
                 if (!selectors_.empty() && selectors_.back()->is_projection() && 
                     (expr->precedence_level() < selectors_.back()->precedence_level() ||
                      (expr->precedence_level() == selectors_.back()->precedence_level() && expr->is_right_associative())))
                 {
-                    selectors_.back()->add_expression(std::move(expr));
+                    selectors_.back()->add_selector(std::move(expr));
                 }
                 else
                 {
@@ -706,7 +1068,7 @@ namespace jsoncons { namespace jsonpath_new {
              jsonpath_filter_expr<Json> result_;
         public:
             filter_selector(const jsonpath_filter_expr<Json>& result)
-                : selector_base(false, false, true), result_(result)
+                : selector_base(false, true), result_(result)
             {
             }
 
@@ -811,7 +1173,7 @@ namespace jsoncons { namespace jsonpath_new {
         const char_type* begin_input_;
         const char_type* end_input_;
         const char_type* p_;
-        std::vector<std::unique_ptr<selector_base>> selectors_;
+        std::vector<token> tokens_;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
 
         using argument_type = std::vector<pointer>;
@@ -953,14 +1315,14 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 
-        std::vector<std::unique_ptr<selector_base>> compile(jsonpath_resources<Json>& resources,
+        std::vector<token> compile(jsonpath_resources<Json>& resources,
                                                             const char_type* path, 
                                                             std::size_t length,
                                                             std::error_code& ec)
         {
             Json instance;
             evaluate(resources, instance, path, length, ec);
-            return std::move(selectors_);
+            return std::move(tokens_);
         }
 
         void evaluate(jsonpath_resources<Json>& resources,
@@ -1028,7 +1390,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case ' ':case '\t':case '\r':case '\n':
                             {
-                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
 
                                 //apply_selectors(resources);
                                 buffer.clear();
@@ -1049,7 +1411,7 @@ namespace jsoncons { namespace jsonpath_new {
                             {
                                 if (buffer.size() > 0)
                                 {
-                                    add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                    push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                     //apply_selectors(resources);
                                     buffer.clear();
                                 }
@@ -1064,7 +1426,7 @@ namespace jsoncons { namespace jsonpath_new {
                             {
                                 if (buffer.size() > 0)
                                 {
-                                    add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                    push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                     //apply_selectors(resources);
                                     buffer.clear();
                                 }
@@ -1075,7 +1437,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             case '*':
                             {
-                                add_selector(jsoncons::make_unique<wildcard_selector>());
+                                push_token(token(jsoncons::make_unique<wildcard_selector>()));
                                 state_stack_.back().state = path_state::dot;
                                 ++p_;
                                 ++column_;
@@ -1329,7 +1691,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '.':
-                                add_selector(jsoncons::make_unique<recursive_descent_selector>());
+                                push_token(token(recursive_descent_arg));
                                 state_stack_.back().is_recursive_descent = true;
                                 ++p_;
                                 ++column_;
@@ -1364,7 +1726,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '*':
-                                add_selector(jsoncons::make_unique<wildcard_selector>());
+                                push_token(token(jsoncons::make_unique<wildcard_selector>()));
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -1434,13 +1796,13 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '[':
-                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
                             case '.':
-                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1454,7 +1816,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\'':
-                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1483,7 +1845,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\"':
-                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 //apply_selectors(resources);
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1543,7 +1905,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources, root, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                add_selector(jsoncons::make_unique<expr_selector>(result));
+                                push_token(token(jsoncons::make_unique<expr_selector>(result)));
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
                                 break;
                             }
@@ -1553,7 +1915,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources,root,p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                add_selector(jsoncons::make_unique<filter_selector>(result));
+                                push_token(token(jsoncons::make_unique<filter_selector>(result)));
                                 state_stack_.back().state = path_state::comma_or_right_bracket;
                                 break;                   
                             }
@@ -1642,7 +2004,7 @@ namespace jsoncons { namespace jsonpath_new {
                                         ec = jsonpath_errc::invalid_number;
                                         return;
                                     }
-                                    add_selector(jsoncons::make_unique<index_selector>(r.value()));
+                                    push_token(token(jsoncons::make_unique<index_selector>(r.value())));
 
                                     buffer.clear();
                                 }
@@ -1691,7 +2053,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch(*p_)
                         {
                             case ']':
-                                add_selector(jsoncons::make_unique<slice_selector>(slic));
+                                push_token(token(jsoncons::make_unique<slice_selector>(slic)));
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 ++p_;
@@ -1730,7 +2092,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch(*p_)
                         {
                             case ']':
-                                add_selector(jsoncons::make_unique<slice_selector>(slic));
+                                push_token(token(jsoncons::make_unique<slice_selector>(slic)));
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack_.pop_back(); // rhs_slice_expression_stop
@@ -1800,7 +2162,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case ',': 
                             case ']': 
-                                add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1831,7 +2193,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case ',': 
                             case ']': 
-                                add_selector(jsoncons::make_unique<wildcard_selector>());
+                                push_token(token(jsoncons::make_unique<wildcard_selector>()));
                                 state_stack_.pop_back();
                                 break;
                             default:
@@ -1858,7 +2220,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case ']': 
                                 if (!buffer.empty())
                                 {
-                                    add_selector(jsoncons::make_unique<path_selector>(buffer));
+                                    push_token(token(jsoncons::make_unique<path_selector>(buffer)));
                                     buffer.clear();
                                 }
                                 state_stack_.pop_back();
@@ -2002,7 +2364,7 @@ namespace jsoncons { namespace jsonpath_new {
                 case path_state::unquoted_name: 
                 case path_state::unquoted_name2: 
                 {
-                    add_selector(jsoncons::make_unique<identifier_selector>(buffer));
+                    push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                     //apply_selectors(resources);
                     buffer.clear();
                     state_stack_.pop_back(); // unquoted_name
@@ -2064,18 +2426,31 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 
-        void add_selector(std::unique_ptr<selector_base>&& selector)
+        void push_token(token&& tok)
         {
-            //selectors_.push_back(std::move(selector));
-            if (!selectors_.empty() && selectors_.back()->is_projection() && 
-                (selector->precedence_level() < selectors_.back()->precedence_level() ||
-                (selector->precedence_level() == selectors_.back()->precedence_level() && selector->is_right_associative())))
+            switch (tok.type())
             {
-                selectors_.back()->add_expression(std::move(selector));
-            }
-            else
-            {
-                selectors_.emplace_back(std::move(selector));
+                case path_token_type::selector:
+                {
+                    if (!tokens_.empty() && tokens_.back().is_projection() && 
+                        (tok.precedence_level() < tokens_.back().precedence_level() ||
+                        (tok.precedence_level() == tokens_.back().precedence_level() && tok.is_right_associative())))
+                    {
+                        tokens_.back().selector_->add_selector(std::move(tok.selector_));
+                    }
+                    else
+                    {
+                        tokens_.emplace_back(std::move(tok));
+                    }
+                    break;
+                }
+                case path_token_type::recursive_descent:
+                {
+                    tokens_.emplace_back(std::move(tok));
+                    break;
+                }
+                default:
+                    break;
             }
         }
 
