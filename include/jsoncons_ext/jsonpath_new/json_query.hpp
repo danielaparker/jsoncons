@@ -224,6 +224,7 @@ namespace jsoncons { namespace jsonpath_new {
              class PathCons>
     class jsonpath_evaluator : public ser_context
     {
+    public:
         using char_type = typename Json::char_type;
         using char_traits_type = typename Json::char_traits_type;
         using string_type = std::basic_string<char_type,char_traits_type>;
@@ -231,6 +232,7 @@ namespace jsoncons { namespace jsonpath_new {
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using const_pointer = typename Json::const_pointer;
+    private:
 
         struct node_type
         {
@@ -334,7 +336,155 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
         };
+    public:
+        class jsonpath_expression
+        {
+            jsonpath_resources<Json> resources_;
+            std::vector<std::unique_ptr<selector_base>> selectors_;
+        public:
+            jsonpath_expression()
+            {
+            }
 
+            jsonpath_expression(jsonpath_expression&& expr)
+                : resources_(std::move(expr.resources_)),
+                  selectors_(std::move(expr.selectors_))
+            {
+            }
+
+            jsonpath_expression(jsonpath_resources<Json>&& resources,
+                                std::vector<std::unique_ptr<selector_base>>&& selectors)
+                : resources_(std::move(resources)), selectors_(std::move(selectors))
+            {
+            }
+
+            Json evaluate(reference instance)
+            {
+                std::error_code ec;
+                Json result = evaluate(instance, ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(jsonpath_error(ec));
+                }
+                return result;
+            }
+
+            Json evaluate(reference instance, std::error_code& )
+            {
+                jsonpath_resources<Json> dynamic_resources;
+
+                std::vector<node_type> output_stack;
+                std::vector<node_type> stack;
+                std::vector<node_type> collected;
+                string_type path;
+                path.push_back('$');
+                Json result(json_array_arg);
+                bool is_recursive_descent = false;
+
+                if (!selectors_.empty())
+                {
+                    stack.emplace_back(path,std::addressof(instance));
+                    for (std::size_t i = 0; 
+                         i < selectors_.size();
+                         )
+                    {
+                        for (auto& item : stack)
+                        {
+                            output_stack.push_back(std::move(item));
+                        }
+                        stack.clear();
+                        for (auto& item : output_stack)
+                        {
+                            selectors_[i]->select(dynamic_resources, path, *(item.val_ptr), stack);
+                        }
+
+                        if (!stack.empty() && !is_recursive_descent)
+                        {
+                            output_stack.clear();
+                            ++i;
+                        }
+                        else if (is_recursive_descent && output_stack.empty())
+                        {
+                            output_stack.clear();
+                            for (auto& item : collected)
+                            {
+                                output_stack.emplace_back(item.path,item.val_ptr);
+                                stack.push_back(std::move(item));
+                            }
+                            collected.clear();
+                            is_recursive_descent = false;
+                            ++i;
+                        }
+                        else if (is_recursive_descent)
+                        {
+                            for (auto& item : stack)
+                            {
+                                collected.emplace_back(item.path,item.val_ptr);
+                            }
+                            stack.clear();
+                            for (auto& item : output_stack)
+                            {
+                                if (item.val_ptr->is_object())
+                                {
+                                    for (auto& val : item.val_ptr->object_range())
+                                    {
+                                        stack.emplace_back(val.key(),std::addressof(val.value()));
+                                    }
+                                }
+                                else if (item.val_ptr->is_array())
+                                {
+                                    for (auto& val : item.val_ptr->array_range())
+                                    {
+                                        stack.emplace_back("",std::addressof(val));
+                                    }
+                                }
+                            }
+                            output_stack.clear();
+                        }
+                        else if (selectors_[i]->is_recursive_descent())
+                        {
+                            is_recursive_descent = true;
+                            ++i;
+                        }
+                        else if (!is_recursive_descent)
+                        {
+                            break;
+                        }
+                    }
+                }
+                if (!stack.empty())
+                {
+                    result.reserve(stack.size());
+                    for (const auto& p : stack)
+                    {
+                        result.push_back(*(p.val_ptr));
+                    }
+                }
+                return result;
+            }
+
+            static jsonpath_expression compile(const string_view_type& expr)
+            {
+                jsonpath_resources<Json> resources;
+                jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+                std::error_code ec;
+                auto selectors = evaluator.compile(resources, expr.data(), expr.size(), ec);
+                if (ec)
+                {
+                    JSONCONS_THROW(jsonpath_error(ec, evaluator.line(), evaluator.column()));
+                }
+                return jsonpath_expression(std::move(resources), std::move(selectors));
+            }
+
+            static jsonpath_expression compile(const string_view_type& expr,
+                                               std::error_code& ec)
+            {
+                //jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&> evaluator;
+                //return evaluator.compile(expr.data(), expr.size(), ec);
+                return jsonpath_expression();
+            }
+        };
+    private:
         class identifier_selector final : public selector_base
         {
         private:
@@ -487,10 +637,12 @@ namespace jsoncons { namespace jsonpath_new {
         {
         private:
              std::basic_string<char_type> path_;
+             jsonpath_expression expr_;
         public:
             path_selector(const std::basic_string<char_type>& path)
                 : path_(path)
             {
+                //expr_ = make_expression(path);   
             }
 
             void select(jsonpath_resources<Json>& /*resources*/,
@@ -798,154 +950,6 @@ namespace jsoncons { namespace jsonpath_new {
                 ec = jsonpath_errc::unidentified_error;
             }
         }
-
-        class jsonpath_expression
-        {
-            jsonpath_resources<Json> resources_;
-            std::vector<std::unique_ptr<selector_base>> selectors_;
-        public:
-            jsonpath_expression()
-            {
-            }
-
-            jsonpath_expression(jsonpath_expression&& expr)
-                : resources_(std::move(expr.resources_)),
-                  selectors_(std::move(expr.selectors_))
-            {
-            }
-
-            jsonpath_expression(jsonpath_resources<Json>&& resources,
-                                std::vector<std::unique_ptr<selector_base>>&& selectors)
-                : resources_(std::move(resources)), selectors_(std::move(selectors))
-            {
-            }
-
-            Json evaluate(reference instance)
-            {
-                std::error_code ec;
-                Json result = evaluate(instance, ec);
-                if (ec)
-                {
-                    JSONCONS_THROW(jsonpath_error(ec));
-                }
-                return result;
-            }
-
-            Json evaluate(reference instance, std::error_code& )
-            {
-                jsonpath_resources<Json> dynamic_resources;
-
-                std::vector<node_type> output_stack;
-                std::vector<node_type> stack;
-                std::vector<node_type> collected;
-                string_type path;
-                path.push_back('$');
-                Json result(json_array_arg);
-                bool is_recursive_descent = false;
-
-                if (!selectors_.empty())
-                {
-                    stack.emplace_back(path,std::addressof(instance));
-                    for (std::size_t i = 0; 
-                         i < selectors_.size();
-                         )
-                    {
-                        for (auto& item : stack)
-                        {
-                            output_stack.push_back(std::move(item));
-                        }
-                        stack.clear();
-                        for (auto& item : output_stack)
-                        {
-                            selectors_[i]->select(dynamic_resources, path, *(item.val_ptr), stack);
-                        }
-
-                        if (!stack.empty() && !is_recursive_descent)
-                        {
-                            output_stack.clear();
-                            ++i;
-                        }
-                        else if (is_recursive_descent && output_stack.empty())
-                        {
-                            output_stack.clear();
-                            for (auto& item : collected)
-                            {
-                                output_stack.emplace_back(item.path,item.val_ptr);
-                                stack.push_back(std::move(item));
-                            }
-                            collected.clear();
-                            is_recursive_descent = false;
-                            ++i;
-                        }
-                        else if (is_recursive_descent)
-                        {
-                            for (auto& item : stack)
-                            {
-                                collected.emplace_back(item.path,item.val_ptr);
-                            }
-                            stack.clear();
-                            for (auto& item : output_stack)
-                            {
-                                if (item.val_ptr->is_object())
-                                {
-                                    for (auto& val : item.val_ptr->object_range())
-                                    {
-                                        stack.emplace_back(val.key(),std::addressof(val.value()));
-                                    }
-                                }
-                                else if (item.val_ptr->is_array())
-                                {
-                                    for (auto& val : item.val_ptr->array_range())
-                                    {
-                                        stack.emplace_back("",std::addressof(val));
-                                    }
-                                }
-                            }
-                            output_stack.clear();
-                        }
-                        else if (selectors_[i]->is_recursive_descent())
-                        {
-                            is_recursive_descent = true;
-                            ++i;
-                        }
-                        else if (!is_recursive_descent)
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (!stack.empty())
-                {
-                    result.reserve(stack.size());
-                    for (const auto& p : stack)
-                    {
-                        result.push_back(*(p.val_ptr));
-                    }
-                }
-                return result;
-            }
-
-            static jsonpath_expression compile(const string_view_type& expr)
-            {
-                jsonpath_resources<Json> resources;
-                jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-                std::error_code ec;
-                auto selectors = evaluator.compile(resources, expr.data(), expr.size(), ec);
-                if (ec)
-                {
-                    JSONCONS_THROW(jsonpath_error(ec, evaluator.line(), evaluator.column()));
-                }
-                return jsonpath_expression(std::move(resources), std::move(selectors));
-            }
-
-            static jsonpath_expression compile(const string_view_type& expr,
-                                               std::error_code& ec)
-            {
-                //jsoncons::jsonpath::detail::jsonpath_evaluator<Json,const Json&> evaluator;
-                //return evaluator.compile(expr.data(), expr.size(), ec);
-                return jsonpath_expression();
-            }
-        };
 
         std::vector<std::unique_ptr<selector_base>> compile(jsonpath_resources<Json>& resources,
                                                             const char_type* path, 
@@ -2075,10 +2079,48 @@ namespace jsoncons { namespace jsonpath_new {
 
     };
 
-    }
+    } // namespace detail
 
     template <class Json>
-    using jsonpath_expression = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, const Json&, detail::VoidPathConstructor<Json>>::jsonpath_expression;
+    class jsonpath_expression
+    {
+        using evaluator_t = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, const Json&, detail::VoidPathConstructor<Json>>;
+        using expression_t = typename evaluator_t::jsonpath_expression;
+        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources_;
+        expression_t expr_;
+    public:
+        using string_view_type = typename evaluator_t::string_view_type;
+        using reference = typename evaluator_t::reference;
+
+        jsonpath_expression() = default;
+
+        jsonpath_expression(jsoncons::jsonpath_new::detail::jsonpath_resources<Json>&& resources,
+                            expression_t&& expr)
+            : resources_(std::move(resources)), 
+              expr_(std::move(expr))
+        {
+        }
+
+        Json evaluate(reference instance)
+        {
+            return expr_.evaluate(instance);
+        }
+
+        static jsonpath_expression compile(const string_view_type& path)
+        {
+            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            expression_t expr = expression_t::compile(path);
+            return jsonpath_expression(std::move(resources), std::move(expr));
+        }
+
+        static jsonpath_expression compile(const string_view_type& path,
+                                           std::error_code& ec)
+        {
+            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            expression_t expr = expression_t::compile(path, ec);
+            return jsonpath_expression(std::move(resources), std::move(expr));
+        }
+    };
 
     template <class Json>
     jsonpath_expression<Json> make_expression(const typename json::string_view_type& expr)
