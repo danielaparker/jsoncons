@@ -766,16 +766,18 @@ namespace jsoncons { namespace jsonpath_new {
                             output_stack.push_back(std::move(item));
                         }
                         stack.clear();
-                        for (auto& item : output_stack)
-                        {
-                            switch (tokens_[i].type())
-                            { 
-                                case path_token_type::selector:
+                        switch (tokens_[i].type())
+                        { 
+                            case path_token_type::selector:
+                            {
+                                for (auto& item : output_stack)
+                                {
                                     tokens_[i].selector_->select(dynamic_resources, path, *(item.val_ptr), stack);
-                                    break;
-                                default:
-                                    break;
+                                }
+                                break;
                             }
+                            default:
+                                break;
                         }
 
                         if (!stack.empty() && !is_recursive_descent)
