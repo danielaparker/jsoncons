@@ -1079,22 +1079,28 @@ namespace jsoncons { namespace jsonpath_new {
 
         class union_selector final : public selector_base
         {
-            std::vector<std::unique_ptr<selector_base>> selectors_;
+            std::vector<jsonpath_expression> expressions_;
         public:
-            union_selector(std::vector<std::unique_ptr<selector_base>>&& selectors)
-                : selectors_(std::move(selectors))
+            union_selector(std::vector<std::vector<token>>&& token_lists)
             {
+                for (auto& tokens : token_lists)
+                {
+                    expressions_.emplace_back(std::move(tokens));
+                }
             }
 
             void select(jsonpath_resources<Json>& resources,
-                        const string_type& path, 
+                        const string_type& /*path*/, 
                         reference val, 
                         node_set& nodes) override
             {
-                std::error_code ec;
-                for (auto& selector : selectors_)
+                auto callback = [&resources,&nodes](node_type& node)
                 {
-                    selector->select(resources, path, val, nodes);
+                    nodes.push_back(node);
+                };
+                for (auto& expr : expressions_)
+                {
+                    expr.evaluate(resources, val, callback);
                 }
             }
         };
@@ -2619,12 +2625,25 @@ namespace jsoncons { namespace jsonpath_new {
 
                 case path_token_type::end_union:
                 {
-                    std::vector<std::unique_ptr<selector_base>> vals;
+                    std::vector<std::vector<token>> vals;
                     auto it = token_stack_.rbegin();
                     while (it != token_stack_.rend() && it->type() != path_token_type::begin_union)
                     {
-                        vals.insert(vals.begin(), std::move(it->selector_));
-                        ++it;
+                        std::vector<token> toks;
+                        do
+                        {
+                            toks.insert(toks.begin(), std::move(*it));
+                            ++it;
+                        } while (it != token_stack_.rend() && it->type() != path_token_type::begin_union && it->type() != path_token_type::separator);
+                        if (it->type() == path_token_type::separator)
+                        {
+                            ++it;
+                        }
+                        if (toks.front().type() != path_token_type::literal)
+                        {
+                            toks.emplace(toks.begin(), current_node_arg);
+                        }
+                        vals.insert(vals.begin(), std::move(toks));
                     }
                     if (it == token_stack_.rend())
                     {
