@@ -305,7 +305,7 @@ namespace jsoncons { namespace jsonpath_new {
         single_quoted_name,
         double_quoted_name,
         bracketed_unquoted_name_or_union,
-        expect_union_expr,
+        union_expr,
         bracketed_single_quoted_name,
         bracketed_double_quoted_name,
         bracketed_name_or_path,
@@ -2119,10 +2119,11 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case ',': 
+                                push_token(token(begin_multi_select_list_arg));
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 buffer.clear();
                                 state_stack_.back() = path_state::comma_or_right_bracket;
-                                state_stack_.emplace_back(path_state::expect_union_expr); // union
+                                state_stack_.emplace_back(path_state::union_expr); // union
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2133,7 +2134,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                         }
                         break;
-                    case path_state::expect_union_expr:
+                    case path_state::union_expr:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -2142,9 +2143,27 @@ namespace jsoncons { namespace jsonpath_new {
 
                             case '.':
                             case '[':
-                            case ',': 
-                            case ']': 
                                 state_stack_.back() = path_state::bracketed_name_or_path;
+                                break;
+                            case ',': 
+                                if (!buffer.empty())
+                                {
+                                    push_token(token(jsoncons::make_unique<path_selector>(buffer)));
+                                    buffer.clear();
+                                }
+                                ++p_;
+                                ++column_;
+                                break;
+                            case ']': 
+                                if (!buffer.empty())
+                                {
+                                    push_token(token(jsoncons::make_unique<path_selector>(buffer)));
+                                    buffer.clear();
+                                }
+                                push_token(token(end_multi_select_list_arg));
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_colon_dot_left_bracket_comma_or_right_bracket;
