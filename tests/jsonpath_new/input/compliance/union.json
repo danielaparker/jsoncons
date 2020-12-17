@@ -23,7 +23,7 @@
         "cases" : [
             {
                 "comment" : "JSONPath union of multiple different paths",
-                "expression" : "$.[firstName,address.city]",
+                "expression" : "$[firstName,address.city]",
                 "result" : ["John","Nara"]
             }
         ]
