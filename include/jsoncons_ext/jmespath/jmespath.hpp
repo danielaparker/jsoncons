@@ -3440,9 +3440,6 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            //case '{':
-                            //    state_stack_.emplace_back(path_state::lhs_expression);
-                            //    break;
                             default:
                                 if (state_stack_.size() > 1)
                                 {
