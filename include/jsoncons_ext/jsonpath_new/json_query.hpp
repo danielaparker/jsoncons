@@ -1874,8 +1874,10 @@ namespace jsoncons { namespace jsonpath_new {
                     case path_state::unquoted_name: 
                         switch (*p_)
                         {
+                            case ']':
                             case '[':
                             case '.':
+                            case ',':
                             case ' ':case '\t':
                             case '\r':
                             case '\n':
@@ -1900,7 +1902,9 @@ namespace jsoncons { namespace jsonpath_new {
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
+                            case ']':
                             case '.':
+                            case ',':
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 //apply_selectors(resources);
                                 buffer.clear();
@@ -2245,6 +2249,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case ',': 
                                 push_token(token(begin_union_arg));
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(token(separator_arg));
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
@@ -2603,6 +2608,9 @@ namespace jsoncons { namespace jsonpath_new {
                     token_stack_.emplace_back(std::move(tok));
                     break;
                 }
+                case path_token_type::separator:
+                    token_stack_.emplace_back(std::move(tok));
+                    break;
                 case path_token_type::begin_union:
                     token_stack_.emplace_back(std::move(tok));
                     break;
@@ -2622,10 +2630,6 @@ namespace jsoncons { namespace jsonpath_new {
                         if (it->type() == path_token_type::separator)
                         {
                             ++it;
-                        }
-                        if (toks.front().type() != path_token_type::literal)
-                        {
-                            toks.emplace(toks.begin(), current_node_arg);
                         }
                         vals.insert(vals.begin(), std::move(toks));
                     }
