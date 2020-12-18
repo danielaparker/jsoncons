@@ -4149,7 +4149,7 @@ namespace jmespath {
                             default:
                                 push_token(token(begin_multi_select_list_arg));
                                 state_stack_.back() = path_state::multi_select_list;
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
                         }
                         break;
