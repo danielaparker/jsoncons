@@ -700,6 +700,8 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
+            jsonpath_expression& operator=(jsonpath_expression&& expr) = default;
+
             Json evaluate(reference instance) const
             {
                 std::error_code ec;
@@ -994,12 +996,9 @@ namespace jsoncons { namespace jsonpath_new {
         {
             std::vector<jsonpath_expression> expressions_;
         public:
-            union_selector(std::vector<std::vector<token>>&& token_lists)
+            union_selector(std::vector<jsonpath_expression>&& expressions)
+                : expressions_(std::move(expressions))
             {
-                for (auto& tokens : token_lists)
-                {
-                    expressions_.emplace_back(std::move(tokens));
-                }
             }
 
             void select(jsonpath_resources<Json>& resources,
@@ -2542,7 +2541,7 @@ namespace jsoncons { namespace jsonpath_new {
 
                 case path_token_type::end_union:
                 {
-                    std::vector<std::vector<token>> vals;
+                    std::vector<jsonpath_expression> expressions;
                     auto it = token_stack_.rbegin();
                     while (it != token_stack_.rend() && it->type() != path_token_type::begin_union)
                     {
@@ -2556,7 +2555,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             ++it;
                         }
-                        vals.insert(vals.begin(), std::move(toks));
+                        expressions.emplace(expressions.begin(), jsonpath_expression(std::move(toks)));
                     }
                     if (it == token_stack_.rend())
                     {
@@ -2569,11 +2568,11 @@ namespace jsoncons { namespace jsonpath_new {
                         (tok.precedence_level() < token_stack_.back().precedence_level() ||
                         (tok.precedence_level() == token_stack_.back().precedence_level() && tok.is_right_associative())))
                     {
-                        token_stack_.back().selector_->add_selector(jsoncons::make_unique<union_selector>(std::move(vals)));
+                        token_stack_.back().selector_->add_selector(jsoncons::make_unique<union_selector>(std::move(expressions)));
                     }
                     else
                     {
-                        token_stack_.emplace_back(token(jsoncons::make_unique<union_selector>(std::move(vals))));
+                        token_stack_.emplace_back(token(jsoncons::make_unique<union_selector>(std::move(expressions))));
                     }
                     break;
                 }
