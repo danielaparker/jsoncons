@@ -1965,14 +1965,14 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case '\'':
-                                state_stack_.back() = path_state::expect_right_bracket;
-                                state_stack_.emplace_back(path_state::bracketed_single_quoted_name);
+                                //state_stack_.back() = path_state::expect_right_bracket;
+                                state_stack_.back() = path_state::bracketed_single_quoted_name;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\"':
-                                state_stack_.back() = path_state::expect_right_bracket;
-                                state_stack_.emplace_back(path_state::bracketed_double_quoted_name);
+                                //state_stack_.back() = path_state::expect_right_bracket;
+                                state_stack_.back() = path_state::bracketed_double_quoted_name;
                                 ++p_;
                                 ++column_;
                                 break;
