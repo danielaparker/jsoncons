@@ -1013,35 +1013,12 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class path_selector final : public selector_base
-        {
-             jsonpath_expression expr_;
-        public:
-            path_selector(jsonpath_expression&& expr)
-                : expr_(std::move(expr))
-            {
-            }
-
-            void select(jsonpath_resources<Json>& resources,
-                        const string_type& /*path*/, 
-                        reference val, 
-                        node_set& nodes) const override
-            {
-
-                auto callback = [&resources,&nodes](node_type& node)
-                {
-                    nodes.push_back(node);
-                };
-                expr_.evaluate(resources, val, callback);
-            }
-        };
-
-        class expr_selector final : public selector_base
+        class expression_selector final : public selector_base
         {
         private:
              jsonpath_filter_expr<Json> result_;
         public:
-            expr_selector(const jsonpath_filter_expr<Json>& result)
+            expression_selector(const jsonpath_filter_expr<Json>& result)
                 : result_(result)
             {
             }
@@ -1935,7 +1912,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources, root, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                push_token(token(jsoncons::make_unique<expr_selector>(result)));
+                                push_token(token(jsoncons::make_unique<expression_selector>(result)));
                                 state_stack_.back() = path_state::expect_right_bracket;
                                 break;
                             }
