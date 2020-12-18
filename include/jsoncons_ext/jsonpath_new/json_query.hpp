@@ -309,7 +309,7 @@ namespace jsoncons { namespace jsonpath_new {
         union_expression,
         bracketed_single_quoted_name,
         bracketed_double_quoted_name,
-        bracketed_name_or_path,
+        identifier_or_union,
         bracketed_wildcard_or_union,
         bracket_specifier_or_union,
         index_or_slice_expression,
@@ -2215,29 +2215,45 @@ namespace jsoncons { namespace jsonpath_new {
                                 return;
                         }
                         break;
-                    case path_state::bracketed_name_or_path:
+                    case path_state::identifier_or_union:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
                                 advance_past_space_character();
                                 break;
-                            case '.':
-                                buffer.push_back(*p_);
-                                state_stack_.back() = path_state::path;
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '[':
-                                buffer.push_back(*p_);
-                                state_stack_.back() = path_state::path2;
-                                ++p_;
-                                ++column_;
-                                break;
-                            case ',': 
                             case ']': 
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
                                 buffer.clear();
                                 state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '.':
+                                push_token(token(begin_union_arg));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
+                                buffer.clear();
+                                state_stack_.back() = path_state::union_expression; // union
+                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '[':
+                                push_token(token(begin_union_arg));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
+                                state_stack_.back() = path_state::union_expression; // union
+                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                ++p_;
+                                ++column_;
+                                break;
+                            case ',': 
+                                push_token(token(begin_union_arg));
+                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(token(separator_arg));
+                                buffer.clear();
+                                state_stack_.back() = path_state::union_expression; // union
+                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                ++p_;
+                                ++column_;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
@@ -2387,7 +2403,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\'':
-                                state_stack_.back() = path_state::bracketed_name_or_path;
+                                state_stack_.back() = path_state::identifier_or_union;
                                 break;
                             case '\\':
                                 if (p_+1 < end_input_)
@@ -2413,7 +2429,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\"':
-                                state_stack_.back() = path_state::bracketed_name_or_path;
+                                state_stack_.back() = path_state::identifier_or_union;
                                 break;
                             case '\\':
                                 if (p_+1 < end_input_)
