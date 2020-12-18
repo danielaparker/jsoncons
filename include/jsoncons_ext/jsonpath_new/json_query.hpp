@@ -378,7 +378,6 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
         };
-        using node_set = std::vector<node_type>;
 
         struct node_less
         {
@@ -433,7 +432,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             virtual void select(jsonpath_resources<Json>& resources,
-                                const string_type& path, reference val, node_set& nodes) const = 0;
+                                const string_type& path, reference val, std::vector<node_type>& nodes) const = 0;
 
             virtual void add_selector(std::unique_ptr<selector_base>&&) 
             {
@@ -698,17 +697,6 @@ namespace jsoncons { namespace jsonpath_new {
 
             jsonpath_expression& operator=(jsonpath_expression&& expr) = default;
 
-            Json evaluate(reference instance) const
-            {
-                std::error_code ec;
-                Json result = evaluate(instance, ec);
-                if (ec)
-                {
-                    JSONCONS_THROW(jsonpath_error(ec));
-                }
-                return result;
-            }
-
             Json evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance) const
             {
                 Json result(json_array_arg);
@@ -731,7 +719,8 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             template <class Callback>
-            void evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance, Callback callback) const
+            typename std::enable_if<jsoncons::detail::is_function_object<Callback,node_type&>::value,void>::type
+            evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance, Callback callback) const
             {
                 std::vector<node_type> input_stack;
                 std::vector<node_type> output_stack;
@@ -868,7 +857,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
-                        node_set& nodes) const override
+                        std::vector<node_type>& nodes) const override
             {
                 if (val.is_object())
                 {
@@ -892,7 +881,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
-                        node_set& nodes) const override
+                        std::vector<node_type>& nodes) const override
             {
                 if (val.is_array())
                 {
@@ -939,7 +928,7 @@ namespace jsoncons { namespace jsonpath_new {
             void apply_expressions(jsonpath_resources<Json>& resources,
                                    const string_type& path, 
                                    reference val,
-                                   node_set& nodes) const
+                                   std::vector<node_type>& nodes) const
             {
                 if (selectors_.empty())
                 {
@@ -947,11 +936,11 @@ namespace jsoncons { namespace jsonpath_new {
                 }
                 else
                 {
-                    node_set collect;
+                    std::vector<node_type> collect;
                     collect.emplace_back(path,std::addressof(val));
                     for (auto& selector : selectors_)
                     {
-                        node_set temp;
+                        std::vector<node_type> temp;
                         for (auto& item : collect)
                             selector->select(resources, path, *(item.val_ptr), temp);
                         collect = std::move(temp);
@@ -975,7 +964,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, reference val,
-                        node_set& nodes) const override
+                        std::vector<node_type>& nodes) const override
             {
                 if (!val.is_array())
                 {
@@ -1000,7 +989,7 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& resources,
                         const string_type& /*path*/, 
                         reference val, 
-                        node_set& nodes) const override
+                        std::vector<node_type>& nodes) const override
             {
                 auto callback = [&resources,&nodes](node_type& node)
                 {
@@ -1026,7 +1015,7 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& /*path*/, 
                         reference /*val*/, 
-                        node_set& /*nodes*/) const override
+                        std::vector<node_type>& /*nodes*/) const override
             {
 /*
                 auto index = result_.eval(resources, val);
@@ -1060,7 +1049,7 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& /*path*/, 
                         reference /*val*/, 
-                        node_set& /*nodes*/) const override
+                        std::vector<node_type>& /*nodes*/) const override
             {
                 //std::cout << "filter_selector select ";
                 /*
@@ -1100,7 +1089,7 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, 
                         reference val,
-                        node_set& nodes) const override
+                        std::vector<node_type>& nodes) const override
             {
                 if (val.is_array())
                 {
@@ -1151,8 +1140,8 @@ namespace jsoncons { namespace jsonpath_new {
 
         function_table<Json,pointer> functions_;
 
-        node_set nodes_;
-        std::vector<node_set> stack_;
+        std::vector<node_type> nodes_;
+        std::vector<std::vector<node_type>> stack_;
         std::size_t line_;
         std::size_t column_;
         const char_type* begin_input_;
@@ -1234,7 +1223,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             string_type s = {'$'};
-            node_set v;
+            std::vector<node_type> v;
             pointer ptr = resources.create_temp(std::move(result));
             v.emplace_back(s,ptr);
             stack_.push_back(v);
@@ -1326,7 +1315,7 @@ namespace jsoncons { namespace jsonpath_new {
             p_ = begin_input_;
 
             string_type s = {'$'};
-            node_set v;
+            std::vector<node_type> v;
             v.emplace_back(std::move(s),std::addressof(root));
             stack_.push_back(v);
 
