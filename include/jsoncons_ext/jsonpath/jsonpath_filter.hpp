@@ -1230,9 +1230,13 @@ public:
 };
 
 template <class Json>
-class token
+class token;
+
+template <class Json>
+class raw_token
 {
-private:
+    friend class token<Json>;
+
     token_type type_;
 
     union
@@ -1246,39 +1250,309 @@ private:
 
 public:
 
-    token(lparen_arg_t)
+    raw_token(lparen_arg_t)
         : type_(token_type::lparen)
     {
     }
 
-    token(rparen_arg_t)
+    raw_token(rparen_arg_t)
         : type_(token_type::rparen)
     {
     }
 
-    token(value_term<Json>&& term)
+    raw_token(value_term<Json>&& term)
         : type_(token_type::value), value_term_(std::move(term))
     {
     }
-    token(path_term<Json>&& term)
+    raw_token(path_term<Json>&& term)
         : type_(token_type::path), path_term_(std::move(term))
     {
     }
-    token(regex_term<Json>&& term)
+    raw_token(regex_term<Json>&& term)
         : type_(token_type::regex), regex_term_(std::move(term))
     {
     }
 
-    token(const unary_operator_properties<Json>* properties)
+    raw_token(const unary_operator_properties<Json>* properties)
         : type_(token_type::unary_operator), 
           unary_op_properties_(properties)
     {
     }
 
-    token(const binary_operator_properties<Json>* properties)
+    raw_token(const binary_operator_properties<Json>* properties)
         : type_(token_type::binary_operator), 
           binary_op_properties_(properties)
     {
+    }
+
+    raw_token(const raw_token& other)
+    {
+        construct(other);
+    }
+
+    raw_token(raw_token&& other)
+    {
+        construct(std::forward<raw_token>(other));
+    }
+
+    ~raw_token() noexcept
+    {
+        destroy();
+    }
+
+    raw_token& operator=(const raw_token& other)
+    {
+        if (&other != this)
+        {
+            if (other.type_ == type_)
+            {
+                type_ = other.type_;
+                switch(type_)
+                {
+                    case token_type::value:
+                        value_term_ = other.value_term_;
+                        break;
+                    case token_type::path:
+                        path_term_ = other.path_term_;
+                        break;
+                    case token_type::regex:
+                        regex_term_ = other.regex_term_;
+                        break;
+                    case token_type::unary_operator:
+                        unary_op_properties_ = other.unary_op_properties_;
+                        break;
+                    case token_type::binary_operator:
+                        binary_op_properties_ = other.binary_op_properties_;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                destroy();
+                construct(other);
+            }
+        }
+        return *this;
+    }
+
+    raw_token& operator=(raw_token&& other)
+    {
+        if (&other != this)
+        {
+            if (other.type_ == type_)
+            {
+                type_ = other.type_;
+                switch(type_)
+                {
+                    case token_type::value:
+                        value_term_ = std::move(other.value_term_);
+                        break;
+                    case token_type::path:
+                        path_term_ = std::move(other.path_term_);
+                        break;
+                    case token_type::regex:
+                        regex_term_ = std::move(other.regex_term_);
+                        break;
+                    case token_type::unary_operator:
+                        unary_op_properties_ = other.unary_op_properties_;
+                        break;
+                    case token_type::binary_operator:
+                        binary_op_properties_ = other.binary_op_properties_;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                destroy();
+                construct(std::forward<raw_token>(other));
+            }
+        }
+        return *this;
+    }
+
+    token_type type() const
+    {
+        return type_;
+    }
+
+    bool is_operator() const
+    {
+        return is_unary_operator() || is_binary_operator(); 
+    }
+
+    bool is_unary_operator() const
+    {
+        return type_ == token_type::unary_operator; 
+    }
+
+    bool is_binary_operator() const
+    {
+        return type_ == token_type::binary_operator; 
+    }
+
+    bool is_operand() const
+    {
+        switch(type_)
+        {
+            case token_type::value:
+            case token_type::path:
+            case token_type::regex:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    bool is_lparen() const
+    {
+        return type_ == token_type::lparen; 
+    }
+
+    bool is_rparen() const
+    {
+        return type_ == token_type::rparen; 
+    }
+
+    std::size_t precedence_level() const
+    {
+        switch(type_)
+        {
+            case token_type::unary_operator:
+                return unary_op_properties_->precedence_level;
+            case token_type::binary_operator:
+                return binary_op_properties_->precedence_level;
+            default:
+                return 0;
+        }
+    }
+
+    bool is_right_associative() const
+    {
+        switch(type_)
+        {
+            case token_type::unary_operator:
+                return unary_op_properties_->is_right_associative;
+            case token_type::binary_operator:
+                return binary_op_properties_->is_right_associative;
+            default:
+                return false;
+        }
+    }
+
+private:
+
+    void construct(const raw_token& other)
+    {
+        type_ = other.type_;
+        switch (type_)
+        {
+        case token_type::value:
+            ::new(static_cast<void*>(&this->value_term_))value_term<Json>(other.value_term_);
+            break;
+        case token_type::path:
+            ::new(static_cast<void*>(&this->path_term_))path_term<Json>(other.path_term_);
+            break;
+        case token_type::regex:
+            ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(other.regex_term_);
+            break;
+        case token_type::unary_operator:
+            this->unary_op_properties_ = other.unary_op_properties_;
+            break;
+        case token_type::binary_operator:
+            this->binary_op_properties_ = other.binary_op_properties_;
+            break;
+        default:
+            break;
+        }
+    }
+
+    void construct(raw_token&& other)
+    {
+        type_ = other.type_;
+        switch (type_)
+        {
+        case token_type::value:
+            ::new(static_cast<void*>(&this->value_term_))value_term<Json>(std::move(other.value_term_));
+            break;
+        case token_type::path:
+            ::new(static_cast<void*>(&this->path_term_))path_term<Json>(std::move(other.path_term_));
+            break;
+        case token_type::regex:
+            ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(std::move(other.regex_term_));
+            break;
+        case token_type::unary_operator:
+            this->unary_op_properties_ = other.unary_op_properties_;
+            break;
+        case token_type::binary_operator:
+            this->binary_op_properties_ = other.binary_op_properties_;
+            break;
+        default:
+            break;
+        }
+    }
+
+    void destroy() noexcept 
+    {
+        switch(type_)
+        {
+            case token_type::value:
+                value_term_.~value_term();
+                break;
+            case token_type::path:
+                path_term_.~path_term();
+                break;
+            case token_type::regex:
+                regex_term_.~regex_term();
+                break;
+            default:
+                break;
+        }
+    }
+};
+
+template <class Json>
+class token
+{
+    token_type type_;
+
+    union
+    {
+        const unary_operator_properties<Json>* unary_op_properties_;
+        const binary_operator_properties<Json>* binary_op_properties_;
+        value_term<Json> value_term_;
+        path_term<Json> path_term_;
+        regex_term<Json> regex_term_;
+    };
+
+public:
+
+    token(const raw_token<Json>& other)
+        : type_(other.type_)
+    {
+        switch (type_)
+        {
+            case token_type::value:
+                ::new(static_cast<void*>(&this->value_term_))value_term<Json>(other.value_term_);
+                break;
+            case token_type::path:
+                ::new(static_cast<void*>(&this->path_term_))path_term<Json>(other.path_term_);
+                break;
+            case token_type::regex:
+                ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(other.regex_term_);
+                break;
+            case token_type::unary_operator:
+                this->unary_op_properties_ = other.unary_op_properties_;
+                break;
+            case token_type::binary_operator:
+                this->binary_op_properties_ = other.binary_op_properties_;
+                break;
+            default:
+                break;
+        }
     }
 
     token(const token& other)
@@ -1568,8 +1842,13 @@ private:
 };
 
 template <class Json>
-token<Json> evaluate(jsonpath_resources<Json>& resources, const Json& context, std::vector<token<Json>>& tokens)
+token<Json> evaluate(jsonpath_resources<Json>& resources, const Json& context, const std::vector<raw_token<Json>>& raw_tokens)
 {
+    std::vector<token<Json>> tokens;
+    for (const auto& tok : raw_tokens)
+    {
+        tokens.emplace_back(tok);
+    }
     for (auto it = tokens.begin(); it != tokens.end(); ++it)
     {
         it->initialize(resources, context);
@@ -1609,24 +1888,24 @@ template <class Json>
 class jsonpath_filter_expr
 {
 public:
-    std::vector<token<Json>> tokens_;
+    std::vector<raw_token<Json>> tokens_;
 public:
     jsonpath_filter_expr()
     {
     }
 
-    jsonpath_filter_expr(std::vector<token<Json>>&& tokens)
+    jsonpath_filter_expr(std::vector<raw_token<Json>>&& tokens)
         : tokens_(std::move(tokens))
     {
     }
 
-    Json eval(jsonpath_resources<Json>& resources, const Json& current_node)
+    Json eval(jsonpath_resources<Json>& resources, const Json& current_node) const
     {
         auto t = evaluate(resources, current_node, tokens_);
         return t.operand().get_single_node();
     }
 
-    bool exists(jsonpath_resources<Json>& resources, const Json& current_node)
+    bool exists(jsonpath_resources<Json>& resources, const Json& current_node) const
     {
         auto t = evaluate(resources, current_node,tokens_);
         return t.operand().accept_single_node();
@@ -1640,8 +1919,8 @@ class jsonpath_filter_parser
     using string_type = std::basic_string<char_type>;
     using string_view_type = typename Json::string_view_type;
 
-    std::vector<token<Json>> output_stack_;
-    std::vector<token<Json>> operator_stack_;
+    std::vector<raw_token<Json>> output_stack_;
+    std::vector<raw_token<Json>> operator_stack_;
 
     std::size_t line_;
     std::size_t column_;
@@ -1666,17 +1945,17 @@ public:
         return column_;
     }
 
-    void push_token(token<Json>&& token)
+    void push_token(raw_token<Json>&& raw_token)
     {
-        switch (token.type())
+        switch (raw_token.type())
         {
             case token_type::value:
             case token_type::path:
             case token_type::regex:
-                output_stack_.push_back(std::move(token));
+                output_stack_.push_back(std::move(raw_token));
                 break;
             case token_type::lparen:
-                operator_stack_.push_back(std::move(token));
+                operator_stack_.push_back(std::move(raw_token));
                 break;
             case token_type::rparen:
                 {
@@ -1699,26 +1978,26 @@ public:
             {
                 if (operator_stack_.empty() || operator_stack_.back().is_lparen())
                 {
-                    operator_stack_.push_back(std::move(token));
+                    operator_stack_.push_back(std::move(raw_token));
                 }
-                else if (token.precedence_level() < operator_stack_.back().precedence_level()
-                         || (token.precedence_level() == operator_stack_.back().precedence_level() && token.is_right_associative()))
+                else if (raw_token.precedence_level() < operator_stack_.back().precedence_level()
+                         || (raw_token.precedence_level() == operator_stack_.back().precedence_level() && raw_token.is_right_associative()))
                 {
-                    operator_stack_.push_back(std::move(token));
+                    operator_stack_.push_back(std::move(raw_token));
                 }
                 else
                 {
                     auto it = operator_stack_.rbegin();
                     while (it != operator_stack_.rend() && it->is_operator()
-                           && (token.precedence_level() > it->precedence_level()
-                         || (token.precedence_level() == it->precedence_level() && token.is_right_associative())))
+                           && (raw_token.precedence_level() > it->precedence_level()
+                         || (raw_token.precedence_level() == it->precedence_level() && raw_token.is_right_associative())))
                     {
                         output_stack_.push_back(std::move(*it));
                         ++it;
                     }
 
                     operator_stack_.erase(it.base(),operator_stack_.end());
-                    operator_stack_.push_back(std::move(token));
+                    operator_stack_.push_back(std::move(raw_token));
                 }
                 break;
             }
@@ -1766,11 +2045,11 @@ public:
                         case '(':
                             state = filter_state::expect_path_or_value_or_unary_op;
                             ++depth;
-                            push_token(token<Json>(lparen_arg));
+                            push_token(raw_token<Json>(lparen_arg));
                             break;
                         case ')':
                             state = filter_state::expect_path_or_value_or_unary_op;
-                            push_token(token<Json>(rparen_arg));
+                            push_token(raw_token<Json>(rparen_arg));
                             if (--depth == 0)
                             {
                                 state = filter_state::done;
@@ -1958,7 +2237,7 @@ public:
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(properties));
+                        push_token(raw_token<Json>(properties));
                         state = filter_state::expect_regex;
                         break;
                     }
@@ -1976,7 +2255,7 @@ public:
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(properties));
+                        push_token(raw_token<Json>(properties));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
                     }
@@ -1989,7 +2268,7 @@ public:
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
-                        push_token(token<Json>(properties));
+                        push_token(raw_token<Json>(properties));
                         state = filter_state::expect_path_or_value_or_unary_op;
                         break;
                     }
@@ -2004,7 +2283,7 @@ public:
                             {
                                 JSONCONS_TRY
                                 {
-                                    push_token(token<Json>(value_term<Json>(Json::parse(buffer))));
+                                    push_token(raw_token<Json>(value_term<Json>(Json::parse(buffer))));
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
@@ -2040,7 +2319,7 @@ public:
                                 {
                                     JSONCONS_TRY
                                     {
-                                        push_token(token<Json>(value_term<Json>(Json::parse(buffer))));
+                                        push_token(raw_token<Json>(value_term<Json>(Json::parse(buffer))));
                                     }
                                     JSONCONS_CATCH(const ser_error&)     
                                     {
@@ -2061,7 +2340,7 @@ public:
                                 JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
-                                    push_token(token<Json>(value_term<Json>(std::move(val))));
+                                    push_token(raw_token<Json>(value_term<Json>(std::move(val))));
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
@@ -2070,7 +2349,7 @@ public:
                                 buffer.clear();
                                 buffer_line = buffer_column = 1;
                             }
-                            push_token(token<Json>(rparen_arg));
+                            push_token(raw_token<Json>(rparen_arg));
                             if (--depth == 0)
                             {
                                 state = filter_state::done;
@@ -2110,7 +2389,7 @@ public:
                                 JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
-                                    push_token(token<Json>(value_term<Json>(std::move(val))));
+                                    push_token(raw_token<Json>(value_term<Json>(std::move(val))));
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
@@ -2148,7 +2427,7 @@ public:
                             JSONCONS_TRY
                             {
                                 auto val = Json::parse(buffer);
-                                push_token(token<Json>(value_term<Json>(std::move(val))));
+                                push_token(raw_token<Json>(value_term<Json>(std::move(val))));
                             }
                             JSONCONS_CATCH(const ser_error&)     
                             {
@@ -2188,14 +2467,14 @@ public:
                         break;
                     case '!':
                     {
-                        push_token(token<Json>(&(resources.not_properties)));
+                        push_token(raw_token<Json>(&(resources.not_properties)));
                         ++p;
                         ++column_;
                         break;
                     }
                     case '-':
                     {
-                        push_token(token<Json>(&(resources.unary_minus_properties)));
+                        push_token(raw_token<Json>(&(resources.unary_minus_properties)));
                         ++p;
                         ++column_;
                         break;
@@ -2222,12 +2501,12 @@ public:
                         break;
                     case '(':
                         ++depth;
-                        push_token(token<Json>(lparen_arg));
+                        push_token(raw_token<Json>(lparen_arg));
                         ++p;
                         ++column_;
                         break;
                     case ')':
-                        push_token(token<Json>(rparen_arg));
+                        push_token(raw_token<Json>(rparen_arg));
                         if (--depth == 0)
                         {
                             state = filter_state::done;
@@ -2261,7 +2540,7 @@ public:
                         ++column_;
                         break;
                     case ')':
-                        push_token(token<Json>(rparen_arg));
+                        push_token(raw_token<Json>(rparen_arg));
                         if (--depth == 0)
                         {
                             state = filter_state::done;
@@ -2308,7 +2587,7 @@ public:
                     case ' ':case '\t':
                         break;
                     case ')':
-                        push_token(token<Json>(rparen_arg));
+                        push_token(raw_token<Json>(rparen_arg));
                         if (--depth == 0)
                         {
                             state = filter_state::done;
@@ -2348,18 +2627,18 @@ public:
                                     auto result = evaluator.get_values();
                                     if (result.size() > 0)
                                     {
-                                        push_token(token<Json>(value_term<Json>(std::move(result[0]))));
+                                        push_token(raw_token<Json>(value_term<Json>(std::move(result[0]))));
                                     }
                                 }
                                 else
                                 {
-                                    push_token(token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
+                                    push_token(raw_token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
                                 }
                                 path_mode_stack.pop_back();
                             }
                             else
                             {
-                                push_token(token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
+                                push_token(raw_token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
                             }
                             buffer.clear();
                             buffer_line = buffer_column = 1;
@@ -2379,20 +2658,20 @@ public:
                                 auto result = evaluator.get_values();
                                 if (result.size() > 0)
                                 {
-                                    push_token(token<Json>(value_term<Json>(std::move(result[0]))));
+                                    push_token(raw_token<Json>(value_term<Json>(std::move(result[0]))));
                                 }
-                                push_token(token<Json>(rparen_arg));
+                                push_token(raw_token<Json>(rparen_arg));
                             }
                             else
                             {
-                                push_token(token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
+                                push_token(raw_token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
                             }
                             path_mode_stack.pop_back();
                         }
                         else
                         {
-                            push_token(token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
-                            push_token(token<Json>(rparen_arg));
+                            push_token(raw_token<Json>(path_term<Json>(buffer, buffer_line, buffer_column)));
+                            push_token(raw_token<Json>(rparen_arg));
                         }
                         buffer.clear();
                         buffer_line = buffer_column = 1;
@@ -2455,7 +2734,7 @@ public:
                                     ++column_;
                                     flags |= std::regex_constants::icase;
                                 }
-                                push_token(token<Json>(regex_term<Json>(buffer,flags)));
+                                push_token(raw_token<Json>(regex_term<Json>(buffer,flags)));
                                 buffer.clear();
                                 buffer_line = buffer_column = 1;
                             }

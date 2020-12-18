@@ -1012,12 +1012,11 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& /*resources*/,
-                        const string_type& /*path*/, 
-                        reference /*val*/, 
-                        std::vector<node_type>& /*nodes*/) const override
+            void select(jsonpath_resources<Json>& resources,
+                        const string_type& path, 
+                        reference val, 
+                        std::vector<node_type>& nodes) const override
             {
-/*
                 auto index = result_.eval(resources, val);
                 if (index.template is<std::size_t>())
                 {
@@ -1032,7 +1031,6 @@ namespace jsoncons { namespace jsonpath_new {
                     identifier_selector selector(index.as_string_view());
                     selector.select(resources, path, val, nodes);
                 }
-*/
             }
         };
 
@@ -1046,13 +1044,13 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& /*resources*/,
-                        const string_type& /*path*/, 
-                        reference /*val*/, 
-                        std::vector<node_type>& /*nodes*/) const override
+            void select(jsonpath_resources<Json>& resources,
+                        const string_type& path, 
+                        reference val, 
+                        std::vector<node_type>& nodes) const override
             {
                 //std::cout << "filter_selector select ";
-                /*
+                
                 if (val.is_array())
                 {
                     //std::cout << "from array \n";
@@ -1072,7 +1070,7 @@ namespace jsoncons { namespace jsonpath_new {
                         nodes.emplace_back(path, std::addressof(val));
                     }
                 }
-                */
+                
             }
         };
 
