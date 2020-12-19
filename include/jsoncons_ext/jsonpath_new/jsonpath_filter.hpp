@@ -805,16 +805,10 @@ Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
 }
 
 template <class Json>
-struct jsonpath_resources
+struct jsonpath_filter_operators
 {
-    using char_type = typename Json::char_type;
-    using string_type = std::basic_string<char_type>;
-
-    std::vector<std::unique_ptr<Json>> temp_json_values_;
-
     unary_operator_properties<Json> not_properties;
     unary_operator_properties<Json> unary_minus_properties;
-
     binary_operator_properties<Json> lt_properties;
     binary_operator_properties<Json> gt_properties;
     binary_operator_properties<Json> mult_properties;
@@ -829,7 +823,7 @@ struct jsonpath_resources
     binary_operator_properties<Json> ampamp_properties;
     binary_operator_properties<Json> pipepipe_properties;
 
-    jsonpath_resources()
+    jsonpath_filter_operators()
         : not_properties{ 1,true, unary_not_op },
           unary_minus_properties{ 1,true, unary_minus_op },
           lt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }},
@@ -848,8 +842,46 @@ struct jsonpath_resources
     {
     }
 
+private:
+    static Json unary_not_op(const term<Json>& a)
+    {
+        return a.unary_not();
+    }
+
+    static Json unary_minus_op(const term<Json>& a)
+    {
+        return a.unary_minus();
+    }
+};
+
+template <class Json>
+struct jsonpath_resources
+{
+    using char_type = typename Json::char_type;
+    using string_type = std::basic_string<char_type>;
+
+    std::vector<std::unique_ptr<Json>> temp_json_values_;
+
+    jsonpath_resources()
+    {
+    }
+
+    const unary_operator_properties<Json>* get_not_properties() const
+    {
+        static unary_operator_properties<Json> not_properties{ 1,true, unary_not_op };
+        return &not_properties;
+    }
+
+    const unary_operator_properties<Json>* get_unary_minus_properties() const
+    {
+        static unary_operator_properties<Json> unary_minus_properties { 1,true, unary_minus_op };
+        return &unary_minus_properties;
+    }
+
     const binary_operator_properties<Json>* get_binary_operator_properties(const string_type& id) const
     {
+        static const jsonpath_filter_operators<Json> ops_;
+
         switch(id.size())
         {
             case 1:
@@ -858,17 +890,17 @@ struct jsonpath_resources
                 switch (c1)
                 {
                     case '<':
-                        return &lt_properties;
+                        return &ops_.lt_properties;
                     case '>':
-                        return &gt_properties;
+                        return &ops_.gt_properties;
                     case '+':
-                        return &plus_properties;
+                        return &ops_.plus_properties;
                     case '-':
-                        return &minus_properties;
+                        return &ops_.minus_properties;
                     case '*':
-                        return &mult_properties;
+                        return &ops_.mult_properties;
                     case '/':
-                        return &div_properties;
+                        return &ops_.div_properties;
                     default:
                         return nullptr;
                 }
@@ -881,25 +913,25 @@ struct jsonpath_resources
                 switch (c1)
                 {
                     case '<':
-                        return c2 == '=' ? &lte_properties : nullptr;
+                        return c2 == '=' ? &ops_.lte_properties : nullptr;
                     case '>':
-                        return c2 == '=' ? &gte_properties : nullptr;
+                        return c2 == '=' ? &ops_.gte_properties : nullptr;
                     case '!':
-                        return c2 == '=' ? &ne_properties : nullptr;
+                        return c2 == '=' ? &ops_.ne_properties : nullptr;
                     case '=':
                         switch(c2)
                         {
                             case '=':
-                                return &eq_properties;
+                                return &ops_.eq_properties;
                             case '~':
-                                return &eqtilde_properties;
+                                return &ops_.eqtilde_properties;
                             default:
                                 return nullptr;
                         }
                     case '&':
-                        return c2 == '&' ? &ampamp_properties : nullptr;
+                        return c2 == '&' ? &ops_.ampamp_properties : nullptr;
                     case '|':
-                        return c2 == '|' ? &pipepipe_properties : nullptr;
+                        return c2 == '|' ? &ops_.pipepipe_properties : nullptr;
                     default:
                         return nullptr;
                 }
@@ -918,6 +950,7 @@ struct jsonpath_resources
         temp_json_values_.emplace_back(std::move(temp));
         return ptr;
     }
+
 private:
     static Json unary_not_op(const term<Json>& a)
     {
@@ -1196,8 +1229,10 @@ public:
     void initialize(jsonpath_resources<Json>& resources, const Json& current_node) override
     {
         jsonpath_evaluator<Json,const Json&,VoidPathConstructor<Json>> evaluator(line_,column_);
-        evaluator.evaluate(resources, current_node, path_);
+        auto exp = evaluator.compile(resources, path_.c_str(), path_.length());
         nodes_ = evaluator.get_values();
+
+        std::cout << "path nodes: " << nodes_ << "\n";
     }
 
     term_type type() const override {return term_type::path;}
@@ -1576,7 +1611,6 @@ public:
         {
             if (other.type_ == type_)
             {
-                type_ = other.type_;
                 switch(type_)
                 {
                     case token_type::value:
@@ -1613,7 +1647,6 @@ public:
         {
             if (other.type_ == type_)
             {
-                type_ = other.type_;
                 switch(type_)
                 {
                     case token_type::value:
@@ -2467,14 +2500,14 @@ public:
                         break;
                     case '!':
                     {
-                        push_token(raw_token<Json>(&(resources.not_properties)));
+                        push_token(raw_token<Json>(resources.get_not_properties()));
                         ++p;
                         ++column_;
                         break;
                     }
                     case '-':
                     {
-                        push_token(raw_token<Json>(&(resources.unary_minus_properties)));
+                        push_token(raw_token<Json>(resources.get_unary_minus_properties()));
                         ++p;
                         ++column_;
                         break;

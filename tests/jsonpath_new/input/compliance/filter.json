@@ -1,0 +1,14 @@
+[
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given":
+        [{"id": 42, "name": "forty-two"}, {"id": 1, "name": "one"}],
+     "cases": [
+         {
+            "comment" : "Dot notation after filter expression",
+            "expression": "$[?(@.id==42)].name",
+            "result": ["forty-two"]
+         }
+     ]
+}
+]

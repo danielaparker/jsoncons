@@ -1034,13 +1034,13 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class filter_selector final : public selector_base
+        class filter_selector final : public projection_base
         {
         private:
              jsonpath_filter_expr<Json> result_;
         public:
             filter_selector(const jsonpath_filter_expr<Json>& result)
-                : selector_base(false, true), result_(result)
+                : projection_base(11), result_(result)
             {
             }
 
@@ -1056,8 +1056,10 @@ namespace jsoncons { namespace jsonpath_new {
                     //std::cout << "from array \n";
                     for (std::size_t i = 0; i < val.size(); ++i)
                     {
+                        std::cout << val[i] << "\n";
                         if (result_.exists(resources, val[i]))
                         {
+                            std::cout << "matches!\n";
                             nodes.emplace_back(PathCons()(path,i),std::addressof(val[i]));
                         }
                     }
@@ -1288,9 +1290,23 @@ namespace jsoncons { namespace jsonpath_new {
         }
 
         std::vector<token> compile(jsonpath_resources<Json>& resources,
-                                                            const char_type* path, 
-                                                            std::size_t length,
-                                                            std::error_code& ec)
+                                   const char_type* path, 
+                                   std::size_t length)
+        {
+            std::error_code ec;
+            Json instance;
+            evaluate(resources, instance, path, length, ec);
+            if (ec)
+            {
+                JSONCONS_THROW(jsonpath_error(ec, line_, column_));
+            }
+            return std::move(token_stack_);
+        }
+
+        std::vector<token> compile(jsonpath_resources<Json>& resources,
+                                   const char_type* path, 
+                                   std::size_t length,
+                                   std::error_code& ec)
         {
             Json instance;
             evaluate(resources, instance, path, length, ec);
