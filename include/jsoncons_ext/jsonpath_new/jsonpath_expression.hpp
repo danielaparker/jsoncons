@@ -918,7 +918,7 @@ namespace detail {
         }
     };
 
-    enum class path_token_type
+    enum class path_token_kind
     {
         current_node,
         recursive_descent,
@@ -1161,6 +1161,398 @@ namespace detail {
 
         virtual void add_selector(std::unique_ptr<selector_base>&&) 
         {
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class path_token
+    {
+    public:
+        using selector_base_type = selector_base<Json,JsonReference>;
+
+        path_token_kind type_;
+
+        union
+        {
+            std::unique_ptr<selector_base_type> selector_;
+            function_base* function_;
+            Json value_;
+        };
+    public:
+
+        path_token(current_node_arg_t) noexcept
+            : type_(path_token_kind::current_node)
+        {
+        }
+
+        path_token(begin_function_arg_t) noexcept
+            : type_(path_token_kind::begin_function)
+        {
+        }
+
+        path_token(end_function_arg_t) noexcept
+            : type_(path_token_kind::end_function)
+        {
+        }
+
+        path_token(separator_arg_t) noexcept
+            : type_(path_token_kind::separator)
+        {
+        }
+
+        path_token(lparen_arg_t) noexcept
+            : type_(path_token_kind::lparen)
+        {
+        }
+
+        path_token(rparen_arg_t) noexcept
+            : type_(path_token_kind::rparen)
+        {
+        }
+
+        path_token(end_of_expression_arg_t) noexcept
+            : type_(path_token_kind::end_of_expression)
+        {
+        }
+
+        path_token(begin_union_arg_t) noexcept
+            : type_(path_token_kind::begin_union)
+        {
+        }
+
+        path_token(end_union_arg_t) noexcept
+            : type_(path_token_kind::end_union)
+        {
+        }
+
+        path_token(begin_filter_arg_t) noexcept
+            : type_(path_token_kind::begin_filter)
+        {
+        }
+
+        path_token(end_filter_arg_t) noexcept
+            : type_(path_token_kind::end_filter)
+        {
+        }
+
+        path_token(std::unique_ptr<selector_base_type>&& expression)
+            : type_(path_token_kind::selector)
+        {
+            new (&selector_) std::unique_ptr<selector_base_type>(std::move(expression));
+        }
+
+        path_token(function_base* function) noexcept
+            : type_(path_token_kind::function),
+              function_(function)
+        {
+        }
+
+        path_token(argument_arg_t) noexcept
+            : type_(path_token_kind::argument)
+        {
+        }
+
+        path_token(begin_expression_type_arg_t) noexcept
+            : type_(path_token_kind::begin_expression_type)
+        {
+        }
+
+        path_token(end_expression_type_arg_t) noexcept
+            : type_(path_token_kind::end_expression_type)
+        {
+        }
+
+        path_token(recursive_descent_arg_t) noexcept
+            : type_(path_token_kind::recursive_descent)
+        {
+        }
+
+        path_token(literal_arg_t, Json&& value) noexcept
+            : type_(path_token_kind::literal), value_(std::move(value))
+        {
+        }
+
+        path_token(path_token&& other) noexcept
+        {
+            construct(std::forward<path_token>(other));
+        }
+
+        path_token& operator=(path_token&& other)
+        {
+            if (&other != this)
+            {
+                if (type_ == other.type_)
+                {
+                    switch (type_)
+                    {
+                        case path_token_kind::selector:
+                            selector_ = std::move(other.selector_);
+                            break;
+                        case path_token_kind::function:
+                            function_ = other.function_;
+                            break;
+                        case path_token_kind::literal:
+                            value_ = std::move(other.value_);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    destroy();
+                    construct(std::forward<path_token>(other));
+                }
+            }
+            return *this;
+        }
+
+        ~path_token() noexcept
+        {
+            destroy();
+        }
+
+        path_token_kind type() const
+        {
+            return type_;
+        }
+
+        bool is_lparen() const
+        {
+            return type_ == path_token_kind::lparen; 
+        }
+
+        bool is_rparen() const
+        {
+            return type_ == path_token_kind::rparen; 
+        }
+
+        bool is_current_node() const
+        {
+            return type_ == path_token_kind::current_node; 
+        }
+
+        bool is_projection() const
+        {
+            return type_ == path_token_kind::selector && selector_->is_projection(); 
+        }
+
+        bool is_expression() const
+        {
+            return type_ == path_token_kind::selector; 
+        }
+
+        bool is_recursive_descent() const
+        {
+            return type_ == path_token_kind::recursive_descent; 
+        }
+
+        std::size_t precedence_level() const
+        {
+            switch(type_)
+            {
+                case path_token_kind::selector:
+                    return selector_->precedence_level();
+                default:
+                    return 0;
+            }
+        }
+
+        bool is_right_associative() const
+        {
+            switch(type_)
+            {
+                case path_token_kind::selector:
+                    return selector_->is_right_associative();
+                default:
+                    return false;
+            }
+        }
+
+        void construct(path_token&& other)
+        {
+            type_ = other.type_;
+            switch (type_)
+            {
+                case path_token_kind::selector:
+                    new (&selector_) std::unique_ptr<selector_base_type>(std::move(other.selector_));
+                    break;
+                case path_token_kind::function:
+                    function_ = other.function_;
+                    break;
+                case path_token_kind::literal:
+                    new (&value_) Json(std::move(other.value_));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void destroy() noexcept 
+        {
+            switch(type_)
+            {
+                case path_token_kind::selector:
+                    selector_.~unique_ptr();
+                    break;
+                case path_token_kind::literal:
+                    value_.~Json();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class jsonpath_expression
+    {
+    public:
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_view_type = typename Json::string_view_type;
+        using path_node_type = path_node<Json,JsonReference>;
+        using reference = typename path_node_type::reference;
+        using path_token_type = path_token<Json,JsonReference>;
+    private:
+        std::vector<path_token_type> token_stack_;
+    public:
+        jsonpath_expression()
+        {
+        }
+
+        jsonpath_expression(jsonpath_expression&& expr)
+            : token_stack_(std::move(expr.token_stack_))
+        {
+        }
+
+        jsonpath_expression(std::vector<path_token_type>&& token_stack)
+            : token_stack_(std::move(token_stack))
+        {
+        }
+
+        jsonpath_expression& operator=(jsonpath_expression&& expr) = default;
+
+        Json evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance) const
+        {
+            Json result(json_array_arg);
+
+            std::vector<path_node_type> output_stack;
+            auto callback = [&dynamic_resources,&output_stack](path_node_type& node)
+            {
+                output_stack.push_back(node);
+            };
+            evaluate(dynamic_resources, instance, callback);
+            if (!output_stack.empty())
+            {
+                result.reserve(output_stack.size());
+                for (const auto& p : output_stack)
+                {
+                    result.push_back(*(p.val_ptr));
+                }
+            }
+            return result;
+        }
+
+        template <class Callback>
+        typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
+        evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance, Callback callback) const
+        {
+            std::vector<path_node_type> input_stack;
+            std::vector<path_node_type> output_stack;
+            std::vector<path_node_type> collected;
+            string_type path;
+            path.push_back('$');
+            Json result(json_array_arg);
+            bool is_recursive_descent = false;
+
+            if (!token_stack_.empty())
+            {
+                output_stack.emplace_back(path,std::addressof(instance));
+                for (std::size_t i = 0; 
+                     i < token_stack_.size();
+                     )
+                {
+                    for (auto& item : output_stack)
+                    {
+                        input_stack.push_back(std::move(item));
+                    }
+                    output_stack.clear();
+                    switch (token_stack_[i].type())
+                    { 
+                        case path_token_kind::selector:
+                        {
+                            for (auto& item : input_stack)
+                            {
+                                token_stack_[i].selector_->select(dynamic_resources, path, *(item.val_ptr), output_stack);
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+
+                    if (!output_stack.empty() && !is_recursive_descent)
+                    {
+                        input_stack.clear();
+                        ++i;
+                    }
+                    else if (is_recursive_descent && input_stack.empty())
+                    {
+                        input_stack.clear();
+                        for (auto& item : collected)
+                        {
+                            input_stack.emplace_back(item.path,item.val_ptr);
+                            output_stack.push_back(std::move(item));
+                        }
+                        collected.clear();
+                        is_recursive_descent = false;
+                        ++i;
+                    }
+                    else if (is_recursive_descent)
+                    {
+                        for (auto& item : output_stack)
+                        {
+                            collected.emplace_back(item.path,item.val_ptr);
+                        }
+                        output_stack.clear();
+                        for (auto& item : input_stack)
+                        {
+                            if (item.val_ptr->is_object())
+                            {
+                                for (auto& val : item.val_ptr->object_range())
+                                {
+                                    output_stack.emplace_back(val.key(),std::addressof(val.value()));
+                                }
+                            }
+                            else if (item.val_ptr->is_array())
+                            {
+                                for (auto& val : item.val_ptr->array_range())
+                                {
+                                    output_stack.emplace_back("",std::addressof(val));
+                                }
+                            }
+                        }
+                        input_stack.clear();
+                    }
+                    else if (token_stack_[i].is_recursive_descent())
+                    {
+                        is_recursive_descent = true;
+                        ++i;
+                    }
+                    else if (!is_recursive_descent)
+                    {
+                        break;
+                    }
+                }
+            }
+            if (!output_stack.empty())
+            {
+                for (auto& item : output_stack)
+                {
+                    callback(item);
+                }
+            }
         }
     };
 
