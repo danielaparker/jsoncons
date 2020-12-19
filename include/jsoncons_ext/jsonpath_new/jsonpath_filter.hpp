@@ -105,7 +105,7 @@ enum class filter_state
     done
 };
 
-enum class token_type 
+enum class filter_token_type 
 {
     value,
     path,
@@ -115,18 +115,6 @@ enum class token_type
     lparen,
     rparen
 };
-
-struct lparen_arg_t
-{
-    explicit lparen_arg_t() = default; 
-};
-constexpr lparen_arg_t lparen_arg{};
-
-struct rparen_arg_t
-{
-    explicit rparen_arg_t() = default; 
-};
-constexpr rparen_arg_t rparen_arg{};
 
 template <class Json>
 Json unary_minus(const Json& lhs)
@@ -331,7 +319,7 @@ class raw_token
 {
     friend class token<Json>;
 
-    token_type type_;
+    filter_token_type type_;
 
     union
     {
@@ -345,36 +333,36 @@ class raw_token
 public:
 
     raw_token(lparen_arg_t)
-        : type_(token_type::lparen)
+        : type_(filter_token_type::lparen)
     {
     }
 
     raw_token(rparen_arg_t)
-        : type_(token_type::rparen)
+        : type_(filter_token_type::rparen)
     {
     }
 
     raw_token(value_term<Json>&& term)
-        : type_(token_type::value), value_term_(std::move(term))
+        : type_(filter_token_type::value), value_term_(std::move(term))
     {
     }
     raw_token(path_term<Json>&& term)
-        : type_(token_type::path), path_term_(std::move(term))
+        : type_(filter_token_type::path), path_term_(std::move(term))
     {
     }
     raw_token(regex_term<Json>&& term)
-        : type_(token_type::regex), regex_term_(std::move(term))
+        : type_(filter_token_type::regex), regex_term_(std::move(term))
     {
     }
 
     raw_token(const unary_operator_properties<Json>* properties)
-        : type_(token_type::unary_operator), 
+        : type_(filter_token_type::unary_operator), 
           unary_op_properties_(properties)
     {
     }
 
     raw_token(const binary_operator_properties<Json>* properties)
-        : type_(token_type::binary_operator), 
+        : type_(filter_token_type::binary_operator), 
           binary_op_properties_(properties)
     {
     }
@@ -403,19 +391,19 @@ public:
                 type_ = other.type_;
                 switch(type_)
                 {
-                    case token_type::value:
+                    case filter_token_type::value:
                         value_term_ = other.value_term_;
                         break;
-                    case token_type::path:
+                    case filter_token_type::path:
                         path_term_ = other.path_term_;
                         break;
-                    case token_type::regex:
+                    case filter_token_type::regex:
                         regex_term_ = other.regex_term_;
                         break;
-                    case token_type::unary_operator:
+                    case filter_token_type::unary_operator:
                         unary_op_properties_ = other.unary_op_properties_;
                         break;
-                    case token_type::binary_operator:
+                    case filter_token_type::binary_operator:
                         binary_op_properties_ = other.binary_op_properties_;
                         break;
                     default:
@@ -440,19 +428,19 @@ public:
                 type_ = other.type_;
                 switch(type_)
                 {
-                    case token_type::value:
+                    case filter_token_type::value:
                         value_term_ = std::move(other.value_term_);
                         break;
-                    case token_type::path:
+                    case filter_token_type::path:
                         path_term_ = std::move(other.path_term_);
                         break;
-                    case token_type::regex:
+                    case filter_token_type::regex:
                         regex_term_ = std::move(other.regex_term_);
                         break;
-                    case token_type::unary_operator:
+                    case filter_token_type::unary_operator:
                         unary_op_properties_ = other.unary_op_properties_;
                         break;
-                    case token_type::binary_operator:
+                    case filter_token_type::binary_operator:
                         binary_op_properties_ = other.binary_op_properties_;
                         break;
                     default:
@@ -468,7 +456,7 @@ public:
         return *this;
     }
 
-    token_type type() const
+    filter_token_type type() const
     {
         return type_;
     }
@@ -480,21 +468,21 @@ public:
 
     bool is_unary_operator() const
     {
-        return type_ == token_type::unary_operator; 
+        return type_ == filter_token_type::unary_operator; 
     }
 
     bool is_binary_operator() const
     {
-        return type_ == token_type::binary_operator; 
+        return type_ == filter_token_type::binary_operator; 
     }
 
     bool is_operand() const
     {
         switch(type_)
         {
-            case token_type::value:
-            case token_type::path:
-            case token_type::regex:
+            case filter_token_type::value:
+            case filter_token_type::path:
+            case filter_token_type::regex:
                 return true;
             default:
                 return false;
@@ -503,21 +491,21 @@ public:
 
     bool is_lparen() const
     {
-        return type_ == token_type::lparen; 
+        return type_ == filter_token_type::lparen; 
     }
 
     bool is_rparen() const
     {
-        return type_ == token_type::rparen; 
+        return type_ == filter_token_type::rparen; 
     }
 
     std::size_t precedence_level() const
     {
         switch(type_)
         {
-            case token_type::unary_operator:
+            case filter_token_type::unary_operator:
                 return unary_op_properties_->precedence_level;
-            case token_type::binary_operator:
+            case filter_token_type::binary_operator:
                 return binary_op_properties_->precedence_level;
             default:
                 return 0;
@@ -528,9 +516,9 @@ public:
     {
         switch(type_)
         {
-            case token_type::unary_operator:
+            case filter_token_type::unary_operator:
                 return unary_op_properties_->is_right_associative;
-            case token_type::binary_operator:
+            case filter_token_type::binary_operator:
                 return binary_op_properties_->is_right_associative;
             default:
                 return false;
@@ -544,19 +532,19 @@ private:
         type_ = other.type_;
         switch (type_)
         {
-        case token_type::value:
+        case filter_token_type::value:
             ::new(static_cast<void*>(&this->value_term_))value_term<Json>(other.value_term_);
             break;
-        case token_type::path:
+        case filter_token_type::path:
             ::new(static_cast<void*>(&this->path_term_))path_term<Json>(other.path_term_);
             break;
-        case token_type::regex:
+        case filter_token_type::regex:
             ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(other.regex_term_);
             break;
-        case token_type::unary_operator:
+        case filter_token_type::unary_operator:
             this->unary_op_properties_ = other.unary_op_properties_;
             break;
-        case token_type::binary_operator:
+        case filter_token_type::binary_operator:
             this->binary_op_properties_ = other.binary_op_properties_;
             break;
         default:
@@ -569,19 +557,19 @@ private:
         type_ = other.type_;
         switch (type_)
         {
-        case token_type::value:
+        case filter_token_type::value:
             ::new(static_cast<void*>(&this->value_term_))value_term<Json>(std::move(other.value_term_));
             break;
-        case token_type::path:
+        case filter_token_type::path:
             ::new(static_cast<void*>(&this->path_term_))path_term<Json>(std::move(other.path_term_));
             break;
-        case token_type::regex:
+        case filter_token_type::regex:
             ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(std::move(other.regex_term_));
             break;
-        case token_type::unary_operator:
+        case filter_token_type::unary_operator:
             this->unary_op_properties_ = other.unary_op_properties_;
             break;
-        case token_type::binary_operator:
+        case filter_token_type::binary_operator:
             this->binary_op_properties_ = other.binary_op_properties_;
             break;
         default:
@@ -593,13 +581,13 @@ private:
     {
         switch(type_)
         {
-            case token_type::value:
+            case filter_token_type::value:
                 value_term_.~value_term();
                 break;
-            case token_type::path:
+            case filter_token_type::path:
                 path_term_.~path_term();
                 break;
-            case token_type::regex:
+            case filter_token_type::regex:
                 regex_term_.~regex_term();
                 break;
             default:
@@ -611,7 +599,7 @@ private:
 template <class Json>
 class token
 {
-    token_type type_;
+    filter_token_type type_;
 
     union
     {
@@ -629,19 +617,19 @@ public:
     {
         switch (type_)
         {
-            case token_type::value:
+            case filter_token_type::value:
                 ::new(static_cast<void*>(&this->value_term_))value_term<Json>(other.value_term_);
                 break;
-            case token_type::path:
+            case filter_token_type::path:
                 ::new(static_cast<void*>(&this->path_term_))path_term<Json>(other.path_term_);
                 break;
-            case token_type::regex:
+            case filter_token_type::regex:
                 ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(other.regex_term_);
                 break;
-            case token_type::unary_operator:
+            case filter_token_type::unary_operator:
                 this->unary_op_properties_ = other.unary_op_properties_;
                 break;
-            case token_type::binary_operator:
+            case filter_token_type::binary_operator:
                 this->binary_op_properties_ = other.binary_op_properties_;
                 break;
             default:
@@ -672,19 +660,19 @@ public:
             {
                 switch(type_)
                 {
-                    case token_type::value:
+                    case filter_token_type::value:
                         value_term_ = other.value_term_;
                         break;
-                    case token_type::path:
+                    case filter_token_type::path:
                         path_term_ = other.path_term_;
                         break;
-                    case token_type::regex:
+                    case filter_token_type::regex:
                         regex_term_ = other.regex_term_;
                         break;
-                    case token_type::unary_operator:
+                    case filter_token_type::unary_operator:
                         unary_op_properties_ = other.unary_op_properties_;
                         break;
-                    case token_type::binary_operator:
+                    case filter_token_type::binary_operator:
                         binary_op_properties_ = other.binary_op_properties_;
                         break;
                     default:
@@ -708,19 +696,19 @@ public:
             {
                 switch(type_)
                 {
-                    case token_type::value:
+                    case filter_token_type::value:
                         value_term_ = std::move(other.value_term_);
                         break;
-                    case token_type::path:
+                    case filter_token_type::path:
                         path_term_ = std::move(other.path_term_);
                         break;
-                    case token_type::regex:
+                    case filter_token_type::regex:
                         regex_term_ = std::move(other.regex_term_);
                         break;
-                    case token_type::unary_operator:
+                    case filter_token_type::unary_operator:
                         unary_op_properties_ = other.unary_op_properties_;
                         break;
-                    case token_type::binary_operator:
+                    case filter_token_type::binary_operator:
                         binary_op_properties_ = other.binary_op_properties_;
                         break;
                     default:
@@ -736,7 +724,7 @@ public:
         return *this;
     }
 
-    token_type type() const
+    filter_token_type type() const
     {
         return type_;
     }
@@ -745,7 +733,7 @@ public:
     {
         switch(type_)
         {
-            case token_type::unary_operator:
+            case filter_token_type::unary_operator:
                 return unary_op_properties_->op(a);
             default:
                 JSONCONS_UNREACHABLE();
@@ -757,7 +745,7 @@ public:
     {
         switch(type_)
         {
-            case token_type::binary_operator:
+            case filter_token_type::binary_operator:
                 return binary_op_properties_->op(a,b);
             default:
                 JSONCONS_UNREACHABLE();
@@ -772,21 +760,21 @@ public:
 
     bool is_unary_operator() const
     {
-        return type_ == token_type::unary_operator; 
+        return type_ == filter_token_type::unary_operator; 
     }
 
     bool is_binary_operator() const
     {
-        return type_ == token_type::binary_operator; 
+        return type_ == filter_token_type::binary_operator; 
     }
 
     bool is_operand() const
     {
         switch(type_)
         {
-            case token_type::value:
-            case token_type::path:
-            case token_type::regex:
+            case filter_token_type::value:
+            case filter_token_type::path:
+            case filter_token_type::regex:
                 return true;
             default:
                 return false;
@@ -795,21 +783,21 @@ public:
 
     bool is_lparen() const
     {
-        return type_ == token_type::lparen; 
+        return type_ == filter_token_type::lparen; 
     }
 
     bool is_rparen() const
     {
-        return type_ == token_type::rparen; 
+        return type_ == filter_token_type::rparen; 
     }
 
     std::size_t precedence_level() const
     {
         switch(type_)
         {
-            case token_type::unary_operator:
+            case filter_token_type::unary_operator:
                 return unary_op_properties_->precedence_level;
-            case token_type::binary_operator:
+            case filter_token_type::binary_operator:
                 return binary_op_properties_->precedence_level;
             default:
                 return 0;
@@ -820,9 +808,9 @@ public:
     {
         switch(type_)
         {
-            case token_type::unary_operator:
+            case filter_token_type::unary_operator:
                 return unary_op_properties_->is_right_associative;
-            case token_type::binary_operator:
+            case filter_token_type::binary_operator:
                 return binary_op_properties_->is_right_associative;
             default:
                 return false;
@@ -833,11 +821,11 @@ public:
     {
         switch(type_)
         {
-            case token_type::value:
+            case filter_token_type::value:
                 return value_term_;
-            case token_type::path:
+            case filter_token_type::path:
                 return path_term_;
-            case token_type::regex:
+            case filter_token_type::regex:
                 return regex_term_;
             default:
                 JSONCONS_UNREACHABLE();
@@ -848,13 +836,13 @@ public:
     {
         switch(type_)
         {
-            case token_type::value:
+            case filter_token_type::value:
                 value_term_.initialize(resources, current_node);
                 break;
-            case token_type::path:
+            case filter_token_type::path:
                 path_term_.initialize(resources, current_node);
                 break;
-            case token_type::regex:
+            case filter_token_type::regex:
                 regex_term_.initialize(resources, current_node);
                 break;
             default:
@@ -869,19 +857,19 @@ private:
         type_ = other.type_;
         switch (type_)
         {
-        case token_type::value:
+        case filter_token_type::value:
             ::new(static_cast<void*>(&this->value_term_))value_term<Json>(other.value_term_);
             break;
-        case token_type::path:
+        case filter_token_type::path:
             ::new(static_cast<void*>(&this->path_term_))path_term<Json>(other.path_term_);
             break;
-        case token_type::regex:
+        case filter_token_type::regex:
             ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(other.regex_term_);
             break;
-        case token_type::unary_operator:
+        case filter_token_type::unary_operator:
             this->unary_op_properties_ = other.unary_op_properties_;
             break;
-        case token_type::binary_operator:
+        case filter_token_type::binary_operator:
             this->binary_op_properties_ = other.binary_op_properties_;
             break;
         default:
@@ -894,19 +882,19 @@ private:
         type_ = other.type_;
         switch (type_)
         {
-        case token_type::value:
+        case filter_token_type::value:
             ::new(static_cast<void*>(&this->value_term_))value_term<Json>(std::move(other.value_term_));
             break;
-        case token_type::path:
+        case filter_token_type::path:
             ::new(static_cast<void*>(&this->path_term_))path_term<Json>(std::move(other.path_term_));
             break;
-        case token_type::regex:
+        case filter_token_type::regex:
             ::new(static_cast<void*>(&this->regex_term_))regex_term<Json>(std::move(other.regex_term_));
             break;
-        case token_type::unary_operator:
+        case filter_token_type::unary_operator:
             this->unary_op_properties_ = other.unary_op_properties_;
             break;
-        case token_type::binary_operator:
+        case filter_token_type::binary_operator:
             this->binary_op_properties_ = other.binary_op_properties_;
             break;
         default:
@@ -918,13 +906,13 @@ private:
     {
         switch(type_)
         {
-            case token_type::value:
+            case filter_token_type::value:
                 value_term_.~value_term();
                 break;
-            case token_type::path:
+            case filter_token_type::path:
                 path_term_.~path_term();
                 break;
-            case token_type::regex:
+            case filter_token_type::regex:
                 regex_term_.~regex_term();
                 break;
             default:
@@ -1041,15 +1029,15 @@ public:
     {
         switch (raw_token.type())
         {
-            case token_type::value:
-            case token_type::path:
-            case token_type::regex:
+            case filter_token_type::value:
+            case filter_token_type::path:
+            case filter_token_type::regex:
                 output_stack_.push_back(std::move(raw_token));
                 break;
-            case token_type::lparen:
+            case filter_token_type::lparen:
                 operator_stack_.push_back(std::move(raw_token));
                 break;
-            case token_type::rparen:
+            case filter_token_type::rparen:
                 {
                     auto it = operator_stack_.rbegin();
                     while (it != operator_stack_.rend() && !it->is_lparen())
@@ -1065,8 +1053,8 @@ public:
                     operator_stack_.pop_back();
                     break;
                 }
-            case token_type::unary_operator:
-            case token_type::binary_operator:
+            case filter_token_type::unary_operator:
+            case filter_token_type::binary_operator:
             {
                 if (operator_stack_.empty() || operator_stack_.back().is_lparen())
                 {
