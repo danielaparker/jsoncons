@@ -205,100 +205,9 @@ namespace jsoncons { namespace jsonpath_new {
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using const_pointer = typename Json::const_pointer;
+        using path_node_type = path_node<Json,JsonReference>;
+        using selector_base_type = selector_base<Json,JsonReference>;
     private:
-
-        struct path_node
-        {
-            string_type path;
-            pointer val_ptr;
-
-            path_node() = default;
-            path_node(const string_type& p, const pointer& valp)
-                : path(p),val_ptr(valp)
-            {
-            }
-
-            path_node(string_type&& p, pointer&& valp) noexcept
-                : path(std::move(p)),val_ptr(valp)
-            {
-            }
-            path_node(const path_node&) = default;
-
-            path_node(path_node&& other) noexcept
-                : path(std::move(other.path)), val_ptr(other.val_ptr)
-            {
-
-            }
-            path_node& operator=(const path_node&) = default;
-
-            path_node& operator=(path_node&& other) noexcept
-            {
-                path.swap(other.path);
-                val_ptr = other.val_ptr;
-                return *this;
-            }
-
-        };
-
-        struct node_less
-        {
-            bool operator()(const path_node& a, const path_node& b) const
-            {
-                return *(a.val_ptr) < *(b.val_ptr);
-            }
-        };
-
-        class selector_base
-        {
-            bool is_projection_;
-            bool is_filter_;
-            std::size_t precedence_level_;
-        public:
-
-            selector_base()
-                : is_projection_(false), 
-                  is_filter_(false)
-            {
-            }
-
-            selector_base(bool is_projection,
-                          bool is_filter,
-                          std::size_t precedence_level = 0)
-                : is_projection_(is_projection), 
-                  is_filter_(is_filter),
-                  precedence_level_(precedence_level)
-            {
-            }
-
-            virtual ~selector_base() noexcept = default;
-
-            bool is_projection() const 
-            {
-                return is_projection_;
-            }
-
-            bool is_filter() const
-            {
-                return is_filter_;
-            }
-
-            std::size_t precedence_level() const
-            {
-                return precedence_level_;
-            }
-
-            bool is_right_associative() const
-            {
-                return true;
-            }
-
-            virtual void select(jsonpath_resources<Json>& resources,
-                                const string_type& path, reference val, std::vector<path_node>& nodes) const = 0;
-
-            virtual void add_selector(std::unique_ptr<selector_base>&&) 
-            {
-            }
-        };
 
         class path_token
         {
@@ -307,7 +216,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             union
             {
-                std::unique_ptr<selector_base> selector_;
+                std::unique_ptr<selector_base_type> selector_;
                 function_base* function_;
                 Json value_;
             };
@@ -368,10 +277,10 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            path_token(std::unique_ptr<selector_base>&& expression)
+            path_token(std::unique_ptr<selector_base_type>&& expression)
                 : type_(path_token_type::selector)
             {
-                new (&selector_) std::unique_ptr<selector_base>(std::move(expression));
+                new (&selector_) std::unique_ptr<selector_base_type>(std::move(expression));
             }
 
             path_token(function_base* function) noexcept
@@ -508,7 +417,7 @@ namespace jsoncons { namespace jsonpath_new {
                 switch (type_)
                 {
                     case path_token_type::selector:
-                        new (&selector_) std::unique_ptr<selector_base>(std::move(other.selector_));
+                        new (&selector_) std::unique_ptr<selector_base_type>(std::move(other.selector_));
                         break;
                     case path_token_type::function:
                         function_ = other.function_;
@@ -562,8 +471,8 @@ namespace jsoncons { namespace jsonpath_new {
             {
                 Json result(json_array_arg);
 
-                std::vector<path_node> output_stack;
-                auto callback = [&dynamic_resources,&output_stack](path_node& node)
+                std::vector<path_node_type> output_stack;
+                auto callback = [&dynamic_resources,&output_stack](path_node_type& node)
                 {
                     output_stack.push_back(node);
                 };
@@ -580,12 +489,12 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             template <class Callback>
-            typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node&>::value,void>::type
+            typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
             evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance, Callback callback) const
             {
-                std::vector<path_node> input_stack;
-                std::vector<path_node> output_stack;
-                std::vector<path_node> collected;
+                std::vector<path_node_type> input_stack;
+                std::vector<path_node_type> output_stack;
+                std::vector<path_node_type> collected;
                 string_type path;
                 path.push_back('$');
                 Json result(json_array_arg);
@@ -706,7 +615,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
     private:
-        class identifier_selector final : public selector_base
+        class identifier_selector final : public selector_base_type
         {
         private:
             string_type identifier_;
@@ -718,7 +627,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
-                        std::vector<path_node>& nodes) const override
+                        std::vector<path_node_type>& nodes) const override
             {
                 if (val.is_object())
                 {
@@ -731,7 +640,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class index_selector final : public selector_base
+        class index_selector final : public selector_base_type
         {
             int64_t index_;
         public:
@@ -742,7 +651,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(jsonpath_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
-                        std::vector<path_node>& nodes) const override
+                        std::vector<path_node_type>& nodes) const override
             {
                 if (val.is_array())
                 {
@@ -762,17 +671,17 @@ namespace jsoncons { namespace jsonpath_new {
         };
 
         // projection_base
-        class projection_base : public selector_base
+        class projection_base : public selector_base_type
         {
         protected:
-            std::vector<std::unique_ptr<selector_base>> selectors_;
+            std::vector<std::unique_ptr<selector_base_type>> selectors_;
         public:
             projection_base(std::size_t precedence_level)
-                : selector_base(true, false, precedence_level)
+                : selector_base_type(true, false, precedence_level)
             {
             }
 
-            void add_selector(std::unique_ptr<selector_base>&& expr) override
+            void add_selector(std::unique_ptr<selector_base_type>&& expr) override
             {
                 if (!selectors_.empty() && selectors_.back()->is_projection() && 
                     (expr->precedence_level() < selectors_.back()->precedence_level() ||
@@ -789,7 +698,7 @@ namespace jsoncons { namespace jsonpath_new {
             void apply_expressions(jsonpath_resources<Json>& resources,
                                    const string_type& path, 
                                    reference val,
-                                   std::vector<path_node>& nodes) const
+                                   std::vector<path_node_type>& nodes) const
             {
                 if (selectors_.empty())
                 {
@@ -797,11 +706,11 @@ namespace jsoncons { namespace jsonpath_new {
                 }
                 else
                 {
-                    std::vector<path_node> collect;
+                    std::vector<path_node_type> collect;
                     collect.emplace_back(path,std::addressof(val));
                     for (auto& selector : selectors_)
                     {
-                        std::vector<path_node> temp;
+                        std::vector<path_node_type> temp;
                         for (auto& item : collect)
                             selector->select(resources, path, *(item.val_ptr), temp);
                         collect = std::move(temp);
@@ -825,7 +734,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, reference val,
-                        std::vector<path_node>& nodes) const override
+                        std::vector<path_node_type>& nodes) const override
             {
                 if (!val.is_array())
                 {
@@ -838,7 +747,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class union_selector final : public selector_base
+        class union_selector final : public selector_base_type
         {
             std::vector<jsonpath_expression> expressions_;
         public:
@@ -850,9 +759,9 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& resources,
                         const string_type& /*path*/, 
                         reference val, 
-                        std::vector<path_node>& nodes) const override
+                        std::vector<path_node_type>& nodes) const override
             {
-                auto callback = [&resources,&nodes](path_node& node)
+                auto callback = [&resources,&nodes](path_node_type& node)
                 {
                     nodes.push_back(node);
                 };
@@ -863,7 +772,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class expression_selector final : public selector_base
+        class expression_selector final : public selector_base_type
         {
         private:
              jsonpath_filter_expr<Json> result_;
@@ -876,7 +785,7 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, 
                         reference val, 
-                        std::vector<path_node>& nodes) const override
+                        std::vector<path_node_type>& nodes) const override
             {
                 auto index = result_.eval(resources, val);
                 if (index.template is<std::size_t>())
@@ -908,7 +817,7 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, 
                         reference val, 
-                        std::vector<path_node>& nodes) const override
+                        std::vector<path_node_type>& nodes) const override
             {
                 //std::cout << "filter_selector select ";
                 
@@ -950,7 +859,7 @@ namespace jsoncons { namespace jsonpath_new {
             void select(jsonpath_resources<Json>& resources,
                         const string_type& path, 
                         reference val,
-                        std::vector<path_node>& nodes) const override
+                        std::vector<path_node_type>& nodes) const override
             {
                 if (val.is_array())
                 {
@@ -1001,8 +910,8 @@ namespace jsoncons { namespace jsonpath_new {
 
         function_table<Json,pointer> functions_;
 
-        std::vector<path_node> nodes_;
-        std::vector<std::vector<path_node>> stack_;
+        std::vector<path_node_type> nodes_;
+        std::vector<std::vector<path_node_type>> stack_;
         std::size_t line_;
         std::size_t column_;
         const char_type* begin_input_;
@@ -1084,7 +993,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             string_type s = {'$'};
-            std::vector<path_node> v;
+            std::vector<path_node_type> v;
             pointer ptr = resources.create_temp(std::move(result));
             v.emplace_back(s,ptr);
             stack_.push_back(v);
@@ -1190,7 +1099,7 @@ namespace jsoncons { namespace jsonpath_new {
             p_ = begin_input_;
 
             string_type s = {'$'};
-            std::vector<path_node> v;
+            std::vector<path_node_type> v;
             v.emplace_back(std::move(s),std::addressof(root));
             stack_.push_back(v);
 

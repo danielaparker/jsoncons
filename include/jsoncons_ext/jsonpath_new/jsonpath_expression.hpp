@@ -1058,6 +1058,112 @@ namespace detail {
         //                           std::error_code& ec) const = 0;
     };  
 
+    template <class Json,class JsonReference>
+    struct path_node
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using reference = JsonReference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+
+        string_type path;
+        pointer val_ptr;
+
+        path_node() = default;
+        path_node(const string_type& p, const pointer& valp)
+            : path(p),val_ptr(valp)
+        {
+        }
+
+        path_node(string_type&& p, pointer&& valp) noexcept
+            : path(std::move(p)),val_ptr(valp)
+        {
+        }
+        path_node(const path_node&) = default;
+
+        path_node(path_node&& other) noexcept
+            : path(std::move(other.path)), val_ptr(other.val_ptr)
+        {
+
+        }
+        path_node& operator=(const path_node&) = default;
+
+        path_node& operator=(path_node&& other) noexcept
+        {
+            path.swap(other.path);
+            val_ptr = other.val_ptr;
+            return *this;
+        }
+    };
+
+    template <class Json,class JsonReference>
+    struct node_less
+    {
+        bool operator()(const path_node<Json,JsonReference>& a, const path_node<Json,JsonReference>& b) const
+        {
+            return *(a.val_ptr) < *(b.val_ptr);
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class selector_base
+    {
+        bool is_projection_;
+        bool is_filter_;
+        std::size_t precedence_level_;
+    public:
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using reference = JsonReference;
+        using path_node_type = path_node<Json,JsonReference>;
+
+        selector_base()
+            : is_projection_(false), 
+              is_filter_(false)
+        {
+        }
+
+        selector_base(bool is_projection,
+                      bool is_filter,
+                      std::size_t precedence_level = 0)
+            : is_projection_(is_projection), 
+              is_filter_(is_filter),
+              precedence_level_(precedence_level)
+        {
+        }
+
+        virtual ~selector_base() noexcept = default;
+
+        bool is_projection() const 
+        {
+            return is_projection_;
+        }
+
+        bool is_filter() const
+        {
+            return is_filter_;
+        }
+
+        std::size_t precedence_level() const
+        {
+            return precedence_level_;
+        }
+
+        bool is_right_associative() const
+        {
+            return true;
+        }
+
+        virtual void select(jsonpath_resources<Json>& resources,
+                            const string_type& path, 
+                            reference val, 
+                            std::vector<path_node_type>& nodes) const = 0;
+
+        virtual void add_selector(std::unique_ptr<selector_base>&&) 
+        {
+        }
+    };
+
 } // namespace detail
 } // namespace jsonpath_new
 } // namespace jsoncons
