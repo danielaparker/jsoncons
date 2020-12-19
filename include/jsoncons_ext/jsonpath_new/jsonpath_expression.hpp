@@ -19,7 +19,7 @@ namespace detail {
     template <class Json>
     class value_term;
     template <class Json>
-    class path_term;
+    class evaluated_path_term;
     template <class Json>
     class regex_term;
 
@@ -51,7 +51,7 @@ namespace detail {
             return plus(lhs.value(), rhs.value());
         }
 
-        Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -60,7 +60,7 @@ namespace detail {
             return (*this)(lhs.value(),rhs.result()[0]);
         }
 
-        Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -69,7 +69,7 @@ namespace detail {
             return (*this)(rhs, lhs);
         }
 
-        Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty() || rhs.result().empty())
             {
@@ -83,7 +83,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -115,7 +115,7 @@ namespace detail {
             return mult(lhs.value(), rhs.value());
         }
 
-        Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -124,7 +124,7 @@ namespace detail {
             return mult(lhs.value(),rhs.result()[0]);
         }
 
-        Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -133,7 +133,7 @@ namespace detail {
             return (*this)(rhs, lhs);
         }
 
-        Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty() || rhs.result().empty())
             {
@@ -147,7 +147,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -179,7 +179,7 @@ namespace detail {
             return div(lhs.value(), rhs.value());
         }
 
-        Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -188,7 +188,7 @@ namespace detail {
             return div(lhs.value(),rhs.result()[0]);
         }
 
-        Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -197,7 +197,7 @@ namespace detail {
             return div(lhs.result()[0],rhs.value());
         }
 
-        Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty() || rhs.result().empty())
             {
@@ -211,7 +211,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -225,7 +225,7 @@ namespace detail {
             return lhs.value() == rhs.value();
         }
 
-        bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -234,7 +234,7 @@ namespace detail {
             return lhs.value() == rhs.result()[0];
         }
 
-        bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -243,7 +243,7 @@ namespace detail {
             return (*this)(rhs, lhs);
         }
 
-        bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty())
             {
@@ -273,7 +273,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -293,7 +293,7 @@ namespace detail {
             return !eq(lhs, rhs);
         }
 
-        bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const 
+        bool operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const 
         {
             if (rhs.result().size() != 1)
             {
@@ -302,7 +302,7 @@ namespace detail {
             return !eq(lhs, rhs);
         }
 
-        bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -311,7 +311,7 @@ namespace detail {
             return !eq(lhs, rhs);
         }
 
-        bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const 
+        bool operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const 
         {
             if (lhs.result().empty())
             {
@@ -329,7 +329,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -343,7 +343,7 @@ namespace detail {
             return lhs.value().as_bool() || rhs.value().as_bool();
         }
 
-        bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -352,7 +352,7 @@ namespace detail {
             return (*this)(lhs.value(),rhs.result()[0]);
         }
 
-        bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -361,7 +361,7 @@ namespace detail {
             return (*this)(rhs, lhs);
         }
 
-        bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty())
             {
@@ -390,7 +390,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -404,7 +404,7 @@ namespace detail {
             return lhs.value().as_bool() && rhs.value().as_bool();
         }
 
-        bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -413,7 +413,7 @@ namespace detail {
             return (*this)(lhs.value(),rhs.result()[0]);
         }
 
-        bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -422,7 +422,7 @@ namespace detail {
             return (*this)(rhs, lhs);
         }
 
-        bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty())
             {
@@ -451,7 +451,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -494,7 +494,7 @@ namespace detail {
             return lhs.value() < rhs.value();
         }
 
-        bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -503,7 +503,7 @@ namespace detail {
             return !((*this)(rhs, lhs) || eq(rhs,lhs));
         }
 
-        bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
              {
@@ -513,7 +513,7 @@ namespace detail {
             return result;
         }
 
-        bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty())
             {
@@ -537,7 +537,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -558,7 +558,7 @@ namespace detail {
             return lhs.value() <= rhs.value();
         }
 
-        bool operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -567,7 +567,7 @@ namespace detail {
             return !lt(rhs, lhs);
         }
 
-        bool operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
              {
@@ -577,7 +577,7 @@ namespace detail {
             return result;
         }
 
-        bool operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty())
             {
@@ -601,7 +601,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -640,7 +640,7 @@ namespace detail {
             return minus(lhs.value(), rhs.value());
         }
 
-        Json operator()(const value_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const value_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (rhs.result().size() != 1)
             {
@@ -649,7 +649,7 @@ namespace detail {
             return minus(lhs.value(),rhs.result()[0]);
         }
 
-        Json operator()(const path_term<Json>& lhs, const value_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const value_term<Json>& rhs) const
         {
             if (lhs.result().size() != 1)
             {
@@ -658,7 +658,7 @@ namespace detail {
             return minus(lhs.result()[0],rhs.value());
         }
 
-        Json operator()(const path_term<Json>& lhs, const path_term<Json>& rhs) const
+        Json operator()(const evaluated_path_term<Json>& lhs, const evaluated_path_term<Json>& rhs) const
         {
             if (lhs.result().empty() || rhs.result().empty())
             {
@@ -672,7 +672,7 @@ namespace detail {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>&, const regex_term<Json>&) const
+        bool operator()(const evaluated_path_term<Json>&, const regex_term<Json>&) const
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -685,11 +685,11 @@ namespace detail {
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
-        bool operator()(const path_term<Json>&, const value_term<Json>&) const 
+        bool operator()(const evaluated_path_term<Json>&, const value_term<Json>&) const 
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
-        bool operator()(const path_term<Json>&, const path_term<Json>&) const 
+        bool operator()(const evaluated_path_term<Json>&, const evaluated_path_term<Json>&) const 
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
@@ -697,12 +697,12 @@ namespace detail {
         {
             return rhs.evaluate(lhs.value().as_string()); 
         }
-        bool operator()(const value_term<Json>&, const path_term<Json>&) const 
+        bool operator()(const value_term<Json>&, const evaluated_path_term<Json>&) const 
         {
             JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator));
         }
 
-        bool operator()(const path_term<Json>& lhs, const regex_term<Json>& rhs) const
+        bool operator()(const evaluated_path_term<Json>& lhs, const regex_term<Json>& rhs) const
         {
             if (lhs.result().empty())
                 return false;
@@ -754,7 +754,7 @@ namespace detail {
                     }
                     case term_type::path:
                     {
-                        const auto& t2 = static_cast<const path_term<Json>&>(w);
+                        const auto& t2 = static_cast<const evaluated_path_term<Json>&>(w);
                         return vis(t1, t2);
                     }
                     case term_type::regex:
@@ -767,7 +767,7 @@ namespace detail {
             }
             case term_type::path:
             {
-                const auto& t1 = static_cast<const path_term<Json>&>(v);
+                const auto& t1 = static_cast<const evaluated_path_term<Json>&>(v);
                 switch(w.type())
                 {
                     case term_type::value:
@@ -777,7 +777,7 @@ namespace detail {
                     }
                     case term_type::path:
                     {
-                        const auto& t2 = static_cast<const path_term<Json>&>(w);
+                        const auto& t2 = static_cast<const evaluated_path_term<Json>&>(w);
                         return vis(t1, t2);
                     }
                     case term_type::regex:
@@ -1405,7 +1405,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class jsonpath_expression
+    class path_expression
     {
     public:
         using char_type = typename Json::char_type;
@@ -1417,28 +1417,28 @@ namespace detail {
     private:
         std::vector<path_token_type> token_stack_;
     public:
-        jsonpath_expression()
+        path_expression()
         {
         }
 
-        jsonpath_expression(jsonpath_expression&& expr)
+        path_expression(path_expression&& expr)
             : token_stack_(std::move(expr.token_stack_))
         {
         }
 
-        jsonpath_expression(std::vector<path_token_type>&& token_stack)
+        path_expression(std::vector<path_token_type>&& token_stack)
             : token_stack_(std::move(token_stack))
         {
         }
 
-        jsonpath_expression& operator=(jsonpath_expression&& expr) = default;
+        path_expression& operator=(path_expression&& expr) = default;
 
         Json evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance) const
         {
             Json result(json_array_arg);
 
             std::vector<path_node_type> output_stack;
-            auto callback = [&dynamic_resources,&output_stack](path_node_type& node)
+            auto callback = [&output_stack](path_node_type& node)
             {
                 output_stack.push_back(node);
             };
@@ -1451,6 +1451,7 @@ namespace detail {
                     result.push_back(*(p.val_ptr));
                 }
             }
+
             return result;
         }
 

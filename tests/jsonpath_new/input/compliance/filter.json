@@ -6,9 +6,14 @@
      "cases": [
          {
             "comment" : "Dot notation after filter expression",
+            "expression": "$[?(@.id==42)]",
+            "result": [{"id": 42, "name": "forty-two"}]
+         }/*,
+         {
+            "comment" : "Dot notation after filter expression",
             "expression": "$[?(@.id==42)].name",
             "result": ["forty-two"]
-         }
+         }*/
      ]
 }
 ]

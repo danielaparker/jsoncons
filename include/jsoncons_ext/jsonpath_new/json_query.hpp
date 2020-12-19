@@ -201,13 +201,12 @@ namespace jsoncons { namespace jsonpath_new {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
-        using reference = JsonReference;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        using const_pointer = typename Json::const_pointer;
         using path_node_type = path_node<Json,JsonReference>;
+        using reference = JsonReference;
+        using pointer = typename path_node_type::pointer;
         using selector_base_type = selector_base<Json,JsonReference>;
         using path_token_type = path_token<Json,JsonReference>;
-        using jsonpath_expression_type = jsonpath_expression<Json,JsonReference>;
+        using path_expression_type = path_expression<Json,JsonReference>;
 
     private:
         class identifier_selector final : public selector_base_type
@@ -344,9 +343,9 @@ namespace jsoncons { namespace jsonpath_new {
 
         class union_selector final : public selector_base_type
         {
-            std::vector<jsonpath_expression_type> expressions_;
+            std::vector<path_expression_type> expressions_;
         public:
-            union_selector(std::vector<jsonpath_expression_type>&& expressions)
+            union_selector(std::vector<path_expression_type>&& expressions)
                 : expressions_(std::move(expressions))
             {
             }
@@ -356,7 +355,7 @@ namespace jsoncons { namespace jsonpath_new {
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
             {
-                auto callback = [&resources,&nodes](path_node_type& node)
+                auto callback = [&nodes](path_node_type& node)
                 {
                     nodes.push_back(node);
                 };
@@ -372,8 +371,8 @@ namespace jsoncons { namespace jsonpath_new {
         private:
              jsonpath_filter_expr<Json> result_;
         public:
-            expression_selector(const jsonpath_filter_expr<Json>& result)
-                : result_(result)
+            expression_selector(jsonpath_filter_expr<Json>&& result)
+                : result_(std::move(result))
             {
             }
 
@@ -404,8 +403,8 @@ namespace jsoncons { namespace jsonpath_new {
         private:
              jsonpath_filter_expr<Json> result_;
         public:
-            filter_selector(const jsonpath_filter_expr<Json>& result)
-                : projection_base(11), result_(result)
+            filter_selector(jsonpath_filter_expr<Json>&& result)
+                : projection_base(11), result_(std::move(result))
             {
             }
 
@@ -414,24 +413,18 @@ namespace jsoncons { namespace jsonpath_new {
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
             {
-                //std::cout << "filter_selector select ";
-                
                 if (val.is_array())
                 {
-                    //std::cout << "from array \n";
                     for (std::size_t i = 0; i < val.size(); ++i)
                     {
-                        std::cout << val[i] << "\n";
                         if (result_.exists(resources, val[i]))
                         {
-                            std::cout << "matches!\n";
                             nodes.emplace_back(PathCons()(path,i),std::addressof(val[i]));
                         }
                     }
                 }
                 else if (val.is_object())
                 {
-                    //std::cout << "from object \n";
                     if (result_.exists(resources, val))
                     {
                         nodes.emplace_back(path, std::addressof(val));
@@ -654,9 +647,9 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 
-        std::vector<path_token_type> compile(jsonpath_resources<Json>& resources,
-                                   const char_type* path, 
-                                   std::size_t length)
+        path_expression_type compile(jsonpath_resources<Json>& resources,
+                                     const char_type* path, 
+                                     std::size_t length)
         {
             std::error_code ec;
             Json instance;
@@ -665,17 +658,17 @@ namespace jsoncons { namespace jsonpath_new {
             {
                 JSONCONS_THROW(jsonpath_error(ec, line_, column_));
             }
-            return std::move(token_stack_);
+            return path_expression_type(std::move(token_stack_));
         }
 
-        std::vector<path_token_type> compile(jsonpath_resources<Json>& resources,
-                                   const char_type* path, 
-                                   std::size_t length,
-                                   std::error_code& ec)
+        path_expression_type compile(jsonpath_resources<Json>& resources,
+                                     const char_type* path, 
+                                     std::size_t length,
+                                     std::error_code& ec)
         {
             Json instance;
             evaluate(resources, instance, path, length, ec);
-            return std::move(token_stack_);
+            return path_expression_type(std::move(token_stack_));
         }
 
         void evaluate(jsonpath_resources<Json>& resources,
@@ -1280,7 +1273,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources, root, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                push_token(path_token_type(jsoncons::make_unique<expression_selector>(result)));
+                                push_token(path_token_type(jsoncons::make_unique<expression_selector>(std::move(result))));
                                 state_stack_.back() = path_state::expect_right_bracket;
                                 break;
                             }
@@ -1290,7 +1283,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources,root,p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                push_token(path_token_type(jsoncons::make_unique<filter_selector>(result)));
+                                push_token(path_token_type(jsoncons::make_unique<filter_selector>(std::move(result))));
                                 state_stack_.back() = path_state::expect_right_bracket;
                                 break;                   
                             }
@@ -1804,7 +1797,7 @@ namespace jsoncons { namespace jsonpath_new {
 
                 case path_token_kind::end_union:
                 {
-                    std::vector<jsonpath_expression_type> expressions;
+                    std::vector<path_expression_type> expressions;
                     auto it = token_stack_.rbegin();
                     while (it != token_stack_.rend() && it->type() != path_token_kind::begin_union)
                     {
@@ -1818,7 +1811,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             ++it;
                         }
-                        expressions.emplace(expressions.begin(), jsonpath_expression_type(std::move(toks)));
+                        expressions.emplace(expressions.begin(), path_expression_type(std::move(toks)));
                     }
                     if (it == token_stack_.rend())
                     {
@@ -1852,7 +1845,7 @@ namespace jsoncons { namespace jsonpath_new {
     class jsonpath_expression
     {
         using evaluator_t = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, const Json&, detail::VoidPathConstructor<Json>>;
-        using expression_t = typename evaluator_t::jsonpath_expression_type;
+        using expression_t = typename evaluator_t::path_expression_type;
         jsoncons::jsonpath_new::detail::jsonpath_resources<Json> static_resources_;
         expression_t expr_;
     public:
