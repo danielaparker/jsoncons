@@ -1036,6 +1036,28 @@ namespace detail {
     };
     constexpr argument_arg_t argument_arg{};
 
+    // function_base
+    class function_base
+    {
+        jsoncons::optional<std::size_t> arg_count_;
+    public:
+        function_base(jsoncons::optional<std::size_t> arg_count)
+            : arg_count_(arg_count)
+        {
+        }
+
+        jsoncons::optional<std::size_t> arg_count() const
+        {
+            return arg_count_;
+        }
+
+        virtual ~function_base() = default;
+
+        //virtual reference evaluate(std::vector<parameter>& args, 
+        //                           eval_context&, 
+        //                           std::error_code& ec) const = 0;
+    };  
+
 } // namespace detail
 } // namespace jsonpath_new
 } // namespace jsoncons
