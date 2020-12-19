@@ -20,6 +20,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath_new/jsonpath_expression.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_function.hpp>
 
 namespace jsoncons { namespace jsonpath_new {
