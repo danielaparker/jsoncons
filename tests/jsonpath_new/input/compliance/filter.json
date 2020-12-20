@@ -77,6 +77,30 @@
   "more"}]
          }
      ]
+},
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given": {"id": 2, "more": [{"id": 2}, {"more": {"id": 2}}, {"id": {"id": 2}}, [{"id": 2}]]},
+     "cases": [
+         {
+            "comment" : "Filter expression after recursive descent",
+            "expression": "$..[?(@.id==2)]",
+            "result": [{"id":2,"more":[{"id":2},{"more":{"id":2}},{"id":{"id":2}},[{"id":2}]]},
+  {"id":2},{"id":2},{"id":2},{"id":2},{"id":2},{"id":2}]
+         }
+     ]
+},
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given": [{"key": 60}, {"key": 50}, {"key": 10}, {"key": -50}, {"key+50": 100}],
+     "cases": [
+         {
+            "comment" : "Filter expression with addition",
+            "expression": "$[?(@.key+50==100)]",
+            "result": [{"key": 50}]
+         }
+     ]
 }
+
 
 ]
