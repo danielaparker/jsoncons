@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         "given": {
             "__L": true
         },
@@ -10,18 +10,18 @@
                 "normalized-path-expression" : "$['__L']"
             }
         ]
-    }/*,
+    },*/
     {
         "given": {
             "!\r": true
         },
         "cases": [
             {
-                "expression": "\"!\\r\"",
-                "result": true
+                "expression": "$.\"!\\r\"",
+                "result": [true]
             }
         ]
-    },
+    }/*,
     {
         "given": {
             "Y_1623": true
@@ -32,7 +32,7 @@
                 "result": true
             }
         ]
-    }/*,
+    },
     {
         "given": {
             "x": true

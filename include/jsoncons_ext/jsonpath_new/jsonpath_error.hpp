@@ -46,7 +46,9 @@ namespace jsoncons { namespace jsonpath_new {
         argument_to_unflatten_invalid,
         invalid_flattened_key,
         step_cannot_be_zero,
-        invalid_number
+        invalid_number,
+        illegal_escaped_character,
+        invalid_codepoint
     };
 
     class jsonpath_error_category_impl
@@ -123,6 +125,10 @@ namespace jsoncons { namespace jsonpath_new {
                     return "Slice step cannot be zero";
                 case jsonpath_errc::invalid_number:
                     return "Invalid number";
+                case jsonpath_errc::illegal_escaped_character:
+                    return "Illegal escaped character";
+                case jsonpath_errc::invalid_codepoint:
+                    return "Invalid codepoint";
                 default:
                     return "Unknown jsonpath parser error";
             }
