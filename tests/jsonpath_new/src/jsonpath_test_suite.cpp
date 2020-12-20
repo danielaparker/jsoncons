@@ -28,21 +28,21 @@ void jsonpath_tests(const std::string& fpath)
         exit(1);
     }
 
-    ojson tests = ojson::parse(is);
+    json tests = json::parse(is);
     for (const auto& test_group : tests.array_range())
     {
-        const ojson& instance = test_group["given"];
+        const json& instance = test_group["given"];
 
         for (const auto& test_case : test_group["cases"].array_range())
         {
             std::string expr = test_case["expression"].as<std::string>();
             try
             {
-                auto expression = jsoncons::jsonpath_new::make_expression<ojson>(jsoncons::string_view(expr));
-                ojson actual = expression.evaluate(instance);
+                auto expression = jsoncons::jsonpath_new::make_expression<json>(jsoncons::string_view(expr));
+                json actual = expression.evaluate(instance);
                 if (test_case.contains("result"))
                 {
-                    const ojson& expected = test_case["result"];
+                    const json& expected = test_case["result"];
                     //std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
                     {
@@ -75,7 +75,7 @@ void jsonpath_tests(const std::string& fpath)
             {
                 if (test_case.contains("result"))
                 {
-                    const ojson& expected = test_case["result"];
+                    const json& expected = test_case["result"];
                     std::cout << e.what() << "\n";
                     if (test_case.contains("comment"))
                     {
@@ -105,13 +105,13 @@ TEST_CASE("jsonpath-tests")
 #endif
         //jsonpath_tests("./jsonpath_new/input/compliance/jsonpath-tests.json");
 
-        jsonpath_tests("./jsonpath_new/input/compliance/basic.json"); 
-        jsonpath_tests("./jsonpath_new/input/compliance/slice.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/identifiers.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/indices.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/wildcard.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
-        jsonpath_tests("./jsonpath_new/input/compliance/union.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/basic.json"); 
+        //jsonpath_tests("./jsonpath_new/input/compliance/slice.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/identifiers.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/indices.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/wildcard.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
+        //jsonpath_tests("./jsonpath_new/input/compliance/union.json");
         jsonpath_tests("./jsonpath_new/input/compliance/filter.json");
     }
 }

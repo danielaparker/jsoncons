@@ -8,12 +8,75 @@
             "comment" : "Dot notation after filter expression",
             "expression": "$[?(@.id==42)]",
             "result": [{"id": 42, "name": "forty-two"}]
-         }/*,
+         },
          {
             "comment" : "Dot notation after filter expression",
             "expression": "$[?(@.id==42)].name",
             "result": ["forty-two"]
-         }*/
+         }
+     ]
+},
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given":{"key": 42, "another": {"key": 1}},
+     "cases": [
+         {
+            "comment" : "Filter expression on object",
+            "expression": "$[?(@.key)]",
+            "result": [
+              {
+                "key": 42,
+                "another": {
+                  "key": 1
+                }
+              }
+            ]
+         }
+     ]
+},
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given": [
+          {
+              "complext": {
+                  "one": [
+                      {
+                          "name": "first",
+                          "id": 1
+                      },
+                      {
+                          "name": "next",
+                          "id": 2
+                      },
+                      {
+                          "name": "another",
+                          "id": 3
+                      },
+                      {
+                          "name": "more",
+                          "id": 4
+                      }
+                  ],
+                  "more": {
+                      "name": "next to last",
+                      "id": 5
+                  }
+              }
+          },
+          {
+              "name": "last",
+              "id": 6
+          }
+      ],
+     "cases": [
+         {
+            "comment" : "Filter expression after dot notation with wildcard after recursive descent",
+            "expression": "$..*[?(@.id>2)]",
+            "result": [{"id":6,"name":"last"},{"id":5,"name":"next to last"},{"id":3,"name":
+  "another"},{"id":4,"name":"more"},{"id":3,"name":"another"},{"id":4,"name":
+  "more"}]
+         }
      ]
 }
+
 ]

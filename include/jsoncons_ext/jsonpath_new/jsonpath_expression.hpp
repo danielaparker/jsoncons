@@ -1498,14 +1498,9 @@ namespace detail {
                         input_stack.clear();
                         ++i;
                     }
-                    else if (is_recursive_descent && input_stack.empty())
+                    else if (is_recursive_descent && input_stack.empty()) // input_stack is empty, so output_stack is empty too
                     {
-                        input_stack.clear();
-                        for (auto& item : collected)
-                        {
-                            input_stack.emplace_back(item.path,item.val_ptr);
-                            output_stack.push_back(std::move(item));
-                        }
+                        output_stack = std::move(collected);
                         collected.clear();
                         is_recursive_descent = false;
                         ++i;

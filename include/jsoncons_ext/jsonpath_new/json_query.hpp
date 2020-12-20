@@ -289,13 +289,19 @@ namespace jsoncons { namespace jsonpath_new {
                         const string_type& path, reference val,
                         std::vector<path_node_type>& nodes) const override
             {
-                if (!val.is_array())
+                if (val.is_array())
                 {
-                    return;
+                    for (auto& item : val.array_range())
+                    {
+                        this->apply_expressions(resources, path, item, nodes);
+                    }
                 }
-                for (auto& item : val.array_range())
+                else if (val.is_object())
                 {
-                    this->apply_expressions(resources, path, item, nodes);
+                    for (auto& item : val.object_range())
+                    {
+                        this->apply_expressions(resources, path, item.value(), nodes);
+                    }
                 }
             }
         };
