@@ -1055,7 +1055,6 @@ namespace detail {
         }
 
         jsonpath_filter_expr<Json> parse(jsonpath_resources<Json>& resources, 
-                                         const Json& root, 
                                          const char_type* p, 
                                          const char_type* end_expr, 
                                          const char_type** end_ptr)
@@ -1670,21 +1669,21 @@ namespace detail {
                                 auto expr = evaluator.compile(resources, buffer.data(), buffer.length());
                                 if (!path_mode_stack.empty())
                                 {
-                                    if (path_mode_stack[0] == filter_path_mode::root_path)
-                                    {
-                                        auto result = expr.evaluate(resources, root);
-                                        if (result.size() > 0)
-                                        {
-                                            push_token(raw_token<Json>(value_term<Json>(std::move(result.at(0)))));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
-                                    }
+                                    //if (path_mode_stack[0] == filter_path_mode::root_path)
+                                    //{
+                                    //    auto result = expr.evaluate(resources, root);
+                                    //    if (result.size() > 0)
+                                    //    {
+                                    //        push_token(raw_token<Json>(value_term<Json>(std::move(result.at(0)))));
+                                    //    }
+                                    //}
+                                    //else
+                                    //{
+                                    //    push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
+                                    //}
                                     path_mode_stack.pop_back();
                                 }
-                                else
+                                //else
                                 {
                                     push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
                                 }
@@ -1704,14 +1703,14 @@ namespace detail {
                             {
                                 if (path_mode_stack[0] == filter_path_mode::root_path)
                                 {
-                                    auto result = expr.evaluate(resources, root);
-                                    if (result.size() > 0)
-                                    {
-                                        push_token(raw_token<Json>(value_term<Json>(std::move(result.at(0)))));
-                                    }
+                                    //auto result = expr.evaluate(resources, root);
+                                    //if (result.size() > 0)
+                                    //{
+                                    //    push_token(raw_token<Json>(value_term<Json>(std::move(result.at(0)))));
+                                    //}
                                     push_token(raw_token<Json>(rparen_arg));
                                 }
-                                else
+                                //else
                                 {
                                     push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
                                 }

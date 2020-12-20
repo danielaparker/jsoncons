@@ -112,47 +112,6 @@ namespace jsoncons { namespace jsonpath_new {
         }
     };
 
-    enum class result_type {value,path};
-
-    template<class Json>
-    Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
-    {
-        if (result_t == result_type::value)
-        {
-            jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
-            evaluator.evaluate(resources, root, path);
-            return evaluator.get_values();
-        }
-        else
-        {
-            jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
-            evaluator.evaluate(resources, root, path);
-            return evaluator.get_normalized_paths();
-        }
-    }
-
-    template<class Json, class T>
-    typename std::enable_if<!jsoncons::detail::is_function_object<T,Json>::value,void>::type
-    json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
-    {
-        jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
-        evaluator.evaluate(resources, root, path);
-        evaluator.replace(std::forward<T>(new_value));
-    }
-
-    template<class Json, class Op>
-    typename std::enable_if<jsoncons::detail::is_function_object<Op,Json>::value,void>::type
-    json_replace(Json& root, const typename Json::string_view_type& path, Op op)
-    {
-        jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
-        evaluator.evaluate(resources, root, path);
-        evaluator.replace_fn(op);
-    }
-
     namespace detail {
      
     enum class path_state 
@@ -498,19 +457,16 @@ namespace jsoncons { namespace jsonpath_new {
 
         function_table<Json,pointer> functions_;
 
-        std::vector<path_node_type> nodes_;
-        std::vector<std::vector<path_node_type>> stack_;
         std::size_t line_;
         std::size_t column_;
         const char_type* begin_input_;
         const char_type* end_input_;
         const char_type* p_;
-        std::vector<path_token_type> token_stack_;
-        std::vector<std::unique_ptr<Json>> temp_json_values_;
 
         using argument_type = std::vector<pointer>;
         std::vector<argument_type> function_stack_;
         std::vector<path_state> state_stack_;
+        std::vector<path_token_type> token_stack_;
 
     public:
         jsonpath_evaluator()
@@ -536,37 +492,7 @@ namespace jsoncons { namespace jsonpath_new {
         {
             return column_;
         }
-
-        Json get_values() const
-        {
-            Json result = typename Json::array();
-
-            if (!stack_.empty())
-            {
-                result.reserve(stack_.back().size());
-                for (const auto& p : stack_.back())
-                {
-                    result.push_back(*(p.val_ptr));
-                }
-            }
-            return result;
-        }
-
-        std::vector<pointer> get_pointers() const
-        {
-            std::vector<pointer> result;
-
-            if (!stack_.empty())
-            {
-                result.reserve(stack_.back().size());
-                for (const auto& p : stack_.back())
-                {
-                    result.push_back(p.val_ptr);
-                }
-            }
-            return result;
-        }
-
+/*
         void call_function(jsonpath_resources<Json>& resources, const string_type& function_name, std::error_code& ec)
         {
             auto f = functions_.get(function_name, ec);
@@ -586,21 +512,8 @@ namespace jsoncons { namespace jsonpath_new {
             v.emplace_back(s,ptr);
             stack_.push_back(v);
         }
-
-        Json get_normalized_paths() const
-        {
-            Json result = typename Json::array();
-            if (!stack_.empty())
-            {
-                result.reserve(stack_.back().size());
-                for (const auto& p : stack_.back())
-                {
-                    result.push_back(p.path);
-                }
-            }
-            return result;
-        }
-
+*/
+/*
         template<class Op>
         void replace_fn(Op op)
         {
@@ -624,22 +537,23 @@ namespace jsoncons { namespace jsonpath_new {
                 }
             }
         }
-
-        void evaluate(jsonpath_resources<Json>& resources, reference root, const string_view_type& path)
+*/
+        path_expression_type compile(jsonpath_resources<Json>& resources, const string_view_type& path)
         {
             std::error_code ec;
-            evaluate(resources, root, path.data(), path.length(), ec);
+            auto result = compile(resources, path.data(), path.length(), ec);
             if (ec)
             {
                 JSONCONS_THROW(jsonpath_error(ec, line_, column_));
             }
+            return std::move(result);
         }
 
-        void evaluate(jsonpath_resources<Json>& resources, reference root, const string_view_type& path, std::error_code& ec)
+        path_expression_type compile(jsonpath_resources<Json>& resources, const string_view_type& path, std::error_code& ec)
         {
             JSONCONS_TRY
             {
-                evaluate(resources, root, path.data(), path.length(), ec);
+                return compile(resources, path.data(), path.length(), ec);
             }
             JSONCONS_CATCH(...)
             {
@@ -652,13 +566,12 @@ namespace jsoncons { namespace jsonpath_new {
                                      std::size_t length)
         {
             std::error_code ec;
-            Json instance;
-            evaluate(resources, instance, path, length, ec);
+            auto result = compile(resources, path, length, ec);
             if (ec)
             {
                 JSONCONS_THROW(jsonpath_error(ec, line_, column_));
             }
-            return path_expression_type(std::move(token_stack_));
+            return std::move(result);
         }
 
         path_expression_type compile(jsonpath_resources<Json>& resources,
@@ -666,17 +579,7 @@ namespace jsoncons { namespace jsonpath_new {
                                      std::size_t length,
                                      std::error_code& ec)
         {
-            Json instance;
-            evaluate(resources, instance, path, length, ec);
-            return path_expression_type(std::move(token_stack_));
-        }
 
-        void evaluate(jsonpath_resources<Json>& resources,
-                      reference root, 
-                      const char_type* path, 
-                      std::size_t length,
-                      std::error_code& ec)
-        {
             state_stack_.emplace_back(path_state::start);
 
             string_type function_name;
@@ -687,9 +590,9 @@ namespace jsoncons { namespace jsonpath_new {
             p_ = begin_input_;
 
             string_type s = {'$'};
-            std::vector<path_node_type> v;
-            v.emplace_back(std::move(s),std::addressof(root));
-            stack_.push_back(v);
+            //std::vector<path_node_type> v;
+            //v.emplace_back(std::move(s),std::addressof(root));
+            //stack_.push_back(v);
 
             slice slic;
             std::size_t save_line = 1;
@@ -720,7 +623,7 @@ namespace jsoncons { namespace jsonpath_new {
                                     case '.':
                                     case '[':
                                         ec = jsonpath_errc::expected_root;
-                                        return;
+                                        return path_expression_type();
                                     default: // might be function, validate name later
                                         state_stack_.emplace_back(path_state::rhs_expression);
                                         state_stack_.emplace_back(path_state::path_or_function_name);
@@ -841,24 +744,24 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case ')':
+                            case ')': // revisit
                             {
-                                jsonpath_evaluator<Json,JsonReference,PathCons> evaluator(save_line, save_column);
+                                /*jsonpath_evaluator<Json,JsonReference,PathCons> evaluator(save_line, save_column);
                                 evaluator.evaluate(resources, root, buffer, ec);
                                 if (ec)
                                 {
                                     line_ = evaluator.line();
                                     column_ = evaluator.column();
-                                    return;
+                                    return path_expression_type();
                                 }
                                 function_stack_.push_back(evaluator.get_pointers());
 
                                 call_function(resources, function_name, ec);
                                 if (ec)
                                 {
-                                    return;
+                                    return path_expression_type();
                                 }
-                                state_stack_.pop_back();
+                                state_stack_.pop_back(); */
                                 ++p_;
                                 ++column_;
                                 break;
@@ -872,18 +775,18 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                         }
                         break;
-                    case path_state::path_argument:
+                    case path_state::path_argument: // revisit
                         switch (*p_)
                         {
                             case ',':
                             {
-                                jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
+                                /*jsonpath_evaluator<Json, JsonReference, PathCons> evaluator;
                                 evaluator.evaluate(resources, root, buffer, ec);
                                 if (ec)
                                 {
-                                    return;
+                                    return path_expression_type();
                                 }
-                                function_stack_.push_back(evaluator.get_pointers());
+                                function_stack_.push_back(evaluator.get_pointers());*/
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -914,7 +817,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
-                                    return;
+                                    return path_expression_type();
                                 }
                                 buffer.clear();
                                 //state_ = path_state::arg_or_right_paren;
@@ -931,12 +834,12 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
-                                    return;
+                                    return path_expression_type();
                                 }
-                                call_function(resources, function_name, ec);
+                                //call_function(resources, function_name, ec);
                                 if (ec)
                                 {
-                                    return;
+                                    return path_expression_type();
                                 }
                                 state_stack_.pop_back();
                                 break;
@@ -997,7 +900,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
-                                    return;
+                                    return path_expression_type();
                                 }
                                 buffer.clear();
                                 //state_ = path_state::arg_or_right_paren;
@@ -1016,12 +919,12 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
                                     ec = jsonpath_errc::argument_parse_error;
-                                    return;
+                                    return path_expression_type();
                                 }
-                                call_function(resources, function_name, ec);
+                                //call_function(resources, function_name, ec);
                                 if (ec)
                                 {
-                                    return;
+                                    return path_expression_type();
                                 }
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1030,7 +933,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             default:
                                 ec = jsonpath_errc::invalid_filter_unsupported_operator;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::recursive_descent_or_lhs_expression:
@@ -1093,7 +996,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '.':
                                 ec = jsonpath_errc::expected_key;
-                                return;
+                                return path_expression_type();
                             default:
                                 buffer.clear();
                                 state_stack_.back() = path_state::unquoted_name;
@@ -1118,7 +1021,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_separator;
-                                return;
+                                return path_expression_type();
                         };
                         break;
                     case path_state::unquoted_name: 
@@ -1162,7 +1065,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_key;
-                                return;
+                                return path_expression_type();
                         };
                         break;
                     case path_state::single_quoted_name:
@@ -1184,7 +1087,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 else
                                 {
                                     ec = jsonpath_errc::unexpected_end_of_input;
-                                    return;
+                                    return path_expression_type();
                                 }
                                 break;
                             default:
@@ -1213,7 +1116,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 else
                                 {
                                     ec = jsonpath_errc::unexpected_end_of_input;
-                                    return;
+                                    return path_expression_type();
                                 }
                                 break;
                             default:
@@ -1242,7 +1145,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::expect_right_bracket:
@@ -1258,7 +1161,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::bracket_specifier_or_union:
@@ -1270,7 +1173,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case '(':
                             {
                                 jsonpath_filter_parser<Json> parser(line_,column_);
-                                auto result = parser.parse(resources, root, p_,end_input_,&p_);
+                                auto result = parser.parse(resources, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
                                 push_token(path_token_type(jsoncons::make_unique<expression_selector>(std::move(result))));
@@ -1280,7 +1183,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case '?':
                             {
                                 jsonpath_filter_parser<Json> parser(line_,column_);
-                                auto result = parser.parse(resources,root,p_,end_input_,&p_);
+                                auto result = parser.parse(resources,p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
                                 push_token(path_token_type(jsoncons::make_unique<filter_selector>(std::move(result))));
@@ -1360,7 +1263,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 if (buffer.empty())
                                 {
                                     ec = jsonpath_errc::invalid_number;
-                                    return;
+                                    return path_expression_type();
                                 }
                                 else
                                 {
@@ -1368,7 +1271,7 @@ namespace jsoncons { namespace jsonpath_new {
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
-                                        return;
+                                        return path_expression_type();
                                     }
                                     push_token(path_token_type(jsoncons::make_unique<index_selector>(r.value())));
 
@@ -1387,7 +1290,7 @@ namespace jsoncons { namespace jsonpath_new {
                                     if (!r)
                                     {
                                         ec = jsonpath_errc::invalid_number;
-                                        return;
+                                        return path_expression_type();
                                     }
                                     slic.start_ = r.value();
                                     buffer.clear();
@@ -1400,7 +1303,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::rhs_slice_expression_start:
@@ -1411,7 +1314,7 @@ namespace jsoncons { namespace jsonpath_new {
                             if (!r)
                             {
                                 ec = jsonpath_errc::invalid_number;
-                                return;
+                                return path_expression_type();
                             }
                             slic.stop_ = jsoncons::optional<int64_t>(r.value());
                             buffer.clear();
@@ -1433,7 +1336,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     }
@@ -1445,12 +1348,12 @@ namespace jsoncons { namespace jsonpath_new {
                             if (!r)
                             {
                                 ec = jsonpath_errc::invalid_number;
-                                return;
+                                return path_expression_type();
                             }
                             if (r.value() == 0)
                             {
                                 ec = jsonpath_errc::step_cannot_be_zero;
-                                return;
+                                return path_expression_type();
                             }
                             slic.step_ = r.value();
                             buffer.clear();
@@ -1467,7 +1370,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     }
@@ -1546,7 +1449,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::identifier_or_union:
@@ -1591,7 +1494,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::wildcard_or_union:
@@ -1636,7 +1539,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_right_bracket;
-                                return;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::single_quoted_name_or_union:
@@ -1655,7 +1558,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 else
                                 {
                                     ec = jsonpath_errc::unexpected_end_of_input;
-                                    return;
+                                    return path_expression_type();
                                 }
                                 break;
                             default:
@@ -1681,7 +1584,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 else
                                 {
                                     ec = jsonpath_errc::unexpected_end_of_input;
-                                    return;
+                                    return path_expression_type();
                                 }
                                 break;
                             default:
@@ -1716,10 +1619,10 @@ namespace jsoncons { namespace jsonpath_new {
             if (state_stack_.size() > 2)
             {
                 ec = jsonpath_errc::unexpected_end_of_input;
-                return;
+                return path_expression_type();
             }
 
-            switch (state_stack_.back())
+            /*switch (state_stack_.back())
             {
                 case path_state::start:
                 {
@@ -1737,7 +1640,8 @@ namespace jsoncons { namespace jsonpath_new {
                     state_stack_.pop_back();
                     break;
                 }
-            }
+            }*/
+            return path_expression_type(std::move(token_stack_));
         }
 
         void advance_past_space_character()
@@ -1836,7 +1740,6 @@ namespace jsoncons { namespace jsonpath_new {
                     break;
             }
         }
-
     };
 
     } // namespace detail
@@ -1898,6 +1801,50 @@ namespace jsoncons { namespace jsonpath_new {
     {
         return jsonpath_expression<Json>::compile(expr, ec);
     }
+
+    enum class result_type {value,path};
+
+/*
+    template<class Json>
+    Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
+    {
+        if (result_t == result_type::value)
+        {
+            jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
+            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            evaluator.evaluate(resources, root, path);
+            return evaluator.get_values();
+        }
+        else
+        {
+            jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
+            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            evaluator.evaluate(resources, root, path);
+            return evaluator.get_normalized_paths();
+        }
+    }
+
+    template<class Json, class T>
+    typename std::enable_if<!jsoncons::detail::is_function_object<T,Json>::value,void>::type
+    json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
+    {
+        jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+        evaluator.evaluate(resources, root, path);
+        evaluator.replace(std::forward<T>(new_value));
+    }
+
+    template<class Json, class Op>
+    typename std::enable_if<jsoncons::detail::is_function_object<Op,Json>::value,void>::type
+    json_replace(Json& root, const typename Json::string_view_type& path, Op op)
+    {
+        jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
+        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+        evaluator.evaluate(resources, root, path);
+        evaluator.replace_fn(op);
+    }
+
+*/
 
 } // namespace jsonpath_new
 } // namespace jsoncons
