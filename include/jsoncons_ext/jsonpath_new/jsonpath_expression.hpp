@@ -798,14 +798,14 @@ namespace detail {
     }
 
     template <class Json>
-    struct jsonpath_resources
+    struct static_resources
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
 
         std::vector<std::unique_ptr<Json>> temp_json_values_;
 
-        jsonpath_resources()
+        static_resources()
         {
         }
 
@@ -915,6 +915,21 @@ namespace detail {
         static Json unary_minus_op(const term<Json>& a)
         {
             return a.unary_minus();
+        }
+    };
+
+    template <class Json>
+    struct dynamic_resources
+    {
+        std::vector<std::unique_ptr<Json>> temp_json_values_;
+
+        template <typename... Args>
+        Json* create_temp(Args&& ... args)
+        {
+            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+            Json* ptr = temp.get();
+            temp_json_values_.emplace_back(std::move(temp));
+            return ptr;
         }
     };
 
@@ -1154,7 +1169,7 @@ namespace detail {
             return true;
         }
 
-        virtual void select(jsonpath_resources<Json>& resources,
+        virtual void select(dynamic_resources<Json>& resources,
                             const string_type& path, 
                             reference val, 
                             std::vector<path_node_type>& nodes) const = 0;
@@ -1433,7 +1448,7 @@ namespace detail {
 
         path_expression& operator=(path_expression&& expr) = default;
 
-        Json evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance) const
+        Json evaluate(dynamic_resources<Json>& resources, reference instance) const
         {
             Json result(json_array_arg);
 
@@ -1442,7 +1457,7 @@ namespace detail {
             {
                 output_stack.push_back(node);
             };
-            evaluate(dynamic_resources, instance, callback);
+            evaluate(resources, instance, callback);
             if (!output_stack.empty())
             {
                 result.reserve(output_stack.size());
@@ -1457,7 +1472,7 @@ namespace detail {
 
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
-        evaluate(jsonpath_resources<Json>& dynamic_resources, reference instance, Callback callback) const
+        evaluate(dynamic_resources<Json>& resources, reference instance, Callback callback) const
         {
             std::vector<path_node_type> input_stack;
             std::vector<path_node_type> output_stack;
@@ -1485,7 +1500,7 @@ namespace detail {
                         {
                             for (auto& item : input_stack)
                             {
-                                token_stack_[i].selector_->select(dynamic_resources, path, *(item.val_ptr), output_stack);
+                                token_stack_[i].selector_->select(resources, path, *(item.val_ptr), output_stack);
                             }
                             break;
                         }

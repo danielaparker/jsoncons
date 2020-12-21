@@ -189,7 +189,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& /*resources*/,
+            void select(dynamic_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
                         std::vector<path_node_type>& nodes) const override
             {
@@ -213,7 +213,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& /*resources*/,
+            void select(dynamic_resources<Json>& /*resources*/,
                         const string_type& path, reference val,
                         std::vector<path_node_type>& nodes) const override
             {
@@ -259,7 +259,7 @@ namespace jsoncons { namespace jsonpath_new {
                 }
             }
 
-            void apply_expressions(jsonpath_resources<Json>& resources,
+            void apply_expressions(dynamic_resources<Json>& resources,
                                    const string_type& path, 
                                    reference val,
                                    std::vector<path_node_type>& nodes) const
@@ -296,7 +296,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
+            void select(dynamic_resources<Json>& resources,
                         const string_type& path, reference val,
                         std::vector<path_node_type>& nodes) const override
             {
@@ -326,7 +326,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
+            void select(dynamic_resources<Json>& resources,
                         const string_type& /*path*/, 
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
@@ -352,7 +352,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
+            void select(dynamic_resources<Json>& resources,
                         const string_type& path, 
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
@@ -384,7 +384,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
+            void select(dynamic_resources<Json>& resources,
                         const string_type& path, 
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
@@ -420,7 +420,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(jsonpath_resources<Json>& resources,
+            void select(dynamic_resources<Json>& resources,
                         const string_type& path, 
                         reference val,
                         std::vector<path_node_type>& nodes) const override
@@ -510,7 +510,7 @@ namespace jsoncons { namespace jsonpath_new {
             return column_;
         }
 /*
-        void call_function(jsonpath_resources<Json>& resources, const string_type& function_name, std::error_code& ec)
+        void call_function(static_resources<Json>& resources, const string_type& function_name, std::error_code& ec)
         {
             auto f = functions_.get(function_name, ec);
             if (ec)
@@ -555,7 +555,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 */
-        path_expression_type compile(jsonpath_resources<Json>& resources, const string_view_type& path)
+        path_expression_type compile(static_resources<Json>& resources, const string_view_type& path)
         {
             std::error_code ec;
             auto result = compile(resources, path.data(), path.length(), ec);
@@ -566,7 +566,7 @@ namespace jsoncons { namespace jsonpath_new {
             return std::move(result);
         }
 
-        path_expression_type compile(jsonpath_resources<Json>& resources, const string_view_type& path, std::error_code& ec)
+        path_expression_type compile(static_resources<Json>& resources, const string_view_type& path, std::error_code& ec)
         {
             JSONCONS_TRY
             {
@@ -578,7 +578,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 
-        path_expression_type compile(jsonpath_resources<Json>& resources,
+        path_expression_type compile(static_resources<Json>& resources,
                                      const char_type* path, 
                                      std::size_t length)
         {
@@ -591,7 +591,7 @@ namespace jsoncons { namespace jsonpath_new {
             return std::move(result);
         }
 
-        path_expression_type compile(jsonpath_resources<Json>& resources,
+        path_expression_type compile(static_resources<Json>& resources,
                                      const char_type* path, 
                                      std::size_t length,
                                      std::error_code& ec)
@@ -1928,7 +1928,7 @@ namespace jsoncons { namespace jsonpath_new {
     {
         using evaluator_t = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, const Json&, detail::VoidPathConstructor<Json>>;
         using expression_t = typename evaluator_t::path_expression_type;
-        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> static_resources_;
+        jsoncons::jsonpath_new::detail::static_resources<Json> static_resources_;
         expression_t expr_;
     public:
         using string_view_type = typename evaluator_t::string_view_type;
@@ -1936,7 +1936,7 @@ namespace jsoncons { namespace jsonpath_new {
 
         jsonpath_expression() = default;
 
-        jsonpath_expression(jsoncons::jsonpath_new::detail::jsonpath_resources<Json>&& resources,
+        jsonpath_expression(jsoncons::jsonpath_new::detail::static_resources<Json>&& resources,
                             expression_t&& expr)
             : static_resources_(std::move(resources)), 
               expr_(std::move(expr))
@@ -1945,13 +1945,13 @@ namespace jsoncons { namespace jsonpath_new {
 
         Json evaluate(reference instance)
         {
-            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> dynamic_resources;
-            return expr_.evaluate(dynamic_resources, instance);
+            jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
+            return expr_.evaluate(resources, instance);
         }
 
         static jsonpath_expression compile(const string_view_type& path)
         {
-            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            jsoncons::jsonpath_new::detail::static_resources<Json> resources;
 
             evaluator_t e;
             expression_t expr = e.compile(resources, path.data(), path.length());
@@ -1961,7 +1961,7 @@ namespace jsoncons { namespace jsonpath_new {
         static jsonpath_expression compile(const string_view_type& path,
                                            std::error_code& ec)
         {
-            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            jsoncons::jsonpath_new::detail::static_resources<Json> resources;
             evaluator_t e;
             expression_t expr = e.compile(resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
@@ -1990,14 +1990,14 @@ namespace jsoncons { namespace jsonpath_new {
         if (result_t == result_type::value)
         {
             jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            jsoncons::jsonpath_new::detail::static_resources<Json> resources;
             evaluator.evaluate(resources, root, path);
             return evaluator.get_values();
         }
         else
         {
             jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
-            jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+            jsoncons::jsonpath_new::detail::static_resources<Json> resources;
             evaluator.evaluate(resources, root, path);
             return evaluator.get_normalized_paths();
         }
@@ -2008,7 +2008,7 @@ namespace jsoncons { namespace jsonpath_new {
     json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
     {
         jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+        jsoncons::jsonpath_new::detail::static_resources<Json> resources;
         evaluator.evaluate(resources, root, path);
         evaluator.replace(std::forward<T>(new_value));
     }
@@ -2018,7 +2018,7 @@ namespace jsoncons { namespace jsonpath_new {
     json_replace(Json& root, const typename Json::string_view_type& path, Op op)
     {
         jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&,detail::VoidPathConstructor<Json>> evaluator;
-        jsoncons::jsonpath_new::detail::jsonpath_resources<Json> resources;
+        jsoncons::jsonpath_new::detail::static_resources<Json> resources;
         evaluator.evaluate(resources, root, path);
         evaluator.replace_fn(op);
     }

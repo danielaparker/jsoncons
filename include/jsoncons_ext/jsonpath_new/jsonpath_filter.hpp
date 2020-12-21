@@ -268,7 +268,7 @@ namespace detail {
 
         term_type type() const override {return term_type::path;}
 
-        Json evaluate(jsonpath_resources<Json>& resources, const Json& instance) const 
+        Json evaluate(dynamic_resources<Json>& resources, const Json& instance) const 
         {
             return path_.evaluate(resources, instance);
         }
@@ -598,7 +598,7 @@ namespace detail {
         {
         }
 
-        token(const raw_token<Json>& other, jsonpath_resources<Json>& resources, const Json& instance)
+        token(const raw_token<Json>& other, dynamic_resources<Json>& resources, const Json& instance)
             : type_(other.type_)
         {
             switch (type_)
@@ -892,7 +892,7 @@ namespace detail {
     };
 
     template <class Json>
-    token<Json> evaluate(jsonpath_resources<Json>& resources, 
+    token<Json> evaluate(dynamic_resources<Json>& resources, 
                          const Json& instance, 
                          const std::vector<raw_token<Json>>& raw_tokens)
     {
@@ -947,13 +947,13 @@ namespace detail {
         {
         }
 
-        Json eval(jsonpath_resources<Json>& resources, const Json& instance) const
+        Json eval(dynamic_resources<Json>& resources, const Json& instance) const
         {
             auto t = evaluate(resources, instance, tokens_);
             return t.operand().get_single_node();
         }
 
-        bool exists(jsonpath_resources<Json>& resources, const Json& instance) const
+        bool exists(dynamic_resources<Json>& resources, const Json& instance) const
         {
             auto t = evaluate(resources, instance,tokens_);
             return t.operand().accept_single_node();
@@ -1054,7 +1054,7 @@ namespace detail {
             }
         }
 
-        jsonpath_filter_expr<Json> parse(jsonpath_resources<Json>& resources, 
+        jsonpath_filter_expr<Json> parse(static_resources<Json>& resources, 
                                          const char_type* p, 
                                          const char_type* end_expr, 
                                          const char_type** end_ptr)
