@@ -1,5 +1,6 @@
 [
-    /*{
+    {
+        "source:" : "https://github.com/jmespath/jmespath.test",
         "given": {
             "__L": true
         },
@@ -10,7 +11,7 @@
                 "normalized-path-expression" : "$['__L']"
             }
         ]
-    },*/
+    },
     {
         "given": {
             "!\r": true
@@ -21,15 +22,15 @@
                 "result": [true]
             }
         ]
-    }/*,
+    },
     {
         "given": {
             "Y_1623": true
         },
         "cases": [
             {
-                "expression": "Y_1623",
-                "result": true
+                "expression": "$.Y_1623",
+                "result": [true]
             }
         ]
     },
@@ -39,8 +40,8 @@
         },
         "cases": [
             {
-                "expression": "x",
-                "result": true
+                "expression": "$.x",
+                "result": [true]
             }
         ]
     },
@@ -50,8 +51,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\tF\\uCebb\"",
-                "result": true
+                "expression": "$.\"\\tF\\uCebb\"",
+                "result": [true]
             }
         ]
     },
@@ -61,8 +62,8 @@
         },
         "cases": [
             {
-                "expression": "\" \\t\"",
-                "result": true
+                "expression": "$.\" \\t\"",
+                "result": [true]
             }
         ]
     },
@@ -72,8 +73,8 @@
         },
         "cases": [
             {
-                "expression": "\" \"",
-                "result": true
+                "expression": "$.\" \"",
+                "result": [true]
             }
         ]
     },
@@ -83,8 +84,8 @@
         },
         "cases": [
             {
-                "expression": "v2",
-                "result": true
+                "expression": "$.v2",
+                "result": [true]
             }
         ]
     },
@@ -94,8 +95,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\t\"",
-                "result": true
+                "expression": "$.\"\\t\"",
+                "result": [true]
             }
         ]
     },
@@ -105,8 +106,8 @@
         },
         "cases": [
             {
-                "expression": "_X",
-                "result": true
+                "expression": "$._X",
+                "result": [true]
             }
         ]
     },
@@ -116,8 +117,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\t4\\ud9da\\udd15\"",
-                "result": true
+                "expression": "$.\"\\t4\\ud9da\\udd15\"",
+                "result": [true]
             }
         ]
     },
@@ -127,8 +128,8 @@
         },
         "cases": [
             {
-                "expression": "v24_W",
-                "result": true
+                "expression": "$.v24_W",
+                "result": [true]
             }
         ]
     },
@@ -138,8 +139,8 @@
         },
         "cases": [
             {
-                "expression": "\"H\"",
-                "result": true
+                "expression": "$.\"H\"",
+                "result": [true]
             }
         ]
     },
@@ -149,8 +150,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\f\"",
-                "result": true
+                "expression": "$.\"\\f\"",
+                "result": [true]
             }
         ]
     },
@@ -160,8 +161,8 @@
         },
         "cases": [
             {
-                "expression": "\"E4\"",
-                "result": true
+                "expression": "$.\"E4\"",
+                "result": [true]
             }
         ]
     },
@@ -171,8 +172,8 @@
         },
         "cases": [
             {
-                "expression": "\"!\"",
-                "result": true
+                "expression": "$.\"!\"",
+                "result": [true]
             }
         ]
     },
@@ -182,8 +183,8 @@
         },
         "cases": [
             {
-                "expression": "tM",
-                "result": true
+                "expression": "$.tM",
+                "result": [true]
             }
         ]
     },
@@ -193,8 +194,8 @@
         },
         "cases": [
             {
-                "expression": "\" [\"",
-                "result": true
+                "expression": "$.\" [\"",
+                "result": [true]
             }
         ]
     },
@@ -204,8 +205,8 @@
         },
         "cases": [
             {
-                "expression": "\"R!\"",
-                "result": true
+                "expression": "$.\"R!\"",
+                "result": [true]
             }
         ]
     },
@@ -215,8 +216,8 @@
         },
         "cases": [
             {
-                "expression": "_6W",
-                "result": true
+                "expression": "$._6W",
+                "result": [true]
             }
         ]
     },
@@ -226,8 +227,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\uaBA1\\r\"",
-                "result": true
+                "expression": "$.\"\\uaBA1\\r\"",
+                "result": [true]
             }
         ]
     },
@@ -237,8 +238,8 @@
         },
         "cases": [
             {
-                "expression": "tL7",
-                "result": true
+                "expression": "$.tL7",
+                "result": [true]
             }
         ]
     },
@@ -248,8 +249,8 @@
         },
         "cases": [
             {
-                "expression": "\"<<U\\t\"",
-                "result": true
+                "expression": "$.\"<<U\\t\"",
+                "result": [true]
             }
         ]
     },
@@ -259,8 +260,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\ubBcE\\ufAfB\"",
-                "result": true
+                "expression": "$.\"\\ubBcE\\ufAfB\"",
+                "result": [true]
             }
         ]
     },
@@ -270,8 +271,8 @@
         },
         "cases": [
             {
-                "expression": "sNA_",
-                "result": true
+                "expression": "$.sNA_",
+                "result": [true]
             }
         ]
     },
@@ -281,8 +282,8 @@
         },
         "cases": [
             {
-                "expression": "\"9\"",
-                "result": true
+                "expression": "$.\"9\"",
+                "result": [true]
             }
         ]
     },
@@ -292,8 +293,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\\\\b\\ud8cb\\udc83\"",
-                "result": true
+                "expression": "$.\"\\\\\\b\\ud8cb\\udc83\"",
+                "result": [true]
             }
         ]
     },
@@ -303,8 +304,8 @@
         },
         "cases": [
             {
-                "expression": "\"r\"",
-                "result": true
+                "expression": "$.\"r\"",
+                "result": [true]
             }
         ]
     },
@@ -314,8 +315,8 @@
         },
         "cases": [
             {
-                "expression": "Q",
-                "result": true
+                "expression": "$.Q",
+                "result": [true]
             }
         ]
     },
@@ -325,8 +326,8 @@
         },
         "cases": [
             {
-                "expression": "_Q__7GL8",
-                "result": true
+                "expression": "$._Q__7GL8",
+                "result": [true]
             }
         ]
     },
@@ -336,8 +337,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\\\"",
-                "result": true
+                "expression": "$.\"\\\\\"",
+                "result": [true]
             }
         ]
     },
@@ -347,8 +348,8 @@
         },
         "cases": [
             {
-                "expression": "RR9_",
-                "result": true
+                "expression": "$.RR9_",
+                "result": [true]
             }
         ]
     },
@@ -358,8 +359,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\r\\f:\"",
-                "result": true
+                "expression": "$.\"\\r\\f:\"",
+                "result": [true]
             }
         ]
     },
@@ -369,8 +370,8 @@
         },
         "cases": [
             {
-                "expression": "r7",
-                "result": true
+                "expression": "$.r7",
+                "result": [true]
             }
         ]
     },
@@ -380,8 +381,8 @@
         },
         "cases": [
             {
-                "expression": "\"-\"",
-                "result": true
+                "expression": "$.\"-\"",
+                "result": [true]
             }
         ]
     },
@@ -391,8 +392,8 @@
         },
         "cases": [
             {
-                "expression": "p9",
-                "result": true
+                "expression": "$.p9",
+                "result": [true]
             }
         ]
     },
@@ -402,8 +403,8 @@
         },
         "cases": [
             {
-                "expression": "__",
-                "result": true
+                "expression": "$.__",
+                "result": [true]
             }
         ]
     },
@@ -413,8 +414,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\b\\t\"",
-                "result": true
+                "expression": "$.\"\\b\\t\"",
+                "result": [true]
             }
         ]
     },
@@ -424,8 +425,8 @@
         },
         "cases": [
             {
-                "expression": "O_",
-                "result": true
+                "expression": "$.O_",
+                "result": [true]
             }
         ]
     },
@@ -435,8 +436,8 @@
         },
         "cases": [
             {
-                "expression": "_r_8",
-                "result": true
+                "expression": "$._r_8",
+                "result": [true]
             }
         ]
     },
@@ -446,8 +447,8 @@
         },
         "cases": [
             {
-                "expression": "_j",
-                "result": true
+                "expression": "$._j",
+                "result": [true]
             }
         ]
     },
@@ -457,8 +458,8 @@
         },
         "cases": [
             {
-                "expression": "\":\"",
-                "result": true
+                "expression": "$.\":\"",
+                "result": [true]
             }
         ]
     },
@@ -468,8 +469,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\rB\"",
-                "result": true
+                "expression": "$.\"\\rB\"",
+                "result": [true]
             }
         ]
     },
@@ -479,8 +480,8 @@
         },
         "cases": [
             {
-                "expression": "Obf",
-                "result": true
+                "expression": "$.Obf",
+                "result": [true]
             }
         ]
     },
@@ -490,8 +491,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\n\"",
-                "result": true
+                "expression": "$.\"\\n\"",
+                "result": [true]
             }
         ]
     },
@@ -501,8 +502,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\f\udb54\udf33\"",
-                "result": true
+                "expression": "$.\"\\f\udb54\udf33\"",
+                "result": [true]
             }
         ]
     },
@@ -512,8 +513,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\\\\u4FDc\"",
-                "result": true
+                "expression": "$.\"\\\\\\u4FDc\"",
+                "result": [true]
             }
         ]
     },
@@ -523,8 +524,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\r\"",
-                "result": true
+                "expression": "$.\"\\r\"",
+                "result": [true]
             }
         ]
     },
@@ -534,8 +535,8 @@
         },
         "cases": [
             {
-                "expression": "m_",
-                "result": true
+                "expression": "$.m_",
+                "result": [true]
             }
         ]
     },
@@ -545,8 +546,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\r\\fB \"",
-                "result": true
+                "expression": "$.\"\\r\\fB \"",
+                "result": [true]
             }
         ]
     },
@@ -556,8 +557,8 @@
         },
         "cases": [
             {
-                "expression": "\"+\\\"\\\"\"",
-                "result": true
+                "expression": "$.\"+\\\"\\\"\"",
+                "result": [true]
             }
         ]
     },
@@ -567,8 +568,8 @@
         },
         "cases": [
             {
-                "expression": "Mg",
-                "result": true
+                "expression": "$.Mg",
+                "result": [true]
             }
         ]
     },
@@ -578,8 +579,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\"!\\/\"",
-                "result": true
+                "expression": "$.\"\\\"!\\/\"",
+                "result": [true]
             }
         ]
     },
@@ -589,8 +590,8 @@
         },
         "cases": [
             {
-                "expression": "\"7\\\"\"",
-                "result": true
+                "expression": "$.\"7\\\"\"",
+                "result": [true]
             }
         ]
     },
@@ -600,8 +601,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\\\udb3a\udca4S\"",
-                "result": true
+                "expression": "$.\"\\\\\udb3a\udca4S\"",
+                "result": [true]
             }
         ]
     },
@@ -611,8 +612,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\"\"",
-                "result": true
+                "expression": "$.\"\\\"\"",
+                "result": [true]
             }
         ]
     },
@@ -622,8 +623,8 @@
         },
         "cases": [
             {
-                "expression": "Kl",
-                "result": true
+                "expression": "$.Kl",
+                "result": [true]
             }
         ]
     },
@@ -633,8 +634,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\b\\b\"",
-                "result": true
+                "expression": "$.\"\\b\\b\"",
+                "result": [true]
             }
         ]
     },
@@ -644,8 +645,8 @@
         },
         "cases": [
             {
-                "expression": "\">\"",
-                "result": true
+                "expression": "$.\">\"",
+                "result": [true]
             }
         ]
     },
@@ -655,8 +656,8 @@
         },
         "cases": [
             {
-                "expression": "hvu",
-                "result": true
+                "expression": "$.hvu",
+                "result": [true]
             }
         ]
     },
@@ -666,8 +667,8 @@
         },
         "cases": [
             {
-                "expression": "\"; !\"",
-                "result": true
+                "expression": "$.\"; !\"",
+                "result": [true]
             }
         ]
     },
@@ -677,8 +678,8 @@
         },
         "cases": [
             {
-                "expression": "hU",
-                "result": true
+                "expression": "$.hU",
+                "result": [true]
             }
         ]
     },
@@ -688,8 +689,8 @@
         },
         "cases": [
             {
-                "expression": "\"!I\\n\\/\"",
-                "result": true
+                "expression": "$.\"!I\\n\\/\"",
+                "result": [true]
             }
         ]
     },
@@ -699,8 +700,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\uEEbF\"",
-                "result": true
+                "expression": "$.\"\\uEEbF\"",
+                "result": [true]
             }
         ]
     },
@@ -710,8 +711,8 @@
         },
         "cases": [
             {
-                "expression": "\"U)\\t\"",
-                "result": true
+                "expression": "$.\"U)\\t\"",
+                "result": [true]
             }
         ]
     },
@@ -721,8 +722,8 @@
         },
         "cases": [
             {
-                "expression": "fa0_9",
-                "result": true
+                "expression": "$.fa0_9",
+                "result": [true]
             }
         ]
     },
@@ -732,8 +733,8 @@
         },
         "cases": [
             {
-                "expression": "\"/\"",
-                "result": true
+                "expression": "$.\"/\"",
+                "result": [true]
             }
         ]
     },
@@ -743,8 +744,8 @@
         },
         "cases": [
             {
-                "expression": "Gy",
-                "result": true
+                "expression": "$.Gy",
+                "result": [true]
             }
         ]
     },
@@ -754,8 +755,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\b\"",
-                "result": true
+                "expression": "$.\"\\b\"",
+                "result": [true]
             }
         ]
     },
@@ -765,8 +766,8 @@
         },
         "cases": [
             {
-                "expression": "\"<\"",
-                "result": true
+                "expression": "$.\"<\"",
+                "result": [true]
             }
         ]
     },
@@ -776,8 +777,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\t\"",
-                "result": true
+                "expression": "$.\"\\t\"",
+                "result": [true]
             }
         ]
     },
@@ -787,8 +788,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\t&\\\\\\r\"",
-                "result": true
+                "expression": "$.\"\\t&\\\\\\r\"",
+                "result": [true]
             }
         ]
     },
@@ -798,8 +799,8 @@
         },
         "cases": [
             {
-                "expression": "\"#\"",
-                "result": true
+                "expression": "$.\"#\"",
+                "result": [true]
             }
         ]
     },
@@ -809,8 +810,8 @@
         },
         "cases": [
             {
-                "expression": "B__",
-                "result": true
+                "expression": "$.B__",
+                "result": [true]
             }
         ]
     },
@@ -820,8 +821,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\nS \\n\"",
-                "result": true
+                "expression": "$.\"\\nS \\n\"",
+                "result": [true]
             }
         ]
     },
@@ -831,8 +832,8 @@
         },
         "cases": [
             {
-                "expression": "Bp",
-                "result": true
+                "expression": "$.Bp",
+                "result": [true]
             }
         ]
     },
@@ -842,8 +843,8 @@
         },
         "cases": [
             {
-                "expression": "\",\\t;\"",
-                "result": true
+                "expression": "$.\",\\t;\"",
+                "result": [true]
             }
         ]
     },
@@ -853,8 +854,8 @@
         },
         "cases": [
             {
-                "expression": "B_q",
-                "result": true
+                "expression": "$.B_q",
+                "result": [true]
             }
         ]
     },
@@ -864,8 +865,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\/+\\t\\n\\b!Z\"",
-                "result": true
+                "expression": "$.\"\\/+\\t\\n\\b!Z\"",
+                "result": [true]
             }
         ]
     },
@@ -875,8 +876,8 @@
         },
         "cases": [
             {
-                "expression": "\"\udadd\udfc7\\\\ueFAc\"",
-                "result": true
+                "expression": "$.\"\udadd\udfc7\\\\ueFAc\"",
+                "result": [true]
             }
         ]
     },
@@ -886,8 +887,8 @@
         },
         "cases": [
             {
-                "expression": "\":\\f\"",
-                "result": true
+                "expression": "$.\":\\f\"",
+                "result": [true]
             }
         ]
     },
@@ -897,8 +898,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\/\"",
-                "result": true
+                "expression": "$.\"\\/\"",
+                "result": [true]
             }
         ]
     },
@@ -908,8 +909,8 @@
         },
         "cases": [
             {
-                "expression": "_BW_6Hg_Gl",
-                "result": true
+                "expression": "$._BW_6Hg_Gl",
+                "result": [true]
             }
         ]
     },
@@ -919,8 +920,8 @@
         },
         "cases": [
             {
-                "expression": "\"\udbcf\udc02\"",
-                "result": true
+                "expression": "$.\"\udbcf\udc02\"",
+                "result": [true]
             }
         ]
     },
@@ -930,8 +931,8 @@
         },
         "cases": [
             {
-                "expression": "zs1DC",
-                "result": true
+                "expression": "$.zs1DC",
+                "result": [true]
             }
         ]
     },
@@ -941,8 +942,8 @@
         },
         "cases": [
             {
-                "expression": "__434",
-                "result": true
+                "expression": "$.__434",
+                "result": [true]
             }
         ]
     },
@@ -952,8 +953,8 @@
         },
         "cases": [
             {
-                "expression": "\"\udb94\udd41\"",
-                "result": true
+                "expression": "$.\"\udb94\udd41\"",
+                "result": [true]
             }
         ]
     },
@@ -963,8 +964,8 @@
         },
         "cases": [
             {
-                "expression": "Z_5",
-                "result": true
+                "expression": "$.Z_5",
+                "result": [true]
             }
         ]
     },
@@ -974,8 +975,8 @@
         },
         "cases": [
             {
-                "expression": "z_M_",
-                "result": true
+                "expression": "$.z_M_",
+                "result": [true]
             }
         ]
     },
@@ -985,8 +986,8 @@
         },
         "cases": [
             {
-                "expression": "YU_2",
-                "result": true
+                "expression": "$.YU_2",
+                "result": [true]
             }
         ]
     },
@@ -996,8 +997,8 @@
         },
         "cases": [
             {
-                "expression": "_0",
-                "result": true
+                "expression": "$._0",
+                "result": [true]
             }
         ]
     },
@@ -1007,8 +1008,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\b+\"",
-                "result": true
+                "expression": "$.\"\\b+\"",
+                "result": [true]
             }
         ]
     },
@@ -1018,8 +1019,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\"\"",
-                "result": true
+                "expression": "$.\"\\\"\"",
+                "result": [true]
             }
         ]
     },
@@ -1029,8 +1030,8 @@
         },
         "cases": [
             {
-                "expression": "D7",
-                "result": true
+                "expression": "$.D7",
+                "result": [true]
             }
         ]
     },
@@ -1040,8 +1041,8 @@
         },
         "cases": [
             {
-                "expression": "_62L",
-                "result": true
+                "expression": "$._62L",
+                "result": [true]
             }
         ]
     },
@@ -1051,8 +1052,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\tK\\t\"",
-                "result": true
+                "expression": "$.\"\\tK\\t\"",
+                "result": [true]
             }
         ]
     },
@@ -1062,8 +1063,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\n\\\\\\f\"",
-                "result": true
+                "expression": "$.\"\\n\\\\\\f\"",
+                "result": [true]
             }
         ]
     },
@@ -1073,8 +1074,8 @@
         },
         "cases": [
             {
-                "expression": "I_",
-                "result": true
+                "expression": "$.I_",
+                "result": [true]
             }
         ]
     },
@@ -1084,8 +1085,8 @@
         },
         "cases": [
             {
-                "expression": "W_a0_",
-                "result": true
+                "expression": "$.W_a0_",
+                "result": [true]
             }
         ]
     },
@@ -1095,8 +1096,8 @@
         },
         "cases": [
             {
-                "expression": "BQ",
-                "result": true
+                "expression": "$.BQ",
+                "result": [true]
             }
         ]
     },
@@ -1106,8 +1107,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\tX$\\uABBb\"",
-                "result": true
+                "expression": "$.\"\\tX$\\uABBb\"",
+                "result": [true]
             }
         ]
     },
@@ -1117,8 +1118,8 @@
         },
         "cases": [
             {
-                "expression": "Z9",
-                "result": true
+                "expression": "$.Z9",
+                "result": [true]
             }
         ]
     },
@@ -1128,8 +1129,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\b%\\\"\uda38\udd0f\"",
-                "result": true
+                "expression": "$.\"\\b%\\\"\uda38\udd0f\"",
+                "result": [true]
             }
         ]
     },
@@ -1139,8 +1140,8 @@
         },
         "cases": [
             {
-                "expression": "_F",
-                "result": true
+                "expression": "$._F",
+                "result": [true]
             }
         ]
     },
@@ -1150,8 +1151,8 @@
         },
         "cases": [
             {
-                "expression": "\"!,\"",
-                "result": true
+                "expression": "$.\"!,\"",
+                "result": [true]
             }
         ]
     },
@@ -1161,8 +1162,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\"!\"",
-                "result": true
+                "expression": "$.\"\\\"!\"",
+                "result": [true]
             }
         ]
     },
@@ -1172,8 +1173,8 @@
         },
         "cases": [
             {
-                "expression": "Hh",
-                "result": true
+                "expression": "$.Hh",
+                "result": [true]
             }
         ]
     },
@@ -1183,8 +1184,8 @@
         },
         "cases": [
             {
-                "expression": "\"&\"",
-                "result": true
+                "expression": "$.\"&\"",
+                "result": [true]
             }
         ]
     },
@@ -1194,8 +1195,8 @@
         },
         "cases": [
             {
-                "expression": "\"9\\r\\\\R\"",
-                "result": true
+                "expression": "$.\"9\\r\\\\R\"",
+                "result": [true]
             }
         ]
     },
@@ -1205,8 +1206,8 @@
         },
         "cases": [
             {
-                "expression": "M_k",
-                "result": true
+                "expression": "$.M_k",
+                "result": [true]
             }
         ]
     },
@@ -1216,8 +1217,8 @@
         },
         "cases": [
             {
-                "expression": "\"!\\b\\n\udb06\ude52\\\"\\\"\"",
-                "result": true
+                "expression": "$.\"!\\b\\n\udb06\ude52\\\"\\\"\"",
+                "result": [true]
             }
         ]
     },
@@ -1227,8 +1228,8 @@
         },
         "cases": [
             {
-                "expression": "\"6\"",
-                "result": true
+                "expression": "$.\"6\"",
+                "result": [true]
             }
         ]
     },
@@ -1238,8 +1239,8 @@
         },
         "cases": [
             {
-                "expression": "_7",
-                "result": true
+                "expression": "$._7",
+                "result": [true]
             }
         ]
     },
@@ -1249,8 +1250,8 @@
         },
         "cases": [
             {
-                "expression": "\"0\"",
-                "result": true
+                "expression": "$.\"0\"",
+                "result": [true]
             }
         ]
     },
@@ -1260,8 +1261,8 @@
         },
         "cases": [
             {
-                "expression": "\"\\\\8\\\\\"",
-                "result": true
+                "expression": "$.\"\\\\8\\\\\"",
+                "result": [true]
             }
         ]
     },
@@ -1271,8 +1272,8 @@
         },
         "cases": [
             {
-                "expression": "b7eo",
-                "result": true
+                "expression": "$.b7eo",
+                "result": [true]
             }
         ]
     },
@@ -1282,8 +1283,8 @@
         },
         "cases": [
             {
-                "expression": "xIUo9",
-                "result": true
+                "expression": "$.xIUo9",
+                "result": [true]
             }
         ]
     },
@@ -1293,8 +1294,8 @@
         },
         "cases": [
             {
-                "expression": "\"5\"",
-                "result": true
+                "expression": "$.\"5\"",
+                "result": [true]
             }
         ]
     },
@@ -1304,8 +1305,8 @@
         },
         "cases": [
             {
-                "expression": "\"?\"",
-                "result": true
+                "expression": "$.\"?\"",
+                "result": [true]
             }
         ]
     },
@@ -1315,8 +1316,8 @@
         },
         "cases": [
             {
-                "expression": "sU",
-                "result": true
+                "expression": "$.sU",
+                "result": [true]
             }
         ]
     },
@@ -1326,8 +1327,8 @@
         },
         "cases": [
             {
-                "expression": "\"VH2&H\\\\\\/\"",
-                "result": true
+                "expression": "$.\"VH2&H\\\\\\/\"",
+                "result": [true]
             }
         ]
     },
@@ -1337,8 +1338,8 @@
         },
         "cases": [
             {
-                "expression": "_C",
-                "result": true
+                "expression": "$._C",
+                "result": [true]
             }
         ]
     },
@@ -1348,8 +1349,8 @@
         },
         "cases": [
             {
-                "expression": "_",
-                "result": true
+                "expression": "$._",
+                "result": [true]
             }
         ]
     },
@@ -1359,8 +1360,8 @@
         },
         "cases": [
             {
-                "expression": "\"<\\t\"",
-                "result": true
+                "expression": "$.\"<\\t\"",
+                "result": [true]
             }
         ]
     },
@@ -1370,9 +1371,9 @@
         },
         "cases": [
             {
-                "expression": "\"\\uD834\\uDD1E\"",
-                "result": true
+                "expression": "$.\"\\uD834\\uDD1E\"",
+                "result": [true]
             }
         ]
-    }*/
+    }
 ]
