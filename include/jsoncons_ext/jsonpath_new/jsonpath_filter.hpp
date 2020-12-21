@@ -72,11 +72,6 @@ namespace detail {
         }
     };
 
-    template <class Json,
-              class JsonReference,
-              class PathCons>
-    class jsonpath_evaluator;
-
     enum class filter_path_mode
     {
         path,
@@ -960,15 +955,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <class Evaluator>
     class jsonpath_filter_parser
     {
-        using char_type = typename Json::char_type;
+        using value_type = typename Evaluator::value_type;
+        using char_type = typename value_type::char_type;
         using string_type = std::basic_string<char_type>;
-        using string_view_type = typename Json::string_view_type;
+        using string_view_type = typename value_type::string_view_type;
 
-        std::vector<raw_token<Json>> output_stack_;
-        std::vector<raw_token<Json>> operator_stack_;
+        std::vector<raw_token<value_type>> output_stack_;
+        std::vector<raw_token<value_type>> operator_stack_;
 
         std::size_t line_;
         std::size_t column_;
@@ -993,7 +989,7 @@ namespace detail {
             return column_;
         }
 
-        void push_token(raw_token<Json>&& raw_token)
+        void push_token(raw_token<value_type>&& raw_token)
         {
             switch (raw_token.type())
             {
@@ -1054,7 +1050,7 @@ namespace detail {
             }
         }
 
-        jsonpath_filter_expr<Json> parse(static_resources<Json>& resources, 
+        jsonpath_filter_expr<value_type> parse(static_resources<value_type>& resources, 
                                          const char_type* p, 
                                          const char_type* end_expr, 
                                          const char_type** end_ptr)
@@ -1092,11 +1088,11 @@ namespace detail {
                             case '(':
                                 state = filter_state::expect_path_or_value_or_unary_op;
                                 ++depth;
-                                push_token(raw_token<Json>(lparen_arg));
+                                push_token(raw_token<value_type>(lparen_arg));
                                 break;
                             case ')':
                                 state = filter_state::expect_path_or_value_or_unary_op;
-                                push_token(raw_token<Json>(rparen_arg));
+                                push_token(raw_token<value_type>(rparen_arg));
                                 if (--depth == 0)
                                 {
                                     state = filter_state::done;
@@ -1284,7 +1280,7 @@ namespace detail {
                             }
                             buffer.clear();
                             buffer_line = buffer_column = 1;
-                            push_token(raw_token<Json>(properties));
+                            push_token(raw_token<value_type>(properties));
                             state = filter_state::expect_regex;
                             break;
                         }
@@ -1302,7 +1298,7 @@ namespace detail {
                             }
                             buffer.clear();
                             buffer_line = buffer_column = 1;
-                            push_token(raw_token<Json>(properties));
+                            push_token(raw_token<value_type>(properties));
                             state = filter_state::expect_path_or_value_or_unary_op;
                             break;
                         }
@@ -1315,7 +1311,7 @@ namespace detail {
                             }
                             buffer.clear();
                             buffer_line = buffer_column = 1;
-                            push_token(raw_token<Json>(properties));
+                            push_token(raw_token<value_type>(properties));
                             state = filter_state::expect_path_or_value_or_unary_op;
                             break;
                         }
@@ -1330,7 +1326,7 @@ namespace detail {
                                 {
                                     JSONCONS_TRY
                                     {
-                                        push_token(raw_token<Json>(value_term<Json>(Json::parse(buffer))));
+                                        push_token(raw_token<value_type>(value_term<value_type>(value_type::parse(buffer))));
                                     }
                                     JSONCONS_CATCH(const ser_error&)     
                                     {
@@ -1366,7 +1362,7 @@ namespace detail {
                                     {
                                         JSONCONS_TRY
                                         {
-                                            push_token(raw_token<Json>(value_term<Json>(Json::parse(buffer))));
+                                            push_token(raw_token<value_type>(value_term<value_type>(value_type::parse(buffer))));
                                         }
                                         JSONCONS_CATCH(const ser_error&)     
                                         {
@@ -1386,8 +1382,8 @@ namespace detail {
                                 {
                                     JSONCONS_TRY
                                     {
-                                        auto val = Json::parse(buffer);
-                                        push_token(raw_token<Json>(value_term<Json>(std::move(val))));
+                                        auto val = value_type::parse(buffer);
+                                        push_token(raw_token<value_type>(value_term<value_type>(std::move(val))));
                                     }
                                     JSONCONS_CATCH(const ser_error&)     
                                     {
@@ -1396,7 +1392,7 @@ namespace detail {
                                     buffer.clear();
                                     buffer_line = buffer_column = 1;
                                 }
-                                push_token(raw_token<Json>(rparen_arg));
+                                push_token(raw_token<value_type>(rparen_arg));
                                 if (--depth == 0)
                                 {
                                     state = filter_state::done;
@@ -1435,8 +1431,8 @@ namespace detail {
                                 {
                                     JSONCONS_TRY
                                     {
-                                        auto val = Json::parse(buffer);
-                                        push_token(raw_token<Json>(value_term<Json>(std::move(val))));
+                                        auto val = value_type::parse(buffer);
+                                        push_token(raw_token<value_type>(value_term<value_type>(std::move(val))));
                                     }
                                     JSONCONS_CATCH(const ser_error&)     
                                     {
@@ -1473,8 +1469,8 @@ namespace detail {
                                 buffer.push_back(*p);
                                 JSONCONS_TRY
                                 {
-                                    auto val = Json::parse(buffer);
-                                    push_token(raw_token<Json>(value_term<Json>(std::move(val))));
+                                    auto val = value_type::parse(buffer);
+                                    push_token(raw_token<value_type>(value_term<value_type>(std::move(val))));
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
                                 {
@@ -1514,14 +1510,14 @@ namespace detail {
                             break;
                         case '!':
                         {
-                            push_token(raw_token<Json>(resources.get_not_properties()));
+                            push_token(raw_token<value_type>(resources.get_not_properties()));
                             ++p;
                             ++column_;
                             break;
                         }
                         case '-':
                         {
-                            push_token(raw_token<Json>(resources.get_unary_minus_properties()));
+                            push_token(raw_token<value_type>(resources.get_unary_minus_properties()));
                             ++p;
                             ++column_;
                             break;
@@ -1548,12 +1544,12 @@ namespace detail {
                             break;
                         case '(':
                             ++depth;
-                            push_token(raw_token<Json>(lparen_arg));
+                            push_token(raw_token<value_type>(lparen_arg));
                             ++p;
                             ++column_;
                             break;
                         case ')':
-                            push_token(raw_token<Json>(rparen_arg));
+                            push_token(raw_token<value_type>(rparen_arg));
                             if (--depth == 0)
                             {
                                 state = filter_state::done;
@@ -1587,7 +1583,7 @@ namespace detail {
                             ++column_;
                             break;
                         case ')':
-                            push_token(raw_token<Json>(rparen_arg));
+                            push_token(raw_token<value_type>(rparen_arg));
                             if (--depth == 0)
                             {
                                 state = filter_state::done;
@@ -1634,7 +1630,7 @@ namespace detail {
                         case ' ':case '\t':
                             break;
                         case ')':
-                            push_token(raw_token<Json>(rparen_arg));
+                            push_token(raw_token<value_type>(rparen_arg));
                             if (--depth == 0)
                             {
                                 state = filter_state::done;
@@ -1665,7 +1661,7 @@ namespace detail {
                         case '*':
                         case '/':
                             {
-                                jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
+                                Evaluator evaluator(buffer_line,buffer_column);
                                 auto expr = evaluator.compile(resources, buffer.data(), buffer.length());
                                 if (!path_mode_stack.empty())
                                 {
@@ -1674,18 +1670,18 @@ namespace detail {
                                     //    auto result = expr.evaluate(resources, root);
                                     //    if (result.size() > 0)
                                     //    {
-                                    //        push_token(raw_token<Json>(value_term<Json>(std::move(result.at(0)))));
+                                    //        push_token(raw_token<value_type>(value_term<value_type>(std::move(result.at(0)))));
                                     //    }
                                     //}
                                     //else
                                     //{
-                                    //    push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
+                                    //    push_token(raw_token<value_type>(raw_path_term<value_type>(std::move(expr), buffer_line, buffer_column)));
                                     //}
                                     path_mode_stack.pop_back();
                                 }
                                 //else
                                 {
-                                    push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
+                                    push_token(raw_token<value_type>(raw_path_term<value_type>(std::move(expr), buffer_line, buffer_column)));
                                 }
                                 buffer.clear();
                                 buffer_line = buffer_column = 1;
@@ -1697,7 +1693,7 @@ namespace detail {
                             break;
                         case ')':
                         {
-                            jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator(buffer_line,buffer_column);
+                            Evaluator evaluator(buffer_line,buffer_column);
                             auto expr = evaluator.compile(resources, buffer.data(), buffer.length());
                             if (!path_mode_stack.empty())
                             {
@@ -1706,20 +1702,20 @@ namespace detail {
                                     //auto result = expr.evaluate(resources, root);
                                     //if (result.size() > 0)
                                     //{
-                                    //    push_token(raw_token<Json>(value_term<Json>(std::move(result.at(0)))));
+                                    //    push_token(raw_token<value_type>(value_term<value_type>(std::move(result.at(0)))));
                                     //}
-                                    push_token(raw_token<Json>(rparen_arg));
+                                    push_token(raw_token<value_type>(rparen_arg));
                                 }
                                 //else
                                 {
-                                    push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
+                                    push_token(raw_token<value_type>(raw_path_term<value_type>(std::move(expr), buffer_line, buffer_column)));
                                 }
                                 path_mode_stack.pop_back();
                             }
                             else
                             {
-                                push_token(raw_token<Json>(raw_path_term<Json>(std::move(expr), buffer_line, buffer_column)));
-                                push_token(raw_token<Json>(rparen_arg));
+                                push_token(raw_token<value_type>(raw_path_term<value_type>(std::move(expr), buffer_line, buffer_column)));
+                                push_token(raw_token<value_type>(rparen_arg));
                             }
                             buffer.clear();
                             buffer_line = buffer_column = 1;
@@ -1783,7 +1779,7 @@ namespace detail {
                                         ++column_;
                                         flags |= std::regex_constants::icase;
                                     }
-                                    push_token(raw_token<Json>(regex_term<Json>(buffer,flags)));
+                                    push_token(raw_token<value_type>(regex_term<value_type>(buffer,flags)));
                                     buffer.clear();
                                     buffer_line = buffer_column = 1;
                                 }
@@ -1810,7 +1806,7 @@ namespace detail {
             }
             *end_ptr = p;
 
-            return jsonpath_filter_expr<Json>(std::move(output_stack_));
+            return jsonpath_filter_expr<value_type>(std::move(output_stack_));
         }
     };
 

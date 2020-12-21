@@ -172,6 +172,7 @@ namespace jsoncons { namespace jsonpath_new {
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
         using path_node_type = path_node<Json,JsonReference>;
+        using value_type = Json;
         using reference = JsonReference;
         using pointer = typename path_node_type::pointer;
         using selector_base_type = selector_base<Json,JsonReference>;
@@ -1163,7 +1164,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '(':
                             {
-                                jsonpath_filter_parser<Json> parser(line_,column_);
+                                jsonpath_filter_parser<jsonpath_evaluator> parser(line_,column_);
                                 auto result = parser.parse(resources, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
@@ -1173,7 +1174,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             case '?':
                             {
-                                jsonpath_filter_parser<Json> parser(line_,column_);
+                                jsonpath_filter_parser<jsonpath_evaluator> parser(line_,column_);
                                 auto result = parser.parse(resources,p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
