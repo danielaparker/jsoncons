@@ -11,7 +11,7 @@
                 "normalized-path-expression" : "$['__L']"
             }
         ]
-    },
+    }/*,
     {
         "given": {
             "!\r": true
@@ -1375,5 +1375,5 @@
                 "result": [true]
             }
         ]
-    }
+    }*/
 ]
