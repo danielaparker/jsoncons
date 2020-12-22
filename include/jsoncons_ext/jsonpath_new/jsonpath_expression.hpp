@@ -1052,10 +1052,14 @@ namespace detail {
     constexpr argument_arg_t argument_arg{};
 
     // function_base
+    template <class Json,class JsonReference>
     class function_base
     {
         jsoncons::optional<std::size_t> arg_count_;
     public:
+        using reference = JsonReference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+
         function_base(jsoncons::optional<std::size_t> arg_count)
             : arg_count_(arg_count)
         {
@@ -1068,9 +1072,9 @@ namespace detail {
 
         virtual ~function_base() = default;
 
-        //virtual reference evaluate(std::vector<parameter>& args, 
-        //                           eval_context&, 
-        //                           std::error_code& ec) const = 0;
+        virtual reference evaluate(dynamic_resources<Json>& resources,
+                                   std::vector<pointer>& args, 
+                                   std::error_code& ec) const = 0;
     };  
 
     template <class Json,class JsonReference>
@@ -1190,7 +1194,7 @@ namespace detail {
         union
         {
             std::unique_ptr<selector_base_type> selector_;
-            function_base* function_;
+            function_base<Json,JsonReference>* function_;
             Json value_;
         };
     public:
@@ -1256,7 +1260,7 @@ namespace detail {
             new (&selector_) std::unique_ptr<selector_base_type>(std::move(expression));
         }
 
-        path_token(function_base* function) noexcept
+        path_token(function_base<Json,JsonReference>* function) noexcept
             : type_(path_token_kind::function),
               function_(function)
         {
@@ -1428,6 +1432,7 @@ namespace detail {
         using string_view_type = typename Json::string_view_type;
         using path_node_type = path_node<Json,JsonReference>;
         using reference = typename path_node_type::reference;
+        using pointer = typename path_node_type::pointer;
         using path_token_type = path_token<Json,JsonReference>;
     private:
         std::vector<path_token_type> token_stack_;
@@ -1477,6 +1482,7 @@ namespace detail {
             std::vector<path_node_type> input_stack;
             std::vector<path_node_type> output_stack;
             std::vector<path_node_type> collected;
+            std::vector<pointer> arg_output_stack;
             string_type path;
             path.push_back('$');
             Json result(json_array_arg);
@@ -1489,18 +1495,42 @@ namespace detail {
                      i < token_stack_.size();
                      )
                 {
+                    auto& tok = token_stack_[i];
                     for (auto& item : output_stack)
                     {
                         input_stack.push_back(std::move(item));
                     }
                     output_stack.clear();
-                    switch (token_stack_[i].type())
+                    switch (tok.type())
                     { 
+                        case path_token_kind::argument:
+                            JSONCONS_ASSERT(!output_stack.empty());
+                            arg_output_stack.push_back(std::move(output_stack.back().val_ptr));
+                            output_stack.pop_back();
+                            break;
+                        case path_token_kind::function:
+                        {
+                            if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_output_stack.size())
+                            {
+                                //ec = jmespath_errc::invalid_arity;
+                                return;
+                            }
+
+                            std::error_code ec;
+                            reference r = tok.function_->evaluate(resources, arg_output_stack, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            arg_output_stack.clear();
+                            output_stack.emplace_back(string_type(),std::addressof(r));
+                            break;
+                        }
                         case path_token_kind::selector:
                         {
                             for (auto& item : input_stack)
                             {
-                                token_stack_[i].selector_->select(resources, path, *(item.val_ptr), output_stack);
+                                tok.selector_->select(resources, path, *(item.val_ptr), output_stack);
                             }
                             break;
                         }
@@ -1546,7 +1576,7 @@ namespace detail {
                         }
                         input_stack.clear();
                     }
-                    else if (token_stack_[i].is_recursive_descent())
+                    else if (tok.is_recursive_descent())
                     {
                         is_recursive_descent = true;
                         ++i;

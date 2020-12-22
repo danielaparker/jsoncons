@@ -959,9 +959,9 @@ namespace detail {
     class jsonpath_filter_parser
     {
         using value_type = typename Evaluator::value_type;
-        using char_type = typename value_type::char_type;
-        using string_type = std::basic_string<char_type>;
-        using string_view_type = typename value_type::string_view_type;
+        using char_type = typename Evaluator::char_type;
+        using string_type = typename Evaluator::string_type;
+        using string_view_type = typename Evaluator::string_view_type;
 
         std::vector<raw_token<value_type>> output_stack_;
         std::vector<raw_token<value_type>> operator_stack_;

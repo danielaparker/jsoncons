@@ -473,6 +473,29 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
+        class function_expression final : public selector_base_type
+        {
+        public:
+            path_expression_type expr_;
+
+            function_expression(path_expression_type&& expr)
+                : expr_(std::move(expr))
+            {
+            }
+
+            void select(dynamic_resources<Json>& resources,
+                        const string_type& /*path*/, 
+                        reference val, 
+                        std::vector<path_node_type>& nodes) const override
+            {
+                auto callback = [&nodes](path_node_type& node)
+                {
+                    nodes.push_back(node);
+                };
+                return expr_.evaluate(resources, val, callback);
+            }
+        };
+
         function_table<Json,pointer> functions_;
 
         std::size_t line_;
@@ -485,6 +508,7 @@ namespace jsoncons { namespace jsonpath_new {
         std::vector<argument_type> function_stack_;
         std::vector<path_state> state_stack_;
         std::vector<path_token_type> token_stack_;
+        std::vector<path_token_type> operator_stack_;
 
     public:
         jsonpath_evaluator()
@@ -610,9 +634,6 @@ namespace jsoncons { namespace jsonpath_new {
             p_ = begin_input_;
 
             string_type s = {'$'};
-            //std::vector<path_node_type> v;
-            //v.emplace_back(std::move(s),std::addressof(root));
-            //stack_.push_back(v);
 
             slice slic;
             std::size_t save_line = 1;
@@ -1827,6 +1848,22 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 
+        void unwind_rparen()
+        {
+            auto it = operator_stack_.rbegin();
+            while (it != operator_stack_.rend() && !it->is_lparen())
+            {
+                token_stack_.emplace_back(std::move(*it));
+                ++it;
+            }
+            if (it == operator_stack_.rend())
+            {
+                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
+            }
+            ++it;
+            operator_stack_.erase(it.base(),operator_stack_.end());
+        }
+
         void push_token(path_token_type&& tok)
         {
             switch (tok.type())
@@ -1894,6 +1931,47 @@ namespace jsoncons { namespace jsonpath_new {
                     }
                     break;
                 }
+                case path_token_kind::end_function:
+                {
+                    unwind_rparen();
+                    std::vector<path_token_type> toks;
+                    auto it = token_stack_.rbegin();
+                    while (it != token_stack_.rend() && it->type() != path_token_kind::begin_function)
+                    {
+                        toks.insert(toks.begin(), std::move(*it));
+                        ++it;
+                    }
+                    if (it == token_stack_.rend())
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
+                    }
+                    ++it;
+                    //if (toks.front().type() != token_type::literal)
+                    //{
+                    //    toks.emplace(toks.begin(), current_node_arg);
+                    //}
+                    token_stack_.erase(it.base(),token_stack_.end());
+
+                    if (!token_stack_.empty() && token_stack_.back().is_projection() && 
+                        (tok.precedence_level() < token_stack_.back().precedence_level() ||
+                        (tok.precedence_level() == token_stack_.back().precedence_level() && tok.is_right_associative())))
+                    {
+                        token_stack_.back().selector_->add_selector(jsoncons::make_unique<function_expression>(path_expression_type(std::move(toks))));
+                    }
+                    else
+                    {
+                        token_stack_.emplace_back(path_token_type(jsoncons::make_unique<function_expression>(std::move(toks))));
+                    }
+                    break;
+                }
+                case path_token_kind::begin_function:
+                    token_stack_.emplace_back(std::move(tok));
+                    operator_stack_.emplace_back(path_token_type(lparen_arg));
+                    break;
+                case path_token_kind::argument:
+                case path_token_kind::function:
+                    operator_stack_.emplace_back(std::move(tok));
+                    break;
                 default:
                     break;
             }
