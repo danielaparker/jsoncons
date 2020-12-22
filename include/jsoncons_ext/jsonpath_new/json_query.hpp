@@ -659,6 +659,28 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             default:
                             {
+                                state_stack_.back() = path_state::rhs_expression;
+                                state_stack_.emplace_back(path_state::lhs_expression);
+                                break;
+                            }
+                        }
+                    }
+                    /*case path_state::start: 
+                    {
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '$':
+                            {
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            default:
+                            {
                                 switch (*p_)
                                 {
                                     case '.':
@@ -674,7 +696,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                         };
                         break;
-                    }
+                    }*/
                     case path_state::path_or_function_name:
                         switch (*p_)
                         {
