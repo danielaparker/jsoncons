@@ -1894,6 +1894,9 @@ namespace jsoncons { namespace jsonpath_new {
                 case path_token_kind::function:
                     operator_stack_.emplace_back(std::move(tok));
                     break;
+                case path_token_kind::current_node:
+                    token_stack_.emplace_back(std::move(tok));
+                    break;
                 default:
                     break;
             }

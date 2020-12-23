@@ -1494,7 +1494,9 @@ namespace detail {
 
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
-        evaluate(dynamic_resources<Json>& resources, reference instance, Callback callback) const
+        evaluate(dynamic_resources<Json>& resources, 
+                 reference instance, 
+                 Callback callback) const
         {
             std::vector<path_node_type> input_stack;
             std::vector<path_node_type> output_stack;
@@ -1520,6 +1522,9 @@ namespace detail {
                     output_stack.clear();
                     switch (tok.type())
                     { 
+                        case path_token_kind::current_node:
+                            output_stack.emplace_back(string_type(),std::addressof(instance));
+                            break;
                         case path_token_kind::argument:
                             JSONCONS_ASSERT(!output_stack.empty());
                             arg_output_stack.push_back(std::move(output_stack.back().val_ptr));
