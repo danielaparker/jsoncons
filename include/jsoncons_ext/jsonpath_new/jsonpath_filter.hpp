@@ -959,6 +959,7 @@ namespace detail {
     class jsonpath_filter_parser
     {
         using value_type = typename Evaluator::value_type;
+        using reference = typename Evaluator::reference;
         using char_type = typename Evaluator::char_type;
         using string_type = typename Evaluator::string_type;
         using string_view_type = typename Evaluator::string_view_type;
@@ -1050,7 +1051,7 @@ namespace detail {
             }
         }
 
-        jsonpath_filter_expr<value_type> parse(static_resources<value_type>& resources, 
+        jsonpath_filter_expr<value_type> parse(static_resources<value_type,reference>& resources, 
                                          const char_type* p, 
                                          const char_type* end_expr, 
                                          const char_type** end_ptr)

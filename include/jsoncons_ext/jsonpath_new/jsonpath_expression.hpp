@@ -798,15 +798,73 @@ namespace detail {
     }
 
     template <class Json>
+    struct dynamic_resources
+    {
+        std::vector<std::unique_ptr<Json>> temp_json_values_;
+
+        template <typename... Args>
+        Json* create_temp(Args&& ... args)
+        {
+            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+            Json* ptr = temp.get();
+            temp_json_values_.emplace_back(std::move(temp));
+            return ptr;
+        }
+    };
+
+    // function_base
+    template <class Json,class JsonReference>
+    class function_base
+    {
+        jsoncons::optional<std::size_t> arg_count_;
+    public:
+        using reference = JsonReference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+
+        function_base(jsoncons::optional<std::size_t> arg_count)
+            : arg_count_(arg_count)
+        {
+        }
+
+        jsoncons::optional<std::size_t> arg_count() const
+        {
+            return arg_count_;
+        }
+
+        virtual ~function_base() = default;
+
+        virtual reference evaluate(dynamic_resources<Json>& resources,
+                                   std::vector<pointer>& args, 
+                                   std::error_code& ec) const = 0;
+    };  
+
+    template <class Json, class JsonReference>
     struct static_resources
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
+        using reference = JsonReference;
+        using function_base_type = function_base<Json,JsonReference>;
 
         std::vector<std::unique_ptr<Json>> temp_json_values_;
 
         static_resources()
         {
+        }
+
+        function_base_type* get_function(const string_type& name, std::error_code& ec) const
+        {
+            static std::unordered_map<string_type,function_base_type*> functions =
+            {
+            };
+
+            auto it = functions.find(name);
+            if (it == functions.end())
+            {
+                ec = jsonpath_errc::unknown_function;
+                return nullptr;
+            }
+            return it->second;
         }
 
         const unary_operator_properties<Json>* get_not_properties() const
@@ -915,21 +973,6 @@ namespace detail {
         static Json unary_minus_op(const term<Json>& a)
         {
             return a.unary_minus();
-        }
-    };
-
-    template <class Json>
-    struct dynamic_resources
-    {
-        std::vector<std::unique_ptr<Json>> temp_json_values_;
-
-        template <typename... Args>
-        Json* create_temp(Args&& ... args)
-        {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-            Json* ptr = temp.get();
-            temp_json_values_.emplace_back(std::move(temp));
-            return ptr;
         }
     };
 
@@ -1050,32 +1093,6 @@ namespace detail {
         explicit argument_arg_t() = default;
     };
     constexpr argument_arg_t argument_arg{};
-
-    // function_base
-    template <class Json,class JsonReference>
-    class function_base
-    {
-        jsoncons::optional<std::size_t> arg_count_;
-    public:
-        using reference = JsonReference;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-
-        function_base(jsoncons::optional<std::size_t> arg_count)
-            : arg_count_(arg_count)
-        {
-        }
-
-        jsoncons::optional<std::size_t> arg_count() const
-        {
-            return arg_count_;
-        }
-
-        virtual ~function_base() = default;
-
-        virtual reference evaluate(dynamic_resources<Json>& resources,
-                                   std::vector<pointer>& args, 
-                                   std::error_code& ec) const = 0;
-    };  
 
     template <class Json,class JsonReference>
     struct path_node
