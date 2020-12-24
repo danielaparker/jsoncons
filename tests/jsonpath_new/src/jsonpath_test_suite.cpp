@@ -4,6 +4,7 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
+#include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath.hpp>
 #include <catch/catch.hpp>
@@ -105,6 +106,7 @@ TEST_CASE("jsonpath-tests")
 #endif
         //jsonpath_tests("./jsonpath_new/input/compliance/jsonpath-tests.json");
 
+        //*
         jsonpath_tests("./jsonpath_new/input/compliance/identifiers.json");
         jsonpath_tests("./jsonpath_new/input/compliance/basic.json"); 
         jsonpath_tests("./jsonpath_new/input/compliance/slice.json");
@@ -113,6 +115,8 @@ TEST_CASE("jsonpath-tests")
         jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
         jsonpath_tests("./jsonpath_new/input/compliance/union.json");
         jsonpath_tests("./jsonpath_new/input/compliance/filter.json");
+        //*/
+        jsonpath_tests("./jsonpath_new/input/compliance/functions.json");
         
     }
 }

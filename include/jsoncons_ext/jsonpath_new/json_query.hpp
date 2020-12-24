@@ -204,6 +204,35 @@ namespace jsoncons { namespace jsonpath_new {
                     }
                 }
             }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("identifier: ");
+                s.append(identifier_);
+
+                return s;
+            }
+        };
+
+        class current_node final : public selector_base_type
+        {
+        public:
+            current_node()
+            {
+            }
+
+            void select(dynamic_resources<Json>& /*resources*/,
+                        const string_type& path, reference val,
+                        std::vector<path_node_type>& nodes) const override
+            {
+                nodes.emplace_back(path, std::addressof(val));
+            }
         };
 
         class index_selector final : public selector_base_type
@@ -494,6 +523,19 @@ namespace jsoncons { namespace jsonpath_new {
                     nodes.push_back(node);
                 };
                 return expr_.evaluate(resources, val, callback);
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("function expression");
+
+                return s;
             }
         };
 
@@ -856,6 +898,12 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case '$':
+                                ++p_;
+                                ++column_;
+                                //push_token(path_token_type(jsoncons::make_unique<current_node>()));
+                                state_stack_.pop_back();
+                                break;
                             case '.':
                                 ec = jsonpath_errc::expected_key;
                                 return path_expression_type();
@@ -937,6 +985,8 @@ namespace jsoncons { namespace jsonpath_new {
                     case path_state::unquoted_string: 
                         switch (*p_)
                         {
+                            case '(':
+                            case ')':
                             case ']':
                             case '[':
                             case '.':
@@ -969,6 +1019,21 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case ')':
+                            {
+                                if (state_stack_.size() > 1 && (*(state_stack_.rbegin()+1) == path_state::argument))
+                                {
+                                    state_stack_.pop_back();
+                                }
+                                else
+                                {
+                                    ++p_;
+                                    ++column_;
+                                    --paren_level;
+                                    push_token(rparen_arg);
+                                }
+                                break;
+                            }
                             default:
                                 ec = jsonpath_errc::expected_separator;
                                 return path_expression_type();

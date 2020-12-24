@@ -15,10 +15,10 @@
     "null_key": null
   },
   "cases": [
-    {
+    /*{
       "expression": "abs($.foo)",
       "result": 1
-    }/*,
+    },
     {
       "expression": "abs(foo)",
       "result": 1
@@ -438,11 +438,11 @@
     {
       "expression": "starts_with(str, `0`)",
       "error": "invalid-type"
-    },
+    },*/
     {
-      "expression": "sum(numbers)",
-      "result": 11
-    },
+      "expression": "sum($.numbers)",
+      "result": [11]
+    }/*,
     {
       "expression": "sum(decimals)",
       "result": 0.71

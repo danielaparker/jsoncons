@@ -838,6 +838,45 @@ namespace detail {
                                    std::error_code& ec) const = 0;
     };  
 
+    template <class Json,class JsonReference>
+    class sum_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        sum_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_array())
+            {
+                ec = jsonpath_errc::invalid_type;
+                return Json::null();
+            }
+            double sum = 0;
+            for (auto& j : arg0_ptr->array_range())
+            {
+                if (!j.is_number())
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return Json::null();
+                }
+                sum += j.template as<double>();
+            }
+
+            return *resources.create_temp(sum);
+        }
+    };
+
     template <class Json, class JsonReference>
     struct static_resources
     {
@@ -854,8 +893,11 @@ namespace detail {
 
         function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
+            static sum_function<Json,JsonReference> sum_func;
+
             static std::unordered_map<string_type,function_base_type*> functions =
             {
+                {string_type{'s','u','m'}, &sum_func}
             };
 
             auto it = functions.find(name);
@@ -1198,6 +1240,11 @@ namespace detail {
         virtual void add_selector(std::unique_ptr<selector_base>&&) 
         {
         }
+
+        virtual std::string to_string(int level = 0) const
+        {
+            return std::string();
+        }
     };
 
     template <class Json,class JsonReference>
@@ -1438,6 +1485,21 @@ namespace detail {
                     break;
             }
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s("Token type: ");
+            s.append(std::to_string((int)type_));
+            switch (type_)
+            {
+                case path_token_kind::selector:
+                    s.append(selector_->to_string(level+1));
+                    break;
+                default:
+                    break;
+            }
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -1452,19 +1514,19 @@ namespace detail {
         using pointer = typename path_node_type::pointer;
         using path_token_type = path_token<Json,JsonReference>;
     private:
-        std::vector<path_token_type> token_stack_;
+        std::vector<path_token_type> token_list_;
     public:
         path_expression()
         {
         }
 
         path_expression(path_expression&& expr)
-            : token_stack_(std::move(expr.token_stack_))
+            : token_list_(std::move(expr.token_list_))
         {
         }
 
         path_expression(std::vector<path_token_type>&& token_stack)
-            : token_stack_(std::move(token_stack))
+            : token_list_(std::move(token_stack))
         {
         }
 
@@ -1501,20 +1563,20 @@ namespace detail {
             std::vector<path_node_type> input_stack;
             std::vector<path_node_type> output_stack;
             std::vector<path_node_type> collected;
-            std::vector<pointer> arg_output_stack;
+            std::vector<pointer> arg_input_stack;
             string_type path;
             path.push_back('$');
             Json result(json_array_arg);
             bool is_recursive_descent = false;
 
-            if (!token_stack_.empty())
+            if (!token_list_.empty())
             {
                 output_stack.emplace_back(path,std::addressof(instance));
                 for (std::size_t i = 0; 
-                     i < token_stack_.size();
+                     i < token_list_.size();
                      )
                 {
-                    auto& tok = token_stack_[i];
+                    auto& tok = token_list_[i];
                     for (auto& item : output_stack)
                     {
                         input_stack.push_back(std::move(item));
@@ -1526,25 +1588,25 @@ namespace detail {
                             output_stack.emplace_back(string_type(),std::addressof(instance));
                             break;
                         case path_token_kind::argument:
-                            JSONCONS_ASSERT(!output_stack.empty());
-                            arg_output_stack.push_back(std::move(output_stack.back().val_ptr));
-                            output_stack.pop_back();
+                            JSONCONS_ASSERT(!input_stack.empty());
+                            arg_input_stack.push_back(std::move(input_stack.back().val_ptr));
+                            input_stack.pop_back();
                             break;
                         case path_token_kind::function:
                         {
-                            if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_output_stack.size())
+                            if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_input_stack.size())
                             {
                                 //ec = jmespath_errc::invalid_arity;
                                 return;
                             }
 
                             std::error_code ec;
-                            reference r = tok.function_->evaluate(resources, arg_output_stack, ec);
+                            reference r = tok.function_->evaluate(resources, arg_input_stack, ec);
                             if (ec)
                             {
                                 return;
                             }
-                            arg_output_stack.clear();
+                            arg_input_stack.clear();
                             output_stack.emplace_back(string_type(),std::addressof(r));
                             break;
                         }
@@ -1603,9 +1665,9 @@ namespace detail {
                         is_recursive_descent = true;
                         ++i;
                     }
-                    else if (!is_recursive_descent)
+                    else 
                     {
-                        break;
+                        ++i;
                     }
                 }
             }

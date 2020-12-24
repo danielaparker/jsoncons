@@ -49,7 +49,8 @@ namespace jsoncons { namespace jsonpath_new {
         invalid_number,
         illegal_escaped_character,
         invalid_codepoint,
-        unknown_function
+        unknown_function,
+        invalid_type
     };
 
     class jsonpath_error_category_impl
@@ -132,6 +133,8 @@ namespace jsoncons { namespace jsonpath_new {
                     return "Invalid codepoint";
                 case jsonpath_errc::unknown_function:
                     return "Unknown function";
+                case jsonpath_errc::invalid_type:
+                    return "Invalid type";
                 default:
                     return "Unknown jsonpath parser error";
             }
