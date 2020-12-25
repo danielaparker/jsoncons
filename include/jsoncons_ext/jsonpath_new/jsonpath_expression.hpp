@@ -718,7 +718,7 @@ namespace detail {
     };
 
     template <class Json>
-    struct unary_operator_properties
+    struct unary_operator
     {
         typedef std::function<Json(const term<Json>&)> operator_type;
 
@@ -728,7 +728,7 @@ namespace detail {
     };
 
     template <class Json>
-    struct binary_operator_properties
+    struct binary_operator
     {
         typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
 
@@ -909,33 +909,33 @@ namespace detail {
             return it->second;
         }
 
-        const unary_operator_properties<Json>* get_not_properties() const
+        const unary_operator<Json>* get_not_properties() const
         {
-            static unary_operator_properties<Json> not_properties{ 1,true, unary_not_op };
+            static unary_operator<Json> not_properties{ 1,true, unary_not_op };
             return &not_properties;
         }
 
-        const unary_operator_properties<Json>* get_unary_minus_properties() const
+        const unary_operator<Json>* get_unary_minus_properties() const
         {
-            static unary_operator_properties<Json> unary_minus_properties { 1,true, unary_minus_op };
+            static unary_operator<Json> unary_minus_properties { 1,true, unary_minus_op };
             return &unary_minus_properties;
         }
 
-        const binary_operator_properties<Json>* get_binary_operator_properties(const string_type& id) const
+        const binary_operator<Json>* get_binary_operator_properties(const string_type& id) const
         {
-            static const binary_operator_properties<Json> lt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }};
-            static const binary_operator_properties<Json> gt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }};
-            static const binary_operator_properties<Json> mult_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }};
-            static const binary_operator_properties<Json> div_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }};
-            static const binary_operator_properties<Json> plus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }};
-            static const binary_operator_properties<Json> minus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }};
-            static const binary_operator_properties<Json> lte_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }};
-            static const binary_operator_properties<Json> gte_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }};
-            static const binary_operator_properties<Json> ne_properties{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }};
-            static const binary_operator_properties<Json> eq_properties{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }};
-            static const binary_operator_properties<Json> eqtilde_properties{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }};
-            static const binary_operator_properties<Json> ampamp_properties{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }};
-            static const binary_operator_properties<Json> pipepipe_properties{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }};
+            static const binary_operator<Json> lt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }};
+            static const binary_operator<Json> gt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }};
+            static const binary_operator<Json> mult_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_mult<Json>(),a,b); }};
+            static const binary_operator<Json> div_properties{3,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_div<Json>(),a,b); }};
+            static const binary_operator<Json> plus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_plus<Json>(),a,b); }};
+            static const binary_operator<Json> minus_properties{4,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_minus<Json>(),a,b); }};
+            static const binary_operator<Json> lte_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),a,b); }};
+            static const binary_operator<Json> gte_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lte<Json>(),b,a); }};
+            static const binary_operator<Json> ne_properties{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ne<Json>(),a,b); }};
+            static const binary_operator<Json> eq_properties{6,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_eq<Json>(),a,b); }};
+            static const binary_operator<Json> eqtilde_properties{2,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_regex<Json>(),a,b); }};
+            static const binary_operator<Json> ampamp_properties{7,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_ampamp<Json>(),a,b); }};
+            static const binary_operator<Json> pipepipe_properties{8,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_pipepipe<Json>(),a,b); }};
 
             switch(id.size())
             {

@@ -353,8 +353,8 @@ namespace detail {
 
         union
         {
-            const unary_operator_properties<Json>* unary_op_properties_;
-            const binary_operator_properties<Json>* binary_op_properties_;
+            const unary_operator<Json>* unary_op_properties_;
+            const binary_operator<Json>* binary_op_properties_;
             value_term<Json> value_term_;
             raw_path_term<Json> path_term_;
             regex_term<Json> regex_term_;
@@ -385,13 +385,13 @@ namespace detail {
         {
         }
 
-        raw_token(const unary_operator_properties<Json>* properties)
+        raw_token(const unary_operator<Json>* properties)
             : type_(filter_token_type::unary_operator), 
               unary_op_properties_(properties)
         {
         }
 
-        raw_token(const binary_operator_properties<Json>* properties)
+        raw_token(const binary_operator<Json>* properties)
             : type_(filter_token_type::binary_operator), 
               binary_op_properties_(properties)
         {
@@ -569,8 +569,8 @@ namespace detail {
 
         union
         {
-            const unary_operator_properties<Json>* unary_op_properties_;
-            const binary_operator_properties<Json>* binary_op_properties_;
+            const unary_operator<Json>* unary_op_properties_;
+            const binary_operator<Json>* binary_op_properties_;
             value_term<Json> value_term_;
             evaluated_path_term<Json> path_term_;
             regex_term<Json> regex_term_;
