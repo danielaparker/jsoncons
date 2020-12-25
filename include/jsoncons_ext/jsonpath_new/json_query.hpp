@@ -888,7 +888,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '.':
-                                push_token(path_token_type(recursive_descent_arg));
+                                push_token(path_token_type(recursive_descent_arg), ec);
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = path_state::name_or_left_bracket;
@@ -922,7 +922,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '*':
-                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()));
+                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()), ec);
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -962,7 +962,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 ++paren_level;
-                                push_token(lparen_arg);
+                                push_token(lparen_arg, ec);
                                 break;
                             }
                             /*case '!':
@@ -992,8 +992,8 @@ namespace jsoncons { namespace jsonpath_new {
                                 }
                                 buffer.clear();
                                 ++paren_level;
-                                push_token(path_token_type(begin_function_arg));
-                                push_token(path_token_type(f));
+                                push_token(path_token_type(begin_function_arg), ec);
+                                push_token(path_token_type(f), ec);
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::rhs_expression);
@@ -1004,7 +1004,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             default:
                             {
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.pop_back(); 
                                 break;
@@ -1020,7 +1020,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(path_token_type(current_node_arg));
+                                push_token(path_token_type(current_node_arg), ec);
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
@@ -1030,7 +1030,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case ')':
                             {
                                 --paren_level;
-                                push_token(path_token_type(end_function_arg));
+                                push_token(path_token_type(end_function_arg), ec);
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1043,7 +1043,7 @@ namespace jsoncons { namespace jsonpath_new {
                     }
                     case path_state::argument:
                     {
-                        push_token(argument_arg);
+                        push_token(argument_arg, ec);
                         state_stack_.pop_back();
                         break;
                     }
@@ -1095,13 +1095,20 @@ namespace jsoncons { namespace jsonpath_new {
                                     ++p_;
                                     ++column_;
                                     --paren_level;
-                                    push_token(rparen_arg);
+                                    push_token(rparen_arg, ec);
                                 }
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_separator;
-                                return path_expression_type();
+                                if (state_stack_.size() > 1)
+                                {
+                                    state_stack_.pop_back();
+                                }
+                                else
+                                {
+                                    ec = jsonpath_errc::expected_separator;
+                                    return path_expression_type();
+                                }
                         };
                         break;
                     case path_state::unquoted_name: 
@@ -1130,14 +1137,14 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case '[':
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
                             case ']':
                             case '.':
                             case ',':
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1150,7 +1157,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\'':
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1168,7 +1175,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\"':
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 break;
@@ -1231,13 +1238,13 @@ namespace jsoncons { namespace jsonpath_new {
                                 auto result = parser.parse(resources, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
-                                push_token(path_token_type(jsoncons::make_unique<expression_selector>(std::move(result))));
+                                push_token(path_token_type(jsoncons::make_unique<expression_selector>(std::move(result))), ec);
                                 state_stack_.back() = path_state::expect_right_bracket;
                                 break;
                             }
                             case '?':
                             {
-                                push_token(path_token_type(begin_filter_arg));
+                                push_token(path_token_type(begin_filter_arg), ec);
                                 state_stack_.back() = path_state::filter;
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
@@ -1335,7 +1342,7 @@ namespace jsoncons { namespace jsonpath_new {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(path_token_type(jsoncons::make_unique<index_selector>(r.value())));
+                                    push_token(path_token_type(jsoncons::make_unique<index_selector>(r.value())), ec);
 
                                     buffer.clear();
                                 }
@@ -1384,7 +1391,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch(*p_)
                         {
                             case ']':
-                                push_token(path_token_type(jsoncons::make_unique<slice_selector>(slic)));
+                                push_token(path_token_type(jsoncons::make_unique<slice_selector>(slic)), ec);
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 ++p_;
@@ -1423,7 +1430,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch(*p_)
                         {
                             case ']':
-                                push_token(path_token_type(jsoncons::make_unique<slice_selector>(slic)));
+                                push_token(path_token_type(jsoncons::make_unique<slice_selector>(slic)), ec);
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack_.pop_back(); // rhs_slice_expression_stop
@@ -1441,15 +1448,15 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case ']': 
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             case '.':
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
@@ -1457,17 +1464,17 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case '[':
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
                                 ++p_;
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
-                                push_token(path_token_type(separator_arg));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(path_token_type(separator_arg), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
@@ -1498,13 +1505,13 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(path_token_type(separator_arg));
+                                push_token(path_token_type(separator_arg), ec);
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': 
-                                push_token(path_token_type(end_union_arg));
+                                push_token(path_token_type(end_union_arg), ec);
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -1521,15 +1528,15 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             case '.':
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
@@ -1537,17 +1544,17 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case '[':
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
                                 ++p_;
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
-                                push_token(path_token_type(separator_arg));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(path_token_type(separator_arg), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
@@ -1566,15 +1573,15 @@ namespace jsoncons { namespace jsonpath_new {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()));
+                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()), ec);
                                 buffer.clear();
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             case '.':
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
@@ -1582,17 +1589,17 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case '[':
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()), ec);
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
                                 ++p_;
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(path_token_type(begin_union_arg));
-                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()));
-                                push_token(path_token_type(separator_arg));
+                                push_token(path_token_type(begin_union_arg), ec);
+                                push_token(path_token_type(jsoncons::make_unique<wildcard_selector>()), ec);
+                                push_token(path_token_type(separator_arg), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::lhs_expression);                                
@@ -1832,7 +1839,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case ']':
                             {
-                                push_token(path_token_type(end_filter_arg));
+                                push_token(path_token_type(end_filter_arg), ec);
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -1856,7 +1863,7 @@ namespace jsoncons { namespace jsonpath_new {
                 case path_state::unquoted_name: 
                 case path_state::unquoted_name2: 
                 {
-                    push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                    push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                     buffer.clear();
                     state_stack_.pop_back(); // unquoted_name
                     break;
@@ -1866,7 +1873,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
             if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
             {
-                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)));
+                push_token(path_token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                 state_stack_.pop_back(); // unquoted_string
                 if (/*state_stack_.back() == path_state::val_expr ||*/ state_stack_.back() == path_state::identifier_or_function_expr)
                 {
@@ -1928,7 +1935,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         }
 
-        void unwind_rparen()
+        void unwind_rparen(std::error_code& ec)
         {
             auto it = operator_stack_.rbegin();
             while (it != operator_stack_.rend() && !it->is_lparen())
@@ -1938,19 +1945,28 @@ namespace jsoncons { namespace jsonpath_new {
             }
             if (it == operator_stack_.rend())
             {
-                JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced parenthesis"));
+                ec = jsonpath_errc::unbalanced_parenthesis;
+                return;
             }
             ++it;
             operator_stack_.erase(it.base(),operator_stack_.end());
         }
 
-        void push_token(path_token_type&& tok)
+        void push_token(path_token_type&& tok, std::error_code& ec)
         {
             switch (tok.type())
             {
+                case path_token_kind::begin_filter:
+                    output_stack_.emplace_back(std::move(tok));
+                    operator_stack_.emplace_back(path_token_type(lparen_arg));
+                    break;
                 case path_token_kind::end_filter:
                 {
-                    unwind_rparen();
+                    unwind_rparen(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     std::vector<path_token_type> toks;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != path_token_kind::begin_filter)
@@ -2044,9 +2060,21 @@ namespace jsoncons { namespace jsonpath_new {
                     }
                     break;
                 }
+                case path_token_kind::lparen:
+                    operator_stack_.emplace_back(std::move(tok));
+                    break;
+                case path_token_kind::rparen:
+                {
+                    unwind_rparen(ec);
+                    break;
+                }
                 case path_token_kind::end_function:
                 {
-                    unwind_rparen();
+                    unwind_rparen(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
                     std::vector<path_token_type> toks;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != path_token_kind::begin_function)
