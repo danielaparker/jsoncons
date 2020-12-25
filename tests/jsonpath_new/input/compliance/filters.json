@@ -1,5 +1,15 @@
 [
 {
+    "given":
+        [{"name": "John Smith"}, {"name": null}],
+     "cases": [
+         {
+            "comment" : "Filter expression",
+            "expression": "$[?(@.name)]",
+            "result": [{"name": "John Smith"}]
+         }
+     ]
+}/*,{
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given":
         [{"id": 42, "name": "forty-two"}, {"id": 1, "name": "one"}],
@@ -100,7 +110,7 @@
             "result": [{"key": 50}]
          }
      ]
-}
+}*/
 
 
 ]
