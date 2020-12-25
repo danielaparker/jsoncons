@@ -191,7 +191,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& /*resources*/,
+            void select(dynamic_resources<Json>& resources,
                         const string_type& path, reference val,
                         std::vector<path_node_type>& nodes) const override
             {
@@ -202,6 +202,18 @@ namespace jsoncons { namespace jsonpath_new {
                     {
                         nodes.emplace_back(PathCons()(path,identifier_),std::addressof(it->value()));
                     }
+                }
+                else if (val.is_array() && identifier_ == length_literal<char_type>())
+                {
+                    pointer ptr = resources.create_temp(val.size());
+                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
+                }
+                else if (val.is_string() && identifier_ == length_literal<char_type>())
+                {
+                    string_view_type sv = val.as_string_view();
+                    std::size_t count = unicons::u32_length(sv.begin(), sv.end());
+                    pointer ptr = resources.create_temp(count);
+                    nodes.emplace_back(PathCons()(path, identifier_), ptr);
                 }
             }
 

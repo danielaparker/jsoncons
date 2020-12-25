@@ -1,0 +1,14 @@
+[
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given":
+        ["first", "second", "third", "forth", "fifth"],
+     "cases": [
+         {
+            "comment" : "Dot notation after filter expression",
+            "expression": "$[(@.length-1)]",
+            "result": ["fifth"]
+         }
+     ]
+}
+]
