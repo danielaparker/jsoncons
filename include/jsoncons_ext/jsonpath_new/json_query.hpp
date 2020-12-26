@@ -965,13 +965,13 @@ namespace jsoncons { namespace jsonpath_new {
                                 push_token(lparen_arg, ec);
                                 break;
                             }
-                            /*case '!':
+                            case '!':
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token(resources.get_not_operator()));
+                                push_token(path_token_type(resources.get_not_operator()), ec);
                                 break;
-                            }*/
+                            }
                             default:
                                 buffer.clear();
                                 state_stack_.back() = path_state::identifier_or_function_expr;
@@ -2116,6 +2116,34 @@ namespace jsoncons { namespace jsonpath_new {
                 case path_token_kind::current_node:
                     output_stack_.emplace_back(std::move(tok));
                     break;
+                case path_token_kind::unary_operator:
+                case path_token_kind::binary_operator:
+                {
+                    if (operator_stack_.empty() || operator_stack_.back().is_lparen())
+                    {
+                        operator_stack_.emplace_back(std::move(tok));
+                    }
+                    else if (tok.precedence_level() < operator_stack_.back().precedence_level()
+                             || (tok.precedence_level() == operator_stack_.back().precedence_level() && tok.is_right_associative()))
+                    {
+                        operator_stack_.emplace_back(std::move(tok));
+                    }
+                    else
+                    {
+                        auto it = operator_stack_.rbegin();
+                        while (it != operator_stack_.rend() && it->is_operator()
+                               && (tok.precedence_level() > it->precedence_level()
+                             || (tok.precedence_level() == it->precedence_level() && tok.is_right_associative())))
+                        {
+                            output_stack_.emplace_back(std::move(*it));
+                            ++it;
+                        }
+
+                        operator_stack_.erase(it.base(),operator_stack_.end());
+                        operator_stack_.emplace_back(std::move(tok));
+                    }
+                    break;
+                }
                 default:
                     break;
             }

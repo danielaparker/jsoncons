@@ -718,13 +718,110 @@ namespace detail {
     };
 
     template <class Json>
+    struct dynamic_resources
+    {
+        std::vector<std::unique_ptr<Json>> temp_json_values_;
+
+        Json& true_value() const
+        {
+            static Json value(true, semantic_tag::none);
+            return value;
+        }
+
+        Json& false_value() const
+        {
+            static Json value(false, semantic_tag::none);
+            return value;
+        }
+
+        Json& null_value() const
+        {
+            static Json value(null_type(), semantic_tag::none);
+            return value;
+        }
+
+        template <typename... Args>
+        Json* create_temp(Args&& ... args)
+        {
+            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+            Json* ptr = temp.get();
+            temp_json_values_.emplace_back(std::move(temp));
+            return ptr;
+        }
+    };
+
+    template <class Json>
     struct unary_operator
     {
         typedef std::function<Json(const term<Json>&)> operator_type;
 
-        std::size_t precedence_level;
-        bool is_right_associative;
+        std::size_t precedence_level_;
+        bool is_right_associative_;
         operator_type op;
+
+        unary_operator(std::size_t precedence_level,
+                       bool is_right_associative)
+            : precedence_level_(precedence_level),
+              is_right_associative_(is_right_associative)
+        {
+        }
+
+        unary_operator(std::size_t precedence_level,
+                       bool is_right_associative,
+                       operator_type op)
+            : precedence_level_(precedence_level),
+              is_right_associative_(is_right_associative),
+              op(std::move(op))
+        {
+        }
+
+        std::size_t precedence_level() const 
+        {
+            return precedence_level_;
+        }
+        bool is_right_associative() const
+        {
+            return is_right_associative_;
+        }
+
+        virtual const Json& evaluate(dynamic_resources<Json>&,
+                                     const Json&, 
+                                     std::error_code&) const 
+        {
+            return Json::null();
+        }
+    };
+
+    template <class Json>
+    bool is_false(const Json& val)
+    {
+        return ((val.is_array() && val.empty()) ||
+                 (val.is_object() && val.empty()) ||
+                 (val.is_string() && val.as_string_view().empty()) ||
+                 (val.is_bool() && !val.as_bool()) ||
+                 val.is_null());
+    }
+
+    template <class Json>
+    bool is_true(const Json& val)
+    {
+        return !is_false(val);
+    }
+
+    template <class Json>
+    class not_expression final : public unary_operator<Json>
+    {
+    public:
+        not_expression()
+            : unary_operator<Json>(1, true)
+        {}
+
+        const Json& evaluate(dynamic_resources<Json>& resources,
+                             const Json& val, 
+                             std::error_code&) const override
+        {
+            return is_false(val) ? resources.true_value() : resources.false_value();
+        }
     };
 
     template <class Json>
@@ -732,9 +829,18 @@ namespace detail {
     {
         typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
 
-        std::size_t precedence_level;
-        bool is_right_associative;
+        std::size_t precedence_level_;
+        bool is_right_associative_;
         operator_type op;
+
+        std::size_t precedence_level() const 
+        {
+            return precedence_level_;
+        }
+        bool is_right_associative() const
+        {
+            return is_right_associative_;
+        }
     };
 
     template <typename Visitor,typename Json>
@@ -796,21 +902,6 @@ namespace detail {
 
         return false;
     }
-
-    template <class Json>
-    struct dynamic_resources
-    {
-        std::vector<std::unique_ptr<Json>> temp_json_values_;
-
-        template <typename... Args>
-        Json* create_temp(Args&& ... args)
-        {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-            Json* ptr = temp.get();
-            temp_json_values_.emplace_back(std::move(temp));
-            return ptr;
-        }
-    };
 
     // function_base
     template <class Json,class JsonReference>
@@ -909,19 +1000,22 @@ namespace detail {
             return it->second;
         }
 
-        const unary_operator<Json>* get_not_properties() const
+        const unary_operator<Json>* get_not_operator() const
         {
-            static unary_operator<Json> not_properties{ 1,true, unary_not_op };
-            return &not_properties;
+            static not_expression<Json> not_oper;
+            return &not_oper;
+
+            //static unary_operator<Json> not_properties{ 1,true, unary_not_op };
+            //return &not_properties;
         }
 
-        const unary_operator<Json>* get_unary_minus_properties() const
+        const unary_operator<Json>* get_unary_minus_operator() const
         {
             static unary_operator<Json> unary_minus_properties { 1,true, unary_minus_op };
             return &unary_minus_properties;
         }
 
-        const binary_operator<Json>* get_binary_operator_properties(const string_type& id) const
+        const binary_operator<Json>* get_binary_operator_operator(const string_type& id) const
         {
             static const binary_operator<Json> lt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),a,b); }};
             static const binary_operator<Json> gt_properties{5,false,[](const term<Json>& a, const term<Json>& b) -> Json {return visit(cmp_lt<Json>(),b,a); }};
@@ -1037,7 +1131,9 @@ namespace detail {
         argument,
         begin_expression_type,
         end_expression_type,
-        end_of_expression
+        end_of_expression,
+        unary_operator,
+        binary_operator
     };
 
     struct literal_arg_t
@@ -1258,10 +1354,24 @@ namespace detail {
         union
         {
             std::unique_ptr<selector_base_type> selector_;
+            const unary_operator<Json>* unary_operator_;
+            const binary_operator<Json>* binary_operator_;
             function_base<Json,JsonReference>* function_;
             Json value_;
         };
     public:
+
+        path_token(const unary_operator<Json>* expression) noexcept
+            : type_(path_token_kind::unary_operator),
+              unary_operator_(expression)
+        {
+        }
+
+        path_token(const binary_operator<Json>* expression) noexcept
+            : type_(path_token_kind::binary_operator),
+              binary_operator_(expression)
+        {
+        }
 
         path_token(current_node_arg_t) noexcept
             : type_(path_token_kind::current_node)
@@ -1371,6 +1481,12 @@ namespace detail {
                         case path_token_kind::selector:
                             selector_ = std::move(other.selector_);
                             break;
+                        case path_token_kind::unary_operator:
+                            unary_operator_ = other.unary_operator_;
+                            break;
+                        case path_token_kind::binary_operator:
+                            binary_operator_ = other.binary_operator_;
+                            break;
                         case path_token_kind::function:
                             function_ = other.function_;
                             break;
@@ -1425,6 +1541,12 @@ namespace detail {
             return type_ == path_token_kind::selector; 
         }
 
+        bool is_operator() const
+        {
+            return type_ == path_token_kind::unary_operator || 
+                   type_ == path_token_kind::binary_operator; 
+        }
+
         bool is_recursive_descent() const
         {
             return type_ == path_token_kind::recursive_descent; 
@@ -1436,6 +1558,10 @@ namespace detail {
             {
                 case path_token_kind::selector:
                     return selector_->precedence_level();
+                case path_token_kind::unary_operator:
+                    return unary_operator_->precedence_level();
+                case path_token_kind::binary_operator:
+                    return binary_operator_->precedence_level();
                 default:
                     return 0;
             }
@@ -1447,6 +1573,10 @@ namespace detail {
             {
                 case path_token_kind::selector:
                     return selector_->is_right_associative();
+                case path_token_kind::unary_operator:
+                    return unary_operator_->is_right_associative();
+                case path_token_kind::binary_operator:
+                    return binary_operator_->is_right_associative();
                 default:
                     return false;
             }
@@ -1459,6 +1589,12 @@ namespace detail {
             {
                 case path_token_kind::selector:
                     new (&selector_) std::unique_ptr<selector_base_type>(std::move(other.selector_));
+                    break;
+                case path_token_kind::unary_operator:
+                    unary_operator_ = other.unary_operator_;
+                    break;
+                case path_token_kind::binary_operator:
+                    binary_operator_ = other.binary_operator_;
                     break;
                 case path_token_kind::function:
                     function_ = other.function_;
@@ -1560,6 +1696,8 @@ namespace detail {
                  reference instance, 
                  Callback callback) const
         {
+            std::error_code ec;
+
             std::vector<path_node_type> input_stack;
             std::vector<path_node_type> output_stack;
             std::vector<path_node_type> collected;
@@ -1584,6 +1722,28 @@ namespace detail {
                     output_stack.clear();
                     switch (tok.type())
                     { 
+                        case path_token_kind::unary_operator:
+                        {
+                            JSONCONS_ASSERT(input_stack.size() >= 1);
+                            pointer ptr = input_stack.back().val_ptr;
+                            input_stack.pop_back();
+
+                            reference r = tok.unary_operator_->evaluate(resources, *ptr, ec);
+                            output_stack.emplace_back("",std::addressof(r));
+                            break;
+                        }
+                        case path_token_kind::binary_operator:
+                        {
+                            //JSONCONS_ASSERT(input_stack.size() >= 2);
+                            //pointer rhs = input_stack.back().val_ptr;
+                            //input_stack.pop_back();
+                            //pointer lhs = input_stack.back().val_ptr;
+                            //input_stack.pop_back();
+
+                            //reference r = t.binary_operator_->evaluate(*lhs,*rhs, context, ec);
+                            //stack.push_back(std::addressof(r));
+                            break;
+                        }
                         case path_token_kind::current_node:
                             output_stack.emplace_back(string_type(),std::addressof(instance));
                             break;

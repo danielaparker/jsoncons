@@ -495,9 +495,9 @@ namespace detail {
             switch(type_)
             {
                 case filter_token_type::unary_operator:
-                    return unary_op_properties_->precedence_level;
+                    return unary_op_properties_->precedence_level();
                 case filter_token_type::binary_operator:
-                    return binary_op_properties_->precedence_level;
+                    return binary_op_properties_->precedence_level();
                 default:
                     return 0;
             }
@@ -508,9 +508,9 @@ namespace detail {
             switch(type_)
             {
                 case filter_token_type::unary_operator:
-                    return unary_op_properties_->is_right_associative;
+                    return unary_op_properties_->is_right_associative();
                 case filter_token_type::binary_operator:
-                    return binary_op_properties_->is_right_associative;
+                    return binary_op_properties_->is_right_associative();
                 default:
                     return false;
             }
@@ -779,9 +779,9 @@ namespace detail {
             switch(type_)
             {
                 case filter_token_type::unary_operator:
-                    return unary_op_properties_->precedence_level;
+                    return unary_op_properties_->precedence_level();
                 case filter_token_type::binary_operator:
-                    return binary_op_properties_->precedence_level;
+                    return binary_op_properties_->precedence_level();
                 default:
                     return 0;
             }
@@ -792,9 +792,9 @@ namespace detail {
             switch(type_)
             {
                 case filter_token_type::unary_operator:
-                    return unary_op_properties_->is_right_associative;
+                    return unary_op_properties_->is_right_associative();
                 case filter_token_type::binary_operator:
-                    return binary_op_properties_->is_right_associative;
+                    return binary_op_properties_->is_right_associative();
                 default:
                     return false;
             }
@@ -1274,7 +1274,7 @@ namespace detail {
                             buffer.push_back(*p);
                             ++p;
                             ++column_;
-                            auto properties = resources.get_binary_operator_properties(buffer);
+                            auto properties = resources.get_binary_operator_operator(buffer);
                             if (properties == nullptr)
                             {
                                 JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
@@ -1292,7 +1292,7 @@ namespace detail {
                             buffer.push_back(*p);
                             ++p;
                             ++column_;
-                            auto properties = resources.get_binary_operator_properties(buffer);
+                            auto properties = resources.get_binary_operator_operator(buffer);
                             if (properties == nullptr)
                             {
                                 JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
@@ -1305,7 +1305,7 @@ namespace detail {
                         }
                         default:
                         {
-                            auto properties = resources.get_binary_operator_properties(buffer);
+                            auto properties = resources.get_binary_operator_operator(buffer);
                             if (properties == nullptr)
                             {
                                 JSONCONS_THROW(jsonpath_error(jsonpath_errc::invalid_filter_unsupported_operator, line_, column_));
@@ -1511,14 +1511,14 @@ namespace detail {
                             break;
                         case '!':
                         {
-                            push_token(raw_token<value_type>(resources.get_not_properties()));
+                            push_token(raw_token<value_type>(resources.get_not_operator()));
                             ++p;
                             ++column_;
                             break;
                         }
                         case '-':
                         {
-                            push_token(raw_token<value_type>(resources.get_unary_minus_properties()));
+                            push_token(raw_token<value_type>(resources.get_unary_minus_operator()));
                             ++p;
                             ++column_;
                             break;

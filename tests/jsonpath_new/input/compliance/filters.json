@@ -3,10 +3,15 @@
     "given":
         [{"name": "John Smith"}, {"name": null}],
      "cases": [
-         {
+         /*{
             "comment" : "Filter expression",
             "expression": "$[?(@.name)]",
             "result": [{"name": "John Smith"}]
+         },*/
+         {
+            "comment" : "Filter expression",
+            "expression": "$[?(!@.name)]",
+            "result": [{"name": null}]
          }
      ]
 }/*,{
