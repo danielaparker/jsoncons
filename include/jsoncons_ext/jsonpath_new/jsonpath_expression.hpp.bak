@@ -1930,10 +1930,9 @@ namespace detail {
             std::error_code ec;
 
             std::vector<path_node_type> stack;
-            std::vector<path_node_type> recursive_in_stack;
-            std::vector<path_node_type> recursive_out_stack;
+            std::vector<path_node_type> output_stack;
             std::vector<path_node_type> collected;
-            std::vector<pointer> arg_stack;
+            std::vector<pointer> arg_input_stack;
             string_type path;
             path.push_back('$');
             Json result(json_array_arg);
@@ -1941,11 +1940,17 @@ namespace detail {
 
             if (!token_list_.empty())
             {
+                //output_stack.emplace_back(path,std::addressof(instance));
                 for (std::size_t i = 0; 
                      i < token_list_.size();
                      )
                 {
                     auto& tok = token_list_[i];
+                    for (auto& item : output_stack)
+                    {
+                        stack.push_back(std::move(item));
+                    }
+                    output_stack.clear();
                     switch (tok.type())
                     { 
                         case path_token_kind::unary_operator:
@@ -1955,7 +1960,7 @@ namespace detail {
                             stack.pop_back();
 
                             reference r = tok.unary_operator_->evaluate(resources, *ptr, ec);
-                            stack.emplace_back("",std::addressof(r));
+                            output_stack.emplace_back("",std::addressof(r));
                             break;
                         }
                         case path_token_kind::binary_operator:
@@ -1967,50 +1972,40 @@ namespace detail {
                             stack.pop_back();
 
                             reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
-                            stack.emplace_back("",std::addressof(r));
+                            output_stack.emplace_back("",std::addressof(r));
                             break;
                         }
                         case path_token_kind::current_node:
-                            stack.emplace_back(string_type(),std::addressof(instance));
+                            output_stack.emplace_back(string_type(),std::addressof(instance));
                             break;
                         case path_token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
-                            arg_stack.push_back(std::move(stack.back().val_ptr));
+                            arg_input_stack.push_back(std::move(stack.back().val_ptr));
                             stack.pop_back();
                             break;
                         case path_token_kind::function:
                         {
-                            if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_stack.size())
+                            if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_input_stack.size())
                             {
                                 //ec = jmespath_errc::invalid_arity;
                                 return;
                             }
 
                             std::error_code ec;
-                            reference r = tok.function_->evaluate(resources, arg_stack, ec);
+                            reference r = tok.function_->evaluate(resources, arg_input_stack, ec);
                             if (ec)
                             {
                                 return;
                             }
-                            arg_stack.clear();
-                            stack.emplace_back(string_type(),std::addressof(r));
+                            arg_input_stack.clear();
+                            output_stack.emplace_back(string_type(),std::addressof(r));
                             break;
                         }
                         case path_token_kind::selector:
                         {
-                            if (is_recursive_descent)
+                            for (auto& item : stack)
                             {
-                                for (auto& item : recursive_in_stack)
-                                {
-                                    tok.selector_->select(resources, path, *(item.val_ptr), recursive_out_stack);
-                                }
-                            }
-                            else
-                            {
-                                JSONCONS_ASSERT(!stack.empty());
-                                pointer ptr = stack.back().val_ptr;
-                                stack.pop_back();
-                                tok.selector_->select(resources, path, *ptr, stack);
+                                tok.selector_->select(resources, path, *(item.val_ptr), output_stack);
                             }
                             break;
                         }
@@ -2018,48 +2013,46 @@ namespace detail {
                             break;
                     }
 
-                    if (is_recursive_descent && recursive_in_stack.empty()) // recursive_out_stack is empty too
+                    if (!output_stack.empty() && !is_recursive_descent)
                     {
-                        for (auto& item : collected)
-                        {
-                            stack.emplace_back(item);
-                        }
+                        stack.clear();
+                        ++i;
+                    }
+                    else if (is_recursive_descent && stack.empty()) // stack is empty, so output_stack is empty too
+                    {
+                        output_stack = std::move(collected);
                         collected.clear();
                         is_recursive_descent = false;
                         ++i;
                     }
                     else if (is_recursive_descent)
                     {
-                        for (auto& item : recursive_out_stack)
+                        for (auto& item : output_stack)
                         {
-                            collected.emplace_back(item);
+                            collected.emplace_back(item.path,item.val_ptr);
                         }
-                        recursive_out_stack.clear();
-                        for (auto& item : recursive_in_stack)
+                        output_stack.clear();
+                        for (auto& item : stack)
                         {
                             if (item.val_ptr->is_object())
                             {
                                 for (auto& val : item.val_ptr->object_range())
                                 {
-                                    recursive_out_stack.emplace_back(val.key(),std::addressof(val.value()));
+                                    output_stack.emplace_back(val.key(),std::addressof(val.value()));
                                 }
                             }
                             else if (item.val_ptr->is_array())
                             {
                                 for (auto& val : item.val_ptr->array_range())
                                 {
-                                    recursive_out_stack.emplace_back("",std::addressof(val));
+                                    output_stack.emplace_back("",std::addressof(val));
                                 }
                             }
                         }
-                        recursive_in_stack = std::move(recursive_out_stack);
-                        recursive_out_stack.clear();
+                        stack.clear();
                     }
                     else if (tok.is_recursive_descent())
                     {
-                        JSONCONS_ASSERT(!stack.empty());
-                        recursive_in_stack.emplace_back(stack.back());
-                        stack.pop_back();
                         is_recursive_descent = true;
                         ++i;
                     }
@@ -2069,9 +2062,9 @@ namespace detail {
                     }
                 }
             }
-            if (!stack.empty())
+            if (!output_stack.empty())
             {
-                for (auto& item : stack)
+                for (auto& item : output_stack)
                 {
                     callback(item);
                 }

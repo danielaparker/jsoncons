@@ -733,6 +733,7 @@ namespace jsoncons { namespace jsonpath_new {
             slice slic;
             int paren_level = 0;
 
+            push_token(current_node_arg, ec);
             while (p_ < end_input_)
             {
                 switch (state_stack_.back())

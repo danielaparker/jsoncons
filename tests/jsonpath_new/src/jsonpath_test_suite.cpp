@@ -106,20 +106,20 @@ TEST_CASE("jsonpath-tests")
 #endif
         //jsonpath_tests("./jsonpath_new/input/compliance/jsonpath-tests.json");
 
-        /*
-        jsonpath_tests("./jsonpath_new/input/compliance/identifiers.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/basic.json"); 
-        jsonpath_tests("./jsonpath_new/input/compliance/slice.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/indices.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/wildcard.json");
+        
+        //jsonpath_tests("./jsonpath_new/input/compliance/identifiers.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/basic.json"); 
+        //jsonpath_tests("./jsonpath_new/input/compliance/slice.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/indices.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/wildcard.json");
         jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
-        jsonpath_tests("./jsonpath_new/input/compliance/union.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
-        */
+        //jsonpath_tests("./jsonpath_new/input/compliance/union.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
+        
         //jsonpath_tests("./jsonpath_new/input/compliance/functions.json");
         
         //jsonpath_tests("./jsonpath_new/input/compliance/expressions.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
     }
 }
 
