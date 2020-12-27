@@ -1,36 +1,36 @@
 [
-{
+/*{
     "given":
         [{"name": "John Smith"}, {"name": null}],
      "cases": [
-         /*{
+         {
             "comment" : "Filter expression",
             "expression": "$[?(@.name)]",
             "result": [{"name": "John Smith"}]
-         },*/
+         },
          {
             "comment" : "Filter expression",
             "expression": "$[?(!@.name)]",
             "result": [{"name": null}]
          }
      ]
-}/*,{
+},*/{
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given":
         [{"id": 42, "name": "forty-two"}, {"id": 1, "name": "one"}],
      "cases": [
          {
-            "comment" : "Dot notation after filter expression",
+            "comment" : "Filter expression with ==",
             "expression": "$[?(@.id==42)]",
             "result": [{"id": 42, "name": "forty-two"}]
-         },
+         }/*,
          {
             "comment" : "Dot notation after filter expression",
             "expression": "$[?(@.id==42)].name",
             "result": ["forty-two"]
-         }
+         }*/
      ]
-},
+}/*,
 {
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given":{"key": 42, "another": {"key": 1}},

@@ -1726,7 +1726,7 @@ minus_sign:
                 ++position_;
                 goto integer;
             default:
-                err_handler_(json_errc::expected_value, *this);
+                err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::expected_value;
                 more_ = false;
                 return;
@@ -2001,7 +2001,7 @@ exp1:
                 ++position_;
                 goto exp3;
             default:
-                err_handler_(json_errc::expected_value, *this);
+                err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::expected_value;
                 more_ = false;
                 state_ = json_parse_state::exp1;
@@ -2021,7 +2021,7 @@ exp2:
                 ++position_;
                 goto exp3;
             default:
-                err_handler_(json_errc::expected_value, *this);
+                err_handler_(json_errc::invalid_number, *this);
                 ec = json_errc::expected_value;
                 more_ = false;
                 state_ = json_parse_state::exp2;
@@ -2603,6 +2603,11 @@ escape_u8:
     std::size_t position() const override
     {
         return saved_position_;
+    }
+
+    std::size_t offset() const 
+    {
+        return input_ptr_ - begin_input_;
     }
 private:
 

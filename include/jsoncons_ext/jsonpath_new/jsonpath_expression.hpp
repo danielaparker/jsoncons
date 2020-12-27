@@ -833,6 +833,22 @@ namespace detail {
         bool is_right_associative_;
         operator_type op;
 
+        binary_operator(std::size_t precedence_level,
+                        bool is_right_associative = false)
+            : precedence_level_(precedence_level),
+              is_right_associative_(is_right_associative)
+        {
+        }
+
+        binary_operator(std::size_t precedence_level,
+                        bool is_right_associative,
+                        operator_type op)
+            : precedence_level_(precedence_level),
+              is_right_associative_(is_right_associative),
+              op(std::move(op))
+        {
+        }
+
         std::size_t precedence_level() const 
         {
             return precedence_level_;
@@ -840,6 +856,171 @@ namespace detail {
         bool is_right_associative() const
         {
             return is_right_associative_;
+        }
+
+        virtual const Json& evaluate(dynamic_resources<Json>&,
+                             const Json&, 
+                             const Json&, 
+                             std::error_code&) const
+        {
+            return Json::null();
+        }
+    };
+
+    // Implementations
+
+    template <class Json>
+    class or_operator final : public binary_operator<Json>
+    {
+    public:
+        or_operator()
+            : binary_operator<Json>(9)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, 
+                             std::error_code&) const override
+        {
+            if (lhs.is_null() && rhs.is_null())
+            {
+                return resources.null_value();
+            }
+            if (!is_false(lhs))
+            {
+                return lhs;
+            }
+            else
+            {
+                return rhs;
+            }
+        }
+    };
+
+    template <class Json>
+    class and_operator final : public binary_operator<Json>
+    {
+    public:
+        and_operator()
+            : binary_operator<Json>(8)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>&, const Json& lhs, const Json& rhs, std::error_code&) const override
+        {
+            if (is_true(lhs))
+            {
+                return rhs;
+            }
+            else
+            {
+                return lhs;
+            }
+        }
+    };
+
+    template <class Json>
+    class eq_operator final : public binary_operator<Json>
+    {
+    public:
+        eq_operator()
+            : binary_operator<Json>(6)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        {
+            return lhs == rhs ? resources.true_value() : resources.false_value();
+        }
+    };
+
+    template <class Json>
+    class ne_operator final : public binary_operator<Json>
+    {
+    public:
+        ne_operator()
+            : binary_operator<Json>(6)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        {
+            return lhs != rhs ? resources.true_value() : resources.false_value();
+        }
+    };
+
+    template <class Json>
+    class lt_operator final : public binary_operator<Json>
+    {
+    public:
+        lt_operator()
+            : binary_operator<Json>(5)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        {
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return resources.null_value();
+            }
+            return lhs < rhs ? resources.true_value() : resources.false_value();
+        }
+    };
+
+    template <class Json>
+    class lte_operator final : public binary_operator<Json>
+    {
+    public:
+        lte_operator()
+            : binary_operator<Json>(5)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        {
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return resources.null_value();
+            }
+            return lhs <= rhs ? resources.true_value() : resources.false_value();
+        }
+    };
+
+    template <class Json>
+    class gt_operator final : public binary_operator<Json>
+    {
+    public:
+        gt_operator()
+            : binary_operator<Json>(5)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        {
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return resources.null_value();
+            }
+            return lhs > rhs ? resources.true_value() : resources.false_value();
+        }
+    };
+
+    template <class Json>
+    class gte_operator final : public binary_operator<Json>
+    {
+    public:
+        gte_operator()
+            : binary_operator<Json>(5)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        {
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return resources.null_value();
+            }
+            return lhs >= rhs ? resources.true_value() : resources.false_value();
         }
     };
 
@@ -1007,6 +1188,56 @@ namespace detail {
 
             //static unary_operator<Json> not_properties{ 1,true, unary_not_op };
             //return &not_properties;
+        }
+
+        binary_operator<Json>* get_or_operator() const
+        {
+            static or_operator<Json> or_oper;
+
+            return &or_oper;
+        }
+
+        binary_operator<Json>* get_and_operator() const
+        {
+            static and_operator<Json> and_oper;
+
+            return &and_oper;
+        }
+
+        binary_operator<Json>* get_eq_operator() const
+        {
+            static eq_operator<Json> eq_oper;
+            return &eq_oper;
+        }
+
+        binary_operator<Json>* get_ne_operator() const
+        {
+            static ne_operator<Json> ne_oper;
+            return &ne_oper;
+        }
+
+        binary_operator<Json>* get_lt_operator() const
+        {
+            static lt_operator<Json> lt_oper;
+            return &lt_oper;
+        }
+
+        binary_operator<Json>* get_lte_operator() const
+        {
+            static lte_operator<Json> lte_oper;
+            return &lte_oper;
+        }
+
+        binary_operator<Json>* get_gt_operator() const
+        {
+            static gt_operator<Json> gt_oper;
+            return &gt_oper;
+        }
+
+        binary_operator<Json>* get_gte_operator() const
+        {
+            static gte_operator<Json> gte_oper;
+            return &gte_oper;
         }
 
         const unary_operator<Json>* get_unary_minus_operator() const
@@ -1734,14 +1965,14 @@ namespace detail {
                         }
                         case path_token_kind::binary_operator:
                         {
-                            //JSONCONS_ASSERT(input_stack.size() >= 2);
-                            //pointer rhs = input_stack.back().val_ptr;
-                            //input_stack.pop_back();
-                            //pointer lhs = input_stack.back().val_ptr;
-                            //input_stack.pop_back();
+                            JSONCONS_ASSERT(input_stack.size() >= 2);
+                            pointer rhs = input_stack.back().val_ptr;
+                            input_stack.pop_back();
+                            pointer lhs = input_stack.back().val_ptr;
+                            input_stack.pop_back();
 
-                            //reference r = t.binary_operator_->evaluate(*lhs,*rhs, context, ec);
-                            //stack.push_back(std::addressof(r));
+                            reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
+                            output_stack.emplace_back("",std::addressof(r));
                             break;
                         }
                         case path_token_kind::current_node:

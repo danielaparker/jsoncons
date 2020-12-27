@@ -304,10 +304,6 @@ namespace jmespath {
         cmp_eq,
         cmp_gt_or_gte,
         cmp_ne,
-        cmp_lt_or_lte_old,
-        cmp_eq_old,
-        cmp_gt_or_gte_old,
-        cmp_ne_old,
         expect_pipe_or_or,
         expect_and
     };
@@ -4427,72 +4423,6 @@ namespace jmespath {
                                 push_token(token(context_.get_ne_operator()));
                                 push_token(token(current_node_arg));
                                 state_stack_.pop_back(); 
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                ec = jmespath_errc::expected_comparator;
-                                return jmespath_expression();
-                        }
-                        break;
-                    }
-                    case path_state::cmp_lt_or_lte_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                break;
-                        }
-                        break;
-                    }
-                    case path_state::cmp_eq_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                ec = jmespath_errc::expected_comparator;
-                                return jmespath_expression();
-                        }
-                        break;
-                    }
-                    case path_state::cmp_gt_or_gte_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                break;
-                        }
-                        break;
-                    }
-                    case path_state::cmp_ne_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;

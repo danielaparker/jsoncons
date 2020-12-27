@@ -120,6 +120,9 @@ namespace jsoncons { namespace jsonpath_new {
         rhs_expression,
         recursive_descent_or_lhs_expression,
         lhs_expression,
+        path_or_literal,
+        literal,
+        json_text,
         identifier_or_function_expr,
         name_or_left_bracket,
         unquoted_string,
@@ -127,8 +130,8 @@ namespace jsoncons { namespace jsonpath_new {
         argument,
         unquoted_name,
         unquoted_name2,
-        single_quoted_name,
-        double_quoted_name,
+        single_quoted_string,
+        double_quoted_string,
         bracketed_unquoted_name_or_union,
         union_expression,
         single_quoted_name_or_union,
@@ -137,7 +140,7 @@ namespace jsoncons { namespace jsonpath_new {
         wildcard_or_union,
         bracket_specifier_or_union,
         index_or_slice_expression,
-        number,
+        integer,
         digit,
         rhs_slice_expression_start,
         rhs_slice_expression_stop,
@@ -159,8 +162,13 @@ namespace jsoncons { namespace jsonpath_new {
         escape_u7, 
         escape_u8,
         filter,
-        lhs_filter_expression,
-        rhs_filter_expression
+        comparator_expression,
+        cmp_lt_or_lte,
+        cmp_eq,
+        cmp_gt_or_gte,
+        cmp_ne,
+        expect_pipe_or_or,
+        expect_and
     };
 
     JSONCONS_STRING_LITERAL(length_literal, 'l', 'e', 'n', 'g', 't', 'h')
@@ -915,6 +923,68 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                         }
                         break;
+                    case path_state::json_text:
+                    {
+                        std::cout << "json_text: " << buffer << "\n";
+                        json_decoder<Json> decoder;
+                        basic_json_parser<char_type> parser;
+                        parser.update(buffer.data(),buffer.size());
+                        parser.parse_some(decoder, ec);
+                        if (ec)
+                        {
+                            return path_expression_type();
+                        }
+                        parser.finish_parse(decoder, ec);
+                        if (ec)
+                        {
+                            return path_expression_type();
+                        }
+                        push_token(path_token_type(literal_arg, decoder.get_result()), ec);
+                        state_stack_.pop_back();
+                        break;
+                    }
+                    case path_state::literal:
+                    {
+                        push_token(path_token_type(literal_arg, Json(buffer)), ec);
+                        break;
+                    }
+                    case path_state::path_or_literal: 
+                    {
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '@':
+                                ++p_;
+                                ++column_;
+                                state_stack_.pop_back();
+                                break;
+                            case '(':
+                            {
+                                ++p_;
+                                ++column_;
+                                ++paren_level;
+                                push_token(lparen_arg, ec);
+                                break;
+                            }
+                            case '\'':
+                                state_stack_.back() = path_state::literal;
+                                state_stack_.emplace_back(path_state::single_quoted_string);
+                                break;
+                            case '\"':
+                                state_stack_.back() = path_state::literal;
+                                state_stack_.emplace_back(path_state::double_quoted_string);
+                                break;
+                            default:
+                            {
+                                state_stack_.back() = path_state::json_text;
+                                state_stack_.emplace_back(path_state::unquoted_string);
+                                break;
+                            }
+                        }
+                        break;
+                    }
                     case path_state::lhs_expression: 
                         switch (*p_)
                         {
@@ -928,12 +998,12 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             case '\'':
-                                state_stack_.back() = path_state::single_quoted_name;
+                                state_stack_.back() = path_state::single_quoted_string;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\"':
-                                state_stack_.back() = path_state::double_quoted_name;
+                                state_stack_.back() = path_state::double_quoted_string;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -951,7 +1021,7 @@ namespace jsoncons { namespace jsonpath_new {
                             case '@':
                                 ++p_;
                                 ++column_;
-                                //push_token(token(jsoncons::make_unique<current_node>()));
+                                //push_token(path_token_type(jsoncons::make_unique<current_node>()));
                                 state_stack_.pop_back();
                                 break;
                             case '.':
@@ -1059,6 +1129,11 @@ namespace jsoncons { namespace jsonpath_new {
                             case ' ':case '\t':
                             case '\r':
                             case '\n':
+                            case '!':
+                            case '=':
+                            case '<':
+                            case '>':
+                            case '~':
                                 state_stack_.pop_back(); // unquoted_string
                                 break;
                             default:
@@ -1099,6 +1174,21 @@ namespace jsoncons { namespace jsonpath_new {
                                 }
                                 break;
                             }
+                            case '<':
+                            case '>':
+                            case '=':
+                            {
+                                state_stack_.emplace_back(path_state::comparator_expression);
+                                break;
+                            }
+                            case '!':
+                            {
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(path_state::path_or_literal);
+                                state_stack_.emplace_back(path_state::cmp_ne);
+                                break;
+                            }
                             default:
                                 if (state_stack_.size() > 1)
                                 {
@@ -1111,6 +1201,117 @@ namespace jsoncons { namespace jsonpath_new {
                                 }
                         };
                         break;
+                    case path_state::comparator_expression:
+                        switch(*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '<':
+                                ++p_;
+                                ++column_;
+                                state_stack_.back() = path_state::path_or_literal;
+                                state_stack_.emplace_back(path_state::cmp_lt_or_lte);
+                                break;
+                            case '>':
+                                ++p_;
+                                ++column_;
+                                state_stack_.back() = path_state::path_or_literal;
+                                state_stack_.emplace_back(path_state::cmp_gt_or_gte);
+                                break;
+                            case '=':
+                            {
+                                ++p_;
+                                ++column_;
+                                state_stack_.back() = path_state::path_or_literal;
+                                state_stack_.emplace_back(path_state::cmp_eq);
+                                break;
+                            }
+                            default:
+                                if (state_stack_.size() > 1)
+                                {
+                                    state_stack_.pop_back();
+                                }
+                                else
+                                {
+                                    ec = jsonpath_errc::syntax_error;
+                                    return path_expression_type();
+                                }
+                                break;
+                        }
+                        break;
+                    case path_state::cmp_lt_or_lte:
+                    {
+                        switch(*p_)
+                        {
+                            case '=':
+                                push_token(path_token_type(resources.get_lte_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                push_token(path_token_type(resources.get_lt_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back();
+                                break;
+                        }
+                        break;
+                    }
+                    case path_state::cmp_gt_or_gte:
+                    {
+                        switch(*p_)
+                        {
+                            case '=':
+                                push_token(path_token_type(resources.get_gte_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back(); 
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                push_token(path_token_type(resources.get_gt_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back(); 
+                                break;
+                        }
+                        break;
+                    }
+                    case path_state::cmp_eq:
+                    {
+                        switch(*p_)
+                        {
+                            case '=':
+                                push_token(path_token_type(resources.get_eq_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back(); 
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::expected_comparator;
+                                return path_expression_type();
+                        }
+                        break;
+                    }
+                    case path_state::cmp_ne:
+                    {
+                        switch(*p_)
+                        {
+                            case '=':
+                                push_token(path_token_type(resources.get_ne_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back(); 
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::expected_comparator;
+                                return path_expression_type();
+                        }
+                        break;
+                    }
                     case path_state::unquoted_name: 
                         switch (*p_)
                         {
@@ -1153,7 +1354,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 return path_expression_type();
                         };
                         break;
-                    case path_state::single_quoted_name:
+                    case path_state::single_quoted_string:
                         switch (*p_)
                         {
                             case '\'':
@@ -1171,7 +1372,7 @@ namespace jsoncons { namespace jsonpath_new {
                         ++p_;
                         ++column_;
                         break;
-                    case path_state::double_quoted_name: 
+                    case path_state::double_quoted_string: 
                         switch (*p_)
                         {
                             case '\"':
@@ -1247,7 +1448,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 push_token(path_token_type(begin_filter_arg), ec);
                                 state_stack_.back() = path_state::filter;
                                 state_stack_.emplace_back(path_state::rhs_expression);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::path_or_literal);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1261,7 +1462,7 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             case ':': // slice_expression
                                 state_stack_.back() = path_state::rhs_slice_expression_start ;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.emplace_back(path_state::integer);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1282,10 +1483,10 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 break;
-                            // number
+                            // integer
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 state_stack_.back() = path_state::index_or_slice_expression;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.emplace_back(path_state::integer);
                                 break;
                             default:
                                 buffer.clear();
@@ -1297,7 +1498,7 @@ namespace jsoncons { namespace jsonpath_new {
                         }
                         break;
 
-                    case path_state::number:
+                    case path_state::integer:
                         switch(*p_)
                         {
                             case '-':
@@ -1365,7 +1566,7 @@ namespace jsoncons { namespace jsonpath_new {
                                     buffer.clear();
                                 }
                                 state_stack_.back() = path_state::rhs_slice_expression_start;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.emplace_back(path_state::integer);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1399,7 +1600,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case ':':
                                 state_stack_.back() = path_state::rhs_slice_expression_stop;
-                                state_stack_.emplace_back(path_state::number);
+                                state_stack_.emplace_back(path_state::integer);
                                 ++p_;
                                 ++column_;
                                 break;
