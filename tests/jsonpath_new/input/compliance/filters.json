@@ -19,6 +19,11 @@
     "given":
         [{"id": 42, "name": "forty-two"}, {"id": 1, "name": "one"}],
      "cases": [
+         /*{
+            "comment" : "Filter expression with ==",
+            "expression": "$[?(42==42)]",
+            "result": [{"id": 42, "name": "forty-two"}]
+         },*/
          {
             "comment" : "Filter expression with ==",
             "expression": "$[?(@.id==42)]",

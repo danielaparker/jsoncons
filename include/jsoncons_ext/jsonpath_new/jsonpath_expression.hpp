@@ -1568,7 +1568,7 @@ namespace detail {
         {
         }
 
-        virtual std::string to_string(int level = 0) const
+        virtual std::string to_string(int = 0) const
         {
             return std::string();
         }
@@ -1948,6 +1948,11 @@ namespace detail {
                     auto& tok = token_list_[i];
                     switch (tok.type())
                     { 
+                        case path_token_kind::literal:
+                        {
+                            stack.emplace_back("", &tok.value_);
+                            break;
+                        }
                         case path_token_kind::unary_operator:
                         {
                             JSONCONS_ASSERT(stack.size() >= 1);
@@ -1986,7 +1991,6 @@ namespace detail {
                                 return;
                             }
 
-                            std::error_code ec;
                             reference r = tok.function_->evaluate(resources, arg_stack, ec);
                             if (ec)
                             {
