@@ -14,28 +14,23 @@
             "result": [{"name": null}]
          }
      ]
-},*/{
+},{
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given":
         [{"id": 42, "name": "forty-two"}, {"id": 1, "name": "one"}],
      "cases": [
-         /*{
-            "comment" : "Filter expression with ==",
-            "expression": "$[?(42==42)]",
-            "result": [{"id": 42, "name": "forty-two"}]
-         },*/
          {
             "comment" : "Filter expression with ==",
             "expression": "$[?(@.id==42)]",
             "result": [{"id": 42, "name": "forty-two"}]
-         }/*,
+         },
          {
             "comment" : "Dot notation after filter expression",
             "expression": "$[?(@.id==42)].name",
             "result": ["forty-two"]
-         }*/
+         }
      ]
-}/*,
+},
 {
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given":{"key": 42, "another": {"key": 1}},
@@ -120,7 +115,17 @@
             "result": [{"key": 50}]
          }
      ]
-}*/
-
+},*/
+{
+    "comment" : "Filter expressions with || and &&",
+    "given": [{"id":42,"name":"forty-two"},{"id":1,"name":"one"}],
+     "cases": [
+         {
+            "comment" : "true and true",
+            "expression": "$[?(true && true)]",
+            "result": [{"id":42,"name":"forty-two"},{"id":1,"name":"one"}]
+         }
+     ]
+}
 
 ]

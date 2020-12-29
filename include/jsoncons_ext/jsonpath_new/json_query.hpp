@@ -167,7 +167,7 @@ namespace jsoncons { namespace jsonpath_new {
         cmp_eq,
         cmp_gt_or_gte,
         cmp_ne,
-        expect_pipe_or_or,
+        expect_or,
         expect_and
     };
 
@@ -1137,6 +1137,8 @@ namespace jsoncons { namespace jsonpath_new {
                             case '<':
                             case '>':
                             case '~':
+                            case '|':
+                            case '&':
                                 state_stack_.pop_back(); // unquoted_string
                                 break;
                             default:
@@ -1177,6 +1179,18 @@ namespace jsoncons { namespace jsonpath_new {
                                 }
                                 break;
                             }
+                            case '|':
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(path_state::path_or_literal);
+                                state_stack_.emplace_back(path_state::expect_or);
+                                break;
+                            case '&':
+                                ++p_;
+                                ++column_;
+                                state_stack_.emplace_back(path_state::path_or_literal);
+                                state_stack_.emplace_back(path_state::expect_and);
+                                break;
                             case '<':
                             case '>':
                             case '=':
@@ -1204,6 +1218,40 @@ namespace jsoncons { namespace jsonpath_new {
                                 }
                         };
                         break;
+                    case path_state::expect_or:
+                    {
+                        switch (*p_)
+                        {
+                            case '|':
+                                push_token(path_token_type(resources.get_or_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back(); 
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::expected_or;
+                                return path_expression_type();
+                        }
+                        break;
+                    }
+                    case path_state::expect_and:
+                    {
+                        switch(*p_)
+                        {
+                            case '&':
+                                push_token(path_token_type(resources.get_and_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                state_stack_.pop_back(); // expect_and
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::expected_and;
+                                return path_expression_type();
+                        }
+                        break;
+                    }
                     case path_state::comparator_expression:
                         switch(*p_)
                         {
