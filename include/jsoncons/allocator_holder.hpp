@@ -17,15 +17,13 @@ public:
 private:
     allocator_type alloc_;
 public:
-    allocator_holder()
-        : alloc_()
-    {
-    }
-    allocator_holder(const allocator_type& alloc)
-        : alloc_(alloc)
-    {
-    }
-
+    allocator_holder() = default;
+    allocator_holder(const allocator_type&)  = default;
+    allocator_holder(allocator_type&&)  = default;
+    allocator_holder& operator=(const allocator_type&)  = default;
+    allocator_holder& operator=(allocator_type&&)  = default;
+    ~allocator_holder() = default;
+    
     allocator_type get_allocator() const
     {
         return alloc_;
