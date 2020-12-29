@@ -124,6 +124,31 @@
             "comment" : "true and true",
             "expression": "$[?(true && true)]",
             "result": [{"id":42,"name":"forty-two"},{"id":1,"name":"one"}]
+         },
+         {
+            "comment" : "true and false",
+            "expression": "$[?(true && false)]",
+            "result": []
+         },
+         {
+            "comment" : "true or true",
+            "expression": "$[?(true || true)]",
+            "result": [{"id":42,"name":"forty-two"},{"id":1,"name":"one"}]
+         },
+         {
+            "comment" : "true or false",
+            "expression": "$[?(true || false)]",
+            "result": [{"id":42,"name":"forty-two"},{"id":1,"name":"one"}]
+         },
+         {
+            "comment" : "(true or false) and true",
+            "expression": "$[?((true || false) && true)]",
+            "result": [{"id":42,"name":"forty-two"},{"id":1,"name":"one"}]
+         },
+         {
+            "comment" : "(true and false) and true",
+            "expression": "$[?((true && false) && true)]",
+            "result": []
          }
      ]
 }
