@@ -17,20 +17,6 @@ using jsoncons::json;
 namespace jsonschema = jsoncons::jsonschema;
 namespace jsonpatch = jsoncons::jsonpatch;
 
-json resolver(const jsoncons::uri& uri)
-{
-    std::cout << "uri: " << uri.string() << ", path: " << uri.path() << "\n\n";
-
-    std::string pathname = "./input/jsonschema/";
-    pathname += std::string(uri.path());
-
-    std::fstream is(pathname.c_str());
-    if (!is)
-        throw jsonschema::schema_error("Could not open " + std::string(uri.base()) + " for schema loading\n");
-
-    return json::parse(is);        
-}
-
 TEST_CASE("jsonschema defaults tests")
 {
     SECTION("Basic")
