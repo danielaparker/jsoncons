@@ -237,7 +237,20 @@ TEST_CASE("test_empty_object_copy")
     CHECK(b.is_object());
 }
 
-TEST_CASE("test_empty_object_assignment")
+TEST_CASE("test_empty_object_move")
+{
+    json a;
+    CHECK(a.size() == 0);
+    CHECK(a.is_object());
+    CHECK(a.is_object());
+
+    json b = std::move(a);
+    CHECK(b.size() == 0);
+    CHECK(b.is_object());
+    CHECK(b.is_object());
+}
+
+TEST_CASE("test_empty_object_copy_assignment")
 {
     json a;
     CHECK(a.size() == 0);
@@ -260,6 +273,35 @@ TEST_CASE("test_empty_object_assignment")
     CHECK(c.is_object());
     CHECK(c.is_object());
     c = a;
+    CHECK(c.size() == 0);
+    CHECK(c.is_object());
+    CHECK(c.is_object());
+}
+
+TEST_CASE("test_empty_object_move_assignment")
+{
+    json a;
+    CHECK(a.size() == 0);
+    CHECK(a.is_object());
+    CHECK(a.is_object());
+
+    json b = json::make_array(10);
+    CHECK(b.size() == 10);
+    CHECK(b.is_array());
+    CHECK(b.is_array());
+
+    b = std::move(a);
+    CHECK(b.size() == 0);
+    CHECK(b.is_object());
+    CHECK(b.is_object());
+
+    json c;
+    c["key"] = "value";
+    CHECK(c.size() == 1);
+    CHECK(c.is_object());
+    CHECK(c.is_object());
+
+    c = std::move(b);
     CHECK(c.size() == 0);
     CHECK(c.is_object());
     CHECK(c.is_object());
