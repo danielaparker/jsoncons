@@ -94,7 +94,7 @@ namespace jsonschema {
     {
         Json j;
         j.try_emplace("op", "add"); 
-        j.try_emplace("path", instance_location.string()); 
+        j.try_emplace("path", instance_location.pointer()); 
         j.try_emplace("value", std::forward<Json>(default_value)); 
 
         patch.push_back(std::move(j));
