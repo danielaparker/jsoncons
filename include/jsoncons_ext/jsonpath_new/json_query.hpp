@@ -18,7 +18,7 @@
 #include <set> // std::set
 #include <iterator> // std::make_move_iterator
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath_new/jsonpath_filter.hpp>
+//#include <jsoncons_ext/jsonpath_new/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_expression.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_function.hpp>
@@ -113,6 +113,24 @@ namespace jsoncons { namespace jsonpath_new {
     };
 
     namespace detail {
+
+    template<class Json>
+    struct VoidPathConstructor
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+        using string_view_type = typename Json::string_view_type;
+
+        string_type operator()(const string_type&, std::size_t) const
+        {
+            return string_type{};
+        }
+
+        string_type operator()(const string_type&, string_view_type) const
+        {
+            return string_type{};
+        }
+    };
      
     enum class path_state 
     {
@@ -396,7 +414,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class expression_selector final : public selector_base_type
+        /*class expression_selector final : public selector_base_type
         {
              jsonpath_filter_expr<Json> result_;
         public:
@@ -425,7 +443,7 @@ namespace jsoncons { namespace jsonpath_new {
                     selector.select(resources, path, val, nodes);
                 }
             }
-        };
+        };*/
 
         static bool is_false(const std::vector<path_node_type>& nodes)
         {
@@ -1157,6 +1175,10 @@ namespace jsoncons { namespace jsonpath_new {
                             case '~':
                             case '|':
                             case '&':
+                            case '+':
+                            case '-':
+                            case '*':
+                            case '/':
                                 state_stack_.pop_back(); // unquoted_string
                                 break;
                             default:
@@ -1224,6 +1246,13 @@ namespace jsoncons { namespace jsonpath_new {
                                 state_stack_.emplace_back(path_state::cmp_ne);
                                 break;
                             }
+                            case '+':
+                                state_stack_.emplace_back(path_state::path_or_literal);
+                                push_token(path_token_type(resources.get_plus_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                ++p_;
+                                ++column_;
+                                break;
                             default:
                                 if (state_stack_.size() > 1)
                                 {
@@ -1522,12 +1551,12 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '(':
                             {
-                                jsonpath_filter_parser<jsonpath_evaluator> parser(line_,column_);
+                                /*jsonpath_filter_parser<jsonpath_evaluator> parser(line_,column_);
                                 auto result = parser.parse(resources, p_,end_input_,&p_);
                                 line_ = parser.line();
                                 column_ = parser.column();
                                 push_token(path_token_type(jsoncons::make_unique<expression_selector>(std::move(result))), ec);
-                                state_stack_.back() = path_state::expect_right_bracket;
+                                state_stack_.back() = path_state::expect_right_bracket;*/
                                 break;
                             }
                             case '?':
