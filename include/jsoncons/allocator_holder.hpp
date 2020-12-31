@@ -22,7 +22,7 @@ public:
     allocator_holder(allocator_holder&&)  = default;
     allocator_holder& operator=(const allocator_holder&)  = default;
     allocator_holder& operator=(allocator_holder&&)  = default;
-    allocator_holder(const allocator_type&)
+    allocator_holder(const allocator_type& alloc)
         : alloc_(alloc)
         {}
     ~allocator_holder() = default;
