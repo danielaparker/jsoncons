@@ -1054,6 +1054,96 @@ namespace detail {
         }
     };
 
+    template <class Json>
+    class minus_operator final : public binary_operator<Json>
+    {
+    public:
+        minus_operator()
+            : binary_operator<Json>(4)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        {
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return resources.null_value();
+            }
+            else if (lhs.is_int64() && rhs.is_int64())
+            {
+                return *resources.create_temp(((lhs.template as<int64_t>() - rhs.template as<int64_t>())));
+            }
+            else if (lhs.is_uint64() && rhs.is_uint64())
+            {
+                return *resources.create_temp((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()));
+            }
+            else
+            {
+                return *resources.create_temp((lhs.as_double() - rhs.as_double()));
+            }
+        }
+    };
+
+    template <class Json>
+    class mult_operator final : public binary_operator<Json>
+    {
+    public:
+        mult_operator()
+            : binary_operator<Json>(3)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        {
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return resources.null_value();
+            }
+            else if (lhs.is_int64() && rhs.is_int64())
+            {
+                return *resources.create_temp(((lhs.template as<int64_t>() * rhs.template as<int64_t>())));
+            }
+            else if (lhs.is_uint64() && rhs.is_uint64())
+            {
+                return *resources.create_temp((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()));
+            }
+            else
+            {
+                return *resources.create_temp((lhs.as_double() * rhs.as_double()));
+            }
+        }
+    };
+
+    template <class Json>
+    class div_operator final : public binary_operator<Json>
+    {
+    public:
+        div_operator()
+            : binary_operator<Json>(3)
+        {
+        }
+
+        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        {
+            if (!(lhs.is_number() && rhs.is_number()))
+            {
+                return resources.null_value();
+            }
+            else if (lhs.is_int64() && rhs.is_int64())
+            {
+                return *resources.create_temp(((lhs.template as<int64_t>() / rhs.template as<int64_t>())));
+            }
+            else if (lhs.is_uint64() && rhs.is_uint64())
+            {
+                return *resources.create_temp((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()));
+            }
+            else
+            {
+                return *resources.create_temp((lhs.as_double() / rhs.as_double()));
+            }
+        }
+    };
+
     template <typename Visitor,typename Json>
     Json visit(Visitor vis, const term<Json>& v, const term<Json>& w)
     {
@@ -1273,6 +1363,24 @@ namespace detail {
         binary_operator<Json>* get_plus_operator() const
         {
             static plus_operator<Json> oper;
+            return &oper;
+        }
+
+        binary_operator<Json>* get_minus_operator() const
+        {
+            static minus_operator<Json> oper;
+            return &oper;
+        }
+
+        binary_operator<Json>* get_mult_operator() const
+        {
+            static mult_operator<Json> oper;
+            return &oper;
+        }
+
+        binary_operator<Json>* get_div_operator() const
+        {
+            static div_operator<Json> oper;
             return &oper;
         }
 

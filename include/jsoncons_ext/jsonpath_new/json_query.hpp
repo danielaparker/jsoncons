@@ -1253,6 +1253,27 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case '-':
+                                state_stack_.emplace_back(path_state::path_or_literal);
+                                push_token(path_token_type(resources.get_minus_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '*':
+                                state_stack_.emplace_back(path_state::path_or_literal);
+                                push_token(path_token_type(resources.get_mult_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '/':
+                                state_stack_.emplace_back(path_state::path_or_literal);
+                                push_token(path_token_type(resources.get_div_operator()), ec);
+                                push_token(path_token_type(current_node_arg), ec);
+                                ++p_;
+                                ++column_;
+                                break;
                             default:
                                 if (state_stack_.size() > 1)
                                 {
