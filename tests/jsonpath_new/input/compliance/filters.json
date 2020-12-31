@@ -1,8 +1,24 @@
 [
 /*{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given": [{"id": 2}],
+     "cases": [
+         {
+            "comment" : "Filter expression after recursive descent",
+            "expression": "$..[?(@.id==2)]",
+            "result": [{"id":2}]
+         }
+     ]
+}
+,*/{
     "given":
         [{"name": "John Smith"}, {"name": null}],
      "cases": [
+         {
+            "comment" : "Filter expression",
+            "expression": "$[?(@.name == 'John Smith')]",
+            "result": [{"name": "John Smith"}]
+         },
          {
             "comment" : "Filter expression",
             "expression": "$[?(@.name)]",
@@ -15,41 +31,6 @@
          }
      ]
 },{
-    "source" : "https://cburgmer.github.io/json-path-comparison/",       
-    "given":
-        [{"id": 42, "name": "forty-two"}, {"id": 1, "name": "one"}],
-     "cases": [
-         {
-            "comment" : "Filter expression with ==",
-            "expression": "$[?(@.id==42)]",
-            "result": [{"id": 42, "name": "forty-two"}]
-         },
-         {
-            "comment" : "Dot notation after filter expression",
-            "expression": "$[?(@.id==42)].name",
-            "result": ["forty-two"]
-         }
-     ]
-},
-{
-    "source" : "https://cburgmer.github.io/json-path-comparison/",       
-    "given":{"key": 42, "another": {"key": 1}},
-     "cases": [
-         {
-            "comment" : "Filter expression on object",
-            "expression": "$[?(@.key)]",
-            "result": [
-              {
-                "key": 42,
-                "another": {
-                  "key": 1
-                }
-              }
-            ]
-         }
-     ]
-},
-{
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given": [
           {
@@ -95,6 +76,41 @@
 },
 {
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given":
+        [{"id": 42, "name": "forty-two"}, {"id": 1, "name": "one"}],
+     "cases": [
+         {
+            "comment" : "Filter expression with ==",
+            "expression": "$[?(@.id==42)]",
+            "result": [{"id": 42, "name": "forty-two"}]
+         },
+         {
+            "comment" : "Dot notation after filter expression",
+            "expression": "$[?(@.id==42)].name",
+            "result": ["forty-two"]
+         }
+     ]
+},
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given":{"key": 42, "another": {"key": 1}},
+     "cases": [
+         {
+            "comment" : "Filter expression on object",
+            "expression": "$[?(@.key)]",
+            "result": [
+              {
+                "key": 42,
+                "another": {
+                  "key": 1
+                }
+              }
+            ]
+         }
+     ]
+},
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given": {"id": 2, "more": [{"id": 2}, {"more": {"id": 2}}, {"id": {"id": 2}}, [{"id": 2}]]},
      "cases": [
          {
@@ -104,7 +120,8 @@
   {"id":2},{"id":2},{"id":2},{"id":2},{"id":2},{"id":2}]
          }
      ]
-},
+}
+,
 {
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given": [{"key": 60}, {"key": 50}, {"key": 10}, {"key": -50}, {"key+50": 100}],
@@ -115,7 +132,8 @@
             "result": [{"key": 50}]
          }
      ]
-},*/
+}
+,
 {
     "comment" : "Filter expressions with || and &&",
     "given": [{"id":42,"name":"forty-two"},{"id":1,"name":"one"}],

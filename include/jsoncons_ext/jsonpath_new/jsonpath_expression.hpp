@@ -1921,6 +1921,131 @@ namespace detail {
             return result;
         }
 
+        enum class node_set_tag {none,single,multi};
+
+        struct node_set
+        {
+            node_set_tag tag;
+            union
+            {
+                path_node_type node;
+                std::vector<path_node_type> nodes;
+            };
+
+            node_set() noexcept
+                : tag(node_set_tag::none), node()
+            {
+            }
+            node_set(path_node_type&& node) noexcept
+                : tag(node_set_tag::single),
+                node(std::move(node))
+            {
+            }
+            node_set(std::vector<path_node_type>&& nds) noexcept
+            {
+                if (nds.empty())
+                {
+                    tag = node_set_tag::none;
+                }
+                else if (nds.size() == 1)
+                {
+                    tag = node_set_tag::single;
+                    new (&node)path_node_type(nds.back());
+                }
+                else
+                {
+                    tag = node_set_tag::multi;
+                    new (&nodes) std::vector<path_node_type>(nds);
+                }
+            }
+
+            node_set(node_set&& other) noexcept
+            {
+                construct(std::forward<node_set>(other));
+            }
+
+            ~node_set() noexcept
+            {
+                destroy();
+            }
+
+            node_set& operator=(node_set&& other)
+            {
+                if (&other != this)
+                {
+                    if (tag == other.tag)
+                    {
+                        switch (tag)
+                        {
+                            case node_set_tag::single:
+                                node = std::move(other.node);
+                                break;
+                            case node_set_tag::multi:
+                                nodes = std::move(other.nodes);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        destroy();
+                        construct(std::forward<node_set>(other));
+                    }
+                }
+                return *this;
+            }
+
+            pointer to_pointer(dynamic_resources<Json>& resources) const
+            {
+                switch (tag)
+                {
+                    case node_set_tag::single:
+                        return node.val_ptr;
+                    case node_set_tag::multi:
+                    {
+                        auto j = resources.create_temp(json_array_arg);
+                        j->reserve(nodes.size());
+                        for (auto& item : nodes)
+                        {
+                            j->emplace_back(*item.val_ptr);
+                        }
+                        return j;
+                    }
+                    default:
+                        return &resources.false_value();
+                }
+            }
+
+            void construct(node_set&& other) noexcept
+            {
+                tag = other.tag;
+                switch (tag)
+                {
+                    case node_set_tag::single:
+                        new (&node) path_node_type(std::move(other.node));
+                        break;
+                    case node_set_tag::multi:
+                        new (&nodes) std::vector<path_node_type>(std::move(other.nodes));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            void destroy() noexcept 
+            {
+                switch(tag)
+                {
+                    case node_set_tag::multi:
+                        nodes.~vector<path_node_type>();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
         evaluate(dynamic_resources<Json>& resources, 
@@ -1929,7 +2054,7 @@ namespace detail {
         {
             std::error_code ec;
 
-            std::vector<path_node_type> stack;
+            std::vector<node_set> stack;
             std::vector<path_node_type> recursive_in_stack;
             std::vector<path_node_type> recursive_out_stack;
             std::vector<path_node_type> collected;
@@ -1950,37 +2075,37 @@ namespace detail {
                     { 
                         case path_token_kind::literal:
                         {
-                            stack.emplace_back("", &tok.value_);
+                            stack.emplace_back(path_node_type(string_type(), &tok.value_));
                             break;
                         }
                         case path_token_kind::unary_operator:
                         {
                             JSONCONS_ASSERT(stack.size() >= 1);
-                            pointer ptr = stack.back().val_ptr;
+                            pointer ptr = stack.back().to_pointer(resources);
                             stack.pop_back();
 
                             reference r = tok.unary_operator_->evaluate(resources, *ptr, ec);
-                            stack.emplace_back("",std::addressof(r));
+                            stack.emplace_back(path_node_type("",std::addressof(r)));
                             break;
                         }
                         case path_token_kind::binary_operator:
                         {
                             JSONCONS_ASSERT(stack.size() >= 2);
-                            pointer rhs = stack.back().val_ptr;
+                            pointer rhs = stack.back().to_pointer(resources);
                             stack.pop_back();
-                            pointer lhs = stack.back().val_ptr;
+                            pointer lhs = stack.back().to_pointer(resources);
                             stack.pop_back();
 
                             reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
-                            stack.emplace_back("",std::addressof(r));
+                            stack.emplace_back(path_node_type("",std::addressof(r)));
                             break;
                         }
                         case path_token_kind::current_node:
-                            stack.emplace_back(string_type(),std::addressof(instance));
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(instance)));
                             break;
                         case path_token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
-                            arg_stack.push_back(std::move(stack.back().val_ptr));
+                            arg_stack.push_back(stack.back().to_pointer(resources));
                             stack.pop_back();
                             break;
                         case path_token_kind::function:
@@ -1997,7 +2122,7 @@ namespace detail {
                                 return;
                             }
                             arg_stack.clear();
-                            stack.emplace_back(string_type(),std::addressof(r));
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
                             break;
                         }
                         case path_token_kind::selector:
@@ -2012,9 +2137,29 @@ namespace detail {
                             else
                             {
                                 JSONCONS_ASSERT(!stack.empty());
-                                pointer ptr = stack.back().val_ptr;
-                                stack.pop_back();
-                                tok.selector_->select(resources, path, *ptr, stack);
+                                pointer ptr = nullptr;
+                                switch (stack.back().tag)
+                                {
+                                    case node_set_tag::single:
+                                        ptr = stack.back().node.val_ptr;
+                                        break;
+                                    case node_set_tag::multi:
+                                        if (!stack.back().nodes.empty())
+                                        {
+                                            ptr = stack.back().nodes.back().val_ptr;
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if (ptr)
+                                {
+                                    stack.pop_back();
+                                    std::vector<path_node_type> temp;
+                                    tok.selector_->select(resources, path, *ptr, temp);
+                                    stack.emplace_back(std::move(temp));
+
+                                }
                             }
                             break;
                         }
@@ -2024,10 +2169,7 @@ namespace detail {
 
                     if (is_recursive_descent && recursive_in_stack.empty()) // recursive_out_stack is empty too
                     {
-                        for (auto& item : collected)
-                        {
-                            stack.emplace_back(item);
-                        }
+                        stack.emplace_back(std::move(collected));
                         collected.clear();
                         is_recursive_descent = false;
                         ++i;
@@ -2062,9 +2204,24 @@ namespace detail {
                     else if (tok.is_recursive_descent())
                     {
                         JSONCONS_ASSERT(!stack.empty());
-                        recursive_in_stack.emplace_back(stack.back());
-                        stack.pop_back();
-                        is_recursive_descent = true;
+                        switch (stack.back().tag)
+                        {
+                            case node_set_tag::single:
+                                recursive_in_stack.emplace_back(stack.back().node);
+                                stack.pop_back();
+                                is_recursive_descent = true;
+                                break;
+                            case node_set_tag::multi:
+                                if (!stack.back().nodes.empty())
+                                {
+                                    recursive_in_stack.emplace_back(stack.back().nodes.back());
+                                    stack.pop_back();
+                                    is_recursive_descent = true;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                         ++i;
                     }
                     else 
@@ -2077,7 +2234,20 @@ namespace detail {
             {
                 for (auto& item : stack)
                 {
-                    callback(item);
+                    switch (item.tag)
+                    {
+                        case node_set_tag::single:
+                            callback(item.node);
+                            break;
+                        case node_set_tag::multi:
+                            for (auto& node : item.nodes)
+                            {
+                                callback(node);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
