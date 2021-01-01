@@ -39,8 +39,8 @@
      "cases": [
        {
          "comment" : "",
-         "expression": "length($.store.book[*])",
-         "result": [4]
+         "expression": "length(@.store.book[*])",
+         "result": 4
        }
      ]
   }

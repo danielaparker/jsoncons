@@ -1228,6 +1228,7 @@ namespace detail {
         virtual reference evaluate(dynamic_resources<Json>& resources,
                                    std::vector<pointer>& args, 
                                    std::error_code& ec) const = 0;
+
     };  
 
     template <class Json,class JsonReference>
@@ -1269,6 +1270,47 @@ namespace detail {
         }
     };
 
+    template <class Json,class JsonReference>
+    class length_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+        using string_view_type = typename Json::string_view_type;
+
+        length_function()
+            : function_base<Json,JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+
+            switch (arg0_ptr->type())
+            {
+                case json_type::object_value:
+                case json_type::array_value:
+                    return *resources.create_temp(arg0_ptr->size());
+                case json_type::string_value:
+                {
+                    auto sv0 = arg0_ptr->template as<string_view_type>();
+                    auto length = unicons::u32_length(sv0.begin(), sv0.end());
+                    return *resources.create_temp(length);
+                }
+                default:
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+                }
+            }
+        }
+    };
+
     template <class Json, class JsonReference>
     struct static_resources
     {
@@ -1286,10 +1328,12 @@ namespace detail {
         function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
             static sum_function<Json,JsonReference> sum_func;
+            static length_function<Json,JsonReference> length_func;
 
             static std::unordered_map<string_type,function_base_type*> functions =
             {
-                {string_type{'s','u','m'}, &sum_func}
+                {string_type{'s','u','m'}, &sum_func},
+                {string_type{'l','e','n','g','t','h'}, &length_func}
             };
 
             auto it = functions.find(name);

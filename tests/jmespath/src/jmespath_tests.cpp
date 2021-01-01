@@ -112,9 +112,9 @@ TEST_CASE("jmespath-tests")
         jmespath_tests("./jmespath/input/compliance/benchmarks.json"); // OK
         jmespath_tests("./jmespath/input/compliance/functions.json"); // OK
 
-        //jmespath_tests("./jmespath/input/compliance/test.json"); 
-
         jmespath_tests("./jmespath/input/examples/jmespath-examples.json"); 
+
+        //jmespath_tests("./jmespath/input/test.json"); 
     }
 }
 

@@ -1101,6 +1101,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 }
                                 buffer.clear();
                                 ++paren_level;
+                                push_token(current_node_arg, ec);
                                 push_token(path_token_type(begin_function_arg), ec);
                                 push_token(path_token_type(f), ec);
                                 state_stack_.back() = path_state::function_expression;
@@ -2414,10 +2415,10 @@ namespace jsoncons { namespace jsonpath_new {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
                     }
                     ++it;
-                    if (toks.front().type() != path_token_kind::literal)
-                    {
-                        toks.emplace(toks.begin(), current_node_arg);
-                    }
+                    //if (toks.front().type() != path_token_kind::literal)
+                    //{
+                        //toks.emplace(toks.begin(), current_node_arg);
+                    //}
                     output_stack_.erase(it.base(),output_stack_.end());
 
                     if (!output_stack_.empty() && output_stack_.back().is_projection() && 
@@ -2447,6 +2448,8 @@ namespace jsoncons { namespace jsonpath_new {
                     operator_stack_.emplace_back(path_token_type(lparen_arg));
                     break;
                 case path_token_kind::argument:
+                    output_stack_.emplace_back(std::move(tok));
+                    break;
                 case path_token_kind::function:
                     operator_stack_.emplace_back(std::move(tok));
                     break;

@@ -115,10 +115,10 @@ TEST_CASE("jsonpath-tests")
         //jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
         //jsonpath_tests("./jsonpath_new/input/compliance/union.json");
         
-        //jsonpath_tests("./jsonpath_new/input/compliance/functions.json");
-        
         //jsonpath_tests("./jsonpath_new/input/compliance/expressions.json");
-        jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
+
+        jsonpath_tests("./jsonpath_new/input/compliance/functions.json");
     }
 }
 
