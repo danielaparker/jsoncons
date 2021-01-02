@@ -1316,6 +1316,117 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    class min_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        min_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_array())
+            {
+                //std::cout << "arg: " << *arg0_ptr << "\n";
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+            if (arg0_ptr->empty())
+            {
+                return resources.null_value();
+            }
+            bool is_number = arg0_ptr->at(0).is_number();
+            bool is_string = arg0_ptr->at(0).is_string();
+            if (!is_number && !is_string)
+            {
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+
+            std::size_t index = 0;
+            for (std::size_t i = 1; i < arg0_ptr->size(); ++i)
+            {
+                if (!(arg0_ptr->at(i).is_number() == is_number && arg0_ptr->at(i).is_string() == is_string))
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+                }
+                if (arg0_ptr->at(i) < arg0_ptr->at(index))
+                {
+                    index = i;
+                }
+            }
+
+            return arg0_ptr->at(index);
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class max_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        max_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_array())
+            {
+                //std::cout << "arg: " << *arg0_ptr << "\n";
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+            if (arg0_ptr->empty())
+            {
+                return resources.null_value();
+            }
+
+            bool is_number = arg0_ptr->at(0).is_number();
+            bool is_string = arg0_ptr->at(0).is_string();
+            if (!is_number && !is_string)
+            {
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+
+            std::size_t index = 0;
+            for (std::size_t i = 1; i < arg0_ptr->size(); ++i)
+            {
+                if (!(arg0_ptr->at(i).is_number() == is_number && arg0_ptr->at(i).is_string() == is_string))
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+                }
+                if (arg0_ptr->at(i) > arg0_ptr->at(index))
+                {
+                    index = i;
+                }
+            }
+
+            return arg0_ptr->at(index);
+        }
+    };
+
+    template <class Json,class JsonReference>
     class length_function : public function_base<Json,JsonReference>
     {
     public:
@@ -1411,6 +1522,8 @@ namespace detail {
         {
             static sum_function<Json,JsonReference> sum_func;
             static avg_function<Json,JsonReference> avg_func;
+            static min_function<Json,JsonReference> min_func;
+            static max_function<Json,JsonReference> max_func;
             static length_function<Json,JsonReference> length_func;
             static keys_function<Json,JsonReference> keys_func;
 
@@ -1418,6 +1531,8 @@ namespace detail {
             {
                 {string_type{'s','u','m'}, &sum_func},
                 {string_type{'a','v','g'}, &avg_func},
+                {string_type{'m','i','n'}, &min_func},
+                {string_type{'m','a','x'}, &max_func},
                 {string_type{'l','e','n','g','t','h'}, &length_func},
                 {string_type{'k','e','y','s'}, &keys_func}
             };
