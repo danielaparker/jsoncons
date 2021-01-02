@@ -158,7 +158,7 @@ To save typing and enhance readability, the jsoncons library defines macros,
 so you could also write
 
 ```c++
-JSONCONS_N_MEMBER_TRAITS(ns::book, author, title, price)
+JSONCONS_ALL_MEMBER_TRAITS(ns::book, author, title, price)
 ```
 
 which expands to the code above.
