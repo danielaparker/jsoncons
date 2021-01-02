@@ -741,7 +741,7 @@ namespace detail {
         }
 
         template <typename... Args>
-        Json* create_temp(Args&& ... args)
+        Json* create_json(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
@@ -1041,15 +1041,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_temp(((lhs.template as<int64_t>() + rhs.template as<int64_t>())));
+                return *resources.create_json(((lhs.template as<int64_t>() + rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_temp((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()));
+                return *resources.create_json((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_temp((lhs.as_double() + rhs.as_double()));
+                return *resources.create_json((lhs.as_double() + rhs.as_double()));
             }
         }
     };
@@ -1071,15 +1071,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_temp(((lhs.template as<int64_t>() - rhs.template as<int64_t>())));
+                return *resources.create_json(((lhs.template as<int64_t>() - rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_temp((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()));
+                return *resources.create_json((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_temp((lhs.as_double() - rhs.as_double()));
+                return *resources.create_json((lhs.as_double() - rhs.as_double()));
             }
         }
     };
@@ -1101,15 +1101,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_temp(((lhs.template as<int64_t>() * rhs.template as<int64_t>())));
+                return *resources.create_json(((lhs.template as<int64_t>() * rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_temp((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()));
+                return *resources.create_json((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_temp((lhs.as_double() * rhs.as_double()));
+                return *resources.create_json((lhs.as_double() * rhs.as_double()));
             }
         }
     };
@@ -1131,15 +1131,15 @@ namespace detail {
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_temp(((lhs.template as<int64_t>() / rhs.template as<int64_t>())));
+                return *resources.create_json(((lhs.template as<int64_t>() / rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_temp((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()));
+                return *resources.create_json((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_temp((lhs.as_double() / rhs.as_double()));
+                return *resources.create_json((lhs.as_double() / rhs.as_double()));
             }
         }
     };
@@ -1252,8 +1252,9 @@ namespace detail {
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array())
             {
+                //std::cout << "arg: " << *arg0_ptr << "\n";
                 ec = jsonpath_errc::invalid_type;
-                return Json::null();
+                return resources.null_value();
             }
             double sum = 0;
             for (auto& j : arg0_ptr->array_range())
@@ -1266,7 +1267,51 @@ namespace detail {
                 sum += j.template as<double>();
             }
 
-            return *resources.create_temp(sum);
+            return *resources.create_json(sum);
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class avg_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        avg_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_array())
+            {
+                //std::cout << "arg: " << *arg0_ptr << "\n";
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+            if (arg0_ptr->empty())
+            {
+                return resources.null_value();
+            }
+            double sum = 0;
+            for (auto& j : arg0_ptr->array_range())
+            {
+                if (!j.is_number())
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return Json::null();
+                }
+                sum += j.template as<double>();
+            }
+
+            return *resources.create_json(sum / static_cast<double>(arg0_ptr->size()));
         }
     };
 
@@ -1295,12 +1340,12 @@ namespace detail {
             {
                 case json_type::object_value:
                 case json_type::array_value:
-                    return *resources.create_temp(arg0_ptr->size());
+                    return *resources.create_json(arg0_ptr->size());
                 case json_type::string_value:
                 {
                     auto sv0 = arg0_ptr->template as<string_view_type>();
                     auto length = unicons::u32_length(sv0.begin(), sv0.end());
-                    return *resources.create_temp(length);
+                    return *resources.create_json(length);
                 }
                 default:
                 {
@@ -1308,6 +1353,43 @@ namespace detail {
                     return resources.null_value();
                 }
             }
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class keys_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+        using string_view_type = typename Json::string_view_type;
+
+        keys_function()
+            : function_base<Json,JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_object())
+            {
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+
+            auto result = resources.create_json(json_array_arg);
+            result->reserve(args.size());
+
+            for (auto& item : arg0_ptr->object_range())
+            {
+                result->emplace_back(item.key());
+            }
+            return *result;
         }
     };
 
@@ -1328,12 +1410,16 @@ namespace detail {
         function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
             static sum_function<Json,JsonReference> sum_func;
+            static avg_function<Json,JsonReference> avg_func;
             static length_function<Json,JsonReference> length_func;
+            static keys_function<Json,JsonReference> keys_func;
 
             static std::unordered_map<string_type,function_base_type*> functions =
             {
                 {string_type{'s','u','m'}, &sum_func},
-                {string_type{'l','e','n','g','t','h'}, &length_func}
+                {string_type{'a','v','g'}, &avg_func},
+                {string_type{'l','e','n','g','t','h'}, &length_func},
+                {string_type{'k','e','y','s'}, &keys_func}
             };
 
             auto it = functions.find(name);
@@ -1511,7 +1597,7 @@ namespace detail {
         }
 
         template <typename... Args>
-        Json* create_temp(Args&& ... args)
+        Json* create_json(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
@@ -1712,7 +1798,8 @@ namespace detail {
 
         selector_base()
             : is_projection_(false), 
-              is_filter_(false)
+              is_filter_(false),
+              precedence_level_(0)
         {
         }
 
@@ -2192,7 +2279,7 @@ namespace detail {
                         return node.val_ptr;
                     case node_set_tag::multi:
                     {
-                        auto j = resources.create_temp(json_array_arg);
+                        auto j = resources.create_json(json_array_arg);
                         j->reserve(nodes.size());
                         for (auto& item : nodes)
                         {
@@ -2252,6 +2339,8 @@ namespace detail {
             Json result(json_array_arg);
             bool is_recursive_descent = false;
 
+            //std::cout << "EVALUATE BEGIN\n";
+
             if (!token_list_.empty())
             {
                 for (std::size_t i = 0; 
@@ -2259,6 +2348,7 @@ namespace detail {
                      )
                 {
                     auto& tok = token_list_[i];
+                    //std::cout << "Token: " << tok.to_string() << "\n";
                     switch (tok.type())
                     { 
                         case path_token_kind::literal:
@@ -2293,6 +2383,12 @@ namespace detail {
                             break;
                         case path_token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
+                            //std::cout << "argument stack items\n";
+                            //for (auto& item : stack)
+                            //{
+                            //    std::cout << *item.to_pointer(resources) << "\n";
+                            //}
+                            //std::cout << "\n";
                             arg_stack.push_back(stack.back().to_pointer(resources));
                             stack.pop_back();
                             break;
@@ -2303,6 +2399,12 @@ namespace detail {
                                 //ec = jmespath_errc::invalid_arity;
                                 return;
                             }
+                            //std::cout << "function arg stack:\n";
+                            //for (auto& item : arg_stack)
+                            //{
+                            //    std::cout << *item << "\n";
+                            //}
+                            //std::cout << "\n";
 
                             reference r = tok.function_->evaluate(resources, arg_stack, ec);
                             if (ec)
@@ -2326,26 +2428,54 @@ namespace detail {
                             {
                                 JSONCONS_ASSERT(!stack.empty());
                                 pointer ptr = nullptr;
+                                //for (auto& item : stack)
+                                //{
+                                    //std::cout << "selector stack input:\n";
+                                    //switch (item.tag)
+                                    //{
+                                    //    case node_set_tag::single:
+                                    //        std::cout << "single: " << *(item.node.val_ptr) << "\n";
+                                    //        break;
+                                    //    case node_set_tag::multi:
+                                    //        for (auto& node : stack.back().nodes)
+                                    //        {
+                                    //            std::cout << "multi: " << *node.val_ptr << "\n";
+                                    //        }
+                                    //        break;
+                                    //    default:
+                                    //        break;
+                                    //}
+                                    //std::cout << "\n";
+                                //}
                                 switch (stack.back().tag)
                                 {
                                     case node_set_tag::single:
                                         ptr = stack.back().node.val_ptr;
                                         break;
                                     case node_set_tag::multi:
-                                        if (!stack.back().nodes.empty())
-                                        {
-                                            ptr = stack.back().nodes.back().val_ptr;
-                                        }
+                                        //if (!stack.back().nodes.empty())
+                                        //{
+                                        //    ptr = stack.back().nodes.back().val_ptr;
+                                        //}
+                                        ptr = stack.back().to_pointer(resources);
                                         break;
                                     default:
                                         break;
                                 }
                                 if (ptr)
                                 {
+                                    //std::cout << "selector item: " << *ptr << "\n";
                                     stack.pop_back();
                                     std::vector<path_node_type> temp;
                                     tok.selector_->select(resources, path, *ptr, temp);
                                     stack.emplace_back(std::move(temp));
+
+                                    //std::cout << "selector output\n";
+                                    //for (auto& item : temp)
+                                    //{
+                                    //    std::cout << *item.val_ptr << "\n";
+                                    //}
+                                    //std::cout << "\n";
 
                                 }
                             }
@@ -2438,6 +2568,7 @@ namespace detail {
                     }
                 }
             }
+            //std::cout << "EVALUATE END\n";
         }
     };
 

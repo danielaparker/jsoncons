@@ -225,6 +225,7 @@ namespace jsoncons { namespace jsonpath_new {
                         const string_type& path, reference val,
                         std::vector<path_node_type>& nodes) const override
             {
+                //std::cout << "begin identifier_selector " << identifier_ << ": " << val << "\n";
                 if (val.is_object())
                 {
                     auto it = val.find(identifier_);
@@ -235,16 +236,17 @@ namespace jsoncons { namespace jsonpath_new {
                 }
                 else if (val.is_array() && identifier_ == length_literal<char_type>())
                 {
-                    pointer ptr = resources.create_temp(val.size());
+                    pointer ptr = resources.create_json(val.size());
                     nodes.emplace_back(PathCons()(path, identifier_), ptr);
                 }
                 else if (val.is_string() && identifier_ == length_literal<char_type>())
                 {
                     string_view_type sv = val.as_string_view();
                     std::size_t count = unicons::u32_length(sv.begin(), sv.end());
-                    pointer ptr = resources.create_temp(count);
+                    pointer ptr = resources.create_json(count);
                     nodes.emplace_back(PathCons()(path, identifier_), ptr);
                 }
+                //std::cout << "end identifier_selector\n";
             }
 
             std::string to_string(int level = 0) const override
@@ -358,6 +360,17 @@ namespace jsoncons { namespace jsonpath_new {
                     }
                 }
             }
+
+            virtual std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                for (auto& sel : selectors_)
+                {
+                    s.append(sel->to_string(level+1));
+                }
+
+                return s;
+            }
         };
 
         class wildcard_selector final : public projection_base
@@ -372,6 +385,7 @@ namespace jsoncons { namespace jsonpath_new {
                         const string_type& path, reference val,
                         std::vector<path_node_type>& nodes) const override
             {
+                //std::cout << "begin wildcard_selector: " << val << "\n";
                 if (val.is_array())
                 {
                     for (auto& item : val.array_range())
@@ -386,6 +400,21 @@ namespace jsoncons { namespace jsonpath_new {
                         this->apply_expressions(resources, path, item.value(), nodes);
                     }
                 }
+                //std::cout << "end wildcard_selector\n";
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("wildcard\n");
+                s.append(projection_base::to_string(level));
+
+                return s;
             }
         };
 
@@ -664,7 +693,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             string_type s = {'$'};
             std::vector<path_node_type> v;
-            pointer ptr = resources.create_temp(std::move(result));
+            pointer ptr = resources.create_json(std::move(result));
             v.emplace_back(s,ptr);
             stack_.push_back(v);
         }
@@ -787,7 +816,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
-                                    auto temp = resources.create_temp(val);
+                                    auto temp = resources.create_json(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
@@ -804,7 +833,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
-                                    auto temp = resources.create_temp(val);
+                                    auto temp = resources.create_json(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
@@ -870,7 +899,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
-                                    auto temp = resources.create_temp(val);
+                                    auto temp = resources.create_json(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
@@ -889,7 +918,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 JSONCONS_TRY
                                 {
                                     auto val = Json::parse(buffer);
-                                    auto temp = resources.create_temp(val);
+                                    auto temp = resources.create_json(val);
                                     function_stack_.push_back(std::vector<pointer>{temp});
                                 }
                                 JSONCONS_CATCH(const ser_error&)     
