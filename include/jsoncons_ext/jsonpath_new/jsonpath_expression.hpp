@@ -1734,6 +1734,7 @@ namespace detail {
 
     enum class token_kind
     {
+        root_node,
         current_node,
         recursive_descent,
         lparen,
@@ -1833,6 +1834,12 @@ namespace detail {
         explicit current_node_arg_t() = default;
     };
     constexpr current_node_arg_t current_node_arg{};
+
+    struct root_node_arg_t
+    {
+        explicit root_node_arg_t() = default;
+    };
+    constexpr root_node_arg_t root_node_arg{};
 
     struct end_function_arg_t
     {
@@ -1996,6 +2003,11 @@ namespace detail {
 
         token(current_node_arg_t) noexcept
             : type_(token_kind::current_node)
+        {
+        }
+
+        token(root_node_arg_t) noexcept
+            : type_(token_kind::root_node)
         {
         }
 
@@ -2493,6 +2505,9 @@ namespace detail {
                             stack.emplace_back(path_node_type("",std::addressof(r)));
                             break;
                         }
+                        case token_kind::root_node:
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
+                            break;
                         case token_kind::current_node:
                             stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
                             break;

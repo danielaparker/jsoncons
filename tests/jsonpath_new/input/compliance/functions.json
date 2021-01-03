@@ -37,7 +37,7 @@
          }
      },
      "cases": [
-       {
+       /*{
          "comment" : "",
          "expression": "length($.store.book[*])",
          "result": [4]
@@ -66,12 +66,12 @@
          "comment" : "",
          "expression": "max($.store.book[*].price)",
          "result": [22.99]
-       }/*,
+       },*/
        {
          "comment" : "avg in filter",
          "expression": "$.store.book[?(@.price > avg($.store.book[*].price))].title",
          "result": ["The Lord of the Rings"]
-       }*/
+       }
      ]
   }
 ]
