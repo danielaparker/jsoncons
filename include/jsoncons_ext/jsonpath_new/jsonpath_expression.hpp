@@ -1732,7 +1732,7 @@ namespace detail {
         }
     };
 
-    enum class path_token_kind
+    enum class token_kind
     {
         current_node,
         recursive_descent,
@@ -1965,12 +1965,12 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class path_token
+    class token
     {
     public:
         using selector_base_type = selector_base<Json,JsonReference>;
 
-        path_token_kind type_;
+        token_kind type_;
 
         union
         {
@@ -1982,116 +1982,116 @@ namespace detail {
         };
     public:
 
-        path_token(const unary_operator<Json>* expression) noexcept
-            : type_(path_token_kind::unary_operator),
+        token(const unary_operator<Json>* expression) noexcept
+            : type_(token_kind::unary_operator),
               unary_operator_(expression)
         {
         }
 
-        path_token(const binary_operator<Json>* expression) noexcept
-            : type_(path_token_kind::binary_operator),
+        token(const binary_operator<Json>* expression) noexcept
+            : type_(token_kind::binary_operator),
               binary_operator_(expression)
         {
         }
 
-        path_token(current_node_arg_t) noexcept
-            : type_(path_token_kind::current_node)
+        token(current_node_arg_t) noexcept
+            : type_(token_kind::current_node)
         {
         }
 
-        path_token(begin_function_arg_t) noexcept
-            : type_(path_token_kind::begin_function)
+        token(begin_function_arg_t) noexcept
+            : type_(token_kind::begin_function)
         {
         }
 
-        path_token(end_function_arg_t) noexcept
-            : type_(path_token_kind::end_function)
+        token(end_function_arg_t) noexcept
+            : type_(token_kind::end_function)
         {
         }
 
-        path_token(separator_arg_t) noexcept
-            : type_(path_token_kind::separator)
+        token(separator_arg_t) noexcept
+            : type_(token_kind::separator)
         {
         }
 
-        path_token(lparen_arg_t) noexcept
-            : type_(path_token_kind::lparen)
+        token(lparen_arg_t) noexcept
+            : type_(token_kind::lparen)
         {
         }
 
-        path_token(rparen_arg_t) noexcept
-            : type_(path_token_kind::rparen)
+        token(rparen_arg_t) noexcept
+            : type_(token_kind::rparen)
         {
         }
 
-        path_token(end_of_expression_arg_t) noexcept
-            : type_(path_token_kind::end_of_expression)
+        token(end_of_expression_arg_t) noexcept
+            : type_(token_kind::end_of_expression)
         {
         }
 
-        path_token(begin_union_arg_t) noexcept
-            : type_(path_token_kind::begin_union)
+        token(begin_union_arg_t) noexcept
+            : type_(token_kind::begin_union)
         {
         }
 
-        path_token(end_union_arg_t) noexcept
-            : type_(path_token_kind::end_union)
+        token(end_union_arg_t) noexcept
+            : type_(token_kind::end_union)
         {
         }
 
-        path_token(begin_filter_arg_t) noexcept
-            : type_(path_token_kind::begin_filter)
+        token(begin_filter_arg_t) noexcept
+            : type_(token_kind::begin_filter)
         {
         }
 
-        path_token(end_filter_arg_t) noexcept
-            : type_(path_token_kind::end_filter)
+        token(end_filter_arg_t) noexcept
+            : type_(token_kind::end_filter)
         {
         }
 
-        path_token(std::unique_ptr<selector_base_type>&& expression)
-            : type_(path_token_kind::selector)
+        token(std::unique_ptr<selector_base_type>&& expression)
+            : type_(token_kind::selector)
         {
             new (&selector_) std::unique_ptr<selector_base_type>(std::move(expression));
         }
 
-        path_token(function_base<Json,JsonReference>* function) noexcept
-            : type_(path_token_kind::function),
+        token(function_base<Json,JsonReference>* function) noexcept
+            : type_(token_kind::function),
               function_(function)
         {
         }
 
-        path_token(argument_arg_t) noexcept
-            : type_(path_token_kind::argument)
+        token(argument_arg_t) noexcept
+            : type_(token_kind::argument)
         {
         }
 
-        path_token(begin_expression_type_arg_t) noexcept
-            : type_(path_token_kind::begin_expression_type)
+        token(begin_expression_type_arg_t) noexcept
+            : type_(token_kind::begin_expression_type)
         {
         }
 
-        path_token(end_expression_type_arg_t) noexcept
-            : type_(path_token_kind::end_expression_type)
+        token(end_expression_type_arg_t) noexcept
+            : type_(token_kind::end_expression_type)
         {
         }
 
-        path_token(recursive_descent_arg_t) noexcept
-            : type_(path_token_kind::recursive_descent)
+        token(recursive_descent_arg_t) noexcept
+            : type_(token_kind::recursive_descent)
         {
         }
 
-        path_token(literal_arg_t, Json&& value) noexcept
-            : type_(path_token_kind::literal), value_(std::move(value))
+        token(literal_arg_t, Json&& value) noexcept
+            : type_(token_kind::literal), value_(std::move(value))
         {
         }
 
-        path_token(path_token&& other) noexcept
+        token(token&& other) noexcept
         {
-            construct(std::forward<path_token>(other));
+            construct(std::forward<token>(other));
         }
 
-        path_token& operator=(path_token&& other)
+        token& operator=(token&& other)
         {
             if (&other != this)
             {
@@ -2099,19 +2099,19 @@ namespace detail {
                 {
                     switch (type_)
                     {
-                        case path_token_kind::selector:
+                        case token_kind::selector:
                             selector_ = std::move(other.selector_);
                             break;
-                        case path_token_kind::unary_operator:
+                        case token_kind::unary_operator:
                             unary_operator_ = other.unary_operator_;
                             break;
-                        case path_token_kind::binary_operator:
+                        case token_kind::binary_operator:
                             binary_operator_ = other.binary_operator_;
                             break;
-                        case path_token_kind::function:
+                        case token_kind::function:
                             function_ = other.function_;
                             break;
-                        case path_token_kind::literal:
+                        case token_kind::literal:
                             value_ = std::move(other.value_);
                             break;
                         default:
@@ -2121,67 +2121,67 @@ namespace detail {
                 else
                 {
                     destroy();
-                    construct(std::forward<path_token>(other));
+                    construct(std::forward<token>(other));
                 }
             }
             return *this;
         }
 
-        ~path_token() noexcept
+        ~token() noexcept
         {
             destroy();
         }
 
-        path_token_kind type() const
+        token_kind type() const
         {
             return type_;
         }
 
         bool is_lparen() const
         {
-            return type_ == path_token_kind::lparen; 
+            return type_ == token_kind::lparen; 
         }
 
         bool is_rparen() const
         {
-            return type_ == path_token_kind::rparen; 
+            return type_ == token_kind::rparen; 
         }
 
         bool is_current_node() const
         {
-            return type_ == path_token_kind::current_node; 
+            return type_ == token_kind::current_node; 
         }
 
         bool is_projection() const
         {
-            return type_ == path_token_kind::selector && selector_->is_projection(); 
+            return type_ == token_kind::selector && selector_->is_projection(); 
         }
 
         bool is_expression() const
         {
-            return type_ == path_token_kind::selector; 
+            return type_ == token_kind::selector; 
         }
 
         bool is_operator() const
         {
-            return type_ == path_token_kind::unary_operator || 
-                   type_ == path_token_kind::binary_operator; 
+            return type_ == token_kind::unary_operator || 
+                   type_ == token_kind::binary_operator; 
         }
 
         bool is_recursive_descent() const
         {
-            return type_ == path_token_kind::recursive_descent; 
+            return type_ == token_kind::recursive_descent; 
         }
 
         std::size_t precedence_level() const
         {
             switch(type_)
             {
-                case path_token_kind::selector:
+                case token_kind::selector:
                     return selector_->precedence_level();
-                case path_token_kind::unary_operator:
+                case token_kind::unary_operator:
                     return unary_operator_->precedence_level();
-                case path_token_kind::binary_operator:
+                case token_kind::binary_operator:
                     return binary_operator_->precedence_level();
                 default:
                     return 0;
@@ -2192,35 +2192,35 @@ namespace detail {
         {
             switch(type_)
             {
-                case path_token_kind::selector:
+                case token_kind::selector:
                     return selector_->is_right_associative();
-                case path_token_kind::unary_operator:
+                case token_kind::unary_operator:
                     return unary_operator_->is_right_associative();
-                case path_token_kind::binary_operator:
+                case token_kind::binary_operator:
                     return binary_operator_->is_right_associative();
                 default:
                     return false;
             }
         }
 
-        void construct(path_token&& other)
+        void construct(token&& other)
         {
             type_ = other.type_;
             switch (type_)
             {
-                case path_token_kind::selector:
+                case token_kind::selector:
                     new (&selector_) std::unique_ptr<selector_base_type>(std::move(other.selector_));
                     break;
-                case path_token_kind::unary_operator:
+                case token_kind::unary_operator:
                     unary_operator_ = other.unary_operator_;
                     break;
-                case path_token_kind::binary_operator:
+                case token_kind::binary_operator:
                     binary_operator_ = other.binary_operator_;
                     break;
-                case path_token_kind::function:
+                case token_kind::function:
                     function_ = other.function_;
                     break;
-                case path_token_kind::literal:
+                case token_kind::literal:
                     new (&value_) Json(std::move(other.value_));
                     break;
                 default:
@@ -2232,10 +2232,10 @@ namespace detail {
         {
             switch(type_)
             {
-                case path_token_kind::selector:
+                case token_kind::selector:
                     selector_.~unique_ptr();
                     break;
-                case path_token_kind::literal:
+                case token_kind::literal:
                     value_.~Json();
                     break;
                 default:
@@ -2249,7 +2249,7 @@ namespace detail {
             s.append(std::to_string((int)type_));
             switch (type_)
             {
-                case path_token_kind::selector:
+                case token_kind::selector:
                     s.append(selector_->to_string(level+1));
                     break;
                 default:
@@ -2269,9 +2269,9 @@ namespace detail {
         using path_node_type = path_node<Json,JsonReference>;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
-        using path_token_type = path_token<Json,JsonReference>;
+        using token_type = token<Json,JsonReference>;
     private:
-        std::vector<path_token_type> token_list_;
+        std::vector<token_type> token_list_;
     public:
         path_expression()
         {
@@ -2282,7 +2282,7 @@ namespace detail {
         {
         }
 
-        path_expression(std::vector<path_token_type>&& token_stack)
+        path_expression(std::vector<token_type>&& token_stack)
             : token_list_(std::move(token_stack))
         {
         }
@@ -2439,7 +2439,7 @@ namespace detail {
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
         evaluate(dynamic_resources<Json>& resources, 
-                 reference instance, 
+                 reference current, 
                  Callback callback) const
         {
             std::error_code ec;
@@ -2466,12 +2466,12 @@ namespace detail {
                     //std::cout << "Token: " << tok.to_string() << "\n";
                     switch (tok.type())
                     { 
-                        case path_token_kind::literal:
+                        case token_kind::literal:
                         {
                             stack.emplace_back(path_node_type(string_type(), &tok.value_));
                             break;
                         }
-                        case path_token_kind::unary_operator:
+                        case token_kind::unary_operator:
                         {
                             JSONCONS_ASSERT(stack.size() >= 1);
                             pointer ptr = stack.back().to_pointer(resources);
@@ -2481,7 +2481,7 @@ namespace detail {
                             stack.emplace_back(path_node_type("",std::addressof(r)));
                             break;
                         }
-                        case path_token_kind::binary_operator:
+                        case token_kind::binary_operator:
                         {
                             JSONCONS_ASSERT(stack.size() >= 2);
                             pointer rhs = stack.back().to_pointer(resources);
@@ -2493,10 +2493,10 @@ namespace detail {
                             stack.emplace_back(path_node_type("",std::addressof(r)));
                             break;
                         }
-                        case path_token_kind::current_node:
-                            stack.emplace_back(path_node_type(string_type(),std::addressof(instance)));
+                        case token_kind::current_node:
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
                             break;
-                        case path_token_kind::argument:
+                        case token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
                             //std::cout << "argument stack items\n";
                             //for (auto& item : stack)
@@ -2507,7 +2507,7 @@ namespace detail {
                             arg_stack.push_back(stack.back().to_pointer(resources));
                             stack.pop_back();
                             break;
-                        case path_token_kind::function:
+                        case token_kind::function:
                         {
                             if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_stack.size())
                             {
@@ -2530,7 +2530,7 @@ namespace detail {
                             stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
                             break;
                         }
-                        case path_token_kind::selector:
+                        case token_kind::selector:
                         {
                             if (is_recursive_descent)
                             {
