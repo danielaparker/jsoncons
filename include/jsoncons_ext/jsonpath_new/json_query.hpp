@@ -139,8 +139,8 @@ namespace jsoncons { namespace jsonpath_new {
         recursive_descent_or_lhs_expression,
         lhs_expression,
         path_or_literal_or_function,
+        json_text_or_function_expr,
         literal,
-        json_text,
         identifier_or_function_expr,
         name_or_left_bracket,
         unquoted_string,
@@ -972,26 +972,6 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                         }
                         break;
-                    case path_state::json_text:
-                    {
-                        json_decoder<Json> decoder;
-                        basic_json_parser<char_type> parser;
-                        parser.update(buffer.data(),buffer.size());
-                        parser.parse_some(decoder, ec);
-                        if (ec)
-                        {
-                            return path_expression_type();
-                        }
-                        parser.finish_parse(decoder, ec);
-                        if (ec)
-                        {
-                            return path_expression_type();
-                        }
-                        push_token(token_type(literal_arg, decoder.get_result()), ec);
-                        buffer.clear();
-                        state_stack_.pop_back();
-                        break;
-                    }
                     case path_state::literal:
                     {
                         //std::cout << "literal: " << buffer << "\n";
@@ -1050,8 +1030,55 @@ namespace jsoncons { namespace jsonpath_new {
                             }
                             default:
                             {
-                                state_stack_.back() = path_state::json_text;
+                                state_stack_.back() = path_state::json_text_or_function_expr;
                                 state_stack_.emplace_back(path_state::unquoted_string);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case path_state::json_text_or_function_expr:
+                    {
+                        switch(*p_)
+                        {
+                            case '(':
+                            {
+                                auto f = resources.get_function(buffer, ec);
+                                if (ec)
+                                {
+                                    return path_expression_type();
+                                }
+                                buffer.clear();
+                                ++paren_level;
+                                push_token(current_node_arg, ec);
+                                push_token(token_type(begin_function_arg), ec);
+                                push_token(token_type(f), ec);
+                                state_stack_.back() = path_state::function_expression;
+                                state_stack_.emplace_back(path_state::argument);
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::lhs_expression);
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            default:
+                            {
+                                json_decoder<Json> decoder;
+                                basic_json_parser<char_type> parser;
+                                parser.update(buffer.data(),buffer.size());
+                                parser.parse_some(decoder, ec);
+                                if (ec)
+                                {
+                                    return path_expression_type();
+                                }
+                                parser.finish_parse(decoder, ec);
+                                if (ec)
+                                {
+                                    return path_expression_type();
+                                }
+                                push_token(token_type(literal_arg, decoder.get_result()), ec);
+                                buffer.clear();
+                                state_stack_.pop_back();
                                 break;
                             }
                         }
