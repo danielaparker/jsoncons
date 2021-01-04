@@ -49,7 +49,7 @@ _"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
 
 _"the ability to have an xpath like facility is so useful"_
 
-_"Great project ... I finally decided on jsoncons after evaluating quite a few json libraries out there."_
+_"I finally decided on jsoncons after evaluating quite a few json libraries out there."_
 
 _"the serialization lib of choice with its beautiful mappings and ease of use"_
 
