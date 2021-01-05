@@ -315,8 +315,8 @@ namespace jsoncons { namespace jsonpath_new {
         protected:
             std::vector<std::unique_ptr<selector_base_type>> selectors_;
         public:
-            projection_base(std::size_t precedence_level)
-                : selector_base_type(true, false, precedence_level)
+            projection_base(bool is_filter, std::size_t precedence_level)
+                : selector_base_type(true, is_filter, precedence_level)
             {
             }
 
@@ -377,7 +377,7 @@ namespace jsoncons { namespace jsonpath_new {
         {
         public:
             wildcard_selector()
-                : projection_base(11)
+                : projection_base(false, 11)
             {
             }
 
@@ -500,7 +500,7 @@ namespace jsoncons { namespace jsonpath_new {
         public:
 
             filter_selector(path_expression_type&& expr)
-                : projection_base(11), expr_(std::move(expr))
+                : projection_base(true, 11), expr_(std::move(expr))
             {
             }
 
@@ -521,7 +521,7 @@ namespace jsoncons { namespace jsonpath_new {
                         expr_.evaluate(resources, val[i], callback);
                         if (is_true(temp))
                         {
-                            nodes.emplace_back(PathCons()(path,i),std::addressof(val[i]));
+                            this->apply_expressions(resources, PathCons()(path,i), val[i], nodes);
                         }
                     }
                 }
@@ -535,7 +535,7 @@ namespace jsoncons { namespace jsonpath_new {
                     expr_.evaluate(resources, val, callback);
                     if (is_true(temp))
                     {
-                        nodes.emplace_back(path, std::addressof(val));
+                        this->apply_expressions(resources, path, val, nodes);
                     }
                 }                
             }
@@ -547,7 +547,7 @@ namespace jsoncons { namespace jsonpath_new {
             slice slice_;
         public:
             slice_selector(const slice& slic)
-                : projection_base(11), slice_(slic) 
+                : projection_base(false, 11), slice_(slic) 
             {
             }
 

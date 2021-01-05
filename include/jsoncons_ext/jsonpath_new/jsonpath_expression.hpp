@@ -2583,10 +2583,10 @@ namespace detail {
                                         ptr = stack.back().node.val_ptr;
                                         break;
                                     case node_set_tag::multi:
-                                        //if (!stack.back().nodes.empty())
-                                        //{
-                                        //    ptr = stack.back().nodes.back().val_ptr;
-                                        //}
+                                        if (!stack.back().nodes.empty())
+                                        {
+                                            ptr = stack.back().nodes.back().val_ptr;
+                                        }
                                         ptr = stack.back().to_pointer(resources);
                                         break;
                                     default:
