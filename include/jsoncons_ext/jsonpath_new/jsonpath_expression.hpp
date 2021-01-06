@@ -1292,7 +1292,6 @@ namespace detail {
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array())
             {
-                //std::cout << "arg: " << *arg0_ptr << "\n";
                 ec = jsonpath_errc::invalid_type;
                 return resources.null_value();
             }
@@ -1958,6 +1957,7 @@ namespace detail {
 
         virtual void select(dynamic_resources<Json>& resources,
                             const string_type& path, 
+                            reference root,
                             reference val, 
                             std::vector<path_node_type>& nodes) const = 0;
 
@@ -2301,7 +2301,9 @@ namespace detail {
 
         path_expression& operator=(path_expression&& expr) = default;
 
-        Json evaluate(dynamic_resources<Json>& resources, reference instance) const
+        Json evaluate(dynamic_resources<Json>& resources, 
+                      reference root,
+                      reference instance) const
         {
             Json result(json_array_arg);
 
@@ -2310,7 +2312,7 @@ namespace detail {
             {
                 output_stack.push_back(node);
             };
-            evaluate(resources, instance, callback);
+            evaluate(resources, root, instance, callback);
             if (!output_stack.empty())
             {
                 result.reserve(output_stack.size());
@@ -2451,6 +2453,7 @@ namespace detail {
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
         evaluate(dynamic_resources<Json>& resources, 
+                 reference root,
                  reference current, 
                  Callback callback) const
         {
@@ -2467,6 +2470,10 @@ namespace detail {
             bool is_recursive_descent = false;
 
             //std::cout << "EVALUATE BEGIN\n";
+            //for (auto& tok : token_list_)
+            //{
+            //    std::cout << tok.to_string() << "\n";
+            //}
 
             if (!token_list_.empty())
             {
@@ -2506,20 +2513,26 @@ namespace detail {
                             break;
                         }
                         case token_kind::root_node:
-                            stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
+                            //std::cout << "root: " << root << "\n";
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(root)));
                             break;
                         case token_kind::current_node:
                             stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
                             break;
                         case token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
-                            //std::cout << "argument stack items\n";
+                            //std::cout << "argument stack items " << stack.size() << "\n";
                             //for (auto& item : stack)
                             //{
                             //    std::cout << *item.to_pointer(resources) << "\n";
                             //}
                             //std::cout << "\n";
                             arg_stack.push_back(stack.back().to_pointer(resources));
+                            //for (auto& item : arg_stack)
+                            //{
+                            //    std::cout << *item << "\n";
+                            //}
+                            //std::cout << "\n";
                             stack.pop_back();
                             break;
                         case token_kind::function:
@@ -2541,6 +2554,7 @@ namespace detail {
                             {
                                 return;
                             }
+                            //std::cout << "function result: " << r << "\n";
                             arg_stack.clear();
                             stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
                             break;
@@ -2551,7 +2565,7 @@ namespace detail {
                             {
                                 for (auto& item : recursive_in_stack)
                                 {
-                                    tok.selector_->select(resources, path, *(item.val_ptr), recursive_out_stack);
+                                    tok.selector_->select(resources, path, root, *(item.val_ptr), recursive_out_stack);
                                 }
                             }
                             else
@@ -2597,7 +2611,7 @@ namespace detail {
                                     //std::cout << "selector item: " << *ptr << "\n";
                                     stack.pop_back();
                                     std::vector<path_node_type> temp;
-                                    tok.selector_->select(resources, path, *ptr, temp);
+                                    tok.selector_->select(resources, path, root, *ptr, temp);
                                     stack.emplace_back(std::move(temp));
 
                                     //std::cout << "selector output\n";

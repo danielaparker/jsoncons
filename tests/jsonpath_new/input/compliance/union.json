@@ -46,7 +46,7 @@
            "result": [1]
         }
       ]
-    },*/ {
+    },{
     "given": {
       "foo": {
           "bar": {"baz": [{"common": "first", "one": 1},
@@ -66,5 +66,5 @@
             "result": [true]
          }
     ]
-}
+}*/
 ]

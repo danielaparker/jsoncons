@@ -74,6 +74,7 @@ void jsonpath_tests(const std::string& fpath)
             }
             catch (const std::exception& e)
             {
+                std::cout << e.what() << "\n";
                 if (test_case.contains("result"))
                 {
                     const json& expected = test_case["result"];
@@ -112,13 +113,14 @@ TEST_CASE("jsonpath-tests")
         //jsonpath_tests("./jsonpath_new/input/compliance/slice.json");
         //jsonpath_tests("./jsonpath_new/input/compliance/indices.json");
         //jsonpath_tests("./jsonpath_new/input/compliance/wildcard.json");
+
         //jsonpath_tests("./jsonpath_new/input/compliance/recursive-descent.json"); 
-        //jsonpath_tests("./jsonpath_new/input/compliance/union.json");
+        jsonpath_tests("./jsonpath_new/input/compliance/union.json");
         
         //jsonpath_tests("./jsonpath_new/input/compliance/expressions.json");
         //jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
 
-        jsonpath_tests("./jsonpath_new/input/compliance/functions.json");
+        //jsonpath_tests("./jsonpath_new/input/compliance/functions.json");
     }
 }
 

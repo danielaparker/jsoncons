@@ -222,7 +222,9 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             void select(dynamic_resources<Json>& resources,
-                        const string_type& path, reference val,
+                        const string_type& path, 
+                        reference /* root */,
+                        reference val,
                         std::vector<path_node_type>& nodes) const override
             {
                 //std::cout << "begin identifier_selector " << identifier_ << ": " << val << "\n";
@@ -272,10 +274,55 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             void select(dynamic_resources<Json>& /*resources*/,
-                        const string_type& path, reference val,
+                        const string_type& path, 
+                        reference,
+                        reference val,
                         std::vector<path_node_type>& nodes) const override
             {
                 nodes.emplace_back(path, std::addressof(val));
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("current_node");
+
+                return s;
+            }
+        };
+
+        class root_node final : public selector_base_type
+        {
+        public:
+            root_node()
+            {
+            }
+
+            void select(dynamic_resources<Json>& /*resources*/,
+                        const string_type& path, 
+                        reference root,
+                        reference,
+                        std::vector<path_node_type>& nodes) const override
+            {
+                nodes.emplace_back(path, std::addressof(root));
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("root_node");
+
+                return s;
             }
         };
 
@@ -289,7 +336,9 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             void select(dynamic_resources<Json>& /*resources*/,
-                        const string_type& path, reference val,
+                        const string_type& path, 
+                        reference /* root */,
+                        reference val,
                         std::vector<path_node_type>& nodes) const override
             {
                 if (val.is_array())
@@ -336,6 +385,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void apply_expressions(dynamic_resources<Json>& resources,
                                    const string_type& path, 
+                                   reference root,
                                    reference val,
                                    std::vector<path_node_type>& nodes) const
             {
@@ -351,7 +401,7 @@ namespace jsoncons { namespace jsonpath_new {
                     {
                         std::vector<path_node_type> temp;
                         for (auto& item : collect)
-                            selector->select(resources, path, *(item.val_ptr), temp);
+                            selector->select(resources, path, root, *(item.val_ptr), temp);
                         collect = std::move(temp);
                     }
                     for (auto& item : collect)
@@ -382,22 +432,24 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             void select(dynamic_resources<Json>& resources,
-                        const string_type& path, reference val,
+                        const string_type& path, 
+                        reference root,
+                        reference val,
                         std::vector<path_node_type>& nodes) const override
             {
-                //std::cout << "begin wildcard_selector: " << val << "\n";
+                //std::cout << "wildcard_selector: " << val << "\n";
                 if (val.is_array())
                 {
                     for (auto& item : val.array_range())
                     {
-                        this->apply_expressions(resources, path, item, nodes);
+                        this->apply_expressions(resources, path, root, item, nodes);
                     }
                 }
                 else if (val.is_object())
                 {
                     for (auto& item : val.object_range())
                     {
-                        this->apply_expressions(resources, path, item.value(), nodes);
+                        this->apply_expressions(resources, path, root, item.value(), nodes);
                     }
                 }
                 //std::cout << "end wildcard_selector\n";
@@ -429,6 +481,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(dynamic_resources<Json>& resources,
                         const string_type& /*path*/, 
+                        reference root,
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
             {
@@ -438,41 +491,10 @@ namespace jsoncons { namespace jsonpath_new {
                 };
                 for (auto& expr : expressions_)
                 {
-                    expr.evaluate(resources, val, callback);
+                    expr.evaluate(resources, root, val, callback);
                 }
             }
         };
-
-        /*class expression_selector final : public selector_base_type
-        {
-             jsonpath_filter_expr<Json> result_;
-        public:
-            expression_selector(jsonpath_filter_expr<Json>&& result)
-                : result_(std::move(result))
-            {
-            }
-
-            void select(dynamic_resources<Json>& resources,
-                        const string_type& path, 
-                        reference val, 
-                        std::vector<path_node_type>& nodes) const override
-            {
-                auto index = result_.eval(resources, val);
-                if (index.template is<std::size_t>())
-                {
-                    std::size_t start = index.template as<std::size_t>();
-                    if (val.is_array() && start < val.size())
-                    {
-                        nodes.emplace_back(PathCons()(path,start),std::addressof(val[start]));
-                    }
-                }
-                else if (index.is_string())
-                {
-                    identifier_selector selector(index.as_string_view());
-                    selector.select(resources, path, val, nodes);
-                }
-            }
-        };*/
 
         static bool is_false(const std::vector<path_node_type>& nodes)
         {
@@ -506,6 +528,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(dynamic_resources<Json>& resources,
                         const string_type& path, 
+                        reference root,
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
             {
@@ -518,10 +541,10 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             temp.push_back(node);
                         };
-                        expr_.evaluate(resources, val[i], callback);
+                        expr_.evaluate(resources, root, val[i], callback);
                         if (is_true(temp))
                         {
-                            this->apply_expressions(resources, PathCons()(path,i), val[i], nodes);
+                            this->apply_expressions(resources, PathCons()(path,i), root, val[i], nodes);
                         }
                     }
                 }
@@ -532,12 +555,26 @@ namespace jsoncons { namespace jsonpath_new {
                     {
                         temp.push_back(node);
                     };
-                    expr_.evaluate(resources, val, callback);
+                    expr_.evaluate(resources, root, val, callback);
                     if (is_true(temp))
                     {
-                        this->apply_expressions(resources, path, val, nodes);
+                        this->apply_expressions(resources, path, root, val, nodes);
                     }
-                }                
+                }
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level * 2, ' ');
+                }
+                s.append("filter selector\n");
+                //s.append(expr_.to_string(level));
+
+                return s;
             }
         };
 
@@ -553,6 +590,7 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(dynamic_resources<Json>& resources,
                         const string_type& path, 
+                        reference root,
                         reference val,
                         std::vector<path_node_type>& nodes) const override
             {
@@ -576,7 +614,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             std::size_t j = static_cast<std::size_t>(i);
                             //nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
-                            this->apply_expressions(resources, path, val[j], nodes);
+                            this->apply_expressions(resources, path, root, val[j], nodes);
                         }
                     }
                     else if (step < 0)
@@ -594,8 +632,7 @@ namespace jsoncons { namespace jsonpath_new {
                             std::size_t j = static_cast<std::size_t>(i);
                             if (j < val.size())
                             {
-                                //nodes.emplace_back(PathCons()(path,j),std::addressof(val[j]));
-                                this->apply_expressions(resources, path, val[j], nodes);
+                                this->apply_expressions(resources, PathCons()(path,j), root, val[j], nodes);
                             }
                         }
                     }
@@ -615,14 +652,16 @@ namespace jsoncons { namespace jsonpath_new {
 
             void select(dynamic_resources<Json>& resources,
                         const string_type& /*path*/, 
+                        reference root,
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
             {
+                //std::cout << "function val: " << val << "\n";
                 auto callback = [&nodes](path_node_type& node)
                 {
                     nodes.push_back(node);
                 };
-                return expr_.evaluate(resources, val, callback);
+                return expr_.evaluate(resources, root, val, callback);
             }
 
             std::string to_string(int level = 0) const override
@@ -794,7 +833,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '$':
                             {
-                                push_token(current_node_arg, ec);
+                                push_token(root_node_arg, ec);
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 ++p_;
                                 ++column_;
@@ -991,12 +1030,14 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '$':
                                 push_token(root_node_arg, ec);
+                                push_token(token_type(jsoncons::make_unique<root_node>()), ec);
                                 ++p_;
                                 ++column_;
                                 state_stack_.pop_back();
                                 break;
                             case '@':
                                 push_token(current_node_arg, ec);
+                                push_token(token_type(jsoncons::make_unique<current_node>()), ec);
                                 ++p_;
                                 ++column_;
                                 state_stack_.pop_back();
@@ -1116,13 +1157,15 @@ namespace jsoncons { namespace jsonpath_new {
                             case '$':
                                 ++p_;
                                 ++column_;
-                                push_token(token_type(current_node_arg), ec);
+                                push_token(token_type(root_node_arg), ec);
+                                push_token(token_type(jsoncons::make_unique<root_node>()), ec);
                                 state_stack_.pop_back();
                                 break;
                             case '@':
                                 ++p_;
                                 ++column_;
                                 push_token(token_type(current_node_arg), ec);
+                                push_token(token_type(jsoncons::make_unique<current_node>()), ec);
                                 state_stack_.pop_back();
                                 break;
                             case '.':
@@ -1314,28 +1357,28 @@ namespace jsoncons { namespace jsonpath_new {
                             case '+':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(token_type(resources.get_plus_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '-':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(token_type(resources.get_minus_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(token_type(resources.get_mult_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '/':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 push_token(token_type(resources.get_div_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1357,7 +1400,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '|':
                                 push_token(token_type(resources.get_or_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1374,7 +1417,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '&':
                                 push_token(token_type(resources.get_and_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
@@ -1430,14 +1473,14 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '=':
                                 push_token(token_type(resources.get_lte_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token_type(resources.get_lt_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back();
                                 break;
                         }
@@ -1449,14 +1492,14 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '=':
                                 push_token(token_type(resources.get_gte_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token_type(resources.get_gt_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -1468,7 +1511,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '=':
                                 push_token(token_type(resources.get_eq_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1485,7 +1528,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             case '=':
                                 push_token(token_type(resources.get_ne_operator()), ec);
-                                push_token(token_type(current_node_arg), ec);
+                                //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -1560,37 +1603,37 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '\'':
-                                //push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                //buffer.clear();
                                 state_stack_.pop_back();
                                 break;
                             case '\\':
                                 state_stack_.emplace_back(path_state::quoted_string_escape_char);
+                                ++p_;
+                                ++column_;
                                 break;
                             default:
                                 buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
                                 break;
                         };
-                        ++p_;
-                        ++column_;
                         break;
                     case path_state::double_quoted_string: 
                         switch (*p_)
                         {
                             case '\"':
-                                //push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                //buffer.clear();
                                 state_stack_.pop_back();
                                 break;
                             case '\\':
                                 state_stack_.emplace_back(path_state::quoted_string_escape_char);
+                                ++p_;
+                                ++column_;
                                 break;
                             default:
                                 buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
                                 break;
                         };
-                        ++p_;
-                        ++column_;
                         break;
                     case path_state::comma_or_right_bracket:
                         switch (*p_)
@@ -2498,7 +2541,7 @@ namespace jsoncons { namespace jsonpath_new {
                     break;
                 }
                 case token_kind::literal:
-                    if (!output_stack_.empty() && output_stack_.back().type() == token_kind::current_node)
+                    if (!output_stack_.empty() && (output_stack_.back().type() == token_kind::current_node || output_stack_.back().type() == token_kind::root_node))
                     {
                         output_stack_.back() = std::move(tok);
                     }
@@ -2604,7 +2647,7 @@ namespace jsoncons { namespace jsonpath_new {
         Json evaluate(reference instance)
         {
             jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
-            return expr_.evaluate(resources, instance);
+            return expr_.evaluate(resources, instance, instance);
         }
 
         static jsonpath_expression compile(const string_view_type& path)

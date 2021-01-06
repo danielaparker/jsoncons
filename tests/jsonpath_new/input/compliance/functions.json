@@ -69,14 +69,9 @@
        },
        {
          "comment" : "avg in filter",
-         "expression": "$.store.book[?(@.price >= avg(@.price))].title",
-         "result": ["Sayings of the Century","Sword of Honour","Moby Dick","The Lord of the Rings"]
-       }/*,
-       {
-         "comment" : "avg in filter",
          "expression": "$.store.book[?(@.price > avg($.store.book[*].price))].title",
          "result": ["The Lord of the Rings"]
-       }*/
+       }
      ]
   }
 ]
