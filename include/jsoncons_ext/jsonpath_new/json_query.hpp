@@ -227,7 +227,7 @@ namespace jsoncons { namespace jsonpath_new {
                         reference val,
                         std::vector<path_node_type>& nodes) const override
             {
-                //std::cout << "begin identifier_selector " << identifier_ << ": " << val << "\n";
+                //std::cout << "identifier_selector " << identifier_ << ", val: " << val << "\n";
                 if (val.is_object())
                 {
                     auto it = val.find(identifier_);
@@ -470,29 +470,46 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class union_selector final : public selector_base_type
+        class union_selector final : public projection_base
         {
             std::vector<path_expression_type> expressions_;
         public:
             union_selector(std::vector<path_expression_type>&& expressions)
-                : expressions_(std::move(expressions))
+                : projection_base(false, 11), expressions_(std::move(expressions))
             {
             }
 
             void select(dynamic_resources<Json>& resources,
-                        const string_type& /*path*/, 
+                        const string_type& path, 
                         reference root,
                         reference val, 
                         std::vector<path_node_type>& nodes) const override
             {
-                auto callback = [&nodes](path_node_type& node)
+                //std::cout << "union select val: " << val << "\n";
+                auto callback = [this,&resources, &path, &root, &nodes](path_node_type& node)
                 {
-                    nodes.push_back(node);
+                    //std::cout << "union select callback: node: " << *node.val_ptr << "\n";
+                    //nodes.push_back(node);
+                    this->apply_expressions(resources, path, root, *node.val_ptr, nodes);
                 };
                 for (auto& expr : expressions_)
                 {
                     expr.evaluate(resources, root, val, callback);
                 }
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level * 2, ' ');
+                }
+                s.append("union selector\n");
+                //s.append(expr_.to_string(level));
+
+                return s;
             }
         };
 
@@ -2460,6 +2477,11 @@ namespace jsoncons { namespace jsonpath_new {
 
                 case token_kind::end_union:
                 {
+                    //unwind_rparen(ec);
+                    //if (ec)
+                    //{
+                    //    return;
+                    //}
                     std::vector<path_expression_type> expressions;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_union)
@@ -2473,6 +2495,10 @@ namespace jsoncons { namespace jsonpath_new {
                         if (it->type() == token_kind::separator)
                         {
                             ++it;
+                        }
+                        if (toks.front().type() != token_kind::literal)
+                        {
+                            toks.emplace(toks.begin(), current_node_arg);
                         }
                         expressions.emplace(expressions.begin(), path_expression_type(std::move(toks)));
                     }

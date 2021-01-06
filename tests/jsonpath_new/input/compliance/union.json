@@ -1,5 +1,19 @@
 [
-    /*{
+    {
+        "given" : {
+             "one": {"key": "value"},
+             "two": {"k": "v"},
+             "three": {"some": "more", "key": "other value"}
+         }
+         ,
+        "cases" : [
+            {
+                "comment" : "Dot notation after union with keys",
+                "expression" : "$['one','three'].key",
+                "result" : ["value","other value"]
+            }
+        ]
+    },{
         "given" : {
           "firstName": "John",
           "lastName" : "doe",
@@ -66,5 +80,5 @@
             "result": [true]
          }
     ]
-}*/
+}
 ]

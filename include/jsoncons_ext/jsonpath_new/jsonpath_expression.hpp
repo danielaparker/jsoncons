@@ -2517,6 +2517,7 @@ namespace detail {
                             stack.emplace_back(path_node_type(string_type(),std::addressof(root)));
                             break;
                         case token_kind::current_node:
+                            //std::cout << "current: " << current << "\n";
                             stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
                             break;
                         case token_kind::argument:
@@ -2574,22 +2575,22 @@ namespace detail {
                                 pointer ptr = nullptr;
                                 //for (auto& item : stack)
                                 //{
-                                    //std::cout << "selector stack input:\n";
-                                    //switch (item.tag)
-                                    //{
-                                    //    case node_set_tag::single:
-                                    //        std::cout << "single: " << *(item.node.val_ptr) << "\n";
-                                    //        break;
-                                    //    case node_set_tag::multi:
-                                    //        for (auto& node : stack.back().nodes)
-                                    //        {
-                                    //            std::cout << "multi: " << *node.val_ptr << "\n";
-                                    //        }
-                                    //        break;
-                                    //    default:
-                                    //        break;
-                                    //}
-                                    //std::cout << "\n";
+                                //    std::cout << "selector stack input:\n";
+                                //    switch (item.tag)
+                                //    {
+                                //        case node_set_tag::single:
+                                //            std::cout << "single: " << *(item.node.val_ptr) << "\n";
+                                //            break;
+                                //        case node_set_tag::multi:
+                                //            for (auto& node : stack.back().nodes)
+                                //            {
+                                //                std::cout << "multi: " << *node.val_ptr << "\n";
+                                //            }
+                                //            break;
+                                //        default:
+                                //            break;
+                                //}
+                                //std::cout << "\n";
                                 //}
                                 switch (stack.back().tag)
                                 {
