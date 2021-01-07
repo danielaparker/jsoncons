@@ -182,6 +182,7 @@ namespace jsoncons { namespace jsonpath_new {
         escape_u7, 
         escape_u8,
         filter,
+        expression,
         comparator_expression,
         cmp_lt_or_lte,
         cmp_eq,
@@ -590,6 +591,59 @@ namespace jsoncons { namespace jsonpath_new {
                     s.append(level * 2, ' ');
                 }
                 s.append("filter selector\n");
+                //s.append(expr_.to_string(level));
+
+                return s;
+            }
+        };
+
+        class expression_selector final : public projection_base
+        {
+            path_expression_type expr_;
+
+        public:
+
+            expression_selector(path_expression_type&& expr)
+                : projection_base(true, 11), expr_(std::move(expr))
+            {
+            }
+
+            void select(dynamic_resources<Json>& resources,
+                        const string_type& path, 
+                        reference root,
+                        reference val, 
+                        std::vector<path_node_type>& nodes) const override
+            {
+                std::vector<path_node_type> temp;
+                auto callback = [&temp](path_node_type& node)
+                {
+                    temp.push_back(node);
+                };
+                expr_.evaluate(resources, root, val, callback);
+                if (!temp.empty())
+                {
+                    auto& j = *temp.back().val_ptr;
+                    if (j.template is<std::size_t>() && val.is_array())
+                    {
+                        std::size_t start = j.template as<std::size_t>();
+                        this->apply_expressions(resources, path, root, val.at(start), nodes);
+                    }
+                    else if (j.is_string() && val.is_object())
+                    {
+                        this->apply_expressions(resources, path, root, val.at(j.as_string_view()), nodes);
+                    }
+                }
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level * 2, ' ');
+                }
+                s.append("expression selector\n");
                 //s.append(expr_.to_string(level));
 
                 return s;
@@ -1714,12 +1768,14 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '(':
                             {
-                                /*jsonpath_filter_parser<jsonpath_evaluator> parser(line_,column_);
-                                auto result = parser.parse(resources, p_,end_input_,&p_);
-                                line_ = parser.line();
-                                column_ = parser.column();
-                                push_token(token_type(jsoncons::make_unique<expression_selector>(std::move(result))), ec);
-                                state_stack_.back() = path_state::expect_right_bracket;*/
+                                push_token(token_type(begin_expression_arg), ec);
+                                state_stack_.back() = path_state::expression;
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::path_or_literal_or_function);
+                                ++paren_level;
+                                push_token(lparen_arg, ec);
+                                ++p_;
+                                ++column_;
                                 break;
                             }
                             case '?':
@@ -2387,6 +2443,27 @@ namespace jsoncons { namespace jsonpath_new {
                         }
                         break;
                     }
+                    case path_state::expression:
+                    {
+                        switch(*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case ']':
+                            {
+                                push_token(token_type(end_expression_arg), ec);
+                                state_stack_.pop_back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            default:
+                                ec = jsonpath_errc::expected_right_bracket;
+                                return path_expression_type();
+                        }
+                        break;
+                    }
                     default:
                         ++p_;
                         ++column_;
@@ -2526,6 +2603,43 @@ namespace jsoncons { namespace jsonpath_new {
                     else
                     {
                         output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks)))));
+                    }
+                    break;
+                }
+                case token_kind::begin_expression:
+                    output_stack_.emplace_back(std::move(tok));
+                    operator_stack_.emplace_back(token_type(lparen_arg));
+                    break;
+                case token_kind::end_expression:
+                {
+                    unwind_rparen(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    std::vector<token_type> toks;
+                    auto it = output_stack_.rbegin();
+                    while (it != output_stack_.rend() && it->type() != token_kind::begin_expression)
+                    {
+                        toks.insert(toks.begin(), std::move(*it));
+                        ++it;
+                    }
+                    if (it == output_stack_.rend())
+                    {
+                        JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
+                    }
+                    ++it;
+                    output_stack_.erase(it.base(),output_stack_.end());
+
+                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
+                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
+                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    {
+                        output_stack_.back().selector_->add_selector(jsoncons::make_unique<expression_selector>(path_expression_type(std::move(toks))));
+                    }
+                    else
+                    {
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<expression_selector>(path_expression_type(std::move(toks)))));
                     }
                     break;
                 }

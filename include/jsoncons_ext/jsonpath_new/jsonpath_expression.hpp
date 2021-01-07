@@ -1742,6 +1742,8 @@ namespace detail {
         end_union,
         begin_filter,
         end_filter,
+        begin_expression,
+        end_expression,
         separator,
         literal,
         selector,
@@ -1827,6 +1829,18 @@ namespace detail {
         explicit end_filter_arg_t() = default;
     };
     constexpr end_filter_arg_t end_filter_arg{};
+
+    struct begin_expression_arg_t
+    {
+        explicit begin_expression_arg_t() = default;
+    };
+    constexpr begin_expression_arg_t begin_expression_arg{};
+
+    struct end_expression_arg_t
+    {
+        explicit end_expression_arg_t() = default;
+    };
+    constexpr end_expression_arg_t end_expression_arg{};
 
     struct current_node_arg_t
     {
@@ -2058,6 +2072,16 @@ namespace detail {
 
         token(end_filter_arg_t) noexcept
             : type_(token_kind::end_filter)
+        {
+        }
+
+        token(begin_expression_arg_t) noexcept
+            : type_(token_kind::begin_expression)
+        {
+        }
+
+        token(end_expression_arg_t) noexcept
+            : type_(token_kind::end_expression)
         {
         }
 
