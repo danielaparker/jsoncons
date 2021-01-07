@@ -1,5 +1,5 @@
 [
-    {
+    /*{
         "given" : [{"key": "ey"}, {"key": "bee"}, {"key": "see"}],
         "cases" : [
             {
@@ -9,7 +9,7 @@
 
             }
         ]
-    }/*,
+    },
     {
         "given" : {
              "one": {"key": "value"},
@@ -25,6 +25,42 @@
             }
         ]
     },
+    {
+        "given" : ["a"],
+        "cases" : [
+            {
+                "comment" : "Union with duplication from array",
+                "expression" : "$[0,0]",
+                "result" : ["a","a"]
+            }
+        ]
+    },*/
+    {
+        "given" : [{"key": 1}, {"key": 8}, {"key": 3}, {"key": 10}, {"key": 7}, {"key": 2}, {"key": 6}, {"key": 4}],
+        "cases" : [
+            {
+                "comment" : "Union with filter",
+                "expression" : "$[?(@.key<3),?(@.key>6)]",
+                "result" : [
+                 {
+                   "key": 1
+                 },
+                 {
+                   "key": 2
+                 },
+                 {
+                   "key": 8
+                 },
+                 {
+                   "key": 10
+                 },
+                 {
+                   "key": 7
+                 }
+               ]
+            }
+        ]
+    }/*,
     {
         "given" : {
           "firstName": "John",
