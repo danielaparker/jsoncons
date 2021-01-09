@@ -1598,13 +1598,13 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '/':
                                 state_stack_.back() = path_state::regex;
+                                ++p_;
+                                ++column_;
                                 break;
                             default: 
                                 ec = jsonpath_errc::invalid_filter_expected_slash;
                                 break;
                         };
-                        ++p_;
-                        ++column_;
                         break;
                     case path_state::regex: 
                     {
