@@ -832,10 +832,9 @@ namespace detail {
         using string_type = std::basic_string<char_type>;
         std::basic_regex<char_type> pattern_;
     public:
-        regex_operator(const string_type& pattern, 
-                       std::regex::flag_type flags)
+        regex_operator(std::basic_regex<char_type>&& pattern)
             : unary_operator<Json>(2, true),
-              pattern_(pattern,flags)
+              pattern_(std::move(pattern))
         {
         }
 
@@ -1582,10 +1581,9 @@ namespace detail {
             return &oper;
         }
 
-        const unary_operator<Json>* get_regex_operator(const string_type& pattern, 
-                                                       std::regex::flag_type flags) 
+        const unary_operator<Json>* get_regex_operator(std::basic_regex<char_type>&& pattern) 
         {
-            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json>>(pattern, flags));
+            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json>>(std::move(pattern)));
             return unary_operators_.back().get();
         }
 

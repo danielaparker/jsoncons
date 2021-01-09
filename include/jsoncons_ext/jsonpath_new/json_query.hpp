@@ -1619,7 +1619,8 @@ namespace jsoncons { namespace jsonpath_new {
                                         ++column_;
                                         flags |= std::regex_constants::icase;
                                     }
-                                    push_token(resources.get_regex_operator(buffer,flags), ec);
+                                    std::basic_regex<char_type> pattern(buffer, flags);
+                                    push_token(resources.get_regex_operator(std::move(pattern)), ec);
                                     buffer.clear();
                                 }
                                 state_stack_.pop_back();
