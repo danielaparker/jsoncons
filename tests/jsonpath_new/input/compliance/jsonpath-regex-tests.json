@@ -19,6 +19,15 @@
                         "name": "yes hello world"
                     }
                 ]
+            },
+            {
+                "comment" : "Filter expression with regular expression",
+                "expression" : "$[?(@.name=~/hello.*/i)]",
+                "result" : [
+                    {"name": "hello world"},
+                    {"name": "yes hello world"},
+                    {"name": "HELLO WORLD"}
+                ]
             }
         ]
     },
