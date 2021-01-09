@@ -184,8 +184,10 @@ namespace jsoncons { namespace jsonpath_new {
         filter,
         expression,
         comparator_expression,
+        eq_or_regex,
+        expect_regex,
+        regex,
         cmp_lt_or_lte,
-        cmp_eq,
         cmp_gt_or_gte,
         cmp_ne,
         expect_or,
@@ -1429,9 +1431,15 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '<':
                             case '>':
-                            case '=':
                             {
                                 state_stack_.emplace_back(path_state::comparator_expression);
+                                break;
+                            }
+                            case '=':
+                            {
+                                state_stack_.emplace_back(path_state::eq_or_regex);
+                                ++p_;
+                                ++column_;
                                 break;
                             }
                             case '!':
@@ -1534,12 +1542,39 @@ namespace jsoncons { namespace jsonpath_new {
                                 state_stack_.back() = path_state::path_or_literal_or_function;
                                 state_stack_.emplace_back(path_state::cmp_gt_or_gte);
                                 break;
+                            default:
+                                if (state_stack_.size() > 1)
+                                {
+                                    state_stack_.pop_back();
+                                }
+                                else
+                                {
+                                    ec = jsonpath_errc::syntax_error;
+                                    return path_expression_type();
+                                }
+                                break;
+                        }
+                        break;
+                    case path_state::eq_or_regex:
+                        switch(*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
                             case '=':
+                            {
+                                push_token(token_type(resources.get_eq_operator()), ec);
+                                state_stack_.pop_back(); 
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            case '~':
                             {
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::path_or_literal_or_function;
-                                state_stack_.emplace_back(path_state::cmp_eq);
+                                //state_stack_.back() = path_state::path_or_literal_or_function;
+                                state_stack_.emplace_back(path_state::expect_regex);
                                 break;
                             }
                             default:
@@ -1555,6 +1590,49 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                         }
                         break;
+                    case path_state::expect_regex: 
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '/':
+                                state_stack_.back() = path_state::regex;
+                                break;
+                            default: 
+                                ec = jsonpath_errc::invalid_filter_expected_slash;
+                                break;
+                        };
+                        ++p_;
+                        ++column_;
+                        break;
+                    case path_state::regex: 
+                    {
+                        switch (*p_)
+                        {                   
+                            case '/':
+                                {
+                                    std::regex::flag_type flags = std::regex_constants::ECMAScript; 
+                                    if (p_+1  < end_input_ && *(p_+1) == 'i')
+                                    {
+                                        ++p_;
+                                        ++column_;
+                                        flags |= std::regex_constants::icase;
+                                    }
+                                    push_token(resources.get_regex_operator(buffer,flags), ec);
+                                    buffer.clear();
+                                }
+                                state_stack_.pop_back();
+                                break;
+
+                            default: 
+                                buffer.push_back(*p_);
+                                break;
+                        }
+                        ++p_;
+                        ++column_;
+                        break;
+                    }
                     case path_state::cmp_lt_or_lte:
                     {
                         switch(*p_)
@@ -1590,23 +1668,6 @@ namespace jsoncons { namespace jsonpath_new {
                                 //push_token(token_type(current_node_arg), ec);
                                 state_stack_.pop_back(); 
                                 break;
-                        }
-                        break;
-                    }
-                    case path_state::cmp_eq:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                push_token(token_type(resources.get_eq_operator()), ec);
-                                //push_token(token_type(current_node_arg), ec);
-                                state_stack_.pop_back(); 
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                ec = jsonpath_errc::expected_comparator;
-                                return path_expression_type();
                         }
                         break;
                     }

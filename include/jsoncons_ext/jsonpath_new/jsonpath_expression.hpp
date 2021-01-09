@@ -7,6 +7,7 @@
 #ifndef JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
 #define JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
 
+#include <regex>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_function.hpp>
 
@@ -825,6 +826,35 @@ namespace detail {
     };
 
     template <class Json>
+    class regex_operator final : public unary_operator<Json>
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+        std::basic_regex<char_type> pattern_;
+    public:
+        regex_operator(const string_type& pattern, 
+                       std::regex::flag_type flags)
+            : unary_operator<Json>(2, true),
+              pattern_(pattern,flags)
+        {
+        }
+
+        regex_operator(regex_operator&&) = default;
+        regex_operator& operator=(regex_operator&&) = default;
+
+        const Json& evaluate(dynamic_resources<Json>& resources, 
+                             const Json& val, 
+                             std::error_code&) const override
+        {
+            if (!val.is_string())
+            {
+                return resources.null_value();
+            }
+            return std::regex_search(val.as_string(), pattern_) ? resources.true_value() : resources.false_value();
+        }
+    };
+
+    template <class Json>
     struct binary_operator
     {
         typedef std::function<Json(const term<Json>&, const term<Json>&)> operator_type;
@@ -1512,6 +1542,7 @@ namespace detail {
         using function_base_type = function_base<Json,JsonReference>;
 
         std::vector<std::unique_ptr<Json>> temp_json_values_;
+        std::vector<std::unique_ptr<unary_operator<Json>>> unary_operators_;
 
         static_resources()
         {
@@ -1547,55 +1578,59 @@ namespace detail {
 
         const unary_operator<Json>* get_not_operator() const
         {
-            static not_expression<Json> not_oper;
-            return &not_oper;
+            static not_expression<Json> oper;
+            return &oper;
+        }
 
-            //static unary_operator<Json> not_properties{ 1,true, unary_not_op };
-            //return &not_properties;
+        const unary_operator<Json>* get_regex_operator(const string_type& pattern, 
+                                                       std::regex::flag_type flags) 
+        {
+            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json>>(pattern, flags));
+            return unary_operators_.back().get();
         }
 
         binary_operator<Json>* get_or_operator() const
         {
-            static or_operator<Json> or_oper;
+            static or_operator<Json> oper;
 
-            return &or_oper;
+            return &oper;
         }
 
         binary_operator<Json>* get_and_operator() const
         {
-            static and_operator<Json> and_oper;
+            static and_operator<Json> oper;
 
-            return &and_oper;
+            return &oper;
         }
 
         binary_operator<Json>* get_eq_operator() const
         {
-            static eq_operator<Json> eq_oper;
-            return &eq_oper;
+            static eq_operator<Json> oper;
+            return &oper;
         }
 
         binary_operator<Json>* get_ne_operator() const
         {
-            static ne_operator<Json> ne_oper;
-            return &ne_oper;
+            static ne_operator<Json> oper;
+            return &oper;
         }
 
         binary_operator<Json>* get_lt_operator() const
         {
-            static lt_operator<Json> lt_oper;
-            return &lt_oper;
+            static lt_operator<Json> oper;
+            return &oper;
         }
 
         binary_operator<Json>* get_lte_operator() const
         {
-            static lte_operator<Json> lte_oper;
-            return &lte_oper;
+            static lte_operator<Json> oper;
+            return &oper;
         }
 
         binary_operator<Json>* get_gt_operator() const
         {
-            static gt_operator<Json> gt_oper;
-            return &gt_oper;
+            static gt_operator<Json> oper;
+            return &oper;
         }
 
         binary_operator<Json>* get_gte_operator() const
