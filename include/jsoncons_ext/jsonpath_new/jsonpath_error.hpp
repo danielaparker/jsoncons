@@ -20,12 +20,7 @@ namespace jsoncons { namespace jsonpath_new {
         expected_right_bracket,
         expected_key,
         expected_separator,
-        invalid_filter,
-        invalid_filter_expected_slash,
-        invalid_filter_unbalanced_paren,
-        invalid_filter_unsupported_operator,
-        invalid_filter_expected_right_brace,
-        invalid_filter_expected_primary,
+        expected_forward_slash,
         expected_slice_start,
         expected_slice_end,
         expected_slice_step,
@@ -86,18 +81,8 @@ namespace jsoncons { namespace jsonpath_new {
                     return "Expected slice step";
                 case jsonpath_errc::expected_separator:
                     return "Expected dot or left bracket separator";
-                case jsonpath_errc::invalid_filter:
-                    return "Invalid path filter";
-                case jsonpath_errc::invalid_filter_expected_slash:
+                case jsonpath_errc::expected_forward_slash:
                     return "Invalid path filter, expected '/'";
-                case jsonpath_errc::invalid_filter_unbalanced_paren:
-                    return "Invalid path filter, unbalanced parenthesis";
-                case jsonpath_errc::invalid_filter_unsupported_operator:
-                    return "Unsupported operator";
-                case jsonpath_errc::invalid_filter_expected_right_brace:
-                    return "Invalid path filter, expected right brace }";
-                case jsonpath_errc::invalid_filter_expected_primary:
-                    return "Invalid path filter, expected primary expression.";
                 case jsonpath_errc::expected_left_bracket_token:
                     return "Expected ?,',\",0-9,*";
                 case jsonpath_errc::expected_minus_or_digit_or_colon_or_comma_or_right_bracket:

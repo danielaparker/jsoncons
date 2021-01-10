@@ -1502,7 +1502,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++column_;
                                 break;
                             default: 
-                                ec = jsonpath_errc::invalid_filter_expected_slash;
+                                ec = jsonpath_errc::expected_forward_slash;
                                 break;
                         };
                         break;
