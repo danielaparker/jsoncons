@@ -1768,7 +1768,6 @@ namespace detail {
     {
         root_node,
         current_node,
-        recursive_descent,
         lparen,
         rparen,
         begin_union,
@@ -1796,12 +1795,6 @@ namespace detail {
         explicit literal_arg_t() = default;
     };
     constexpr literal_arg_t literal_arg{};
-
-    struct recursive_descent_arg_t
-    {
-        explicit recursive_descent_arg_t() = default;
-    };
-    constexpr recursive_descent_arg_t recursive_descent_arg{};
 
     struct begin_expression_type_arg_t
     {
@@ -2145,11 +2138,6 @@ namespace detail {
         {
         }
 
-        token(recursive_descent_arg_t) noexcept
-            : type_(token_kind::recursive_descent)
-        {
-        }
-
         token(literal_arg_t, Json&& value) noexcept
             : type_(token_kind::literal), value_(std::move(value))
         {
@@ -2235,11 +2223,6 @@ namespace detail {
         {
             return type_ == token_kind::unary_operator || 
                    type_ == token_kind::binary_operator; 
-        }
-
-        bool is_recursive_descent() const
-        {
-            return type_ == token_kind::recursive_descent; 
         }
 
         std::size_t precedence_level() const
@@ -2517,14 +2500,10 @@ namespace detail {
             std::error_code ec;
 
             std::vector<node_set> stack;
-            std::vector<path_node_type> recursive_in_stack;
-            std::vector<path_node_type> recursive_out_stack;
-            std::vector<path_node_type> collected;
             std::vector<pointer> arg_stack;
             string_type path;
             path.push_back('$');
             Json result(json_array_arg);
-            bool is_recursive_descent = false;
 
             //std::cout << "EVALUATE BEGIN\n";
             //for (auto& tok : token_list_)
@@ -2534,11 +2513,8 @@ namespace detail {
 
             if (!token_list_.empty())
             {
-                for (std::size_t i = 0; 
-                     i < token_list_.size();
-                     )
+                for (auto& tok : token_list_)
                 {
-                    auto& tok = token_list_[i];
                     //std::cout << "Token: " << tok.to_string() << "\n";
                     switch (tok.type())
                     { 
@@ -2619,134 +2595,62 @@ namespace detail {
                         }
                         case token_kind::selector:
                         {
-                            if (is_recursive_descent)
+                            JSONCONS_ASSERT(!stack.empty());
+                            pointer ptr = nullptr;
+                            //for (auto& item : stack)
+                            //{
+                            //    std::cout << "selector stack input:\n";
+                            //    switch (item.tag)
+                            //    {
+                            //        case node_set_tag::single:
+                            //            std::cout << "single: " << *(item.node.val_ptr) << "\n";
+                            //            break;
+                            //        case node_set_tag::multi:
+                            //            for (auto& node : stack.back().nodes)
+                            //            {
+                            //                std::cout << "multi: " << *node.val_ptr << "\n";
+                            //            }
+                            //            break;
+                            //        default:
+                            //            break;
+                            //}
+                            //std::cout << "\n";
+                            //}
+                            switch (stack.back().tag)
                             {
-                                for (auto& item : recursive_in_stack)
-                                {
-                                    tok.selector_->select(resources, path, root, *(item.val_ptr), recursive_out_stack);
-                                }
+                                case node_set_tag::single:
+                                    ptr = stack.back().node.val_ptr;
+                                    break;
+                                case node_set_tag::multi:
+                                    if (!stack.back().nodes.empty())
+                                    {
+                                        ptr = stack.back().nodes.back().val_ptr;
+                                    }
+                                    ptr = stack.back().to_pointer(resources);
+                                    break;
+                                default:
+                                    break;
                             }
-                            else
+                            if (ptr)
                             {
-                                JSONCONS_ASSERT(!stack.empty());
-                                pointer ptr = nullptr;
-                                //for (auto& item : stack)
+                                //std::cout << "selector item: " << *ptr << "\n";
+                                stack.pop_back();
+                                std::vector<path_node_type> temp;
+                                tok.selector_->select(resources, path, root, *ptr, temp);
+                                stack.emplace_back(std::move(temp));
+
+                                //std::cout << "selector output\n";
+                                //for (auto& item : temp)
                                 //{
-                                //    std::cout << "selector stack input:\n";
-                                //    switch (item.tag)
-                                //    {
-                                //        case node_set_tag::single:
-                                //            std::cout << "single: " << *(item.node.val_ptr) << "\n";
-                                //            break;
-                                //        case node_set_tag::multi:
-                                //            for (auto& node : stack.back().nodes)
-                                //            {
-                                //                std::cout << "multi: " << *node.val_ptr << "\n";
-                                //            }
-                                //            break;
-                                //        default:
-                                //            break;
+                                //    std::cout << *item.val_ptr << "\n";
                                 //}
                                 //std::cout << "\n";
-                                //}
-                                switch (stack.back().tag)
-                                {
-                                    case node_set_tag::single:
-                                        ptr = stack.back().node.val_ptr;
-                                        break;
-                                    case node_set_tag::multi:
-                                        if (!stack.back().nodes.empty())
-                                        {
-                                            ptr = stack.back().nodes.back().val_ptr;
-                                        }
-                                        ptr = stack.back().to_pointer(resources);
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                if (ptr)
-                                {
-                                    //std::cout << "selector item: " << *ptr << "\n";
-                                    stack.pop_back();
-                                    std::vector<path_node_type> temp;
-                                    tok.selector_->select(resources, path, root, *ptr, temp);
-                                    stack.emplace_back(std::move(temp));
 
-                                    //std::cout << "selector output\n";
-                                    //for (auto& item : temp)
-                                    //{
-                                    //    std::cout << *item.val_ptr << "\n";
-                                    //}
-                                    //std::cout << "\n";
-
-                                }
                             }
                             break;
                         }
                         default:
                             break;
-                    }
-
-                    if (is_recursive_descent && recursive_in_stack.empty()) // recursive_out_stack is empty too
-                    {
-                        stack.emplace_back(std::move(collected));
-                        collected.clear();
-                        is_recursive_descent = false;
-                        ++i;
-                    }
-                    else if (is_recursive_descent)
-                    {
-                        for (auto& item : recursive_out_stack)
-                        {
-                            collected.emplace_back(item);
-                        }
-                        recursive_out_stack.clear();
-                        for (auto& item : recursive_in_stack)
-                        {
-                            if (item.val_ptr->is_object())
-                            {
-                                for (auto& val : item.val_ptr->object_range())
-                                {
-                                    recursive_out_stack.emplace_back(val.key(),std::addressof(val.value()));
-                                }
-                            }
-                            else if (item.val_ptr->is_array())
-                            {
-                                for (auto& val : item.val_ptr->array_range())
-                                {
-                                    recursive_out_stack.emplace_back("",std::addressof(val));
-                                }
-                            }
-                        }
-                        recursive_in_stack = std::move(recursive_out_stack);
-                        recursive_out_stack.clear();
-                    }
-                    else if (tok.is_recursive_descent())
-                    {
-                        JSONCONS_ASSERT(!stack.empty());
-                        switch (stack.back().tag)
-                        {
-                            case node_set_tag::single:
-                                recursive_in_stack.emplace_back(stack.back().node);
-                                stack.pop_back();
-                                is_recursive_descent = true;
-                                break;
-                            case node_set_tag::multi:
-                                if (!stack.back().nodes.empty())
-                                {
-                                    recursive_in_stack.emplace_back(stack.back().nodes.back());
-                                    stack.pop_back();
-                                    is_recursive_descent = true;
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                        ++i;
-                    }
-                    else 
-                    {
-                        ++i;
                     }
                 }
             }

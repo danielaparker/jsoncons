@@ -1,5 +1,5 @@
 [
-/*{
+{
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given": [{"id": 2}],
      "cases": [
@@ -9,8 +9,32 @@
             "result": [{"id":2}]
          }
      ]
-}
-,*/{
+},
+{
+    "source" : "https://cburgmer.github.io/json-path-comparison/",       
+    "given": {"id": 2, "more": [{"id": 2}, {"more": {"id": 2}}, {"id": {"id": 2}}, [{"id": 2}]]},
+     "cases": [
+         {
+            "comment" : "Filter expression after recursive descent",
+            "expression": "$..[?(@.id==2)]",
+            "result":  [
+                {
+                    "id": 2
+                },
+                {
+                    "id": 2
+                },
+                {
+                    "id": 2
+                },
+                {
+                    "id": 2
+                }
+            ]
+          }
+        ]
+},
+{
     "given":
         [{"name": "John Smith"}, {"name": null}],
      "cases": [
@@ -68,8 +92,7 @@
          {
             "comment" : "Filter expression after dot notation with wildcard after recursive descent",
             "expression": "$..*[?(@.id>2)]",
-            "result": [{"id":6,"name":"last"},{"id":5,"name":"next to last"},{"id":3,"name":
-  "another"},{"id":4,"name":"more"},{"id":3,"name":"another"},{"id":4,"name":
+            "result": [{"id":5,"name":"next to last"},{"id":3,"name":"another"},{"id":4,"name":
   "more"}]
          }
      ]
@@ -98,14 +121,7 @@
          {
             "comment" : "Filter expression on object",
             "expression": "$[?(@.key)]",
-            "result": [
-              {
-                "key": 42,
-                "another": {
-                  "key": 1
-                }
-              }
-            ]
+            "result": [{"key":1}]
          }
      ]
 },
@@ -116,12 +132,10 @@
          {
             "comment" : "Filter expression after recursive descent",
             "expression": "$..[?(@.id==2)]",
-            "result": [{"id":2,"more":[{"id":2},{"more":{"id":2}},{"id":{"id":2}},[{"id":2}]]},
-  {"id":2},{"id":2},{"id":2},{"id":2},{"id":2},{"id":2}]
+            "result": [{"id":2},{"id":2},{"id":2},{"id":2}]
          }
      ]
-}
-,
+},
 {
     "source" : "https://cburgmer.github.io/json-path-comparison/",       
     "given": [{"key": 60}, {"key": 50}, {"key": 10}, {"key": -50}, {"key+50": 100}],

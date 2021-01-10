@@ -474,6 +474,55 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
+        class recursive_selector final : public projection_base
+        {
+        public:
+            recursive_selector()
+                : projection_base(false, 11)
+            {
+            }
+
+            void select(dynamic_resources<Json>& resources,
+                        const string_type& path, 
+                        reference root,
+                        reference val,
+                        std::vector<path_node_type>& nodes) const override
+            {
+                //std::cout << "wildcard_selector: " << val << "\n";
+                if (val.is_array())
+                {
+                    this->apply_expressions(resources, path, root, val, nodes);
+                    for (auto& item : val.array_range())
+                    {
+                        select(resources,path,root,item,nodes);
+                    }
+                }
+                else if (val.is_object())
+                {
+                    this->apply_expressions(resources, path, root, val, nodes);
+                    for (auto& item : val.object_range())
+                    {
+                        select(resources,path,root,item.value(),nodes);
+                    }
+                }
+                //std::cout << "end wildcard_selector\n";
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("wildcard\n");
+                s.append(projection_base::to_string(level));
+
+                return s;
+            }
+        };
+
         class union_selector final : public projection_base
         {
             std::vector<path_expression_type> expressions_;
@@ -571,7 +620,21 @@ namespace jsoncons { namespace jsonpath_new {
                 }
                 else if (val.is_object())
                 {
-                    std::vector<path_node_type> temp;
+                    for (auto& member : val.object_range())
+                    {
+                        std::vector<path_node_type> temp;
+                        auto callback = [&temp](path_node_type& node)
+                        {
+                            temp.push_back(node);
+                        };
+                        expr_.evaluate(resources, root, member.value(), callback);
+                        if (is_true(temp))
+                        {
+                            this->apply_expressions(resources, PathCons()(path,member.key()), root, member.value(), nodes);
+                        }
+                    }
+
+                    /*std::vector<path_node_type> temp;
                     auto callback = [&temp](path_node_type& node)
                     {
                         temp.push_back(node);
@@ -581,6 +644,7 @@ namespace jsoncons { namespace jsonpath_new {
                     {
                         this->apply_expressions(resources, path, root, val, nodes);
                     }
+                    */
                 }
             }
 
@@ -1058,7 +1122,7 @@ namespace jsoncons { namespace jsonpath_new {
                         switch (*p_)
                         {
                             case '.':
-                                push_token(token_type(recursive_descent_arg), ec);
+                                push_token(token_type(jsoncons::make_unique<recursive_selector>()), ec);
                                 ++p_;
                                 ++column_;
                                 state_stack_.back() = path_state::name_or_left_bracket;
@@ -1564,7 +1628,8 @@ namespace jsoncons { namespace jsonpath_new {
                             case '=':
                             {
                                 push_token(token_type(resources.get_eq_operator()), ec);
-                                state_stack_.pop_back(); 
+                                //state_stack_.pop_back(); 
+                                state_stack_.back() = path_state::path_or_literal_or_function;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2717,11 +2782,6 @@ namespace jsoncons { namespace jsonpath_new {
                     {
                         output_stack_.emplace_back(std::move(tok));
                     }
-                    break;
-                }
-                case token_kind::recursive_descent:
-                {
-                    output_stack_.emplace_back(std::move(tok));
                     break;
                 }
                 case token_kind::separator:

@@ -20,26 +20,26 @@
     },
     {
         "given" : [
-          "first",
-          {
-              "key": [
-                  "first nested",
-                  {
-                      "more": [
-                          {
-                              "nested": ["deepest", "second"]
-                          },
-                          ["more", "values"]
-                      ]
-                  }
-              ]
-          }
-      ],
+             "first",
+             {
+                 "key": [
+                     "first nested",
+                     {
+                         "more": [
+                             {
+                                 "nested": ["deepest", "second"]
+                             },
+                             ["more", "values"]
+                         ]
+                     }
+                 ]
+             }
+         ],
         "cases" : [
             {
                 "comment" : "Bracket notation after recursive descent",
                 "expression" : "$..[0]",
-                "result" : ["first","first nested",{"nested":["deepest","second"]},"more","deepest"]
+                "result" : ["first","first nested",{"nested":["deepest","second"]},"deepest","more"]
             }
         ]
     }
