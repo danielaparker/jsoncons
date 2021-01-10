@@ -7,10 +7,14 @@
 #ifndef JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
 #define JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
 
+#include <string> // std::basic_string
+#include <vector> // std::vector
+#include <unordered_map> // std::unordered_map
+#include <limits> // std::numeric_limits
+#include <utility> // std::move
 #include <regex>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
-#include <jsoncons_ext/jsonpath_new/jsonpath_function.hpp>
 
 namespace jsoncons { 
 namespace jsonpath_new {

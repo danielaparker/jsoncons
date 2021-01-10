@@ -21,7 +21,6 @@
 //#include <jsoncons_ext/jsonpath_new/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_expression.hpp>
-#include <jsoncons_ext/jsonpath_new/jsonpath_function.hpp>
 
 namespace jsoncons { namespace jsonpath_new {
 
@@ -816,8 +815,6 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        function_table<Json,pointer> functions_;
-
         std::size_t line_;
         std::size_t column_;
         const char_type* begin_input_;
@@ -854,27 +851,6 @@ namespace jsoncons { namespace jsonpath_new {
         {
             return column_;
         }
-/*
-        void call_function(static_resources<Json>& resources, const string_type& function_name, std::error_code& ec)
-        {
-            auto f = functions_.get(function_name, ec);
-            if (ec)
-            {
-                return;
-            }
-            auto result = f(function_stack_, ec);
-            if (ec)
-            {
-                return;
-            }
-
-            string_type s = {'$'};
-            std::vector<path_node_type> v;
-            pointer ptr = resources.create_json(std::move(result));
-            v.emplace_back(s,ptr);
-            stack_.push_back(v);
-        }
-*/
 /*
         template<class Op>
         void replace_fn(Op op)
