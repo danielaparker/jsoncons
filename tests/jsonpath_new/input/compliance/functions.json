@@ -38,39 +38,54 @@
      },
      "cases": [
        {
-         "comment" : "",
+         "comment" : "length",
          "expression": "length($.store.book[*])",
          "result": [4]
        },
        {
-         "comment" : "",
+         "comment" : "keys",
          "expression": "keys($.store.book[0])[*]",
          "result": ["author","category","price","title"]
        },
        {
-         "comment" : "",
+         "comment" : "sum",
          "expression": "sum($.store.book[*].price)",
          "result": [53.92]
        },
        {
-         "comment" : "",
+         "comment" : "sum in filter",
+         "expression": "$.store.book[?(@.price > sum($.store.book[*].price) / length($.store.book[*]))].title",
+         "result": ["The Lord of the Rings"]
+       },
+       {
+         "comment" : "avg",
          "expression": "avg($.store.book[*].price)",
          "result": [13.48]
-       },
-       {
-         "comment" : "",
-         "expression": "min($.store.book[*].price)",
-         "result": [8.95]
-       },
-       {
-         "comment" : "",
-         "expression": "max($.store.book[*].price)",
-         "result": [22.99]
        },
        {
          "comment" : "avg in filter",
          "expression": "$.store.book[?(@.price > avg($.store.book[*].price))].title",
          "result": ["The Lord of the Rings"]
+       },
+       {
+         "comment" : "prod",
+         "expression": "prod($.store.book[*].price)",
+         "result": [24028.731766049998]
+       },
+       {
+         "comment" : "min",
+         "expression": "min($.store.book[*].price)",
+         "result": [8.95]
+       },
+       {
+         "comment" : "max",
+         "expression": "max($.store.book[*].price)",
+         "result": [22.99]
+       },
+       {
+         "comment" : "max in filter",
+         "expression": "$.store.book[?(@.price < max($.store.book[*].price))].title",
+         "result": ["Sayings of the Century","Sword of Honour","Moby Dick"]
        }
      ]
   }

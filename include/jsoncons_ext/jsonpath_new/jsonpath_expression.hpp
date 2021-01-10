@@ -8,6 +8,7 @@
 #define JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
 
 #include <regex>
+#include <jsoncons/json_type.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_function.hpp>
 
@@ -1301,6 +1302,134 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    class tokenize_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+
+        tokenize_function()
+            : function_base<Json, JsonReference>(2)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            if (!args[0]->is_string() || !args[1]->is_string())
+            {
+                //std::cout << "arg: " << *arg0_ptr << "\n";
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+            auto arg0 = args[0]->template as<string_type>();
+            auto arg1 = args[1]->template as<string_type>();
+
+            std::regex::flag_type flags = std::regex_constants::ECMAScript; 
+            std::basic_regex<char_type> pieces_regex(arg1, flags);
+
+            std::regex_token_iterator<typename string_type::const_iterator> rit ( arg0.begin(), arg0.end(), pieces_regex, -1);
+            std::regex_token_iterator<typename string_type::const_iterator> rend;
+
+            auto j = resources.create_json(json_array_arg);
+            while (rit!=rend) 
+            {
+                j->emplace_back(rit->str());
+                ++rit;
+            }
+            return *j;
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class ceil_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        ceil_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_array())
+            {
+                //std::cout << "arg: " << *arg0_ptr << "\n";
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+            switch (arg0_ptr->type())
+            {
+                case json_type::uint64_value:
+                case json_type::int64_value:
+                {
+                    return *resources.create_json(arg0_ptr->template as<double>());
+                }
+                case json_type::double_value:
+                {
+                    return *resources.create_json(std::ceil(arg0_ptr->template as<double>()));
+                }
+                default:
+                    ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class prod_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        prod_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json>& resources,
+                           std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_array() || arg0_ptr->empty())
+            {
+                //std::cout << "arg: " << *arg0_ptr << "\n";
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+            double prod = 1;
+            for (auto& j : arg0_ptr->array_range())
+            {
+                if (!j.is_number())
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return Json::null();
+                }
+                prod *= j.template as<double>();
+            }
+
+            return *resources.create_json(prod);
+        }
+    };
+
+    template <class Json,class JsonReference>
     class avg_function : public function_base<Json,JsonReference>
     {
     public:
@@ -1549,21 +1678,27 @@ namespace detail {
 
         function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
+            static ceil_function<Json,JsonReference> ceil_func;
             static sum_function<Json,JsonReference> sum_func;
+            static prod_function<Json,JsonReference> prod_func;
             static avg_function<Json,JsonReference> avg_func;
             static min_function<Json,JsonReference> min_func;
             static max_function<Json,JsonReference> max_func;
             static length_function<Json,JsonReference> length_func;
             static keys_function<Json,JsonReference> keys_func;
+            static tokenize_function<Json,JsonReference> tokenize_func;
 
             static std::unordered_map<string_type,function_base_type*> functions =
             {
+                {string_type{'c','e','i','l'}, &ceil_func},
                 {string_type{'s','u','m'}, &sum_func},
+                {string_type{'p','r','o', 'd'}, &prod_func},
                 {string_type{'a','v','g'}, &avg_func},
                 {string_type{'m','i','n'}, &min_func},
                 {string_type{'m','a','x'}, &max_func},
                 {string_type{'l','e','n','g','t','h'}, &length_func},
-                {string_type{'k','e','y','s'}, &keys_func}
+                {string_type{'k','e','y','s'}, &keys_func},
+                {string_type{'t','o','k','e','n','i','z','e'}, &tokenize_func}
             };
 
             auto it = functions.find(name);

@@ -103,7 +103,7 @@ TEST_CASE("jsonpath-tests")
     SECTION("compliance")
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
-        jsonpath_tests("./jsonpath_new/input/compliance/jsonpath-regex-tests.json");
+        jsonpath_tests("./jsonpath_new/input/compliance/regex.json");
 #endif
         //jsonpath_tests("./jsonpath_new/input/compliance/jsonpath-tests.json");
 
@@ -117,7 +117,6 @@ TEST_CASE("jsonpath-tests")
         jsonpath_tests("./jsonpath_new/input/compliance/union.json");       
         jsonpath_tests("./jsonpath_new/input/compliance/filters.json");
         jsonpath_tests("./jsonpath_new/input/compliance/functions.json");
-
         jsonpath_tests("./jsonpath_new/input/compliance/expressions.json");
     }
 }
