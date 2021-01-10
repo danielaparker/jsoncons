@@ -145,8 +145,6 @@ namespace jsoncons { namespace jsonpath_new {
         unquoted_string,
         function_expression,
         argument,
-        unquoted_name,
-        unquoted_name2,
         identifier,
         single_quoted_string,
         double_quoted_string,
@@ -165,10 +163,6 @@ namespace jsoncons { namespace jsonpath_new {
         rhs_slice_expression_stop,
         comma_or_right_bracket,
         expect_right_bracket,
-        unquoted_arg,
-        single_quoted_arg,
-        double_quoted_arg,
-        more_args_or_right_paren,
         quoted_string_escape_char,
         escape_u1, 
         escape_u2, 
@@ -962,138 +956,6 @@ namespace jsoncons { namespace jsonpath_new {
                         }
                         break;
                     }
-                    case path_state::unquoted_arg:
-                        switch (*p_)
-                        {
-                            case ',':
-                                JSONCONS_TRY
-                                {
-                                    auto val = Json::parse(buffer);
-                                    auto temp = resources.create_json(val);
-                                    function_stack_.push_back(std::vector<pointer>{temp});
-                                }
-                                JSONCONS_CATCH(const ser_error&)     
-                                {
-                                    ec = jsonpath_errc::argument_parse_error;
-                                    return path_expression_type();
-                                }
-                                buffer.clear();
-                                //state_ = path_state::arg_or_right_paren;
-                                state_stack_.pop_back();
-                                break;
-                            case ')':
-                            {
-                                JSONCONS_TRY
-                                {
-                                    auto val = Json::parse(buffer);
-                                    auto temp = resources.create_json(val);
-                                    function_stack_.push_back(std::vector<pointer>{temp});
-                                }
-                                JSONCONS_CATCH(const ser_error&)     
-                                {
-                                    ec = jsonpath_errc::argument_parse_error;
-                                    return path_expression_type();
-                                }
-                                //call_function(resources, function_name, ec);
-                                if (ec)
-                                {
-                                    return path_expression_type();
-                                }
-                                state_stack_.pop_back();
-                                break;
-                            }
-                            default:
-                                buffer.push_back(*p_);
-                                break;
-                        }
-                        ++p_;
-                        ++column_;
-                        break;
-                    case path_state::single_quoted_arg:
-                        switch (*p_)
-                        {
-                            case '\'':
-                                buffer.push_back('\"');
-                                state_stack_.pop_back();
-                                break;
-                            case '\"':
-                                buffer.push_back('\\');
-                                buffer.push_back('\"');
-                                state_stack_.pop_back();
-                                break;
-                            default:
-                                buffer.push_back(*p_);
-                                break;
-                        }
-                        ++p_;
-                        ++column_;
-                        break;
-                    case path_state::double_quoted_arg:
-                        switch (*p_)
-                        {
-                            case '\"':
-                                buffer.push_back('\"');
-                                state_stack_.pop_back();
-                                break;
-                            default:
-                                buffer.push_back(*p_);
-                                break;
-                        }
-                        ++p_;
-                        ++column_;
-                        break;
-                    case path_state::more_args_or_right_paren:
-                        switch (*p_)
-                        {
-                            case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character();
-                                break;
-                            case ',':
-                                JSONCONS_TRY
-                                {
-                                    auto val = Json::parse(buffer);
-                                    auto temp = resources.create_json(val);
-                                    function_stack_.push_back(std::vector<pointer>{temp});
-                                }
-                                JSONCONS_CATCH(const ser_error&)     
-                                {
-                                    ec = jsonpath_errc::argument_parse_error;
-                                    return path_expression_type();
-                                }
-                                buffer.clear();
-                                //state_ = path_state::arg_or_right_paren;
-                                state_stack_.pop_back();
-                                ++p_;
-                                ++column_;
-                                break;
-                            case ')':
-                            {
-                                JSONCONS_TRY
-                                {
-                                    auto val = Json::parse(buffer);
-                                    auto temp = resources.create_json(val);
-                                    function_stack_.push_back(std::vector<pointer>{temp});
-                                }
-                                JSONCONS_CATCH(const ser_error&)     
-                                {
-                                    ec = jsonpath_errc::argument_parse_error;
-                                    return path_expression_type();
-                                }
-                                //call_function(resources, function_name, ec);
-                                if (ec)
-                                {
-                                    return path_expression_type();
-                                }
-                                state_stack_.pop_back();
-                                ++p_;
-                                ++column_;
-                                break;
-                            }
-                            default:
-                                ec = jsonpath_errc::invalid_filter_unsupported_operator;
-                                return path_expression_type();
-                        }
-                        break;
                     case path_state::recursive_descent_or_lhs_expression:
                         switch (*p_)
                         {
@@ -1727,48 +1589,6 @@ namespace jsoncons { namespace jsonpath_new {
                         }
                         break;
                     }
-                    case path_state::unquoted_name: 
-                        switch (*p_)
-                        {
-                            case ']':
-                            case '[':
-                            case '.':
-                            case ',':
-                            case ' ':case '\t':
-                            case '\r':
-                            case '\n':
-                                state_stack_.back() = path_state::unquoted_name2;
-                                break;
-                            default:
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                                break;
-                        };
-                        break;
-                    case path_state::unquoted_name2: 
-                        switch (*p_)
-                        {
-                            case ' ':case '\t':case '\r':case '\n':
-                                advance_past_space_character();
-                                break;
-                            case '[':
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                buffer.clear();
-                                state_stack_.pop_back();
-                                break;
-                            case ']':
-                            case '.':
-                            case ',':
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                buffer.clear();
-                                state_stack_.pop_back();
-                                break;
-                            default:
-                                ec = jsonpath_errc::expected_key;
-                                return path_expression_type();
-                        };
-                        break;
                     case path_state::identifier:
                         switch (*p_)
                         {
@@ -2571,19 +2391,6 @@ namespace jsoncons { namespace jsonpath_new {
                 }
             }
 
-            switch (state_stack_.back())
-            {
-                case path_state::unquoted_name: 
-                case path_state::unquoted_name2: 
-                {
-                    push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                    buffer.clear();
-                    state_stack_.pop_back(); // unquoted_name
-                    break;
-                }
-                default:
-                    break;
-            }
             if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
             {
                 push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
@@ -2601,25 +2408,6 @@ namespace jsoncons { namespace jsonpath_new {
                 return path_expression_type();
             }
 
-            /*switch (state_stack_.back())
-            {
-                case path_state::start:
-                {
-                    JSONCONS_ASSERT(!stack_.empty());
-                    stack_.clear();
-                    JSONCONS_ASSERT(state_stack_.size() == 1);
-                    state_stack_.pop_back();
-                    break;
-                }
-                default:
-                {
-                    JSONCONS_ASSERT(state_stack_.size() == 2);
-                    state_stack_.pop_back(); 
-                    JSONCONS_ASSERT(state_stack_.back() == path_state::start);
-                    state_stack_.pop_back();
-                    break;
-                }
-            }*/
             return path_expression_type(std::move(output_stack_));
         }
 
