@@ -287,10 +287,10 @@ namespace detail {
 
         const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
         {
-            if (!(lhs.is_number() && rhs.is_number()))
-            {
-                return resources.null_value();
-            }
+            //if (!(lhs.is_number() && rhs.is_number()))
+            //{
+            //    return resources.null_value();
+            //}
             return lhs < rhs ? resources.true_value() : resources.false_value();
         }
     };
@@ -306,10 +306,10 @@ namespace detail {
 
         const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
         {
-            if (!(lhs.is_number() && rhs.is_number()))
-            {
-                return resources.null_value();
-            }
+            //if (!(lhs.is_number() && rhs.is_number()))
+            //{
+            //    return resources.null_value();
+            //}
             return lhs <= rhs ? resources.true_value() : resources.false_value();
         }
     };
@@ -325,10 +325,10 @@ namespace detail {
 
         const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
         {
-            if (!(lhs.is_number() && rhs.is_number()))
-            {
-                return resources.null_value();
-            }
+            //if (!(lhs.is_number() && rhs.is_number()))
+            //{
+            //    return resources.null_value();
+            //}
             return lhs > rhs ? resources.true_value() : resources.false_value();
         }
     };
@@ -344,10 +344,10 @@ namespace detail {
 
         const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
         {
-            if (!(lhs.is_number() && rhs.is_number()))
-            {
-                return resources.null_value();
-            }
+            //if (!(lhs.is_number() && rhs.is_number()))
+            //{
+            //    return resources.null_value();
+            //}
             return lhs >= rhs ? resources.true_value() : resources.false_value();
         }
     };
