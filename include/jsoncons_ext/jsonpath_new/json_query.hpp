@@ -1042,7 +1042,14 @@ namespace jsoncons { namespace jsonpath_new {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token_type(resources.get_not_operator()), ec);
+                                push_token(token_type(resources.get_unary_not()), ec);
+                                break;
+                            }
+                            case '-':
+                            {
+                                ++p_;
+                                ++column_;
+                                push_token(token_type(resources.get_unary_minus()), ec);
                                 break;
                             }
                             default:
@@ -1159,7 +1166,7 @@ namespace jsoncons { namespace jsonpath_new {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token_type(resources.get_not_operator()), ec);
+                                push_token(token_type(resources.get_unary_not()), ec);
                                 break;
                             }
                             case '?':
@@ -2769,26 +2776,24 @@ namespace jsoncons { namespace jsonpath_new {
 
     enum class result_type {value,path};
 
-/*
     template<class Json>
     Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
     {
-        if (result_t == result_type::value)
+        //if (result_t == result_type::value)
         {
-            jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::VoidPathConstructor<Json>> evaluator;
-            jsoncons::jsonpath_new::detail::static_resources<value_type,reference> resources;
-            evaluator.evaluate(resources, root, path);
-            return evaluator.get_values();
+            auto expression = make_expression<Json>(path);
+            return expression.evaluate(root);
         }
-        else
+        /*else
         {
             jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,const Json&,detail::PathConstructor<Json>> evaluator;
             jsoncons::jsonpath_new::detail::static_resources<value_type,reference> resources;
             evaluator.evaluate(resources, root, path);
             return evaluator.get_normalized_paths();
-        }
+        }*/
     }
 
+/*
     template<class Json, class T>
     typename std::enable_if<!jsoncons::detail::is_function_object<T,Json>::value,void>::type
     json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)

@@ -97,10 +97,10 @@ namespace detail {
     }
 
     template <class Json>
-    class not_expression final : public unary_operator<Json>
+    class unary_not_operator final : public unary_operator<Json>
     {
     public:
-        not_expression()
+        unary_not_operator()
             : unary_operator<Json>(1, true)
         {}
 
@@ -109,6 +109,33 @@ namespace detail {
                              std::error_code&) const override
         {
             return is_false(val) ? resources.true_value() : resources.false_value();
+        }
+    };
+
+    template <class Json>
+    class unary_minus_operator final : public unary_operator<Json>
+    {
+    public:
+        unary_minus_operator()
+            : unary_operator<Json>(1, true)
+        {}
+
+        const Json& evaluate(dynamic_resources<Json>& resources,
+                             const Json& val, 
+                             std::error_code&) const override
+        {
+            if (val.is_int64())
+            {
+                return *resources.create_json(-val.template as<int64_t>());
+            }
+            else if (val.is_double())
+            {
+                return *resources.create_json(-val.as_double());
+            }
+            else
+            {
+                return resources.null_value();
+            }
         }
     };
 
@@ -921,9 +948,15 @@ namespace detail {
             return it->second;
         }
 
-        const unary_operator<Json>* get_not_operator() const
+        const unary_operator<Json>* get_unary_not() const
         {
-            static not_expression<Json> oper;
+            static unary_not_operator<Json> oper;
+            return &oper;
+        }
+
+        const unary_operator<Json>* get_unary_minus() const
+        {
+            static unary_minus_operator<Json> oper;
             return &oper;
         }
 
