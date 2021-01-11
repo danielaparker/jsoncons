@@ -58,10 +58,10 @@ void jsonpath_tests(const std::string& fpath)
                     }
                     CHECK(actual == expected);
                 }
-                if (test_case.contains("path-result"))
+                if (test_case.contains("path"))
                 {
-                    json actual = expression.evaluate(instance);
-                    const json& expected = test_case["path-result"];
+                    json actual = expression.evaluate(instance, jsonpath_new::result_flags::path);
+                    const json& expected = test_case["path"];
                     //std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
                     {

@@ -8,7 +8,7 @@
             {
                 "expression": "$.__L",
                 "result": [true],
-                "path-result" : "$['__L']"
+                "path" : ["$['__L']"]
             }
         ]
     },

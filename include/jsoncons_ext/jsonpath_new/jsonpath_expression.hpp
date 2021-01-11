@@ -16,8 +16,17 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
 
+
 namespace jsoncons { 
 namespace jsonpath_new {
+
+    enum class result_flags {value=1,path=2};
+
+    inline result_flags operator&(result_flags a, result_flags b)
+    {
+        return static_cast<result_flags>(static_cast<int>(a) & static_cast<int>(b));
+    }
+
 namespace detail {
 
     template <class Json>
@@ -1240,6 +1249,7 @@ namespace detail {
     public:
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
         using reference = JsonReference;
         using path_node_type = path_node<Json,JsonReference>;
 
@@ -1281,11 +1291,44 @@ namespace detail {
             return true;
         }
 
+        static string_type generate_path(const string_type& path, 
+                                         std::size_t index, 
+                                         result_flags flags) 
+        {
+            string_type s;
+            if ((flags & result_flags::path) == result_flags::path)
+            {
+                s.append(path);
+                s.push_back('[');
+                jsoncons::detail::from_integer(index,s);
+                s.push_back(']');
+            }
+            return s;
+        }
+
+        static string_type generate_path(const string_type& path, 
+                                         const string_view_type& identifier, 
+                                         result_flags flags) 
+        {
+            string_type s;
+            if ((flags & result_flags::path) == result_flags::path)
+            {
+                s.append(path);
+                s.push_back('[');
+                s.push_back('\'');
+                s.append(identifier.data(),identifier.length());
+                s.push_back('\'');
+                s.push_back(']');
+            }
+            return s;
+        }
+
         virtual void select(dynamic_resources<Json>& resources,
                             const string_type& path, 
                             reference root,
                             reference val, 
-                            std::vector<path_node_type>& nodes) const = 0;
+                            std::vector<path_node_type>& nodes,
+                            result_flags flags) const = 0;
 
         virtual void add_selector(std::unique_ptr<selector_base>&&) 
         {
@@ -1629,23 +1672,26 @@ namespace detail {
 
         Json evaluate(dynamic_resources<Json>& resources, 
                       reference root,
-                      reference instance) const
+                      reference instance,
+                      result_flags flags) const
         {
             Json result(json_array_arg);
 
-            std::vector<path_node_type> output_stack;
-            auto callback = [&output_stack](path_node_type& node)
+            if ((flags & result_flags::value) == result_flags::value)
             {
-                output_stack.push_back(node);
-            };
-            evaluate(resources, root, instance, callback);
-            if (!output_stack.empty())
-            {
-                result.reserve(output_stack.size());
-                for (const auto& p : output_stack)
+                auto callback = [&result](path_node_type& node)
                 {
-                    result.push_back(*(p.val_ptr));
-                }
+                    result.push_back(*node.val_ptr);
+                };
+                evaluate(resources, root, instance, callback, flags);
+            }
+            else if ((flags & result_flags::path) == result_flags::path)
+            {
+                auto callback = [&result](path_node_type& node)
+                {
+                    result.emplace_back(node.path);
+                };
+                evaluate(resources, root, instance, callback, flags);
             }
 
             return result;
@@ -1781,7 +1827,8 @@ namespace detail {
         evaluate(dynamic_resources<Json>& resources, 
                  reference root,
                  reference current, 
-                 Callback callback) const
+                 Callback callback,
+                 result_flags flags) const
         {
             std::error_code ec;
 
@@ -1922,7 +1969,7 @@ namespace detail {
                                 //std::cout << "selector item: " << *ptr << "\n";
                                 stack.pop_back();
                                 std::vector<path_node_type> temp;
-                                tok.selector_->select(resources, path, root, *ptr, temp);
+                                tok.selector_->select(resources, path, root, *ptr, temp, flags);
                                 stack.emplace_back(std::move(temp));
 
                                 //std::cout << "selector output\n";
