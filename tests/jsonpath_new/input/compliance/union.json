@@ -108,25 +108,26 @@
            "result": [1]
         }
       ]
-    },{
-    "given": {
-      "foo": {
-          "bar": {"baz": [{"common": "first", "one": 1},
-                          {"common": "second", "two": 2}]},
-          "ignoreme": 1,
-          "includeme": true
-      }
     },
-    "cases": [
-         
-         {
-            "expression": "$.foo[includeme, bar.baz[*].common]",
-            "result": [true, "first", "second"]
-         },
-         {
-            "expression": "$.foo[includeme, bar.baz[*].none]",
-            "result": [true]
+    {
+       "given": {
+         "foo": {
+             "bar": {"baz": [{"common": "first", "one": 1},
+                             {"common": "second", "two": 2}]},
+             "ignoreme": 1,
+             "includeme": true
          }
-    ]
-}
+       },
+       "cases": [
+            
+            {
+               "expression": "$.foo[includeme, bar.baz[*].common]",
+               "result": [true, "first", "second"]
+            },
+            {
+               "expression": "$.foo[includeme, bar.baz[*].none]",
+               "result": [true]
+            }
+         ]
+    }
 ]
