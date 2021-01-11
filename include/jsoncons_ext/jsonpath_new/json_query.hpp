@@ -2714,6 +2714,8 @@ namespace jsoncons { namespace jsonpath_new {
 
     } // namespace detail
 
+    enum class result_type {value,path};
+
     template <class Json>
     class jsonpath_expression
     {
@@ -2736,10 +2738,18 @@ namespace jsoncons { namespace jsonpath_new {
         {
         }
 
-        Json evaluate(reference instance)
+        Json evaluate(reference instance, result_type type = result_type::value)
         {
-            jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
-            return expr_.evaluate(resources, instance, instance);
+            if (type == result_type::value)
+            {
+                jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
+                return expr_.evaluate(resources, instance, instance);
+            }
+            else
+            {
+                jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
+                return expr_.evaluate(resources, instance, instance);
+            }
         }
 
         static jsonpath_expression compile(const string_view_type& path)
@@ -2774,12 +2784,10 @@ namespace jsoncons { namespace jsonpath_new {
         return jsonpath_expression<Json>::compile(expr, ec);
     }
 
-    enum class result_type {value,path};
-
     template<class Json>
-    Json json_query(const Json& root, const typename Json::string_view_type& path, result_type result_t = result_type::value)
+    Json json_query(const Json& root, const typename Json::string_view_type& path, result_type type = result_type::value)
     {
-        //if (result_t == result_type::value)
+        //if (type == result_type::value)
         {
             auto expression = make_expression<Json>(path);
             return expression.evaluate(root);

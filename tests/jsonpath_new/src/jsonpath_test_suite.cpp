@@ -40,9 +40,9 @@ void jsonpath_tests(const std::string& fpath)
             try
             {
                 auto expression = jsoncons::jsonpath_new::make_expression<json>(jsoncons::string_view(expr));
-                json actual = expression.evaluate(instance);
                 if (test_case.contains("result"))
                 {
+                    json actual = expression.evaluate(instance);
                     const json& expected = test_case["result"];
                     //std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
@@ -58,8 +58,27 @@ void jsonpath_tests(const std::string& fpath)
                     }
                     CHECK(actual == expected);
                 }
-                else if (test_case.contains("error"))
+                if (test_case.contains("path-result"))
                 {
+                    json actual = expression.evaluate(instance);
+                    const json& expected = test_case["path-result"];
+                    //std::cout << "actual\n:" << actual << "\n";
+                    if (actual != expected)
+                    {
+                        if (test_case.contains("comment"))
+                        {
+                            std::cout << "\n" << test_case["comment"] << "\n";
+                        }
+                        std::cout << "Input:\n" << pretty_print(instance) << "\n\n";
+                        std::cout << "Expression: " << expr << "\n\n";
+                        std::cout << "Actual: " << pretty_print(actual) << "\n\n";
+                        std::cout << "Expected: " << pretty_print(expected) << "\n\n";
+                    }
+                    CHECK(actual == expected);
+                }
+                if (test_case.contains("error"))
+                {
+                    json actual = expression.evaluate(instance);
                     if (test_case.contains("comment"))
                     {
                         std::cout << "Comment: " << test_case["comment"] << "\n";

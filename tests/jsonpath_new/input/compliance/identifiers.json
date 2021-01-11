@@ -8,7 +8,7 @@
             {
                 "expression": "$.__L",
                 "result": [true],
-                "normalized-path-expression" : "$['__L']"
+                "path-result" : "$['__L']"
             }
         ]
     },
