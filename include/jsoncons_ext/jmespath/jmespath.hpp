@@ -286,7 +286,7 @@ namespace jmespath {
         key_val_expr,
         number,
         digit,
-        right_bracket_or_slice_expression,
+        index_or_slice_expression,
         bracket_specifier,
         bracket_specifier_or_multi_select_list,
         filter,
@@ -304,10 +304,6 @@ namespace jmespath {
         cmp_eq,
         cmp_gt_or_gte,
         cmp_ne,
-        cmp_lt_or_lte_old,
-        cmp_eq_old,
-        cmp_gt_or_gte_old,
-        cmp_ne_old,
         expect_pipe_or_or,
         expect_and
     };
@@ -3440,9 +3436,6 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            //case '{':
-                            //    state_stack_.emplace_back(path_state::lhs_expression);
-                            //    break;
                             default:
                                 if (state_stack_.size() > 1)
                                 {
@@ -4115,7 +4108,7 @@ namespace jmespath {
                                 break;
                             // number
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = path_state::right_bracket_or_slice_expression;
+                                state_stack_.back() = path_state::index_or_slice_expression;
                                 state_stack_.emplace_back(path_state::number);
                                 break;
                             default:
@@ -4152,7 +4145,7 @@ namespace jmespath {
                             default:
                                 push_token(token(begin_multi_select_list_arg));
                                 state_stack_.back() = path_state::multi_select_list;
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
                         }
                         break;
@@ -4195,7 +4188,7 @@ namespace jmespath {
                         }
                         break;
 
-                    case path_state::right_bracket_or_slice_expression:
+                    case path_state::index_or_slice_expression:
                         switch(*p_)
                         {
                             case ']':
@@ -4430,72 +4423,6 @@ namespace jmespath {
                                 push_token(token(context_.get_ne_operator()));
                                 push_token(token(current_node_arg));
                                 state_stack_.pop_back(); 
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                ec = jmespath_errc::expected_comparator;
-                                return jmespath_expression();
-                        }
-                        break;
-                    }
-                    case path_state::cmp_lt_or_lte_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                break;
-                        }
-                        break;
-                    }
-                    case path_state::cmp_eq_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                ec = jmespath_errc::expected_comparator;
-                                return jmespath_expression();
-                        }
-                        break;
-                    }
-                    case path_state::cmp_gt_or_gte_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                ++p_;
-                                ++column_;
-                                break;
-                            default:
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
-                                break;
-                        }
-                        break;
-                    }
-                    case path_state::cmp_ne_old:
-                    {
-                        switch(*p_)
-                        {
-                            case '=':
-                                state_stack_.back() = path_state::expect_filter_right_bracket;
-                                state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;
                                 break;

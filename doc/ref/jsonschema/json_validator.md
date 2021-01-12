@@ -13,15 +13,20 @@ class json_validator
 
 #### Member functions
 
-    Json validate(const Json& instance) const; // (1)
+    bool is_valid(const Json& instance) const;  (1)
+
+    Json validate(const Json& instance) const;  (2)
 
     template <class Reporter>
-    Json validate(const Json& instance, const Reporter& reporter) const; // (2)
+    Json validate(const Json& instance, const Reporter& reporter) const;  (3)
 
-(1) Validates input JSON against a JSON Schema with a default error reporter
+(1) Validates input JSON against a JSON Schema and returns false upon the 
+first schema violation.
+
+(2) Validates input JSON against a JSON Schema with a default error reporter
 that throws upon the first schema violation.
 
-(2) Validates input JSON against a JSON Schema with a provided error reporter
+(3) Validates input JSON against a JSON Schema with a provided error reporter
 that is called for each schema violation.
 
 #### Parameters
@@ -41,14 +46,15 @@ which accepts an argument of type <a href="validation_output.md">validation_outp
 </table>
 
 #### Return value
-
-Returns a JSONPatch document that may be applied to the input JSON
+ 
+(1) `true` if the instance is valid, otherwise `false` 
+(2) - (3) A JSONPatch document that may be applied to the input JSON
 to fill in missing properties that have "default" values in the
 schema.
 
 #### Exceptions
 
-(1) Throws a [validation_error](validation_error.md) for the first schema violation.
+(2) Throws a [validation_error](validation_error.md) for the first schema violation.
 
-(2) `reporter` is called for each schema violation
+(3) `reporter` is called for each schema violation
 

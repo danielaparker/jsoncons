@@ -267,11 +267,19 @@ namespace jsonschema {
                     if (retval.ec != jsoncons::conv_errc::success)
                     {
                         reporter.error(validation_output(instance_location.string(), "Content is not a base64 string", "contentEncoding", absolute_content_encoding_location_));
+                        if (reporter.fail_early())
+                        {
+                            return;
+                        }
                     }
                 }
                 else if (!content_encoding_->empty())
                 {
                     reporter.error(validation_output(instance_location.string(), "unable to check for contentEncoding '" + *content_encoding_ + "'", "contentEncoding", absolute_content_encoding_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
             else
@@ -286,6 +294,10 @@ namespace jsonschema {
             else if (instance.type() == json_type::byte_string_value) 
             {
                 reporter.error(validation_output(instance_location.string(), "Expected string, but is byte string", "contentMediaType", absolute_content_media_type_location_));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
             }
 
             if (instance.type() != json_type::string_value) 
@@ -300,6 +312,10 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected minLength: ") + std::to_string(*min_length_)
                                               + ", actual: " + std::to_string(length), "minLength", absolute_min_length_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -310,6 +326,10 @@ namespace jsonschema {
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected maxLength: ") + std::to_string(*max_length_)
                         + ", actual: " + std::to_string(length), "maxLength", absolute_max_length_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -324,6 +344,10 @@ namespace jsonschema {
                     message.append(pattern_string_);
                     message.append("\"");
                     reporter.error(validation_output(instance_location.string(), std::move(message), "pattern", absolute_pattern_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -332,6 +356,10 @@ namespace jsonschema {
             if (format_check_ != nullptr) 
             {
                 format_check_(absolute_format_location_, instance_location, content, reporter);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
             }
         }
     };
@@ -365,7 +393,9 @@ namespace jsonschema {
             rule_->validate(instance_location, instance, local_reporter, patch);
 
             if (local_reporter.errors.empty())
+            {
                 reporter.error(validation_output(instance_location.string(), "Instance must not be valid against schema", "not", this->absolute_keyword_location()));
+            }
         }
 
         jsoncons::optional<Json> get_default_value(const uri_wrapper& instance_location, 
@@ -566,6 +596,10 @@ namespace jsonschema {
             if (Json(value) != instance)
             {
                 reporter.error(validation_output(instance_location.string(), "Instance is not a number", "number", this->absolute_keyword_location()));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
             }
 
             if (multiple_of_ && value != 0) // exclude zero
@@ -573,31 +607,59 @@ namespace jsonschema {
                 if (!is_multiple_of(value, *multiple_of_))
                 {
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is not a multiple of " + std::to_string(*multiple_of_), "multipleOf", absolute_multiple_of_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
 
             if (maximum_)
             {
                 if (value > *maximum_)
+                {
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*maximum_), "maximum", absolute_maximum_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
+                }
             }
 
             if (minimum_)
             {
                 if (value < *minimum_)
+                {
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*minimum_), "minimum", absolute_minimum_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
+                }
             }
 
             if (exclusive_maximum_)
             {
                 if (value >= *exclusive_maximum_)
+                {
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " exceeds maximum of " + std::to_string(*exclusive_maximum_), "exclusiveMaximum", absolute_exclusive_maximum_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
+                }
             }
 
             if (exclusive_minimum_)
             {
                 if (value <= *exclusive_minimum_)
+                {
                     reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is below minimum of " + std::to_string(*exclusive_minimum_), "exclusiveMinimum", absolute_exclusive_minimum_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
+                }
             }
         }
 
@@ -708,6 +770,10 @@ namespace jsonschema {
                 if (instance.find(key) == instance.object_range().end())
                 {
                     reporter.error(validation_output(instance_location.string(), "Required property \"" + key + "\" not found", "required", this->absolute_keyword_location()));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -836,6 +902,10 @@ namespace jsonschema {
                 std::string message("Maximum properties: " + std::to_string(*max_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
                 reporter.error(validation_output(instance_location.string(), std::move(message), "maxProperties", absolute_max_properties_location_));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
             }
 
             if (min_properties_ && instance.size() < *min_properties_)
@@ -843,6 +913,10 @@ namespace jsonschema {
                 std::string message("Minimum properties: " + std::to_string(*min_properties_));
                 message.append(", found: " + std::to_string(instance.size()));
                 reporter.error(validation_output(instance_location.string(), std::move(message), "minProperties", absolute_min_properties_location_));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
             }
 
             if (required_)
@@ -880,7 +954,13 @@ namespace jsonschema {
                     collecting_error_reporter local_reporter;
                     additional_properties_->validate(instance_location.append(property.key()), property.value(), local_reporter, patch);
                     if (!local_reporter.errors.empty())
+                    {
                         reporter.error(validation_output(instance_location.string(), "Additional property \"" + property.key() + "\" found but was invalid.", "additionalProperties", additional_properties_->absolute_keyword_location()));
+                        if (reporter.fail_early())
+                        {
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -1008,6 +1088,10 @@ namespace jsonschema {
                     std::string message("Expected maximum item count: " + std::to_string(*max_items_));
                     message.append(", found: " + std::to_string(instance.size()));
                     reporter.error(validation_output(instance_location.string(), std::move(message), "maxItems", absolute_max_items_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -1018,6 +1102,10 @@ namespace jsonschema {
                     std::string message("Expected minimum item count: " + std::to_string(*min_items_));
                     message.append(", found: " + std::to_string(instance.size()));
                     reporter.error(validation_output(instance_location.string(), std::move(message), "minItems", absolute_min_items_location_));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -1026,6 +1114,10 @@ namespace jsonschema {
                 if (!array_has_unique_items(instance))
                 {
                     reporter.error(validation_output(instance_location.string(), "Array items are not unique", "uniqueItems", this->absolute_keyword_location()));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -1074,7 +1166,13 @@ namespace jsonschema {
                     }
                 }
                 if (!contained)
+                {
                     reporter.error(validation_output(instance_location.string(), "Expected at least one array item to match \"contains\" schema", "contains", this->absolute_keyword_location(), local_reporter.errors));
+                    if (reporter.fail_early())
+                    {
+                        return;
+                    }
+                }
             }
         }
 
@@ -1187,6 +1285,10 @@ namespace jsonschema {
             if (!in_range)
             {
                 reporter.error(validation_output(instance_location.string(), instance.template as<std::string>() + " is not a valid enum value", "enum", this->absolute_keyword_location()));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
             }
         }
     };
@@ -1362,25 +1464,47 @@ namespace jsonschema {
                 ss << ", found " << instance.type();
 
                 reporter.error(validation_output(instance_location.string(), ss.str(), "type", this->absolute_keyword_location()));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
             }
 
             if (enum_)
             { 
                 enum_->validate(instance_location, instance, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
             }
 
             if (const_)
             { 
                 const_->validate(instance_location, instance, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
             }
 
             for (const auto& l : combined_)
+            {
                 l->validate(instance_location, instance, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
+            }
 
 
             if (conditional_)
             { 
                 conditional_->validate(instance_location, instance, reporter, patch);
+                if (reporter.error_count() > 0 && reporter.fail_early())
+                {
+                    return;
+                }
             }
         }
 
