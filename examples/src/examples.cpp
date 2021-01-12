@@ -464,10 +464,9 @@ int main()
 
         json_traits_variant_examples();
 
-        jsonschema_examples();
-
         erase_examples();
 
+        jsonschema_examples();
     }
     catch (const std::exception& e)
     {

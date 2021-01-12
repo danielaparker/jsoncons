@@ -1594,7 +1594,7 @@ private:
             {
                 return false;
             }
-            return evaluate().is_datetime();
+            return evaluate().tag() == semantic_tag::datetime;
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_second")
@@ -1604,35 +1604,35 @@ private:
             {
                 return false;
             }
-            return evaluate().is_epoch_time();
+            return evaluate().tag() == semantic_tag::epoch_second;
         }
 
         template <class T>
         JSONCONS_DEPRECATED_MSG("Instead, use push_back(T&&)")
         void add(T&& val)
         {
-            evaluate_with_default().add(std::forward<T>(val));
+            evaluate_with_default().push_back(std::forward<T>(val));
         }
 
         template <class T>
         JSONCONS_DEPRECATED_MSG("Instead, use insert(const_array_iterator, T&&)")
         array_iterator add(const_array_iterator pos, T&& val)
         {
-            return evaluate_with_default().add(pos, std::forward<T>(val));
+            return evaluate_with_default().insert(pos, std::forward<T>(val));
         }
 
         template <class T>
         JSONCONS_DEPRECATED_MSG("Instead, use insert_or_assign(const string_view_type&, T&&)")
         std::pair<object_iterator,bool> set(const string_view_type& name, T&& val)
         {
-            return evaluate().set(name,std::forward<T>(val));
+            return evaluate().insert_or_assign(name,std::forward<T>(val));
         }
 
         template <class T>
         JSONCONS_DEPRECATED_MSG("Instead, use insert_or_assign(object_iterator, const string_view_type&, T&&)")
         object_iterator set(object_iterator hint, const string_view_type& name, T&& val)
         {
-            return evaluate().set(hint, name, std::forward<T>(val));
+            return evaluate().insert_or_assign(hint, name, std::forward<T>(val));
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")
@@ -1726,13 +1726,14 @@ private:
         {
             evaluate().write(os,options,pprint);
         }
-
+/*
         template <class SAllocator=std::allocator<char_type>>
         JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
         std::basic_string<char_type,char_traits_type,SAllocator> to_string(const basic_json_encode_options<char_type>& options, char_allocator_type& alloc = char_allocator_type()) const
         {
             return evaluate().to_string(options,alloc);
         }
+*/
         JSONCONS_DEPRECATED_MSG("Instead, use dump(basic_json_visitor<char_type>&)")
         void to_stream(basic_json_visitor<char_type>& visitor) const
         {
@@ -4931,7 +4932,7 @@ public:
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-
+/*
     template <class SAllocator = std::allocator<char_type>>
     JSONCONS_DEPRECATED_MSG("Instead, use dump(std::basic_ostream<char_type>&, const basic_json_encode_options<char_type>&)")
     std::basic_string<char_type, char_traits_type, SAllocator> to_string(const basic_json_encode_options<char_type>& options,
@@ -4943,7 +4944,7 @@ public:
         dump(encoder);
         return s;
     }
-
+*/
     JSONCONS_DEPRECATED_MSG("Instead, use basic_json(byte_string_arg_t, const Source&, semantic_tag=semantic_tag::none,const Allocator& = Allocator())")
     basic_json(const byte_string_view& bytes, 
                semantic_tag tag, 
