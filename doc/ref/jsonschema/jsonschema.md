@@ -51,10 +51,12 @@ missing key/value pairs.
 Some of the schemas used below are from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html)
 and the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
 
-[Arrays of things](#Arrays)  
-[Using a URIResolver to resolve references to schemas defined in external files](#Using)  
-[Default values](#Default)  
-[Validate before decoding JSON into C++ class objects](#Validate)  
+[Arrays of things](#eg1)  
+[Using a URIResolver to resolve references to schemas defined in external files](#eg2)  
+[Default values](#eg3)  
+[Validate before decoding JSON into C++ class objects](#eg4)  
+
+ <div id="eg1"/>
 
 #### Arrays of things
 
@@ -164,6 +166,8 @@ Output:
 Error count: 2
 ```
 
+<div id="eg2"/>
+
 #### Using a URIResolver to resolve references to schemas defined in external files
 
 In this example, the main schema defines a reference using the `$ref` property to a
@@ -267,6 +271,8 @@ Output:
 Error count: 1
 ```
 
+<div id="eg3"/>
+
 #### Default values
 
 ```c++
@@ -328,6 +334,8 @@ Patch: [{"op":"add","path":"/bar","value":"bad"}]
 Original data: {}
 Patched data: {"bar":"bad"}
 ```
+
+<div id="eg4"/>
 
 #### Validate before decoding JSON into C++ class objects 
 
