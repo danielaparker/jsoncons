@@ -48,7 +48,7 @@ missing key/value pairs.
   
 ### Examples
 
-Some of the schemas used below are from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html)
+The examples use schemas from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html)
 and the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
 
 [Arrays of things](#eg1)  
