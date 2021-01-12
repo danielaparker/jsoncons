@@ -1291,7 +1291,7 @@ namespace detail {
             return true;
         }
 
-        static string_type generate_path(const string_type& path, 
+        static string_type generate_path(const string_view_type& path, 
                                          std::size_t index, 
                                          result_flags flags) 
         {
@@ -1306,7 +1306,7 @@ namespace detail {
             return s;
         }
 
-        static string_type generate_path(const string_type& path, 
+        static string_type generate_path(const string_view_type& path, 
                                          const string_view_type& identifier, 
                                          result_flags flags) 
         {
@@ -1671,6 +1671,7 @@ namespace detail {
         path_expression& operator=(path_expression&& expr) = default;
 
         Json evaluate(dynamic_resources<Json>& resources, 
+                      const string_type& path, 
                       reference root,
                       reference instance,
                       result_flags flags) const
@@ -1683,7 +1684,7 @@ namespace detail {
                 {
                     result.push_back(*node.val_ptr);
                 };
-                evaluate(resources, root, instance, callback, flags);
+                evaluate(resources, path, root, instance, callback, flags);
             }
             else if ((flags & result_flags::path) == result_flags::path)
             {
@@ -1691,7 +1692,7 @@ namespace detail {
                 {
                     result.emplace_back(node.path);
                 };
-                evaluate(resources, root, instance, callback, flags);
+                evaluate(resources, path, root, instance, callback, flags);
             }
 
             return result;
@@ -1825,6 +1826,7 @@ namespace detail {
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
         evaluate(dynamic_resources<Json>& resources, 
+                 const string_type& ipath, 
                  reference root,
                  reference current, 
                  Callback callback,
@@ -1834,8 +1836,7 @@ namespace detail {
 
             std::vector<node_set> stack;
             std::vector<pointer> arg_stack;
-            string_type path;
-            path.push_back('$');
+            string_type path(ipath);
             Json result(json_array_arg);
 
             //std::cout << "EVALUATE BEGIN\n";

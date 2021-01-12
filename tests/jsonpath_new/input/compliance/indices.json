@@ -4,35 +4,36 @@
      "cases": [
          {
             "expression": "$.foo.bar[0]",
-            "result": ["zero"]
+            "result": ["zero"],
+            "path" : ["$['foo']['bar'][0]"]
          }/*,
          {
-            "expression": "foo.bar[1]",
-            "result": "one"
+            "expression": "$foo.bar[1]",
+            "result": ["one"]
          },
          {
-            "expression": "foo.bar[2]",
-            "result": "two"
+            "expression": "$foo.bar[2]",
+            "result": ["two"]
          },
          {
-            "expression": "foo.bar[3]",
-            "result": null
+            "expression": "$foo.bar[3]",
+            "result": []
          },
          {
-            "expression": "foo.bar[-1]",
-            "result": "two"
+            "expression": "$foo.bar[-1]",
+            "result": ["two"]
          },
          {
-            "expression": "foo.bar[-2]",
-            "result": "one"
+            "expression": "$foo.bar[-2]",
+            "result": ["one"]
          },
          {
-            "expression": "foo.bar[-3]",
-            "result": "zero"
+            "expression": "$foo.bar[-3]",
+            "result": ["zero"]
          },
          {
-            "expression": "foo.bar[-4]",
-            "result": null
+            "expression": "$foo.bar[-4]",
+            "result": []
          }*/
      ]
 }/*,

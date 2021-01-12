@@ -189,159 +189,6 @@ namespace jsoncons { namespace jsonpath_new {
         using function_base_type = function_base<Json,JsonReference>;
 
     private:
-        class identifier_selector final : public selector_base_type
-        {
-            string_type identifier_;
-            using selector_base_type::generate_path;
-        public:
-            identifier_selector(const string_view_type& identifier)
-                : identifier_(identifier)
-            {
-            }
-
-            void select(dynamic_resources<Json>& resources,
-                        const string_type& path, 
-                        reference /* root */,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        result_flags flags) const override
-            {
-                //std::cout << "identifier_selector " << identifier_ << ", val: " << val << "\n";
-                if (val.is_object())
-                {
-                    auto it = val.find(identifier_);
-                    if (it != val.object_range().end())
-                    {
-                        nodes.emplace_back(generate_path(path,identifier_,flags),std::addressof(it->value()));
-                    }
-                }
-                else if (val.is_array() && identifier_ == length_literal<char_type>())
-                {
-                    pointer ptr = resources.create_json(val.size());
-                    nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
-                }
-                else if (val.is_string() && identifier_ == length_literal<char_type>())
-                {
-                    string_view_type sv = val.as_string_view();
-                    std::size_t count = unicons::u32_length(sv.begin(), sv.end());
-                    pointer ptr = resources.create_json(count);
-                    nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
-                }
-                //std::cout << "end identifier_selector\n";
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("identifier: ");
-                s.append(identifier_);
-
-                return s;
-            }
-        };
-
-        class current_node final : public selector_base_type
-        {
-            using selector_base_type::generate_path;
-        public:
-            current_node()
-            {
-            }
-
-            void select(dynamic_resources<Json>& /*resources*/,
-                        const string_type& path, 
-                        reference,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        result_flags) const override
-            {
-                nodes.emplace_back(path, std::addressof(val));
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("current_node");
-
-                return s;
-            }
-        };
-
-        class root_node final : public selector_base_type
-        {
-            using selector_base_type::generate_path;
-        public:
-            root_node()
-            {
-            }
-
-            void select(dynamic_resources<Json>& /*resources*/,
-                        const string_type& path, 
-                        reference root,
-                        reference,
-                        std::vector<path_node_type>& nodes,
-                        result_flags) const override
-            {
-                nodes.emplace_back(path, std::addressof(root));
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("root_node");
-
-                return s;
-            }
-        };
-
-        class index_selector final : public selector_base_type
-        {
-            int64_t index_;
-            using selector_base_type::generate_path;
-        public:
-            index_selector(int64_t index)
-                : index_(index)
-            {
-            }
-
-            void select(dynamic_resources<Json>& /*resources*/,
-                        const string_type& path, 
-                        reference /* root */,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        result_flags flags) const override
-            {
-                if (val.is_array())
-                {
-                    int64_t slen = static_cast<int64_t>(val.size());
-                    if (index_ >= 0 && index_ < slen)
-                    {
-                        std::size_t index = static_cast<std::size_t>(index_);
-                        nodes.emplace_back(generate_path(path, "", flags),std::addressof(val.at(index)));
-                    }
-                    else if ((slen + index_) >= 0 && (slen+index_) < slen)
-                    {
-                        std::size_t index = static_cast<std::size_t>(slen + index_);
-                        nodes.emplace_back(generate_path(path,"",flags),std::addressof(val.at(index)));
-                    }
-                }
-            }
-        };
 
         // projection_base
         class projection_base : public selector_base_type
@@ -406,6 +253,180 @@ namespace jsoncons { namespace jsonpath_new {
                 }
 
                 return s;
+            }
+        };
+
+        class identifier_selector final : public projection_base
+        {
+            string_type identifier_;
+            using projection_base::generate_path;
+        public:
+            identifier_selector(const string_view_type& identifier)
+                : projection_base(false, 11), identifier_(identifier)
+            {
+            }
+
+            void select(dynamic_resources<Json>& resources,
+                        const string_type& path, 
+                        reference root,
+                        reference val,
+                        std::vector<path_node_type>& nodes,
+                        result_flags flags) const override
+            {
+                //std::cout << "path: " << path << ", val: " << val << ", identifier: " << identifier_  << "\n";
+                if (val.is_object())
+                {
+                    auto it = val.find(identifier_);
+                    if (it != val.object_range().end())
+                    {
+                        //nodes.emplace_back(generate_path(path,identifier_,flags),std::addressof(it->value()));
+                        this->apply_expressions(resources, generate_path(path, identifier_, flags), 
+                                                root, it->value(), nodes, flags);
+                    }
+                }
+                else if (val.is_array() && identifier_ == length_literal<char_type>())
+                {
+                    pointer ptr = resources.create_json(val.size());
+                    //nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
+                    this->apply_expressions(resources, generate_path(path, identifier_, flags), 
+                                            root, *ptr, nodes, flags);
+                }
+                else if (val.is_string() && identifier_ == length_literal<char_type>())
+                {
+                    string_view_type sv = val.as_string_view();
+                    std::size_t count = unicons::u32_length(sv.begin(), sv.end());
+                    pointer ptr = resources.create_json(count);
+                    //nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
+                    this->apply_expressions(resources, generate_path(path, identifier_, flags), 
+                                            root, *ptr, nodes, flags);
+                }
+                //std::cout << "end identifier_selector\n";
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("identifier: ");
+                s.append(identifier_);
+
+                return s;
+            }
+        };
+
+        class current_node final : public projection_base
+        {
+            using projection_base::generate_path;
+        public:
+            current_node()
+                : projection_base(false, 11)
+            {
+            }
+
+            void select(dynamic_resources<Json>& resources,
+                        const string_type& path, 
+                        reference root,
+                        reference val,
+                        std::vector<path_node_type>& nodes,
+                        result_flags flags) const override
+            {
+                //nodes.emplace_back(path, std::addressof(val));
+                this->apply_expressions(resources, path, 
+                                        root, val, nodes, flags);
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("current_node");
+
+                return s;
+            }
+        };
+
+        class root_node final : public projection_base
+        {
+            using projection_base::generate_path;
+        public:
+            root_node()
+                : projection_base(false, 11)
+            {
+            }
+
+            void select(dynamic_resources<Json>& resources,
+                        const string_type& path, 
+                        reference root,
+                        reference,
+                        std::vector<path_node_type>& nodes,
+                        result_flags flags) const override
+            {
+                //nodes.emplace_back(path, std::addressof(root));
+                //nodes.emplace_back(path, std::addressof(val));
+                this->apply_expressions(resources, path, 
+                                        root, root, nodes, flags);
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("root_node");
+
+                return s;
+            }
+        };
+
+        class index_selector final : public projection_base
+        {
+            int64_t index_;
+            using projection_base::generate_path;
+        public:
+            index_selector(int64_t index)
+                : projection_base(false, 11), index_(index)
+            {
+            }
+
+            void select(dynamic_resources<Json>& resources,
+                        const string_type& path, 
+                        reference root,
+                        reference val,
+                        std::vector<path_node_type>& nodes,
+                        result_flags flags) const override
+            {
+                if (val.is_array())
+                {
+                    int64_t slen = static_cast<int64_t>(val.size());
+                    if (index_ >= 0 && index_ < slen)
+                    {
+                        std::size_t index = static_cast<std::size_t>(index_);
+                        //std::cout << "path: " << path << ", val: " << val << ", index: " << index << "\n";
+                        //nodes.emplace_back(generate_path(path, index, flags),std::addressof(val.at(index)));
+                        //nodes.emplace_back(path, std::addressof(val));
+                        this->apply_expressions(resources, generate_path(path, index, flags), 
+                                                root, val.at(index), nodes, flags);
+                    }
+                    else if ((slen + index_) >= 0 && (slen+index_) < slen)
+                    {
+                        std::size_t index = static_cast<std::size_t>(slen + index_);
+                        //std::cout << "path: " << path << ", val: " << val << ", index: " << index << "\n";
+                        //nodes.emplace_back(generate_path(path, index ,flags),std::addressof(val.at(index)));
+                        this->apply_expressions(resources, generate_path(path, index, flags), 
+                                                root, val.at(index), nodes, flags);
+                    }
+                }
             }
         };
 
@@ -536,7 +557,7 @@ namespace jsoncons { namespace jsonpath_new {
                 };
                 for (auto& expr : expressions_)
                 {
-                    expr.evaluate(resources, root, val, callback, flags);
+                    expr.evaluate(resources, path, root, val, callback, flags);
                 }
             }
 
@@ -602,7 +623,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             temp.push_back(node);
                         };
-                        expr_.evaluate(resources, root, val[i], callback, flags);
+                        expr_.evaluate(resources, path, root, val[i], callback, flags);
                         if (is_true(temp))
                         {
                             this->apply_expressions(resources, generate_path(path,i,flags), root, val[i], nodes, flags);
@@ -618,24 +639,12 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             temp.push_back(node);
                         };
-                        expr_.evaluate(resources, root, member.value(), callback, flags);
+                        expr_.evaluate(resources, path, root, member.value(), callback, flags);
                         if (is_true(temp))
                         {
                             this->apply_expressions(resources, generate_path(path,member.key(),flags), root, member.value(), nodes, flags);
                         }
                     }
-
-                    /*std::vector<path_node_type> temp;
-                    auto callback = [&temp](path_node_type& node)
-                    {
-                        temp.push_back(node);
-                    };
-                    expr_.evaluate(resources, root, val, callback);
-                    if (is_true(temp))
-                    {
-                        this->apply_expressions(resources, path, root, val, nodes);
-                    }
-                    */
                 }
             }
 
@@ -678,7 +687,7 @@ namespace jsoncons { namespace jsonpath_new {
                 {
                     temp.push_back(node);
                 };
-                expr_.evaluate(resources, root, val, callback, flags);
+                expr_.evaluate(resources, path, root, val, callback, flags);
                 if (!temp.empty())
                 {
                     auto& j = *temp.back().val_ptr;
@@ -784,7 +793,7 @@ namespace jsoncons { namespace jsonpath_new {
             }
 
             void select(dynamic_resources<Json>& resources,
-                        const string_type& /*path*/, 
+                        const string_type& path, 
                         reference root,
                         reference val, 
                         std::vector<path_node_type>& nodes,
@@ -795,7 +804,7 @@ namespace jsoncons { namespace jsonpath_new {
                 {
                     nodes.push_back(node);
                 };
-                return expr_.evaluate(resources, root, val, callback, flags);
+                return expr_.evaluate(resources, path, root, val, callback, flags);
             }
 
             std::string to_string(int level = 0) const override
@@ -2722,6 +2731,7 @@ namespace jsoncons { namespace jsonpath_new {
     {
     public:
         using evaluator_t = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, const Json&>;
+        using string_type = typename evaluator_t::string_type;
         using string_view_type = typename evaluator_t::string_view_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
@@ -2742,10 +2752,11 @@ namespace jsoncons { namespace jsonpath_new {
 
         Json evaluate(reference root, result_flags flags = result_flags::value)
         {
+            string_type path = {'$'};
             if ((flags & result_flags::value) == result_flags::value)
             {
                 jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
-                return expr_.evaluate(resources, root, root, flags);
+                return expr_.evaluate(resources, path, root, root, flags);
             }
             else if ((flags & result_flags::path) == result_flags::path)
             {
@@ -2756,7 +2767,7 @@ namespace jsoncons { namespace jsonpath_new {
                 {
                     result.emplace_back(node.path);
                 };
-                expr_.evaluate(resources, root, root, callback, flags);
+                expr_.evaluate(resources, path, root, root, callback, flags);
                 return result;
             }
             else
