@@ -50,8 +50,6 @@
 
 [Construct a json object](#C1)  
 [Construct a json array](#C2)  
-[Insert a new value in an array at a specific position](#C3)  
-[Merge two json objects](#C5)  
 [Construct a json byte string](#C6)  
 [Construct a multidimensional json array](#C7)  
 [Construct a json array that contains non-owning references to other json values (since 0.156.0)](#C8)
@@ -69,6 +67,12 @@
 
 [Iterate over a json array](#D1)  
 [Iterate over a json object](#D2)  
+
+### Modify
+
+[Insert a new value in an array at a specific position](#J1)  
+[Merge two json objects](#J2)  
+[Erase an object with a specified key from an array](#J3)  
 
 ### Flatten and unflatten
 
@@ -2931,64 +2935,6 @@ or use an array initializer-list,
 json image_formats(json_array_arg, {"JPEG","PSD","TIFF","DNG"});
 ```
 
-<div id="C3"/>
-
-#### Insert a new value in an array at a specific position
-
-```c++
-json cities(json_array_arg); // an empty array
-cities.push_back("Toronto");  
-cities.push_back("Vancouver");
-// Insert "Montreal" at beginning of array
-cities.insert(cities.array_range().begin(),"Montreal");  
-
-std::cout << cities << std::endl;
-```
-Output:
-```
-["Montreal","Toronto","Vancouver"]
-```
-
-<div id="C5"/>
-
-#### Merge two json objects
-
-[json::merge](ref/json/merge.md) inserts another json object's key-value pairs into a json object,
-unless they already exist with an equivalent key.
-
-[json::merge_or_update](ref/json/merge_or_update.md) inserts another json object's key-value pairs 
-into a json object, or assigns them if they already exist.
-
-The `merge` and `merge_or_update` functions perform only a one-level-deep shallow merge,
-not a deep merge of nested objects.
-
-```c++
-json another = json::parse(R"(
-{
-    "a" : "2",
-    "c" : [4,5,6]
-}
-)");
-
-json j = json::parse(R"(
-{
-    "a" : "1",
-    "b" : [1,2,3]
-}
-)");
-
-j.merge(std::move(another));
-std::cout << pretty_print(j) << std::endl;
-```
-Output:
-```json
-{
-    "a": "1",
-    "b": [1,2,3],
-    "c": [4,5,6]
-}
-```
-
 <div id="C6"/>
 
 #### Construct a json byte string
@@ -3184,6 +3130,137 @@ for (const auto& member : j.object_range())
     std::cout << member.key() << "=" 
               << member.value() << std::endl;
 }
+```
+
+### Modify
+
+<div id="J1"/>
+
+#### Insert a new value in an array at a specific position
+
+```c++
+json cities(json_array_arg); // an empty array
+cities.push_back("Toronto");  
+cities.push_back("Vancouver");
+// Insert "Montreal" at beginning of array
+cities.insert(cities.array_range().begin(),"Montreal");  
+
+std::cout << cities << std::endl;
+```
+Output:
+```
+["Montreal","Toronto","Vancouver"]
+```
+
+<div id="J2"/>
+
+#### Merge two json objects
+
+[json::merge](ref/json/merge.md) inserts another json object's key-value pairs into a json object,
+unless they already exist with an equivalent key.
+
+[json::merge_or_update](ref/json/merge_or_update.md) inserts another json object's key-value pairs 
+into a json object, or assigns them if they already exist.
+
+The `merge` and `merge_or_update` functions perform only a one-level-deep shallow merge,
+not a deep merge of nested objects.
+
+```c++
+json another = json::parse(R"(
+{
+    "a" : "2",
+    "c" : [4,5,6]
+}
+)");
+
+json j = json::parse(R"(
+{
+    "a" : "1",
+    "b" : [1,2,3]
+}
+)");
+
+j.merge(std::move(another));
+std::cout << pretty_print(j) << std::endl;
+```
+Output:
+```json
+{
+    "a": "1",
+    "b": [1,2,3],
+    "c": [4,5,6]
+}
+```
+
+<div id="J3"/>
+
+#### Erase an object with a specified key from an array
+
+```c++
+int main()
+{
+    std::string input = R"(
+[
+    {
+        "address": "ashdod",
+        "email": "ron10@gmail.com",
+        "first name": "ron",
+        "id": "756746783",
+        "last name": "cohen",
+        "phone": "0526732996",
+        "salary": 3000,
+        "type": "manager"
+    },
+    {
+        "address": "ashdod",
+        "email": "nirlevy120@gmail.com",
+        "first name": "nir",
+        "id": "11884398",
+        "last name": "levy",
+        "phone": "0578198932",
+        "salary": 4500,
+        "type": "manager"
+    }
+]
+    )";
+
+    try
+    {
+        // Read from input 
+        json instance = json::parse(input);
+ 
+        // Locate the item to be erased
+        auto it = std::find_if(instance.array_range().begin(), instance.array_range().end(), 
+                               [](const json& item){return item.at("id") == "756746783";});
+ 
+        // If found, erase it
+        if (it != instance.array_range().end())
+        {
+            instance.erase(it);
+        }
+
+        std::cout << pretty_print(instance) << "\n\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;    
+    }
+}
+```
+Output:
+```json
+[
+    {
+        "address": "ashdod",
+        "email": "nirlevy120@gmail.com",
+        "first name": "nir",
+        "id": "11884398",
+        "last name": "levy",
+        "phone": "0578198932",
+        "salary": 4500,
+        "type": "manager"
+    }
+]
 ```
 
 ### Access
