@@ -51,10 +51,10 @@ missing key/value pairs.
 Some of the schemas used below are from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html)
 and the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
 
-[Arrays of things](#Arrays)
-[Using a URIResolver to resolve references to schemas defined in external files](#Using)
-[Default values](#Default)
-[Validate before decoding JSON into C++ class objects](#Validate) 
+[Arrays of things](#Arrays)  
+[Using a URIResolver to resolve references to schemas defined in external files](#Using)  
+[Default values](#Default)  
+[Validate before decoding JSON into C++ class objects](#Validate)  
 
 #### Arrays of things
 
