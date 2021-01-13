@@ -53,8 +53,8 @@ and the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-
 
 [Arrays of things](#eg1)  
 [Using a URIResolver to resolve references to schemas defined in external files](#eg2)  
-[Default values](#eg3)  
-[Validate before decoding JSON into C++ class objects](#eg4)  
+[Validate before decoding JSON into C++ class objects](#eg3)  
+[Default values](#eg4)  
 
  <div id="eg1"/>
 
@@ -273,70 +273,6 @@ Error count: 1
 
 <div id="eg3"/>
 
-#### Default values
-
-```c++
-#include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonschema/jsonschema.hpp>
-#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
-#include <fstream>
-
-// for brevity
-using jsoncons::json;
-namespace jsonschema = jsoncons::jsonschema; 
-namespace jsonpatch = jsoncons::jsonpatch; 
-
-int main() 
-{
-    // JSON Schema
-    json schema = json::parse(R"(
-{
-    "properties": {
-        "bar": {
-            "type": "string",
-            "minLength": 4,
-            "default": "bad"
-        }
-    }
-}
-    )");
-
-    // Data
-    json data = json::parse("{}");
-
-    try
-    {
-       // will throw schema_error if JSON Schema loading fails 
-       auto sch = jsonschema::make_schema(schema, resolver); 
-
-       jsonschema::json_validator<json> validator(sch); 
-
-       // will throw a validation_error on first encountered schema violation 
-       json patch = validator.validate(data); 
-
-       std::cout << "Patch: " << patch << "\n";
-
-       std::cout << "Original data: " << data << "\n";
-
-       jsonpatch::apply_patch(data, patch);
-
-       std::cout << "Patched data: " << data << "\n\n";
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << e.what() << '\n';
-    }
-}
-```
-Output:
-```
-Patch: [{"op":"add","path":"/bar","value":"bad"}]
-Original data: {}
-Patched data: {"bar":"bad"}
-```
-
-<div id="eg4"/>
-
 #### Validate before decoding JSON into C++ class objects 
 
 ```c++
@@ -499,3 +435,68 @@ Output:
     }
 }
 ```
+
+<div id="eg4"/>
+
+#### Default values
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonschema/jsonschema.hpp>
+#include <jsoncons_ext/jsonpatch/jsonpatch.hpp>
+#include <fstream>
+
+// for brevity
+using jsoncons::json;
+namespace jsonschema = jsoncons::jsonschema; 
+namespace jsonpatch = jsoncons::jsonpatch; 
+
+int main() 
+{
+    // JSON Schema
+    json schema = json::parse(R"(
+{
+    "properties": {
+        "bar": {
+            "type": "string",
+            "minLength": 4,
+            "default": "bad"
+        }
+    }
+}
+    )");
+
+    // Data
+    json data = json::parse("{}");
+
+    try
+    {
+       // will throw schema_error if JSON Schema loading fails 
+       auto sch = jsonschema::make_schema(schema, resolver); 
+
+       jsonschema::json_validator<json> validator(sch); 
+
+       // will throw a validation_error on first encountered schema violation 
+       json patch = validator.validate(data); 
+
+       std::cout << "Patch: " << patch << "\n";
+
+       std::cout << "Original data: " << data << "\n";
+
+       jsonpatch::apply_patch(data, patch);
+
+       std::cout << "Patched data: " << data << "\n\n";
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << '\n';
+    }
+}
+```
+Output:
+```
+Patch: [{"op":"add","path":"/bar","value":"bad"}]
+Original data: {}
+Patched data: {"bar":"bad"}
+```
+
