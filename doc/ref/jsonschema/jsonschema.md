@@ -275,6 +275,9 @@ Error count: 1
 
 #### Validate before decoding JSON into C++ class objects 
 
+This example illustrates decoding data that validates against "oneOf"
+into a `std::variant`.
+
 ```c++
 #include <variant> // This example requires C++17
 #include <iostream>
