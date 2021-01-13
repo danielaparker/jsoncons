@@ -49,7 +49,7 @@ missing key/value pairs.
 ### Examples
 
 The example schemas are from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html),
-the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), and from users.
+the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), and user contributions.
 
 [Arrays of things](#eg1)  
 [Using a URIResolver to resolve references to schemas defined in external files](#eg2)  
