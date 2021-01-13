@@ -48,8 +48,8 @@ missing key/value pairs.
   
 ### Examples
 
-The examples use schemas from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html)
-and the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite).
+The example schemas are from [JSON Schema Miscellaneous Examples](https://json-schema.org/learn/miscellaneous-examples.html),
+the [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), and from users.
 
 [Arrays of things](#eg1)  
 [Using a URIResolver to resolve references to schemas defined in external files](#eg2)  
