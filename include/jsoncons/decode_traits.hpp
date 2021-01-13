@@ -437,7 +437,7 @@ namespace jsoncons {
             cursor.array_expected(ec);
             if (ec)
             {
-                v.fill(0);
+                v.fill(T());
                 return v;
             }
             v.fill(T{});
