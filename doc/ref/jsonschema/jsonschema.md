@@ -408,7 +408,7 @@ int main()
         // Test that input is valid before attempting to decode
         if (validator.is_valid(data))
         {
-            const ns::job_properties v = data.as<ns::job_properties>(); // You don't need to reparse test_data 
+            const ns::job_properties v = data.as<ns::job_properties>(); 
 
             std::string output;
             jsoncons::encode_json_pretty(v, output);
