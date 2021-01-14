@@ -91,7 +91,7 @@ before_build:
   - cmake -G "%makecommand%" -D BUILD_TESTS=1 .
 
 build_script:
-  - cmake --build . --target test_jsoncons --config Release
+  - cmake --build . --target unit_tests --config Release
   - cd tests
 
 test_script:
@@ -100,4 +100,4 @@ test_script:
   - if %arch%==ARM (
       set "testplatform=none"
     )
-  - if %testplatform%==vs .\Release\test_jsoncons
+  - if %testplatform%==vs .\Release\unit_tests
