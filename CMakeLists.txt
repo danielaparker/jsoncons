@@ -32,6 +32,8 @@ target_include_directories(jsoncons INTERFACE $<BUILD_INTERFACE:${JSONCONS_INCLU
 OPTION(BUILD_TESTS "jsoncons test suite" ON)
 
 if(BUILD_TESTS)
+    include(CTest)
+    enable_testing()
     add_subdirectory(tests)
 endif()
 
