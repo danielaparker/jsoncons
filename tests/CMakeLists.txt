@@ -60,7 +60,7 @@ set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
 add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
-add_executable(test_jsoncons 
+add_executable(unit_tests 
                src/jsoncons_tests.cpp
                src/JSONTestSuite_tests.cpp
                src/bigint_tests.cpp
@@ -170,14 +170,15 @@ add_executable(test_jsoncons
                src/wjson_tests.cpp
 )
 
-add_test(example_test test_jsoncons)
+add_test(jsoncons unit_tests
+         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 
-target_include_directories (test_jsoncons 
+target_include_directories (unit_tests 
                             PUBLIC ${JSONCONS_INCLUDE_DIR} 
                             PUBLIC ${JSONCONS_TESTS_DIR}
                             PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
-target_link_libraries(test_jsoncons Catch)
+target_link_libraries(unit_tests Catch)
 
-add_custom_target(jtest COMMAND test_jsoncons DEPENDS test_jsoncons)
+# add_custom_target(jtest COMMAND unit_tests DEPENDS unit_tests)
 
