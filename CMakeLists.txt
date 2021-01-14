@@ -22,16 +22,13 @@ message(STATUS "jsoncons v${${PROJECT_NAME}_VERSION}")
 # Build
 # =====
 
-
-file(GLOB_RECURSE JSONCONS_HEADERS ${JSONCONS_INCLUDE_DIR}/*.hpp)
-
 add_library(jsoncons INTERFACE)
 target_include_directories(jsoncons INTERFACE $<BUILD_INTERFACE:${JSONCONS_INCLUDE_DIR}>
                                            $<INSTALL_INTERFACE:include>)
 
-OPTION(BUILD_TESTS "jsoncons test suite" ON)
+OPTION(JSONCONS_BUILD_TESTS "jsoncons test suite" ON)
 
-if(BUILD_TESTS)
+if(JSONCONS_BUILD_TESTS)
     include(CTest)
     enable_testing()
     add_subdirectory(tests)
