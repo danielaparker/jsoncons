@@ -11,6 +11,7 @@ TEST_CASE("jsoncons::detail::span constructor tests")
     SECTION("jsoncons::detail::span()")
     {
         jsoncons::detail::span<const uint8_t> s;
+        CHECK(s.empty());
     }
     SECTION("jsoncons::detail::span(pointer,size_type)")
     {
