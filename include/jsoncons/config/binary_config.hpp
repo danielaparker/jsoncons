@@ -79,9 +79,9 @@ namespace detail {
     #else
         uint64_t v;
         std::memcpy(&v, &val, sizeof(v));
-        int sign = v >> 63 << 15;
-        int exp = (v >> 52) & 0x7ff;
-        int mant = v << 12 >> 12 >> (53-11);    /* keep only the 11 most significant bits of the mantissa */
+        int64_t sign = v >> 63 << 15;
+        int64_t exp = (v >> 52) & 0x7ff;
+        int64_t mant = v << 12 >> 12 >> (53-11);    /* keep only the 11 most significant bits of the mantissa */
         exp -= 1023;
         if (exp == 1024) {
             /* infinity or NaN */
@@ -115,8 +115,8 @@ namespace detail {
     #if defined(__F16C__) && !defined(APPLE_MISSING_INTRINSICS)
         return _cvtsh_ss(half);
     #else
-        int exp = (half >> 10) & 0x1f;
-        int mant = half & 0x3ff;
+        int64_t exp = (half >> 10) & 0x1f;
+        int64_t mant = half & 0x3ff;
         double val;
         if (exp == 0) 
         {
