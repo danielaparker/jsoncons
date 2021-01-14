@@ -216,7 +216,7 @@
 #endif
 
 #if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
-   #if defined(__clang__ && defined(_cplusplus))
+   #if defined(__clang__) && defined(_cplusplus)
       #if defined(__APPLE__)
          #if __clang_major__ >= 6  && _cplusplus >= 201103L // Xcode 6
             #define JSONCONS_HAS_STD_MAKE_UNIQUE
