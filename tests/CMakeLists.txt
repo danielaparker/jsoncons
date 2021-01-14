@@ -14,10 +14,6 @@ include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
-################
-# ARM SETTINGS #
-################
-
 OPTION(JSONCONS_SANITIZE "sanitize" OFF)
 option(JSONCONS_VALGRIND "Execute tests with valgrind" OFF)
 
@@ -38,7 +34,6 @@ if (JSONCONS_SANITIZE)
 endif()
 
 if(MSVC)
-    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
 
@@ -162,7 +157,7 @@ add_executable(unit_tests
 )
 
 target_compile_options(unit_tests PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj>
+    $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj /W4>
 )
 
 add_test(jsoncons unit_tests
@@ -170,8 +165,8 @@ add_test(jsoncons unit_tests
 
 target_include_directories (unit_tests 
                             PUBLIC ${JSONCONS_INCLUDE_DIR} 
-                            PUBLIC ${JSONCONS_TESTS_DIR}
-                            PUBLIC ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
+                            PRIVATE ${JSONCONS_TESTS_DIR}
+                            PRIVATE ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
 target_link_libraries(unit_tests Catch)
 
