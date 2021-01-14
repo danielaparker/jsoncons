@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.0.2)
-
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(jsoncons-test)
 
@@ -43,10 +41,6 @@ if(MSVC)
     # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
-
-target_compile_options(json_unit PRIVATE
-    $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj>
-)
 
 set(CTEST_OUTPUT_ON_FAILURE ON)
 
@@ -165,6 +159,10 @@ add_executable(unit_tests
                ubjson/src/ubjson_encoder_tests.cpp
                src/unicode_tests.cpp
                src/wjson_tests.cpp
+)
+
+target_compile_options(unit_tests PRIVATE
+    $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj>
 )
 
 add_test(jsoncons unit_tests
