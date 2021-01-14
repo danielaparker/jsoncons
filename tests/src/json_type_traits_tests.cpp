@@ -223,11 +223,6 @@ namespace { namespace ns {
         std::string name_;
         Color color_;
     public:
-        friend std::ostream& operator<<(std::ostream& os, const Fruit& val)
-        {
-            os << "name: " << val.name_ << ", color: " << val.color_ << "\n";
-            return os;
-        }
     };
 
     class Fabric 
@@ -237,11 +232,6 @@ namespace { namespace ns {
       int size_;
       std::string material_;
     public:
-        friend std::ostream& operator<<(std::ostream& os, const Fabric& val)
-        {
-            os << "size: " << val.size_ << ", material: " << val.material_ << "\n";
-            return os;
-        }
     };
 
     class Basket {
