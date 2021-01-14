@@ -61,6 +61,7 @@ add_library(Catch INTERFACE)
 target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_executable(unit_tests 
+               src/main.cpp
                src/jsoncons_tests.cpp
                src/JSONTestSuite_tests.cpp
                src/bigint_tests.cpp
@@ -129,7 +130,6 @@ add_executable(unit_tests
                src/json_traits_macro_functional_tests.cpp
                src/json_type_traits_container_tests.cpp
                src/json_type_traits_chrono_tests.cpp
-               src/json_type_traits_chrono_tests.cpp
                src/json_type_traits_tests.cpp
                src/json_validation_tests.cpp
                jsonpatch/src/jsonpatch_tests.cpp
@@ -161,7 +161,6 @@ add_executable(unit_tests
                src/staj_iterator_tests.cpp
                src/stateful_allocator_tests.cpp
                src/string_to_double_tests.cpp
-               src/tests_main.cpp
                ubjson/src/decode_ubjson_tests.cpp
                ubjson/src/encode_ubjson_tests.cpp
                ubjson/src/ubjson_cursor_tests.cpp
