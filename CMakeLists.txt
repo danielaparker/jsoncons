@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.18.3)
 
 project(jsoncons)
 
@@ -57,7 +57,7 @@ install(DIRECTORY ${JSONCONS_INCLUDE_DIR}/jsoncons
 # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
 set(JSONCONS_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE STRING "install path for jsonconsConfig.cmake")
 
-configure_package_config_file(build_files/cmake/config.cmake.in
+configure_package_config_file(cmake/config.cmake.in
                               "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
                               INSTALL_DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
 
