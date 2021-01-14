@@ -878,8 +878,8 @@ namespace ns {
     const std::string Circle_NMN::type_ = "circle";
 
     const auto rectangle_marker = [](double) noexcept {return "rectangle"; };
-    const auto triangle_marker = [](double) noexcept {return "triangle";};
-    const auto circle_marker = [](double) noexcept {return "circle";};
+    //const auto triangle_marker = [](double) noexcept {return "triangle";};
+    //const auto circle_marker = [](double) noexcept {return "circle";};
           
 } // namespace
 } // ns

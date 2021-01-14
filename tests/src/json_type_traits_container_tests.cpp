@@ -346,11 +346,11 @@ struct own_vector : std::vector<int64_t> { using  std::vector<int64_t>::vector; 
 namespace jsoncons {
 template<class Json>
 struct json_type_traits<Json, own_vector> {
-	static bool is(const Json& j) noexcept
+    static bool is(const Json& j) noexcept
     { 
         return j.is_object() && j.size() % 2 == 0;
     }
-	static own_vector as(const Json& j)
+    static own_vector as(const Json& j)
     {   
         own_vector v;
         for (auto& item : j.object_range())
@@ -361,13 +361,13 @@ struct json_type_traits<Json, own_vector> {
         }
         return v;
     }
-	static Json to_json(const own_vector& val){
-		Json j;
-		for (std::size_t i=0;i<val.size();i+=2){
-			j[std::to_string(val[i])] = val[i + 1];
-		}
-		return j;
-	}
+    static Json to_json(const own_vector& val){
+        Json j;
+        for (std::size_t i=0;i<val.size();i+=2){
+            j[std::to_string(val[i])] = val[i + 1];
+        }
+        return j;
+    }
 };
 
 template <> 
@@ -418,55 +418,55 @@ namespace {
 namespace ns {
 
     enum class MyCriterionType{
-		First,
-		Presentation = First,
-		MessageType,
-		Version,
-		Release,
-		Last
-	};
+        First,
+        Presentation = First,
+        MessageType,
+        Version,
+        Release,
+        Last
+    };
 
     template <typename E>
     class TCriterion
     {
     public:
-    	TCriterion() = default;
-    	TCriterion(E iType, std::string iVal) : _type(iType), _value(iVal) {}
+        TCriterion() = default;
+        TCriterion(E iType, std::string iVal) : _type(iType), _value(iVal) {}
 
-    	const std::string& getValue() const {
-    		return _value;
-    	}
+        const std::string& getValue() const {
+            return _value;
+        }
 
-    	const E getType() const {
-    		return _type;
-    	}
+        const E getType() const {
+            return _type;
+        }
 
     protected:
-    	JSONCONS_TYPE_TRAITS_FRIEND
-    	E _type;
-    	std::string _value;
+        JSONCONS_TYPE_TRAITS_FRIEND
+        E _type;
+        std::string _value;
     };
 
-	struct EnumClassHash {
-		template<typename T>
-		std::size_t operator()(T t) const noexcept {
-			return static_cast<std::size_t>(t);
-		}
-	};//To be able to use the enum class as key
+    struct EnumClassHash {
+        template<typename T>
+        std::size_t operator()(T t) const noexcept {
+            return static_cast<std::size_t>(t);
+        }
+    };//To be able to use the enum class as key
 
     template <typename E>
     class TCriteria
     {
     public:
-    	TCriteria() = default;
+        TCriteria() = default;
 
-    	const std::unordered_map <E, TCriterion<E>>& getCriteriaMap() const {
-    		return _criteriaMap;
-    	}
+        const std::unordered_map <E, TCriterion<E>>& getCriteriaMap() const {
+            return _criteriaMap;
+        }
 
     //protected:
-    	JSONCONS_TYPE_TRAITS_FRIEND
-    	std::unordered_map<E, TCriterion<E>, EnumClassHash> _criteriaMap;
+        JSONCONS_TYPE_TRAITS_FRIEND
+        std::unordered_map<E, TCriterion<E>, EnumClassHash> _criteriaMap;
     };
 
 } // ns
@@ -525,27 +525,23 @@ namespace {
 namespace ns {
 
     struct Value {
-    	std::string  name;
-    	std::int32_t value;
+        std::string  name;
+        std::int32_t value;
 
         friend bool operator==(const Value& lhs, const Value& rhs)
         {
             return lhs.name == rhs.name && lhs.value == rhs.value;
         }
-        friend bool operator!=(const Value& lhs, const Value& rhs)
-        {
-            return !(lhs == rhs);
-        }
     };
 
     struct ValueHash {
-		std::size_t operator()(const Value& val) const noexcept
+        std::size_t operator()(const Value& val) const noexcept
         {
             std::size_t h1 = std::hash<std::string>{}(val.name);
             std::size_t h2 = std::hash<std::int32_t>{}(val.value);
             return h1 ^ (h2 << 1);
-		}
-	};
+        }
+    };
 
     inline bool operator<(const Value &l, const Value &r) noexcept {
       return l.name < r.name;
@@ -553,12 +549,12 @@ namespace ns {
 
     template <class Container>
     struct Project {
-    	std::int32_t         version = 1;
-    	std::string          name;
-    	std::string          author;
-    	std::string          notes;
-    	bool                 showNotes;
-    	Container values;
+        std::int32_t         version = 1;
+        std::string          name;
+        std::string          author;
+        std::string          notes;
+        bool                 showNotes;
+        Container values;
 
         friend bool operator==(const Project& lhs, const Project& rhs)
         {
@@ -575,17 +571,17 @@ namespace ns {
 } // namespace
 
 JSONCONS_N_MEMBER_TRAITS(ns::Value, 0,
-	name,
-	value
+    name,
+    value
 )
 
 JSONCONS_TPL_N_MEMBER_TRAITS(1, ns::Project, 0,
-	version,
-	name,
-	author,
-	notes,
-	showNotes,
-	values
+    version,
+    name,
+    author,
+    notes,
+    showNotes,
+    values
 )
 
 TEST_CASE("encode/decode set traits")

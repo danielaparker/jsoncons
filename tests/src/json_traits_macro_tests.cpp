@@ -418,11 +418,6 @@ namespace ns {
             return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
                    lhs.rated == rhs.rated && lhs.rating == rhs.rating;
         }
-
-        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
-        {
-            return !(lhs == rhs);
-        };
     };
 
     class hiking_reputation
