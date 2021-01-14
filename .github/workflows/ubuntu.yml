@@ -21,7 +21,7 @@ jobs:
     - name: build
       run: cmake --build build --parallel 10
     - name: test
-      run: cd build ; ls *; ./unit_tests
+      run: cd build ; ls *; ./tests/unit_tests
 
   clang_build:
     runs-on: ubuntu-latest
