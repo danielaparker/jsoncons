@@ -16,8 +16,6 @@ namespace {
 
     class string_locator : public jsoncons::default_json_visitor
     {
-        char* data_;
-        std::size_t length_;
         std::string path_;
         std::string from_;
         std::vector<std::string> current_;
@@ -30,13 +28,11 @@ namespace {
     public:
         using jsoncons::default_json_visitor::string_view_type;
         
-        string_locator(char* data, std::size_t length,
-            const std::string& path,
-            const std::string& from, std::vector<std::size_t>& positions)
-            : data_(data), length_(length),
-            path_(path),
-            from_(from),
-            positions_(positions)
+        string_locator(const std::string& path,
+                      const std::string& from, std::vector<std::size_t>& positions)
+            : path_(path),
+              from_(from),
+              positions_(positions)
         {
         }
 
@@ -165,7 +161,7 @@ namespace {
 
     void update_in_place(std::string& input, const std::string& path, std::vector<std::size_t>& positions)
     {
-        string_locator updater(&input[0], input.size(), path, "", positions);
+        string_locator updater(path, "", positions);
         jsoncons::json_reader reader(jsoncons::string_view(input), updater);
         reader.read();
     }
