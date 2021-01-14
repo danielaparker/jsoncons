@@ -440,11 +440,6 @@ namespace ns {
         {
             return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
         }
-
-        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return !(lhs == rhs);
-        };
     };
 
     struct smart_pointer_and_optional_test1
