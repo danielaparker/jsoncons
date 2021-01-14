@@ -766,7 +766,7 @@ base16_to_integer(const CharT* s, std::size_t length)
     return to_integer_result<T>(n);
 }
 
-#if defined(JSONCONS_HAS_MSC__STRTOD_L)
+#if defined(JSONCONS_HAS_MSC_STRTOD_L)
 
 class to_double_t
 {
