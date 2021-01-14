@@ -26,7 +26,7 @@ namespace {
             : data_(data), length_(length), 
               from_(from), to_(to)
         {
-
+            (void)length_;
         }
         bool visit_string(const string_view_type& value,
                           jsoncons::semantic_tag,
