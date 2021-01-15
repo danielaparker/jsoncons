@@ -168,7 +168,7 @@ target_compile_options(unit_tests PRIVATE
 )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "8.0")
-    message(STATUS Version "${CMAKE_CXX_COMPILER_VERSION}")
+    message(STATUS Version " ${CMAKE_CXX_COMPILER_VERSION}")
     # older GCC versions don't support 
     target_compile_options(unit_tests PRIVATE -Wimplicit-fallthrough -pedantic)
 endif()
