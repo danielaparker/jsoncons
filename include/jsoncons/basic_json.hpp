@@ -1282,9 +1282,19 @@ private:
             return evaluate() == rhs;
         }
 
+        bool operator==(const proxy& rhs) const noexcept
+        {
+            return evaluate() == basic_json(rhs);
+        }
+
         bool operator!=(const basic_json& rhs) const noexcept
         {
             return evaluate() != rhs;
+        }
+
+        bool operator!=(const proxy& rhs) const noexcept
+        {
+            return evaluate() != basic_json(rhs);
         }
 
         bool operator<(const basic_json& rhs) const noexcept
