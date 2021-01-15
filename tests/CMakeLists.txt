@@ -164,9 +164,12 @@ target_compile_features(unit_tests INTERFACE cxx_std_11)
 
 target_compile_options(unit_tests PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj /W4>
-    # $<$<CXX_COMPILER_ID:Clang>:-Werror -Wall -Wextra -Wimplicit-fallthrough -Wcast-align -Wcast-qual>
     $<$<CXX_COMPILER_ID:GNU>:-Werror -Wall -Wextra -Wimplicit-fallthrough -pedantic -Wcast-align -Wcast-qual>
 )
+
+if (NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+    $<$<CXX_COMPILER_ID:Clang>:-Werror -Wall -Wextra -Wimplicit-fallthrough -Wcast-align -Wcast-qual>
+endif()
 
 add_test(jsoncons unit_tests
          WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
