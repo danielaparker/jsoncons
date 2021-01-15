@@ -164,15 +164,12 @@ target_compile_features(unit_tests INTERFACE cxx_std_11)
 
 target_compile_options(unit_tests PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj /W4>
-    $<$<CXX_COMPILER_ID:GNU>:-Werror -Wall -Wextra -pedantic -Wcast-align -Wcast-qual>
+    $<$<CXX_COMPILER_ID:GNU>:-Werror -Wall -Wextra -Wcast-align -Wcast-qual>
 )
 
-check_cxx_compiler_flag("implicit-fallthrough" ${implicit-fallthrough-name})
-if(${implicit-fallthrough-name})
-    message(STATUS "implicit-fallthrough") 
-    target_compile_options(unit_tests PRIVATE
-                           $<$<CXX_COMPILER_ID:GNU>:-Wimplicit-fallthrough>
-                           )
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "8.0")
+  # older GCC versions don't support 
+  target_compile_options(unit_tests PRIVATE -Wimplicit-fallthrough -pedantic)
 endif()
 
 if (NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
