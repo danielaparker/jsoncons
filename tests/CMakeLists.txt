@@ -172,6 +172,7 @@ if(${implicit-fallthrough-name})
     message(STATUS "implicit-fallthrough") 
     target_compile_options(unit_tests PRIVATE
                            $<$<CXX_COMPILER_ID:GNU>:-Wimplicit-fallthrough>
+                           )
 endif()
 
 if (NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
