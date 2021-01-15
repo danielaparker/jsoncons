@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(jsoncons)
+project(jsoncons CXX)
 
 set(JSONCONS_PROJECT_DIR ${PROJECT_SOURCE_DIR})
 set(JSONCONS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
