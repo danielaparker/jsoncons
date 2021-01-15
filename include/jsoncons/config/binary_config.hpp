@@ -104,7 +104,7 @@ namespace detail {
         }
 
         /* safe cast here as bit operations above guarantee not to overflow */
-        return (uint16_t)(sign | ((exp + 15) << 10) | mant);
+        return static_cast<uint16_t>(sign | ((exp + 15) << 10) | mant);
     #endif
     }
 
@@ -120,15 +120,15 @@ namespace detail {
         double val;
         if (exp == 0) 
         {
-            val = ldexp((double)mant, -24);
+            val = ldexp(static_cast<double>(mant), -24);
         }
         else if (exp != 31) 
         {
-            val = ldexp(mant + 1024.0, exp - 25);
+            val = static_cast<int64_t>(ldexp(mant + 1024.0, exp - 25));
         } 
         else
         {
-            val = mant == 0 ? INFINITY : NAN;
+            val = mant == 0 ? static_cast<double>(INFINITY) : static_cast<double>(NAN);
         }
         return half & 0x8000 ? -val : val;
     #endif
