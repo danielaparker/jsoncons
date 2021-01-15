@@ -168,7 +168,9 @@ target_compile_options(unit_tests PRIVATE
 )
 
 if (NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
+target_compile_options(unit_tests PRIVATE
     $<$<CXX_COMPILER_ID:Clang>:-Werror -Wall -Wextra -Wimplicit-fallthrough -Wcast-align -Wcast-qual>
+)
 endif()
 
 add_test(jsoncons unit_tests
