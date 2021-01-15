@@ -955,22 +955,25 @@ Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/googl
 sudo apt-get install cmake
 ```
 Once cmake is installed, you can build the tests:
-```
-mkdir build
-cd build
-cmake ../ -DBUILD_TESTS=ON
-cmake --build . --target test_jsoncons --config Release
-```
-Run from the jsoncons tests directory:
+
+Run from the jsoncons directory:
 
 On Windows:
 ```
-..\build\tests\Release\test_jsoncons
+> mkdir build
+> cd build
+> cmake .. -DJSONCONS_BUILD_TESTS=On
+> cmake --build .
+> ctest -C Debug --output-on-failure
 ```
 
 On UNIX:
 ```
-../build/tests/Release/test_jsoncons
+$ mkdir build
+$ cd build
+$ cmake .. -DJSONCONS_BUILD_TESTS=On
+$ cmake --build .
+$ ctest --output-on-failure
 ```
 
 ## Acknowledgements
