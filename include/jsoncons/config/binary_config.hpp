@@ -25,8 +25,8 @@
 #  define __has_builtin(x)  0
 #endif
 
-#if (defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 403)) || \
-    (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
+#if defined(__GNUC__)
+#if (__GNUC__ * 100 + __GNUC_MINOR__ >= 403) || (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
 #  define JSONCONS_BYTE_SWAP_64 __builtin_bswap64
 #  define JSONCONS_BYTE_SWAP_32 __builtin_bswap32
 #    ifdef __INTEL_COMPILER
@@ -34,6 +34,7 @@
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
 #      define JSONCONS_BYTE_SWAP_16    __builtin_bswap16
 #  endif
+#endif
 #elif defined(__sun)
 #  include <sys/byteorder.h>
 #elif defined(_MSC_VER)
