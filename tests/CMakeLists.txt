@@ -29,9 +29,10 @@ include (CTest)
 # load per-platform configuration
 # include (${JSONCONS_PROJECT_DIR}/cmake/${CMAKE_SYSTEM_NAME}.cmake)
 
+# -fsanitize=undefined clang issue
 if (JSONCONS_SANITIZE)
     if(NOT MSVC)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2 -fsanitize=address -fno-omit-frame-pointer")
         message(STATUS "SANITIZE ON")
     endif()
 endif()
