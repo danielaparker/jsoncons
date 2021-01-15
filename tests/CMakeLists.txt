@@ -159,6 +159,8 @@ add_executable(unit_tests
                src/wjson_tests.cpp
 )
 
+target_compile_features(unit_tests INTERFACE cxx_std_11)
+
 target_compile_options(unit_tests PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj /W4>
     $<$<CXX_COMPILER_ID:Clang>:-Werror -Wall -Wextra -Wimplicit-fallthrough -Wcast-align -Wcast-qual>
