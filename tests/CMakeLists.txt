@@ -167,9 +167,10 @@ target_compile_options(unit_tests PRIVATE
     $<$<CXX_COMPILER_ID:GNU>:-Werror -Wall -Wextra -Wcast-align -Wcast-qual>
 )
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "8.0")
-  # older GCC versions don't support 
-  target_compile_options(unit_tests PRIVATE -Wimplicit-fallthrough -pedantic)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "8.0")
+    message(STATUS Version "${CMAKE_CXX_COMPILER_VERSION}")
+    # older GCC versions don't support 
+    target_compile_options(unit_tests PRIVATE -Wimplicit-fallthrough -pedantic)
 endif()
 
 if (NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
