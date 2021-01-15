@@ -125,7 +125,7 @@ namespace detail {
         }
         else if (exp != 31) 
         {
-            val = static_cast<double>(ldexp(mant + 1024.0, exp - 25));
+            val = ldexp(static_cast<double>(mant + 1024.0), static_cast<int>(exp - 25));
         } 
         else
         {
