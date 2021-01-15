@@ -954,9 +954,7 @@ Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/googl
 ```
 sudo apt-get install cmake
 ```
-Once cmake is installed, you can build the tests:
-
-Run from the jsoncons directory:
+Once cmake is installed, you can build and run the unit tests from the jsoncons directory,
 
 On Windows:
 ```
