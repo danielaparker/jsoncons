@@ -616,6 +616,7 @@ TEST_CASE("encode/decode set traits")
 
         CHECK(project2 == project);
         CHECK_FALSE(project2 != project);
+        CHECK_FALSE(project2.values != project.values);
     }
 
     SECTION("json_type_traits")
