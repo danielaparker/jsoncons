@@ -536,7 +536,7 @@ namespace ns {
         // Required for fedora24-x86_64 g++ 6.3.1
         friend bool operator!=(const Value& lhs, const Value& rhs)
         {
-            return lhs.name == rhs.name && lhs.value == rhs.value;
+            return !(lhs == rhs);
         }
     };
 
@@ -570,6 +570,10 @@ namespace ns {
                 lhs.notes == rhs.notes &&
                 lhs.showNotes == rhs.showNotes &&
                 lhs.values == rhs.values);
+        }
+        friend bool operator!=(const Project& lhs, const Project& rhs)
+        {
+            return !(lhs == rhs);
         }
     };
 
