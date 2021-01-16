@@ -607,6 +607,15 @@ TEST_CASE("encode/decode set traits")
     project.values.insert({ "foo",1 });
     project.values.insert({ "baz",1 });
 
+    SECTION("Value comparator tests")
+    {
+        ns::Value a{"foo", 1};
+        ns::Value b{ "foo",2 };
+
+        CHECK(a == a);
+        CHECK(a != b);
+    }
+
     SECTION("encode/decode")
     {
         std::string s;
