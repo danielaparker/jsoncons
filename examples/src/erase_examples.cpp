@@ -50,7 +50,7 @@ namespace {
      
             // Locate the item to be erased
             auto it = std::find_if(instance.array_range().begin(), instance.array_range().end(), 
-                                   [](const json& item){return item.at("id") == "756746783";});
+                                   [](const json& item){return item.at("id") == std::string("756746783");});
      
             // If found, erase it
             if (it != instance.array_range().end())

@@ -645,6 +645,11 @@ namespace jsoncons {
             destroy();
         }
 
+        bool empty() const
+        {
+            return members_.empty();
+        }
+
         void swap(json_object& val) noexcept
         {
             members_.swap(val.members_);
@@ -1388,6 +1393,11 @@ namespace jsoncons {
         void swap(json_object& val) noexcept
         {
             members_.swap(val.members_);
+        }
+
+        bool empty() const
+        {
+            return members_.empty();
         }
 
         iterator begin()
