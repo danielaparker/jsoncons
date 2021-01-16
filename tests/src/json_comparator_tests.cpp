@@ -13,7 +13,7 @@ using namespace jsoncons;
 
 TEST_CASE("basic_json object == basic_json object")
 {
-    SECTION("empty == empty")
+    SECTION("empty, empty")
     {
         json o1;
         json o2;
@@ -22,11 +22,73 @@ TEST_CASE("basic_json object == basic_json object")
         CHECK(o1 == o2);
         CHECK(o2 == o1);
         CHECK(o1 == o3);
+
+        CHECK(o1 >= o2);
+        CHECK(o2 <= o1);
+        CHECK(o1 >= o3);
+        CHECK(o3 >= o2);
+
         CHECK_FALSE((o1 != o2));
         CHECK_FALSE((o2 != o1));
         CHECK_FALSE((o1 != o3));
+
+        CHECK_FALSE(o1 < o2);
+        CHECK_FALSE(o2 < o1);
+        CHECK_FALSE(o1 < o3);
+        CHECK_FALSE(o1 > o2);
+        CHECK_FALSE(o2 > o1);
+        CHECK_FALSE(o1 > o3);
     }
-    SECTION("nonempty and unequal")
+
+    SECTION("empty and nonempty")
+    {
+        json a;
+        a["c"] = 3;
+        a["a"] = 1;
+        a["b"] = 2;
+
+        json b;
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+
+    SECTION("nonempty and shorter")
+    {
+        json a;
+        a["a"] = "hello";
+        a["b"] = 1.0;
+        a["c"] = true;
+
+        json b;
+        b["a"] = "hello";
+        b["b"] = 1.0;
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+
+    SECTION("nonempty and different")
     {
         json o1;
         o1["a"] = 1;

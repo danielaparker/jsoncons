@@ -905,12 +905,12 @@ private:
         }
     };
 
-    template <class ProxiedType>
+    template <class ParentType>
     class proxy 
     {
         friend class basic_json<char_type,implementation_policy,allocator_type>;
 
-        ProxiedType& parent_;
+        ParentType& parent_;
         string_view_type key_;
 
         proxy() = delete;
@@ -920,7 +920,7 @@ private:
         proxy& operator = (const proxy& other) = delete; 
         proxy& operator = (proxy&& other) = delete; 
 
-        proxy(ProxiedType& parent, const string_view_type& key)
+        proxy(ParentType& parent, const string_view_type& key)
             : parent_(parent), key_(key)
         {
         }
@@ -960,8 +960,8 @@ private:
             return evaluate().at(index);
         }
     public:
-        using proxied_type = ProxiedType;
-        using proxy_type = proxy<typename ProxiedType::proxy_type>;
+        using proxied_type = basic_json;
+        using proxy_type = proxy<typename ParentType::proxy_type>;
 
         basic_json& evaluate() 
         {
