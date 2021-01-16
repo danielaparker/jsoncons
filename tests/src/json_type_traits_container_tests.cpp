@@ -532,6 +532,12 @@ namespace ns {
         {
             return lhs.name == rhs.name && lhs.value == rhs.value;
         }
+
+        // Required for fedora24-x86_64 g++ 6.3.1
+        friend bool operator!=(const Value& lhs, const Value& rhs)
+        {
+            return lhs.name == rhs.name && lhs.value == rhs.value;
+        }
     };
 
     struct ValueHash {
@@ -605,6 +611,7 @@ TEST_CASE("encode/decode set traits")
         auto project2 = decode_json<project_type>(s);
 
         CHECK(project2 == project);
+        CHECK_FALSE(project2 != project);
     }
 
     SECTION("json_type_traits")
