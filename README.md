@@ -935,7 +935,7 @@ bar,UHVzcw==,273.15
 
 ## Supported compilers
 
-jsoncons requires a C++11 compiler. It is tested in continuous integration on [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
+jsoncons requires a compiler with C++11 support. It is tested in continuous integration on [Github Actions](https://github.com/danielaparker/jsoncons/actions), [AppVeyor](https://ci.appveyor.com/project/danielaparker/jsoncons), [Travis](https://travis-ci.org/danielaparker/jsoncons), and [doozer](https://doozer.io/).
 [UndefinedBehaviorSanitizer (UBSan)](http://clang.llvm.org/docs/UndefinedBehaviorSanitizer.html) diagnostics are enabled for selected gcc and clang builds.
 Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/google/oss-fuzz), with coverage for all parsers and encoders.
 
@@ -948,7 +948,7 @@ Since v0.151.0, it is integrated with [Google OSS-fuzz](https://github.com/googl
 |                         | 4.8.5                     | x64         | CentOS 7.6        |`std::regex` isn't fully implemented in 4.8, so `jsoncons::jsonpath` regular expression filters aren't supported in 4.8 |
 |                         | 6.3.1 (Red Hat 6.3.1-1)   | x64         | Fedora release 24 |       |
 |                         | 4.9.2                     | i386        | Debian 8          |       |
-| clang                   | 4.0, 5.0, 6.0, 7, 8                | x64         | Ubuntu            |       |
+| clang                   | 4.0, 5.0, 6.0, 7, 8, 9, 10| x64         | Ubuntu            |       |
 | clang xcode             | 9.3, 9.4, 10, 10.1, 10.2, 11.2, 12 | x64         | OSX               |       |
 
 ## Building the test suite and examples with CMake
