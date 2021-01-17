@@ -196,8 +196,8 @@ namespace jsoncons { namespace jsonpath_new {
             using selector_base_type::generate_path;
             std::unique_ptr<selector_base_type> tail_selector_;
         public:
-            projection_base(bool is_filter, std::size_t precedence_level)
-                : selector_base_type(true, is_filter, precedence_level), tail_selector_()
+            projection_base(std::size_t precedence_level)
+                : selector_base_type(true, precedence_level), tail_selector_()
             {
             }
 
@@ -242,7 +242,7 @@ namespace jsoncons { namespace jsonpath_new {
             using projection_base::generate_path;
         public:
             identifier_selector(const string_view_type& identifier)
-                : projection_base(false, 11), identifier_(identifier)
+                : projection_base(11), identifier_(identifier)
             {
             }
 
@@ -303,7 +303,7 @@ namespace jsoncons { namespace jsonpath_new {
             using projection_base::generate_path;
         public:
             current_node()
-                : projection_base(false, 11)
+                : projection_base(11)
             {
             }
 
@@ -338,7 +338,7 @@ namespace jsoncons { namespace jsonpath_new {
             using projection_base::generate_path;
         public:
             root_node()
-                : projection_base(false, 11)
+                : projection_base(11)
             {
             }
 
@@ -375,7 +375,7 @@ namespace jsoncons { namespace jsonpath_new {
             using projection_base::generate_path;
         public:
             index_selector(int64_t index)
-                : projection_base(false, 11), index_(index)
+                : projection_base(11), index_(index)
             {
             }
 
@@ -415,7 +415,7 @@ namespace jsoncons { namespace jsonpath_new {
             using projection_base::generate_path;
         public:
             wildcard_selector()
-                : projection_base(false, 11)
+                : projection_base(11)
             {
             }
 
@@ -464,7 +464,7 @@ namespace jsoncons { namespace jsonpath_new {
             using projection_base::generate_path;
         public:
             recursive_selector()
-                : projection_base(false, 11)
+                : projection_base(11)
             {
             }
 
@@ -517,7 +517,7 @@ namespace jsoncons { namespace jsonpath_new {
             using projection_base::generate_path;
         public:
             union_selector(std::vector<path_expression_type>&& expressions)
-                : projection_base(false, 11), expressions_(std::move(expressions))
+                : projection_base(11), expressions_(std::move(expressions))
             {
             }
 
@@ -583,7 +583,7 @@ namespace jsoncons { namespace jsonpath_new {
         public:
 
             filter_selector(path_expression_type&& expr)
-                : projection_base(true, 11), expr_(std::move(expr))
+                : projection_base(11), expr_(std::move(expr))
             {
             }
 
@@ -651,7 +651,7 @@ namespace jsoncons { namespace jsonpath_new {
         public:
 
             expression_selector(path_expression_type&& expr)
-                : projection_base(true, 11), expr_(std::move(expr))
+                : projection_base(11), expr_(std::move(expr))
             {
             }
 
@@ -705,7 +705,7 @@ namespace jsoncons { namespace jsonpath_new {
             slice slice_;
         public:
             slice_selector(const slice& slic)
-                : projection_base(false, 11), slice_(slic) 
+                : projection_base(11), slice_(slic) 
             {
             }
 

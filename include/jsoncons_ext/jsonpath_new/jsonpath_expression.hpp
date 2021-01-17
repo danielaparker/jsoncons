@@ -1246,7 +1246,6 @@ namespace detail {
     class selector_base
     {
         bool is_projection_;
-        bool is_filter_;
         std::size_t precedence_level_;
     public:
         using char_type = typename Json::char_type;
@@ -1257,16 +1256,13 @@ namespace detail {
 
         selector_base()
             : is_projection_(false), 
-              is_filter_(false),
               precedence_level_(0)
         {
         }
 
         selector_base(bool is_projection,
-                      bool is_filter,
                       std::size_t precedence_level = 0)
             : is_projection_(is_projection), 
-              is_filter_(is_filter),
               precedence_level_(precedence_level)
         {
         }
@@ -1276,11 +1272,6 @@ namespace detail {
         bool is_projection() const 
         {
             return is_projection_;
-        }
-
-        bool is_filter() const
-        {
-            return is_filter_;
         }
 
         std::size_t precedence_level() const
