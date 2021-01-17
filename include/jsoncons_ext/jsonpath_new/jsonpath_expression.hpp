@@ -1285,7 +1285,7 @@ namespace detail {
             string_type s;
             if ((flags & result_flags::path) == result_flags::path)
             {
-                s.append(path);
+                s.append(path.data(), path.length());
                 s.push_back('[');
                 jsoncons::detail::from_integer(index,s);
                 s.push_back(']');
@@ -1300,7 +1300,7 @@ namespace detail {
             string_type s;
             if ((flags & result_flags::path) == result_flags::path)
             {
-                s.append(path);
+                s.append(path.data(), path.length());
                 s.push_back('[');
                 s.push_back('\'');
                 s.append(identifier.data(),identifier.length());
