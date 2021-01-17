@@ -25,6 +25,8 @@ JSON-like data formats such as CBOR that have them.
 
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html). 
 
+jsoncons is free but welcomes support to sustain its development. You can sponsor this library at [GitHub Sponsors](https://github.com/sponsors/danielaparker).
+
 ## Extensions
 
 - [bson](doc/ref/bson/bson.md) implements decode from and encode to the [Binary JSON](http://bsonspec.org/) data format.
