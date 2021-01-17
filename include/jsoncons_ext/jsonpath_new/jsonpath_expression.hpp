@@ -75,6 +75,8 @@ namespace detail {
         {
         }
 
+        virtual ~unary_operator() = default;
+
         std::size_t precedence_level() const 
         {
             return precedence_level_;
