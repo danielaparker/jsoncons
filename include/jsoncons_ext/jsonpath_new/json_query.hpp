@@ -196,8 +196,8 @@ namespace jsoncons { namespace jsonpath_new {
             using selector_base_type::generate_path;
             std::unique_ptr<selector_base_type> tail_selector_;
         public:
-            path_selector(std::size_t precedence_level)
-                : selector_base_type(true, precedence_level), tail_selector_()
+            path_selector()
+                : selector_base_type(true, 11), tail_selector_()
             {
             }
 
@@ -242,7 +242,7 @@ namespace jsoncons { namespace jsonpath_new {
             using path_selector::generate_path;
         public:
             identifier_selector(const string_view_type& identifier)
-                : path_selector(11), identifier_(identifier)
+                : path_selector(), identifier_(identifier)
             {
             }
 
@@ -303,7 +303,7 @@ namespace jsoncons { namespace jsonpath_new {
             using path_selector::generate_path;
         public:
             current_node()
-                : path_selector(11)
+                : path_selector()
             {
             }
 
@@ -338,7 +338,7 @@ namespace jsoncons { namespace jsonpath_new {
             using path_selector::generate_path;
         public:
             root_node()
-                : path_selector(11)
+                : path_selector()
             {
             }
 
@@ -375,7 +375,7 @@ namespace jsoncons { namespace jsonpath_new {
             using path_selector::generate_path;
         public:
             index_selector(int64_t index)
-                : path_selector(11), index_(index)
+                : path_selector(), index_(index)
             {
             }
 
@@ -415,7 +415,7 @@ namespace jsoncons { namespace jsonpath_new {
             using path_selector::generate_path;
         public:
             wildcard_selector()
-                : path_selector(11)
+                : path_selector()
             {
             }
 
@@ -464,7 +464,7 @@ namespace jsoncons { namespace jsonpath_new {
             using path_selector::generate_path;
         public:
             recursive_selector()
-                : path_selector(11)
+                : path_selector()
             {
             }
 
@@ -517,7 +517,7 @@ namespace jsoncons { namespace jsonpath_new {
             using path_selector::generate_path;
         public:
             union_selector(std::vector<path_expression_type>&& expressions)
-                : path_selector(11), expressions_(std::move(expressions))
+                : path_selector(), expressions_(std::move(expressions))
             {
             }
 
@@ -583,7 +583,7 @@ namespace jsoncons { namespace jsonpath_new {
         public:
 
             filter_selector(path_expression_type&& expr)
-                : path_selector(11), expr_(std::move(expr))
+                : path_selector(), expr_(std::move(expr))
             {
             }
 
@@ -651,7 +651,7 @@ namespace jsoncons { namespace jsonpath_new {
         public:
 
             expression_selector(path_expression_type&& expr)
-                : path_selector(11), expr_(std::move(expr))
+                : path_selector(), expr_(std::move(expr))
             {
             }
 
@@ -705,7 +705,7 @@ namespace jsoncons { namespace jsonpath_new {
             slice slice_;
         public:
             slice_selector(const slice& slic)
-                : path_selector(11), slice_(slic) 
+                : path_selector(), slice_(slic) 
             {
             }
 
