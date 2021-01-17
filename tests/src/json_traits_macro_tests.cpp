@@ -59,12 +59,6 @@ namespace ns {
         std::string author;
         std::string title;
         double price;
-
-        friend std::ostream& operator<<(std::ostream& os, const book1a& b)
-        {
-            std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
-            return os;
-        }
     };
     struct book1b
     {
@@ -424,11 +418,6 @@ namespace ns {
             return lhs.rater == rhs.rater && lhs.assertion == rhs.assertion && 
                    lhs.rated == rhs.rated && lhs.rating == rhs.rating;
         }
-
-        friend bool operator!=(const hiking_reputon& lhs, const hiking_reputon& rhs)
-        {
-            return !(lhs == rhs);
-        };
     };
 
     class hiking_reputation
@@ -451,11 +440,6 @@ namespace ns {
         {
             return (lhs.application == rhs.application) && (lhs.reputons == rhs.reputons);
         }
-
-        friend bool operator!=(const hiking_reputation& lhs, const hiking_reputation& rhs)
-        {
-            return !(lhs == rhs);
-        };
     };
 
     struct smart_pointer_and_optional_test1

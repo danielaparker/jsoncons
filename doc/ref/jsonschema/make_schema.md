@@ -4,11 +4,11 @@
 #include <jsoncons_ext/jsonschema/jsonschema.hpp>
 
 template <class Json>
-std::shared_ptr<json_schema<Json>> make_schema(const Json& schema); // (1)
+std::shared_ptr<json_schema<Json>> make_schema(const Json& schema); (1)
 
 template <class Json,class URIResolver>
 std::shared_ptr<json_schema<Json>> make_schema(const Json& schema, 
-                                               const URIResolver& resolver); // (2)
+                                               const URIResolver& resolver); (2)
 ```
 
 Returns a `shared_ptr` to a `json_schema`.

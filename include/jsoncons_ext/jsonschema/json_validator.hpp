@@ -22,12 +22,23 @@
 namespace jsoncons {
 namespace jsonschema {
 
-    struct default_error_reporter : public error_reporter
+    class throwing_error_reporter : public error_reporter
     {
-    private:
         void do_error(const validation_output& o) override
         {
             JSONCONS_THROW(validation_error(o.message()));
+        }
+    };
+
+    class fail_early_reporter : public error_reporter
+    {
+        void do_error(const validation_output&) override
+        {
+        }
+    public:
+        fail_early_reporter()
+            : error_reporter(true)
+        {
         }
     };
 
@@ -70,12 +81,23 @@ namespace jsonschema {
         // Validate input JSON against a JSON Schema with a default throwing error reporter
         Json validate(const Json& instance) const
         {
-            default_error_reporter reporter;
+            throwing_error_reporter reporter;
             uri_wrapper instance_location("#");
             Json patch(json_array_arg);
 
             root_->validate(instance_location, instance, reporter, patch);
             return patch;
+        }
+
+        // Validate input JSON against a JSON Schema 
+        bool is_valid(const Json& instance) const
+        {
+            fail_early_reporter reporter;
+            uri_wrapper instance_location("#");
+            Json patch(json_array_arg);
+
+            root_->validate(instance_location, instance, reporter, patch);
+            return reporter.error_count() == 0;
         }
 
         // Validate input JSON against a JSON Schema with a provided error reporter

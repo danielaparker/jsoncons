@@ -32,12 +32,6 @@ namespace jsonschema {
             {
                 identifier_ = uri.substr(pos + 1); 
                 unescape_percent(identifier_);
-                //unescape_percent(identifier_);
-                //uri_ = jsoncons::uri(uri.substr(0,pos));
-            }
-            else
-            {
-                //uri_ = jsoncons::uri(uri);
             }
             uri_ = jsoncons::uri(uri);
         }
@@ -208,12 +202,30 @@ namespace jsonschema {
     // Interface for validation error handlers
     class error_reporter
     {
+        bool fail_early_;
+        std::size_t error_count_;
     public:
+        error_reporter(bool fail_early = false)
+            : fail_early_(fail_early), error_count_(0)
+        {
+        }
+
         virtual ~error_reporter() = default;
 
         void error(const validation_output& o)
         {
+            ++error_count_;
             do_error(o);
+        }
+
+        std::size_t error_count() const
+        {
+            return error_count_;
+        }
+
+        bool fail_early() const
+        {
+            return fail_early_;
         }
 
     private:

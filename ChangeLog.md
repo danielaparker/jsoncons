@@ -1,5 +1,10 @@
-master
-------
+v0.160.0
+--------
+
+Bugs fixed:
+
+- A C++20 change caused a `basic_json` overloaded operator '==' to be ambiguous 
+despite there being a unique best viable function. Fixed.
 
 Enhancements:
 

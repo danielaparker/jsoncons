@@ -226,8 +226,8 @@ TEST_CASE("test_move_constructor")
     CHECK(storage_kind::long_string_value == var14.storage());
     CHECK(val13 == var14.as<std::string>());
 
-    json::object val15 = { {"first",1},{"second",2} };
-    json var15(val15, semantic_tag::none);
+    json val15(json_object_arg, {{"first",1},{"second",2} });
+    json var15(val15);
     json var16(std::move(var15));
     CHECK(storage_kind::null_value == var15.storage());
     CHECK(storage_kind::object_value == var16.storage());
@@ -285,15 +285,15 @@ TEST_CASE("test_copy_constructor")
     CHECK(storage_kind::long_string_value == var14.storage());
     CHECK(var14.as<std::string>() == val13);
 
-    json::object val15 = { {"first",1},{"second",2} };
-    json var15(val15, semantic_tag::none);
+    json val15(json_object_arg, { {"first",1},{"second",2} });
+    json var15(val15);
     json var16(var15);
     CHECK(storage_kind::object_value == var15.storage());
     CHECK(storage_kind::object_value == var16.storage());
     CHECK(val15 == var16);
 
-    json::array val17 = {1,2,3,4};
-    json var17(val17, semantic_tag::none);
+    json val17(json_array_arg, {1,2,3,4});
+    json var17(val17);
     json var18(var17);
     CHECK(storage_kind::array_value == var17.storage());
     CHECK(storage_kind::array_value == var18.storage());

@@ -11,22 +11,137 @@
 
 using namespace jsoncons;
 
-TEST_CASE("test_object_equals_basic")
+TEST_CASE("basic_json object == basic_json object")
 {
-    json o1;
-    o1["a"] = 1;
-    o1["b"] = 2;
-    o1["c"] = 3;
+    SECTION("empty, empty")
+    {
+        json o1;
+        json o2;
+        json o3(json_object_arg);
 
-    json o2;
-    o2["c"] = 3;
-    o2["a"] = 1;
-    o2["b"] = 2;
+        CHECK(o1 == o2);
+        CHECK(o2 == o1);
+        CHECK(o1 == o3);
 
-    CHECK(o1 == o2);
-    CHECK(o2 == o1);
-    CHECK_FALSE((o1 != o2));
-    CHECK_FALSE((o2 != o1));
+        CHECK(o1 >= o2);
+        CHECK(o2 <= o1);
+        CHECK(o1 >= o3);
+        CHECK(o3 >= o2);
+
+        CHECK_FALSE((o1 != o2));
+        CHECK_FALSE((o2 != o1));
+        CHECK_FALSE((o1 != o3));
+
+        CHECK_FALSE(o1 < o2);
+        CHECK_FALSE(o2 < o1);
+        CHECK_FALSE(o1 < o3);
+        CHECK_FALSE(o1 > o2);
+        CHECK_FALSE(o2 > o1);
+        CHECK_FALSE(o1 > o3);
+    }
+
+    SECTION("empty and nonempty")
+    {
+        json a;
+        a["c"] = 3;
+        a["a"] = 1;
+        a["b"] = 2;
+
+        json b;
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+
+    SECTION("nonempty and shorter")
+    {
+        json a;
+        a["a"] = "hello";
+        a["b"] = 1.0;
+        a["c"] = true;
+
+        json b;
+        b["a"] = "hello";
+        b["b"] = 1.0;
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+
+    SECTION("nonempty and different")
+    {
+        json o1;
+        o1["a"] = 1;
+        o1["b"] = 2;
+        o1["c"] = 3;
+
+        json o2;
+        o2["c"] = 3;
+        o2["a"] = 1;
+        o2["b"] = 2;
+
+        CHECK(o1 == o2);
+        CHECK(o2 == o1);
+        CHECK_FALSE((o1 != o2));
+        CHECK_FALSE((o2 != o1));
+
+        CHECK(std::is_convertible<decltype(o1.at("a")),json>::value);
+        CHECK(jsoncons::is_basic_json<decltype(o1.at("a"))>::value);
+        CHECK(jsoncons::is_basic_json<const json&>::value);
+
+        CHECK((o1.at("a") == 1)); // basic_json == int
+        CHECK((1 == o1.at("a"))); // int == basic_json
+        CHECK((o1["a"] == 1));    // proxy == int
+        CHECK((1 == o1["a"]));    // int == proxy
+
+        CHECK((o1.at("b") != 1)); // basic_json == int
+        CHECK((1 != o1.at("b"))); // int == basic_json
+        CHECK((o1["b"] != 1));    // proxy == int
+        CHECK((1 != o1["b"]));    // int == proxy
+    }
+}
+
+TEST_CASE("basic_json proxy == basic_json")
+{
+    SECTION("test 1")
+    {
+        json o1;
+        o1["a"] = 1;
+        o1["b"] = 2;
+
+        json o2(2);
+
+        CHECK(is_proxy<typename std::decay<decltype(o1["a"])>::type>::value);
+        CHECK(is_proxy_of<decltype(o1["a"]),json>::value);
+        CHECK(is_basic_json<typename decltype(o1["a"])::proxied_type>::value);
+
+        CHECK_FALSE((o1["a"] == o2));
+        CHECK_FALSE((o2 == o1["a"]));
+        CHECK((o1["a"] == o1["a"]));
+        CHECK_FALSE(o1["a"] == o1["b"]);
+        CHECK(o1["b"] == o2);
+        CHECK((o2 == o1["b"]));
+    }
 }
 
 TEST_CASE("test_object_equals_diff_vals")
@@ -203,5 +318,221 @@ TEST_CASE("json comparator equals tests")
     json var17(static_cast<uint64_t>(0), semantic_tag::none);
     CHECK(var16 == var17);
     CHECK(var17 == var16);
+}
+
+TEST_CASE("basic_json number comparators")
+{
+    SECTION("unsigned unsigned")
+    {
+        json o;
+        o["a"] = std::numeric_limits<uint64_t>::max();
+        o["b"] = std::numeric_limits<uint64_t>::lowest();
+
+        CHECK(o.at("a") == o.at("a")); // value and value
+        CHECK(o.at("a") == o["a"]); // value and proxy
+        CHECK(o["a"] == o.at("a")); // proxy and value
+        CHECK(o["a"] == o["a"]); // proxy and proxy
+
+        CHECK(o.at("a") <= o.at("a")); // value and value
+        CHECK(o.at("a") <= o["a"]); // value and proxy
+        CHECK(o["a"] <= o.at("a")); // proxy and value
+        CHECK(o["a"] <= o["a"]); // proxy and proxy
+
+        CHECK(o.at("a") >= o.at("a")); // value and value
+        CHECK(o.at("a") >= o["a"]); // value and proxy
+        CHECK(o["a"] >= o.at("a")); // proxy and value
+        CHECK(o["a"] >= o["a"]); // proxy and proxy
+
+        CHECK(o.at("a") != o.at("b")); // value and value
+        CHECK(o.at("a") != o["b"]); // value and proxy
+        CHECK(o["a"] != o.at("b")); // proxy and value
+        CHECK(o["a"] != o["b"]); // proxy and proxy
+
+        CHECK(o.at("a") > o.at("b")); // value and value
+        CHECK(o.at("a") > o["b"]); // value and proxy
+        CHECK(o["a"] > o.at("b")); // proxy and value
+        CHECK(o["a"] > o["b"]); // proxy and proxy
+
+        CHECK(o.at("a") >= o.at("b")); // value and value
+        CHECK(o.at("a") >= o["b"]); // value and proxy
+        CHECK(o["a"] >= o.at("b")); // proxy and value
+        CHECK(o["a"] >= o["b"]); // proxy and proxy
+
+        CHECK_FALSE(o.at("a") < o.at("b")); // value and value
+        CHECK_FALSE(o.at("a") < o["b"]); // value and proxy
+        CHECK_FALSE(o["a"] < o.at("b")); // proxy and value
+        CHECK_FALSE(o["a"] < o["b"]); // proxy and proxy
+
+        CHECK_FALSE(o.at("a") <= o.at("b")); // value and value
+        CHECK_FALSE(o.at("a") <= o["b"]); // value and proxy
+        CHECK_FALSE(o["a"] <= o.at("b")); // proxy and value
+        CHECK_FALSE(o["a"] <= o["b"]); // proxy and proxy
+    }
+    SECTION("signed signed test")
+    {
+        auto a = std::numeric_limits<int64_t>::max();
+        auto b = std::numeric_limits<int64_t>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("unsigned signed test")
+    {
+        json a = std::numeric_limits<uint64_t>::max();
+        json b = std::numeric_limits<int64_t>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("signed unsigned test")
+    {
+        json a = std::numeric_limits<int64_t>::max();
+        json b = std::numeric_limits<uint64_t>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("double double test")
+    {
+        json a = std::numeric_limits<double>::max();
+        json b = std::numeric_limits<double>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("signed double test")
+    {
+        json a = std::numeric_limits<int64_t>::max();
+        json b = std::numeric_limits<double>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("double signed test")
+    {
+        json a = std::numeric_limits<double>::max();
+        json b = std::numeric_limits<int64_t>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("unsigned double test")
+    {
+        json a = std::numeric_limits<uint64_t>::max();
+        json b = std::numeric_limits<double>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+    SECTION("double unsigned test")
+    {
+        json a = std::numeric_limits<double>::max();
+        json b = std::numeric_limits<uint64_t>::lowest();
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
+}
+
+TEST_CASE("basic_json bool comparator")
+{
+    SECTION("bool")
+    {
+        json a(true);
+        json b(false);
+
+        CHECK(a == a); // value and value
+        CHECK(a <= a); // value and value
+        CHECK(a >= a); // value and value
+        CHECK(a != b); // value and value
+        CHECK(a > b); // value and value
+        CHECK(a >= b); // value and value
+        CHECK(b < a); // value and value
+        CHECK(b <= a); // value and value
+        CHECK_FALSE(a < b); // value and value
+        CHECK_FALSE(a <= b); // value and value
+        CHECK_FALSE(b > a); // value and value
+        CHECK_FALSE(b >= a); // value and value
+    }
 }
 

@@ -420,11 +420,17 @@ convert(InputIt first, InputIt last,
          */
         switch (extra_bytes_to_read) {
             case 5: ch += static_cast<uint8_t>(*first++); ch <<= 6; /* remember, illegal UTF-8 */
+                UNICONS_FALLTHROUGH;
             case 4: ch += static_cast<uint8_t>(*first++); ch <<= 6; /* remember, illegal UTF-8 */
+                UNICONS_FALLTHROUGH;
             case 3: ch += static_cast<uint8_t>(*first++); ch <<= 6;
+                UNICONS_FALLTHROUGH;
             case 2: ch += static_cast<uint8_t>(*first++); ch <<= 6;
+                UNICONS_FALLTHROUGH;
             case 1: ch += static_cast<uint8_t>(*first++); ch <<= 6;
+                UNICONS_FALLTHROUGH;
             case 0: ch += static_cast<uint8_t>(*first++);
+                break;
         }
         ch -= offsets_from_utf8[extra_bytes_to_read];
 
@@ -599,9 +605,13 @@ convert(InputIt first, InputIt last,
 
         switch (bytes_to_write) { // note: everything falls through
             case 4: byte4 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+                UNICONS_FALLTHROUGH;
             case 3: byte3 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+                UNICONS_FALLTHROUGH;
             case 2: byte2 = (uint8_t)((ch | byteMark) & byteMask); ch >>= 6;
+                UNICONS_FALLTHROUGH;
             case 1: byte1 = (uint8_t)(ch | first_byte_mark[bytes_to_write]);
+                break;
         }
         switch (bytes_to_write) 
         {
@@ -781,6 +791,7 @@ convert(InputIt first, InputIt last,
             UNICONS_FALLTHROUGH;
         case 1:
             byte1 = (uint8_t) (ch | first_byte_mark[bytes_to_write]);
+            break;
         }
 
         switch (bytes_to_write) 

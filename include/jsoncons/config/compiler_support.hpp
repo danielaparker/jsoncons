@@ -100,7 +100,7 @@
 #endif 
 
 #if defined(_MSC_VER)
-#define JSONCONS_HAS_MSC__STRTOD_L
+#define JSONCONS_HAS_MSC_STRTOD_L
 #define JSONCONS_HAS_FOPEN_S
 #endif
 
@@ -191,7 +191,7 @@
 
 #if !defined(JSONCONS_NO_EXCEPTIONS)
 
-#if __GNUC__ && !__EXCEPTIONS
+#if defined(__GNUC__) && !__EXCEPTIONS
 # define JSONCONS_NO_EXCEPTIONS 1
 #elif _MSC_VER 
 #if defined(_HAS_EXCEPTIONS) && _HAS_EXCEPTIONS == 0
@@ -216,7 +216,7 @@
 #endif
 
 #if !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
-   #if defined(__clang__)
+   #if defined(__clang__) && defined(_cplusplus)
       #if defined(__APPLE__)
          #if __clang_major__ >= 6  && _cplusplus >= 201103L // Xcode 6
             #define JSONCONS_HAS_STD_MAKE_UNIQUE

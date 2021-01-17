@@ -484,12 +484,6 @@ namespace ns {
             author(author), title(title), price(price)
         {
         }
-
-        friend std::ostream& operator<<(std::ostream& os, const book& b)
-        {
-            std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
-            return os;
-        }
     };
 
 } // namespace ns

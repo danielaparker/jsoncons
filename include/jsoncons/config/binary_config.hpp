@@ -25,8 +25,8 @@
 #  define __has_builtin(x)  0
 #endif
 
-#if (defined(__GNUC__) && (__GNUC__ * 100 + __GNUC_MINOR__ >= 403)) || \
-    (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
+#if defined(__GNUC__)
+#if (__GNUC__ * 100 + __GNUC_MINOR__ >= 403) || (__has_builtin(__builtin_bswap64) && __has_builtin(__builtin_bswap32))
 #  define JSONCONS_BYTE_SWAP_64 __builtin_bswap64
 #  define JSONCONS_BYTE_SWAP_32 __builtin_bswap32
 #    ifdef __INTEL_COMPILER
@@ -34,6 +34,7 @@
 #    elif (__GNUC__ * 100 + __GNUC_MINOR__ >= 608) || __has_builtin(__builtin_bswap16)
 #      define JSONCONS_BYTE_SWAP_16    __builtin_bswap16
 #  endif
+#endif
 #elif defined(__sun)
 #  include <sys/byteorder.h>
 #elif defined(_MSC_VER)
@@ -79,9 +80,9 @@ namespace detail {
     #else
         uint64_t v;
         std::memcpy(&v, &val, sizeof(v));
-        int sign = v >> 63 << 15;
-        int exp = (v >> 52) & 0x7ff;
-        int mant = v << 12 >> 12 >> (53-11);    /* keep only the 11 most significant bits of the mantissa */
+        int64_t sign = static_cast<int64_t>(v >> 63 << 15);
+        int64_t exp = (v >> 52) & 0x7ff;
+        int64_t mant = v << 12 >> 12 >> (53-11);    /* keep only the 11 most significant bits of the mantissa */
         exp -= 1023;
         if (exp == 1024) {
             /* infinity or NaN */
@@ -104,7 +105,7 @@ namespace detail {
         }
 
         /* safe cast here as bit operations above guarantee not to overflow */
-        return (uint16_t)(sign | ((exp + 15) << 10) | mant);
+        return static_cast<uint16_t>(sign | ((exp + 15) << 10) | mant);
     #endif
     }
 
@@ -115,20 +116,20 @@ namespace detail {
     #if defined(__F16C__) && !defined(APPLE_MISSING_INTRINSICS)
         return _cvtsh_ss(half);
     #else
-        int exp = (half >> 10) & 0x1f;
-        int mant = half & 0x3ff;
+        int64_t exp = (half >> 10) & 0x1f;
+        int64_t mant = half & 0x3ff;
         double val;
         if (exp == 0) 
         {
-            val = ldexp((double)mant, -24);
+            val = ldexp(static_cast<double>(mant), -24);
         }
         else if (exp != 31) 
         {
-            val = ldexp(mant + 1024.0, exp - 25);
+            val = ldexp(static_cast<double>(mant) + 1024.0, static_cast<int>(exp - 25));
         } 
         else
         {
-            val = mant == 0 ? INFINITY : NAN;
+            val = mant == 0 ? std::numeric_limits<double>::infinity() : std::nan("");
         }
         return half & 0x8000 ? -val : val;
     #endif

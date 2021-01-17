@@ -50,6 +50,7 @@ void json_traits_bitset_examples();
 void json_traits_integer_examples();
 void json_traits_polymorphic_examples();
 void jsonschema_examples();
+void erase_examples();
 
 void comment_example()
 {
@@ -462,6 +463,8 @@ int main()
         json_traits_polymorphic_examples();
 
         json_traits_variant_examples();
+
+        erase_examples();
 
         jsonschema_examples();
     }

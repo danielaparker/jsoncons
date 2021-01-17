@@ -33,12 +33,6 @@ namespace ns {
             : author(author), title(title), price(price)
         {
         }
-
-        friend std::ostream& operator<<(std::ostream& os, const book1a& b)
-        {
-            std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
-            return os;
-        }
     };
 
     struct book1b
@@ -46,12 +40,6 @@ namespace ns {
         std::string author;
         std::string title;
         double price;
-
-        friend std::ostream& operator<<(std::ostream& os, const book1b& b)
-        {
-            std::cout << "author: " << b.author << ", title: " << b.title << ", price: " << b.price << "\n";
-            return os;
-        }
     };
 
     class book2a
