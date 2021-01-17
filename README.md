@@ -25,7 +25,7 @@ JSON-like data formats such as CBOR that have them.
 
 jsoncons is distributed under the [Boost Software License](http://www.boost.org/users/license.html). 
 
-jsoncons is free but welcomes support to sustain its development. You can sponsor this library at [GitHub Sponsors](https://github.com/sponsors/danielaparker).
+jsoncons is free but welcomes support to sustain its development [:heart: Sponsor](/sponsors/danielaparker/dashboard)
 
 ## Extensions
 
