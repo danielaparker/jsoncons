@@ -1245,7 +1245,7 @@ namespace detail {
     template <class Json,class JsonReference>
     class selector_base
     {
-        bool is_projection_;
+        bool is_path_;
         std::size_t precedence_level_;
     public:
         using char_type = typename Json::char_type;
@@ -1254,24 +1254,18 @@ namespace detail {
         using reference = JsonReference;
         using path_node_type = path_node<Json,JsonReference>;
 
-        selector_base()
-            : is_projection_(false), 
-              precedence_level_(0)
-        {
-        }
-
-        selector_base(bool is_projection,
+        selector_base(bool is_path,
                       std::size_t precedence_level = 0)
-            : is_projection_(is_projection), 
+            : is_path_(is_path), 
               precedence_level_(precedence_level)
         {
         }
 
         virtual ~selector_base() noexcept = default;
 
-        bool is_projection() const 
+        bool is_path() const 
         {
-            return is_projection_;
+            return is_path_;
         }
 
         std::size_t precedence_level() const
@@ -1531,9 +1525,9 @@ namespace detail {
             return type_ == token_kind::current_node; 
         }
 
-        bool is_projection() const
+        bool is_path() const
         {
-            return type_ == token_kind::selector && selector_->is_projection(); 
+            return type_ == token_kind::selector && selector_->is_path(); 
         }
 
         bool is_operator() const
