@@ -2467,9 +2467,7 @@ namespace jsoncons { namespace jsonpath_new {
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack_.empty() && output_stack_.back().is_projection())
                     {
                         output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks))));
                     }
@@ -2504,9 +2502,7 @@ namespace jsoncons { namespace jsonpath_new {
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack_.empty() && output_stack_.back().is_projection())
                     {
                         output_stack_.back().selector_->append_selector(jsoncons::make_unique<expression_selector>(path_expression_type(std::move(toks))));
                     }
@@ -2518,9 +2514,7 @@ namespace jsoncons { namespace jsonpath_new {
                 }
                 case token_kind::selector:
                 {
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack_.empty() && output_stack_.back().is_projection())
                     {
                         output_stack_.back().selector_->append_selector(std::move(tok.selector_));
                     }
@@ -2571,9 +2565,7 @@ namespace jsoncons { namespace jsonpath_new {
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack_.empty() && output_stack_.back().is_projection())
                     {
                         output_stack_.back().selector_->append_selector(jsoncons::make_unique<union_selector>(std::move(expressions)));
                     }
@@ -2612,9 +2604,7 @@ namespace jsoncons { namespace jsonpath_new {
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
-                    if (!output_stack_.empty() && output_stack_.back().is_projection() && 
-                        (tok.precedence_level() < output_stack_.back().precedence_level() ||
-                        (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
+                    if (!output_stack_.empty() && output_stack_.back().is_projection())
                     {
                         output_stack_.back().selector_->append_selector(jsoncons::make_unique<function_expression>(path_expression_type(std::move(toks))));
                     }

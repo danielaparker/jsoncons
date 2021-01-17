@@ -1332,7 +1332,7 @@ namespace detail {
                             std::vector<path_node_type>& nodes,
                             result_flags flags) const = 0;
 
-        virtual void add_selector(std::unique_ptr<selector_base>&&) 
+        virtual void append_selector(std::unique_ptr<selector_base>&&) 
         {
         }
 
@@ -1543,11 +1543,6 @@ namespace detail {
         bool is_projection() const
         {
             return type_ == token_kind::selector && selector_->is_projection(); 
-        }
-
-        bool is_expression() const
-        {
-            return type_ == token_kind::selector; 
         }
 
         bool is_operator() const
