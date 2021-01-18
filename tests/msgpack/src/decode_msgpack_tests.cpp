@@ -151,13 +151,51 @@ TEST_CASE("decode msgpack from source")
     }
 }
 
-TEST_CASE("decode msgpack size tests")
+TEST_CASE("decode msgpack str size tests")
 {
     SECTION("str8_cd")
     {
         std::string input = R"(
-{"a": "Новое расписание на автобусных маршрутах №№8, 15, 64 будет действовать с 4.07.2016"}
+{"title": "Новое расписание на автобусных маршрутах №№8, 15, 64 будет действовать с 4.07.2016"}
         )";
+
+        json j = json::parse(input);
+        std::vector<uint8_t> buf;
+        msgpack::encode_msgpack(j, buf);
+        json other = msgpack::decode_msgpack<json>(buf);
+        CHECK(j == other);
+    }
+    SECTION("str8_cd 0")
+    {
+        std::string input = "{\"\":\"\"}";
+
+        json j = json::parse(input);
+        std::vector<uint8_t> buf;
+        msgpack::encode_msgpack(j, buf);
+        json other = msgpack::decode_msgpack<json>(buf);
+        CHECK(j == other);
+    }
+    SECTION("str8_cd max")
+    {
+        std::string input = "{\"";
+        input.append((std::numeric_limits<uint8_t>::max)(), '0');
+        input.append("\":\"");
+        input.append((std::numeric_limits<uint8_t>::max)(), '0');
+        input.append("\"}");
+
+        json j = json::parse(input);
+        std::vector<uint8_t> buf;
+        msgpack::encode_msgpack(j, buf);
+        json other = msgpack::decode_msgpack<json>(buf);
+        CHECK(j == other);
+    }
+    SECTION("str16_cd max")
+    {
+        std::string input = "{\"";
+        input.append((std::numeric_limits<uint16_t>::max)(), '0');
+        input.append("\":\"");
+        input.append((std::numeric_limits<uint16_t>::max)(), '0');
+        input.append("\"}");
 
         json j = json::parse(input);
         std::vector<uint8_t> buf;
