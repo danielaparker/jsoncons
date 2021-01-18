@@ -6,6 +6,9 @@ Bugs fixed:
 - A C++20 change caused a `basic_json` overloaded operator '==' to be ambiguous 
 despite there being a unique best viable function. Fixed.
 
+- When parsing MessagePack buffers, lengths were being incorrectly 
+parsed as signed integers. Fixed.
+
 Enhancements:
 
 - Added jsonschema extension that implements the JSON Schema [Draft 7](https://json-schema.org/specification-links.html#draft-7) 
@@ -20,6 +23,12 @@ produce `[]` or `{}`. For example, given `{"bar":{},"foo":[]}`,
 the flattened output was {"/bar":null,"/foo":null}, but is now 
 `{"/bar":{},"/foo":[]}`. `jsonpointer::unflatten` will now return 
 the original object.  
+
+Deprecated function removed:
+
+- The long since deprecated `basic_json` funtion 
+`to_string(const basic_json_encode_options<char_type>&, char_allocator_type&) const`
+has been removed (replaced by `dump`).
 
 v0.159.0
 --------
