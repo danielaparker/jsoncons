@@ -223,8 +223,10 @@ namespace ns {
                        hiking_experience assertion,
                        const std::string& rated,
                        double rating,
-                       const std::optional<std::chrono::seconds>& generated = std::optional<std::chrono::seconds>(),
-                       const std::optional<std::chrono::seconds>& expires = std::optional<std::chrono::seconds>())
+                       const std::optional<std::chrono::seconds>& generated = 
+                           std::optional<std::chrono::seconds>(),
+                       const std::optional<std::chrono::seconds>& expires = 
+                           std::optional<std::chrono::seconds>())
             : rater_(rater), assertion_(assertion), rated_(rated), rating_(rating),
               generated_(generated), expires_(expires)
         {
