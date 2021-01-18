@@ -13,12 +13,12 @@
 #include <limits>
 #include <catch/catch.hpp>
 
-using namespace jsoncons;
-using namespace jsoncons::msgpack;
+using jsoncons::json;
+namespace msgpack = jsoncons::msgpack;
 
 void check_decode_msgpack(const std::vector<uint8_t>& v, const json& expected)
 {
-    json result = decode_msgpack<json>(v);
+    json result = msgpack::decode_msgpack<json>(v);
     REQUIRE(result == expected);
 }
 
@@ -95,11 +95,11 @@ TEST_CASE("decode_number_msgpack_test")
 TEST_CASE("decode_msgpack_arrays_and_maps")
 {
     // fixarray
-    check_decode_msgpack({0x90}, json(json_array_arg));
-    check_decode_msgpack({0x80}, json(json_object_arg));
+    check_decode_msgpack({0x90}, json(jsoncons::json_array_arg));
+    check_decode_msgpack({0x80}, json(jsoncons::json_object_arg));
 
     check_decode_msgpack({0x91,'\0'},json::parse("[0]"));
-    check_decode_msgpack({0x92,'\0','\0'}, json(json_array_arg, {0,0}));
+    check_decode_msgpack({0x92,'\0','\0'}, json(jsoncons::json_array_arg, {0,0}));
     check_decode_msgpack({0x92,0x91,'\0','\0'}, json::parse("[[0],0]"));
     check_decode_msgpack({0x91,0xa5,'H','e','l','l','o'},json::parse("[\"Hello\"]"));
 
@@ -113,14 +113,14 @@ TEST_CASE("Compare msgpack packed item and jsoncons item")
     msgpack::msgpack_bytes_encoder encoder(bytes);
     encoder.begin_array(2); // Must be definite length array
     encoder.string_value("foo");
-    encoder.byte_string_value(byte_string{'b','a','r'});
+    encoder.byte_string_value(jsoncons::byte_string{'b','a','r'});
     encoder.end_array();
     encoder.flush();
 
-    json expected(json_array_arg);
+    json expected(jsoncons::json_array_arg);
 
     expected.emplace_back("foo");
-    expected.emplace_back(byte_string{ 'b','a','r' });
+    expected.emplace_back(jsoncons::byte_string{ 'b','a','r' });
 
     json j = msgpack::decode_msgpack<json>(bytes);
 
@@ -150,4 +150,21 @@ TEST_CASE("decode msgpack from source")
         CHECK(j[0].as<std::string>() == std::string("Hello"));
     }
 }
+
+TEST_CASE("decode msgpack size tests")
+{
+    SECTION("str8_cd")
+    {
+        std::string input = R"(
+{"a": "Новое расписание на автобусных маршрутах №№8, 15, 64 будет действовать с 4.07.2016"}
+        )";
+
+        json j = json::parse(input);
+        std::vector<uint8_t> buf;
+        msgpack::encode_msgpack(j, buf);
+        json other = msgpack::decode_msgpack<json>(buf);
+        CHECK(j == other);
+    }
+}
+
 

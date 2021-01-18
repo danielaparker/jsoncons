@@ -669,13 +669,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                int8_t len = jsoncons::detail::big_to_native<int8_t>(buf, sizeof(buf));
-                if (len < 0)
-                {
-                    ec = msgpack_errc::length_is_negative;
-                    more_ = false;
-                    return 0;
-                }
+                uint8_t len = jsoncons::detail::big_to_native<uint8_t>(buf, sizeof(buf));
                 return static_cast<std::size_t>(len);
             }
 
@@ -692,13 +686,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                int16_t len = jsoncons::detail::big_to_native<int16_t>(buf, sizeof(buf));
-                if (len < 0)
-                {
-                    ec = msgpack_errc::length_is_negative;
-                    more_ = false;
-                    return 0;
-                }
+                uint16_t len = jsoncons::detail::big_to_native<uint16_t>(buf, sizeof(buf));
                 return static_cast<std::size_t>(len);
             }
 
@@ -715,13 +703,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                int32_t len = jsoncons::detail::big_to_native<int32_t>(buf, sizeof(buf));
-                if (len < 0)
-                {
-                    ec = msgpack_errc::length_is_negative;
-                    more_ = false;
-                    return 0;
-                }
+                uint32_t len = jsoncons::detail::big_to_native<uint32_t>(buf, sizeof(buf));
                 return static_cast<std::size_t>(len);
             }
             case jsoncons::msgpack::detail::msgpack_format::fixext1_cd: 
