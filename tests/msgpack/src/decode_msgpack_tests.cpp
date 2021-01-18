@@ -153,7 +153,7 @@ TEST_CASE("decode msgpack from source")
 
 TEST_CASE("decode msgpack str size tests")
 {
-    SECTION("str8_cd")
+    SECTION("str8")
     {
         std::string input = R"(
 {"title": "Новое расписание на автобусных маршрутах №№8, 15, 64 будет действовать с 4.07.2016"}
@@ -165,7 +165,7 @@ TEST_CASE("decode msgpack str size tests")
         json other = msgpack::decode_msgpack<json>(buf);
         CHECK(j == other);
     }
-    SECTION("str8_cd 0")
+    SECTION("str8 0")
     {
         std::string input = "{\"\":\"\"}";
 
@@ -175,7 +175,7 @@ TEST_CASE("decode msgpack str size tests")
         json other = msgpack::decode_msgpack<json>(buf);
         CHECK(j == other);
     }
-    SECTION("str8_cd max")
+    SECTION("str8 max")
     {
         std::string input = "{\"";
         input.append((std::numeric_limits<uint8_t>::max)(), '0');
@@ -189,7 +189,7 @@ TEST_CASE("decode msgpack str size tests")
         json other = msgpack::decode_msgpack<json>(buf);
         CHECK(j == other);
     }
-    SECTION("str16_cd max")
+    SECTION("str16 max")
     {
         std::string input = "{\"";
         input.append((std::numeric_limits<uint16_t>::max)(), '0');
@@ -202,6 +202,58 @@ TEST_CASE("decode msgpack str size tests")
         msgpack::encode_msgpack(j, buf);
         json other = msgpack::decode_msgpack<json>(buf);
         CHECK(j == other);
+    }
+    SECTION("str8 max (bytes)")
+    {
+        std::vector<uint8_t> in = {0xd9,0xff};
+        in.insert(in.end(), (std::numeric_limits<uint8_t>::max)(), ' ');
+
+        std::vector<uint8_t> out;
+        msgpack::msgpack_bytes_encoder visitor(out);
+
+        msgpack::msgpack_bytes_reader reader(in, visitor);
+        reader.read();
+
+        CHECK(in == out);
+    }
+    SECTION("str16 max (bytes)")
+    {
+        std::vector<uint8_t> in = {0xda,0xff,0xff};
+        in.insert(in.end(), (std::numeric_limits<uint16_t>::max)(), ' ');
+
+        std::vector<uint8_t> out;
+        msgpack::msgpack_bytes_encoder visitor(out);
+
+        msgpack::msgpack_bytes_reader reader(in, visitor);
+        reader.read();
+
+        CHECK(in == out);
+    }
+    SECTION("bin8 max (bytes)")
+    {
+        std::vector<uint8_t> in = {0xc4,0xff};
+        in.insert(in.end(), (std::numeric_limits<uint8_t>::max)(), ' ');
+
+        std::vector<uint8_t> out;
+        msgpack::msgpack_bytes_encoder visitor(out);
+
+        msgpack::msgpack_bytes_reader reader(in, visitor);
+        reader.read();
+
+        CHECK(in == out);
+    }
+    SECTION("bin16 max (bytes)")
+    {
+        std::vector<uint8_t> in = {0xc5,0xff,0xff};
+        in.insert(in.end(), (std::numeric_limits<uint16_t>::max)(), ' ');
+
+        std::vector<uint8_t> out;
+        msgpack::msgpack_bytes_encoder visitor(out);
+
+        msgpack::msgpack_bytes_reader reader(in, visitor);
+        reader.read();
+
+        CHECK(in == out);
     }
 }
 
