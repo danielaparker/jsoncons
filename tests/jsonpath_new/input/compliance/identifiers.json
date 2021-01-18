@@ -1,5 +1,18 @@
 [
     {
+        "source:" : "https://cburgmer.github.io/json-path-comparison/",
+        "given": {
+               "key": "value"
+           },
+        "cases": [
+            {
+                "expression": "$.key",
+                "result": ["value"],
+                "path" : ["$['key']"]
+            }
+        ]
+    },
+    {
         "source:" : "https://github.com/jmespath/jmespath.test",
         "given": {
             "__L": true
