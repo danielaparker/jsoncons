@@ -26,9 +26,9 @@ the original object.
 
 Deprecated function removed:
 
-- The long since deprecated `basic_json` funtion 
+- The long deprecated `basic_json` function 
 `to_string(const basic_json_encode_options<char_type>&, char_allocator_type&) const`
-has been removed (replaced by `dump`).
+has been removed (replacement is `dump`).
 
 v0.159.0
 --------
