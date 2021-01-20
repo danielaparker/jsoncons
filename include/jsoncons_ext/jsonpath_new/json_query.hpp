@@ -394,16 +394,16 @@ namespace jsoncons { namespace jsonpath_new {
                 //std::cout << "wildcard_selector: " << val << "\n";
                 if (val.is_array())
                 {
-                    for (auto& item : val.array_range())
+                    for (std::size_t i = 0; i < val.size(); ++i)
                     {
-                        this->evaluate_tail(resources, path, root, item, nodes, flags);
+                        this->evaluate_tail(resources, generate_path(path, i, flags), root, val[i], nodes, flags);
                     }
                 }
                 else if (val.is_object())
                 {
                     for (auto& item : val.object_range())
                     {
-                        this->evaluate_tail(resources, path, root, item.value(), nodes, flags);
+                        this->evaluate_tail(resources, generate_path(path, item.key(), flags), root, item.value(), nodes, flags);
                     }
                 }
                 //std::cout << "end wildcard_selector\n";
