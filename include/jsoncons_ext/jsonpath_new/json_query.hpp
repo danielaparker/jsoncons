@@ -497,8 +497,7 @@ namespace jsoncons { namespace jsonpath_new {
                 auto callback = [&](path_node_type& node)
                 {
                     //std::cout << "union select callback: node: " << *node.val_ptr << "\n";
-                    //nodes.push_back(node);
-                    this->evaluate_tail(resources, path, root, *node.val_ptr, nodes, flags);
+                    this->evaluate_tail(resources, node.path, root, *node.val_ptr, nodes, flags);
                 };
                 for (auto& expr : expressions_)
                 {

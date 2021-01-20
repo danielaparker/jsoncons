@@ -5,8 +5,8 @@
             {
                 "comment" : "Dot notation after union",
                 "expression" : "$[0,2].key",
-                "result" : ["ey","see"]
-
+                "result" : ["ey","see"],
+                "path" : ["$[0]['key']","$[2]['key']"]
             }
         ]
     },
