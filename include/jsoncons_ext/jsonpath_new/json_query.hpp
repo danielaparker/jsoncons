@@ -444,9 +444,9 @@ namespace jsoncons { namespace jsonpath_new {
                 if (val.is_array())
                 {
                     this->evaluate_tail(resources, path, root, val, nodes, flags);
-                    for (auto& item : val.array_range())
+                    for (std::size_t i = 0; i < val.size(); ++i)
                     {
-                        select(resources, path, root, item, nodes, flags);
+                        select(resources, generate_path(path, i, flags), root, val[i], nodes, flags);
                     }
                 }
                 else if (val.is_object())
@@ -454,7 +454,7 @@ namespace jsoncons { namespace jsonpath_new {
                     this->evaluate_tail(resources, path, root, val, nodes, flags);
                     for (auto& item : val.object_range())
                     {
-                        select(resources, path, root, item.value(), nodes, flags);
+                        select(resources, generate_path(path, item.key(), flags), root, item.value(), nodes, flags);
                     }
                 }
                 //std::cout << "end wildcard_selector\n";
