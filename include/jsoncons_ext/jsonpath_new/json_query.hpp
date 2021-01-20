@@ -298,41 +298,6 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class current_node final : public path_selector
-        {
-            using path_selector::generate_path;
-        public:
-            current_node()
-                : path_selector()
-            {
-            }
-
-            void select(dynamic_resources<Json>& resources,
-                        const string_type& path, 
-                        reference root,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        result_flags flags) const override
-            {
-                //nodes.emplace_back(path, std::addressof(val));
-                this->evaluate_tail(resources, path, 
-                                        root, val, nodes, flags);
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("current_node");
-
-                return s;
-            }
-        };
-
         class root_node final : public path_selector
         {
             using path_selector::generate_path;
@@ -1005,7 +970,6 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '@':
                                 push_token(current_node_arg, ec);
-                                push_token(token_type(jsoncons::make_unique<current_node>()), ec);
                                 ++p_;
                                 ++column_;
                                 state_stack_.pop_back();
@@ -1140,7 +1104,6 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 push_token(token_type(current_node_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<current_node>()), ec);
                                 state_stack_.pop_back();
                                 break;
                             case '.':
