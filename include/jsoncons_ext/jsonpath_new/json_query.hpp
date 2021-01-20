@@ -567,7 +567,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             temp.push_back(node);
                         };
-                        expr_.evaluate(resources, path, root, val[i], callback, flags);
+                        expr_.evaluate(resources, generate_path(path, i, flags), root, val[i], callback, flags);
                         if (is_true(temp))
                         {
                             this->evaluate_tail(resources, generate_path(path,i,flags), root, val[i], nodes, flags);
@@ -583,7 +583,7 @@ namespace jsoncons { namespace jsonpath_new {
                         {
                             temp.push_back(node);
                         };
-                        expr_.evaluate(resources, path, root, member.value(), callback, flags);
+                        expr_.evaluate(resources, generate_path(path, member.key(), flags), root, member.value(), callback, flags);
                         if (is_true(temp))
                         {
                             this->evaluate_tail(resources, generate_path(path,member.key(),flags), root, member.value(), nodes, flags);
@@ -638,11 +638,11 @@ namespace jsoncons { namespace jsonpath_new {
                     if (j.template is<std::size_t>() && val.is_array())
                     {
                         std::size_t start = j.template as<std::size_t>();
-                        this->evaluate_tail(resources, path, root, val.at(start), nodes, flags);
+                        this->evaluate_tail(resources, generate_path(path, start, flags), root, val.at(start), nodes, flags);
                     }
                     else if (j.is_string() && val.is_object())
                     {
-                        this->evaluate_tail(resources, path, root, val.at(j.as_string_view()), nodes, flags);
+                        this->evaluate_tail(resources, generate_path(path, j.as_string(), flags), root, val.at(j.as_string_view()), nodes, flags);
                     }
                 }
             }
