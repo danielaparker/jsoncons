@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2021 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -186,6 +186,7 @@ namespace jsoncons { namespace jsonpath_new {
         using selector_base_type = selector_base<Json,JsonReference>;
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
+        using script_expression_type = script_expression<Json>;
         using function_base_type = function_base<Json,JsonReference>;
 
     private:
@@ -541,12 +542,12 @@ namespace jsoncons { namespace jsonpath_new {
 
         class filter_selector final : public path_selector
         {
-            path_expression_type expr_;
+            script_expression_type expr_;
 
             using path_selector::generate_path;
         public:
 
-            filter_selector(path_expression_type&& expr)
+            filter_selector(script_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
             {
             }
@@ -610,11 +611,11 @@ namespace jsoncons { namespace jsonpath_new {
         class expression_selector final : public path_selector
         {
             using path_selector::generate_path;
-            path_expression_type expr_;
+            script_expression_type expr_;
 
         public:
 
-            expression_selector(path_expression_type&& expr)
+            expression_selector(script_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
             {
             }
@@ -2427,11 +2428,11 @@ namespace jsoncons { namespace jsonpath_new {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_selector>(script_expression_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_selector>(script_expression_type(std::move(toks)))));
                     }
                     break;
                 }
@@ -2462,11 +2463,11 @@ namespace jsoncons { namespace jsonpath_new {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<expression_selector>(path_expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<expression_selector>(script_expression_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<expression_selector>(path_expression_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<expression_selector>(script_expression_type(std::move(toks)))));
                     }
                     break;
                 }
@@ -2745,17 +2746,33 @@ namespace jsoncons { namespace jsonpath_new {
         return expression.evaluate(root, flags);
     }
 
-/*
     template<class Json, class T>
     typename std::enable_if<!jsoncons::detail::is_function_object<T,Json>::value,void>::type
-    json_replace(Json& root, const typename Json::string_view_type& path, T&& new_value)
+    json_replace(Json& root, const typename Json::string_view_type& path, const T& new_value)
     {
-        jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&> evaluator;
-        jsoncons::jsonpath_new::detail::static_resources<value_type,reference> resources;
-        evaluator.evaluate(resources, root, path);
-        evaluator.replace(std::forward<T>(new_value));
+        using evaluator_t = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, Json&>;
+        using string_type = typename evaluator_t::string_type;
+        using string_view_type = typename evaluator_t::string_view_type;
+        using value_type = typename evaluator_t::value_type;
+        using reference = typename evaluator_t::reference;
+        using expression_t = typename evaluator_t::path_expression_type;
+        using path_node_type = typename evaluator_t::path_node_type;
+
+        string_type output_path = { '$' };
+
+        jsoncons::jsonpath_new::detail::static_resources<value_type,reference> static_resources;
+        evaluator_t e;
+        expression_t expr = e.compile(static_resources, path);
+
+        jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
+        auto callback = [&new_value](path_node_type& node)
+        {
+            *node.val_ptr = new_value;
+        };
+        expr.evaluate(resources, output_path, root, root, callback, result_flags::value);
     }
 
+/*
     template<class Json, class Op>
     typename std::enable_if<jsoncons::detail::is_function_object<Op,Json>::value,void>::type
     json_replace(Json& root, const typename Json::string_view_type& path, Op op)

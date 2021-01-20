@@ -1,4 +1,4 @@
-// Copyright 2020 Daniel Parker
+// Copyright 2021 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -541,7 +541,7 @@ namespace detail {
                 if (!j.is_number())
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return Json::null();
+                    return resources.null_value();
                 }
                 sum += j.template as<double>();
             }
@@ -669,7 +669,7 @@ namespace detail {
                 if (!j.is_number())
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return Json::null();
+                    return resources.null_value();
                 }
                 prod *= j.template as<double>();
             }
@@ -712,7 +712,7 @@ namespace detail {
                 if (!j.is_number())
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return Json::null();
+                    return resources.null_value();
                 }
                 sum += j.template as<double>();
             }
@@ -1086,6 +1086,18 @@ namespace detail {
         unary_operator,
         binary_operator
     };
+
+    struct reference_arg_t
+    {
+        explicit reference_arg_t() = default;
+    };
+    constexpr reference_arg_t reference_arg{};
+
+    struct const_reference_arg_t
+    {
+        explicit const_reference_arg_t() = default;
+    };
+    constexpr const_reference_arg_t const_reference_arg{};
 
     struct literal_arg_t
     {
@@ -1464,6 +1476,16 @@ namespace detail {
             construct(std::forward<token>(other));
         }
 
+        const Json& get_value(const_reference_arg_t, dynamic_resources<Json>&) const
+        {
+            return value_;
+        }
+
+        Json& get_value(reference_arg_t, dynamic_resources<Json>& resources) const
+        {
+            return resources.create_json(value_);
+        }
+
         token& operator=(token&& other)
         {
             if (&other != this)
@@ -1622,6 +1644,135 @@ namespace detail {
         }
     };
 
+    enum class node_set_tag {none,single,multi};
+
+    template <class Json,class JsonReference>
+    struct node_set
+    {
+        using path_node_type = path_node<Json,JsonReference>;
+        using pointer = typename path_node_type::pointer;
+
+        node_set_tag tag;
+        union
+        {
+            path_node_type node;
+            std::vector<path_node_type> nodes;
+        };
+
+        node_set() noexcept
+            : tag(node_set_tag::none), node()
+        {
+        }
+        node_set(path_node_type&& node) noexcept
+            : tag(node_set_tag::single),
+            node(std::move(node))
+        {
+        }
+        node_set(std::vector<path_node_type>&& nds) noexcept
+        {
+            if (nds.empty())
+            {
+                tag = node_set_tag::none;
+            }
+            else if (nds.size() == 1)
+            {
+                tag = node_set_tag::single;
+                new (&node)path_node_type(nds.back());
+            }
+            else
+            {
+                tag = node_set_tag::multi;
+                new (&nodes) std::vector<path_node_type>(nds);
+            }
+        }
+
+        node_set(node_set&& other) noexcept
+        {
+            construct(std::forward<node_set>(other));
+        }
+
+        ~node_set() noexcept
+        {
+            destroy();
+        }
+
+        node_set& operator=(node_set&& other)
+        {
+            if (&other != this)
+            {
+                if (tag == other.tag)
+                {
+                    switch (tag)
+                    {
+                        case node_set_tag::single:
+                            node = std::move(other.node);
+                            break;
+                        case node_set_tag::multi:
+                            nodes = std::move(other.nodes);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    destroy();
+                    construct(std::forward<node_set>(other));
+                }
+            }
+            return *this;
+        }
+
+        pointer to_pointer(dynamic_resources<Json>& resources) const
+        {
+            switch (tag)
+            {
+                case node_set_tag::single:
+                    return node.val_ptr;
+                case node_set_tag::multi:
+                {
+                    auto j = resources.create_json(json_array_arg);
+                    j->reserve(nodes.size());
+                    for (auto& item : nodes)
+                    {
+                        j->emplace_back(*item.val_ptr);
+                    }
+                    return j;
+                }
+                default:
+                    return &resources.false_value();
+            }
+        }
+
+        void construct(node_set&& other) noexcept
+        {
+            tag = other.tag;
+            switch (tag)
+            {
+                case node_set_tag::single:
+                    new (&node) path_node_type(std::move(other.node));
+                    break;
+                case node_set_tag::multi:
+                    new (&nodes) std::vector<path_node_type>(std::move(other.nodes));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void destroy() noexcept 
+        {
+            switch(tag)
+            {
+                case node_set_tag::multi:
+                    nodes.~vector<path_node_type>();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     template <class Json,class JsonReference>
     class path_expression
     {
@@ -1633,6 +1784,8 @@ namespace detail {
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
+        using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
+            const_reference_arg_t,reference_arg_t>::type;
     private:
         std::vector<token_type> token_list_;
     public:
@@ -1680,134 +1833,9 @@ namespace detail {
             return result;
         }
 
-        enum class node_set_tag {none,single,multi};
-
-        struct node_set
-        {
-            node_set_tag tag;
-            union
-            {
-                path_node_type node;
-                std::vector<path_node_type> nodes;
-            };
-
-            node_set() noexcept
-                : tag(node_set_tag::none), node()
-            {
-            }
-            node_set(path_node_type&& node) noexcept
-                : tag(node_set_tag::single),
-                node(std::move(node))
-            {
-            }
-            node_set(std::vector<path_node_type>&& nds) noexcept
-            {
-                if (nds.empty())
-                {
-                    tag = node_set_tag::none;
-                }
-                else if (nds.size() == 1)
-                {
-                    tag = node_set_tag::single;
-                    new (&node)path_node_type(nds.back());
-                }
-                else
-                {
-                    tag = node_set_tag::multi;
-                    new (&nodes) std::vector<path_node_type>(nds);
-                }
-            }
-
-            node_set(node_set&& other) noexcept
-            {
-                construct(std::forward<node_set>(other));
-            }
-
-            ~node_set() noexcept
-            {
-                destroy();
-            }
-
-            node_set& operator=(node_set&& other)
-            {
-                if (&other != this)
-                {
-                    if (tag == other.tag)
-                    {
-                        switch (tag)
-                        {
-                            case node_set_tag::single:
-                                node = std::move(other.node);
-                                break;
-                            case node_set_tag::multi:
-                                nodes = std::move(other.nodes);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        destroy();
-                        construct(std::forward<node_set>(other));
-                    }
-                }
-                return *this;
-            }
-
-            pointer to_pointer(dynamic_resources<Json>& resources) const
-            {
-                switch (tag)
-                {
-                    case node_set_tag::single:
-                        return node.val_ptr;
-                    case node_set_tag::multi:
-                    {
-                        auto j = resources.create_json(json_array_arg);
-                        j->reserve(nodes.size());
-                        for (auto& item : nodes)
-                        {
-                            j->emplace_back(*item.val_ptr);
-                        }
-                        return j;
-                    }
-                    default:
-                        return &resources.false_value();
-                }
-            }
-
-            void construct(node_set&& other) noexcept
-            {
-                tag = other.tag;
-                switch (tag)
-                {
-                    case node_set_tag::single:
-                        new (&node) path_node_type(std::move(other.node));
-                        break;
-                    case node_set_tag::multi:
-                        new (&nodes) std::vector<path_node_type>(std::move(other.nodes));
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            void destroy() noexcept 
-            {
-                switch(tag)
-                {
-                    case node_set_tag::multi:
-                        nodes.~vector<path_node_type>();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        };
-
         template <class Callback>
-        typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
-        evaluate(dynamic_resources<Json>& resources, 
+        //typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
+        void evaluate(dynamic_resources<Json>& resources, 
                  const string_type& ipath, 
                  reference root,
                  reference current, 
@@ -1816,7 +1844,7 @@ namespace detail {
         {
             std::error_code ec;
 
-            std::vector<node_set> stack;
+            std::vector<node_set<Json,JsonReference>> stack;
             std::vector<pointer> arg_stack;
             string_type path(ipath);
             Json result(json_array_arg);
@@ -1836,7 +1864,234 @@ namespace detail {
                     { 
                         case token_kind::literal:
                         {
-                            stack.emplace_back(path_node_type(string_type(), &tok.value_));
+                            stack.emplace_back(path_node_type(string_type(), &tok.get_value(reference_arg_type(), resources)));
+                            break;
+                        }
+                        case token_kind::root_node:
+                            //std::cout << "root: " << root << "\n";
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(root)));
+                            break;
+                        case token_kind::current_node:
+                            //std::cout << "current: " << current << "\n";
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
+                            break;
+                        case token_kind::argument:
+                            JSONCONS_ASSERT(!stack.empty());
+                            //std::cout << "argument stack items " << stack.size() << "\n";
+                            //for (auto& item : stack)
+                            //{
+                            //    std::cout << *item.to_pointer(resources) << "\n";
+                            //}
+                            //std::cout << "\n";
+                            arg_stack.push_back(stack.back().to_pointer(resources));
+                            //for (auto& item : arg_stack)
+                            //{
+                            //    std::cout << *item << "\n";
+                            //}
+                            //std::cout << "\n";
+                            stack.pop_back();
+                            break;
+                        case token_kind::function:
+                        {
+                            if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_stack.size())
+                            {
+                                //ec = jmespath_errc::invalid_arity;
+                                return;
+                            }
+                            //std::cout << "function arg stack:\n";
+                            //for (auto& item : arg_stack)
+                            //{
+                            //    std::cout << *item << "\n";
+                            //}
+                            //std::cout << "\n";
+
+                            reference r = tok.function_->evaluate(resources, arg_stack, ec);
+                            if (ec)
+                            {
+                                return;
+                            }
+                            //std::cout << "function result: " << r << "\n";
+                            arg_stack.clear();
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
+                            break;
+                        }
+                        case token_kind::selector:
+                        {
+                            JSONCONS_ASSERT(!stack.empty());
+                            pointer ptr = nullptr;
+                            //for (auto& item : stack)
+                            //{
+                            //    std::cout << "selector stack input:\n";
+                            //    switch (item.tag)
+                            //    {
+                            //        case node_set_tag::single:
+                            //            std::cout << "single: " << *(item.node.val_ptr) << "\n";
+                            //            break;
+                            //        case node_set_tag::multi:
+                            //            for (auto& node : stack.back().nodes)
+                            //            {
+                            //                std::cout << "multi: " << *node.val_ptr << "\n";
+                            //            }
+                            //            break;
+                            //        default:
+                            //            break;
+                            //}
+                            //std::cout << "\n";
+                            //}
+                            switch (stack.back().tag)
+                            {
+                                case node_set_tag::single:
+                                    ptr = stack.back().node.val_ptr;
+                                    break;
+                                case node_set_tag::multi:
+                                    if (!stack.back().nodes.empty())
+                                    {
+                                        ptr = stack.back().nodes.back().val_ptr;
+                                    }
+                                    ptr = stack.back().to_pointer(resources);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (ptr)
+                            {
+                                //std::cout << "selector item: " << *ptr << "\n";
+                                stack.pop_back();
+                                std::vector<path_node_type> temp;
+                                tok.selector_->select(resources, path, root, *ptr, temp, flags);
+                                stack.emplace_back(std::move(temp));
+
+                                //std::cout << "selector output\n";
+                                //for (auto& item : temp)
+                                //{
+                                //    std::cout << *item.val_ptr << "\n";
+                                //}
+                                //std::cout << "\n";
+
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                }
+            }
+            if (!stack.empty())
+            {
+                for (auto& item : stack)
+                {
+                    switch (item.tag)
+                    {
+                        case node_set_tag::single:
+                            callback(item.node);
+                            break;
+                        case node_set_tag::multi:
+                            for (auto& node : item.nodes)
+                            {
+                                callback(node);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            //std::cout << "EVALUATE END\n";
+        }
+    };
+
+    template <class Json>
+    class script_expression
+    {
+    public:
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_view_type = typename Json::string_view_type;
+        using path_node_type = path_node<Json,const Json&>;
+        using reference = typename path_node_type::reference;
+        using pointer = typename path_node_type::pointer;
+        using token_type = token<Json,reference>;
+        using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,
+            const_reference_arg_t,reference_arg_t>::type;
+    private:
+        std::vector<token_type> token_list_;
+    public:
+        script_expression()
+        {
+        }
+
+        script_expression(script_expression&& expr)
+            : token_list_(std::move(expr.token_list_))
+        {
+        }
+
+        script_expression(std::vector<token_type>&& token_stack)
+            : token_list_(std::move(token_stack))
+        {
+        }
+
+        script_expression& operator=(script_expression&& expr) = default;
+
+        Json evaluate(dynamic_resources<Json>& resources, 
+                      const string_type& path, 
+                      reference root,
+                      reference instance,
+                      result_flags flags) const
+        {
+            Json result(json_array_arg);
+
+            if ((flags & result_flags::value) == result_flags::value)
+            {
+                auto callback = [&result](path_node_type& node)
+                {
+                    result.push_back(*node.val_ptr);
+                };
+                evaluate(resources, path, root, instance, callback, flags);
+            }
+            else if ((flags & result_flags::path) == result_flags::path)
+            {
+                auto callback = [&result](path_node_type& node)
+                {
+                    result.emplace_back(node.path);
+                };
+                evaluate(resources, path, root, instance, callback, flags);
+            }
+
+            return result;
+        }
+
+        template <class Callback>
+        //typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
+        void evaluate(dynamic_resources<Json>& resources, 
+                 const string_type& ipath, 
+                 reference root,
+                 reference current, 
+                 Callback callback,
+                 result_flags flags) const
+        {
+            std::error_code ec;
+
+            std::vector<node_set<Json,reference>> stack;
+            std::vector<pointer> arg_stack;
+            string_type path(ipath);
+            Json result(json_array_arg);
+
+            //std::cout << "EVALUATE BEGIN\n";
+            //for (auto& tok : token_list_)
+            //{
+            //    std::cout << tok.to_string() << "\n";
+            //}
+
+            if (!token_list_.empty())
+            {
+                for (auto& tok : token_list_)
+                {
+                    //std::cout << "Token: " << tok.to_string() << "\n";
+                    switch (tok.type())
+                    { 
+                        case token_kind::literal:
+                        {
+                            stack.emplace_back(path_node_type(string_type(), &tok.get_value(reference_arg_type(), resources)));
                             break;
                         }
                         case token_kind::unary_operator:
