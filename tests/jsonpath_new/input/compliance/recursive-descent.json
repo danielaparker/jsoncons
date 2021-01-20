@@ -14,7 +14,8 @@
             {
                 "comment" : "Dot notation after recursive descent",
                 "expression" : "$..key",
-                "result" : ["top","value","something",{"key":"russian dolls"},"russian dolls"]
+                "result" : ["top","value","something",{"key":"russian dolls"},"russian dolls"],
+                "path" : ["$['key']","$['object']['key']","$['object']['array'][0]['key']","$['object']['array'][1]['key']","$['object']['array'][1]['key']['key']"]
             }
         ]
     },
