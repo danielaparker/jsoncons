@@ -700,8 +700,7 @@ namespace jsoncons { namespace jsonpath_new {
                         for (int64_t i = start; i < end; i += step)
                         {
                             std::size_t j = static_cast<std::size_t>(i);
-                            //nodes.emplace_back(generate_path(path,j),std::addressof(val[j]));
-                            this->evaluate_tail(resources, path, root, val[j], nodes, flags);
+                            this->evaluate_tail(resources, generate_path(path, j, flags), root, val[j], nodes, flags);
                         }
                     }
                     else if (step < 0)
