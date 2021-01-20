@@ -93,9 +93,9 @@ void jsonpath_tests(const std::string& fpath)
             }
             catch (const std::exception& e)
             {
-                std::cout << e.what() << "\n";
                 if (test_case.contains("result"))
                 {
+                    std::cout << e.what() << "\n";
                     const json& expected = test_case["result"];
                     std::cout << e.what() << "\n";
                     if (test_case.contains("comment"))

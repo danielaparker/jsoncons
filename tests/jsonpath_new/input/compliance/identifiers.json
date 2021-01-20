@@ -6,6 +6,10 @@
            },
         "cases": [
             {
+                "expression": "$key",
+                "error": "Require dot after $"
+            },
+            {
                 "expression": "$.key",
                 "result": ["value"],
                 "path" : ["$['key']"]

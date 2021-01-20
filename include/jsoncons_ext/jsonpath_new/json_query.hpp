@@ -1337,16 +1337,13 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case ']':
+                            case ',':
+                                state_stack_.pop_back();
+                                break;
                             default:
-                                if (state_stack_.size() > 1)
-                                {
-                                    state_stack_.pop_back();
-                                }
-                                else
-                                {
-                                    ec = jsonpath_errc::expected_separator;
-                                    return path_expression_type();
-                                }
+                                ec = jsonpath_errc::expected_separator;
+                                return path_expression_type();
                         };
                         break;
                     case path_state::expect_or:
