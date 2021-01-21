@@ -62,7 +62,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <class Json,class JsonReference>
     struct unary_operator
     {
         std::size_t precedence_level_;
@@ -86,8 +86,8 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual const Json& evaluate(dynamic_resources<Json>&,
-                                     const Json&, 
+        virtual JsonReference evaluate(dynamic_resources<Json>&,
+                                     JsonReference, 
                                      std::error_code&) const = 0;
     };
 
@@ -107,32 +107,32 @@ namespace detail {
         return !is_false(val);
     }
 
-    template <class Json>
-    class unary_not_operator final : public unary_operator<Json>
+    template <class Json,class JsonReference>
+    class unary_not_operator final : public unary_operator<Json,JsonReference>
     {
     public:
         unary_not_operator()
-            : unary_operator<Json>(1, true)
+            : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        const Json& evaluate(dynamic_resources<Json>& resources,
-                             const Json& val, 
+        JsonReference evaluate(dynamic_resources<Json>& resources,
+                             JsonReference val, 
                              std::error_code&) const override
         {
             return is_false(val) ? resources.true_value() : resources.false_value();
         }
     };
 
-    template <class Json>
-    class unary_minus_operator final : public unary_operator<Json>
+    template <class Json,class JsonReference>
+    class unary_minus_operator final : public unary_operator<Json,JsonReference>
     {
     public:
         unary_minus_operator()
-            : unary_operator<Json>(1, true)
+            : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        const Json& evaluate(dynamic_resources<Json>& resources,
-                             const Json& val, 
+        JsonReference evaluate(dynamic_resources<Json>& resources,
+                             JsonReference val, 
                              std::error_code&) const override
         {
             if (val.is_int64())
@@ -150,15 +150,15 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class regex_operator final : public unary_operator<Json>
+    template <class Json,class JsonReference>
+    class regex_operator final : public unary_operator<Json,JsonReference>
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
         std::basic_regex<char_type> pattern_;
     public:
         regex_operator(std::basic_regex<char_type>&& pattern)
-            : unary_operator<Json>(2, true),
+            : unary_operator<Json,JsonReference>(2, true),
               pattern_(std::move(pattern))
         {
         }
@@ -166,8 +166,8 @@ namespace detail {
         regex_operator(regex_operator&&) = default;
         regex_operator& operator=(regex_operator&&) = default;
 
-        const Json& evaluate(dynamic_resources<Json>& resources, 
-                             const Json& val, 
+        JsonReference evaluate(dynamic_resources<Json>& resources, 
+                             JsonReference val, 
                              std::error_code&) const override
         {
             if (!val.is_string())
@@ -178,7 +178,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <class Json,class JsonReference>
     struct binary_operator
     {
         std::size_t precedence_level_;
@@ -200,24 +200,24 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual const Json& evaluate(dynamic_resources<Json>&,
-                             const Json&, 
-                             const Json&, 
+        virtual JsonReference evaluate(dynamic_resources<Json>&,
+                             JsonReference, 
+                             JsonReference, 
                              std::error_code&) const = 0;
     };
 
     // Implementations
 
-    template <class Json>
-    class or_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class or_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         or_operator()
-            : binary_operator<Json>(9)
+            : binary_operator<Json,JsonReference>(9)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, 
                              std::error_code&) const override
         {
             if (lhs.is_null() && rhs.is_null())
@@ -235,16 +235,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class and_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class and_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         and_operator()
-            : binary_operator<Json>(8)
+            : binary_operator<Json,JsonReference>(8)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>&, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>&, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (is_true(lhs))
             {
@@ -257,46 +257,46 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class eq_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class eq_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         eq_operator()
-            : binary_operator<Json>(6)
+            : binary_operator<Json,JsonReference>(6)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             return lhs == rhs ? resources.true_value() : resources.false_value();
         }
     };
 
-    template <class Json>
-    class ne_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class ne_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         ne_operator()
-            : binary_operator<Json>(6)
+            : binary_operator<Json,JsonReference>(6)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             return lhs != rhs ? resources.true_value() : resources.false_value();
         }
     };
 
-    template <class Json>
-    class lt_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class lt_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         lt_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -306,16 +306,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class lte_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class lte_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         lte_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -325,16 +325,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class gt_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class gt_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         gt_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -344,16 +344,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class gte_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class gte_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         gte_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -363,16 +363,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class plus_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class plus_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         plus_operator()
-            : binary_operator<Json>(4)
+            : binary_operator<Json,JsonReference>(4)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -393,16 +393,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class minus_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class minus_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         minus_operator()
-            : binary_operator<Json>(4)
+            : binary_operator<Json,JsonReference>(4)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -423,16 +423,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class mult_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class mult_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         mult_operator()
-            : binary_operator<Json>(3)
+            : binary_operator<Json,JsonReference>(3)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -453,16 +453,16 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class div_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class div_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         div_operator()
-            : binary_operator<Json>(3)
+            : binary_operator<Json,JsonReference>(3)
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -919,7 +919,7 @@ namespace detail {
         using function_base_type = function_base<Json,JsonReference>;
 
         std::vector<std::unique_ptr<Json>> temp_json_values_;
-        std::vector<std::unique_ptr<unary_operator<Json>>> unary_operators_;
+        std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
 
         static_resources()
         {
@@ -959,95 +959,95 @@ namespace detail {
             return it->second;
         }
 
-        const unary_operator<Json>* get_unary_not() const
+        const unary_operator<Json,JsonReference>* get_unary_not() const
         {
-            static unary_not_operator<Json> oper;
+            static unary_not_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        const unary_operator<Json>* get_unary_minus() const
+        const unary_operator<Json,JsonReference>* get_unary_minus() const
         {
-            static unary_minus_operator<Json> oper;
+            static unary_minus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        const unary_operator<Json>* get_regex_operator(std::basic_regex<char_type>&& pattern) 
+        const unary_operator<Json,JsonReference>* get_regex_operator(std::basic_regex<char_type>&& pattern) 
         {
-            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json>>(std::move(pattern)));
+            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json,JsonReference>>(std::move(pattern)));
             return unary_operators_.back().get();
         }
 
-        binary_operator<Json>* get_or_operator() const
+        binary_operator<Json,JsonReference>* get_or_operator() const
         {
-            static or_operator<Json> oper;
+            static or_operator<Json,JsonReference> oper;
 
             return &oper;
         }
 
-        binary_operator<Json>* get_and_operator() const
+        binary_operator<Json,JsonReference>* get_and_operator() const
         {
-            static and_operator<Json> oper;
+            static and_operator<Json,JsonReference> oper;
 
             return &oper;
         }
 
-        binary_operator<Json>* get_eq_operator() const
+        binary_operator<Json,JsonReference>* get_eq_operator() const
         {
-            static eq_operator<Json> oper;
+            static eq_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_ne_operator() const
+        binary_operator<Json,JsonReference>* get_ne_operator() const
         {
-            static ne_operator<Json> oper;
+            static ne_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_lt_operator() const
+        binary_operator<Json,JsonReference>* get_lt_operator() const
         {
-            static lt_operator<Json> oper;
+            static lt_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_lte_operator() const
+        binary_operator<Json,JsonReference>* get_lte_operator() const
         {
-            static lte_operator<Json> oper;
+            static lte_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_gt_operator() const
+        binary_operator<Json,JsonReference>* get_gt_operator() const
         {
-            static gt_operator<Json> oper;
+            static gt_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_gte_operator() const
+        binary_operator<Json,JsonReference>* get_gte_operator() const
         {
-            static gte_operator<Json> oper;
+            static gte_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_plus_operator() const
+        binary_operator<Json,JsonReference>* get_plus_operator() const
         {
-            static plus_operator<Json> oper;
+            static plus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_minus_operator() const
+        binary_operator<Json,JsonReference>* get_minus_operator() const
         {
-            static minus_operator<Json> oper;
+            static minus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_mult_operator() const
+        binary_operator<Json,JsonReference>* get_mult_operator() const
         {
-            static mult_operator<Json> oper;
+            static mult_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_div_operator() const
+        binary_operator<Json,JsonReference>* get_div_operator() const
         {
-            static div_operator<Json> oper;
+            static div_operator<Json,JsonReference> oper;
             return &oper;
         }
 
@@ -1350,20 +1350,20 @@ namespace detail {
         union
         {
             std::unique_ptr<selector_base_type> selector_;
-            const unary_operator<Json>* unary_operator_;
-            const binary_operator<Json>* binary_operator_;
+            const unary_operator<Json,JsonReference>* unary_operator_;
+            const binary_operator<Json,JsonReference>* binary_operator_;
             function_base<Json,JsonReference>* function_;
             Json value_;
         };
     public:
 
-        token(const unary_operator<Json>* expression) noexcept
+        token(const unary_operator<Json,JsonReference>* expression) noexcept
             : type_(token_kind::unary_operator),
               unary_operator_(expression)
         {
         }
 
-        token(const binary_operator<Json>* expression) noexcept
+        token(const binary_operator<Json,JsonReference>* expression) noexcept
             : type_(token_kind::binary_operator),
               binary_operator_(expression)
         {
@@ -1483,7 +1483,7 @@ namespace detail {
 
         Json& get_value(reference_arg_t, dynamic_resources<Json>& resources) const
         {
-            return resources.create_json(value_);
+            return *resources.create_json(value_);
         }
 
         token& operator=(token&& other)
