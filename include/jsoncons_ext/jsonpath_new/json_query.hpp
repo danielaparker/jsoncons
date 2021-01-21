@@ -259,24 +259,21 @@ namespace jsoncons { namespace jsonpath_new {
                     auto it = val.find(identifier_);
                     if (it != val.object_range().end())
                     {
-                        //nodes.emplace_back(generate_path(path,identifier_,flags),std::addressof(it->value()));
                         this->evaluate_tail(resources, generate_path(path, identifier_, flags), 
-                                                root, it->value(), nodes, flags);
+                                            root, it->value(), nodes, flags);
                     }
                 }
                 else if (val.is_array() && identifier_ == length_literal<char_type>())
                 {
                     pointer ptr = resources.create_json(val.size());
-                    //nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
                     this->evaluate_tail(resources, generate_path(path, identifier_, flags), 
-                                            root, *ptr, nodes, flags);
+                                        root, *ptr, nodes, flags);
                 }
                 else if (val.is_string() && identifier_ == length_literal<char_type>())
                 {
                     string_view_type sv = val.as_string_view();
                     std::size_t count = unicons::u32_length(sv.begin(), sv.end());
                     pointer ptr = resources.create_json(count);
-                    //nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
                     this->evaluate_tail(resources, generate_path(path, identifier_, flags), 
                                             root, *ptr, nodes, flags);
                 }

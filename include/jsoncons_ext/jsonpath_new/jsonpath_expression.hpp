@@ -29,10 +29,130 @@ namespace jsonpath_new {
 
 namespace detail {
 
+    struct reference_result_t
+    {
+        explicit reference_result_t() = default;
+    };
+    constexpr reference_result_t reference_result{};
+
+    struct const_reference_result_t
+    {
+        explicit const_reference_result_t() = default;
+    };
+    constexpr const_reference_result_t const_reference_result{};
+
+    struct literal_arg_t
+    {
+        explicit literal_arg_t() = default;
+    };
+    constexpr literal_arg_t literal_arg{};
+
+    struct begin_expression_type_arg_t
+    {
+        explicit begin_expression_type_arg_t() = default;
+    };
+    constexpr begin_expression_type_arg_t begin_expression_type_arg{};
+
+    struct end_expression_type_arg_t
+    {
+        explicit end_expression_type_arg_t() = default;
+    };
+    constexpr end_expression_type_arg_t end_expression_type_arg{};
+
+    struct end_of_expression_arg_t
+    {
+        explicit end_of_expression_arg_t() = default;
+    };
+    constexpr end_of_expression_arg_t end_of_expression_arg{};
+
+    struct separator_arg_t
+    {
+        explicit separator_arg_t() = default;
+    };
+    constexpr separator_arg_t separator_arg{};
+
+    struct lparen_arg_t
+    {
+        explicit lparen_arg_t() = default;
+    };
+    constexpr lparen_arg_t lparen_arg{};
+
+    struct rparen_arg_t
+    {
+        explicit rparen_arg_t() = default;
+    };
+    constexpr rparen_arg_t rparen_arg{};
+
+    struct begin_union_arg_t
+    {
+        explicit begin_union_arg_t() = default;
+    };
+    constexpr begin_union_arg_t begin_union_arg{};
+
+    struct end_union_arg_t
+    {
+        explicit end_union_arg_t() = default;
+    };
+    constexpr end_union_arg_t end_union_arg{};
+
+    struct begin_filter_arg_t
+    {
+        explicit begin_filter_arg_t() = default;
+    };
+    constexpr begin_filter_arg_t begin_filter_arg{};
+
+    struct end_filter_arg_t
+    {
+        explicit end_filter_arg_t() = default;
+    };
+    constexpr end_filter_arg_t end_filter_arg{};
+
+    struct begin_expression_arg_t
+    {
+        explicit begin_expression_arg_t() = default;
+    };
+    constexpr begin_expression_arg_t begin_expression_arg{};
+
+    struct end_expression_arg_t
+    {
+        explicit end_expression_arg_t() = default;
+    };
+    constexpr end_expression_arg_t end_expression_arg{};
+
+    struct current_node_arg_t
+    {
+        explicit current_node_arg_t() = default;
+    };
+    constexpr current_node_arg_t current_node_arg{};
+
+    struct root_node_arg_t
+    {
+        explicit root_node_arg_t() = default;
+    };
+    constexpr root_node_arg_t root_node_arg{};
+
+    struct end_function_arg_t
+    {
+        explicit end_function_arg_t() = default;
+    };
+    constexpr end_function_arg_t end_function_arg{};
+
+    struct begin_function_arg_t
+    {
+        explicit begin_function_arg_t() = default;
+    };
+    constexpr begin_function_arg_t begin_function_arg{};
+
+    struct argument_arg_t
+    {
+        explicit argument_arg_t() = default;
+    };
+    constexpr argument_arg_t argument_arg{};
+
     template <class Json>
     struct dynamic_resources
     {
-        std::vector<std::unique_ptr<Json>> temp_json_values_;
+        std::vector<Json> instances_;
 
         Json& true_value() const
         {
@@ -55,14 +175,12 @@ namespace detail {
         template <typename... Args>
         Json* create_json(Args&& ... args)
         {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-            Json* ptr = temp.get();
-            temp_json_values_.emplace_back(std::move(temp));
-            return ptr;
+            instances_.emplace_back(std::forward<Args>(args)...);
+            return &(instances_.back());
         }
     };
 
-    template <class Json>
+    template <class Json,class JsonReference>
     struct unary_operator
     {
         std::size_t precedence_level_;
@@ -107,12 +225,12 @@ namespace detail {
         return !is_false(val);
     }
 
-    template <class Json>
-    class unary_not_operator final : public unary_operator<Json>
+    template <class Json,class JsonReference>
+    class unary_not_operator final : public unary_operator<Json,JsonReference>
     {
     public:
         unary_not_operator()
-            : unary_operator<Json>(1, true)
+            : unary_operator<Json,JsonReference>(1, true)
         {}
 
         const Json& evaluate(dynamic_resources<Json>& resources,
@@ -123,12 +241,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class unary_minus_operator final : public unary_operator<Json>
+    template <class Json,class JsonReference>
+    class unary_minus_operator final : public unary_operator<Json,JsonReference>
     {
     public:
         unary_minus_operator()
-            : unary_operator<Json>(1, true)
+            : unary_operator<Json,JsonReference>(1, true)
         {}
 
         const Json& evaluate(dynamic_resources<Json>& resources,
@@ -150,15 +268,15 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class regex_operator final : public unary_operator<Json>
+    template <class Json,class JsonReference>
+    class regex_operator final : public unary_operator<Json,JsonReference>
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
         std::basic_regex<char_type> pattern_;
     public:
         regex_operator(std::basic_regex<char_type>&& pattern)
-            : unary_operator<Json>(2, true),
+            : unary_operator<Json,JsonReference>(2, true),
               pattern_(std::move(pattern))
         {
         }
@@ -178,7 +296,7 @@ namespace detail {
         }
     };
 
-    template <class Json>
+    template <class Json,class JsonReference>
     struct binary_operator
     {
         std::size_t precedence_level_;
@@ -208,12 +326,12 @@ namespace detail {
 
     // Implementations
 
-    template <class Json>
-    class or_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class or_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         or_operator()
-            : binary_operator<Json>(9)
+            : binary_operator<Json,JsonReference>(9)
         {
         }
 
@@ -235,12 +353,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class and_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class and_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         and_operator()
-            : binary_operator<Json>(8)
+            : binary_operator<Json,JsonReference>(8)
         {
         }
 
@@ -257,12 +375,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class eq_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class eq_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         eq_operator()
-            : binary_operator<Json>(6)
+            : binary_operator<Json,JsonReference>(6)
         {
         }
 
@@ -272,12 +390,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class ne_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class ne_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         ne_operator()
-            : binary_operator<Json>(6)
+            : binary_operator<Json,JsonReference>(6)
         {
         }
 
@@ -287,12 +405,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class lt_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class lt_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         lt_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
@@ -306,12 +424,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class lte_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class lte_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         lte_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
@@ -325,12 +443,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class gt_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class gt_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         gt_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
@@ -344,12 +462,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class gte_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class gte_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         gte_operator()
-            : binary_operator<Json>(5)
+            : binary_operator<Json,JsonReference>(5)
         {
         }
 
@@ -363,12 +481,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class plus_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class plus_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         plus_operator()
-            : binary_operator<Json>(4)
+            : binary_operator<Json,JsonReference>(4)
         {
         }
 
@@ -393,12 +511,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class minus_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class minus_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         minus_operator()
-            : binary_operator<Json>(4)
+            : binary_operator<Json,JsonReference>(4)
         {
         }
 
@@ -423,12 +541,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class mult_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class mult_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         mult_operator()
-            : binary_operator<Json>(3)
+            : binary_operator<Json,JsonReference>(3)
         {
         }
 
@@ -453,12 +571,12 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class div_operator final : public binary_operator<Json>
+    template <class Json,class JsonReference>
+    class div_operator final : public binary_operator<Json,JsonReference>
     {
     public:
         div_operator()
-            : binary_operator<Json>(3)
+            : binary_operator<Json,JsonReference>(3)
         {
         }
 
@@ -918,8 +1036,8 @@ namespace detail {
         using reference = JsonReference;
         using function_base_type = function_base<Json,JsonReference>;
 
-        std::vector<std::unique_ptr<Json>> temp_json_values_;
-        std::vector<std::unique_ptr<unary_operator<Json>>> unary_operators_;
+        std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
+        std::vector<Json> instances_;
 
         static_resources()
         {
@@ -959,105 +1077,103 @@ namespace detail {
             return it->second;
         }
 
-        const unary_operator<Json>* get_unary_not() const
+        const unary_operator<Json,JsonReference>* get_unary_not() const
         {
-            static unary_not_operator<Json> oper;
+            static unary_not_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        const unary_operator<Json>* get_unary_minus() const
+        const unary_operator<Json,JsonReference>* get_unary_minus() const
         {
-            static unary_minus_operator<Json> oper;
+            static unary_minus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        const unary_operator<Json>* get_regex_operator(std::basic_regex<char_type>&& pattern) 
+        const unary_operator<Json,JsonReference>* get_regex_operator(std::basic_regex<char_type>&& pattern) 
         {
-            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json>>(std::move(pattern)));
+            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json,JsonReference>>(std::move(pattern)));
             return unary_operators_.back().get();
         }
 
-        binary_operator<Json>* get_or_operator() const
+        binary_operator<Json,JsonReference>* get_or_operator() const
         {
-            static or_operator<Json> oper;
+            static or_operator<Json,JsonReference> oper;
 
             return &oper;
         }
 
-        binary_operator<Json>* get_and_operator() const
+        binary_operator<Json,JsonReference>* get_and_operator() const
         {
-            static and_operator<Json> oper;
+            static and_operator<Json,JsonReference> oper;
 
             return &oper;
         }
 
-        binary_operator<Json>* get_eq_operator() const
+        binary_operator<Json,JsonReference>* get_eq_operator() const
         {
-            static eq_operator<Json> oper;
+            static eq_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_ne_operator() const
+        binary_operator<Json,JsonReference>* get_ne_operator() const
         {
-            static ne_operator<Json> oper;
+            static ne_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_lt_operator() const
+        binary_operator<Json,JsonReference>* get_lt_operator() const
         {
-            static lt_operator<Json> oper;
+            static lt_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_lte_operator() const
+        binary_operator<Json,JsonReference>* get_lte_operator() const
         {
-            static lte_operator<Json> oper;
+            static lte_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_gt_operator() const
+        binary_operator<Json,JsonReference>* get_gt_operator() const
         {
-            static gt_operator<Json> oper;
+            static gt_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_gte_operator() const
+        binary_operator<Json,JsonReference>* get_gte_operator() const
         {
-            static gte_operator<Json> oper;
+            static gte_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_plus_operator() const
+        binary_operator<Json,JsonReference>* get_plus_operator() const
         {
-            static plus_operator<Json> oper;
+            static plus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_minus_operator() const
+        binary_operator<Json,JsonReference>* get_minus_operator() const
         {
-            static minus_operator<Json> oper;
+            static minus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_mult_operator() const
+        binary_operator<Json,JsonReference>* get_mult_operator() const
         {
-            static mult_operator<Json> oper;
+            static mult_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json>* get_div_operator() const
+        binary_operator<Json,JsonReference>* get_div_operator() const
         {
-            static div_operator<Json> oper;
+            static div_operator<Json,JsonReference> oper;
             return &oper;
         }
 
         template <typename... Args>
         Json* create_json(Args&& ... args)
         {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-            Json* ptr = temp.get();
-            temp_json_values_.emplace_back(std::move(temp));
-            return ptr;
+            instances_.emplace_back(std::forward<Args>(args)...);
+            return &(instances_.back());
         }
     };
 
@@ -1086,126 +1202,6 @@ namespace detail {
         unary_operator,
         binary_operator
     };
-
-    struct reference_arg_t
-    {
-        explicit reference_arg_t() = default;
-    };
-    constexpr reference_arg_t reference_arg{};
-
-    struct const_reference_arg_t
-    {
-        explicit const_reference_arg_t() = default;
-    };
-    constexpr const_reference_arg_t const_reference_arg{};
-
-    struct literal_arg_t
-    {
-        explicit literal_arg_t() = default;
-    };
-    constexpr literal_arg_t literal_arg{};
-
-    struct begin_expression_type_arg_t
-    {
-        explicit begin_expression_type_arg_t() = default;
-    };
-    constexpr begin_expression_type_arg_t begin_expression_type_arg{};
-
-    struct end_expression_type_arg_t
-    {
-        explicit end_expression_type_arg_t() = default;
-    };
-    constexpr end_expression_type_arg_t end_expression_type_arg{};
-
-    struct end_of_expression_arg_t
-    {
-        explicit end_of_expression_arg_t() = default;
-    };
-    constexpr end_of_expression_arg_t end_of_expression_arg{};
-
-    struct separator_arg_t
-    {
-        explicit separator_arg_t() = default;
-    };
-    constexpr separator_arg_t separator_arg{};
-
-    struct lparen_arg_t
-    {
-        explicit lparen_arg_t() = default;
-    };
-    constexpr lparen_arg_t lparen_arg{};
-
-    struct rparen_arg_t
-    {
-        explicit rparen_arg_t() = default;
-    };
-    constexpr rparen_arg_t rparen_arg{};
-
-    struct begin_union_arg_t
-    {
-        explicit begin_union_arg_t() = default;
-    };
-    constexpr begin_union_arg_t begin_union_arg{};
-
-    struct end_union_arg_t
-    {
-        explicit end_union_arg_t() = default;
-    };
-    constexpr end_union_arg_t end_union_arg{};
-
-    struct begin_filter_arg_t
-    {
-        explicit begin_filter_arg_t() = default;
-    };
-    constexpr begin_filter_arg_t begin_filter_arg{};
-
-    struct end_filter_arg_t
-    {
-        explicit end_filter_arg_t() = default;
-    };
-    constexpr end_filter_arg_t end_filter_arg{};
-
-    struct begin_expression_arg_t
-    {
-        explicit begin_expression_arg_t() = default;
-    };
-    constexpr begin_expression_arg_t begin_expression_arg{};
-
-    struct end_expression_arg_t
-    {
-        explicit end_expression_arg_t() = default;
-    };
-    constexpr end_expression_arg_t end_expression_arg{};
-
-    struct current_node_arg_t
-    {
-        explicit current_node_arg_t() = default;
-    };
-    constexpr current_node_arg_t current_node_arg{};
-
-    struct root_node_arg_t
-    {
-        explicit root_node_arg_t() = default;
-    };
-    constexpr root_node_arg_t root_node_arg{};
-
-    struct end_function_arg_t
-    {
-        explicit end_function_arg_t() = default;
-    };
-    constexpr end_function_arg_t end_function_arg{};
-
-    struct begin_function_arg_t
-    {
-        explicit begin_function_arg_t() = default;
-    };
-    constexpr begin_function_arg_t begin_function_arg{};
-
-    struct argument_arg_t
-    {
-        explicit argument_arg_t() = default;
-    };
-    constexpr argument_arg_t argument_arg{};
 
     template <class Json,class JsonReference>
     struct path_node
@@ -1350,20 +1346,20 @@ namespace detail {
         union
         {
             std::unique_ptr<selector_base_type> selector_;
-            const unary_operator<Json>* unary_operator_;
-            const binary_operator<Json>* binary_operator_;
+            const unary_operator<Json,JsonReference>* unary_operator_;
+            const binary_operator<Json,JsonReference>* binary_operator_;
             function_base<Json,JsonReference>* function_;
             Json value_;
         };
     public:
 
-        token(const unary_operator<Json>* expression) noexcept
+        token(const unary_operator<Json,JsonReference>* expression) noexcept
             : type_(token_kind::unary_operator),
               unary_operator_(expression)
         {
         }
 
-        token(const binary_operator<Json>* expression) noexcept
+        token(const binary_operator<Json,JsonReference>* expression) noexcept
             : type_(token_kind::binary_operator),
               binary_operator_(expression)
         {
@@ -1476,12 +1472,12 @@ namespace detail {
             construct(std::forward<token>(other));
         }
 
-        const Json& get_value(const_reference_arg_t, dynamic_resources<Json>&) const
+        const Json& get_value(const_reference_result_t, dynamic_resources<Json>&) const
         {
             return value_;
         }
 
-        Json& get_value(reference_arg_t, dynamic_resources<Json>& resources) const
+        Json& get_value(reference_result_t, dynamic_resources<Json>& resources) const
         {
             return resources.create_json(value_);
         }
@@ -1784,8 +1780,8 @@ namespace detail {
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
-        using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
-            const_reference_arg_t,reference_arg_t>::type;
+        using reference_result_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
+            const_reference_result_t,reference_result_t>::type;
     private:
         std::vector<token_type> token_list_;
     public:
@@ -1864,7 +1860,7 @@ namespace detail {
                     { 
                         case token_kind::literal:
                         {
-                            stack.emplace_back(path_node_type(string_type(), &tok.get_value(reference_arg_type(), resources)));
+                            stack.emplace_back(path_node_type(string_type(), &tok.get_value(reference_result_type(), resources)));
                             break;
                         }
                         case token_kind::unary_operator:
