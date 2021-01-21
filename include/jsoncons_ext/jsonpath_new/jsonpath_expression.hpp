@@ -204,8 +204,8 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual const Json& evaluate(dynamic_resources<Json>&,
-                                     const Json&, 
+        virtual JsonReference evaluate(dynamic_resources<Json>&,
+                                     JsonReference, 
                                      std::error_code&) const = 0;
     };
 
@@ -233,8 +233,8 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        const Json& evaluate(dynamic_resources<Json>& resources,
-                             const Json& val, 
+        JsonReference evaluate(dynamic_resources<Json>& resources,
+                             JsonReference val, 
                              std::error_code&) const override
         {
             return is_false(val) ? resources.true_value() : resources.false_value();
@@ -249,8 +249,8 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        const Json& evaluate(dynamic_resources<Json>& resources,
-                             const Json& val, 
+        JsonReference evaluate(dynamic_resources<Json>& resources,
+                             JsonReference val, 
                              std::error_code&) const override
         {
             if (val.is_int64())
@@ -284,8 +284,8 @@ namespace detail {
         regex_operator(regex_operator&&) = default;
         regex_operator& operator=(regex_operator&&) = default;
 
-        const Json& evaluate(dynamic_resources<Json>& resources, 
-                             const Json& val, 
+        JsonReference evaluate(dynamic_resources<Json>& resources, 
+                             JsonReference val, 
                              std::error_code&) const override
         {
             if (!val.is_string())
@@ -318,9 +318,9 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual const Json& evaluate(dynamic_resources<Json>&,
-                             const Json&, 
-                             const Json&, 
+        virtual JsonReference evaluate(dynamic_resources<Json>&,
+                             JsonReference, 
+                             JsonReference, 
                              std::error_code&) const = 0;
     };
 
@@ -335,7 +335,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, 
                              std::error_code&) const override
         {
             if (lhs.is_null() && rhs.is_null())
@@ -362,7 +362,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>&, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>&, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (is_true(lhs))
             {
@@ -384,7 +384,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             return lhs == rhs ? resources.true_value() : resources.false_value();
         }
@@ -399,7 +399,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             return lhs != rhs ? resources.true_value() : resources.false_value();
         }
@@ -414,7 +414,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -433,7 +433,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -452,7 +452,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -471,7 +471,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -490,7 +490,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -520,7 +520,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -550,7 +550,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -580,7 +580,7 @@ namespace detail {
         {
         }
 
-        const Json& evaluate(dynamic_resources<Json>& resources, const Json& lhs, const Json& rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
