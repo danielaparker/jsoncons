@@ -186,7 +186,6 @@ namespace jsoncons { namespace jsonpath_new {
         using selector_base_type = selector_base<Json,JsonReference>;
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
-        using script_expression_type = script_expression<Json>;
         using function_base_type = function_base<Json,JsonReference>;
 
     private:
@@ -542,12 +541,12 @@ namespace jsoncons { namespace jsonpath_new {
 
         class filter_selector final : public path_selector
         {
-            script_expression_type expr_;
+            path_expression_type expr_;
 
             using path_selector::generate_path;
         public:
 
-            filter_selector(script_expression_type&& expr)
+            filter_selector(path_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
             {
             }
@@ -611,11 +610,11 @@ namespace jsoncons { namespace jsonpath_new {
         class expression_selector final : public path_selector
         {
             using path_selector::generate_path;
-            script_expression_type expr_;
+            path_expression_type expr_;
 
         public:
 
-            expression_selector(script_expression_type&& expr)
+            expression_selector(path_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
             {
             }
@@ -2428,11 +2427,11 @@ namespace jsoncons { namespace jsonpath_new {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_selector>(script_expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_selector>(script_expression_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks)))));
                     }
                     break;
                 }
@@ -2463,11 +2462,11 @@ namespace jsoncons { namespace jsonpath_new {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<expression_selector>(script_expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<expression_selector>(path_expression_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<expression_selector>(script_expression_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<expression_selector>(path_expression_type(std::move(toks)))));
                     }
                     break;
                 }
