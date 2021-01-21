@@ -1479,7 +1479,7 @@ namespace detail {
 
         Json& get_value(reference_result_t, dynamic_resources<Json>& resources) const
         {
-            return resources.create_json(value_);
+            return *resources.create_json(value_);
         }
 
         token& operator=(token&& other)
