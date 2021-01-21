@@ -505,7 +505,7 @@ namespace detail {
         virtual ~function_base() = default;
 
         virtual reference evaluate(dynamic_resources<Json>& resources,
-                                   std::vector<pointer>& args, 
+                                   const std::vector<pointer>& args, 
                                    std::error_code& ec) const = 0;
 
     };  
@@ -523,7 +523,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -565,7 +565,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -608,7 +608,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -651,7 +651,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -691,7 +691,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -734,7 +734,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -789,7 +789,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -846,7 +846,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
@@ -887,7 +887,7 @@ namespace detail {
         }
 
         reference evaluate(dynamic_resources<Json>& resources,
-                           std::vector<pointer>& args, 
+                           const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
