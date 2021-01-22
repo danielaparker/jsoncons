@@ -51,7 +51,7 @@ TEST_CASE("test replace tests")
 
         jsonpath_new::json_replace(j,"$..book[?(@.price==31.96)].price", 30.9);
 
-        //CHECK(30.9 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
+        CHECK(30.9 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
     }
 
     //std::cout << ("2\n") << pretty_print(j) << std::endl;

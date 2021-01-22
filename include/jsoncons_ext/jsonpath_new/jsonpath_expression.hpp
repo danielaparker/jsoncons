@@ -1224,7 +1224,7 @@ namespace detail {
 
         bool is_cached(std::size_t id) const
         {
-            return cache_.count(id);
+            return cache_.find(id) != cache_.end();
         }
 
         void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val) 
