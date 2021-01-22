@@ -194,9 +194,9 @@ namespace jsoncons { namespace jsonpath {
         // path_selector
         class path_selector : public selector_base_type
         {
-            using selector_base_type::generate_path;
             std::unique_ptr<selector_base_type> tail_selector_;
         public:
+            using selector_base_type::generate_path;
             path_selector()
                 : selector_base_type(true, 11), tail_selector_()
             {
