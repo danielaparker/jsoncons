@@ -29,38 +29,8 @@ namespace jsonpath_new {
 
 namespace detail {
 
-    template <class Json>
-    struct dynamic_resources
-    {
-        std::vector<std::unique_ptr<Json>> temp_json_values_;
-
-        Json& true_value() const
-        {
-            static Json value(true, semantic_tag::none);
-            return value;
-        }
-
-        Json& false_value() const
-        {
-            static Json value(false, semantic_tag::none);
-            return value;
-        }
-
-        Json& null_value() const
-        {
-            static Json value(null_type(), semantic_tag::none);
-            return value;
-        }
-
-        template <typename... Args>
-        Json* create_json(Args&& ... args)
-        {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-            Json* ptr = temp.get();
-            temp_json_values_.emplace_back(std::move(temp));
-            return ptr;
-        }
-    };
+    template <class Json,class JsonReference>
+    class dynamic_resources;
 
     template <class Json,class JsonReference>
     struct unary_operator
@@ -86,9 +56,9 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual JsonReference evaluate(dynamic_resources<Json>&,
-                                     JsonReference, 
-                                     std::error_code&) const = 0;
+        virtual JsonReference evaluate(dynamic_resources<Json,JsonReference>&,
+                                       JsonReference, 
+                                       std::error_code&) const = 0;
     };
 
     template <class Json>
@@ -115,7 +85,7 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        JsonReference evaluate(dynamic_resources<Json>& resources,
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources,
                              JsonReference val, 
                              std::error_code&) const override
         {
@@ -131,7 +101,7 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        JsonReference evaluate(dynamic_resources<Json>& resources,
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources,
                              JsonReference val, 
                              std::error_code&) const override
         {
@@ -166,7 +136,7 @@ namespace detail {
         regex_operator(regex_operator&&) = default;
         regex_operator& operator=(regex_operator&&) = default;
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, 
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, 
                              JsonReference val, 
                              std::error_code&) const override
         {
@@ -200,7 +170,7 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual JsonReference evaluate(dynamic_resources<Json>&,
+        virtual JsonReference evaluate(dynamic_resources<Json,JsonReference>&,
                              JsonReference, 
                              JsonReference, 
                              std::error_code&) const = 0;
@@ -217,7 +187,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, 
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, 
                              std::error_code&) const override
         {
             if (lhs.is_null() && rhs.is_null())
@@ -244,7 +214,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>&, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>&, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (is_true(lhs))
             {
@@ -266,7 +236,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             return lhs == rhs ? resources.true_value() : resources.false_value();
         }
@@ -281,7 +251,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             return lhs != rhs ? resources.true_value() : resources.false_value();
         }
@@ -296,7 +266,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -315,7 +285,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -334,7 +304,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -353,7 +323,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //if (!(lhs.is_number() && rhs.is_number()))
             //{
@@ -372,7 +342,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -402,7 +372,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -432,7 +402,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -462,7 +432,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -504,7 +474,7 @@ namespace detail {
 
         virtual ~function_base() = default;
 
-        virtual reference evaluate(dynamic_resources<Json>& resources,
+        virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                                    const std::vector<pointer>& args, 
                                    std::error_code& ec) const = 0;
 
@@ -522,7 +492,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -564,7 +534,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -607,7 +577,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -650,7 +620,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -690,7 +660,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -733,7 +703,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -788,7 +758,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -845,7 +815,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -886,7 +856,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json>& resources,
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1245,6 +1215,63 @@ namespace detail {
         }
     };
 
+    template <class Json, class JsonReference>
+    class dynamic_resources
+    {
+        std::vector<std::unique_ptr<Json>> temp_json_values_;
+        std::unordered_map<std::size_t,std::vector<path_node<Json,JsonReference>>> cache_;
+    public:
+
+        bool is_cached(std::size_t id) const
+        {
+            return cache_.count(id);
+        }
+
+        void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val) 
+        {
+            cache_.try_emplace(id,val);
+        }
+
+        void retrieve_from_cache(std::size_t id, std::vector<path_node<Json,JsonReference>>& nodes) 
+        {
+            auto it = cache_.find(id);
+            if (it != cache_.end())
+            {
+                for (auto& item : it->second)
+                {
+                    nodes.push_back(item);
+                }
+            }
+        }
+
+        Json& true_value() const
+        {
+            static Json value(true, semantic_tag::none);
+            return value;
+        }
+
+        Json& false_value() const
+        {
+            static Json value(false, semantic_tag::none);
+            return value;
+        }
+
+        Json& null_value() const
+        {
+            static Json value(null_type(), semantic_tag::none);
+            return value;
+        }
+
+        template <typename... Args>
+        Json* create_json(Args&& ... args)
+        {
+            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+            Json* ptr = temp.get();
+            temp_json_values_.emplace_back(std::move(temp));
+            return ptr;
+        }
+    };
+
     template <class Json,class JsonReference>
     struct node_less
     {
@@ -1322,7 +1349,7 @@ namespace detail {
             return s;
         }
 
-        virtual void select(dynamic_resources<Json>& resources,
+        virtual void select(dynamic_resources<Json,JsonReference>& resources,
                             const string_type& path, 
                             reference root,
                             reference val, 
@@ -1476,12 +1503,12 @@ namespace detail {
             construct(std::forward<token>(other));
         }
 
-        const Json& get_value(const_reference_arg_t, dynamic_resources<Json>&) const
+        const Json& get_value(const_reference_arg_t, dynamic_resources<Json,JsonReference>&) const
         {
             return value_;
         }
 
-        Json& get_value(reference_arg_t, dynamic_resources<Json>& resources) const
+        Json& get_value(reference_arg_t, dynamic_resources<Json,JsonReference>& resources) const
         {
             return *resources.create_json(value_);
         }
@@ -1723,7 +1750,7 @@ namespace detail {
             return *this;
         }
 
-        pointer to_pointer(dynamic_resources<Json>& resources) const
+        pointer to_pointer(dynamic_resources<Json,JsonReference>& resources) const
         {
             switch (tag)
             {
@@ -1805,7 +1832,7 @@ namespace detail {
 
         path_expression& operator=(path_expression&& expr) = default;
 
-        Json evaluate(dynamic_resources<Json>& resources, 
+        Json evaluate(dynamic_resources<Json,JsonReference>& resources, 
                       const string_type& path, 
                       reference root,
                       reference instance,
@@ -1835,7 +1862,7 @@ namespace detail {
 
         template <class Callback>
         //typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
-        void evaluate(dynamic_resources<Json>& resources, 
+        void evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  const string_type& ipath, 
                  reference root,
                  reference current, 

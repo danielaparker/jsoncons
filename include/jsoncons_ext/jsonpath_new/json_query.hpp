@@ -18,7 +18,6 @@
 #include <set> // std::set
 #include <iterator> // std::make_move_iterator
 #include <jsoncons/json.hpp>
-//#include <jsoncons_ext/jsonpath_new/jsonpath_filter.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath_new/jsonpath_expression.hpp>
 
@@ -215,7 +214,7 @@ namespace jsoncons { namespace jsonpath_new {
                 }
             }
 
-            void evaluate_tail(dynamic_resources<Json>& resources,
+            void evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
                                const string_type& path, 
                                reference root,
                                reference val,
@@ -248,7 +247,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val,
@@ -300,26 +299,39 @@ namespace jsoncons { namespace jsonpath_new {
             }
         };
 
-        class root_node final : public path_selector
+        class root_selector final : public path_selector
         {
             using path_selector::generate_path;
+
+            std::size_t id_;
         public:
-            root_node()
-                : path_selector()
+            root_selector(std::size_t id)
+                : path_selector(), id_(id)
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference,
                         std::vector<path_node_type>& nodes,
                         result_flags flags) const override
             {
-                //nodes.emplace_back(path, std::addressof(root));
-                //nodes.emplace_back(path, std::addressof(val));
-                this->evaluate_tail(resources, path, 
-                                        root, root, nodes, flags);
+                if (resources.is_cached(id_))
+                {
+                    resources.retrieve_from_cache(id_, nodes);
+                }
+                else
+                {
+                    std::vector<path_node_type> v;
+                    this->evaluate_tail(resources, path, 
+                                        root, root, v, flags);
+                    resources.add_to_cache(id_, v);
+                    for (auto&& item : v)
+                    {
+                        nodes.push_back(std::move(item));
+                    }
+                }
             }
 
             std::string to_string(int level = 0) const override
@@ -330,7 +342,7 @@ namespace jsoncons { namespace jsonpath_new {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("root_node");
+                s.append("root_selector");
 
                 return s;
             }
@@ -346,7 +358,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val,
@@ -386,7 +398,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val,
@@ -435,7 +447,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val,
@@ -488,7 +500,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val, 
@@ -553,7 +565,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val, 
@@ -621,7 +633,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val, 
@@ -675,7 +687,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val,
@@ -737,7 +749,7 @@ namespace jsoncons { namespace jsonpath_new {
             {
             }
 
-            void select(dynamic_resources<Json>& resources,
+            void select(dynamic_resources<Json,JsonReference>& resources,
                         const string_type& path, 
                         reference root,
                         reference val, 
@@ -802,31 +814,7 @@ namespace jsoncons { namespace jsonpath_new {
         {
             return column_;
         }
-/*
-        template<class Op>
-        void replace_fn(Op op)
-        {
-            if (!stack_.empty())
-            {
-                for (std::size_t i = 0; i < stack_.back().size(); ++i)
-                {
-                    *(stack_.back()[i].val_ptr) = op(*(stack_.back()[i].val_ptr));
-                }
-            }
-        }
 
-        template <class T>
-        void replace(T&& new_value)
-        {
-            if (!stack_.empty())
-            {
-                for (std::size_t i = 0; i < stack_.back().size(); ++i)
-                {
-                    *(stack_.back()[i].val_ptr) = new_value;
-                }
-            }
-        }
-*/
         path_expression_type compile(static_resources<value_type,reference>& resources, const string_view_type& path)
         {
             std::error_code ec;
@@ -868,6 +856,7 @@ namespace jsoncons { namespace jsonpath_new {
                                      std::size_t length,
                                      std::error_code& ec)
         {
+            std::size_t selector_id = 0;
 
             state_stack_.emplace_back(path_state::start);
 
@@ -963,7 +952,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 break;
                             case '$':
                                 push_token(root_node_arg, ec);
-                                push_token(token_type(jsoncons::make_unique<root_node>()), ec);
+                                push_token(token_type(jsoncons::make_unique<root_selector>(selector_id++)), ec);
                                 ++p_;
                                 ++column_;
                                 state_stack_.pop_back();
@@ -1138,7 +1127,7 @@ namespace jsoncons { namespace jsonpath_new {
                                 ++p_;
                                 ++column_;
                                 push_token(token_type(root_node_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<root_node>()), ec);
+                                push_token(token_type(jsoncons::make_unique<root_selector>(selector_id++)), ec);
                                 state_stack_.pop_back();
                                 break;
                             case '@':
@@ -2726,12 +2715,12 @@ namespace jsoncons { namespace jsonpath_new {
             string_type path = {'$'};
             if ((flags & result_flags::value) == result_flags::value)
             {
-                jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
+                jsoncons::jsonpath_new::detail::dynamic_resources<Json,reference> resources;
                 return expr_.evaluate(resources, path, root, root, flags);
             }
             else if ((flags & result_flags::path) == result_flags::path)
             {
-                jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
+                jsoncons::jsonpath_new::detail::dynamic_resources<Json,reference> resources;
 
                 Json result(json_array_arg);
                 auto callback = [&result](path_node_type& node)
@@ -2806,7 +2795,7 @@ namespace jsoncons { namespace jsonpath_new {
         evaluator_t e;
         expression_t expr = e.compile(static_resources, path);
 
-        jsoncons::jsonpath_new::detail::dynamic_resources<Json> resources;
+        jsoncons::jsonpath_new::detail::dynamic_resources<Json,reference> resources;
         auto callback = [&new_value](path_node_type& node)
         {
             *node.val_ptr = new_value;
