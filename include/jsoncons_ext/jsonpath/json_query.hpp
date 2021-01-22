@@ -197,6 +197,7 @@ namespace jsoncons { namespace jsonpath {
             std::unique_ptr<selector_base_type> tail_selector_;
         public:
             using selector_base_type::generate_path;
+
             path_selector()
                 : selector_base_type(true, 11), tail_selector_()
             {
@@ -240,8 +241,9 @@ namespace jsoncons { namespace jsonpath {
         class identifier_selector final : public path_selector
         {
             string_type identifier_;
-            using path_selector::generate_path;
         public:
+            using path_selector::generate_path;
+
             identifier_selector(const string_view_type& identifier)
                 : path_selector(), identifier_(identifier)
             {
@@ -301,10 +303,10 @@ namespace jsoncons { namespace jsonpath {
 
         class root_selector final : public path_selector
         {
-            using path_selector::generate_path;
-
             std::size_t id_;
         public:
+            using path_selector::generate_path;
+
             root_selector(std::size_t id)
                 : path_selector(), id_(id)
             {
@@ -351,8 +353,9 @@ namespace jsoncons { namespace jsonpath {
         class index_selector final : public path_selector
         {
             int64_t index_;
-            using path_selector::generate_path;
         public:
+            using path_selector::generate_path;
+
             index_selector(int64_t index)
                 : path_selector(), index_(index)
             {
@@ -391,8 +394,9 @@ namespace jsoncons { namespace jsonpath {
 
         class wildcard_selector final : public path_selector
         {
-            using path_selector::generate_path;
         public:
+            using path_selector::generate_path;
+
             wildcard_selector()
                 : path_selector()
             {
@@ -440,8 +444,9 @@ namespace jsoncons { namespace jsonpath {
 
         class recursive_selector final : public path_selector
         {
-            using path_selector::generate_path;
         public:
+            using path_selector::generate_path;
+
             recursive_selector()
                 : path_selector()
             {
@@ -493,8 +498,9 @@ namespace jsoncons { namespace jsonpath {
         {
             std::vector<path_expression_type> expressions_;
 
-            using path_selector::generate_path;
         public:
+            using path_selector::generate_path;
+
             union_selector(std::vector<path_expression_type>&& expressions)
                 : path_selector(), expressions_(std::move(expressions))
             {
@@ -557,8 +563,8 @@ namespace jsoncons { namespace jsonpath {
         {
             path_expression_type expr_;
 
-            using path_selector::generate_path;
         public:
+            using path_selector::generate_path;
 
             filter_selector(path_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
@@ -623,10 +629,10 @@ namespace jsoncons { namespace jsonpath {
 
         class expression_selector final : public path_selector
         {
-            using path_selector::generate_path;
             path_expression_type expr_;
 
         public:
+            using path_selector::generate_path;
 
             expression_selector(path_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
@@ -678,10 +684,10 @@ namespace jsoncons { namespace jsonpath {
 
         class slice_selector final : public path_selector
         {
-        private:
-            using path_selector::generate_path;
             slice slice_;
         public:
+            using path_selector::generate_path;
+
             slice_selector(const slice& slic)
                 : path_selector(), slice_(slic) 
             {
@@ -848,7 +854,7 @@ namespace jsoncons { namespace jsonpath {
             {
                 JSONCONS_THROW(jsonpath_error(ec, line_, column_));
             }
-            return std::move(result);
+            return result;
         }
 
         path_expression_type compile(static_resources<value_type,reference>& resources,

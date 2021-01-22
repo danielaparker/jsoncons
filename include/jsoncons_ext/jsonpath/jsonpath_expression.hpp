@@ -1792,7 +1792,7 @@ namespace detail {
             switch(tag)
             {
                 case node_set_tag::multi:
-                    nodes.~vector<path_node_type>();
+                    nodes.~vector();
                     break;
                 default:
                     break;
