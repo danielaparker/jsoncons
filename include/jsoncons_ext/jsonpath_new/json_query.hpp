@@ -2783,7 +2783,6 @@ namespace jsoncons { namespace jsonpath_new {
     {
         using evaluator_t = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
-        using string_view_type = typename evaluator_t::string_view_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using expression_t = typename evaluator_t::path_expression_type;
@@ -2803,18 +2802,30 @@ namespace jsoncons { namespace jsonpath_new {
         expr.evaluate(resources, output_path, root, root, callback, result_flags::value);
     }
 
-/*
     template<class Json, class Op>
     typename std::enable_if<jsoncons::detail::is_function_object<Op,Json>::value,void>::type
     json_replace(Json& root, const typename Json::string_view_type& path, Op op)
     {
-        jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json,Json&> evaluator;
-        jsoncons::jsonpath_new::detail::static_resources<value_type,reference> resources;
-        evaluator.evaluate(resources, root, path);
-        evaluator.replace_fn(op);
-    }
+        using evaluator_t = typename jsoncons::jsonpath_new::detail::jsonpath_evaluator<Json, Json&>;
+        using string_type = typename evaluator_t::string_type;
+        using value_type = typename evaluator_t::value_type;
+        using reference = typename evaluator_t::reference;
+        using expression_t = typename evaluator_t::path_expression_type;
+        using path_node_type = typename evaluator_t::path_node_type;
 
-*/
+        string_type output_path = { '$' };
+
+        jsoncons::jsonpath_new::detail::static_resources<value_type,reference> static_resources;
+        evaluator_t e;
+        expression_t expr = e.compile(static_resources, path);
+
+        jsoncons::jsonpath_new::detail::dynamic_resources<Json,reference> resources;
+        auto callback = [op](path_node_type& node)
+        {
+            *node.val_ptr = op(*node.val_ptr);
+        };
+        expr.evaluate(resources, output_path, root, root, callback, result_flags::value);
+    }
 
 } // namespace jsonpath_new
 } // namespace jsoncons

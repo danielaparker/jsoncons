@@ -1,4 +1,4 @@
-// Copyright 2013 Daniel Parker
+// Copyright 2020 Daniel Parker
 // Distributed under Boost license
 
 #if defined(_MSC_VER)
@@ -25,16 +25,27 @@ TEST_CASE("test replace tests")
     JSONCONS_TRY
     {
         j = json::parse(R"(
-{"store":
-{"book": [
-{"category": "reference",
-"author": "Margaret Weis",
-"title": "Dragonlance Series",
-"price": 31.96}, {"category": "reference",
-"author": "Brent Weeks",
-"title": "Night Angel Trilogy",
-"price": 14.70
-}]}}
+{ "store": {
+    "book": [ 
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      },
+      { "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+      }
+    ]
+  }
+}
 )");
     }
     JSONCONS_CATCH (const ser_error& e)
@@ -42,18 +53,22 @@ TEST_CASE("test replace tests")
         std::cout << e.what() << std::endl;
     }
 
-    //std::cout << "!!!test_replace" << std::endl;
-    //std::cout << ("1\n") << pretty_print(j) << std::endl;
-
     SECTION("test 1")
     {
-        CHECK(31.96 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
+        jsonpath_new::json_replace(j,"$..book[?(@.price==12.99)].price", 30.9);
 
-        jsonpath_new::json_replace(j,"$..book[?(@.price==31.96)].price", 30.9);
-
-        CHECK(30.9 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
+        CHECK(30.9 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
     }
 
-    //std::cout << ("2\n") << pretty_print(j) << std::endl;
+    SECTION("test 2")
+    {
+        // make a discount on all books
+        jsonpath_new::json_replace(j, "$.store.book[*].price",
+            [](const json& price) { return std::round(price.as<double>() - 1.0); });
+
+        CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
+        CHECK(12.0 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
+        CHECK(8.0 == Approx(j["store"]["book"][2]["price"].as<double>()).epsilon(0.001));
+    }
 }
 
