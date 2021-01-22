@@ -829,7 +829,7 @@ namespace jsoncons { namespace jsonpath {
             {
                 JSONCONS_THROW(jsonpath_error(ec, line_, column_));
             }
-            return std::move(result);
+            return result;
         }
 
         path_expression_type compile(static_resources<value_type,reference>& resources, const string_view_type& path, std::error_code& ec)
