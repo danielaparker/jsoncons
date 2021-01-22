@@ -1229,7 +1229,7 @@ namespace detail {
 
         void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val) 
         {
-            cache_.try_emplace(id,val);
+            cache_.emplace(id,val);
         }
 
         void retrieve_from_cache(std::size_t id, std::vector<path_node<Json,JsonReference>>& nodes) 
