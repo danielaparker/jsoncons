@@ -2,29 +2,10 @@
 
     // Tests from https://github.com/cburgmer/json-path-comparison
     {
-        "given" : { "key": "value", "another key": {"complex": "string", "primitives": [0, 1]}},
-        "cases" : [
-            {
-                "comment" : "jsonpath recursive descent with *",
-                "expression" : "$..*",
-                "result" : ["value",{"complex" : "string","primitives" : [0,1]},"string",[0,1],0,1]
-            }
-        ]
-    },
-    {
-        "given" : ["first", "second", "third"],
-        "cases" : [
-            {
-                "comment" : "Array index last",
-                "expression" : "$[-1]",
-                "result" : ["third"]
-            }
-        ]
-    },
-    {
         "given" : [{"key": 0}, {"key": 42}, {"key": -1}, {"key": 41}, {"key": 43}, {"key": 42.0001}, {"key": 41.9999}, {"key": 100}, {"some": "value"}],
         "cases" : [
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Filter less than",
                 "expression" : "$[?(@.key<42)]",
                 "result" : [{"key": 0}, {"key": -1}, {"key": 41}, {"key": 41.9999}]
@@ -32,59 +13,10 @@
         ]
     },
     {
-        "given" : [40,null,42],
-        "cases" : [
-            {
-                "comment" : "Wildcard bracket notation on null value array",
-                "expression" : "$[*]",
-                "result" : [40,null,42]
-            }
-        ]
-    },
-    {
-        "given" : { "some": "string","int": 42,"object": {"key": "value"},"array": [0, 1]},
-        "cases" : [
-            {
-                "comment" : "Wildcard bracket notation on object",
-                "expression" : "$[*]",
-                "result" : ["string",42,{"key": "value"},[0,1]]
-            }
-        ]
-    },
-    {
-        "given" : [{"bar": [{"baz": "hello"}]}],
-        "cases" : [
-            {
-                "comment" : "Wildcard bracket notation with key on nested objects",
-                "expression" : "$[*].bar[*].baz",
-                "result" : ["hello"]
-            }
-        ]
-    },
-    {
-        "given" : ["string",42,{"key": "value"},[0, 1]],
-        "cases" : [
-            {
-                "comment" : "Wildcard dot notation on array",
-                "expression" : "$.*",
-                "result" : ["string",42,{"key": "value"},[0,1]]
-            }
-        ]
-    },
-    {
-        "given" : { "some": "string","int": 42,"object": {"key": "value"},"array": [0, 1]},
-        "cases" : [
-            {
-                "comment" : "Wildcard dot notation on object",
-                "expression" : "$.*",
-                "result" : ["string",42,{"key": "value"},[0,1]]
-            }
-        ]
-    },
-    {
         "given" : ["first", "second", "third"],
         "cases" : [
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Union with spaces",
                 "expression" : "$[ 0 , 1 ]",
                 "result" : ["first","second"]
@@ -95,11 +27,13 @@
         "given" : {"": 42, "''": 123, "\"\"": 222},
         "cases" : [
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Bracket notation with empty string",
                 "expression" : "$['']",
                 "result" : [42]
             },
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Bracket notation with empty string doubled quoted",
                 "expression" : "$[\"\"]",
                 "result" : [42]
@@ -110,6 +44,7 @@
         "given" : {"0": "value"},
         "cases" : [
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Bracket notation with number on object",
                 "expression" : "$[0]",
                 "result" : ["value"] // jsoncons allows unquoted names in square brackets
@@ -120,11 +55,13 @@
         "given" : [2, "a", 4, 5, 100, "nice"],
         "cases" : [
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Array slice with negative start and end and range of -1",
                 "expression" : "$[-4:-5]",
                 "result" : [] 
             },
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Array slice with negative start and end and range of 0",
                 "expression" : "$[-4:-4]",
                 "result" : [] 
@@ -135,6 +72,7 @@
                 "result" : [4] 
             },
             {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
                 "comment" : "Array slice with negative start and positive end and range of -1",
                 "expression" : "$[-4:1]",
                 "result" : [] 
@@ -142,6 +80,7 @@
         ]
     },
     {
+        "source" : "https://github.com/cburgmer/json-path-comparison",
         "given" : ["first", "second", "third", "forth", "fifth"],
         "cases" : [
             {

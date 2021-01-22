@@ -43,5 +43,16 @@
                 "result" : ["first","first nested",{"nested":["deepest","second"]},"deepest","more"]
             }
         ]
+    },
+    {
+        "source" : "https://github.com/cburgmer/json-path-comparison",
+        "given" : { "key": "value", "another key": {"complex": "string", "primitives": [0, 1]}},
+        "cases" : [
+            {
+                "comment" : "jsonpath recursive descent with *",
+                "expression" : "$..*",
+                "result" : [{"complex":"string","primitives":[0,1]},"value","string",[0,1],0,1]
+            }
+        ]
     }
 ]

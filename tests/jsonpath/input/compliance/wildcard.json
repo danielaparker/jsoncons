@@ -62,4 +62,58 @@
                   ]
             }
         ]
-    }]
+    },
+    {
+        "source" : "https://github.com/cburgmer/json-path-comparison",
+        "given" : [40,null,42],
+        "cases" : [
+            {
+                "comment" : "Wildcard bracket notation on null value array",
+                "expression" : "$[*]",
+                "result" : [40,null,42]
+            }
+        ]
+    },
+    {
+        "source" : "https://github.com/cburgmer/json-path-comparison",
+        "given" : { "some": "string","int": 42,"object": {"key": "value"},"array": [0, 1]},
+        "cases" : [
+            {
+                "comment" : "Wildcard bracket notation on object",
+                "expression" : "$[*]",
+                "result" : [[0,1],42,{"key":"value"},"string"]
+            }
+        ]
+    },
+    {
+        "given" : [{"bar": [{"baz": "hello"}]}],
+        "cases" : [
+            {
+                "comment" : "Wildcard bracket notation with key on nested objects",
+                "expression" : "$[*].bar[*].baz",
+                "result" : ["hello"]
+            }
+        ]
+    },
+    {
+        "given" : ["string",42,{"key": "value"},[0, 1]],
+        "cases" : [
+            {
+                "comment" : "Wildcard dot notation on array",
+                "expression" : "$.*",
+                "result" : ["string",42,{"key":"value"},[0,1]]
+            }
+        ]
+    },
+    {
+        "source" : "https://github.com/cburgmer/json-path-comparison",
+        "given" : { "some": "string","int": 42,"object": {"key": "value"},"array": [0, 1]},
+        "cases" : [
+            {
+                "comment" : "Wildcard dot notation on object",
+                "expression" : "$.*",
+                "result" : [[0,1],42,{"key":"value"},"string"]
+            }
+        ]
+    }
+]
