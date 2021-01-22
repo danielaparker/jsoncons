@@ -1,14 +1,64 @@
 [
-    /*{
+    {
         "given" : ["first", "second", "third", "forth", "fifth"],
         "cases" : [
             {
                 "comment" : "Array slice",
                 "expression" : "$[1:3]",
                 "result" : ["second","third"]
+            },
+            {
+                "comment" : "Array slice on exact match",
+                "expression" : "$[0:5]",
+                "result" : ["first","second","third","forth","fifth"]
+            },
+            {
+                "comment" : "Array slice with large number for end",
+                "expression" : "$[2:113667776004]",
+                "result" : ["third","forth","fifth"]
+            },
+            {
+                "comment" : "Array slice with large number for end and negative step",
+                "expression" : "$[2:-113667776004:-1]",
+                "result" : ["third","second","first"]
+            },
+            {
+                "comment" : "Array slice with large number for start",
+                "expression" : "$[-113667776004:2]",
+                "result" : ["first","second"]
+            },
+            {
+                "comment" : "Array slice with large number for start end negative step",
+                "expression" : "$[113667776004:2:-1]",
+                "result" : ["fifth","forth"]
             }
         ]
-    },*/
+    },
+    {
+        "given" : ["first", "second", "third"],
+        "cases" : [
+            {
+                "comment" : "Array slice on non overlapping array",
+                "expression" : "$[7:10]",
+                "result" : []
+            },
+            {
+                "comment" : "Array slice on partially overlapping array",
+                "expression" : "$[1:10]",
+                "result" : ["second","third"]
+            }
+        ]
+    },
+    {
+        "given" : {":": 42, "more": "string", "a": 1, "b": 2, "c": 3, "1:3": "nice"},
+        "cases" : [
+            {
+                "comment" : "Array slice on object",
+                "expression" : "$[1:3]",
+                "result" : []
+            }
+        ]
+    },
     {
         "given" : [{"key": "ey"}, {"key": "bee"}, {"key": "see"}],
         "cases" : [
@@ -18,5 +68,40 @@
                 "result" : ["ey","bee"]
             }
         ]
-    }
+    }, 
+    {
+     "given": {
+       "foo": [{"a": 1}, {"a": 2}, {"a": 3}],
+       "bar": [{"a": {"b": 1}}, {"a": {"b": 2}},
+   	    {"a": {"b": 3}}],
+       "baz": 50
+     },
+     "cases": [
+       {
+         "expression": "$.foo[:2].a",
+         "result": [1, 2]
+       },
+       {
+         "expression": "$.foo[:2].b",
+         "result": []
+       },
+       {
+         "expression": "$.foo[:2].a.b",
+         "result": []
+       },
+       {
+         "expression": "$.bar[::-1].a.b",
+         "result": [3, 2, 1]
+       }
+       ,
+       {
+         "expression": "$.bar[:2].a.b",
+         "result": [1, 2]
+       },
+       {
+         "expression": "$.baz[:2].a",
+         "result": []
+       }
+     ]
+   }
 ]

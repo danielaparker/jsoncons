@@ -4,6 +4,7 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
+#include <iostream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <catch/catch.hpp>
@@ -28,41 +29,62 @@ void jsonpath_tests(const std::string& fpath)
         exit(1);
     }
 
-    ojson tests = ojson::parse(is);
+    json tests = json::parse(is);
     for (const auto& test_group : tests.array_range())
     {
-        const ojson& root = test_group["given"];
+        const json& instance = test_group["given"];
 
         for (const auto& test_case : test_group["cases"].array_range())
         {
             std::string expr = test_case["expression"].as<std::string>();
             try
             {
-                ojson actual = jsonpath::json_query(root, expr);
+                auto expression = jsoncons::jsonpath::make_expression<json>(jsoncons::string_view(expr));
                 if (test_case.contains("result"))
                 {
-                    const ojson& expected = test_case["result"];
+                    json actual = expression.evaluate(instance);
+                    const json& expected = test_case["result"];
+                    //std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
                     {
                         if (test_case.contains("comment"))
                         {
                             std::cout << "\n" << test_case["comment"] << "\n";
                         }
-                        std::cout << "Input:\n" << pretty_print(root) << "\n\n";
+                        std::cout << "Input:\n" << pretty_print(instance) << "\n\n";
                         std::cout << "Expression: " << expr << "\n\n";
                         std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                         std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                     }
                     CHECK(actual == expected);
                 }
-                else if (test_case.contains("error"))
+                if (test_case.contains("path"))
                 {
+                    json actual = expression.evaluate(instance, jsonpath::result_flags::path);
+                    const json& expected = test_case["path"];
+                    //std::cout << "actual\n:" << actual << "\n";
+                    if (actual != expected)
+                    {
+                        if (test_case.contains("comment"))
+                        {
+                            std::cout << "\n" << test_case["comment"] << "\n";
+                        }
+                        std::cout << "Input:\n" << pretty_print(instance) << "\n\n";
+                        std::cout << "Expression: " << expr << "\n\n";
+                        std::cout << "Actual: " << pretty_print(actual) << "\n\n";
+                        std::cout << "Expected: " << pretty_print(expected) << "\n\n";
+                    }
+                    CHECK(actual == expected);
+                }
+                if (test_case.contains("error"))
+                {
+                    json actual = expression.evaluate(instance);
                     if (test_case.contains("comment"))
                     {
                         std::cout << "Comment: " << test_case["comment"] << "\n";
                     }
                     std::cout << "Error: " << test_case["error"] << "\n\n";
-                    std::cout << "Input:\n" << pretty_print(root) << "\n\n";
+                    std::cout << "Input:\n" << pretty_print(instance) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                     CHECK(false);
@@ -73,13 +95,14 @@ void jsonpath_tests(const std::string& fpath)
             {
                 if (test_case.contains("result"))
                 {
-                    const ojson& expected = test_case["result"];
+                    std::cout << e.what() << "\n";
+                    const json& expected = test_case["result"];
                     std::cout << e.what() << "\n";
                     if (test_case.contains("comment"))
                     {
                         std::cout << "Comment: " << test_case["comment"] << "\n\n";
                     }
-                    std::cout << "Input\n" << pretty_print(root) << "\n\n";
+                    std::cout << "Input\n" << pretty_print(instance) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Expected: " << expected << "\n\n";
                     CHECK(false);
@@ -99,11 +122,21 @@ TEST_CASE("jsonpath-tests")
     SECTION("compliance")
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
-        jsonpath_tests("./jsonpath/input/compliance/jsonpath-regex-tests.json");
+        jsonpath_tests("./jsonpath/input/compliance/regex.json");
 #endif
+        //jsonpath_tests("./jsonpath/input/compliance/jsonpath-tests.json");
+
+        
+        jsonpath_tests("./jsonpath/input/compliance/identifiers.json");
         jsonpath_tests("./jsonpath/input/compliance/basic.json"); 
         jsonpath_tests("./jsonpath/input/compliance/slice.json");
-        jsonpath_tests("./jsonpath/input/compliance/jsonpath-tests.json");
+        jsonpath_tests("./jsonpath/input/compliance/indices.json");
+        jsonpath_tests("./jsonpath/input/compliance/wildcard.json");
+        jsonpath_tests("./jsonpath/input/compliance/recursive-descent.json"); 
+        jsonpath_tests("./jsonpath/input/compliance/union.json");       
+        jsonpath_tests("./jsonpath/input/compliance/filters.json");
+        jsonpath_tests("./jsonpath/input/compliance/functions.json");
+        jsonpath_tests("./jsonpath/input/compliance/expressions.json");
     }
 }
 

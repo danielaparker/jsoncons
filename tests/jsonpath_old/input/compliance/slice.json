@@ -1,0 +1,22 @@
+[
+    /*{
+        "given" : ["first", "second", "third", "forth", "fifth"],
+        "cases" : [
+            {
+                "comment" : "Array slice",
+                "expression" : "$[1:3]",
+                "result" : ["second","third"]
+            }
+        ]
+    },*/
+    {
+        "given" : [{"key": "ey"}, {"key": "bee"}, {"key": "see"}],
+        "cases" : [
+            {
+                "comment" : "Dot notation after array slice",
+                "expression" : "$[0:2].key",
+                "result" : ["ey","bee"]
+            }
+        ]
+    }
+]

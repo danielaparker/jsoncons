@@ -7,7 +7,7 @@
 #ifndef JSONCONS_JSONPATH_JSONPATH_HPP
 #define JSONCONS_JSONPATH_JSONPATH_HPP
 
-#include <jsoncons_ext/jsonpath_new/json_query.hpp>
-#include <jsoncons_ext/jsonpath_new/flatten.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
+#include <jsoncons_ext/jsonpath/flatten.hpp>
 
 #endif

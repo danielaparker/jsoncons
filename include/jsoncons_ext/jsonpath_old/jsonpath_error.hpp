@@ -1,4 +1,4 @@
-/// Copyright 2021 Daniel Parker
+/// Copyright 2013 Daniel Parker
 // Distributed under the Boost license, Version 1.0.
 // (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
@@ -10,7 +10,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <system_error>
 
-namespace jsoncons { namespace jsonpath_new {
+namespace jsoncons { namespace jsonpath {
 
     enum class jsonpath_errc 
     {
@@ -20,7 +20,12 @@ namespace jsoncons { namespace jsonpath_new {
         expected_right_bracket,
         expected_key,
         expected_separator,
-        expected_forward_slash,
+        invalid_filter,
+        invalid_filter_expected_slash,
+        invalid_filter_unbalanced_paren,
+        invalid_filter_unsupported_operator,
+        invalid_filter_expected_right_brace,
+        invalid_filter_expected_primary,
         expected_slice_start,
         expected_slice_end,
         expected_slice_step,
@@ -40,17 +45,7 @@ namespace jsoncons { namespace jsonpath_new {
         expected_colon_dot_left_bracket_comma_or_right_bracket,
         argument_to_unflatten_invalid,
         invalid_flattened_key,
-        step_cannot_be_zero,
-        invalid_number,
-        illegal_escaped_character,
-        invalid_codepoint,
-        unknown_function,
-        invalid_type,
-        unbalanced_parenthesis,
-        syntax_error,
-        expected_comparator,
-        expected_or,
-        expected_and
+        step_cannot_be_zero
     };
 
     class jsonpath_error_category_impl
@@ -59,7 +54,7 @@ namespace jsoncons { namespace jsonpath_new {
     public:
         const char* name() const noexcept override
         {
-            return "jsoncons/jsonpath_new";
+            return "jsoncons/jsonpath";
         }
         std::string message(int ev) const override
         {
@@ -81,8 +76,18 @@ namespace jsoncons { namespace jsonpath_new {
                     return "Expected slice step";
                 case jsonpath_errc::expected_separator:
                     return "Expected dot or left bracket separator";
-                case jsonpath_errc::expected_forward_slash:
+                case jsonpath_errc::invalid_filter:
+                    return "Invalid path filter";
+                case jsonpath_errc::invalid_filter_expected_slash:
                     return "Invalid path filter, expected '/'";
+                case jsonpath_errc::invalid_filter_unbalanced_paren:
+                    return "Invalid path filter, unbalanced parenthesis";
+                case jsonpath_errc::invalid_filter_unsupported_operator:
+                    return "Unsupported operator";
+                case jsonpath_errc::invalid_filter_expected_right_brace:
+                    return "Invalid path filter, expected right brace }";
+                case jsonpath_errc::invalid_filter_expected_primary:
+                    return "Invalid path filter, expected primary expression.";
                 case jsonpath_errc::expected_left_bracket_token:
                     return "Expected ?,',\",0-9,*";
                 case jsonpath_errc::expected_minus_or_digit_or_colon_or_comma_or_right_bracket:
@@ -106,7 +111,7 @@ namespace jsoncons { namespace jsonpath_new {
                 case jsonpath_errc::unidentified_error:
                     return "Unidentified error";
                 case jsonpath_errc::unexpected_end_of_input:
-                    return "Unexpected end of jsonpath_new input";
+                    return "Unexpected end of jsonpath input";
                 case jsonpath_errc::expected_colon_dot_left_bracket_comma_or_right_bracket:
                     return "Expected ':', '.', '[', ',', or ']'";
                 case jsonpath_errc::argument_to_unflatten_invalid:
@@ -115,26 +120,6 @@ namespace jsoncons { namespace jsonpath_new {
                     return "Flattened key is invalid";
                 case jsonpath_errc::step_cannot_be_zero:
                     return "Slice step cannot be zero";
-                case jsonpath_errc::invalid_number:
-                    return "Invalid number";
-                case jsonpath_errc::illegal_escaped_character:
-                    return "Illegal escaped character";
-                case jsonpath_errc::invalid_codepoint:
-                    return "Invalid codepoint";
-                case jsonpath_errc::unknown_function:
-                    return "Unknown function";
-                case jsonpath_errc::invalid_type:
-                    return "Invalid type";
-                case jsonpath_errc::unbalanced_parenthesis:
-                    return "Unbalanced parenthesis";
-                case jsonpath_errc::syntax_error:
-                    return "Syntax error";
-                case jsonpath_errc::expected_comparator:
-                    return "Expected comparator";
-                case jsonpath_errc::expected_or:
-                    return "Expected operator '||'";
-                case jsonpath_errc::expected_and:
-                    return "Expected operator '&&'";
                 default:
                     return "Unknown jsonpath parser error";
             }
@@ -154,17 +139,17 @@ namespace jsoncons { namespace jsonpath_new {
         return std::error_code(static_cast<int>(result),jsonpath_error_category());
     }
 
-} // jsonpath_new
+} // jsonpath
 } // jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::jsonpath_new::jsonpath_errc> : public true_type
+    struct is_error_code_enum<jsoncons::jsonpath::jsonpath_errc> : public true_type
     {
     };
 }
 
-namespace jsoncons { namespace jsonpath_new {
+namespace jsoncons { namespace jsonpath {
 
     class jsonpath_error : public std::system_error, public virtual json_exception
     {

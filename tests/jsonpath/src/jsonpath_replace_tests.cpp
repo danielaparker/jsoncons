@@ -5,7 +5,7 @@
 #include "windows.h" // test no inadvertant macro expansions
 #endif
 #include <jsoncons/json.hpp>
-#include <jsoncons_ext/jsonpath_new/json_query.hpp>
+#include <jsoncons_ext/jsonpath/json_query.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 #include <sstream>
@@ -55,7 +55,7 @@ TEST_CASE("test replace tests")
 
     SECTION("test 1")
     {
-        jsonpath_new::json_replace(j,"$..book[?(@.price==12.99)].price", 30.9);
+        jsonpath::json_replace(j,"$..book[?(@.price==12.99)].price", 30.9);
 
         CHECK(30.9 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
     }
@@ -63,7 +63,7 @@ TEST_CASE("test replace tests")
     SECTION("test 2")
     {
         // make a discount on all books
-        jsonpath_new::json_replace(j, "$.store.book[*].price",
+        jsonpath::json_replace(j, "$.store.book[*].price",
             [](const json& price) { return std::round(price.as<double>() - 1.0); });
 
         CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));

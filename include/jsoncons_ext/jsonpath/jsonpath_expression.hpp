@@ -14,11 +14,11 @@
 #include <utility> // std::move
 #include <regex>
 #include <jsoncons/json_type.hpp>
-#include <jsoncons_ext/jsonpath_new/jsonpath_error.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
 
 namespace jsoncons { 
-namespace jsonpath_new {
+namespace jsonpath {
 
     enum class result_flags {value=1,path=2};
 
@@ -2050,7 +2050,7 @@ namespace detail {
     };
 
 } // namespace detail
-} // namespace jsonpath_new
+} // namespace jsonpath
 } // namespace jsoncons
 
 #endif // JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
