@@ -1186,22 +1186,22 @@ namespace detail {
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
         string_type path;
-        pointer val_ptr;
+        pointer ptr;
 
         path_node() = default;
         path_node(const string_type& p, const pointer& valp)
-            : path(p),val_ptr(valp)
+            : path(p),ptr(valp)
         {
         }
 
         path_node(string_type&& p, pointer&& valp) noexcept
-            : path(std::move(p)),val_ptr(valp)
+            : path(std::move(p)),ptr(valp)
         {
         }
         path_node(const path_node&) = default;
 
         path_node(path_node&& other) noexcept
-            : path(std::move(other.path)), val_ptr(other.val_ptr)
+            : path(std::move(other.path)), ptr(other.ptr)
         {
 
         }
@@ -1210,7 +1210,7 @@ namespace detail {
         path_node& operator=(path_node&& other) noexcept
         {
             path.swap(other.path);
-            val_ptr = other.val_ptr;
+            ptr = other.ptr;
             return *this;
         }
     };
@@ -1277,7 +1277,7 @@ namespace detail {
     {
         bool operator()(const path_node<Json,JsonReference>& a, const path_node<Json,JsonReference>& b) const
         {
-            return *(a.val_ptr) < *(b.val_ptr);
+            return *(a.ptr) < *(b.ptr);
         }
     };
 
@@ -1755,14 +1755,14 @@ namespace detail {
             switch (tag)
             {
                 case node_set_tag::single:
-                    return node.val_ptr;
+                    return node.ptr;
                 case node_set_tag::multi:
                 {
                     auto j = resources.create_json(json_array_arg);
                     j->reserve(nodes.size());
                     for (auto& item : nodes)
                     {
-                        j->emplace_back(*item.val_ptr);
+                        j->emplace_back(*item.ptr);
                     }
                     return j;
                 }
@@ -1844,7 +1844,7 @@ namespace detail {
             {
                 auto callback = [&result](path_node_type& node)
                 {
-                    result.push_back(*node.val_ptr);
+                    result.push_back(*node.ptr);
                 };
                 evaluate(resources, path, root, instance, callback, flags);
             }
@@ -1974,12 +1974,12 @@ namespace detail {
                             //    switch (item.tag)
                             //    {
                             //        case node_set_tag::single:
-                            //            std::cout << "single: " << *(item.node.val_ptr) << "\n";
+                            //            std::cout << "single: " << *(item.node.ptr) << "\n";
                             //            break;
                             //        case node_set_tag::multi:
                             //            for (auto& node : stack.back().nodes)
                             //            {
-                            //                std::cout << "multi: " << *node.val_ptr << "\n";
+                            //                std::cout << "multi: " << *node.ptr << "\n";
                             //            }
                             //            break;
                             //        default:
@@ -1990,12 +1990,12 @@ namespace detail {
                             switch (stack.back().tag)
                             {
                                 case node_set_tag::single:
-                                    ptr = stack.back().node.val_ptr;
+                                    ptr = stack.back().node.ptr;
                                     break;
                                 case node_set_tag::multi:
                                     if (!stack.back().nodes.empty())
                                     {
-                                        ptr = stack.back().nodes.back().val_ptr;
+                                        ptr = stack.back().nodes.back().ptr;
                                     }
                                     ptr = stack.back().to_pointer(resources);
                                     break;
@@ -2013,7 +2013,7 @@ namespace detail {
                                 //std::cout << "selector output\n";
                                 //for (auto& item : temp)
                                 //{
-                                //    std::cout << *item.val_ptr << "\n";
+                                //    std::cout << *item.ptr << "\n";
                                 //}
                                 //std::cout << "\n";
 

@@ -516,8 +516,8 @@ namespace jsoncons { namespace jsonpath {
                 //std::cout << "union select val: " << val << "\n";
                 auto callback = [&](path_node_type& node)
                 {
-                    //std::cout << "union select callback: node: " << *node.val_ptr << "\n";
-                    this->evaluate_tail(resources, node.path, root, *node.val_ptr, nodes, flags);
+                    //std::cout << "union select callback: node: " << *node.ptr << "\n";
+                    this->evaluate_tail(resources, node.path, root, *node.ptr, nodes, flags);
                 };
                 for (auto& expr : expressions_)
                 {
@@ -546,7 +546,7 @@ namespace jsoncons { namespace jsonpath {
             {
                 return nodes.empty();
             }
-            auto valp = nodes.front().val_ptr; 
+            auto valp = nodes.front().ptr; 
             return ((valp->is_array() && valp->empty()) ||
                      (valp->is_object() && valp->empty()) ||
                      (valp->is_string() && valp->as_string_view().empty()) ||
@@ -654,7 +654,7 @@ namespace jsoncons { namespace jsonpath {
                 expr_.evaluate(resources, path, root, val, callback, flags);
                 if (!temp.empty())
                 {
-                    auto& j = *temp.back().val_ptr;
+                    auto& j = *temp.back().ptr;
                     if (j.template is<std::size_t>() && val.is_array())
                     {
                         std::size_t start = j.template as<std::size_t>();
@@ -2803,7 +2803,7 @@ namespace jsoncons { namespace jsonpath {
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
         auto callback = [&new_value](path_node_type& node)
         {
-            *node.val_ptr = new_value;
+            *node.ptr = new_value;
         };
         expr.evaluate(resources, output_path, root, root, callback, result_flags::value);
     }
@@ -2828,7 +2828,7 @@ namespace jsoncons { namespace jsonpath {
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
         auto callback = [op](path_node_type& node)
         {
-            *node.val_ptr = op(*node.val_ptr);
+            *node.ptr = op(*node.ptr);
         };
         expr.evaluate(resources, output_path, root, root, callback, result_flags::value);
     }
