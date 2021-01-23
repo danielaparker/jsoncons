@@ -129,5 +129,40 @@
                "result": [true]
             }
          ]
-    }
+    }/*,
+    // no duplicates
+    {
+       "given": {
+        "a": [
+          "string",
+          null,
+          true
+        ],
+        "b": [
+          false,
+          "string",
+          5.4
+        ]
+      },
+       "cases": [            
+            {
+               "expression": "$.*[0,:5]",
+               "result": ["string","string",null,true,false,false,"string",5.4]
+            }
+         ]
+    },
+    {
+       "given": {
+        "a": [
+          "s",
+          null
+        ]
+      },
+       "cases": [            
+            {
+               "expression": "$.*[0,:5]",
+               "result": ["s","s",null]
+            }
+         ]
+    }*/
 ]

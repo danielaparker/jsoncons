@@ -20,11 +20,44 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    enum class result_flags {value=1,path=2};
+    enum class result_flags {value=1,path=2,no_duplicates=4};
+
+    inline result_flags operator~(result_flags a)
+    {
+        return static_cast<result_flags>(~static_cast<unsigned int>(a));
+    }
 
     inline result_flags operator&(result_flags a, result_flags b)
     {
-        return static_cast<result_flags>(static_cast<int>(a) & static_cast<int>(b));
+        return static_cast<result_flags>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
+    }
+
+    inline result_flags operator^(result_flags a, result_flags b)
+    {
+        return static_cast<result_flags>(static_cast<unsigned int>(a) ^ static_cast<unsigned int>(b));
+    }
+
+    inline result_flags operator|(result_flags a, result_flags b)
+    {
+        return static_cast<result_flags>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
+    }
+
+    inline result_flags operator&=(result_flags& a, result_flags b)
+    {
+        a = a & b;
+        return a;
+    }
+
+    inline result_flags operator^=(result_flags& a, result_flags b)
+    {
+        a = a ^ b;
+        return a;
+    }
+
+    inline result_flags operator|=(result_flags& a, result_flags b)
+    {
+        a = a | b;
+        return a;
     }
 
 namespace detail {

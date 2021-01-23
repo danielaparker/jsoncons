@@ -39,10 +39,16 @@ void jsonpath_tests(const std::string& fpath)
             std::string expr = test_case["expression"].as<std::string>();
             try
             {
+                jsonpath::result_flags flags = jsonpath::result_flags();
+                if (test_case.contains("no_duplicates") && test_case.at("no_duplicates").as<bool>())
+                {
+                    flags |= jsonpath::result_flags::no_duplicates;
+                }
                 auto expression = jsoncons::jsonpath::make_expression<json>(jsoncons::string_view(expr));
                 if (test_case.contains("result"))
                 {
-                    json actual = expression.evaluate(instance);
+                    jsonpath::result_flags rflags = flags | jsonpath::result_flags::value;
+                    json actual = expression.evaluate(instance, rflags);
                     const json& expected = test_case["result"];
                     //std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
@@ -60,7 +66,8 @@ void jsonpath_tests(const std::string& fpath)
                 }
                 if (test_case.contains("path"))
                 {
-                    json actual = expression.evaluate(instance, jsonpath::result_flags::path);
+                    jsonpath::result_flags pflags = flags | jsonpath::result_flags::path;
+                    json actual = expression.evaluate(instance, pflags);
                     const json& expected = test_case["path"];
                     //std::cout << "actual\n:" << actual << "\n";
                     if (actual != expected)
@@ -122,10 +129,9 @@ TEST_CASE("jsonpath-tests")
     SECTION("compliance")
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
-        jsonpath_tests("./jsonpath/input/compliance/regex.json");
+        //jsonpath_tests("./jsonpath/input/compliance/regex.json");
 #endif
         //jsonpath_tests("./jsonpath/input/compliance/jsonpath-tests.json");
-
         
         jsonpath_tests("./jsonpath/input/compliance/identifiers.json");
         jsonpath_tests("./jsonpath/input/compliance/basic.json"); 
