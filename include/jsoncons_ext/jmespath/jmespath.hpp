@@ -292,8 +292,8 @@ namespace jmespath {
         filter,
         multi_select_list,
         multi_select_hash,
-        rhs_slice_expression_start,
         rhs_slice_expression_stop,
+        rhs_slice_expression_step,
         expect_right_bracket,
         expect_dot,
         expect_filter_right_bracket,
@@ -4101,7 +4101,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case ':': // slice_expression
-                                state_stack_.back() = path_state::rhs_slice_expression_start ;
+                                state_stack_.back() = path_state::rhs_slice_expression_stop ;
                                 state_stack_.emplace_back(path_state::number);
                                 ++p_;
                                 ++column_;
@@ -4227,7 +4227,7 @@ namespace jmespath {
                                     slic.start_ = r.value();
                                     buffer.clear();
                                 }
-                                state_stack_.back() = path_state::rhs_slice_expression_start;
+                                state_stack_.back() = path_state::rhs_slice_expression_stop;
                                 state_stack_.emplace_back(path_state::number);
                                 ++p_;
                                 ++column_;
@@ -4238,7 +4238,7 @@ namespace jmespath {
                                 return jmespath_expression();
                         }
                         break;
-                    case path_state::rhs_slice_expression_start :
+                    case path_state::rhs_slice_expression_stop :
                     {
                         if (!buffer.empty())
                         {
@@ -4261,7 +4261,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             case ':':
-                                state_stack_.back() = path_state::rhs_slice_expression_stop;
+                                state_stack_.back() = path_state::rhs_slice_expression_step;
                                 state_stack_.emplace_back(path_state::number);
                                 ++p_;
                                 ++column_;
@@ -4272,7 +4272,7 @@ namespace jmespath {
                         }
                         break;
                     }
-                    case path_state::rhs_slice_expression_stop:
+                    case path_state::rhs_slice_expression_step:
                     {
                         if (!buffer.empty())
                         {
@@ -4296,7 +4296,7 @@ namespace jmespath {
                                 push_token(token(jsoncons::make_unique<slice_projection>(slic)));
                                 buffer.clear();
                                 slic = slice{};
-                                state_stack_.pop_back(); // rhs_slice_expression_stop
+                                state_stack_.pop_back(); // rhs_slice_expression_step
                                 ++p_;
                                 ++column_;
                                 break;

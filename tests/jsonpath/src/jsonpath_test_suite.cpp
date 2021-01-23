@@ -129,7 +129,7 @@ TEST_CASE("jsonpath-tests")
     SECTION("compliance")
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
-        //jsonpath_tests("./jsonpath/input/compliance/regex.json");
+        jsonpath_tests("./jsonpath/input/compliance/regex.json");
 #endif
         //jsonpath_tests("./jsonpath/input/compliance/jsonpath-tests.json");
         

@@ -129,7 +129,7 @@
                "result": [true]
             }
          ]
-    }/*,
+    },
     // no duplicates
     {
        "given": {
@@ -164,5 +164,5 @@
                "result": ["s","s",null]
             }
          ]
-    }*/
+    }
 ]
