@@ -1714,11 +1714,12 @@ namespace jsoncons { namespace jsonpath {
                                 ++column_;
                                 break;
                             case ':': // slice_expression
-                                state_stack_.back() = path_state::expect_right_bracket;
-                                state_stack_.emplace_back(path_state::rhs_slice_expression_start);
-                                state_stack_.emplace_back(path_state::integer);
-                                ++p_;
-                                ++column_;
+                                //state_stack_.back() = path_state::expect_right_bracket;
+                                //state_stack_.emplace_back(path_state::rhs_slice_expression_start);
+                                //state_stack_.emplace_back(path_state::integer);
+                                state_stack_.back() = path_state::index_or_slice_or_union;
+                                //++p_;
+                                //++column_;
                                 break;
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 state_stack_.back() = path_state::index_or_slice_or_union;
