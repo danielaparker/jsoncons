@@ -148,20 +148,18 @@
             {
                "expression": "$.*[0,:5]",
                "result": ["string","string",null,true,false,false,"string",5.4]
-            }
-         ]
-    },
-    {
-       "given": {
-        "a": [
-          "s",
-          null
-        ]
-      },
-       "cases": [            
+            },
             {
+               "no_duplicates" : true,
                "expression": "$.*[0,:5]",
-               "result": ["s","s",null]
+               "result": [
+                 "string",
+                 null,
+                 true,
+                 false,
+                 "string",
+                 5.4
+               ]
             }
          ]
     }

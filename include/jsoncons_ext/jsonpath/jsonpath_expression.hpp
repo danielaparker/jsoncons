@@ -10,6 +10,7 @@
 #include <string> // std::basic_string
 #include <vector> // std::vector
 #include <unordered_map> // std::unordered_map
+#include <unordered_set> // std::unordered_set
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <regex>
@@ -20,7 +21,7 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    enum class result_flags {value=1,path=2,no_duplicates=4};
+    enum class result_flags {value=1,path=2,no_duplicates=4|path};
 
     inline result_flags operator~(result_flags a)
     {
@@ -2060,21 +2061,53 @@ namespace detail {
             }
             if (!stack.empty())
             {
-                for (auto& item : stack)
+                if ((flags & result_flags::no_duplicates) == result_flags::no_duplicates)
                 {
-                    switch (item.tag)
+                    std::unordered_set<string_type> index;
+                    for (auto& item : stack)
                     {
-                        case node_set_tag::single:
-                            callback(item.node);
-                            break;
-                        case node_set_tag::multi:
-                            for (auto& node : item.nodes)
-                            {
-                                callback(node);
-                            }
-                            break;
-                        default:
-                            break;
+                        switch (item.tag)
+                        {
+                            case node_set_tag::single:
+                                if (index.count(item.node.path) == 0)
+                                {
+                                    callback(item.node);
+                                    index.emplace(item.node.path);
+                                }
+                                break;
+                            case node_set_tag::multi:
+                                for (auto& node : item.nodes)
+                                {
+                                    if (index.count(node.path) == 0)
+                                    {
+                                        callback(node);
+                                        index.emplace(node.path);
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (auto& item : stack)
+                    {
+                        switch (item.tag)
+                        {
+                            case node_set_tag::single:
+                                callback(item.node);
+                                break;
+                            case node_set_tag::multi:
+                                for (auto& node : item.nodes)
+                                {
+                                    callback(node);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }

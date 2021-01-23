@@ -16,6 +16,7 @@
 #include <utility> // std::move
 #include <regex>
 #include <set> // std::set
+#include <unordered_set>
 #include <iterator> // std::make_move_iterator
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -2806,6 +2807,7 @@ namespace jsoncons { namespace jsonpath {
         Json evaluate(reference root, result_flags flags = result_flags::value)
         {
             string_type path = {'$'};
+
             if ((flags & result_flags::value) == result_flags::value)
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
@@ -2826,7 +2828,7 @@ namespace jsoncons { namespace jsonpath {
             else
             {
                 return Json(json_array_arg);
-            }
+            }            
         }
 
         static jsonpath_expression compile(const string_view_type& path)
