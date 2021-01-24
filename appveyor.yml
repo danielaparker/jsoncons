@@ -12,7 +12,7 @@ environment:
     - platform: vs
       vsversion: 2015
       arch: x86
-      FLAGS: "/std:c++14"
+      FLAGS:  "/std:c++11"
 
     - platform: vs
       vsversion: 2015
@@ -22,18 +22,18 @@ environment:
     - platform: vs
       vsversion: 2015
       arch: x64
-      FLAGS: "/std:c++11"
+      FLAGS:  "/std:c++11"
 
     - platform: vs
       vsversion: 2017
       arch: x64
-      FLAGS: "/std:c++14"
+      FLAGS:  "/std:c++14"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
     - platform: vs
       vsversion: 2017
       arch: x86
-      FLAGS: "/std:c++11"
+      FLAGS:  "/std:c++14"
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
     - platform: vs
@@ -51,7 +51,7 @@ environment:
       vsversion: 2019
       configuration: Debug
       platform: x64
-      CXX_FLAGS: "/std:c++17"
+      CXX_FLAGS: "/std:c++latest"
       LINKER_FLAGS: ""
       GENERATOR: Visual Studio 16 2019
 
