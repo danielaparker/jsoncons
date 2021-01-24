@@ -7,7 +7,6 @@
 #ifndef JSONCONS_JSONPATH_JSON_QUERY_HPP
 #define JSONCONS_JSONPATH_JSON_QUERY_HPP
 
-#include <array> // std::array
 #include <string>
 #include <vector>
 #include <memory>
@@ -15,12 +14,9 @@
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <regex>
-#include <set> // std::set
-#include <unordered_set>
-#include <iterator> // std::make_move_iterator
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
-#include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>
+#include <jsoncons_ext/jsonpath/path_expression.hpp>
 
 namespace jsoncons { namespace jsonpath {
 
