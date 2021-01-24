@@ -2800,6 +2800,15 @@ namespace jsoncons { namespace jsonpath {
         {
         }
 
+        template <class Callback>
+        void evaluate(reference root, Callback callback, result_flags flags = result_flags::value)
+        {
+            string_type path = {'$'};
+
+            jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
+            expr_.evaluate(resources, path, root, root, callback, flags);
+        }
+
         Json evaluate(reference root, result_flags flags = result_flags::value)
         {
             string_type path = {'$'};

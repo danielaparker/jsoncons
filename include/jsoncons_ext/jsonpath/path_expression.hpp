@@ -1895,8 +1895,8 @@ namespace detail {
         }
 
         template <class Callback>
-        //typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
-        void evaluate(dynamic_resources<Json,JsonReference>& resources, 
+        typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
+        evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  const string_type& ipath, 
                  reference root,
                  reference current, 
