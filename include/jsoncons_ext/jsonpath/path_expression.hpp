@@ -302,11 +302,15 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
-            //if (!(lhs.is_number() && rhs.is_number()))
-            //{
-            //    return resources.null_value();
-            //}
-            return lhs < rhs ? resources.true_value() : resources.false_value();
+            if (lhs.is_number() && rhs.is_number())
+            {
+                return lhs < rhs ? resources.true_value() : resources.false_value();
+            }
+            else if (lhs.is_string() && rhs.is_string())
+            {
+                return lhs < rhs ? resources.true_value() : resources.false_value();
+            }
+            return resources.null_value();
         }
     };
 
@@ -321,11 +325,15 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
-            //if (!(lhs.is_number() && rhs.is_number()))
-            //{
-            //    return resources.null_value();
-            //}
-            return lhs <= rhs ? resources.true_value() : resources.false_value();
+            if (lhs.is_number() && rhs.is_number())
+            {
+                return lhs <= rhs ? resources.true_value() : resources.false_value();
+            }
+            else if (lhs.is_string() && rhs.is_string())
+            {
+                return lhs <= rhs ? resources.true_value() : resources.false_value();
+            }
+            return resources.null_value();
         }
     };
 
@@ -340,11 +348,15 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
-            //if (!(lhs.is_number() && rhs.is_number()))
-            //{
-            //    return resources.null_value();
-            //}
-            return lhs > rhs ? resources.true_value() : resources.false_value();
+            if (lhs.is_number() && rhs.is_number())
+            {
+                return lhs > rhs ? resources.true_value() : resources.false_value();
+            }
+            else if (lhs.is_string() && rhs.is_string())
+            {
+                return lhs > rhs ? resources.true_value() : resources.false_value();
+            }
+            return resources.null_value();
         }
     };
 
@@ -359,11 +371,15 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
-            //if (!(lhs.is_number() && rhs.is_number()))
-            //{
-            //    return resources.null_value();
-            //}
-            return lhs >= rhs ? resources.true_value() : resources.false_value();
+            if (lhs.is_number() && rhs.is_number())
+            {
+                return lhs >= rhs ? resources.true_value() : resources.false_value();
+            }
+            else if (lhs.is_string() && rhs.is_string())
+            {
+                return lhs >= rhs ? resources.true_value() : resources.false_value();
+            }
+            return resources.null_value();
         }
     };
 

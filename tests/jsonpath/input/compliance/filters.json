@@ -1,4 +1,15 @@
 [
+    {
+        "given" : [{"key": 0}, {"key": 42}, {"key": -1}, {"key": 41}, {"key": 43}, {"key": 42.0001}, {"key": 41.9999}, {"key": 100}, {"some": "value"}],
+        "cases" : [
+            {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
+                "comment" : "Filter less than",
+                "expression" : "$[?(@.key<42)]",
+                "result" : [{"key": 0}, {"key": -1}, {"key": 41}, {"key": 41.9999}]
+            }
+        ]
+    },
    {
        "source" : "https://cburgmer.github.io/json-path-comparison/",       
        "given": [{"id": 2}],
@@ -224,7 +235,7 @@
             {
                 "comment" : "Filter empty set less than value",
                 "expression" : "$[?(@.key<42)]",
-                "result" : [{"some": "value"}]
+                "result" : []
             }
         ]
     },
@@ -275,7 +286,7 @@
             {
                 "comment" : "Filter value greater than empty set",
                 "expression" : "$[?(42 > @.key)]",
-                "result" : [{"some": "value"}]
+                "result" : []
             }
         ]
     },
@@ -306,7 +317,7 @@
             {
                 "comment" : "Filter empty set less than or equal value",
                 "expression" : "$[?(@.key<=42)]",
-                "result" : [{"some": "value"}]
+                "result" : []
             }
         ]
     },
@@ -326,7 +337,7 @@
             {
                 "comment" : "Filter empty set less than or equal empty set",
                 "expression" : "$[?(@.other <= @.key)]",
-                "result" : [{"some": "value"}]
+                "result" : []
             }
         ]
     },
@@ -357,7 +368,7 @@
             {
                 "comment" : "Filter value greater than or equal empty set",
                 "expression" : "$[?(42 >= @.key)]",
-                "result" : [{"some": "value"}]
+                "result" : []
             }
         ]
     },
@@ -367,7 +378,7 @@
             {
                 "comment" : "Filter empty set greater than or equal empty set",
                 "expression" : "$[?(@.other >= @.key)]",
-                "result" : [{"some": "value"}]
+                "result" : []
             }
         ]
     },
