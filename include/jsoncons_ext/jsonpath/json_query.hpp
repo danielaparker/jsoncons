@@ -2776,11 +2776,11 @@ namespace jsoncons { namespace jsonpath {
 
     } // namespace detail
 
-    template <class Json>
+    template <class Json,class JsonReference = const Json&>
     class jsonpath_expression
     {
     public:
-        using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, const Json&>;
+        using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, JsonReference>;
         using string_type = typename evaluator_t::string_type;
         using string_view_type = typename evaluator_t::string_view_type;
         using value_type = typename evaluator_t::value_type;
@@ -2801,7 +2801,8 @@ namespace jsoncons { namespace jsonpath {
         }
 
         template <class Callback>
-        void evaluate(reference root, Callback callback, result_flags flags = result_flags::value)
+        typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
+        evaluate(reference root, Callback callback, result_flags flags = result_flags::value)
         {
             string_type path = {'$'};
 
