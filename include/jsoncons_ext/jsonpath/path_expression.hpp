@@ -102,6 +102,7 @@ namespace detail {
                  (val.is_object() && val.empty()) ||
                  (val.is_string() && val.as_string_view().empty()) ||
                  (val.is_bool() && !val.as_bool()) ||
+                 (val.is_number() && (val == Json(0))) ||
                  val.is_null());
     }
 

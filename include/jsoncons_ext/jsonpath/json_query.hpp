@@ -350,6 +350,40 @@ namespace jsoncons { namespace jsonpath {
             }
         };
 
+        class current_node_selector final : public path_selector
+        {
+        public:
+            using path_selector::generate_path;
+
+            current_node_selector()
+            {
+            }
+
+            void select(dynamic_resources<Json,JsonReference>& resources,
+                        const string_type& path, 
+                        reference root,
+                        reference current,
+                        std::vector<path_node_type>& nodes,
+                        result_flags flags) const override
+            {
+                    this->evaluate_tail(resources, path, 
+                                        root, current, nodes, flags);
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("current_node_selector");
+
+                return s;
+            }
+        };
+
         class index_selector final : public path_selector
         {
             int64_t index_;
@@ -551,6 +585,7 @@ namespace jsoncons { namespace jsonpath {
                      (valp->is_object() && valp->empty()) ||
                      (valp->is_string() && valp->as_string_view().empty()) ||
                      (valp->is_bool() && !valp->as_bool()) ||
+                     (valp->is_number() && *valp == Json(0)) ||
                      valp->is_null());
         }
 
@@ -965,6 +1000,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '@':
                                 push_token(current_node_arg, ec);
+                                push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
                                 ++p_;
                                 ++column_;
                                 state_stack_.pop_back();
@@ -1140,6 +1176,7 @@ namespace jsoncons { namespace jsonpath {
                                 ++p_;
                                 ++column_;
                                 push_token(token_type(current_node_arg), ec);
+                                push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
                                 state_stack_.pop_back();
                                 break;
                             case '.':
