@@ -1,5 +1,16 @@
 [
     {
+        "given" : {"0": "value"},
+        "cases" : [
+            {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
+                "comment" : "Bracket notation with number on object",
+                "expression" : "$[0]",
+                "result" : [] // unquoted identifier can't start with digit
+            }
+        ]
+    },
+    {
        "given":
            {"foo": {"bar": ["zero", "one", "two"]}},
         "cases": [

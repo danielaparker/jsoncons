@@ -1,5 +1,139 @@
 [
     {
+        "given" : [2, "a", 4, 5, 100, "nice"],
+        "cases" : [
+            {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
+                "comment" : "Array slice with negative start and end and range of -1",
+                "expression" : "$[-4:-5]",
+                "result" : [] 
+            },
+            {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
+                "comment" : "Array slice with negative start and end and range of 0",
+                "expression" : "$[-4:-4]",
+                "result" : [] 
+            },
+            {
+                "comment" : "Array slice with negative start and end and range of 1",
+                "expression" : "$[-4:-3]",
+                "result" : [4] 
+            },
+            {
+                "source" : "https://github.com/cburgmer/json-path-comparison",
+                "comment" : "Array slice with negative start and positive end and range of -1",
+                "expression" : "$[-4:1]",
+                "result" : [] 
+            }
+        ]
+    },
+    {
+        "source" : "https://github.com/cburgmer/json-path-comparison",
+        "given" : ["first", "second", "third", "forth", "fifth"],
+        "cases" : [
+            {
+                "comment" : "Last item",
+                "expression" : "$[-1]",
+                "result" : ["fifth"]
+            },
+            {
+                "comment" : "Last two items",
+                "expression" : "$[-2:]",
+                "result" : ["forth", "fifth"]
+            },
+            {
+                "comment" : "All items except the last two",
+                "expression" : "$[:-2]",
+                "result" : ["first", "second", "third"]
+            },
+            {
+                "comment" : "All items, reversed",
+                "expression" : "$[::-1]",
+                "result" : ["fifth","forth","third","second","first"]
+            },
+            {
+                "comment" : "First two items, reversed",
+                "expression" : "$[1::-1]",
+                "result" : ["second","first"]
+            },
+            {
+                "comment" : "Last two items, reversed",
+                "expression" : "$[:-3:-1]",
+                "result" : ["fifth","forth"]
+            },
+            {
+                "comment" : "All items except the last two, reversed",
+                "expression" : "$[-3::-1]",
+                "result" : ["third","second","first"]
+            },
+            {
+                "comment" : "array index",
+                "expression" : "$[2]",
+                "result" : ["third"]
+            },
+            {
+                "comment" : "Array index slice start end step 0",
+                "expression" : "$[0:3:0]",
+                "error" : "Slice step cannot be zero at line 1 and column 8"
+            },
+            {
+                "comment" : "Array slice with negative step",
+                "expression" : "$[3:0:-2]",
+                "result" : ["forth","second"] 
+            },
+            {
+                "comment" : "Array slice with negative step on partially overlapping array",
+                "expression" : "$[7:3:-1]",
+                "result" : ["fifth"] 
+            },
+            {
+                "comment" : "Array slice with negative step and start greater than end",
+                "expression" : "$[0:3:-2]",
+                "result" : [] 
+            },
+            {
+                "comment" : "Array slice with negative step and start greater than end",
+                "expression" : "$[0:3:-2]",
+                "result" : [] 
+            },
+            {
+                "comment" : "Array slice with negative step and start greater than end",
+                "expression" : "$[::-2]",
+                "result" : ["fifth","third","first"] 
+            },
+            {
+                "comment" : "Array slice with open end",
+                "expression" : "$[1:]",
+                "result" : ["second", "third", "forth", "fifth"]
+            },
+            {
+                "comment" : "Array slice with open end and negative step",
+                "expression" : "$[3::-1]",
+                "result" : ["forth","third","second","first"]
+            },
+            {
+                "comment" : "Array slice with open start",
+                "expression" : "$[:2]",
+                "result" : ["first", "second"]
+            }
+        ]
+    },
+    {
+        "given" : ["first", "second"],
+        "cases" : [
+            {
+                "comment" : "Array slice with open start and end",
+                "expression" : "$[:]",
+                "result" : ["first", "second"]
+            },
+            {
+                "comment" : "Array slice with open start and end and step empty",
+                "expression" : "$[::]",
+                "result" : ["first", "second"]
+            }
+        ]
+    },
+    {
         "given" : ["first", "second", "third", "forth", "fifth"],
         "cases" : [
             {
