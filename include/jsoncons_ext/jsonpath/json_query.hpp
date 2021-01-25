@@ -118,6 +118,8 @@ namespace jsoncons { namespace jsonpath {
         path_or_literal_or_function,
         json_text_or_function_expr,
         json_text,
+        json_text_string,
+        json_value,
         json_string,
         identifier_or_function_expr,
         name_or_left_bracket,
@@ -903,6 +905,7 @@ namespace jsoncons { namespace jsonpath {
 
             string_type function_name;
             string_type buffer;
+            int64_t json_text_level = 0;
             uint32_t cp = 0;
             uint32_t cp2 = 0;
 
@@ -1042,14 +1045,15 @@ namespace jsoncons { namespace jsonpath {
                             // number
                             case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                             {
-                                state_stack_.back() = path_state::json_text;
+                                state_stack_.back() = path_state::json_value;
                                 state_stack_.emplace_back(path_state::number);
                                 break;
                             }
                             default:
                             {
                                 state_stack_.back() = path_state::json_text_or_function_expr;
-                                state_stack_.emplace_back(path_state::unquoted_string);
+                                state_stack_.emplace_back(path_state::json_text);
+                                json_text_level = 0;
                                 break;
                             }
                         }
@@ -1102,7 +1106,7 @@ namespace jsoncons { namespace jsonpath {
                         }
                         break;
                     }
-                    case path_state::json_text:
+                    case path_state::json_value:
                     {
                         json_decoder<Json> decoder;
                         basic_json_parser<char_type> parser;
@@ -1122,6 +1126,71 @@ namespace jsoncons { namespace jsonpath {
                         state_stack_.pop_back();
                         break;
                     }
+                    case path_state::json_text:
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '{':
+                            case '[':
+                                ++json_text_level;
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '}':
+                            case ']':
+                                --json_text_level;
+                                if (json_text_level == 0)
+                                {
+                                    state_stack_.pop_back(); 
+                                }
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
+                                if (json_text_level == 0)
+                                {
+                                    state_stack_.back() = path_state::number;
+                                }
+                                else
+                                {
+                                    state_stack_.emplace_back(path_state::number);
+                                }
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '\"':
+                                if (json_text_level == 0)
+                                {
+                                    state_stack_.back() = path_state::json_text_string;
+                                }
+                                else
+                                {
+                                    state_stack_.emplace_back(path_state::json_text_string);
+                                }
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                if (json_text_level == 0)
+                                {
+                                    state_stack_.back() = path_state::unquoted_string;
+                                }
+                                else
+                                {
+                                    state_stack_.emplace_back(path_state::unquoted_string);
+                                }
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                        };
+                        break;
                     case path_state::number: 
                         switch (*p_)
                         {
@@ -1133,6 +1202,30 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             default:
                                 state_stack_.pop_back(); // number
+                                break;
+                        };
+                        break;
+                    case path_state::json_text_string: 
+                        switch (*p_)
+                        {
+                            case '\\':
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case '\"':
+                                buffer.push_back(*p_);
+                                state_stack_.pop_back(); 
+                                ++p_;
+                                ++column_;
+                                break;
+                            default:
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
                                 break;
                         };
                         break;

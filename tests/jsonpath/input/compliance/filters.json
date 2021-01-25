@@ -669,7 +669,7 @@
             {
                 "comment" : "Filter expression with equals array",
                 "expression" : "$[?(@.d==[\"v1\",\"v2\"])]",
-                "error" : "syntax error"
+                "result" :  [{"d": ["v1", "v2"]}]
             }
         ]
     },
