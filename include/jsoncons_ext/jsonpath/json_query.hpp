@@ -116,8 +116,8 @@ namespace jsoncons { namespace jsonpath {
         recursive_descent_or_lhs_expression,
         lhs_expression,
         path_or_literal_or_function,
-        json_text_or_function_expr,
-        json_text,
+        json_text_or_function,
+        json_text_or_function_name,
         json_text_string,
         json_value,
         json_string,
@@ -1051,15 +1051,15 @@ namespace jsoncons { namespace jsonpath {
                             }
                             default:
                             {
-                                state_stack_.back() = path_state::json_text_or_function_expr;
-                                state_stack_.emplace_back(path_state::json_text);
+                                state_stack_.back() = path_state::json_text_or_function;
+                                state_stack_.emplace_back(path_state::json_text_or_function_name);
                                 json_text_level = 0;
                                 break;
                             }
                         }
                         break;
                     }
-                    case path_state::json_text_or_function_expr:
+                    case path_state::json_text_or_function:
                     {
                         switch(*p_)
                         {
@@ -1126,7 +1126,7 @@ namespace jsoncons { namespace jsonpath {
                         state_stack_.pop_back();
                         break;
                     }
-                    case path_state::json_text:
+                    case path_state::json_text_or_function_name:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -1212,6 +1212,11 @@ namespace jsoncons { namespace jsonpath {
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
+                                if (p_ == end_input_)
+                                {
+                                    ec = jsonpath_errc::unexpected_end_of_input;
+                                    return path_expression_type();
+                                }
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
