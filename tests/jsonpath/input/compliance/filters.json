@@ -673,6 +673,21 @@
             }
         ]
     },
+    {
+        "given" : [[1, 2, 3], [1], [2, 3], 1, 2],
+        "cases" : [
+           /*{
+                "comment" : "Filter expression with equals array for array slice with range",
+                "expression" : "$[0][0:2]",
+                "result" : [1,2]
+            },*/
+            {
+                "comment" : "Filter expression with equals array for array slice with range",
+                "expression" : "$[?(@[0:1]==[1])]",
+                "result" : [[1,2,3],[1]]
+            }
+        ]
+    },
     // + operator
     {
         "given" : [{"key1": 100,"key2": 100},{"key1": 105,"key2": 200}],

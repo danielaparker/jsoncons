@@ -63,6 +63,8 @@ namespace jsonpath {
 
 namespace detail {
 
+    enum class node_type {single=1, multi};
+
     template <class Json,class JsonReference>
     class dynamic_resources;
 
@@ -273,6 +275,7 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
+            //std::cout << "eq_operator: lhs: " << lhs << ", rhs: " << rhs << "\n";
             return lhs == rhs ? resources.true_value() : resources.false_value();
         }
     };
@@ -1270,7 +1273,7 @@ namespace detail {
     class dynamic_resources
     {
         std::vector<std::unique_ptr<Json>> temp_json_values_;
-        std::unordered_map<std::size_t,std::vector<path_node<Json,JsonReference>>> cache_;
+        std::unordered_map<std::size_t,std::pair<std::vector<path_node<Json,JsonReference>>,node_type>> cache_;
     public:
 
         bool is_cached(std::size_t id) const
@@ -1278,20 +1281,21 @@ namespace detail {
             return cache_.find(id) != cache_.end();
         }
 
-        void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val) 
+        void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val, node_type ndtype) 
         {
-            cache_.emplace(id,val);
+            cache_.emplace(id,std::make_pair(val,ndtype));
         }
 
-        void retrieve_from_cache(std::size_t id, std::vector<path_node<Json,JsonReference>>& nodes) 
+        void retrieve_from_cache(std::size_t id, std::vector<path_node<Json,JsonReference>>& nodes, node_type& ndtype) 
         {
             auto it = cache_.find(id);
             if (it != cache_.end())
             {
-                for (auto& item : it->second)
+                for (auto& item : it->second.first)
                 {
                     nodes.push_back(item);
                 }
+                ndtype = it->second.second;
             }
         }
 
@@ -1405,6 +1409,7 @@ namespace detail {
                             reference root,
                             reference val, 
                             std::vector<path_node_type>& nodes,
+                            node_type& ndtype,
                             result_flags flags) const = 0;
 
         virtual void append_selector(std::unique_ptr<selector_base>&&) 
@@ -1746,13 +1751,13 @@ namespace detail {
             node(std::move(node))
         {
         }
-        node_set(std::vector<path_node_type>&& nds) noexcept
+        node_set(std::vector<path_node_type>&& nds, node_type ndtype) noexcept
         {
             if (nds.empty())
             {
                 tag = node_set_tag::none;
             }
-            else if (nds.size() == 1)
+            else if (nds.size() == 1 && (ndtype == node_type::single || ndtype == node_type()))
             {
                 tag = node_set_tag::single;
                 new (&node)path_node_type(nds.back());
@@ -1818,7 +1823,7 @@ namespace detail {
                     return j;
                 }
                 default:
-                    return &resources.false_value();
+                    return &resources.null_value();
             }
         }
 
@@ -2058,8 +2063,9 @@ namespace detail {
                                 //std::cout << "selector item: " << *ptr << "\n";
                                 stack.pop_back();
                                 std::vector<path_node_type> temp;
-                                tok.selector_->select(resources, path, root, *ptr, temp, flags);
-                                stack.emplace_back(std::move(temp));
+                                node_type ndtype = node_type();
+                                tok.selector_->select(resources, path, root, *ptr, temp, ndtype, flags);
+                                stack.emplace_back(std::move(temp), ndtype);
 
                                 //std::cout << "selector output\n";
                                 //for (auto& item : temp)
