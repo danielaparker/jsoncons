@@ -1,5 +1,5 @@
 [
-    {
+   /* {
         "given" : [{"key": 0}, {"key": 42}, {"key": -1}, {"key": 41}, {"key": 43}, {"key": 42.0001}, {"key": 41.9999}, {"key": 100}, {"some": "value"}],
         "cases" : [
             {
@@ -676,15 +676,154 @@
     {
         "given" : [[1, 2, 3], [1], [2, 3], 1, 2],
         "cases" : [
-           /*{
-                "comment" : "Filter expression with equals array for array slice with range",
-                "expression" : "$[0][0:2]",
-                "result" : [1,2]
-            },*/
-            {
-                "comment" : "Filter expression with equals array for array slice with range",
+            { 
+                "comment" : "Filter expression with equals array for array slice with range 1",
                 "expression" : "$[?(@[0:1]==[1])]",
                 "result" : [[1,2,3],[1]]
+            }
+        ]
+    },
+    {
+        "given" : [[1,2], [2,3], [1], [2], [1, 2, 3], 1, 2, 3],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals array for dot notation with star",
+                "expression" : "$[?(@.*==[1,2])]",
+                "result" : [[1,2]]
+            }
+        ]
+    },
+    {
+        "given" : [
+              {
+                "d": [
+                  "v1",
+                  "v2"
+                ]
+              },
+              {
+                "d": [
+                  "a",
+                  "b"
+                ]
+              },
+              {
+                "d": "v1"
+              },
+              {
+                "d": "v2"
+              },
+              {
+                "d": {}
+              },
+              {
+                "d": []
+              },
+              {
+                "d": null
+              },
+              {
+                "d": -1
+              },
+              {
+                "d": 0
+              },
+              {
+                "d": 1
+              },
+              {
+                "d": "['v1','v2']"
+              },
+              {
+                "d": "['v1', 'v2']"
+              },
+              {
+                "d": "v1,v2"
+              },
+              {
+                "d": "[\"v1\", \"v2\"]"
+              },
+              {
+                "d": "[\"v1\",\"v2\"]"
+              }
+            ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals array with single quotes",
+                "expression" : "$[?(@.d==['v1','v2'])]",
+                "error" : "syntax error"
+            }
+        ]
+    },
+    {
+        "given" : [{"key": 42}, {"key": 43}, {"key": 44}],
+        "cases" : [
+            { 
+                "comment" : "Filter expression with equals boolean expression value",
+                "expression" : "$[?((@.key<44)==false)]",
+                "result" : [{"key": 44}]
+            }
+        ]
+    },
+    {
+        "given" : [
+              {
+                "some": "some value"
+              },
+              {
+                "key": true
+              },
+              {
+                "key": false
+              },
+              {
+                "key": null
+              },
+              {
+                "key": "value"
+              },
+              {
+                "key": ""
+              },
+              {
+                "key": 0
+              },
+              {
+                "key": 1
+              },
+              {
+                "key": -1
+              },
+              {
+                "key": 42
+              },
+              {
+                "key": {}
+              },
+              {
+                "key": []
+              }
+            ],
+        "cases" : [
+            { 
+                "comment" : "Filter expression with equals false",
+                "expression" : "$[?(@.key==false)]",
+                "result" : [{"key": false}]
+            },
+            { 
+                "comment" : "Filter expression with equals null",
+                "expression" : "$[?(@.key==null)]",
+                "result" : [{"some": "some value"},{"key": null}]
+            }
+        ]
+    },
+    {
+        "given" : [{"key": 42}, {"key": 43}, {"key": 44}],
+        "cases" : [
+            { 
+                "comment" : "Filter expression with equals boolean expression value",
+                "expression" : "$[?((@.key<44)==false)]",
+                "result" : [{"key": 44}]
             }
         ]
     },
@@ -761,6 +900,323 @@
             }
         ]
     },
+    {
+        "given" : [[1, 2, 3], [1], [2, 3], 1, 2],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals number for array slice with range 1",
+                "expression" : "$[?(@[0:1]==1)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [[1,2], [2,3], [1], [2], [1, 2, 3], 1, 2, 3],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals number for bracket notation with star",
+                "expression" : "$[?(@[*]==2)]",
+                "result" : []
+            },
+            {
+                "comment" : "Filter expression with equals number for dot notation with star",
+                "expression" : "$[?(@.*==2)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : [{"key": -12.3}, {"key": -0.123}, {"key": -12}, {"key": 12.3}, {"key": 2}, {"key": "-0.123e2"}],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals number with fraction",
+                "expression" : "$[?(@.key==-0.123e2)]",
+                "result" : [{"key": -12.3}]
+            }
+        ]
+    },
+    {
+        "given" : [
+              {
+                "d": {
+                  "k": "v"
+                }
+              },
+              {
+                "d": {
+                  "a": "b"
+                }
+              },
+              {
+                "d": "k"
+              },
+              {
+                "d": "v"
+              },
+              {
+                "d": {}
+              },
+              {
+                "d": []
+              },
+              {
+                "d": null
+              },
+              {
+                "d": -1
+              },
+              {
+                "d": 0
+              },
+              {
+                "d": 1
+              },
+              {
+                "d": "[object Object]"
+              },
+              {
+                "d": "{\"k\": \"v\"}"
+              },
+              {
+                "d": "{\"k\":\"v\"}"
+              },
+              "v"
+            ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals object",
+                "expression" : "$[?(@.d=={\"k\":\"v\"})]",
+                "result" : [{"d": {"k": "v"}}]
+            }
+        ]
+    },
+    {
+        "given" : [
+             {"key": "some"},
+             {"key": "value"},
+             {"key": null},
+             {"key": 0},
+             {"key": 1},
+             {"key": -1},
+             {"key": ""},
+             {"key": {}},
+             {"key": []},
+             {"key": "valuemore"},
+             {"key": "morevalue"},
+             {"key": ["value"]},
+             {"key": {"some": "value"}},
+             {"key": {"key": "value"}},
+             {"some": "value"}
+         ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals string",
+                "expression" : "$[?(@.key==\"value\")]",
+                "result" : [{"key": "value"}]
+            }
+        ]
+    },
+    {
+        "given" : [
+                {"key": "some"},
+                {"key": "value"},
+                {"key": "hi@example.com"}
+            ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals string with current object literal",
+                "expression" : "$[?(@.key==\"hi@example.com\")]",
+                "result" : [{"key": "hi@example.com"}]
+            }
+        ]
+    },
+    {
+        "given" : [
+                {"key": "some"},
+                {"key": "value"},
+                {"key": "some.value"}
+            ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals string with dot literal",
+                "expression" : "$[?(@.key==\"some.value\")]",
+                "result" : [{"key": "some.value"}]
+            }
+        ]
+    },
+    {
+        "given" : [
+                {"key": "some"},
+                {"key": "value"}
+            ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals string with single quotes",
+                "expression" : "$[?(@.key=='value')]",
+                "result" : [{"key": "value"}]
+            }
+        ]
+    },
+    {
+        "given" : [
+              {
+                "some": "some value"
+              },
+              {
+                "key": true
+              },
+              {
+                "key": false
+              },
+              {
+                "key": null
+              },
+              {
+                "key": "value"
+              },
+              {
+                "key": ""
+              },
+              {
+                "key": 0
+              },
+              {
+                "key": 1
+              },
+              {
+                "key": -1
+              },
+              {
+                "key": 42
+              },
+              {
+                "key": {}
+              },
+              {
+                "key": []
+              }
+            ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals true",
+                "expression" : "$[?(@.key==true)]",
+                "result" : [{"key": true}]
+            }
+        ]
+    },
+    {
+        "given" : {"value": 42, "items": [{"key": 10}, {"key": 42}, {"key": 50}]},
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals with root reference",
+                "expression" : "$.items[?(@.key==$.value)]",
+                "result" : [{"key": 42}]
+            }
+        ]
+    },*/
+    {
+        "given" : [
+                {"key": 0},
+                {"key": 42},
+                {"key": -1},
+                {"key": 41},
+                {"key": 43},
+                {"key": 42.0001},
+                {"key": 41.9999},
+                {"key": 100},
+                {"key": "43"},
+                {"key": "42"},
+                {"key": "41"},
+                {"key": "value"},
+                {"some": "value"}
+            ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with greater than",
+                "expression" : "$[?(@.key>42)]",
+                "result" : [{"key":43},{"key":42.0001},{"key":100}]
+            },
+            {
+                "comment" : "Filter expression with greater than or equal",
+                "expression" : "$[?(@.key>=42)]",
+                "result" : [{"key":42},{"key":43},{"key":42.0001},{"key":100}]
+            },
+            {
+                "comment" : "Filter expression with less than",
+                "expression" : "$[?(@.key<42)]",
+                "result" : [{"key":0},{"key":-1},{"key":41},{"key":41.9999}]
+            },
+            {
+                "comment" : "Filter expression with less than or equal",
+                "expression" : "$[?(@.key<=42)]",
+                "result" : [{"key":0},{"key":42},{"key":-1},{"key":41},{"key":41.9999}]
+            },
+            {
+                "comment" : "Filter expression with negation and equals",
+                "expression" : "$[?(!(@.key==42))]",
+                "result" : [
+                   {"key": 0},
+                   {"key": -1},
+                   {"key": 41},
+                   {"key": 43},
+                   {"key": 42.0001},
+                   {"key": 41.9999},
+                   {"key": 100},
+                   {"key": "43"},
+                   {"key": "42"},
+                   {"key": "41"},
+                   {"key": "value"},
+                   {"some": "value"}
+               ]
+            },
+            {
+                "comment" : "Filter expression with negation and less than",
+                "expression" : "$[?(!(@.key<42))]",
+                "result" : [
+                   {"key": 42},
+                   {"key": 43},
+                   {"key": 42.0001},
+                   {"key": 100},
+                   {"key": "43"},
+                   {"key": "42"},
+                   {"key": "41"},
+                   {"key": "value"},
+                   {"some": "value"}
+               ]
+            },
+            {
+                "comment" : "Filter expression with negation and less than",
+                "expression" : "$[?(!(@.key<=42))]",
+                "result" : [
+                   {"key": 43},
+                   {"key": 42.0001},
+                   {"key": 100},
+                   {"key": "43"},
+                   {"key": "42"},
+                   {"key": "41"},
+                   {"key": "value"},
+                   {"some": "value"}
+               ]
+            },
+            {
+                "comment" : "Filter expression with negation and less than",
+                "expression" : "$[?(@.key!=42)]",
+                "result" : [{"key":0},{"key":-1},{"key":41},{"key":43},{"key":42.0001},{"key":41.9999},
+                            {"key":100},{"key":"43"},{"key":"42"},{"key":"41"},{"key":"value"},{"some":"value"}]
+            }
+        ]
+    },
+    {
+        "given" : [{"key": 60}, {"key": 50}, {"key": 10}, {"key": -50}, {"key*2": 100}],
+        "cases" : [
+            {
+                "comment" : "Filter expression with multiplication",
+                "expression" : "$[?(@.key*2==100)]",
+                "result" : [{"key": 50}]
+            }
+        ]
+    }
+    /*,
     // > operator
     {
         "given" : [{"some": "value"}],
@@ -1025,5 +1481,5 @@
          "result": [8.99]
        }
      ]
-  }
+  }*/
 ]

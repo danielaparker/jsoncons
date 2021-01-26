@@ -237,7 +237,7 @@ namespace jsoncons { namespace jsonpath {
 
             virtual std::string to_string(int = 0) const override
             {
-                return tail_selector_ ? string_type() : tail_selector_->to_string();
+                return tail_selector_ ? std::string() : tail_selector_->to_string();
             }
         };
 
@@ -301,7 +301,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append(level*2, ' ');
                 }
                 s.append("identifier: ");
-                s.append(identifier_);
+                //s.append(identifier_);
 
                 return s;
             }
@@ -945,6 +945,11 @@ namespace jsoncons { namespace jsonpath {
 
             while (p_ < end_input_)
             {
+                if (state_stack_.empty())
+                {
+                    ec = jsonpath_errc::syntax_error;
+                    return path_expression_type();
+                }
                 switch (state_stack_.back())
                 {
                     case path_state::start: 
@@ -1197,6 +1202,11 @@ namespace jsoncons { namespace jsonpath {
                                 {
                                     state_stack_.emplace_back(path_state::json_text_string);
                                 }
+                                buffer.push_back(*p_);
+                                ++p_;
+                                ++column_;
+                                break;
+                            case ':':
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
@@ -3036,13 +3046,13 @@ namespace jsoncons { namespace jsonpath {
     };
 
     template <class Json>
-    jsonpath_expression<Json> make_expression(const typename json::string_view_type& expr)
+    jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr)
     {
         return jsonpath_expression<Json>::compile(expr);
     }
 
     template <class Json>
-    jsonpath_expression<Json> make_expression(const typename json::string_view_type& expr,
+    jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr,
                                               std::error_code& ec)
     {
         return jsonpath_expression<Json>::compile(expr, ec);

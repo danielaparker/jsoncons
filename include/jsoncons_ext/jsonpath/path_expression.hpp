@@ -23,6 +23,8 @@ namespace jsonpath {
 
     enum class result_flags {value=1,path=2,no_duplicates=4|path};
 
+    using result_type = result_flags;
+
     inline result_flags operator~(result_flags a)
     {
         return static_cast<result_flags>(~static_cast<unsigned int>(a));
@@ -971,7 +973,8 @@ namespace detail {
                 {string_type{'m','a','x'}, &max_func},
                 {string_type{'l','e','n','g','t','h'}, &length_func},
                 {string_type{'k','e','y','s'}, &keys_func},
-                {string_type{'t','o','k','e','n','i','z','e'}, &tokenize_func}
+                {string_type{'t','o','k','e','n','i','z','e'}, &tokenize_func},
+                {string_type{'c','o','u','n','t'}, &length_func}
             };
 
             auto it = functions.find(name);
@@ -1957,7 +1960,7 @@ namespace detail {
                             stack.pop_back();
 
                             reference r = tok.unary_operator_->evaluate(resources, *ptr, ec);
-                            stack.emplace_back(path_node_type("",std::addressof(r)));
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
                             break;
                         }
                         case token_kind::binary_operator:
@@ -1969,7 +1972,7 @@ namespace detail {
                             stack.pop_back();
 
                             reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
-                            stack.emplace_back(path_node_type("",std::addressof(r)));
+                            stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
                             break;
                         }
                         case token_kind::root_node:
