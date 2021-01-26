@@ -112,6 +112,7 @@ namespace jsoncons { namespace jsonpath {
     enum class path_state 
     {
         start,
+        expect_function_expr,
         rhs_expression,
         recursive_descent_or_lhs_expression,
         lhs_expression,
@@ -926,8 +927,6 @@ namespace jsoncons { namespace jsonpath {
         {
             std::size_t selector_id = 0;
 
-            state_stack_.emplace_back(path_state::start);
-
             string_type function_name;
             string_type buffer;
             int64_t json_text_level = 0;
@@ -943,13 +942,9 @@ namespace jsoncons { namespace jsonpath {
             slice slic;
             int paren_level = 0;
 
-            while (p_ < end_input_)
+            state_stack_.emplace_back(path_state::start);
+            while (p_ < end_input_ && !state_stack_.empty())
             {
-                if (state_stack_.empty())
-                {
-                    ec = jsonpath_errc::syntax_error;
-                    return path_expression_type();
-                }
                 switch (state_stack_.back())
                 {
                     case path_state::start: 
@@ -969,8 +964,9 @@ namespace jsoncons { namespace jsonpath {
                             }
                             default:
                             {
-                                state_stack_.back() = path_state::rhs_expression;
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::expect_function_expr);
+                                state_stack_.emplace_back(path_state::unquoted_string);
                                 break;
                             }
                         }
@@ -1249,7 +1245,7 @@ namespace jsoncons { namespace jsonpath {
                                 ++column_;
                                 if (p_ == end_input_)
                                 {
-                                    ec = jsonpath_errc::unexpected_end_of_input;
+                                    ec = jsonpath_errc::unexpected_eof;
                                     return path_expression_type();
                                 }
                                 buffer.push_back(*p_);
@@ -1356,6 +1352,9 @@ namespace jsoncons { namespace jsonpath {
                     {
                         switch(*p_)
                         {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
                             case '(':
                             {
                                 auto f = resources.get_function(buffer, ec);
@@ -1382,6 +1381,41 @@ namespace jsoncons { namespace jsonpath {
                                 buffer.clear();
                                 state_stack_.pop_back(); 
                                 break;
+                            }
+                        }
+                        break;
+                    }
+                    case path_state::expect_function_expr:
+                    {
+                        switch(*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '(':
+                            {
+                                auto f = resources.get_function(buffer, ec);
+                                if (ec)
+                                {
+                                    return path_expression_type();
+                                }
+                                buffer.clear();
+                                ++paren_level;
+                                push_token(current_node_arg, ec);
+                                push_token(token_type(begin_function_arg), ec);
+                                push_token(token_type(f), ec);
+                                state_stack_.back() = path_state::function_expression;
+                                state_stack_.emplace_back(path_state::argument);
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::lhs_expression);
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            default:
+                            {
+                                ec = jsonpath_errc::expected_root_or_function;
+                                return path_expression_type();
                             }
                         }
                         break;
@@ -2645,6 +2679,17 @@ namespace jsoncons { namespace jsonpath {
                 }
             }
 
+            if (state_stack_.empty())
+            {
+                ec = jsonpath_errc::syntax_error;
+                return path_expression_type();
+            }
+            if (state_stack_.back() == path_state::start)
+            {
+                ec = jsonpath_errc::unexpected_eof;
+                return path_expression_type();
+            }
+
             if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
             {
                 push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
@@ -2658,7 +2703,7 @@ namespace jsoncons { namespace jsonpath {
 
             if (state_stack_.size() > 2)
             {
-                ec = jsonpath_errc::unexpected_end_of_input;
+                ec = jsonpath_errc::unexpected_eof;
                 return path_expression_type();
             }
 

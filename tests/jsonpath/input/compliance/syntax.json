@@ -1,0 +1,49 @@
+[
+   /*{
+     "comment": "Empty string",
+     "given": {"type": "object"},
+     "cases": [
+       {
+         "expression": "",
+         "error": "syntax"
+       },
+       {
+         "expression": " ",
+         "error": "syntax"
+       }
+     ]
+   },*/
+   {
+     "comment": "Invalid start to expression",
+     "given": {"type": "object"},
+     "cases": [
+       {
+         "expression": "$foo",
+         "error": "syntax"
+       },
+       {
+         "expression": "@.foo",
+         "error": "syntax"
+       }
+     ]
+   }
+   /*,
+   {
+     "comment": "Dot syntax",
+     "given": {"type": "object"},
+     "cases": [
+       {
+         "expression": "",
+         "result": []
+       },
+       {
+         "expression": "$.foo.bar",
+         "result": []
+       },
+       {
+         "expression": "foo.1",
+         "error": "syntax"
+       }
+     ]
+   }*/
+]

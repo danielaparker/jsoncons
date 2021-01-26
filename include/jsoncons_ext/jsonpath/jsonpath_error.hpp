@@ -15,7 +15,7 @@ namespace jsoncons { namespace jsonpath {
     enum class jsonpath_errc 
     {
         success = 0,
-        expected_root,
+        expected_root_or_function,
         expected_current_node,
         expected_right_bracket,
         expected_key,
@@ -36,7 +36,7 @@ namespace jsoncons { namespace jsonpath {
         parse_error_in_filter,
         argument_parse_error,
         unidentified_error,
-        unexpected_end_of_input,
+        unexpected_eof,
         expected_colon_dot_left_bracket_comma_or_right_bracket,
         argument_to_unflatten_invalid,
         invalid_flattened_key,
@@ -65,8 +65,8 @@ namespace jsoncons { namespace jsonpath {
         {
             switch (static_cast<jsonpath_errc>(ev))
             {
-                case jsonpath_errc::expected_root:
-                    return "Expected $";
+                case jsonpath_errc::expected_root_or_function:
+                    return "Expected '$' or function expression";
                 case jsonpath_errc::expected_current_node:
                     return "Expected @";
                 case jsonpath_errc::expected_right_bracket:
@@ -105,8 +105,8 @@ namespace jsoncons { namespace jsonpath {
                     return "Could not parse JSON expression passed to JSONPath function";
                 case jsonpath_errc::unidentified_error:
                     return "Unidentified error";
-                case jsonpath_errc::unexpected_end_of_input:
-                    return "Unexpected end of jsonpath input";
+                case jsonpath_errc::unexpected_eof:
+                    return "Unexpected EOF while parsing jsonpath expression";
                 case jsonpath_errc::expected_colon_dot_left_bracket_comma_or_right_bracket:
                     return "Expected ':', '.', '[', ',', or ']'";
                 case jsonpath_errc::argument_to_unflatten_invalid:
