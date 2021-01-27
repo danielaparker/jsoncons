@@ -827,6 +827,39 @@
             }
         ]
     },
+    {
+        "given" : [
+                {
+                    "a": [{"price": 1}, {"price": 3}]
+                },
+                {
+                    "a": [{"price": 11}]
+                },
+                {
+                    "a": [{"price": 8}, {"price": 12}, {"price": 3}]
+                },
+                {
+                    "a": []
+                }
+            ],
+        "cases" : [
+            { 
+                "comment" : "Filter expression with subfilter",
+                "expression" : "$[?(@.a[?(@.price>10)])]",
+                "result" : [{"a":[{"price":11}]},{"a":[{"price":8},{"price":12},{"price":3}]}]
+            }
+        ]
+    },
+    {
+        "given" : [{"key": 60}, {"key": 50}, {"key": 10}, {"key": -50}, {"key-50": -100}],
+        "cases" : [
+            { 
+                "comment" : "Filter expression with subtraction",
+                "expression" : "$[?(@.key-50==-100)]",
+                "result" : [{"key":-50}]
+            }
+        ]
+    },
     // + operator
     {
         "given" : [{"key1": 100,"key2": 100},{"key1": 105,"key2": 200}],
