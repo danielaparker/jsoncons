@@ -2729,14 +2729,38 @@ namespace jsoncons { namespace jsonpath {
                 return path_expression_type();
             }
 
-            if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
+            if (state_stack_.size() >= 3)
             {
-                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                state_stack_.pop_back(); // unquoted_string
-                if (/*state_stack_.back() == path_state::identifier ||*/ state_stack_.back() == path_state::identifier_or_function_expr)
+                if (state_stack_.back() == path_state::unquoted_string)
                 {
+                    push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                    state_stack_.pop_back(); // unquoted_string
                     buffer.clear();
-                    state_stack_.pop_back(); // identifier
+                    if (state_stack_.back() == path_state::identifier_or_function_expr)
+                    {
+                        state_stack_.pop_back(); // identifier
+                    }
+                }
+                else if (state_stack_.back() == path_state::digit)
+                {
+                    if (buffer.empty())
+                    {
+                        ec = jsonpath_errc::invalid_number;
+                        return path_expression_type();
+                    }
+                    auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                    if (!r)
+                    {
+                        ec = jsonpath_errc::invalid_number;
+                        return path_expression_type();
+                    }
+                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value())), ec);
+                    buffer.clear();
+                    state_stack_.pop_back(); // index_or_slice_or_union
+                    if (state_stack_.back() == path_state::index)
+                    {
+                        state_stack_.pop_back(); // index
+                    }
                 }
             }
 

@@ -1,5 +1,15 @@
 [
     {
+        "given" : {"foo": ["zero","one","two"]},
+        "cases" : [
+            {
+                "comment" : "Dot followed by index",
+                "expression" : "$.foo.1",
+                "result" : ["one"] 
+            }
+        ]
+    },
+    {
         "given" : {"0": "value"},
         "cases" : [
             {

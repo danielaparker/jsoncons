@@ -121,11 +121,6 @@ void jsonpath_tests(const std::string& fpath)
 
 TEST_CASE("jsonpath-tests")
 {
-    SECTION("Examples and tutorials")
-    {
-        //jsonpath_tests("./jsonpath/input/examples/jsonpath-tests.json");
-
-    }
     SECTION("compliance")
     {
 #if defined(JSONCONS_HAS_STD_REGEX)

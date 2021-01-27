@@ -7,9 +7,11 @@ It provides functions for search and "search and replace" using JSONPath express
 <table border="0">
   <tr>
     <td><a href="jsonpath_expression.md">jsonpath_expression</a></td>
-    <td>Represents the compiled form of a JSONPath expression.</td> 
+    <td>Represents the compiled form of a JSONPath expression. (since 0.161.0)</td> 
   </tr>
 </table>
+
+### Functions
 
 <table border="0">
   <tr>
@@ -23,6 +25,10 @@ It provides functions for search and "search and replace" using JSONPath express
   <tr>
     <td><a href="flatten.md">flatten<br>unflatten</a></td>
     <td>Flattens a json object or array.</td> 
+  </tr>
+  <tr>
+    <td><a href="make_expression.md">make_expression</a></td>
+    <td>Returns a compiled JSONPath expression for later evaluation. (since 0.161.0)</td> 
   </tr>
 </table>
     
@@ -76,7 +82,7 @@ or
     $."store"."book".0
 
 The leading `$` represents the root JSON value. The jsoncons implementation
-allows the `$.` to be omitted, and allows single and double quoted as well as
+allows single and double quoted as well as
 unquoted names. Unquoted names must not contain spaces, and spaces before
 and after the name are ignored. 
 

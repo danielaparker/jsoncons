@@ -38,6 +38,10 @@
        {
          "expression": "foo.1",
          "error": "syntax"
+       },
+       {
+         "expression": "$.foo.1",
+         "result": []
        }
      ]
    },
