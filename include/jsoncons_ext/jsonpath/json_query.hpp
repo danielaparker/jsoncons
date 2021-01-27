@@ -3036,22 +3036,22 @@ namespace jsoncons { namespace jsonpath {
 
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
-        evaluate(reference root, Callback callback, result_flags flags = result_flags::value)
+        evaluate(reference instance, Callback callback, result_flags flags = result_flags::value)
         {
             string_type path = {'$'};
 
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-            expr_.evaluate(resources, path, root, root, callback, flags);
+            expr_.evaluate(resources, path, instance, instance, callback, flags);
         }
 
-        Json evaluate(reference root, result_flags flags = result_flags::value)
+        Json evaluate(reference instance, result_flags flags = result_flags::value)
         {
             string_type path = {'$'};
 
             if ((flags & result_flags::value) == result_flags::value)
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-                return expr_.evaluate(resources, path, root, root, flags);
+                return expr_.evaluate(resources, path, instance, instance, flags);
             }
             else if ((flags & result_flags::path) == result_flags::path)
             {
@@ -3062,7 +3062,7 @@ namespace jsoncons { namespace jsonpath {
                 {
                     result.emplace_back(node.path);
                 };
-                expr_.evaluate(resources, path, root, root, callback, flags);
+                expr_.evaluate(resources, path, instance, instance, callback, flags);
                 return result;
             }
             else
@@ -3104,17 +3104,17 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json>
-    Json json_query(const Json& root, 
+    Json json_query(const Json& instance, 
                     const typename Json::string_view_type& path, 
                     result_flags flags = result_flags::value)
     {
         auto expression = make_expression<Json>(path);
-        return expression.evaluate(root, flags);
+        return expression.evaluate(instance, flags);
     }
 
     template<class Json, class T>
     typename std::enable_if<!jsoncons::detail::is_function_object<T,Json>::value,void>::type
-    json_replace(Json& root, const typename Json::string_view_type& path, const T& new_value)
+    json_replace(Json& instance, const typename Json::string_view_type& path, const T& new_value)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
@@ -3134,12 +3134,12 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = new_value;
         };
-        expr.evaluate(resources, output_path, root, root, callback, result_flags::value);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::value);
     }
 
     template<class Json, class Op>
     typename std::enable_if<jsoncons::detail::is_function_object<Op,Json>::value,void>::type
-    json_replace(Json& root, const typename Json::string_view_type& path, Op op)
+    json_replace(Json& instance, const typename Json::string_view_type& path, Op op)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
@@ -3159,7 +3159,7 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = op(*node.ptr);
         };
-        expr.evaluate(resources, output_path, root, root, callback, result_flags::value);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::value);
     }
 
 } // namespace jsonpath
