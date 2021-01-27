@@ -1216,6 +1216,36 @@
             }
         ]
     },
+    {
+        "given" : [[1,2],[3,4],[5,6]],
+        "cases" : [
+            {
+                "comment" : "Filter expression with set wise comparison to scalar",
+                "expression" : "$[?(@[*]>=4)]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : {"x":[[1,2],[3,4],[5,6]],"y":[3,4,5]},
+        "cases" : [
+            {
+                "comment" : "Filter expression with set wise comparison to set",
+                "expression" : "$.x[?(@[*]>=$.y[*])]",
+                "result" : []
+            }
+        ]
+    },
+    {
+        "given" : {"x":[[1,2],[3,4],[5,6]],"y":[3,4,5]},
+        "cases" : [
+            {
+                "comment" : "Filter expression with set wise comparison to set",
+                "expression" : "$.x[?(@[*]>=$.y[*])]",
+                "result" : []
+            }
+        ]
+    },
     // > operator
     {
         "given" : [{"some": "value"}],

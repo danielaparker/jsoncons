@@ -1,5 +1,5 @@
 [
-   /*{
+   {
      "comment": "Empty string",
      "given": {"type": "object"},
      "cases": [
@@ -12,7 +12,7 @@
          "error": "syntax"
        }
      ]
-   },*/
+   },
    {
      "comment": "Invalid start to expression",
      "given": {"type": "object"},
@@ -26,16 +26,11 @@
          "error": "syntax"
        }
      ]
-   }
-   /*,
+   },
    {
      "comment": "Dot syntax",
      "given": {"type": "object"},
      "cases": [
-       {
-         "expression": "",
-         "result": []
-       },
        {
          "expression": "$.foo.bar",
          "result": []
@@ -45,5 +40,15 @@
          "error": "syntax"
        }
      ]
-   }*/
+   },
+   {
+     "comment": "Filter expression with single equal",
+     "given": [{"key": 0},{"key": 42}],
+     "cases": [
+       {
+         "expression": "$[?(@.key=42)]",
+         "error": "syntax"
+       }
+     ]
+   }
 ]
