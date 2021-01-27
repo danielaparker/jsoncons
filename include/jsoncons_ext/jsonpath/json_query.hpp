@@ -1308,29 +1308,14 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
                                 state_stack_.pop_back();
                                 break;
-                            case '.':
-                                ec = jsonpath_errc::expected_key;
-                                return path_expression_type();
-                            case '(':
-                            {
-                                ++p_;
-                                ++column_;
-                                ++paren_level;
-                                push_token(lparen_arg, ec);
-                                break;
-                            }
-                            case '!':
-                            {
-                                ++p_;
-                                ++column_;
-                                push_token(token_type(resources.get_unary_not()), ec);
-                                break;
-                            }
                             // integer
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
                                 state_stack_.back() = path_state::index;
                                 state_stack_.emplace_back(path_state::integer);
                                 break;
+                            case '.':
+                                ec = jsonpath_errc::expected_key;
+                                return path_expression_type();
                             default:
                                 buffer.clear();
                                 state_stack_.back() = path_state::identifier_or_function_expr;
