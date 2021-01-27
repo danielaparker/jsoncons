@@ -113,11 +113,11 @@ namespace jsoncons { namespace jsonpath {
     {
         start,
         expect_function_expr,
+        expression_lhs,
         expression_rhs,
         filter_expression,
         filter_expression_rhs,
         recursive_descent_or_lhs_expression,
-        lhs_expression,
         path_or_literal_or_function,
         json_text_or_function,
         json_text_or_function_name,
@@ -983,7 +983,7 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.back() = path_state::name_or_left_bracket;
                                 break;
                             default:
-                                state_stack_.back() = path_state::lhs_expression;
+                                state_stack_.back() = path_state::expression_lhs;
                                 break;
                         }
                         break;
@@ -1000,7 +1000,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             default:
                                 buffer.clear();
-                                state_stack_.back() = path_state::lhs_expression;
+                                state_stack_.back() = path_state::expression_lhs;
                                 break;
                         }
                         break;
@@ -1105,7 +1105,7 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::expression_lhs);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1266,7 +1266,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                         };
                         break;
-                    case path_state::lhs_expression: 
+                    case path_state::expression_lhs: 
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -1346,7 +1346,7 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::expression_lhs);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1383,7 +1383,7 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::expression_lhs);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1906,7 +1906,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(begin_union_arg), ec);
                                 push_token(root_node_arg, ec);
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 state_stack_.emplace_back(path_state::expression_rhs);                                
                                 ++p_;
                                 ++column_;
@@ -1915,7 +1915,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(begin_union_arg), ec);
                                 push_token(current_node_arg, ec);
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 state_stack_.emplace_back(path_state::expression_rhs);                                
                                 ++p_;
                                 ++column_;
@@ -1953,7 +1953,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             }
                             default:
-                                state_stack_.back() = path_state::lhs_expression;
+                                state_stack_.back() = path_state::expression_lhs;
                                 break;
                         }
                         break;
@@ -2034,7 +2034,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(separator_arg), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                //state_stack_.emplace_back(path_state::lhs_expression);
+                                //state_stack_.emplace_back(path_state::expression_lhs);
                                 state_stack_.emplace_back(path_state::union_element);
                                 ++p_;
                                 ++column_;
@@ -2192,7 +2192,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2200,7 +2200,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(begin_union_arg), ec);
                                 push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2210,7 +2210,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(separator_arg), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2228,7 +2228,7 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case '.':
-                                state_stack_.emplace_back(path_state::lhs_expression);
+                                state_stack_.emplace_back(path_state::expression_lhs);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2239,7 +2239,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ',': 
                                 push_token(token_type(separator_arg), ec);
-                                //state_stack_.emplace_back(path_state::lhs_expression);
+                                //state_stack_.emplace_back(path_state::expression_lhs);
                                 state_stack_.emplace_back(path_state::union_element);
                                 ++p_;
                                 ++column_;
@@ -2273,7 +2273,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2281,7 +2281,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(begin_union_arg), ec);
                                 push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2291,7 +2291,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(separator_arg), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2390,7 +2390,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2398,7 +2398,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(begin_union_arg), ec);
                                 push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2408,7 +2408,7 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(separator_arg), ec);
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::lhs_expression);                                
+                                state_stack_.emplace_back(path_state::expression_lhs);                                
                                 ++p_;
                                 ++column_;
                                 break;
