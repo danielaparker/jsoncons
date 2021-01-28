@@ -856,6 +856,11 @@
             { 
                 "comment" : "Filter expression with subtraction",
                 "expression" : "$[?(@.key-50==-100)]",
+                "result" : [{"key-50": -100}]
+            },
+            { 
+                "comment" : "Filter expression with subtraction",
+                "expression" : "$[?(@.key - 50==-100)]",
                 "result" : [{"key":-50}]
             }
         ]
