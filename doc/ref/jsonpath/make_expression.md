@@ -4,10 +4,10 @@
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 template <class Json>
-jsonpath_expression<Json> make_expression(const typename json::string_view_type& expr); (1)
+jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr); (1)
 
 template <class Json>
-jsonpath_expression<Json> make_expression(const typename json::string_view_type& expr,
+jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr,
                                           std::error_code& ec); (2)
 ```
 

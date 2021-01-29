@@ -15,6 +15,10 @@ It provides functions for search and "search and replace" using JSONPath express
 
 <table border="0">
   <tr>
+    <td><a href="make_expression.md">make_expression</a></td>
+    <td>Returns a compiled JSONPath expression for later evaluation. (since 0.161.0)</td> 
+  </tr>
+  <tr>
     <td><a href="json_query.md">json_query</a></td>
     <td>Searches for all values that match a JSONPath expression</td> 
   </tr>
@@ -25,10 +29,6 @@ It provides functions for search and "search and replace" using JSONPath express
   <tr>
     <td><a href="flatten.md">flatten<br>unflatten</a></td>
     <td>Flattens a json object or array.</td> 
-  </tr>
-  <tr>
-    <td><a href="make_expression.md">make_expression</a></td>
-    <td>Returns a compiled JSONPath expression for later evaluation. (since 0.161.0)</td> 
   </tr>
 </table>
     
