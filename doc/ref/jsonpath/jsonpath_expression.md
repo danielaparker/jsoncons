@@ -40,9 +40,8 @@ class jsonpath_expression
 
 Compiles the JSONPath expression for later evaluation. Returns a `jsonpath_expression` object 
 that represents the JSONPath expression.
-In (1) and (3), the JSONPath expression `expr` is provided as a sequential container 
-or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
-In (2) and (4), the JSONPath expression `expr` is provided as a null terminated string.
+The JSONPath expression `expr` is provided as a sequential container or view of characters, 
+in (1) and (3), or as a null terminated string, in (2) and (4).
 
 #### Parameters
 
