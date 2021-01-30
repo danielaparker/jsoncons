@@ -3082,6 +3082,7 @@ namespace jsoncons { namespace jsonpath {
     {
     public:
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, JsonReference>;
+        using char_type = typename evaluator_t::char_type;
         using string_type = typename evaluator_t::string_type;
         using string_view_type = typename evaluator_t::string_view_type;
         using value_type = typename evaluator_t::value_type;
@@ -3138,7 +3139,9 @@ namespace jsoncons { namespace jsonpath {
             }            
         }
 
-        static jsonpath_expression compile(const string_view_type& path)
+        template<class Source>
+        static typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,jsonpath_expression>::type
+        compile(const Source& path)
         {
             jsoncons::jsonpath::detail::static_resources<value_type,reference> resources;
 
@@ -3147,13 +3150,24 @@ namespace jsoncons { namespace jsonpath {
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
 
-        static jsonpath_expression compile(const string_view_type& path,
-                                           std::error_code& ec)
+        static jsonpath_expression compile(const char_type* path)
+        {
+            return compile(basic_string_view<char_type>(path));
+        }
+
+        template<class Source>
+        static typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,jsonpath_expression>::type
+        compile(const Source& path, std::error_code& ec)
         {
             jsoncons::jsonpath::detail::static_resources<value_type,reference> resources;
             evaluator_t e;
             expression_t expr = e.compile(resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
+        }
+
+        static jsonpath_expression compile(const char_type* path, std::error_code& ec)
+        {
+            return compile(string_view_type(path), ec);
         }
     };
 

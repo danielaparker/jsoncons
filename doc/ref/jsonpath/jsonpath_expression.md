@@ -26,13 +26,23 @@ class jsonpath_expression
 
 #### Static functions
 
-    static jsonpath_expression compile(const string_view_type& expr); (1)
+    template <class Source>
+    static jsonpath_expression compile(const Source& expr);    (1)
 
-    static jsonpath_expression compile(const string_view_type& expr,
-                                       std::error_code& ec); //(2)
+    static jsonpath_expression compile(const char_type* expr); (2)
+
+    template <class Source>
+    static jsonpath_expression compile(const Source& expr,
+                                       std::error_code& ec);   (3)
+
+    static jsonpath_expression compile(const char_type* expr,
+                                       std::error_code& ec);   (4)
 
 Compiles the JSONPath expression for later evaluation. Returns a `jsonpath_expression` object 
 that represents the JSONPath expression.
+In (1) and (3), the JSONPath expression `expr` is provided as a sequential container 
+or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
+In (2) and (4), the JSONPath expression `expr` is provided as a null terminated string.
 
 #### Parameters
 
