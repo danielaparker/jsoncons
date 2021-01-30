@@ -640,12 +640,6 @@ namespace detail {
             JSONCONS_ASSERT(args.size() == *this->arg_count());
 
             pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_array())
-            {
-                //std::cout << "arg: " << *arg0_ptr << "\n";
-                ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
-            }
             switch (arg0_ptr->type())
             {
                 case json_type::uint64_value:
@@ -659,6 +653,62 @@ namespace detail {
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class to_number_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        to_number_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           const std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            JSONCONS_ASSERT(args.size() == *this->arg_count());
+
+            pointer arg0_ptr = args[0];
+            switch (arg0_ptr->type())
+            {
+                case json_type::int64_value:
+                case json_type::uint64_value:
+                case json_type::double_value:
+                    return *arg0_ptr;
+                case json_type::string_value:
+                {
+                    auto sv = arg0_ptr->as_string_view();
+                    auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
+                    if (result1)
+                    {
+                        return *resources.create_json(result1.value());
+                    }
+                    auto result2 = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
+                    if (result2)
+                    {
+                        return *resources.create_json(result2.value());
+                    }
+                    jsoncons::detail::to_double_t to_double;
+                    try
+                    {
+                        auto s = arg0_ptr->as_string();
+                        double d = to_double(s.c_str(), s.length());
+                        return *resources.create_json(d);
+                    }
+                    catch (const std::exception&)
+                    {
+                        return resources.null_value();
+                    }
+                }
+                default:
                     return resources.null_value();
             }
         }
@@ -954,6 +1004,7 @@ namespace detail {
         function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
             static ceil_function<Json,JsonReference> ceil_func;
+            static to_number_function<Json,JsonReference> to_number_func;
             static sum_function<Json,JsonReference> sum_func;
             static prod_function<Json,JsonReference> prod_func;
             static avg_function<Json,JsonReference> avg_func;
@@ -966,6 +1017,7 @@ namespace detail {
             static std::unordered_map<string_type,function_base_type*> functions =
             {
                 {string_type{'c','e','i','l'}, &ceil_func},
+                {string_type{'t','o','_','n','u','m','b','e','r'}, &to_number_func},
                 {string_type{'s','u','m'}, &sum_func},
                 {string_type{'p','r','o', 'd'}, &prod_func},
                 {string_type{'a','v','g'}, &avg_func},

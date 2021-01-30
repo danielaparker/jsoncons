@@ -1032,18 +1032,10 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case '$':
-                                push_token(root_node_arg, ec);
-                                push_token(token_type(jsoncons::make_unique<root_selector>(selector_id++)), ec);
-                                ++p_;
-                                ++column_;
-                                state_stack_.pop_back();
+                                state_stack_.back() = path_state::expression_lhs;                                
                                 break;
                             case '@':
-                                push_token(current_node_arg, ec);
-                                push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
-                                ++p_;
-                                ++column_;
-                                state_stack_.pop_back();
+                                state_stack_.back() = path_state::expression_lhs;                                
                                 break;
                             case '(':
                             {
@@ -1115,7 +1107,7 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
-                                state_stack_.emplace_back(path_state::expression_lhs);
+                                state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1388,7 +1380,7 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
-                                state_stack_.emplace_back(path_state::expression_lhs);
+                                state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3234,7 +3226,7 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = new_value;
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::value);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_duplicates);
     }
 
     template<class Json, class Source, class Op>
@@ -3260,7 +3252,7 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = op(*node.ptr);
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::value);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_duplicates);
     }
 
     template<class Json, class Op>
