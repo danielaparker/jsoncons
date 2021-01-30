@@ -1952,12 +1952,8 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '@':
                                 push_token(token_type(begin_union_arg), ec);
-                                push_token(current_node_arg, ec);
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::expression_lhs);                                
-                                state_stack_.emplace_back(path_state::expression_rhs);                                
-                                ++p_;
-                                ++column_;
                                 break;
                             default:
                                 buffer.clear();

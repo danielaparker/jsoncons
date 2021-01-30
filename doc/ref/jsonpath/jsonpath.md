@@ -55,7 +55,7 @@ Go to [JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) to
 - Unions produce real unions with no duplicates instead of concatenated results
 - Union of completely separate paths are allowed, e.g.
 
-    $..[firstName,address.city]
+    $..[@.firstName,@.address.city]
 
 #### Paths
 
