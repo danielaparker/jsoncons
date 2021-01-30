@@ -32,6 +32,7 @@ namespace jsoncons { namespace jsonpath {
         unexpected_operator,
         invalid_function_name,
         invalid_argument,
+        invalid_arity,
         function_name_not_found,
         parse_error_in_filter,
         argument_parse_error,
@@ -97,6 +98,8 @@ namespace jsoncons { namespace jsonpath {
                     return "Invalid function name";
                 case jsonpath_errc::invalid_argument:
                     return "Invalid argument type";
+                case jsonpath_errc::invalid_arity:
+                    return "Incorrect number of arguments";
                 case jsonpath_errc::function_name_not_found:
                     return "Function name not found";
                 case jsonpath_errc::parse_error_in_filter:

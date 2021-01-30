@@ -552,7 +552,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array())
@@ -594,7 +598,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             if (!args[0]->is_string() || !args[1]->is_string())
             {
@@ -637,7 +645,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             switch (arg0_ptr->type())
@@ -674,7 +686,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             switch (arg0_ptr->type())
@@ -731,7 +747,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array() || arg0_ptr->empty())
@@ -771,7 +791,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array())
@@ -814,7 +838,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array())
@@ -869,7 +897,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array())
@@ -926,7 +958,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
 
@@ -967,7 +1003,11 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            JSONCONS_ASSERT(args.size() == *this->arg_count());
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_object())

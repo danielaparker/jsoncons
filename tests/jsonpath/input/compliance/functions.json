@@ -1,5 +1,5 @@
 [
-  /*{
+  {
      "given": {
          "store": {
              "book": [
@@ -88,7 +88,7 @@
          "result": ["Sayings of the Century","Sword of Honour","Moby Dick"]
        }
      ]
-  },*/
+  },
    {
      "given":
      {
@@ -106,7 +106,7 @@
        "null_key": null
      },
      "cases": [
-       /*{
+       {
          "expression": "ceil(1.2)",
          "result": [2]
        },
@@ -129,11 +129,11 @@
        {
          "expression": "ceil('string')",
          "result": []
-       },*/
+       }/*,
        {
          "expression": "sum($.array[*].to_number(@))",
          "result": [111]
-       }
+       }*/
      ]
    }
 ]
