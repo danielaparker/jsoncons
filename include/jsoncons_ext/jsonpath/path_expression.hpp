@@ -709,6 +709,7 @@ namespace detail {
                     }
                 }
                 default:
+                    ec = jsonpath_errc::invalid_type;
                     return resources.null_value();
             }
         }
