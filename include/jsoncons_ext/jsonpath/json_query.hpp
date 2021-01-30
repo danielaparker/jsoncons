@@ -117,7 +117,7 @@ namespace jsoncons { namespace jsonpath {
         expression_rhs,
         filter_expression,
         filter_expression_rhs,
-        recursive_descent_or_lhs_expression,
+        recursive_descent_or_expression_lhs,
         path_or_literal_or_function,
         json_text_or_function,
         json_text_or_function_name,
@@ -270,24 +270,34 @@ namespace jsoncons { namespace jsonpath {
                     auto it = val.find(identifier_);
                     if (it != val.object_range().end())
                     {
-                        //nodes.emplace_back(generate_path(path,identifier_,flags),std::addressof(it->value()));
                         this->evaluate_tail(resources, generate_path(path, identifier_, flags), 
                                                 root, it->value(), nodes, ndtype, flags);
                     }
                 }
-                else if (val.is_array() && identifier_ == length_literal<char_type>())
+                else if (val.is_array())
                 {
-                    pointer ptr = resources.create_json(val.size());
-                    //nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
-                    this->evaluate_tail(resources, generate_path(path, identifier_, flags), 
-                                            root, *ptr, nodes, ndtype, flags);
+                    auto r = jsoncons::detail::to_integer_decimal<int64_t>(identifier_.data(), identifier_.size());
+                    if (r)
+                    {
+                        std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + r.value());
+                        if (index < val.size())
+                        {
+                            this->evaluate_tail(resources, generate_path(path, index, flags), 
+                                                root, val[index], nodes, ndtype, flags);
+                        }
+                    }
+                    else if (identifier_ == length_literal<char_type>() && val.size() > 0)
+                    {
+                        pointer ptr = resources.create_json(val.size());
+                        this->evaluate_tail(resources, generate_path(path, identifier_, flags), 
+                                                root, *ptr, nodes, ndtype, flags);
+                    }
                 }
                 else if (val.is_string() && identifier_ == length_literal<char_type>())
                 {
                     string_view_type sv = val.as_string_view();
                     std::size_t count = unicons::u32_length(sv.begin(), sv.end());
                     pointer ptr = resources.create_json(count);
-                    //nodes.emplace_back(generate_path(path, identifier_, flags), ptr);
                     this->evaluate_tail(resources, generate_path(path, identifier_, flags), 
                                             root, *ptr, nodes, ndtype, flags);
                 }
@@ -973,7 +983,7 @@ namespace jsoncons { namespace jsonpath {
                         }
                         break;
                     }
-                    case path_state::recursive_descent_or_lhs_expression:
+                    case path_state::recursive_descent_or_expression_lhs:
                         switch (*p_)
                         {
                             case '.':
@@ -1309,11 +1319,6 @@ namespace jsoncons { namespace jsonpath {
                                 push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
                                 state_stack_.pop_back();
                                 break;
-                            // integer
-                            case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                state_stack_.back() = path_state::index;
-                                state_stack_.emplace_back(path_state::integer);
-                                break;
                             case '.':
                                 ec = jsonpath_errc::expected_key;
                                 return path_expression_type();
@@ -1472,7 +1477,7 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case '.':
-                                state_stack_.emplace_back(path_state::recursive_descent_or_lhs_expression);
+                                state_stack_.emplace_back(path_state::recursive_descent_or_expression_lhs);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1512,7 +1517,7 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case '.':
-                                state_stack_.emplace_back(path_state::recursive_descent_or_lhs_expression);
+                                state_stack_.emplace_back(path_state::recursive_descent_or_expression_lhs);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -3193,7 +3198,7 @@ namespace jsoncons { namespace jsonpath {
                     const typename Json::char_type* path, 
                     result_flags flags = result_flags::value)
     {
-        json_query(instance, basic_string_view<typename Json::char_type>(path), flags);
+        return json_query(instance, basic_string_view<typename Json::char_type>(path), flags);
     }
 
     template<class Json, class Source, class T>

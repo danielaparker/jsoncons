@@ -127,7 +127,7 @@ TEST_CASE("jsonpath-tests")
         jsonpath_tests("./jsonpath/input/compliance/regex.json");
 #endif
         jsonpath_tests("./jsonpath/input/compliance/identifiers.json");
-        jsonpath_tests("./jsonpath/input/compliance/basic.json"); 
+        jsonpath_tests("./jsonpath/input/compliance/dot-notation.json"); 
         jsonpath_tests("./jsonpath/input/compliance/slice.json");
         jsonpath_tests("./jsonpath/input/compliance/indices.json");
         jsonpath_tests("./jsonpath/input/compliance/wildcard.json");
