@@ -62,8 +62,10 @@ TEST_CASE("test replace tests")
 
     SECTION("test 2")
     {
+        std::string expr = "$.store.book[*].price";
+
         // make a discount on all books
-        jsonpath::json_replace(j, "$.store.book[*].price",
+        jsonpath::json_replace(j, expr,
             [](const json& price) { return std::round(price.as<double>() - 1.0); });
 
         CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));

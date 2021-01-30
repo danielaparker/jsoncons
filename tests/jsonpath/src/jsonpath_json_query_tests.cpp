@@ -59,6 +59,14 @@ TEST_CASE("jsonpath json_query json test")
         auto expected = json::parse(R"(["Sword of Honour","Moby Dick"])");
         CHECK((result == expected));
     }
+
+    SECTION("test 2")
+    {
+        std::string expr = "$..book[?(@.category == 'fiction')].title";
+        auto result = jsonpath::json_query(j,expr);
+        auto expected = json::parse(R"(["Sword of Honour","Moby Dick"])");
+        CHECK((result == expected));
+    }
 }
 
 TEST_CASE("jsonpath json_query wjson test")
