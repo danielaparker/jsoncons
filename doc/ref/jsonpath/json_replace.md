@@ -3,19 +3,32 @@
 ```c++
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 
+template<class Json, class Source, class T>
+void json_replace(Json& root, const Source& path, T&& new_value); (1)
+
 template<class Json, class T>
-void json_replace(Json& root, 
-                  const typename Json::string_view_type& path, 
-                  T&& new_value)
+void json_replace(Json& root, const typename Json::char_type* path, T&& new_value); (2)
+
+template<class Json, class Source, class Op>
+void json_replace(Json& root, const Source& path, T Op); (3)
 
 template<class Json, class Op>
-void json_replace(Json& root, 
-                  const typename Json::string_view_type& path, 
-                  T Op)
+void json_replace(Json& root, const typename Json::char_type* path, T Op); (4)
 ```
 
-(1) Searches for all values that match a JSONPath expression and replaces them with the specified value
-(2) Searches for all values that match a JSONPath expression and replaces them with the result of the given function
+(1) Searches for all values that match the JSONPath expression `expr` and replaces them with the specified value
+The JSONPath expression `expr` is provided as a sequential container 
+or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
+
+(2) Searches for all values that match the JSONPath expression `expr` and replaces them with the specified value
+The JSONPath expression `expr` is provided as a null terminated string.
+
+(3) Searches for all values that match a JSONPath expression `expr` and replaces them with the result of the given function
+The JSONPath expression `expr` is provided as a sequential container 
+or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
+
+(4) Searches for all values that match a JSONPath expression `expr` and replaces them with the result of the given function
+The JSONPath expression `expr` is provided as a null terminated string.
 
 #### Parameters
 

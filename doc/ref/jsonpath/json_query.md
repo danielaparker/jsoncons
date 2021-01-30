@@ -5,13 +5,24 @@
 
 enum class result_type {value,path};
 
-template<Json>
+template<class Json, class Source>
 Json json_query(const Json& root, 
-                const typename Json::string_view_type& expr,
-                result_type result_t = result_type::value);
+                const Source& expr,
+                result_type result_t = result_type::value); (1)
+
+
+template<class Json>
+Json json_query(const Json& root, 
+                const typename Json::char_type* expr,
+                result_type result_t = result_type::value); (2)
 ```
 
-Returns a `json` array of values or normalized path expressions selected from a root `json` structure.
+(1) Evaluates the Json value `root` against the JSONPath expression `expr` to produce a `json` array of values or 
+normalized path expressions. The JSONPath expression `expr` is provided as a sequential container 
+or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
+
+(2) Evaluates the Json value `root` against the JSONPath expression `expr` to produce a `json` array of values or 
+normalized path expressions. The JSONPath expression `expr` is provided as a null terminated string.
 
 #### Parameters
 
@@ -37,7 +48,7 @@ Returns an empty array if there is no match.
 
 #### Exceptions
 
-Throws a [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
+Throws a [jsonpath_error](jsonpath_error.md) if JSONPath parsing fails.
 
 #### Note
 Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.

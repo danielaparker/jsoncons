@@ -3152,31 +3152,54 @@ namespace jsoncons { namespace jsonpath {
         }
     };
 
-    template <class Json>
-    jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr)
+    template<class Json,class Source>
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value,jsonpath_expression<Json>>::type
+    make_expression(const Source& expr)
     {
         return jsonpath_expression<Json>::compile(expr);
     }
 
     template <class Json>
-    jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr,
-                                              std::error_code& ec)
+    jsonpath_expression<Json> make_expression(const typename Json::char_type* expr)
+    {
+        return jsonpath_expression<Json>::compile(expr);
+    }
+
+    template<class Json,class Source>
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value,jsonpath_expression<Json>>::type
+    make_expression(const Source& expr, std::error_code& ec)
     {
         return jsonpath_expression<Json>::compile(expr, ec);
     }
 
-    template<class Json>
-    Json json_query(const Json& instance, 
-                    const typename Json::string_view_type& path, 
-                    result_flags flags = result_flags::value)
+    template <class Json>
+    jsonpath_expression<Json> make_expression(const typename Json::char_type* expr, std::error_code& ec)
+    {
+        return make_expression(basic_string_view<typename Json::char_type>(expr), ec);
+    }
+
+    template<class Json,class Source>
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value,Json>::type
+    json_query(const Json& instance, 
+               const Source& path, 
+               result_flags flags = result_flags::value)
     {
         auto expression = make_expression<Json>(path);
         return expression.evaluate(instance, flags);
     }
 
-    template<class Json, class T>
-    typename std::enable_if<!jsoncons::detail::is_function_object<T,Json>::value,void>::type
-    json_replace(Json& instance, const typename Json::string_view_type& path, const T& new_value)
+    template<class Json>
+    Json json_query(const Json& instance, 
+                    const typename Json::char_type* path, 
+                    result_flags flags = result_flags::value)
+    {
+        json_query(instance, basic_string_view<typename Json::char_type>(path), flags);
+    }
+
+    template<class Json, class Source, class T>
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
+                            !jsoncons::detail::is_function_object<T,Json>::value,void>::type
+    json_replace(Json& instance, const Source& path, const T& new_value)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
@@ -3199,9 +3222,10 @@ namespace jsoncons { namespace jsonpath {
         expr.evaluate(resources, output_path, instance, instance, callback, result_flags::value);
     }
 
-    template<class Json, class Op>
-    typename std::enable_if<jsoncons::detail::is_function_object<Op,Json>::value,void>::type
-    json_replace(Json& instance, const typename Json::string_view_type& path, Op op)
+    template<class Json, class Source, class Op>
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
+                            jsoncons::detail::is_function_object<Op,Json>::value,void>::type
+    json_replace(Json& instance, const Source& path, Op op)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
@@ -3222,6 +3246,12 @@ namespace jsoncons { namespace jsonpath {
             *node.ptr = op(*node.ptr);
         };
         expr.evaluate(resources, output_path, instance, instance, callback, result_flags::value);
+    }
+
+    template<class Json, class Op>
+    void json_replace(Json& instance, const typename Json::char_type* path, Op op)
+    {
+        json_replace(instance, basic_string_view<typename Json::char_type>(path), op);
     }
 
 } // namespace jsonpath

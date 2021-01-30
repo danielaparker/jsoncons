@@ -670,6 +670,15 @@ namespace impl {
     using
     is_constructible_from_string = is_detected<construct_from_string_t,T>;
 
+    template<typename T, typename Data, typename Size>
+    using
+    construct_from_data_size_t = decltype(T(static_cast<Data>(nullptr),Size{}));
+
+
+    template<class T, typename Data, typename Size>
+    using
+    is_constructible_from_data_size = is_detected<construct_from_data_size_t,T,Data,Size>;
+
     // is_function_object
     // is_function_object_exact
 
