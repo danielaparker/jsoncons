@@ -40,9 +40,9 @@ void jsonpath_tests(const std::string& fpath)
             try
             {
                 jsonpath::result_flags flags = jsonpath::result_flags();
-                if (test_case.contains("no_duplicate") && test_case.at("no_duplicate").as<bool>())
+                if (test_case.contains("no_dups") && test_case.at("no_dups").as<bool>())
                 {
-                    flags |= jsonpath::result_flags::no_duplicate;
+                    flags |= jsonpath::result_flags::no_dups;
                 }
                 auto expression = jsoncons::jsonpath::make_expression<json>(jsoncons::string_view(expr));
                 if (test_case.contains("result"))

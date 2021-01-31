@@ -291,7 +291,7 @@ namespace {
         std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
 
         auto result2 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
-                                            jsonpath::result_flags::value | jsonpath::result_flags::no_duplicate);
+                                            jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
         std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
         auto result3 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
@@ -299,7 +299,7 @@ namespace {
         std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
         auto result4 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
-                                            jsonpath::result_flags::path | jsonpath::result_flags::no_duplicate);
+                                            jsonpath::result_flags::path | jsonpath::result_flags::no_dups);
         std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
     }
 
