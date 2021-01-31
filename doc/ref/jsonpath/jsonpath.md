@@ -71,10 +71,6 @@ or
 
 or
 
-    store.book.0
-
-or
-
     $.'store'.'book'.0
 
 or
@@ -226,66 +222,14 @@ Function|Description|Result|Example
 
 ### Examples
 
-The examples below use the input JSON file `booklist.json`, from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
+#### json_query function
 
-```json
-{ "store": {
-    "book": [ 
-      { "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      { "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      },
-      { "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      },
-      { "category": "fiction",
-        "author": "J. R. R. Tolkien",
-        "title": "The Lord of the Rings",
-        "isbn": "0-395-19395-8",
-        "price": 22.99
-      }
-    ],
-    "bicycle": {
-      "color": "red",
-      "price": 19.95
-    }
-  }
-}
-```
+#### json_replace function
 
-JSONPath |Result|Notes
----------|--------------------------------------------------------|------
-`$..book.length`        |The number of books|`length` is a property of an array
-`$.store.*`                 |Everything in the store, including books and a bicycle.|`*` is a wildcard symbol
-`$..author`                 |All authors|Recursive descent starting from root ($) to find all authors
-`$.store.book[*].author`        |All authors of books in the store|
-`$.store..price`                |The prices of everything in the store.|
-`$..book[2]`                |The third book|Indices start at `0`
-`$..book.2`                 |The third book|Using the dot notation
-`$..book[(@.length-1)]`         |The last book in order.|Expressions (<expr>) can be used as an alternative to explicit names or indices
-`$..book[-1:]`          |The last book in order.|A negative `start` becomes `start` + `length`. A missing `end` defaults to `length`.
-`$..book[0,1]`            |The first two books
-`$..book[:2]`               |All books from index 0 (inclusive) to index 2 (exclusive)|`start` defaults to 0
-`$..book[1:2]`              |All books from index 1 (inclusive) to index 2 (exclusive)
-`$..book[-2:]`  |Last two books|The start index `-2` becomes `-2+4=2`, `end` defaults to `length` (`4`).
-`$..book[2:]`   |Last two books|`end` defaults to `length`
-`$..book[?(@.isbn)]`        |All books that have isbn number
-`$..book[?(@.price<10)]`        |All books that are cheaper than $10
-`$..*`                  |Everything in the store.
-`$.store.book[ ?((@.author == 'Nigel Rees')` || (@.author == 'Evelyn Waugh')) ].title`|The titles of all books by Nigel Rees and Evelyn Waugh
-`$.store.book[?(@.author =~ /Evelyn.*?/)]`|All books whose author's name starts with Evelyn
-`$.store.book[?((@.author =~ /evelyn.*?/i))]`|All books whose author's name starts with Evelyn, evelyn etc.|`i` indicates case insensitive
-`$.store.book[?(!(@.author =~ /Evelyn.*?/))]`|All books whose author's name does not start with Evelyn
-`$['store']['book']..['author','title']`|All authors and titles of books in the store
-`$.store.book[?(@.price < max($.store.book[*].price))].title`|The titles of all books that are priced less than the most expensive book in the store
-`$.store.book[?(@.price > min($.store.book[*].price))].title`|The titles of all books that are priced higher than the cheapest book in the store
+#### jsonpath_expression function
+
+A [jsoncons::jsonpath::jsonpath_expression](jsonpath_expression.md) 
+represents the compiled form of a JMESPath expression. It allows you to 
+evaluate a single compiled expression on multiple JSON documents.
+A `jsonpath_expression` is immutable and thread-safe. 
 
