@@ -416,8 +416,6 @@ int main()
 
         jsonpatch_examples();
 
-        jsonpath_examples();
-
         jsonpointer_examples();
 
         json_traits_macros_examples();
@@ -467,6 +465,8 @@ int main()
         erase_examples();
 
         jsonschema_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {

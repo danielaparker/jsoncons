@@ -222,7 +222,101 @@ Function|Description|Result|Example
 
 ### Examples
 
+The examples use the JSON data below, taken from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
+
+```json
+{ "store": {
+    "book": [ 
+      { "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      { "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      },
+      { "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+      },
+      { "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99
+      }
+    ],
+    "bicycle": {
+      "color": "red",
+      "price": 19.95
+    }
+  }
+}
+```
+
 #### json_query function
+
+```
+#include <fstream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    std::ifstream is("./input/store.json");
+    json data = json::parse(is);
+
+    auto result1 = jsonpath::json_query(data, "$.store.book[0,0,1].title");
+    std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
+
+    auto result2 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+                                        jsonpath::result_flags::value | jsonpath::result_flags::no_duplicate);
+    std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
+
+    auto result3 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+                                        jsonpath::result_flags::path);
+    std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
+
+    auto result4 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+                                        jsonpath::result_flags::path | jsonpath::result_flags::no_duplicate);
+    std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
+}
+```
+Output:
+```
+(1)
+[
+    "Sayings of the Century",
+    "Sayings of the Century",
+    "Sword of Honour"
+]
+
+(2)
+[
+    "Sayings of the Century",
+    "Sword of Honour"
+]
+
+(3)
+[
+    "$['store']['book'][0]['title']",
+    "$['store']['book'][0]['title']",
+    "$['store']['book'][1]['title']"
+]
+
+(4)
+[
+    "$['store']['book'][0]['title']",
+    "$['store']['book'][1]['title']"
+]
+```
 
 #### json_replace function
 

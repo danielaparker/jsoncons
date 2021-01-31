@@ -59,7 +59,7 @@ Throws a [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
 
 #### Change the price of a book
 
-Input JSON file `booklist.json`:
+Input JSON file `store.json`:
 
 ```json
 { "store": {
@@ -93,7 +93,7 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("input/booklist.json");
+    std::ifstream is("input/store.json");
     json booklist;
     is >> booklist;
 
@@ -134,7 +134,7 @@ Output:
 
 #### Change the prices of all books
 
-Input JSON file `booklist.json`:
+Input JSON file `store.json`:
 
 ```json
 { "store": {
@@ -169,7 +169,7 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("input/booklist.json");
+    std::ifstream is("input/store.json");
     json booklist;
     is >> booklist;
 

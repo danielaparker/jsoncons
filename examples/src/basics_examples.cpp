@@ -127,14 +127,14 @@ void basics_json_example1()
     book["ratings"].erase("*");
 
     // Serialize the booklist to a file
-    std::ofstream os("./output/booklist.json");
+    std::ofstream os("./output/store.json");
     os << pretty_print(booklist);
 }
 
 void basics_json_example2()
 {
     // Deserialize the booklist
-    std::ifstream is("./output/booklist.json");
+    std::ifstream is("./output/store.json");
     json booklist;
     is >> booklist;
 

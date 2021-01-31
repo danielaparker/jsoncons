@@ -5,7 +5,7 @@ enum class result_flags
 {
    value = 1,
    path = 2,
-   no_duplicates = 4 | path
+   no_duplicate = 4 | path
 };
 ```
 

@@ -132,11 +132,11 @@ book["ratings"].erase("*");
 ```
 ```c++  
     // Serialize the booklist to a file
-    std::ofstream os("booklist.json");
+    std::ofstream os("store.json");
     os << pretty_print(booklist);
 ```
 
-The JSON output `booklist.json`
+The JSON output `store.json`
 ```json
 [
     {
@@ -189,7 +189,7 @@ using jsoncons::json;
 using jsoncons::jsonpath::json_query;
 
 // Deserialize the booklist
-std::ifstream is("booklist.json");
+std::ifstream is("store.json");
 json booklist;
 is >> booklist;
 

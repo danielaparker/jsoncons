@@ -56,7 +56,7 @@ Stefan Goessner's javascript implemention returns `false` in case of no match, b
 
 ### Store examples
 
-The examples below use the JSON text from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) (booklist.json).
+The examples below use the JSON text from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) (store.json).
 
 ```json
 { "store": {
@@ -103,7 +103,7 @@ using namespace jsoncons;
 
 int main()
 {
-    std::ifstream is("./input/booklist.json");
+    std::ifstream is("./input/store.json");
     json booklist = json::parse(is);
 
     // The authors of books that are cheaper than $10

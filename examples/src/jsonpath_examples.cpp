@@ -16,7 +16,7 @@ namespace {
 
     void json_query_examples() 
     {
-        std::ifstream is("./input/booklist.json");
+        std::ifstream is("./input/store.json");
         json booklist = json::parse(is);
 
         // The authors of books that are cheaper than $10
@@ -48,11 +48,11 @@ namespace {
         std::cout << "(7)\n" << pretty_print(result7) << "\n";
 
         // Union of a subset of book titles identified by index
-        json result8 = jsonpath::json_query(booklist, "$.store[book[0].title,book[1].title,book[3].title]");
+        json result8 = jsonpath::json_query(booklist, "$.store[@.book[0].title,@.book[1].title,@.book[3].title]");
         std::cout << "(8)\n" << pretty_print(result8) << "\n";
 
         // Union of third book title and all book titles with price > 10
-        json result9 = jsonpath::json_query(booklist, "$.store[book[3].title,book[?(@.price > 10)].title]");
+        json result9 = jsonpath::json_query(booklist, "$.store[@.book[3].title,@.book[?(@.price > 10)].title]");
         std::cout << "(9)\n" << pretty_print(result9) << "\n";
 
         // Intersection of book titles with category fiction and price < 15
@@ -60,7 +60,7 @@ namespace {
         std::cout << "(10)\n" << pretty_print(result10) << "\n";
 
         // Normalized path expressions
-        json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_type::path);
+        json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_flags::path);
         std::cout << "(11)\n" << pretty_print(result11) << "\n";
 
         // All titles whose author's second name is 'Waugh'
@@ -74,7 +74,7 @@ namespace {
 
     void json_replace_example1()
     { 
-        std::ifstream is("./input/booklist.json");
+        std::ifstream is("./input/store.json");
         json booklist = json::parse(is);
 
         jsonpath::json_replace(booklist,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
@@ -114,7 +114,7 @@ namespace {
 
     void json_replace_example3()
     {
-        std::ifstream is("./input/booklist.json");
+        std::ifstream is("./input/store.json");
         json booklist = json::parse(is);
 
         // make a discount on all books
@@ -246,7 +246,7 @@ namespace {
       ]
     }    )");
 
-        std::string path = "$..[firstName,address.city]";
+        std::string path = "$..[@.firstName,@.address.city]";
         json result = jsonpath::json_query(root,path);
 
         std::cout << result << "\n";
@@ -282,6 +282,27 @@ namespace {
         assert(original == input);
     }
 
+    void more_json_query_examples()
+    {
+        std::ifstream is("./input/store.json");
+        json data = json::parse(is);
+
+        auto result1 = jsonpath::json_query(data, "$.store.book[0,0,1].title");
+        std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
+
+        auto result2 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+                                            jsonpath::result_flags::value | jsonpath::result_flags::no_duplicate);
+        std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
+
+        auto result3 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+                                            jsonpath::result_flags::path);
+        std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
+
+        auto result4 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+                                            jsonpath::result_flags::path | jsonpath::result_flags::no_duplicate);
+        std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
+    }
+
 } // namespace
 
 void jsonpath_examples()
@@ -294,6 +315,7 @@ void jsonpath_examples()
     jsonpath_union();
     json_query_examples();
     flatten_and_unflatten();
+    more_json_query_examples();
 
     std::cout << "\n";
 }

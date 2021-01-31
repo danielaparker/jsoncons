@@ -21,7 +21,7 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    enum class result_flags {value=1,path=2,no_duplicates=4|path};
+    enum class result_flags {value=1,path=2,no_duplicate=4|path};
 
     using result_type = result_flags;
 
@@ -2180,7 +2180,7 @@ namespace detail {
             }
             if (!stack.empty())
             {
-                if ((flags & result_flags::no_duplicates) == result_flags::no_duplicates)
+                if ((flags & result_flags::no_duplicate) == result_flags::no_duplicate)
                 {
                     std::unordered_set<string_type> index;
                     for (auto& item : stack)

@@ -3226,7 +3226,7 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = new_value;
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_duplicates);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_duplicate);
     }
 
     template<class Json, class Source, class Op>
@@ -3252,7 +3252,7 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = op(*node.ptr);
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_duplicates);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_duplicate);
     }
 
     template<class Json, class Op>
