@@ -561,5 +561,29 @@ TEST_CASE("oss-fuzz issues")
         }
         catch(const jsoncons::ser_error&) {}
     }
+
+    // Fuzz target: fuzz_json_encoder
+    // Issue: Out-of-memory
+    SECTION("issue 27342")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_json_encoder-5769370349076480";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is);
+
+        std::string s2;
+        json_string_encoder visitor(s2);
+
+        json_reader reader(is, visitor);
+        try
+        {
+            std::error_code ec;
+            reader.read(ec);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
 }
 
