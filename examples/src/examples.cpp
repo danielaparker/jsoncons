@@ -90,11 +90,10 @@ void first_example_a()
     }
     json books = json::parse(is);
 
-    for (std::size_t i = 0; i < books.size(); ++i)
+    for (const auto& book : books.at("books").array_range())
     {
         try
         {
-            json& book = books[i];
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             double price = book["price"].as<double>();
@@ -118,11 +117,10 @@ void first_example_b()
     }
     json books = json::parse(is);
 
-    for (std::size_t i = 0; i < books.size(); ++i)
+    for (const auto& book : books.at("books").array_range())
     {
         try
         {
-            json& book = books[i];
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             std::string price = book.get_value_or<std::string>("price", "N/A");
@@ -190,11 +188,10 @@ void first_example_d()
     //options.floatfield(std::ios::fixed);
     options.precision(2);
 
-    for (std::size_t i = 0; i < books.size(); ++i)
+    for (const auto& book : books.at("books").array_range())
     {
         try
         {
-            json& book = books[i];
             std::string author = book["author"].as<std::string>();
             std::string title = book["title"].as<std::string>();
             if (book.contains("price") && book["price"].is_number())

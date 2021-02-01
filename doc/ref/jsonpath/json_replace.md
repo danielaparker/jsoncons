@@ -175,7 +175,7 @@ int main()
 
     // make a discount on all books
 	jsonpath::json_replace(booklist, "$.store.book[*].price",
-			[](const json& price) { return std::round(price.as<double>() - 1.0); });
+			[](const json& price) {return std::round(price.as<double>() - 1.0);});
     std::cout << pretty_print(booklist) << std::endl;
 
 }

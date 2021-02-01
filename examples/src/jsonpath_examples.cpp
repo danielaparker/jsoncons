@@ -284,23 +284,54 @@ namespace {
 
     void more_json_query_examples()
     {
-        std::ifstream is("./input/store.json");
+        std::ifstream is("./input/books.json");
         json data = json::parse(is);
 
-        auto result1 = jsonpath::json_query(data, "$.store.book[0,0,1].title");
+        auto result1 = jsonpath::json_query(data, "$.books[1,1,3].title");
         std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
 
-        auto result2 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
-                                            jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
+        auto result2 = jsonpath::json_query(data, "$.books[1,1,3].title",
+                                            jsonpath::result_flags::path);
         std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
-        auto result3 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
-                                            jsonpath::result_flags::path);
+        auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
+                                            jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
         std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
-        auto result4 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+        auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title",
                                             jsonpath::result_flags::path | jsonpath::result_flags::no_dups);
         std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
+    }
+
+    void json_replace_examples()
+    {
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
+
+        auto f = [](const json& price) {return std::round(price.as<double>() - 1.0); };
+        jsonpath::json_replace(data, "$.books[*].price", f);
+
+        std::cout << pretty_print(data) << "\n";
+    }
+
+    void json_make_expression_examples()
+    {
+        auto expr = jsonpath::make_expression<json>("$.books[1,1,3].title");
+
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
+
+        json result1 = expr.evaluate(data);
+        std::cout << "(1) " << pretty_print(result1) << "\n\n";
+
+        json result2 = expr.evaluate(data, jsonpath::result_flags::path);
+        std::cout << "(2) " << pretty_print(result2) << "\n\n";
+
+        json result3 = expr.evaluate(data, jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
+        std::cout << "(3) " << pretty_print(result3) << "\n\n";
+
+        json result4 = expr.evaluate(data, jsonpath::result_flags::path | jsonpath::result_flags::no_dups);
+        std::cout << "(4) " << pretty_print(result4) << "\n\n";
     }
 
 } // namespace
@@ -316,6 +347,8 @@ void jsonpath_examples()
     json_query_examples();
     flatten_and_unflatten();
     more_json_query_examples();
+    json_replace_examples();
+    json_make_expression_examples();
 
     std::cout << "\n";
 }

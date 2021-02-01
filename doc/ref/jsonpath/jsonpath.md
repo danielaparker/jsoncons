@@ -222,39 +222,36 @@ Function|Description|Result|Example
 
 ### Examples
 
-The examples use the JSON data below, taken from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
+The examples use the JSON data below, 
 
 ```json
-{ "store": {
-    "book": [ 
-      { "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      { "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      },
-      { "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      },
-      { "category": "fiction",
-        "author": "J. R. R. Tolkien",
-        "title": "The Lord of the Rings",
-        "isbn": "0-395-19395-8",
-        "price": 22.99
-      }
-    ],
-    "bicycle": {
-      "color": "red",
-      "price": 19.95
-    }
-  }
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
 }
 ```
 
@@ -270,21 +267,21 @@ namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("./input/store.json");
+    std::ifstream is("./input/books.json");
     json data = json::parse(is);
 
-    auto result1 = jsonpath::json_query(data, "$.store.book[0,0,1].title");
+    auto result1 = jsonpath::json_query(data, "$.books[1,1,3].title");
     std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
 
-    auto result2 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
-                                        jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
+    auto result2 = jsonpath::json_query(data, "$.books[1,1,3].title",
+                                        jsonpath::result_flags::path);
     std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
-    auto result3 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
-                                        jsonpath::result_flags::path);
+    auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
+                                        jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
     std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
-    auto result4 = jsonpath::json_query(data, "$.store.book[0,0,1].title", 
+    auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title",
                                         jsonpath::result_flags::path | jsonpath::result_flags::no_dups);
     std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
 }
@@ -293,32 +290,82 @@ Output:
 ```
 (1)
 [
-    "Sayings of the Century",
-    "Sayings of the Century",
-    "Sword of Honour"
+    "The Night Watch",
+    "The Night Watch",
+    "The Night Watch"
 ]
 
 (2)
 [
-    "Sayings of the Century",
-    "Sword of Honour"
+    "$['books'][1]['title']",
+    "$['books'][1]['title']",
+    "$['books'][3]['title']"
 ]
 
 (3)
 [
-    "$['store']['book'][0]['title']",
-    "$['store']['book'][0]['title']",
-    "$['store']['book'][1]['title']"
+    "The Night Watch",
+    "The Night Watch"
 ]
 
 (4)
 [
-    "$['store']['book'][0]['title']",
-    "$['store']['book'][1]['title']"
+    "$['books'][1]['title']",
+    "$['books'][3]['title']"
 ]
 ```
 
 #### json_replace function
+
+```
+#include <fstream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    std::ifstream is("./input/books.json");
+    json data = json::parse(is);
+
+    auto f = [](const json& price) {return std::round(price.as<double>() - 1.0);};
+    jsonpath::json_replace(data, "$.books[*].price", f);
+
+    std::cout << pretty_print(data) << "\n";
+}
+```
+Output:
+```
+{
+    "books": [
+        {
+            "author": "Haruki Murakami",
+            "category": "fiction",
+            "price": 22.0,
+            "title": "A Wild Sheep Chase"
+        },
+        {
+            "author": "Sergei Lukyanenko",
+            "category": "fiction",
+            "price": 23.0,
+            "title": "The Night Watch"
+        },
+        {
+            "author": "Graham Greene",
+            "category": "fiction",
+            "price": 21.0,
+            "title": "The Comedians"
+        },
+        {
+            "author": "Phillips, David Atlee",
+            "category": "memoir",
+            "title": "The Night Watch"
+        }
+    ]
+}
+```
 
 #### jsonpath_expression function
 
@@ -326,4 +373,57 @@ A [jsoncons::jsonpath::jsonpath_expression](jsonpath_expression.md)
 represents the compiled form of a JMESPath expression. It allows you to 
 evaluate a single compiled expression on multiple JSON documents.
 A `jsonpath_expression` is immutable and thread-safe. 
+
+```
+#include <fstream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    auto expr = jsonpath::make_expression<json>("$.books[1,1,3].title");
+
+    std::ifstream is("./input/books.json");
+    json data = json::parse(is);
+
+    json result1 = expr.evaluate(data);
+    std::cout << "(1) " << pretty_print(result1) << "\n\n";
+
+    json result2 = expr.evaluate(data, jsonpath::result_flags::path);
+    std::cout << "(2) " << pretty_print(result2) << "\n\n";
+
+    json result3 = expr.evaluate(data, jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
+    std::cout << "(3) " << pretty_print(result3) << "\n\n";
+
+    json result4 = expr.evaluate(data, jsonpath::result_flags::path | jsonpath::result_flags::no_dups);
+    std::cout << "(4) " << pretty_print(result4) << "\n\n";
+}
+```
+Output:
+```
+(1) [
+    "The Night Watch",
+    "The Night Watch",
+    "The Night Watch"
+]
+
+(2) [
+    "$['books'][1]['title']",
+    "$['books'][1]['title']",
+    "$['books'][3]['title']"
+]
+
+(3) [
+    "The Night Watch",
+    "The Night Watch"
+]
+
+(4) [
+    "$['books'][1]['title']",
+    "$['books'][3]['title']"
+]
+```
 

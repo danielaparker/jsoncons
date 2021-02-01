@@ -104,15 +104,15 @@ namespace {
         std::cout << std::boolalpha;
         std::cout << "Is this an object? " << val.is_object() << ", or an array? " << val.is_array() << std::endl;
 
-        if (val.is_array())
+        if (val.at("books").is_array())
         {
-            for (std::size_t i = 0; i < val.size(); ++i)
+            std::size_t index = 0;
+            for (const auto& book : val.at("books").array_range())
             {
-                json& elem = val[i];
-                std::cout << "Is element " << i << " an object? " << elem.is_object() << std::endl;
-                if (elem.is_object())
+                std::cout << "Is element " << index++ << " an object? " << book.is_object() << std::endl;
+                if (book.is_object())
                 {
-                    for (auto it = elem.object_range().begin(); it != elem.object_range().end(); ++it){
+                    for (auto it = book.object_range().begin(); it != book.object_range().end(); ++it){
                         std::cout << "Is member " << it->key() << " a string? " << it->value().is<std::string>() << ", or a double? " << it->value().is<double>() << ", or perhaps an int? " << it->value().is<int>() << std::endl;
 
                     }
