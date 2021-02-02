@@ -39,7 +39,15 @@
             {
                 "comment" : "Last two items",
                 "expression" : "$[-2:]",
-                "result" : ["forth", "fifth"]
+                "result" : ["forth", "fifth"],
+                "path" : ["$[3]", "$[4]"]
+            },
+            {
+                "comment" : "Last two items",
+                "expression" : "$[-2:]",
+                "result" : ["forth", "fifth"],
+                "path" : ["$[3]", "$[4]"],
+                "no_dups" : true
             },
             {
                 "comment" : "All items except the last two",

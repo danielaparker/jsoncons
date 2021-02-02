@@ -2161,7 +2161,26 @@ namespace detail {
                                 std::vector<path_node_type> temp;
                                 node_type ndtype = node_type();
                                 tok.selector_->select(resources, path, root, *ptr, temp, ndtype, flags);
-                                stack.emplace_back(std::move(temp), ndtype);
+
+                                if ((flags & result_flags::no_dups) == result_flags::no_dups)
+                                {
+                                    std::unordered_set<string_type> index;
+                                    std::vector<path_node_type> temp2;
+                                    for (auto&& node : temp)
+                                    {
+                                        //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
+                                        if (index.count(node.path) == 0)
+                                        {
+                                            index.emplace(node.path);
+                                            temp2.emplace_back(std::move(node));
+                                        }
+                                    }
+                                    stack.emplace_back(std::move(temp2), ndtype);
+                                }
+                                else
+                                {
+                                    stack.emplace_back(std::move(temp), ndtype);
+                                }
 
                                 //std::cout << "selector output\n";
                                 //for (auto& item : temp)
@@ -2178,56 +2197,21 @@ namespace detail {
                     }
                 }
             }
-            if (!stack.empty())
+            for (auto& item : stack)
             {
-                if ((flags & result_flags::no_dups) == result_flags::no_dups)
+                switch (item.tag)
                 {
-                    std::unordered_set<string_type> index;
-                    for (auto& item : stack)
-                    {
-                        switch (item.tag)
+                    case node_set_tag::single:
+                        callback(item.node);
+                        break;
+                    case node_set_tag::multi:
+                        for (auto& node : item.nodes)
                         {
-                            case node_set_tag::single:
-                                if (index.count(item.node.path) == 0)
-                                {
-                                    callback(item.node);
-                                    index.emplace(item.node.path);
-                                }
-                                break;
-                            case node_set_tag::multi:
-                                for (auto& node : item.nodes)
-                                {
-                                    if (index.count(node.path) == 0)
-                                    {
-                                        callback(node);
-                                        index.emplace(node.path);
-                                    }
-                                }
-                                break;
-                            default:
-                                break;
+                            callback(node);
                         }
-                    }
-                }
-                else
-                {
-                    for (auto& item : stack)
-                    {
-                        switch (item.tag)
-                        {
-                            case node_set_tag::single:
-                                callback(item.node);
-                                break;
-                            case node_set_tag::multi:
-                                for (auto& node : item.nodes)
-                                {
-                                    callback(node);
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                        break;
+                    default:
+                        break;
                 }
             }
             //std::cout << "EVALUATE END\n";

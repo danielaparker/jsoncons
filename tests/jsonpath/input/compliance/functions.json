@@ -129,11 +129,7 @@
        {
          "expression": "ceil('string')",
          "result": []
-       }/*,
-       {
-         "expression": "sum($.array[*].to_number(@))",
-         "result": [111]
-       }*/
+       }
      ]
    }
 ]
