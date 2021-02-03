@@ -1,7 +1,10 @@
 ### jsonpath extension
 
 The jsonpath extension implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
-It provides functions for search and "search and replace" using JSONPath expressions:
+It provides functions for search and "search and replace" using JSONPath expressions.
+
+Version 0.161.0 is a significant rewrite of the jsonpath extension. The functions `json_query` and
+`json_replace`, however, are compatible with earlier versions.
 
 ### Classes
 <table border="0">
@@ -63,19 +66,15 @@ JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the 
 
 Select the first (indexed 0) book using the dot notation:
 
-    $.store.book.0
+    $.books.0
 
 or
 
-    $. store . book . 0 
+    $.'books'.0
 
 or
 
-    $.'store'.'book'.0
-
-or
-
-    $."store"."book".0
+    $."books".0
 
 The leading `$` represents the root JSON value. The jsoncons implementation
 allows single and double quoted as well as
@@ -83,10 +82,6 @@ unquoted names. Unquoted names must not contain spaces, and spaces before
 and after the name are ignored. 
 
 Select the first (indexed 0) book using the bracket-notation: 
-
-    $[store][book][0]
-
-or 
 
     $['store']['book'][0]
 
@@ -109,7 +104,7 @@ Union of the fourth book and all books with price > 10:
 JSONPath|       Description
 --------|--------------------------------
 `$`|    Represents the root JSON value
-`@`|    Represents the current node being processed by a filter predicate.
+`@`|    Represents the current node in an expression.
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
