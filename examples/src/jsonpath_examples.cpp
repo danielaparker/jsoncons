@@ -314,7 +314,7 @@ namespace {
         std::cout << pretty_print(data) << "\n";
     }
 
-    void json_make_expression_examples()
+    void make_expression_examples()
     {
         auto expr = jsonpath::make_expression<json>("$.books[1,1,3].title");
 
@@ -334,6 +334,17 @@ namespace {
         std::cout << "(4) " << pretty_print(result4) << "\n\n";
     }
 
+    void more_make_expression_examples()
+    {
+        auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
+
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
+
+        json result = expr.evaluate(data);
+        std::cout << pretty_print(result) << "\n\n";
+    }
+
 } // namespace
 
 void jsonpath_examples()
@@ -348,7 +359,8 @@ void jsonpath_examples()
     flatten_and_unflatten();
     more_json_query_examples();
     json_replace_examples();
-    json_make_expression_examples();
+    make_expression_examples();
+    more_make_expression_examples();
 
     std::cout << "\n";
 }

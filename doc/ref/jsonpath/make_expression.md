@@ -56,3 +56,53 @@ Returns a `jsonpath_expression` object that represents the JSONPath expression.
 
 (2) and (4) set the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
 
+### Example
+
+```c++
+int main()
+{
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
+
+    std::string data = R"(
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+    )";
+
+    json data = json::parse(data);
+
+    json result = expr.evaluate(data);
+    std::cout << pretty_print(result) << "\n\n";
+}
+```
+Output:
+```
+[
+    "The Night Watch"
+]
+```
