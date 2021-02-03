@@ -13,7 +13,9 @@
 #include <unordered_set> // std::unordered_set
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
+#if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
+#endif
 #include <jsoncons/json_type.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
@@ -580,6 +582,8 @@ namespace detail {
         }
     };
 
+#if defined(JSONCONS_HAS_STD_REGEX)
+
     template <class Json,class JsonReference>
     class tokenize_function : public function_base<Json,JsonReference>
     {
@@ -613,8 +617,8 @@ namespace detail {
             auto arg0 = args[0]->template as<string_type>();
             auto arg1 = args[1]->template as<string_type>();
 
-            std::regex::flag_type flags = std::regex_constants::ECMAScript; 
-            std::basic_regex<char_type> pieces_regex(arg1, flags);
+            std::regex::flag_type options = std::regex_constants::ECMAScript; 
+            std::basic_regex<char_type> pieces_regex(arg1, options);
 
             std::regex_token_iterator<typename string_type::const_iterator> rit ( arg0.begin(), arg0.end(), pieces_regex, -1);
             std::regex_token_iterator<typename string_type::const_iterator> rend;
@@ -628,6 +632,8 @@ namespace detail {
             return *j;
         }
     };
+
+#endif // defined(JSONCONS_HAS_STD_REGEX)
 
     template <class Json,class JsonReference>
     class ceil_function : public function_base<Json,JsonReference>
@@ -1053,7 +1059,9 @@ namespace detail {
             static max_function<Json,JsonReference> max_func;
             static length_function<Json,JsonReference> length_func;
             static keys_function<Json,JsonReference> keys_func;
+#if defined(JSONCONS_HAS_STD_REGEX)
             static tokenize_function<Json,JsonReference> tokenize_func;
+#endif
 
             static std::unordered_map<string_type,function_base_type*> functions =
             {
@@ -1066,7 +1074,9 @@ namespace detail {
                 {string_type{'m','a','x'}, &max_func},
                 {string_type{'l','e','n','g','t','h'}, &length_func},
                 {string_type{'k','e','y','s'}, &keys_func},
+#if defined(JSONCONS_HAS_STD_REGEX)
                 {string_type{'t','o','k','e','n','i','z','e'}, &tokenize_func},
+#endif
                 {string_type{'c','o','u','n','t'}, &length_func}
             };
 
@@ -1470,10 +1480,10 @@ namespace detail {
 
         static string_type generate_path(const string_view_type& path, 
                                          std::size_t index, 
-                                         result_options flags) 
+                                         result_options options) 
         {
             string_type s;
-            if ((flags & result_options::path) == result_options::path)
+            if ((options & result_options::path) == result_options::path)
             {
                 s.append(path.data(), path.length());
                 s.push_back('[');
@@ -1485,10 +1495,10 @@ namespace detail {
 
         static string_type generate_path(const string_view_type& path, 
                                          const string_view_type& identifier, 
-                                         result_options flags) 
+                                         result_options options) 
         {
             string_type s;
-            if ((flags & result_options::path) == result_options::path)
+            if ((options & result_options::path) == result_options::path)
             {
                 s.append(path.data(), path.length());
                 s.push_back('[');
@@ -1506,7 +1516,7 @@ namespace detail {
                             reference val, 
                             std::vector<path_node_type>& nodes,
                             node_type& ndtype,
-                            result_options flags) const = 0;
+                            result_options options) const = 0;
 
         virtual void append_selector(std::unique_ptr<selector_base>&&) 
         {
@@ -1988,25 +1998,25 @@ namespace detail {
                       const string_type& path, 
                       reference root,
                       reference instance,
-                      result_options flags) const
+                      result_options options) const
         {
             Json result(json_array_arg);
 
-            if ((flags & result_options::value) == result_options::value)
+            if ((options & result_options::value) == result_options::value)
             {
                 auto callback = [&result](path_node_type& node)
                 {
                     result.push_back(*node.ptr);
                 };
-                evaluate(resources, path, root, instance, callback, flags);
+                evaluate(resources, path, root, instance, callback, options);
             }
-            else if ((flags & result_options::path) == result_options::path)
+            else if ((options & result_options::path) == result_options::path)
             {
                 auto callback = [&result](path_node_type& node)
                 {
                     result.emplace_back(node.path);
                 };
-                evaluate(resources, path, root, instance, callback, flags);
+                evaluate(resources, path, root, instance, callback, options);
             }
 
             return result;
@@ -2019,7 +2029,7 @@ namespace detail {
                  reference root,
                  reference current, 
                  Callback callback,
-                 result_options flags) const
+                 result_options options) const
         {
             std::error_code ec;
 
@@ -2160,9 +2170,9 @@ namespace detail {
                                 stack.pop_back();
                                 std::vector<path_node_type> temp;
                                 node_type ndtype = node_type();
-                                tok.selector_->select(resources, path, root, *ptr, temp, ndtype, flags);
+                                tok.selector_->select(resources, path, root, *ptr, temp, ndtype, options);
 
-                                if ((flags & result_options::no_dups) == result_options::no_dups)
+                                if ((options & result_options::no_dups) == result_options::no_dups)
                                 {
                                     std::unordered_set<string_type> index;
                                     std::vector<path_node_type> temp2;

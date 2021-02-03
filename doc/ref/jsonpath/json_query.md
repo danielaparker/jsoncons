@@ -5,24 +5,26 @@
 
 enum class result_type {value,path};
 
+template<class Json>
+Json json_query(const Json& root, 
+                const Json:string_view_type& expr,
+                result_type type = result_type::value); (until 0.161.0)
+
 template<class Json, class Source>
 Json json_query(const Json& root, 
                 const Source& expr,
-                result_options flags = result_options::value); (1)
+                result_options options = result_options::value); (since 0.161.0)
 
 
 template<class Json>
 Json json_query(const Json& root, 
                 const typename Json::char_type* expr,
-                result_options flags = result_options::value); (2)
+                result_options options = result_options::value); (since 0.161.0)
 ```
 
-(1) Evaluates the Json value `root` against the JSONPath expression `expr` to produce a `json` array of values or 
+Evaluates the Json value `root` against the JSONPath expression `expr` to produce a `json` array of values or 
 normalized path expressions. The JSONPath expression `expr` is provided as a sequential container 
 or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
-
-(2) Evaluates the Json value `root` against the JSONPath expression `expr` to produce a `json` array of values or 
-normalized path expressions. The JSONPath expression `expr` is provided as a null terminated string.
 
 #### Parameters
 
@@ -36,8 +38,12 @@ normalized path expressions. The JSONPath expression `expr` is provided as a nul
     <td>JSONPath expression</td> 
   </tr>
   <tr>
-    <td>flags</td>
-    <td>Indicates whether results are matching values (the default) or normalized path expressions</td> 
+    <td>options</td>
+    <td>Result options, a bitmask of type <a href="result_options.md">result_options</></td> 
+  </tr>
+  <tr>
+    <td>type</td>
+    <td>Since 0.161.0, typedefed to `jsonpath_options`.</></td> 
   </tr>
 </table>
 

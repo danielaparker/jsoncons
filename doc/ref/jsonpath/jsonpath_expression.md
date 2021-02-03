@@ -9,7 +9,7 @@ class jsonpath_expression
 
 #### Member functions
 
-    Json evaluate(reference instance, result_options flags = result_options::value); 
+    Json evaluate(reference instance, result_options options = result_options::value); 
 
 #### Parameters
 
