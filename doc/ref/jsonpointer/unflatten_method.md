@@ -1,11 +1,11 @@
-### jsoncons::jsonpointer::unflatten_method
+### jsoncons::jsonpointer::unflatten_options
 
 ```c++
 #include <jsoncons/jsonpointer/jsonpointer.hpp>
 
-enum class unflatten_method{preserve_arrays,object};
+enum class unflatten_options{preserve_arrays,object};
 ```
-`unflatten_method` is used to specify how to unflatten a json 
+`unflatten_options` is used to specify how to unflatten a json 
 object of JSON Pointer-value pairs. There is no unique solution.
 An integer appearing in a path could be an array index or it could be an object key.
 

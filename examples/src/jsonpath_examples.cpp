@@ -60,7 +60,7 @@ namespace {
         std::cout << "(10)\n" << pretty_print(result10) << "\n";
 
         // Normalized path expressions
-        json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_flags::path);
+        json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_options::path);
         std::cout << "(11)\n" << pretty_print(result11) << "\n";
 
         // All titles whose author's second name is 'Waugh'
@@ -291,15 +291,15 @@ namespace {
         std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
 
         auto result2 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                            jsonpath::result_flags::path);
+                                            jsonpath::result_options::path);
         std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
         auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                            jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
+                                            jsonpath::result_options::value | jsonpath::result_options::no_dups);
         std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
         auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                            jsonpath::result_flags::path | jsonpath::result_flags::no_dups);
+                                            jsonpath::result_options::path | jsonpath::result_options::no_dups);
         std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
     }
 
@@ -324,13 +324,13 @@ namespace {
         json result1 = expr.evaluate(data);
         std::cout << "(1) " << pretty_print(result1) << "\n\n";
 
-        json result2 = expr.evaluate(data, jsonpath::result_flags::path);
+        json result2 = expr.evaluate(data, jsonpath::result_options::path);
         std::cout << "(2) " << pretty_print(result2) << "\n\n";
 
-        json result3 = expr.evaluate(data, jsonpath::result_flags::value | jsonpath::result_flags::no_dups);
+        json result3 = expr.evaluate(data, jsonpath::result_options::value | jsonpath::result_options::no_dups);
         std::cout << "(3) " << pretty_print(result3) << "\n\n";
 
-        json result4 = expr.evaluate(data, jsonpath::result_flags::path | jsonpath::result_flags::no_dups);
+        json result4 = expr.evaluate(data, jsonpath::result_options::path | jsonpath::result_options::no_dups);
         std::cout << "(4) " << pretty_print(result4) << "\n\n";
     }
 

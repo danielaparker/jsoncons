@@ -21,43 +21,43 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    enum class result_flags {value=1,path=2,no_dups=4|path};
+    enum class result_options {value=1,path=2,no_dups=4|path};
 
-    using result_type = result_flags;
+    using result_type = result_options;
 
-    inline result_flags operator~(result_flags a)
+    inline result_options operator~(result_options a)
     {
-        return static_cast<result_flags>(~static_cast<unsigned int>(a));
+        return static_cast<result_options>(~static_cast<unsigned int>(a));
     }
 
-    inline result_flags operator&(result_flags a, result_flags b)
+    inline result_options operator&(result_options a, result_options b)
     {
-        return static_cast<result_flags>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
+        return static_cast<result_options>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
     }
 
-    inline result_flags operator^(result_flags a, result_flags b)
+    inline result_options operator^(result_options a, result_options b)
     {
-        return static_cast<result_flags>(static_cast<unsigned int>(a) ^ static_cast<unsigned int>(b));
+        return static_cast<result_options>(static_cast<unsigned int>(a) ^ static_cast<unsigned int>(b));
     }
 
-    inline result_flags operator|(result_flags a, result_flags b)
+    inline result_options operator|(result_options a, result_options b)
     {
-        return static_cast<result_flags>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
+        return static_cast<result_options>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
     }
 
-    inline result_flags operator&=(result_flags& a, result_flags b)
+    inline result_options operator&=(result_options& a, result_options b)
     {
         a = a & b;
         return a;
     }
 
-    inline result_flags operator^=(result_flags& a, result_flags b)
+    inline result_options operator^=(result_options& a, result_options b)
     {
         a = a ^ b;
         return a;
     }
 
-    inline result_flags operator|=(result_flags& a, result_flags b)
+    inline result_options operator|=(result_options& a, result_options b)
     {
         a = a | b;
         return a;
@@ -1470,10 +1470,10 @@ namespace detail {
 
         static string_type generate_path(const string_view_type& path, 
                                          std::size_t index, 
-                                         result_flags flags) 
+                                         result_options flags) 
         {
             string_type s;
-            if ((flags & result_flags::path) == result_flags::path)
+            if ((flags & result_options::path) == result_options::path)
             {
                 s.append(path.data(), path.length());
                 s.push_back('[');
@@ -1485,10 +1485,10 @@ namespace detail {
 
         static string_type generate_path(const string_view_type& path, 
                                          const string_view_type& identifier, 
-                                         result_flags flags) 
+                                         result_options flags) 
         {
             string_type s;
-            if ((flags & result_flags::path) == result_flags::path)
+            if ((flags & result_options::path) == result_options::path)
             {
                 s.append(path.data(), path.length());
                 s.push_back('[');
@@ -1506,7 +1506,7 @@ namespace detail {
                             reference val, 
                             std::vector<path_node_type>& nodes,
                             node_type& ndtype,
-                            result_flags flags) const = 0;
+                            result_options flags) const = 0;
 
         virtual void append_selector(std::unique_ptr<selector_base>&&) 
         {
@@ -1988,11 +1988,11 @@ namespace detail {
                       const string_type& path, 
                       reference root,
                       reference instance,
-                      result_flags flags) const
+                      result_options flags) const
         {
             Json result(json_array_arg);
 
-            if ((flags & result_flags::value) == result_flags::value)
+            if ((flags & result_options::value) == result_options::value)
             {
                 auto callback = [&result](path_node_type& node)
                 {
@@ -2000,7 +2000,7 @@ namespace detail {
                 };
                 evaluate(resources, path, root, instance, callback, flags);
             }
-            else if ((flags & result_flags::path) == result_flags::path)
+            else if ((flags & result_options::path) == result_options::path)
             {
                 auto callback = [&result](path_node_type& node)
                 {
@@ -2019,7 +2019,7 @@ namespace detail {
                  reference root,
                  reference current, 
                  Callback callback,
-                 result_flags flags) const
+                 result_options flags) const
         {
             std::error_code ec;
 
@@ -2162,7 +2162,7 @@ namespace detail {
                                 node_type ndtype = node_type();
                                 tok.selector_->select(resources, path, root, *ptr, temp, ndtype, flags);
 
-                                if ((flags & result_flags::no_dups) == result_flags::no_dups)
+                                if ((flags & result_options::no_dups) == result_options::no_dups)
                                 {
                                     std::unordered_set<string_type> index;
                                     std::vector<path_node_type> temp2;

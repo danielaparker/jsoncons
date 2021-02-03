@@ -39,15 +39,15 @@ void jsonpath_tests(const std::string& fpath)
             std::string expr = test_case["expression"].as<std::string>();
             try
             {
-                jsonpath::result_flags flags = jsonpath::result_flags();
+                jsonpath::result_options flags = jsonpath::result_options();
                 if (test_case.contains("no_dups") && test_case.at("no_dups").as<bool>())
                 {
-                    flags |= jsonpath::result_flags::no_dups;
+                    flags |= jsonpath::result_options::no_dups;
                 }
                 auto expression = jsoncons::jsonpath::make_expression<json>(jsoncons::string_view(expr));
                 if (test_case.contains("result"))
                 {
-                    jsonpath::result_flags rflags = flags | jsonpath::result_flags::value;
+                    jsonpath::result_options rflags = flags | jsonpath::result_options::value;
                     json actual = expression.evaluate(instance, rflags);
                     const json& expected = test_case["result"];
                     //std::cout << "actual\n:" << actual << "\n";
@@ -66,7 +66,7 @@ void jsonpath_tests(const std::string& fpath)
                 }
                 if (test_case.contains("path"))
                 {
-                    jsonpath::result_flags pflags = flags | jsonpath::result_flags::path;
+                    jsonpath::result_options pflags = flags | jsonpath::result_options::path;
                     json actual = expression.evaluate(instance, pflags);
                     const json& expected = test_case["path"];
                     //std::cout << "actual\n:" << actual << "\n";

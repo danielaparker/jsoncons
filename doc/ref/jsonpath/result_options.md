@@ -1,7 +1,7 @@
-### jsoncons::jsonpath::result_flags
+### jsoncons::jsonpath::result_options
 
 ```c++
-enum class result_flags 
+enum class result_options 
 {
    value = 1,
    path = 2,

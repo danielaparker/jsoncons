@@ -225,7 +225,7 @@ namespace jsoncons { namespace jsonpath {
                                reference val,
                                std::vector<path_node_type>& nodes,
                                node_type& ndtype,
-                               result_flags flags) const
+                               result_options flags) const
             {
                 if (!tail_selector_)
                 {
@@ -260,7 +260,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val,
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 //std::cout << "identifier selector val: " << val << ", identifier: " << identifier_  << "\n";
 
@@ -336,7 +336,7 @@ namespace jsoncons { namespace jsonpath {
                         reference,
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 if (resources.is_cached(id_))
                 {
@@ -384,7 +384,7 @@ namespace jsoncons { namespace jsonpath {
                         reference current,
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 ndtype = node_type::single;
                 this->evaluate_tail(resources, path, 
@@ -422,7 +422,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val,
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 ndtype = node_type::single;
                 if (val.is_array())
@@ -465,7 +465,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val,
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 //std::cout << "wildcard_selector: " << val << "\n";
                 ndtype = node_type::multi; // always multi
@@ -519,7 +519,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val,
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 //std::cout << "wildcard_selector: " << val << "\n";
                 if (val.is_array())
@@ -574,7 +574,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val, 
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 //std::cout << "union_selector select val: " << val << "\n";
                 ndtype = node_type::multi;
@@ -643,7 +643,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val, 
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 if (val.is_array())
                 {
@@ -712,7 +712,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val, 
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 std::vector<path_node_type> temp;
                 auto callback = [&temp](path_node_type& node)
@@ -767,7 +767,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val,
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 ndtype = node_type::multi;
 
@@ -832,7 +832,7 @@ namespace jsoncons { namespace jsonpath {
                         reference val, 
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
-                        result_flags flags) const override
+                        result_options flags) const override
             {
                 ndtype = node_type::single;
 
@@ -3093,7 +3093,7 @@ namespace jsoncons { namespace jsonpath {
 
         template <class Callback>
         typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
-        evaluate(reference instance, Callback callback, result_flags flags = result_flags::value)
+        evaluate(reference instance, Callback callback, result_options flags = result_options::value)
         {
             string_type path = {'$'};
 
@@ -3101,16 +3101,16 @@ namespace jsoncons { namespace jsonpath {
             expr_.evaluate(resources, path, instance, instance, callback, flags);
         }
 
-        Json evaluate(reference instance, result_flags flags = result_flags::value)
+        Json evaluate(reference instance, result_options flags = result_options::value)
         {
             string_type path = {'$'};
 
-            if ((flags & result_flags::value) == result_flags::value)
+            if ((flags & result_options::value) == result_options::value)
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
                 return expr_.evaluate(resources, path, instance, instance, flags);
             }
-            else if ((flags & result_flags::path) == result_flags::path)
+            else if ((flags & result_options::path) == result_options::path)
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
@@ -3190,7 +3190,7 @@ namespace jsoncons { namespace jsonpath {
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value,Json>::type
     json_query(const Json& instance, 
                const Source& path, 
-               result_flags flags = result_flags::value)
+               result_options flags = result_options::value)
     {
         auto expression = make_expression<Json>(path);
         return expression.evaluate(instance, flags);
@@ -3199,7 +3199,7 @@ namespace jsoncons { namespace jsonpath {
     template<class Json>
     Json json_query(const Json& instance, 
                     const typename Json::char_type* path, 
-                    result_flags flags = result_flags::value)
+                    result_options flags = result_options::value)
     {
         return json_query(instance, basic_string_view<typename Json::char_type>(path), flags);
     }
@@ -3227,7 +3227,7 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = new_value;
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_dups);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_options::no_dups);
     }
 
     template<class Json, class Source, class Op>
@@ -3253,7 +3253,7 @@ namespace jsoncons { namespace jsonpath {
         {
             *node.ptr = op(*node.ptr);
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_flags::no_dups);
+        expr.evaluate(resources, output_path, instance, instance, callback, result_options::no_dups);
     }
 
     template<class Json, class Op>

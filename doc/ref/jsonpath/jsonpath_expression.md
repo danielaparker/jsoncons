@@ -9,7 +9,7 @@ class jsonpath_expression
 
 #### Member functions
 
-    Json evaluate(reference instance, result_flags flags = result_flags::value); 
+    Json evaluate(reference instance, result_options flags = result_options::value); 
 
 #### Parameters
 
@@ -19,8 +19,8 @@ class jsonpath_expression
     <td>Json value</td> 
   </tr>
   <tr>
-    <td>result_flags</td>
-    <td>Result options, a bitmask of type <a href="result_flags.md">result_flags</></td> 
+    <td>result_options</td>
+    <td>Result options, a bitmask of type <a href="result_options.md">result_options</></td> 
   </tr>
 </table>
 

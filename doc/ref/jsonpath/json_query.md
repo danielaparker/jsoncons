@@ -8,13 +8,13 @@ enum class result_type {value,path};
 template<class Json, class Source>
 Json json_query(const Json& root, 
                 const Source& expr,
-                result_flags flags = result_flags::value); (1)
+                result_options flags = result_options::value); (1)
 
 
 template<class Json>
 Json json_query(const Json& root, 
                 const typename Json::char_type* expr,
-                result_flags flags = result_flags::value); (2)
+                result_options flags = result_options::value); (2)
 ```
 
 (1) Evaluates the Json value `root` against the JSONPath expression `expr` to produce a `json` array of values or 
@@ -147,7 +147,7 @@ int main()
     std::cout << "(10)\n" << pretty_print(result10) << "\n";
 
     // Normalized path expressions
-    json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_flags::path);
+    json result11 = jsonpath::json_query(booklist, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_options::path);
     std::cout << "(11)\n" << pretty_print(result11) << "\n";
 
     // All titles whose author's second name is 'Waugh'
@@ -238,7 +238,7 @@ using namespace jsoncons;
 int main()
 {
     std::string path = "$.store.book[?(@.price < 10)].title";
-    json result = jsonpath::json_query(store,path,result_flags::path);
+    json result = jsonpath::json_query(store,path,result_options::path);
 
     std::cout << pretty_print(result) << std::endl;
 }
