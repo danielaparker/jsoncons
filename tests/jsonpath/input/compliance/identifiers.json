@@ -17,17 +17,6 @@
         ]
     },
     {
-        "source:" : "https://cburgmer.github.io/json-path-comparison/",
-        "given": {"key-dash": "value"},
-        "cases": [
-            {
-                "comment" : "Dot notation with dash",
-                "expression" : "$.key-dash",
-                "result" : ["value"]
-            }
-        ]
-    },
-    {
         "given": {
                "key": "value"
            },

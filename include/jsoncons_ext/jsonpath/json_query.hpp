@@ -1448,6 +1448,7 @@ namespace jsoncons { namespace jsonpath {
                             case '|':
                             case '&':
                             case '+':
+                            case '-':
                             case '*':
                             case '/':
                             case '@':

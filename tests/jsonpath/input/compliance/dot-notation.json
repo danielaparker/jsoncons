@@ -150,5 +150,26 @@
                 "result" : ["Sayings of the Century"]
             }
         ]
+    },
+    {
+        "source:" : "https://cburgmer.github.io/json-path-comparison/",
+        "given": {"key-dash": "value"},
+        "cases": [
+            {
+                "comment" : "Dot notation with dash",
+                "expression" : "$.key-dash",
+                "error" : true
+            },
+            {
+                "comment" : "Dot notation with dash",
+                "expression" : "$.'key-dash'",
+                "result" : ["value"]
+            },
+            {
+                "comment" : "Dot notation with dash",
+                "expression" : "$.\"key-dash\"",
+                "result" : ["value"]
+            }
+        ]
     }
 ]

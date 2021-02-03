@@ -7,7 +7,7 @@
          {
             "comment" : "Dot notation after filter expression",
             "expression": "$[(@.length-1)]",
-            "result": []
+            "result": ["fifth"]
          },
          {
             "comment" : "Dot notation after filter expression",
