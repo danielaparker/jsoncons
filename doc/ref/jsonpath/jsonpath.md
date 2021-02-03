@@ -222,7 +222,7 @@ Function|Description|Result|Example
 
 ### Examples
 
-The examples use the JSON data below, 
+The examples use the sample data file `books.json`, 
 
 ```json
 {

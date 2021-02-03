@@ -58,12 +58,9 @@ Returns a `jsonpath_expression` object that represents the JSONPath expression.
 
 ### Example
 
-```c++
-int main()
-{
-    auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
+The example uses the sample data file `books.json`, 
 
-    std::string data = R"(
+```json
 {
     "books":
     [
@@ -92,9 +89,15 @@ int main()
         }
     ]
 }
-    )";
+```
 
-    json data = json::parse(data);
+```c++
+int main()
+{
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
+
+    std::ifstream is("./input/books.json");
+    json data = json::parse(is);
 
     json result = expr.evaluate(data);
     std::cout << pretty_print(result) << "\n\n";
