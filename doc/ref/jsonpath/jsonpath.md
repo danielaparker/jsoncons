@@ -70,10 +70,10 @@ or
 
     $."store"."book".0
 
-The leading `$` represents the root JSON value. The jsoncons implementation
-allows single and double quoted as well as
-unquoted names. Unquoted names must not contain spaces, and spaces before
-and after the name are ignored. 
+The leading `$` represents the root JSON value. 
+Unquoted names in the dot notation are restricted to digits 0-9, letters A-Z and a-z, 
+the underscore character _, and unicode coded characters that are non-ascii. Note 
+that names with hyphens must be quoted.
 
 Select the first (indexed 0) book using the bracket-notation: 
 
@@ -407,10 +407,10 @@ Output:
 }
 ```
 
-#### jsonpath_expression function
+#### jsonpath_expression
 
 A [jsoncons::jsonpath::jsonpath_expression](jsonpath_expression.md) 
-represents the compiled form of a JMESPath expression. It allows you to 
+represents the compiled form of a JSONPath expression. It allows you to 
 evaluate a single compiled expression on multiple JSON documents.
 A `jsonpath_expression` is immutable and thread-safe. 
 
