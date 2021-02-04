@@ -5,7 +5,7 @@ enum class result_options
 {
    value = 1,
    path = 2,
-   no_dups = 4 | path
+   nodups = 4 | path
 };
 ```
 
