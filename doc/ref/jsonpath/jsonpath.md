@@ -147,6 +147,68 @@ $[1::-1]   | First two items, reversed
 $[:-3:-1]  | Last two items, reversed
 $[-3::-1]  | All items except the last two, reversed
 
+### Filter predicates
+
+JSONPath uses filter predicates to restrict the set of nodes returned by a path.
+
+[Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
+
+Operator|       Description
+--------|--------------------------------
+`*`     |Left times right
+`/`     |Left divided by right
+`+`     |Left plus right
+`-`     |Left minus right
+`&&`    |Left and right
+<code>&#124;&#124;</code>    |Left or right
+`==`    |Left is equal to right 
+`!=`    |Left is not equal to right
+`<`     |Left is less than right
+`<=`    |Left is less or equal to right
+`>`     |Left is greater than right
+`>=`    |Left is greater than or equal to right
+'=~'    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
+
+Unary operators
+
+Operator|       Description
+--------|--------------------------------
+`!`     |Not right
+`-`     |Negates right
+
+Operator precedence
+
+Precedence|Operator|Associativity
+----------|--------|-----------
+1 |`!` unary `-`    |Right
+2 |`=~`             |Left
+3 |`*` `/`          |Left 
+4 |`+` `-`          |Left 
+5 |`<` `>` `<=` `>=`|Left 
+6 |`==` `!=`        |Left 
+7 |`&&`             |Left 
+8 |<code>&#124;&#124;</code> |Left 
+
+### Function expressions
+
+Support for functions is a jsoncons extension.
+
+Functions can be passed JSONPath paths and JSON expressions. 
+Outside a filter predicate, functions can be passed paths that select from
+the root JSON value `$`. Within a filter predicate, functions can be passed either a 
+path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
+
+Function|Description|Result|Example
+----------|--------|-------|---
+`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
+`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
+`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
+`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
+`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
+`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`keys(object)`|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
+`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
+
 ### Duplicates
 
 Consider the JSON instance 
@@ -196,68 +258,6 @@ Path|Value
 Since 0.161.0, the `jsonpath::json_query` function defaults to allowing duplicates, 
 but has an option for no duplicates. The `jsonpath::json_replace` function 
 always excludes duplicates.
-
-### Filter predicates
-
-JSONPath uses filter predicates to restrict the set of nodes returned by a path.
-
-[Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
-
-Operator|       Description
---------|--------------------------------
-`*`     |Left times right
-`/`     |Left divided by right
-`+`     |Left plus right
-`-`     |Left minus right
-`&&`    |Left and right
-<code>&#124;&#124;</code>    |Left or right
-`==`    |Left is equal to right 
-`!=`    |Left is not equal to right
-`<`     |Left is less than right
-`<=`    |Left is less or equal to right
-`>`     |Left is greater than right
-`>=`    |Left is greater than or equal to right
-'=~'    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
-
-Unary operators
-
-Operator|       Description
---------|--------------------------------
-`!`     |Not right
-`-`     |Negates right
-
-Operator precedence
-
-Precedence|Operator|Associativity
-----------|--------|-----------
-1 |`!` unary `-`    |Right
-2 |`=~`             |Left
-3 |`*` `/`          |Left 
-4 |`+` `-`          |Left 
-5 |`<` `>` `<=` `>=`|Left 
-6 |`==` `!=`        |Left 
-7 |`&&`             |Left 
-8 |<code>&#124;&#124;</code> |Left 
-
-### Functions
-
-Support for functions is a jsoncons extension.
-
-Functions can be passed JSONPath paths and JSON expressions. 
-Outside a filter predicate, functions can be passed paths that select from
-the root JSON value `$`. Within a filter predicate, functions can be passed either a 
-path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
-
-Function|Description|Result|Example
-----------|--------|-------|---
-`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
-`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
-`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
-`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
-`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
-`keys(object)`|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
-`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
 
 ### Examples
 
