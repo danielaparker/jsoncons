@@ -39,9 +39,9 @@ Version 0.161.0 is a significant rewrite of the jsonpath extension. The function
 
 [JSONPath](http://goessner.net/articles/JsonPath/), a loosely standardized syntax for querying JSON, is a creation of Stefan Goessner.
 There are many implementations, Christoph Burgmer's [JSONPath comparison](https://cburgmer.github.io/json-path-comparison/)
-shows how they compare.
+indicates where they differ and where they agree.
 
-#### Differences with Stefan Goessner's implementation
+The jsoncons implementation differs from Stefan Goessner's JavaScript implementation in the following respects:
 
 - Stefan Goessner's implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. 
   The `jsoncons` implementation returns an empty array in case of no match.
@@ -189,26 +189,6 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
 
-### Function expressions
-
-Support for functions is a jsoncons extension.
-
-Functions can be passed JSONPath paths and JSON expressions. 
-Outside a filter predicate, functions can be passed paths that select from
-the root JSON value `$`. Within a filter predicate, functions can be passed either a 
-path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
-
-Function|Description|Result|Example
-----------|--------|-------|---
-`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.books[*].price)`
-`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.books[*].price)`
-`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.books[*])`
-`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.books[?(@.price > sum($.books[*].price) / count($.books[*]))].title`
-`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.books[?(@.price > avg($.books[*].price))].title`
-`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.books[?(479373 < prod($..price) && prod($..price) < 479374)].title`
-`keys(object)`|Returns an array of keys.|`array of string`|`keys($.books[0])[*]`
-`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.books[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
-
 ### Duplicates
 
 Consider the JSON instance 
@@ -258,6 +238,26 @@ Path|Value
 Since 0.161.0, the `jsonpath::json_query` function defaults to allowing duplicates, 
 but has an option for no duplicates. The `jsonpath::json_replace` function 
 always excludes duplicates.
+
+### Function expressions
+
+Support for functions is a jsoncons extension.
+
+Functions can be passed JSONPath paths and JSON expressions. 
+Outside a filter predicate, functions can be passed paths that select from
+the root JSON value `$`. Within a filter predicate, functions can be passed either a 
+path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
+
+Function|Description|Result|Example
+----------|--------|-------|---
+`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.books[*].price)`
+`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.books[*].price)`
+`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.books[*])`
+`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.books[?(@.price > sum($.books[*].price) / count($.books[*]))].title`
+`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.books[?(@.price > avg($.books[*].price))].title`
+`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.books[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`keys(object)`|Returns an array of keys.|`array of string`|`keys($.books[0])[*]`
+`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.books[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
 
 ### Examples
 
