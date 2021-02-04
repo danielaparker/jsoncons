@@ -3,7 +3,7 @@ master
 
 Enhancements to JSONPath extension
 
-- Added a new function `make_expression` for creating a compiled JSONPath expression for later evaluation. 
+- Added a new function `make_selector` for creating a compiled JSONPath expression for later evaluation. 
 - The `json_query` functions now takes an options parameter that allows duplicate values (i.e. values with
 the same node paths) to be excluded from results.
 
