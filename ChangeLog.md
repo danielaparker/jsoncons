@@ -7,6 +7,27 @@ Enhancements to JSONPath extension
 - The `json_query` functions now takes an options parameter that allows duplicate values (i.e. values with
 the same node paths) to be excluded from results.
 
+Changes to supported JSONPath syntax
+
+- Previous versions allowed optionally omitting the '$' representing the root of the 
+JSON instance in path selectors. This is no longer allowed. In 0.161.0, all path 
+selectors must start with either '$', if relative to the root of the JSON instance, 
+or '@', if relative to the current node. E.g. `store.book.0` is not allowed, 
+rather, `$store.book.0`.
+- Previous versions supported union of completely separate paths, e.g. 
+`$..[name.first,address.city]`. 0.161.0 does too, but requires that the 
+relative paths `name.first` and `address.city` start with a '@', so the 
+example becomes `$..[@.name.first,@.address.city]` .
+- Previous versions supported unquoted names with the square bracket notation, 
+this is no longer allowed. E.g. `$[books]` is not allowed, rather `$['books']` 
+or `$["books"]`.
+- Previous versions allowed an empty string to be passed as a path argument 
+to `json_query`. This is no longer allowed, a syntax error will be raised.
+- In 0.161.0, unquoted names in the dot notation are restricted to digits `0-9`, 
+letters `A-Z` and `a-z`, the underscore character `_`, and unicode coded characters 
+that are non-ascii.  All others names must be enclosed with single or double quotes. 
+In particular, names with hypens (`-`) must be enclosed with single or double quotes. 
+
 v0.160.0
 --------
 

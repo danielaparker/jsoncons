@@ -45,8 +45,6 @@ are good online evaluators for checking JSONPath expressions.
 
 ### jsoncons JSONPath
 
-The jsoncons implementation follows these [ABNF rules](jsoncons-jsonpath-abnf.md).
-
 Go to [JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) to see how jsoncons JsonPath compares with other implementations.
 
 #### Differences with Stefan Goessner's implementation
