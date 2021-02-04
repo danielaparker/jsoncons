@@ -23,7 +23,7 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    enum class result_options {value=1,path=2,nodups=4|path};
+    enum class result_options {value=1,path=2,nodups=4|path,sort=8|path};
 
     using result_type = result_options;
 
@@ -1375,6 +1375,26 @@ namespace detail {
         }
     };
 
+    template <class Json,class JsonReference>
+    struct path_node_compare
+    {
+        bool operator()(const path_node<Json,JsonReference>& a,
+                        const path_node<Json,JsonReference>& b) const noexcept
+        {
+            return a.path < b.path;
+        }
+    };
+
+    template <class Json,class JsonReference>
+    struct path_node_equivalent
+    {
+        bool operator()(const path_node<Json,JsonReference>& a,
+                        const path_node<Json,JsonReference>& b) const noexcept
+        {
+            return a.path == b.path;
+        }
+    };
+
     template <class Json, class JsonReference>
     class dynamic_resources
     {
@@ -1970,6 +1990,8 @@ namespace detail {
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
         using path_node_type = path_node<Json,JsonReference>;
+        using path_node_compare_type = path_node_compare<Json,JsonReference>;
+        using path_node_equivalent_type = path_node_equivalent<Json,JsonReference>;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
@@ -2172,20 +2194,34 @@ namespace detail {
                                 node_type ndtype = node_type();
                                 tok.selector_->select(resources, path, root, *ptr, temp, ndtype, options);
 
+                                if ((options & result_options::sort) == result_options::sort)
+                                {
+                                    std::sort(temp.begin(), temp.end(), path_node_compare_type());
+                                }
+
                                 if ((options & result_options::nodups) == result_options::nodups)
                                 {
-                                    std::unordered_set<string_type> index;
-                                    std::vector<path_node_type> temp2;
-                                    for (auto&& node : temp)
+                                    if ((options & result_options::sort) == result_options::sort)
                                     {
-                                        //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                        if (index.count(node.path) == 0)
-                                        {
-                                            index.emplace(node.path);
-                                            temp2.emplace_back(std::move(node));
-                                        }
+                                        auto last = std::unique(temp.begin(),temp.end(),path_node_equivalent_type());
+                                        temp.erase(last,temp.end());
+                                        stack.emplace_back(std::move(temp), ndtype);
                                     }
-                                    stack.emplace_back(std::move(temp2), ndtype);
+                                    else
+                                    {
+                                        std::unordered_set<string_type> index;
+                                        std::vector<path_node_type> temp2;
+                                        for (auto&& node : temp)
+                                        {
+                                            //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
+                                            if (index.count(node.path) == 0)
+                                            {
+                                                index.emplace(node.path);
+                                                temp2.emplace_back(std::move(node));
+                                            }
+                                        }
+                                        stack.emplace_back(std::move(temp2), ndtype);
+                                    }
                                 }
                                 else
                                 {
