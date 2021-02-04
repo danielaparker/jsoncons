@@ -39,9 +39,9 @@
         "given" : ["a"],
         "cases" : [
             {
-                "comment" : "Union with duplication from array and no_dups",
+                "comment" : "Union with duplication from array and nodups",
                 "expression" : "$[0,0]",
-                "no_dups" : true,
+                "nodups" : true,
                 "result" : ["a"]
             }
         ]
@@ -148,7 +148,7 @@
             {
                 "comment" : "Union with repeated matches after dot notation with wildcard",
                 "expression" : "$.*[0,:5]",
-                "no_dups" : true,
+                "nodups" : true,
                 "result" : ["string",null,true,false,"string",5.4]
             }
         ]
@@ -282,7 +282,7 @@
                "result": ["string","string",null,true,false,false,"string",5.4]
             },
             {
-               "no_dups" : true,
+               "nodups" : true,
                "expression": "$.*[0,:5]",
                "result": [
                  "string",

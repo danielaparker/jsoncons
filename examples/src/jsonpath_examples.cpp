@@ -295,11 +295,11 @@ namespace {
         std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
         auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                            jsonpath::result_options::value | jsonpath::result_options::no_dups);
+                                            jsonpath::result_options::value | jsonpath::result_options::nodups);
         std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
         auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                            jsonpath::result_options::path | jsonpath::result_options::no_dups);
+                                            jsonpath::result_options::path | jsonpath::result_options::nodups);
         std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
     }
 
@@ -327,10 +327,10 @@ namespace {
         json result2 = expr.evaluate(data, jsonpath::result_options::path);
         std::cout << "(2) " << pretty_print(result2) << "\n\n";
 
-        json result3 = expr.evaluate(data, jsonpath::result_options::value | jsonpath::result_options::no_dups);
+        json result3 = expr.evaluate(data, jsonpath::result_options::value | jsonpath::result_options::nodups);
         std::cout << "(3) " << pretty_print(result3) << "\n\n";
 
-        json result4 = expr.evaluate(data, jsonpath::result_options::path | jsonpath::result_options::no_dups);
+        json result4 = expr.evaluate(data, jsonpath::result_options::path | jsonpath::result_options::nodups);
         std::cout << "(4) " << pretty_print(result4) << "\n\n";
     }
 

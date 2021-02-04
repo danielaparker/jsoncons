@@ -23,7 +23,7 @@
 namespace jsoncons { 
 namespace jsonpath {
 
-    enum class result_options {value=1,path=2,no_dups=4|path};
+    enum class result_options {value=1,path=2,nodups=4|path};
 
     using result_type = result_options;
 
@@ -2172,7 +2172,7 @@ namespace detail {
                                 node_type ndtype = node_type();
                                 tok.selector_->select(resources, path, root, *ptr, temp, ndtype, options);
 
-                                if ((options & result_options::no_dups) == result_options::no_dups)
+                                if ((options & result_options::nodups) == result_options::nodups)
                                 {
                                     std::unordered_set<string_type> index;
                                     std::vector<path_node_type> temp2;

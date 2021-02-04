@@ -40,9 +40,9 @@ void jsonpath_tests(const std::string& fpath)
             try
             {
                 jsonpath::result_options flags = jsonpath::result_options();
-                if (test_case.contains("no_dups") && test_case.at("no_dups").as<bool>())
+                if (test_case.contains("nodups") && test_case.at("nodups").as<bool>())
                 {
-                    flags |= jsonpath::result_options::no_dups;
+                    flags |= jsonpath::result_options::nodups;
                 }
                 auto expression = jsoncons::jsonpath::make_selector<json>(jsoncons::string_view(expr));
                 if (test_case.contains("result"))
