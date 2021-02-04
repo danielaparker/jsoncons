@@ -77,23 +77,23 @@ and after the name are ignored.
 
 Select the first (indexed 0) book using the bracket-notation: 
 
-    $['store']['book'][0]
+    $['books'][0]
 
 or
 
-    $["store"]["book"][0]
+    $["books"][0]
 
-Recursively select all book titles under `'$.store'`:
+Recursively select all book titles in the JSON instance:
 
-    $.'store'..'title'
+    $..'title'
 
 Union of a subset of books identified by index:
 
-    $.store[book[0],book[1],book[3]]
+    $[books[0],books[1],books[3]]
 
 Union of the fourth book and all books with price > 10:
 
-    $.store[book[3],book[?(@.price > 10)]]
+    $[books[3],books[?(@.price > 10)]]
 
 JSONPath|       Description
 --------|--------------------------------
@@ -200,14 +200,14 @@ path that selects from the root JSON value `$`, or a path that selects from the 
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
-`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
-`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
-`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / count($.store.book[*]))].title`
-`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
-`keys(object)`|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
-`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
+`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.books[*].price)`
+`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.books[*].price)`
+`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.books[*])`
+`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.books[?(@.price > sum($.books[*].price) / count($.books[*]))].title`
+`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.books[?(@.price > avg($.books[*].price))].title`
+`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.books[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`keys(object)`|Returns an array of keys.|`array of string`|`keys($.books[0])[*]`
+`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.books[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
 
 ### Duplicates
 
