@@ -60,7 +60,7 @@ JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the 
 
 Select the first (indexed 0) book in [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3) using the dot notation:
 
-    $store.book.0
+    $.store.book.0
 
 or
 
