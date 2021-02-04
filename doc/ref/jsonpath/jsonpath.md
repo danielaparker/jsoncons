@@ -151,6 +151,56 @@ $[1::-1]   | First two items, reversed
 $[:-3:-1]  | Last two items, reversed
 $[-3::-1]  | All items except the last two, reversed
 
+#### Duplicates
+
+Consider the JSON instance 
+
+```json
+{
+    "books":
+    [
+        {
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami"
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko"
+        },
+        {
+            "title" : "The Comedians",
+            "author" : "Graham Greene"
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+```
+with selector
+```
+$.books[1,1,3].title
+```
+The majority of JSONPath implementations will produce (with duplicate paths allowed):
+
+Path|Value
+-------|------------------
+ `$['books'][1]['title']` | "The Night Watch" 
+ `$['books'][1]['title']` | "The Night Watch" 
+ `$['books'][3]['title']` | "The Night Watch" 
+
+A minority will produce (with duplicate paths excluded):
+
+Path|Value
+---------|------------------
+`$['books'][1]['title']` | "The Night Watch"
+`$['books'][3]['title']` | "The Night Watch"
+
+Since 0.161.0, the `jsonpath::json_query` function defaults to allowing duplicates, 
+but has an option for no duplicates. The `jsonpath::json_replace` function 
+always excludes duplicates.
+
 #### Filter predicates
 
 JSONPath uses filter predicates to restrict the set of nodes returned by a path.
