@@ -9,7 +9,6 @@ jsonpath_expression<Json> make_expression(const Source& expr);
 template <class Json>
 jsonpath_expression<Json> make_expression(const typename Json::char_type* expr); (1)
 ```
----
 ```c++
 template <class Json,class Source>
 jsonpath_expression<Json> make_expression(const Source& expr,
@@ -19,7 +18,6 @@ template <class Json>
 jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
                                           std::error_code& ec); (2)
 ```
----
 ```c++
 template <class Json,class Source,class Callback>
 void make_expression(const Source& expr, Callback callback); 
@@ -28,7 +26,6 @@ template <class Json>
 jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
                                           Callback callback); (3)
 ```
----
 ```c++
 template <class Json,class Source>
 jsonpath_expression<Json> make_expression(const Source& expr,
