@@ -35,30 +35,26 @@ Version 0.161.0 is a significant rewrite of the jsonpath extension. The function
   </tr>
 </table>
     
-### Stefan Goessner's JSONPath
-
-[JSONPath](http://goessner.net/articles/JsonPath/), a loosely standardized syntax for querying JSON, is a creation of Stefan Goessner. 
-JSONPath expressions refer to a JSON text in the same way as XPath expressions refer to an XML document. 
-
-The [Jayway JSONPath Evaluator](https://jsonpath.herokuapp.com/) and [JSONPATH Expression Tester](https://jsonpath.curiousconcept.com/)
-are good online evaluators for checking JSONPath expressions.
-
 ### jsoncons JSONPath
 
-Go to [JSONPath Comparison](https://cburgmer.github.io/json-path-comparison/) to see how jsoncons JsonPath compares with other implementations.
+[JSONPath](http://goessner.net/articles/JsonPath/), a loosely standardized syntax for querying JSON, is a creation of Stefan Goessner.
+There are many implementations, Christoph Burgmer's [JSONPath comparison](https://cburgmer.github.io/json-path-comparison/)
+shows how they compare.
 
 #### Differences with Stefan Goessner's implementation
 
 - Stefan Goessner's implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. 
-  The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
-- Names in both the dot notation and the bracket notation may be unquoted (no spaces), single-quoted, or double-quoted.
+  The `jsoncons` implementation returns an empty array in case of no match.
+- Names in the dot notation may be unquoted (no spaces), single-quoted, or double-quoted.
+- Names in the square bracket notation may be single-quoted or double-quoted.
 - Wildcards are allowed in the dot notation
-- Unions produce real unions with no duplicates instead of concatenated results
 - Union of completely separate paths are allowed, e.g.
 
     $..[@.firstName,@.address.city]
 
-#### Paths
+- An option is provided to exclude results corresponding to duplicate paths.
+
+### Paths
 
 JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation or the bracket-notation.
 
@@ -112,7 +108,7 @@ JSONPath|       Description
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
 
-#### Slices
+### Slices
 
 jsoncons jsonpath slices have the same semantics as Python slices
 (including for negative steps since v0.153.3)
@@ -151,7 +147,7 @@ $[1::-1]   | First two items, reversed
 $[:-3:-1]  | Last two items, reversed
 $[-3::-1]  | All items except the last two, reversed
 
-#### Duplicates
+### Duplicates
 
 Consider the JSON instance 
 
@@ -201,7 +197,7 @@ Since 0.161.0, the `jsonpath::json_query` function defaults to allowing duplicat
 but has an option for no duplicates. The `jsonpath::json_replace` function 
 always excludes duplicates.
 
-#### Filter predicates
+### Filter predicates
 
 JSONPath uses filter predicates to restrict the set of nodes returned by a path.
 
@@ -243,7 +239,7 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
 
-#### Functions
+### Functions
 
 Support for functions is a jsoncons extension.
 
