@@ -1185,6 +1185,16 @@
                 "result" : [{"key":42},{"key":43},{"key":42.0001},{"key":100}]
             },
             {
+                "comment" : "Filter expression with greater than or equal with whitespace",
+                "expression" : "$[?(@.key >= 42)]",
+                "result" : [{"key":42},{"key":43},{"key":42.0001},{"key":100}]
+            },
+            {
+                "comment" : "Filter expression with greater than or equal with whitespace",
+                "expression" : "$[?(@.key >= 42.0)]",
+                "result" : [{"key":42},{"key":43},{"key":42.0001},{"key":100}]
+            },
+            {
                 "comment" : "Filter expression with less than",
                 "expression" : "$[?(@.key<42)]",
                 "result" : [{"key":0},{"key":-1},{"key":41},{"key":41.9999}]

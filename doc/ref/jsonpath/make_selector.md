@@ -4,34 +4,45 @@
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 template <class Json,class Source>
-jsonpath_expression<Json> make_expression(const Source& expr); (1)
+jsonpath_expression<Json> make_expression(const Source& expr); 
 
 template <class Json>
-jsonpath_expression<Json> make_expression(const typename Json::char_type* expr); (2)
-
-
+jsonpath_expression<Json> make_expression(const typename Json::char_type* expr); (1)
+---
 template <class Json,class Source>
 jsonpath_expression<Json> make_expression(const Source& expr,
-                                          std::error_code& ec); (3)
+                                          std::error_code& ec); 
 
 template <class Json>
 jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
+                                          std::error_code& ec); (2)
+---
+
+template <class Json,class Source,class Callback>
+void make_expression(const Source& expr, Callback callback); 
+
+template <class Json>
+jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
+                                          Callback callback); (3)
+---
+template <class Json,class Source>
+jsonpath_expression<Json> make_expression(const Source& expr,
+                                          Callback callback,
+                                          std::error_code& ec); 
+
+template <class Json>
+jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
+                                          Callback callback,                                           
                                           std::error_code& ec); (4)
 ```
 
 (1) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 The JSONPath expression `expr` is provided as a sequential container or view of characters, 
-such as a `std::basic_string` or `std::basic_string_view`.
+such as a `std::basic_string` or `std::basic_string_view`, or a null terminated string.
 
 (2) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
-The JSONPath expression `expr` is provided as a null terminated string.
-
-(3) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 The JSONPath expression `expr` is provided as a sequential container or view of characters, 
-such as a `std::basic_string` or `std::basic_string_view`.
-
-(4) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
-The JSONPath expression `expr` is provided as a null terminated string.
+such as a `std::basic_string` or `std::basic_string_view`, or a null terminated string.
 
 #### Parameters
 
@@ -56,9 +67,9 @@ Returns a `jsonpath_expression` object that represents the JSONPath expression.
 
 (2) and (4) set the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
 
-### Example
+### Examples
 
-The example uses the sample data file `books.json`, 
+The examples below uses the sample data file `books.json`, 
 
 ```json
 {
@@ -91,6 +102,8 @@ The example uses the sample data file `books.json`,
 }
 ```
 
+#### Return copies
+
 ```c++
 int main()
 {
@@ -108,4 +121,27 @@ Output:
 [
     "The Night Watch"
 ]
+```
+
+#### Access path and reference to original value
+
+```c++
+int main()
+{
+    auto expr = jsonpath::make_selector<json>("$.books[?(@.price >= 22.0)]");
+
+    std::ifstream is("./input/books.json");
+    json data = json::parse(is);
+
+    auto callback = [](const std::string& path, const json& val)
+    {
+        std::cout << path << ": " << val << "\n";
+    };
+    expr.evaluate(data, callback, jsonpath::result_options::path);
+}
+```
+Output:
+```
+$['books'][0]: {"author":"Haruki Murakami","category":"fiction","price":22.72,"title":"A Wild Sheep Chase"}
+$['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,"title":"The Night Watch"}
 ```

@@ -579,10 +579,10 @@ namespace jsoncons { namespace jsonpath {
                 //std::cout << "union_selector select val: " << val << "\n";
                 ndtype = node_type::multi;
 
-                auto callback = [&](path_node_type& node)
+                auto callback = [&](const string_type& p, reference v)
                 {
                     //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                    this->evaluate_tail(resources, node.path, root, *node.ptr, nodes, ndtype, options);
+                    this->evaluate_tail(resources, p, root, v, nodes, ndtype, options);
                 };
                 for (auto& expr : expressions_)
                 {
@@ -650,9 +650,9 @@ namespace jsoncons { namespace jsonpath {
                     for (std::size_t i = 0; i < val.size(); ++i)
                     {
                         std::vector<path_node_type> temp;
-                        auto callback = [&temp](path_node_type& node)
+                        auto callback = [&temp](const string_type& p, reference v)
                         {
-                            temp.push_back(node);
+                            temp.emplace_back(p, std::addressof(v));
                         };
                         expr_.evaluate(resources, generate_path(path, i, options), root, val[i], callback, options);
                         if (is_true(temp))
@@ -666,9 +666,9 @@ namespace jsoncons { namespace jsonpath {
                     for (auto& member : val.object_range())
                     {
                         std::vector<path_node_type> temp;
-                        auto callback = [&temp](path_node_type& node)
+                        auto callback = [&temp](const string_type& p, reference v)
                         {
-                            temp.push_back(node);
+                            temp.emplace_back(p, std::addressof(v));
                         };
                         expr_.evaluate(resources, generate_path(path, member.key(), options), root, member.value(), callback, options);
                         if (is_true(temp))
@@ -715,9 +715,9 @@ namespace jsoncons { namespace jsonpath {
                         result_options options) const override
             {
                 std::vector<path_node_type> temp;
-                auto callback = [&temp](path_node_type& node)
+                auto callback = [&temp](const string_type& p, reference v)
                 {
-                    temp.push_back(node);
+                    temp.emplace_back(p, std::addressof(v));
                 };
                 expr_.evaluate(resources, path, root, val, callback, options);
                 if (!temp.empty())
@@ -837,9 +837,9 @@ namespace jsoncons { namespace jsonpath {
                 ndtype = node_type::single;
 
                 //std::cout << "function val: " << val << "\n";
-                auto callback = [&nodes](path_node_type& node)
+                auto callback = [&nodes](const string_type& p, reference v)
                 {
-                    nodes.push_back(node);
+                    nodes.emplace_back(p, std::addressof(v));
                 };
                 return expr_.evaluate(resources, path, root, val, callback, options);
             }
@@ -3082,7 +3082,7 @@ namespace jsoncons { namespace jsonpath {
         }
 
         template <class Callback>
-        typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
+        typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const string_type&,reference>::value,void>::type
         evaluate(reference instance, Callback callback, result_options options = result_options::value)
         {
             string_type path = {'$'};
@@ -3105,9 +3105,9 @@ namespace jsoncons { namespace jsonpath {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
                 Json result(json_array_arg);
-                auto callback = [&result](path_node_type& node)
+                auto callback = [&result](const string_type& p, reference)
                 {
-                    result.emplace_back(node.path);
+                    result.emplace_back(p);
                 };
                 expr_.evaluate(resources, path, instance, instance, callback, options);
                 return result;
@@ -3196,7 +3196,7 @@ namespace jsoncons { namespace jsonpath {
 
     template<class Json, class Source, class T>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
-                            !jsoncons::detail::is_function_object<T,Json>::value,void>::type
+                            !jsoncons::detail::is_unary_function_object<T,Json>::value,void>::type
     json_replace(Json& instance, const Source& path, const T& new_value)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
@@ -3213,16 +3213,16 @@ namespace jsoncons { namespace jsonpath {
         expression_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        auto callback = [&new_value](path_node_type& node)
+        auto callback = [&new_value](const string_type&, reference v)
         {
-            *node.ptr = new_value;
+            v = new_value;
         };
         expr.evaluate(resources, output_path, instance, instance, callback, result_options::nodups);
     }
 
     template<class Json, class Source, class Op>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
-                            jsoncons::detail::is_function_object<Op,Json>::value,void>::type
+                            jsoncons::detail::is_unary_function_object<Op,Json>::value,void>::type
     json_replace(Json& instance, const Source& path, Op op)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
@@ -3239,9 +3239,9 @@ namespace jsoncons { namespace jsonpath {
         expression_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        auto callback = [op](path_node_type& node)
+        auto callback = [op](const string_type&, reference v)
         {
-            *node.ptr = op(*node.ptr);
+            v = op(v);
         };
         expr.evaluate(resources, output_path, instance, instance, callback, result_options::nodups);
     }

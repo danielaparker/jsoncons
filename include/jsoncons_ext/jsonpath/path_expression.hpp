@@ -2026,17 +2026,17 @@ namespace detail {
 
             if ((options & result_options::value) == result_options::value)
             {
-                auto callback = [&result](path_node_type& node)
+                auto callback = [&result](const string_type&, reference val)
                 {
-                    result.push_back(*node.ptr);
+                    result.push_back(val);
                 };
                 evaluate(resources, path, root, instance, callback, options);
             }
             else if ((options & result_options::path) == result_options::path)
             {
-                auto callback = [&result](path_node_type& node)
+                auto callback = [&result](const string_type& path, reference)
                 {
-                    result.emplace_back(node.path);
+                    result.push_back(path);
                 };
                 evaluate(resources, path, root, instance, callback, options);
             }
@@ -2045,7 +2045,7 @@ namespace detail {
         }
 
         template <class Callback>
-        typename std::enable_if<jsoncons::detail::is_function_object<Callback,path_node_type&>::value,void>::type
+        typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const string_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  const string_type& ipath, 
                  reference root,
@@ -2248,12 +2248,12 @@ namespace detail {
                 switch (item.tag)
                 {
                     case node_set_tag::single:
-                        callback(item.node);
+                        callback(item.node.path, *item.node.ptr);
                         break;
                     case node_set_tag::multi:
                         for (auto& node : item.nodes)
                         {
-                            callback(node);
+                            callback(node.path, *node.ptr);
                         }
                         break;
                     default:

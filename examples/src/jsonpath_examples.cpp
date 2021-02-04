@@ -334,7 +334,7 @@ namespace {
         std::cout << "(4) " << pretty_print(result4) << "\n\n";
     }
 
-    void more_make_selector_examples()
+    void more_make_selector_example()
     {
         auto expr = jsonpath::make_selector<json>("$.books[?(@.price > avg($.books[*].price))].title");
 
@@ -343,6 +343,20 @@ namespace {
 
         json result = expr.evaluate(data);
         std::cout << pretty_print(result) << "\n\n";
+    }
+
+    void make_selector_with_callback_example()
+    {
+        auto expr = jsonpath::make_selector<json>("$.books[?(@.price >= 22.0)]");
+
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
+
+        auto callback = [](const std::string& path, const json& val)
+        {
+            std::cout << path << ": " << val << "\n";
+        };
+        expr.evaluate(data, callback, jsonpath::result_options::path);
     }
 
     void json_query_options_example()
@@ -395,6 +409,7 @@ namespace {
 void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
+
     json_replace_example1();
     json_replace_example2();
     json_replace_example3();
@@ -405,8 +420,9 @@ void jsonpath_examples()
     more_json_query_examples();
     json_replace_examples();
     make_selector_examples();
-    more_make_selector_examples();
+    more_make_selector_example();
     json_query_options_example();
+    make_selector_with_callback_example();
 
     std::cout << "\n";
 }
