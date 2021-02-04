@@ -58,17 +58,17 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
 
 JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation or the bracket-notation.
 
-Select the first (indexed 0) book using the dot notation:
+Select the first (indexed 0) book in [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3) using the dot notation:
 
-    $.books.0
-
-or
-
-    $.'books'.0
+    $store.book.0
 
 or
 
-    $."books".0
+    $.'store'.'book'.0
+
+or
+
+    $."store"."book".0
 
 The leading `$` represents the root JSON value. The jsoncons implementation
 allows single and double quoted as well as
@@ -77,23 +77,23 @@ and after the name are ignored.
 
 Select the first (indexed 0) book using the bracket-notation: 
 
-    $['books'][0]
+    $['store']['book'][0]
 
 or
 
-    $["books"][0]
+    $["store"]["book"][0]
 
-Recursively select all book titles in the JSON instance:
+Recursively select all book titles under '$.store':
 
-    $..'title'
+    $.'store'..'title'
 
 Union of a subset of books identified by index:
 
-    $[books[0],books[1],books[3]]
+    $.store[book[0],book[1],book[3]]
 
 Union of the fourth book and all books with price > 10:
 
-    $[books[3],books[?(@.price > 10)]]
+    $.store[book[3],book[?(@.price > 10)]]
 
 JSONPath|       Description
 --------|--------------------------------
@@ -107,6 +107,56 @@ JSONPath|       Description
 `[start:end:step]`      |Array slice operator borrowed from ECMASCRIPT 4.
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
+
+### Duplicates
+
+Consider the JSON instance 
+
+```json
+{
+    "books":
+    [
+        {
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami"
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko"
+        },
+        {
+            "title" : "The Comedians",
+            "author" : "Graham Greene"
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+```
+with selector
+```
+$.books[1,1,3].title
+```
+The majority of JSONPath implementations will produce (with duplicate paths allowed):
+
+Path|Value
+-------|------------------
+ `$['books'][1]['title']` | "The Night Watch" 
+ `$['books'][1]['title']` | "The Night Watch" 
+ `$['books'][3]['title']` | "The Night Watch" 
+
+A minority will produce (with duplicate paths excluded):
+
+Path|Value
+---------|------------------
+`$['books'][1]['title']` | "The Night Watch"
+`$['books'][3]['title']` | "The Night Watch"
+
+Since 0.161.0, the `jsonpath::json_query` function defaults to allowing duplicates, 
+but has an option for no duplicates. The `jsonpath::json_replace` function 
+always excludes duplicates.
 
 ### Slices
 
@@ -189,56 +239,6 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
 
-### Duplicates
-
-Consider the JSON instance 
-
-```json
-{
-    "books":
-    [
-        {
-            "title" : "A Wild Sheep Chase",
-            "author" : "Haruki Murakami"
-        },
-        {
-            "title" : "The Night Watch",
-            "author" : "Sergei Lukyanenko"
-        },
-        {
-            "title" : "The Comedians",
-            "author" : "Graham Greene"
-        },
-        {
-            "title" : "The Night Watch",
-            "author" : "Phillips, David Atlee"
-        }
-    ]
-}
-```
-with selector
-```
-$.books[1,1,3].title
-```
-The majority of JSONPath implementations will produce (with duplicate paths allowed):
-
-Path|Value
--------|------------------
- `$['books'][1]['title']` | "The Night Watch" 
- `$['books'][1]['title']` | "The Night Watch" 
- `$['books'][3]['title']` | "The Night Watch" 
-
-A minority will produce (with duplicate paths excluded):
-
-Path|Value
----------|------------------
-`$['books'][1]['title']` | "The Night Watch"
-`$['books'][3]['title']` | "The Night Watch"
-
-Since 0.161.0, the `jsonpath::json_query` function defaults to allowing duplicates, 
-but has an option for no duplicates. The `jsonpath::json_replace` function 
-always excludes duplicates.
-
 ### Function expressions
 
 Support for function expressions is a jsoncons extension.
@@ -250,14 +250,15 @@ path that selects from the root JSON value `$`, or a path that selects from the 
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.books[*].price)`
-`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.books[*].price)`
-`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.books[*])`
-`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.books[?(@.price > sum($.books[*].price) / count($.books[*]))].title`
-`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.books[?(@.price > avg($.books[*].price))].title`
-`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.books[?(479373 < prod($..price) && prod($..price) < 479374)].title`
-`keys(object)`|Returns an array of keys.|`array of string`|`keys($.books[0])[*]`
-`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.books[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
+`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
+`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
+`keys(object)`|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
+`length(array)`|Returns the number of items in an array|`uint64_t`|`length($.store.book[*])`
+`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
+`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
+`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / length($.store.book[*]))].title`
+`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
 
 ### Examples
 
