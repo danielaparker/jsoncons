@@ -241,7 +241,7 @@ always excludes duplicates.
 
 ### Function expressions
 
-Support for functions is a jsoncons extension.
+Support for function expressions is a jsoncons extension.
 
 Functions can be passed JSONPath paths and JSON expressions. 
 Outside a filter predicate, functions can be passed paths that select from
