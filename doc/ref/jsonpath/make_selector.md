@@ -28,8 +28,7 @@ jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
 ```
 ```c++
 template <class Json,class Source>
-jsonpath_expression<Json> make_expression(const Source& expr,
-                                          Callback callback,
+jsonpath_expression<Json> make_expression(const Source& expr, Callback callback,
                                           std::error_code& ec); 
 
 template <class Json>
@@ -52,6 +51,14 @@ such as a `std::basic_string` or `std::basic_string_view`, or a null terminated 
   <tr>
     <td>expr</td>
     <td>JSONPath expression</td> 
+  </tr>
+  <tr>
+    <td><code>callback</code></td>
+    <td>A function object that accepts a path and a reference to a Json value. 
+It must have function call signature equivalent to
+<br/><br/><code>
+bool fun(const Json::string_type& path, const Json& val);
+</code><br/><br/>
   </tr>
   <tr>
     <td>ec</td>
