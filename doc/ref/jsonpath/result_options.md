@@ -10,5 +10,5 @@ enum class result_options
 ```
 
 A [BitmaskType](https://en.cppreference.com/w/cpp/named_req/BitmaskType) 
-used to specify result options for `json_query` 
+used to specify result options for JSONPath queries. 
 
