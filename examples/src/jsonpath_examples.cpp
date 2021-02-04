@@ -345,6 +345,51 @@ namespace {
         std::cout << pretty_print(result) << "\n\n";
     }
 
+    void json_query_options_example()
+    {
+        std::string s = "[1,2,3,4,5]";
+        json data = json::parse(s);
+        std::string path = "$[4,1,1]";
+
+        auto result1 = jsonpath::json_query(data, path);
+        std::cout << "(1) " << result1 << "\n\n";
+
+        auto result2 = jsonpath::json_query(data, path, jsonpath::result_options::path);
+        std::cout << "(2) " << result2 << "\n\n";
+
+        auto result3 = jsonpath::json_query(data, path, 
+                                            jsonpath::result_options::value | 
+                                            jsonpath::result_options::sort);
+        std::cout << "(3) " << result3 << "\n\n";
+
+        auto result4 = jsonpath::json_query(data, path, 
+                                            jsonpath::result_options::path | 
+                                            jsonpath::result_options::sort);
+        std::cout << "(4) " << result4 << "\n\n";
+
+        auto result5 = jsonpath::json_query(data, path, 
+                                            jsonpath::result_options::value | 
+                                            jsonpath::result_options::nodups);
+        std::cout << "(5) " << result5 << "\n\n";
+
+        auto result6 = jsonpath::json_query(data, path, 
+                                            jsonpath::result_options::path | 
+                                            jsonpath::result_options::nodups);
+        std::cout << "(6) " << result6 << "\n\n";
+
+        auto result7 = jsonpath::json_query(data, path, 
+                                            jsonpath::result_options::value | 
+                                            jsonpath::result_options::nodups | 
+                                            jsonpath::result_options::sort);
+        std::cout << "(7) " << result7 << "\n\n";
+
+        auto result8 = jsonpath::json_query(data, path, 
+                                            jsonpath::result_options::path | 
+                                            jsonpath::result_options::nodups | 
+                                            jsonpath::result_options::sort);
+        std::cout << "(8) " << result8 << "\n\n";
+    }
+
 } // namespace
 
 void jsonpath_examples()
@@ -361,6 +406,7 @@ void jsonpath_examples()
     json_replace_examples();
     make_selector_examples();
     more_make_selector_examples();
+    json_query_options_example();
 
     std::cout << "\n";
 }
