@@ -3,8 +3,8 @@
 The jsonpath extension implements [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/).
 It provides functions for search and "search and replace" using JSONPath expressions.
 
-Version 0.161.0 is a significant rewrite of the jsonpath extension. The functions `json_query` and
-`json_replace`, however, are compatible with earlier versions.
+This document describes version 0.161.0 of the jsonpath extension. Version 0.161.0 is a significant rewrite. Documentaion for 
+0.160.0 and earlier may be found [here](https://github.com/danielaparker/jsoncons/blob/v0.160.0/doc/ref/jsonpath/jsonpath.md).
 
 ### Classes
 <table border="0">
