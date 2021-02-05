@@ -66,6 +66,19 @@ TEST_CASE("test replace tests")
 
         // make a discount on all books
         jsonpath::json_replace(j, expr,
+            [](const std::string&,json& price) { price = std::round(price.as<double>() - 1.0); });
+
+        CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));
+        CHECK(12.0 == Approx(j["store"]["book"][1]["price"].as<double>()).epsilon(0.001));
+        CHECK(8.0 == Approx(j["store"]["book"][2]["price"].as<double>()).epsilon(0.001));
+    }
+
+    SECTION("legacy test")
+    {
+        std::string expr = "$.store.book[*].price";
+
+        // make a discount on all books
+        jsonpath::json_replace(j, expr,
             [](const json& price) { return std::round(price.as<double>() - 1.0); });
 
         CHECK(8.0 == Approx(j["store"]["book"][0]["price"].as<double>()).epsilon(0.001));

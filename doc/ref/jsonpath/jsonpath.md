@@ -370,7 +370,10 @@ int main()
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
 
-    auto f = [](const json& price) {return std::round(price.as<double>() - 1.0);};
+    auto f = [](const std::string& /*path*/, json& price) 
+    {
+        price = std::round(price.as<double>() - 1.0);
+    };
     jsonpath::json_replace(data, "$.books[*].price", f);
 
     std::cout << pretty_print(data) << "\n";

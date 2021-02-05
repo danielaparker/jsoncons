@@ -114,15 +114,36 @@ namespace {
 
     void json_replace_example3()
     {
-        std::ifstream is("./input/store.json");
-        json booklist = json::parse(is);
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
+
+        auto f = [](const std::string&,json& price) 
+        {
+            price = std::round(price.as<double>() - 1.0);
+        };
 
         // make a discount on all books
-        jsonpath::json_replace(booklist, "$.store.book[*].price",
-                [](const json& price) { return std::round(price.as<double>() - 1.0); });
-        std::cout << pretty_print(booklist);
+        jsonpath::json_replace(data, "$.books[*].price", f);
+        std::cout << pretty_print(data);
     }
 
+    void json_replace_example4()
+    {
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
+
+        auto f = [](const std::string&,json& book) 
+        {
+            if (book.contains("price"))
+            {
+                book.at("price") = std::round(book.at("price").as<double>() - 1.0);
+            }
+        };
+
+        // make a discount on all books
+        jsonpath::json_replace(data, "$.books[*]", f);
+        std::cout << pretty_print(data);
+    }
 
     void jsonpath_complex_examples()
     {
@@ -303,17 +324,6 @@ namespace {
         std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
     }
 
-    void json_replace_examples()
-    {
-        std::ifstream is("./input/books.json");
-        json data = json::parse(is);
-
-        auto f = [](const json& price) {return std::round(price.as<double>() - 1.0); };
-        jsonpath::json_replace(data, "$.books[*].price", f);
-
-        std::cout << pretty_print(data) << "\n";
-    }
-
     void make_selector_examples()
     {
         auto expr = jsonpath::make_selector<json>("$.books[1,1,3].title");
@@ -423,21 +433,20 @@ void jsonpath_examples()
 {
     std::cout << "\nJsonPath examples\n\n";
 
-    json_replace_example1();
-    json_replace_example2();
-    json_replace_example3();
     jsonpath_complex_examples();
     jsonpath_union();
     json_query_examples();
     flatten_and_unflatten();
     more_json_query_examples();
-    json_replace_examples();
     make_selector_examples();
     more_make_selector_example();
     json_query_with_options_example();
     make_selector_with_callback_example();
     json_query_with_callback_example();
-
+    json_replace_example1();
+    json_replace_example2();
+    json_replace_example3();
+    json_replace_example4();
     std::cout << "\n";
 }
 
