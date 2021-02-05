@@ -1,12 +1,15 @@
-### sum
+### to_number
 
 ```c++
-number avg(array[number] elements)
+number to_number(any value)
 ```
 
-Returns the average of the elements in the provided array.
-
-An empty array will produce a return value of null.
+- string: Returns the parsed number. Any string that conforms to the json-number production is supported. 
+- number: Returns the passed in value.
+- array: Returns null
+- object: Returns null
+- boolean: Returns null
+- null: Returns null
 
 ### Examples
 

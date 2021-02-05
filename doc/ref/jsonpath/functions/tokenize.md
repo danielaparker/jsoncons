@@ -4,9 +4,7 @@
 array[string] tokenize(string input, string pattern)
 ```
 
-Returns the average of the elements in the provided array.
-
-An empty array will produce a return value of null.
+Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.
 
 ### Examples
 

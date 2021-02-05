@@ -1,12 +1,14 @@
 ### length
 
 ```c++
-number length(array elements)
+integer length(array|object|string value)
 ```
 
-Returns the average of the elements in the provided array.
+Returns the length of the given argument using the following types rules:
 
-An empty array will produce a return value of null.
+array: returns the number of elements in the array
+object: returns the number of key-value pairs in the object
+string: returns the number of code points in the string
 
 ### Examples
 

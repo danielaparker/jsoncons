@@ -1,12 +1,10 @@
 ### min
 
 ```c++
-number avg(array[number] elements)
+number min(array[number]|array[string] elements)
 ```
 
-Returns the average of the elements in the provided array.
-
-An empty array will produce a return value of null.
+Returns the lowest found number in the provided elements.
 
 ### Examples
 

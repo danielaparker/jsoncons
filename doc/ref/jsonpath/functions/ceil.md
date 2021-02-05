@@ -1,12 +1,10 @@
 ### ceil
 
 ```c++
-number avg(array[number] elements)
+integer ceil(number value)
 ```
 
-Returns the average of the elements in the provided array.
-
-An empty array will produce a return value of null.
+Returns the next highest integer value by rounding up if necessary.
 
 ### Examples
 

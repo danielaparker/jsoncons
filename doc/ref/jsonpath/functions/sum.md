@@ -1,12 +1,12 @@
 ### sum
 
 ```c++
-number avg(array[number] elements)
+number sum(array[number] elements)
 ```
 
-Returns the average of the elements in the provided array.
+Returns the sum of the provided array argument.
 
-An empty array will produce a return value of null.
+An empty array will produce a return value of 0.
 
 ### Examples
 
