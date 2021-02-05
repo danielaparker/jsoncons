@@ -132,7 +132,7 @@ namespace {
         std::ifstream is("./input/books.json");
         json data = json::parse(is);
 
-        auto f = [](const std::string&,json& book) 
+        auto f = [](const std::string& /*path*/, json& book) 
         {
             if (book.at("category") == "memoir" && !book.contains("price"))
             {
