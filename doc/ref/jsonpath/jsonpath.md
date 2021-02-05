@@ -250,15 +250,17 @@ path that selects from the root JSON value `$`, or a path that selects from the 
 
 Function|Description|Result|Example
 ----------|--------|-------|---
-`avg(array)`|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-`count(array)`|Returns the number of items in an array|`uint64_t`|`count($.store.book[*])`
-`keys(object)`|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
-`length(array)`|Returns the number of items in an array|`uint64_t`|`length($.store.book[*])`
-`max(array)`|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
-`min(array)`|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
-`prod(array)`|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
-`sum(array)`|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / length($.store.book[*]))].title`
-`tokenize(string,pattern)`|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
+[avg](functions/avg.md)|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
+[ceil](functions/ceil.md)|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
+`count(array)` (until 0.161.0)|Same as [length](functions/length.md)
+[keys](functions/keys.md)|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
+[length](functions/length.md)|Returns the number of items in an array|`uint64_t`|`length($.store.book[*])`
+[max](functions/max.md)|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
+[min](functions/min.md)|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
+[prod](functions/prod.md)|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
+[sum](functions/sum.md)|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / length($.store.book[*]))].title`
+[to_number](functions/to_number.md)|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
+[tokenize](functions/tokenize.md)|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
 
 ### Examples
 

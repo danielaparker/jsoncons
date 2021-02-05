@@ -191,7 +191,6 @@ namespace jsoncons { namespace jsonpath {
         using selector_base_type = selector_base<Json,JsonReference>;
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
-        using function_base_type = function_base<Json,JsonReference>;
 
     private:
 
