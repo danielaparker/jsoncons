@@ -31,11 +31,11 @@ such as a `std::basic_string` or `std::basic_string_view`, or a null terminated 
 
 <table>
   <tr>
-    <td>expr</td>
+    <td><code>expr</code></td>
     <td>JSONPath expression</td> 
   </tr>
   <tr>
-    <td>ec</td>
+    <td><code>ec</code></td>
     <td>out-parameter for reporting errors in the non-throwing overload</td> 
   </tr>
 </table>

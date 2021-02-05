@@ -45,11 +45,11 @@ or view of characters, such as a `std::basic_string` or `std::basic_string_view`
 
 <table>
   <tr>
-    <td>root</td>
+    <td><code>root</code></td>
     <td>Json value</td> 
   </tr>
   <tr>
-    <td>path</td>
+    <td><code>expr</code></td>
     <td>JSONPath expression</td> 
   </tr>
   <tr>
@@ -61,12 +61,12 @@ void fun(const Json::string_type& path, const Json& val);
 </code><br/><br/>
   </tr>
   <tr>
-    <td>options</td>
-    <td>Result options, a bitmask of type <a href="result_options.md">result_options</></td> 
+    <td><code>type</code> (until 0.161.0))</td>
+    <td>Since 0.161.0, typedefed to `jsonpath_options`.</></td> 
   </tr>
   <tr>
-    <td>type</td>
-    <td>Since 0.161.0, typedefed to `jsonpath_options`.</></td> 
+    <td><code>options</code> (since 0.161.0)</td>
+    <td>Result options, a bitmask of type <a href="result_options.md">result_options</></td> 
   </tr>
 </table>
 

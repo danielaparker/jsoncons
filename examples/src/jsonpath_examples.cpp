@@ -140,7 +140,6 @@ namespace {
             }
         };
 
-        // make a discount on all books
         jsonpath::json_replace(data, "$.books[*]", f);
         std::cout << pretty_print(data);
     }

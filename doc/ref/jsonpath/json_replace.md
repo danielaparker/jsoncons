@@ -37,15 +37,15 @@ or view of characters, or as a null terminated string.
 
 <table>
   <tr>
-    <td>root</td>
+    <td><code>root</code></td>
     <td>JSON value</td> 
   </tr>
   <tr>
-    <td>expr</td>
+    <td><code>expr</code></td>
     <td>JSONPath expression string</td> 
   </tr>
   <tr>
-    <td>new_value</td>
+    <td><code>new_value</code></td>
     <td>The value to use as replacement</td> 
   </tr>
   <tr>
