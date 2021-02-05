@@ -3194,6 +3194,28 @@ namespace jsoncons { namespace jsonpath {
         return json_query(instance, basic_string_view<typename Json::char_type>(path), options);
     }
 
+    template<class Json,class Source,class Callback>
+    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
+                            jsoncons::detail::is_binary_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
+    json_query(const Json& instance, 
+               const Source& path,
+               Callback callback, 
+               result_options options = result_options::value)
+    {
+        auto expression = make_selector<Json>(path);
+        expression.evaluate(instance, callback, options);
+    }
+
+    template<class Json,class Callback>
+    typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
+    json_query(const Json& instance, 
+               const typename Json::char_type* path, 
+               Callback callback,
+               result_options options = result_options::value)
+    {
+        json_query(instance, basic_string_view<typename Json::char_type>(path), callback, options);
+    }
+
     template<class Json, class Source, class T>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
                             !jsoncons::detail::is_unary_function_object<T,Json>::value,void>::type
@@ -3204,7 +3226,6 @@ namespace jsoncons { namespace jsonpath {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using expression_t = typename evaluator_t::path_expression_type;
-        using path_node_type = typename evaluator_t::path_node_type;
 
         string_type output_path = { '$' };
 
@@ -3230,7 +3251,6 @@ namespace jsoncons { namespace jsonpath {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using expression_t = typename evaluator_t::path_expression_type;
-        using path_node_type = typename evaluator_t::path_node_type;
 
         string_type output_path = { '$' };
 

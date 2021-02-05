@@ -15,7 +15,6 @@ Json json_query(const Json& root,
                 const Source& expr,
                 result_options options = result_options::value); (since 0.161.0)
 
-
 template<class Json>
 Json json_query(const Json& root, 
                 const typename Json::char_type* expr,
@@ -60,9 +59,11 @@ Throws a [jsonpath_error](jsonpath_error.md) if JSONPath parsing fails.
 Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
 ####
 
-### Store examples
+### Examples
 
-The examples below use the JSON text from [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) (store.json).
+#### Store examples
+
+The examples below use the sample data file `store.json`.
 
 ```json
 { "store": {
@@ -97,8 +98,6 @@ The examples below use the JSON text from [Stefan Goessner's JSONPath](http://go
   }
 }
 ```
-
-#### Values
 
 ```c++    
 #include <jsoncons/json.hpp>

@@ -18,24 +18,6 @@ template <class Json>
 jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
                                           std::error_code& ec); (2)
 ```
-```c++
-template <class Json,class Source,class Callback>
-void make_expression(const Source& expr, Callback callback); 
-
-template <class Json>
-jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
-                                          Callback callback); (3)
-```
-```c++
-template <class Json,class Source>
-jsonpath_expression<Json> make_expression(const Source& expr, Callback callback,
-                                          std::error_code& ec); 
-
-template <class Json>
-jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
-                                          Callback callback,                                           
-                                          std::error_code& ec); (4)
-```
 
 (1) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 The JSONPath expression `expr` is provided as a sequential container or view of characters, 
@@ -53,14 +35,6 @@ such as a `std::basic_string` or `std::basic_string_view`, or a null terminated 
     <td>JSONPath expression</td> 
   </tr>
   <tr>
-    <td><code>callback</code></td>
-    <td>A function object that accepts a path and a reference to a Json value. 
-It must have function call signature equivalent to
-<br/><br/><code>
-bool fun(const Json::string_type& path, const Json& val);
-</code><br/><br/>
-  </tr>
-  <tr>
     <td>ec</td>
     <td>out-parameter for reporting errors in the non-throwing overload</td> 
   </tr>
@@ -72,9 +46,9 @@ Returns a `jsonpath_expression` object that represents the JSONPath expression.
 
 #### Exceptions
 
-(1) and (3) throw a [jsonpath_error](jsonpath_error.md) if JSONPath compilation fails.
+(1) throws a [jsonpath_error](jsonpath_error.md) if JSONPath compilation fails.
 
-(2) and (4) set the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
+(2) sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
 
 ### Examples
 

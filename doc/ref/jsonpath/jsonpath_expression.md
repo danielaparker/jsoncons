@@ -9,7 +9,12 @@ class jsonpath_expression
 
 #### Member functions
 
-    Json evaluate(reference instance, result_options options = result_options::value); 
+    Json evaluate(reference instance, result_options options = result_options::value); (1)
+
+    template <class Callback>
+    void evaluate(reference instance, Callback callback, 
+                  result_options options = result_options::value);  (2)
+
 
 #### Parameters
 
@@ -17,6 +22,14 @@ class jsonpath_expression
   <tr>
     <td>instance</td>
     <td>Json value</td> 
+  </tr>
+  <tr>
+    <td><code>callback</code></td>
+    <td>A function object that accepts a path and a reference to a Json value. 
+It must have function call signature equivalent to
+<br/><br/><code>
+void fun(const Json::string_type& path, const Json& val);
+</code><br/><br/>
   </tr>
   <tr>
     <td>result_options</td>

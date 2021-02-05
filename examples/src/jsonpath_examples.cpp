@@ -359,7 +359,20 @@ namespace {
         expr.evaluate(data, callback, jsonpath::result_options::path);
     }
 
-    void json_query_options_example()
+    void json_query_with_callback_example()
+    {
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
+        std::string path = "$.books[?(@.price >= 22.0)]";
+
+        auto callback = [](const std::string& path, const json& val)
+        {
+            std::cout << path << ": " << val << "\n";
+        };
+        jsonpath::json_query(data, path, callback, jsonpath::result_options::path);
+    }
+
+    void json_query_with_options_example()
     {
         std::string s = "[1,2,3,4,5]";
         json data = json::parse(s);
@@ -421,8 +434,9 @@ void jsonpath_examples()
     json_replace_examples();
     make_selector_examples();
     more_make_selector_example();
-    json_query_options_example();
+    json_query_with_options_example();
     make_selector_with_callback_example();
+    json_query_with_callback_example();
 
     std::cout << "\n";
 }
