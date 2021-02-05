@@ -2,7 +2,7 @@
 
 ```c++
 #include <jsoncons_ext/jsonpath/json_query.hpp>
-
+```
 ```c++
 template<class Json, class Source, class T>
 void json_replace(Json& root, const Source& path, T&& new_value); 
@@ -73,34 +73,43 @@ Throws a [jsonpath_error](jsonpath_error.md) if JSONPath evaluation fails.
 
 ### Examples
 
-#### Change the price of a book
-
-Input JSON file `store.json`:
+The examples use the sample data file `books.json`, 
 
 ```json
-{ "store": {
-    "book": [ 
-      { "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      { "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      },
-      { "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      }
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
     ]
-  }
 }
 ```
+
+#### Change the price of A Wild Sheep Chase
+
 ```c++
+#include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
@@ -109,119 +118,98 @@ using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("input/store.json");
-    json booklist;
-    is >> booklist;
+    std::ifstream is("./input/books.json");
+    json data = json::parse(is);
 
-    // Change the price of "Moby Dick"
-    json_replace(booklist,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
-    std::cout << pretty_print(booklist) << std::endl;
-
+    jsonpath::json_replace(data,"$.books[?(@.title == 'A Wild Sheep Chase')].price",20.0);
+    std::cout << pretty_print(data) << "\n\n";
 }
 ```
 Output:
 ```json
 {
-    "store": {
-        "book": [
-            {
-                "author": "Nigel Rees",
-                "category": "reference",
-                "price": 8.95,
-                "title": "Sayings of the Century"
-            },
-            {
-                "author": "Evelyn Waugh",
-                "category": "fiction",
-                "price": 12.99,
-                "title": "Sword of Honour"
-            },
-            {
-                "author": "Herman Melville",
-                "category": "fiction",
-                "isbn": "0-553-21311-3",
-                "price": 10.0,
-                "title": "Moby Dick"
-            }
-        ]
-    }
-}
-```
-
-#### Change the prices of all books
-
-Input JSON file `store.json`:
-
-```json
-{ "store": {
-    "book": [ 
-      { "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      { "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      },
-      { "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      }
+    "books": [
+        {
+            "author": "Haruki Murakami",
+            "category": "fiction",
+            "price": 20.0,
+            "title": "A Wild Sheep Chase"
+        },
+        {
+            "author": "Sergei Lukyanenko",
+            "category": "fiction",
+            "price": 23.58,
+            "title": "The Night Watch"
+        },
+        {
+            "author": "Graham Greene",
+            "category": "fiction",
+            "price": 21.99,
+            "title": "The Comedians"
+        },
+        {
+            "author": "Phillips, David Atlee",
+            "category": "memoir",
+            "title": "The Night Watch"
+        }
     ]
-  }
 }
 ```
+
+#### Make a discount on all books
+
 ```c++
+#include <cmath>
+#include <fstream>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
-#include <cmath>
 
 using namespace jsoncons;
 using namespace jsoncons::jsonpath;
 
 int main()
 {
-    std::ifstream is("input/store.json");
-    json booklist;
-    is >> booklist;
+    std::ifstream is("./input/books.json");
+    json data = json::parse(is);
+
+    auto f = [](const std::string& /*path*/, json& price) 
+    {
+        price = std::round(price.as<double>() - 1.0);
+    };
 
     // make a discount on all books
-	jsonpath::json_replace(booklist, "$.store.book[*].price",
-			[](const json& price) {return std::round(price.as<double>() - 1.0);});
-    std::cout << pretty_print(booklist) << std::endl;
-
+    jsonpath::json_replace(data, "$.books[*].price", f);
+    std::cout << pretty_print(data);
 }
 ```
 Output:
 ```json
 {
-    "store": {
-        "book": [
-            {
-                "author": "Nigel Rees", 
-                "category": "reference", 
-                "price": 8.0, 
-                "title": "Sayings of the Century"
-            }, 
-            {
-                "author": "Evelyn Waugh", 
-                "category": "fiction", 
-                "price": 12.0, 
-                "title": "Sword of Honour"
-            }, 
-            {
-                "author": "Herman Melville", 
-                "category": "fiction", 
-                "isbn": "0-553-21311-3", 
-                "price": 8.0, 
-                "title": "Moby Dick"
-            } 
-        ]
-    }
+    "books": [
+        {
+            "author": "Haruki Murakami",
+            "category": "fiction",
+            "price": 22.0,
+            "title": "A Wild Sheep Chase"
+        },
+        {
+            "author": "Sergei Lukyanenko",
+            "category": "fiction",
+            "price": 23.0,
+            "title": "The Night Watch"
+        },
+        {
+            "author": "Graham Greene",
+            "category": "fiction",
+            "price": 21.0,
+            "title": "The Comedians"
+        },
+        {
+            "author": "Phillips, David Atlee",
+            "category": "memoir",
+            "title": "The Night Watch"
+        }
+    ]
 }
 ```
 

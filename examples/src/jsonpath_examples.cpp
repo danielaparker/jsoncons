@@ -74,11 +74,11 @@ namespace {
 
     void json_replace_example1()
     { 
-        std::ifstream is("./input/store.json");
-        json booklist = json::parse(is);
+        std::ifstream is("./input/books.json");
+        json data = json::parse(is);
 
-        jsonpath::json_replace(booklist,"$.store.book[?(@.isbn == '0-553-21311-3')].price",10.0);
-        std::cout << pretty_print(booklist) << "\n";
+        jsonpath::json_replace(data,"$.books[?(@.title == 'A Wild Sheep Chase')].price",20.0);
+        std::cout << pretty_print(data) << "\n\n";
     }
 
     void json_replace_example2()
@@ -117,7 +117,7 @@ namespace {
         std::ifstream is("./input/books.json");
         json data = json::parse(is);
 
-        auto f = [](const std::string&,json& price) 
+        auto f = [](const std::string& /*path*/, json& price) 
         {
             price = std::round(price.as<double>() - 1.0);
         };
@@ -443,10 +443,10 @@ void jsonpath_examples()
     json_query_with_options_example();
     make_selector_with_callback_example();
     json_query_with_callback_example();
-    json_replace_example1();
     json_replace_example2();
     json_replace_example3();
     json_replace_example4();
+    json_replace_example1();
     std::cout << "\n";
 }
 
