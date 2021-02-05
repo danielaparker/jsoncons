@@ -72,16 +72,12 @@ void fun(const Json::string_type& path, const Json& val);
 
 #### Return value
 
-Returns a `json` array containing either values or normalized path expressions matching the input path expression. 
-Returns an empty array if there is no match.
+(1) returns an array containing either values or normalized path expressions matching the JSONPath expression, 
+or an empty array if there is no match.
 
 #### Exceptions
 
 Throws a [jsonpath_error](jsonpath_error.md) if JSONPath parsing fails.
-
-#### Note
-Stefan Goessner's javascript implemention returns `false` in case of no match, but in a note he suggests an alternative is to return an empty array. The `jsoncons` implementation takes that alternative and returns an empty array in case of no match.
-####
 
 ### Examples
 
@@ -128,7 +124,8 @@ The examples below use the sample data file `store.json`.
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 #include <fstream>
 
-using namespace jsoncons;
+using jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
@@ -262,7 +259,11 @@ Output:
 #### Result options
 
 ```c++
-using namespace jsoncons;
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
@@ -328,3 +329,64 @@ Output:
 (8) ["$[1]","$[4]"]
 ```
 
+#### Callback
+
+The examples use the sample data file `books.json`, 
+
+```json
+{
+    "books":
+    [
+        {
+            "category": "fiction",
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "category": "fiction",
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "category": "fiction",
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "category": "memoir",
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+```
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+#include <fstream>
+
+using jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+int main()
+{
+    std::ifstream is("./input/books.json");
+    json data = json::parse(is);
+    std::string path = "$.books[?(@.price >= 22.0)]";
+
+    auto callback = [](const std::string& path, const json& val)
+    {
+        std::cout << path << ": " << val << "\n";
+    };
+    jsonpath::json_query(data, path, callback, jsonpath::result_options::path);
+}
+```
+Output:
+```
+$['books'][0]: {"author":"Haruki Murakami","category":"fiction","price":22.72,"title":"A Wild Sheep Chase"}
+$['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,"title":"The Night Watch"}
+```
