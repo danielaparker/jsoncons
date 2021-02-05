@@ -15,7 +15,7 @@ template<class Json, class Source, class UnaryCallback>
 void json_replace(Json& root, const Source& path, UnaryCallback callback1); 
 
 template<class Json, class UnaryCallback>
-void json_replace(Json& root, const typename Json::char_type* path, UnaryCallback callback1);        (2) (until 0.161.0)
+void json_replace(Json& root, const typename Json::char_type* path, UnaryCallback callback1); (2) (until 0.161.0)
 ```
 ```c++
 template<class Json, class Source, class BinaryCallback>
