@@ -3152,28 +3152,28 @@ namespace jsoncons { namespace jsonpath {
 
     template<class Json,class Source>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value,jsonpath_expression<Json>>::type
-    make_selector(const Source& expr)
+    make_expression(const Source& expr)
     {
         return jsonpath_expression<Json>::compile(expr);
     }
 
     template <class Json>
-    jsonpath_expression<Json> make_selector(const typename Json::char_type* expr)
+    jsonpath_expression<Json> make_expression(const typename Json::char_type* expr)
     {
         return jsonpath_expression<Json>::compile(expr);
     }
 
     template<class Json,class Source>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value,jsonpath_expression<Json>>::type
-    make_selector(const Source& expr, std::error_code& ec)
+    make_expression(const Source& expr, std::error_code& ec)
     {
         return jsonpath_expression<Json>::compile(expr, ec);
     }
 
     template <class Json>
-    jsonpath_expression<Json> make_selector(const typename Json::char_type* expr, std::error_code& ec)
+    jsonpath_expression<Json> make_expression(const typename Json::char_type* expr, std::error_code& ec)
     {
-        return make_selector(basic_string_view<typename Json::char_type>(expr), ec);
+        return make_expression(basic_string_view<typename Json::char_type>(expr), ec);
     }
 
     template<class Json,class Source>
@@ -3182,7 +3182,7 @@ namespace jsoncons { namespace jsonpath {
                const Source& path, 
                result_options options = result_options::value)
     {
-        auto expression = make_selector<Json>(path);
+        auto expression = make_expression<Json>(path);
         return expression.evaluate(instance, options);
     }
 
@@ -3202,7 +3202,7 @@ namespace jsoncons { namespace jsonpath {
                Callback callback, 
                result_options options = result_options::value)
     {
-        auto expression = make_selector<Json>(path);
+        auto expression = make_expression<Json>(path);
         expression.evaluate(instance, callback, options);
     }
 

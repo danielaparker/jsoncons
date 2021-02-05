@@ -323,9 +323,9 @@ namespace {
         std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
     }
 
-    void make_selector_examples()
+    void make_expression_examples()
     {
-        auto expr = jsonpath::make_selector<json>("$.books[1,1,3].title");
+        auto expr = jsonpath::make_expression<json>("$.books[1,1,3].title");
 
         std::ifstream is("./input/books.json");
         json data = json::parse(is);
@@ -343,9 +343,9 @@ namespace {
         std::cout << "(4) " << pretty_print(result4) << "\n\n";
     }
 
-    void more_make_selector_example()
+    void more_make_expression_example()
     {
-        auto expr = jsonpath::make_selector<json>("$.books[?(@.price > avg($.books[*].price))].title");
+        auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
 
         std::ifstream is("./input/books.json");
         json data = json::parse(is);
@@ -354,9 +354,9 @@ namespace {
         std::cout << pretty_print(result) << "\n\n";
     }
 
-    void make_selector_with_callback_example()
+    void make_expression_with_callback_example()
     {
-        auto expr = jsonpath::make_selector<json>("$.books[?(@.price >= 22.0)]");
+        auto expr = jsonpath::make_expression<json>("$.books[?(@.price >= 22.0)]");
 
         std::ifstream is("./input/books.json");
         json data = json::parse(is);
@@ -437,10 +437,10 @@ void jsonpath_examples()
     json_query_examples();
     flatten_and_unflatten();
     more_json_query_examples();
-    make_selector_examples();
-    more_make_selector_example();
+    make_expression_examples();
+    more_make_expression_example();
     json_query_with_options_example();
-    make_selector_with_callback_example();
+    make_expression_with_callback_example();
     json_query_with_callback_example();
     json_replace_example2();
     json_replace_example3();

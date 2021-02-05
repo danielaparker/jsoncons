@@ -4,18 +4,18 @@
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
 
 template <class Json,class Source>
-jsonpath_expression<Json> make_selector(const Source& expr); 
+jsonpath_expression<Json> make_expression(const Source& expr); 
 
 template <class Json>
-jsonpath_expression<Json> make_selector(const typename Json::char_type* expr); (1)
+jsonpath_expression<Json> make_expression(const typename Json::char_type* expr); (1)
 ```
 ```c++
 template <class Json,class Source>
-jsonpath_expression<Json> make_selector(const Source& expr,
+jsonpath_expression<Json> make_expression(const Source& expr,
                                         std::error_code& ec); 
 
 template <class Json>
-jsonpath_expression<Json> make_selector(const typename Json::char_type* expr,
+jsonpath_expression<Json> make_expression(const typename Json::char_type* expr,
                                         std::error_code& ec); (2)
 ```
 
@@ -90,7 +90,7 @@ The examples below uses the sample data file `books.json`,
 ```c++
 int main()
 {
-    auto expr = jsonpath::make_selector<json>("$.books[?(@.price > avg($.books[*].price))].title");
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.price > avg($.books[*].price))].title");
 
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
@@ -111,7 +111,7 @@ Output:
 ```c++
 int main()
 {
-    auto expr = jsonpath::make_selector<json>("$.books[?(@.price >= 22.0)]");
+    auto expr = jsonpath::make_expression<json>("$.books[?(@.price >= 22.0)]");
 
     std::ifstream is("./input/books.json");
     json data = json::parse(is);

@@ -18,7 +18,7 @@ This document describes version 0.161.0 of the jsonpath extension. Version 0.161
 
 <table border="0">
   <tr>
-    <td><a href="make_selector.md">make_selector</a></td>
+    <td><a href="make_expression.md">make_expression</a></td>
     <td>Returns a compiled JSONPath expression for later evaluation. (since 0.161.0)</td> 
   </tr>
   <tr>
@@ -427,7 +427,7 @@ namespace jsonpath = jsoncons::jsonpath;
 
 int main()
 {
-    auto expr = jsonpath::make_selector<json>("$.books[1,1,3].title");
+    auto expr = jsonpath::make_expression<json>("$.books[1,1,3].title");
 
     std::ifstream is("./input/books.json");
     json data = json::parse(is);
