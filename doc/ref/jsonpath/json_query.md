@@ -22,15 +22,15 @@ Json json_query(const Json& root,
                 result_options options = result_options::value); (1) (since 0.161.0)
 ```
 ```c++
-template<class Json, class Source, class Callback>
+template<class Json, class Source, class BinaryCallback>
 void json_query(const Json& root, const Source& expr,
-                Callback callback
+                BinaryCallback callback
                 result_options options = result_options::value);     (since 0.161.0)
 
-template<class Json, class Callback>
+template<class Json, class BinaryCallback>
 void json_query(const Json& root, 
                 const typename Json::char_type* expr,
-                Callback callback
+                BinaryCallback callback
                 result_options options = result_options::value); (2) (since 0.161.0)
 ```
 (1) Evaluates the Json value `root` against the JSONPath expression `expr` and returns an array of values or 

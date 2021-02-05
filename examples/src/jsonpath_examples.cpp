@@ -134,9 +134,9 @@ namespace {
 
         auto f = [](const std::string&,json& book) 
         {
-            if (book.contains("price"))
+            if (book.at("category") == "memoir" && !book.contains("price"))
             {
-                book.at("price") = std::round(book.at("price").as<double>() - 1.0);
+                book.try_emplace("price",140.0);
             }
         };
 
@@ -445,8 +445,8 @@ void jsonpath_examples()
     json_query_with_callback_example();
     json_replace_example2();
     json_replace_example3();
-    json_replace_example4();
     json_replace_example1();
+    json_replace_example4();
     std::cout << "\n";
 }
 

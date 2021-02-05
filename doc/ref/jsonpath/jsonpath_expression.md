@@ -12,8 +12,8 @@ class jsonpath_expression
 Json evaluate(reference instance, result_options options = result_options::value); (1)
 ```
 ```c++
-template <class Callback>
-void evaluate(reference instance, Callback callback, 
+template <class BinaryCallback>
+void evaluate(reference instance, BinaryCallback callback, 
               result_options options = result_options::value);  (2)
 ```
 
