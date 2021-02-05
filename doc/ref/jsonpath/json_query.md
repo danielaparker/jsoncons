@@ -4,26 +4,42 @@
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 
 enum class result_type {value,path};
+```
 
+```c++
 template<class Json>
 Json json_query(const Json& root, 
                 const Json:string_view_type& expr,
-                result_type type = result_type::value); (until 0.161.0)
+                result_type type = result_type::value);              (until 0.161.0)
 
 template<class Json, class Source>
-Json json_query(const Json& root, 
-                const Source& expr,
-                result_options options = result_options::value); (since 0.161.0)
+Json json_query(const Json& root, const Source& expr,
+                result_options options = result_options::value);     (since 0.161.0)
 
 template<class Json>
 Json json_query(const Json& root, 
                 const typename Json::char_type* expr,
-                result_options options = result_options::value); (since 0.161.0)
+                result_options options = result_options::value); (1) (since 0.161.0)
 ```
+```c++
+template<class Json, class Source, class Callback>
+void json_query(const Json& root, const Source& expr,
+                Callback callback
+                result_options options = result_options::value);     (since 0.161.0)
 
-Evaluates the Json value `root` against the JSONPath expression `expr` to produce a `json` array of values or 
+template<class Json, class Callback>
+void json_query(const Json& root, 
+                const typename Json::char_type* expr,
+                Callback callback
+                result_options options = result_options::value); (2) (since 0.161.0)
+```
+(1) Evaluates the Json value `root` against the JSONPath expression `expr` and returns an array of values or 
 normalized path expressions. The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
+or view of characters, such as a `std::basic_string` or `std::basic_string_view`, or as a null terminated string.
+
+(2) Evaluates the Json value `root` against the JSONPath expression `expr` and calls a provided
+callback repeatedly with the results. The JSONPath expression `expr` is provided as a sequential container 
+or view of characters, such as a `std::basic_string` or `std::basic_string_view`, or as a null terminated string.
 
 #### Parameters
 
@@ -35,6 +51,14 @@ or view of characters, such as a `std::basic_string` or `std::basic_string_view`
   <tr>
     <td>path</td>
     <td>JSONPath expression</td> 
+  </tr>
+  <tr>
+    <td><code>callback</code></td>
+    <td>A function object that accepts a path and a reference to a Json value. 
+It must have function call signature equivalent to
+<br/><br/><code>
+void fun(const Json::string_type& path, const Json& val);
+</code><br/><br/>
   </tr>
   <tr>
     <td>options</td>
@@ -235,7 +259,7 @@ Output:
 ["author","category","price","title"]
 ```
 
-#### Options
+#### Result options
 
 ```c++
 using namespace jsoncons;

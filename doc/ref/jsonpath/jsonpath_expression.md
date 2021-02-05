@@ -8,13 +8,20 @@ class jsonpath_expression
 ```
 
 #### Member functions
+```c++
+Json evaluate(reference instance, result_options options = result_options::value); (1)
+```
+```c++
+template <class Callback>
+void evaluate(reference instance, Callback callback, 
+              result_options options = result_options::value);  (2)
+```
 
-    Json evaluate(reference instance, result_options options = result_options::value); (1)
+(1) Evaluates the Json value `root` against the compiled JSONPath expression and returns an array of values or 
+normalized path expressions. 
 
-    template <class Callback>
-    void evaluate(reference instance, Callback callback, 
-                  result_options options = result_options::value);  (2)
-
+(2) Evaluates the Json value `root` against the compiled JSONPath expression and calls a provided
+callback repeatedly with the results.
 
 #### Parameters
 
