@@ -3,32 +3,35 @@
 ```c++
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 
+```c++
 template<class Json, class Source, class T>
-void json_replace(Json& root, const Source& path, T&& new_value); (1)
+void json_replace(Json& root, const Source& path, T&& new_value); 
 
 template<class Json, class T>
-void json_replace(Json& root, const typename Json::char_type* path, T&& new_value); (2)
+void json_replace(Json& root, const typename Json::char_type* path, T&& new_value);           (1)
+```
+```c++
+template<class Json, class Source, class UnaryCallback>
+void json_replace(Json& root, const Source& path, UnaryCallback callback1); 
 
-template<class Json, class Source, class Op>
-void json_replace(Json& root, const Source& path, T Op); (3)
+template<class Json, class UnaryCallback>
+void json_replace(Json& root, const typename Json::char_type* path, UnaryCallback callback1);        (2) (until 0.161.0)
+```
+```c++
+template<class Json, class Source, class BinaryCallback>
+void json_replace(Json& root, const Source& path, BinaryCallback callback2); 
 
-template<class Json, class Op>
-void json_replace(Json& root, const typename Json::char_type* path, T Op); (4)
+template<class Json, class BinaryCallback>
+void json_replace(Json& root, const typename Json::char_type* path, BinaryCallback callback2); (3) (since 0.161.0)
 ```
 
-(1) Searches for all values that match the JSONPath expression `expr` and replaces them with the specified value
-The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
+(1) Searches for all values that match the JSONPath expression `path` and replaces them with the specified value
+The JSONPath expression `path` is provided as a sequential container 
+or view of characters, or as a null terminated string.
 
-(2) Searches for all values that match the JSONPath expression `expr` and replaces them with the specified value
-The JSONPath expression `expr` is provided as a null terminated string.
-
-(3) Searches for all values that match a JSONPath expression `expr` and replaces them with the result of the given function
-The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, such as a `std::basic_string` or `std::basic_string_view`.
-
-(4) Searches for all values that match a JSONPath expression `expr` and replaces them with the result of the given function
-The JSONPath expression `expr` is provided as a null terminated string.
+(2) Searches for all values that match a JSONPath expression `path` and replaces them with the result of the given function
+The JSONPath expression `path` is provided as a sequential container 
+or view of characters, or as a null terminated string.
 
 #### Parameters
 
@@ -42,12 +45,25 @@ The JSONPath expression `expr` is provided as a null terminated string.
     <td>JSONPath expression string</td> 
   </tr>
   <tr>
-    <td>(1) new_value</td>
+    <td>new_value</td>
     <td>The value to use as replacement</td> 
   </tr>
   <tr>
-    <td>(2) op</td>
-    <td>Callback function to rewrite values that matched the expression</td> 
+    <td><code>callback1</code></td>
+    <td>A function object that accepts a const reference to a Json value
+    and returns a Json value. 
+It must have function call signature equivalent to
+<br/><br/><code>
+Json fun(const Json& val);
+</code><br/><br/>
+  </tr>
+  <tr>
+    <td><code>callback2</code></td>
+    <td>A function object that accepts a path and a reference to a Json value. 
+It must have function call signature equivalent to
+<br/><br/><code>
+void fun(const Json::string_type& path, Json& val);
+</code><br/><br/>
   </tr>
 </table>
 
