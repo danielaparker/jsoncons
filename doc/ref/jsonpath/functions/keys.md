@@ -1,12 +1,12 @@
 ### keys
 
-```c++
-number keys(object members)
+```
+array[string] keys(object value)
 ```
 
-Returns the average of the elements in the provided array.
+Returns an array of keys in the provided object.
 
-An empty array will produce a return value of null.
+Returns `null` if passed a value that is not an object.
 
 ### Examples
 

@@ -1,12 +1,18 @@
 ### max
 
-```c++
+```
 number max(array[number]|array[string] value)
 ```
 
-Returns the highest found number in the provided array argument.
+Returns the highest number found in the provided array.
 
-An empty array will produce a return value of null.
+Returns null if 
+
+- the provided value is not an array
+
+- the array is empty
+
+- the array contains items that are not numbers
 
 ### Examples
 

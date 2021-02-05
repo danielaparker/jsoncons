@@ -1,10 +1,12 @@
 ### ceil
 
-```c++
+```
 integer ceil(number value)
 ```
 
-Returns the next highest integer value by rounding up if necessary.
+Returns the smallest integer value not less than the provided number.
+
+Returns null if passed a value that is not a number.
 
 ### Examples
 

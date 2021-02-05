@@ -1,15 +1,17 @@
 ### to_number
 
-```c++
-number to_number(any value)
+```
+number to_number(string|number value)
 ```
 
-- string: Returns the parsed number. Any string that conforms to the json-number production is supported. 
-- number: Returns the passed in value.
-- array: Returns null
-- object: Returns null
-- boolean: Returns null
-- null: Returns null
+If string, returns the parsed number. 
+If number, returns the passed in value.
+
+Returns null if 
+
+- the provided value is not a string or number
+
+- the string cannot be parsed as a number
 
 ### Examples
 
