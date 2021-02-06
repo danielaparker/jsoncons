@@ -250,12 +250,12 @@ path that selects from the root JSON value `$`, or a path that selects from the 
 
 Function|Description
 ----------|--------
-[abs](functions/abs.md)|Returns the average of the items in an array of numbers.
+[abs](functions/abs.md)|Returns the absolute value of a number.
 [avg](functions/avg.md)|Returns the average of the items in an array of numbers.
 [ceil](functions/ceil.md)|Returns the smallest integer value not less than the provided number.
-[contains](functions/contains.md)|If subject is an array, returns true if the array contains an item that is equal to a provided search value, false otherwise. If subject is a string, returns true if the string contains a substring that is equal to a provided search value, false otherwise.
+[contains](functions/contains.md)|Returns true if an array contains a provided search value, or a string contains a provided substring.
 count (until 0.161.0)|Same as [length](functions/length.md)
-[floor](functions/floor.md)|Returns the average of the items in an array of numbers.
+[floor](functions/floor.md)|Returns the largest integer value not greater than the provided number.
 [keys](functions/keys.md)|Returns an array of keys in the provided object.
 [length](functions/length.md)|Returns the length of an array, object or string.
 [max](functions/max.md)|Returns the highest number found in an array of numbers,or the highest string in an array of strings.
