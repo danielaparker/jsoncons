@@ -72,6 +72,37 @@ namespace {
         std::cout << "(13)\n" << result13 << "\n";
     }
 
+    void function_tokenize_example() 
+    {
+        std::string data = R"(
+{
+    "books":
+    [
+        {
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami"
+        },
+        {
+            "title" : "Almost Transparent Blue",
+            "author" : "Ryu Murakami"
+        },
+        {
+            "title" : "The Quiet American",
+            "author" : "Graham Greene"
+        }
+    ]
+}
+        )";
+
+        json j = json::parse(data);
+
+        // All titles whose author's last name is 'Murakami'
+        std::string expr = R"($.books[?(tokenize(@.author,'\\s+')[-1] == 'Murakami')].title)";
+
+        json result = jsonpath::json_query(j, expr);
+        std::cout << pretty_print(result) << "\n\n";
+    }
+
     void json_replace_example1()
     { 
         std::ifstream is("./input/books.json");
@@ -109,7 +140,7 @@ namespace {
 
         jsonpath::json_replace(j,"$..book[?(@.price==31.96)].price", 30.9);
 
-        std::cout << ("2\n") << pretty_print(j) << "\n";
+        std::cout << ("2\n") << pretty_print(j) << "\n\n";
     }
 
     void json_replace_example3()
@@ -124,7 +155,7 @@ namespace {
 
         // make a discount on all books
         jsonpath::json_replace(data, "$.books[*].price", f);
-        std::cout << pretty_print(data);
+        std::cout << pretty_print(data) << "\n\n";
     }
 
     void json_replace_example4()
@@ -141,7 +172,7 @@ namespace {
         };
 
         jsonpath::json_replace(data, "$.books[*]", f);
-        std::cout << pretty_print(data);
+        std::cout << pretty_print(data) << "\n\n";
     }
 
     void jsonpath_complex_examples()
@@ -446,6 +477,8 @@ void jsonpath_examples()
     json_replace_example3();
     json_replace_example1();
     json_replace_example4();
+
+    function_tokenize_example();
     std::cout << "\n";
 }
 
