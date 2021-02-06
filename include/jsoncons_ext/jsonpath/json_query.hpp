@@ -1398,7 +1398,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ')':
                             {
-                                if (eval_stack.empty() || !eval_stack.back() == 0)
+                                if (eval_stack.empty() || (eval_stack.back() != 0))
                                 {
                                     ec = jsonpath_errc::syntax_error;
                                     return path_expression_type();
