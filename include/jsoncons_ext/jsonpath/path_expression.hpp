@@ -539,6 +539,63 @@ namespace detail {
     };  
 
     template <class Json,class JsonReference>
+    class contains_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+        using string_view_type = typename Json::string_view_type;
+
+        contains_function()
+            : function_base<Json, JsonReference>(2)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           const std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
+
+            pointer arg0_ptr = args[0];
+            pointer arg1_ptr = args[1];
+
+            switch (arg0_ptr->type())
+            {
+                case json_type::array_value:
+                    for (auto& j : arg0_ptr->array_range())
+                    {
+                        if (j == *arg1_ptr)
+                        {
+                            return resources.true_value();
+                        }
+                    }
+                    return resources.false_value();
+                case json_type::string_value:
+                {
+                    if (!arg1_ptr->is_string())
+                    {
+                        ec = jsonpath_errc::invalid_type;
+                        return resources.null_value();
+                    }
+                    auto sv0 = arg0_ptr->template as<string_view_type>();
+                    auto sv1 = arg1_ptr->template as<string_view_type>();
+                    return sv0.find(sv1) != string_view_type::npos ? resources.true_value() : resources.false_value();
+                }
+                default:
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+                }
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
     class sum_function : public function_base<Json,JsonReference>
     {
     public:
@@ -668,6 +725,47 @@ namespace detail {
                 case json_type::double_value:
                 {
                     return *resources.create_json(std::ceil(arg0_ptr->template as<double>()));
+                }
+                default:
+                    ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class floor_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        floor_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           const std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
+
+            pointer arg0_ptr = args[0];
+            switch (arg0_ptr->type())
+            {
+                case json_type::uint64_value:
+                case json_type::int64_value:
+                {
+                    return *resources.create_json(arg0_ptr->template as<double>());
+                }
+                case json_type::double_value:
+                {
+                    return *resources.create_json(std::floor(arg0_ptr->template as<double>()));
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
@@ -948,6 +1046,52 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    class abs_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+
+        abs_function()
+            : function_base<Json, JsonReference>(1)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           const std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
+
+            pointer arg0_ptr = args[0];
+            switch (arg0_ptr->type())
+            {
+                case json_type::uint64_value:
+                    return *arg0_ptr;
+                case json_type::int64_value:
+                {
+                    pointer j_ptr = arg0_ptr->template as<int64_t>() >= 0 ? arg0_ptr : resources.create_json(std::abs(arg0_ptr->template as<int64_t>()));
+                    return *j_ptr;
+                }
+                case json_type::double_value:
+                {
+                    pointer j_ptr = arg0_ptr->template as<double>() >= 0 ? arg0_ptr : resources.create_json(std::abs(arg0_ptr->template as<double>()));
+                    return *j_ptr;
+                }
+                default:
+                {
+                    ec = jsonpath_errc::invalid_type;
+                    return resources.null_value();
+                }
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
     class length_function : public function_base<Json,JsonReference>
     {
     public:
@@ -1050,7 +1194,10 @@ namespace detail {
 
         function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
+            static abs_function<Json,JsonReference> abs_func;
+            static contains_function<Json,JsonReference> contains_func;
             static ceil_function<Json,JsonReference> ceil_func;
+            static floor_function<Json, JsonReference> floor_func;
             static to_number_function<Json,JsonReference> to_number_func;
             static sum_function<Json,JsonReference> sum_func;
             static prod_function<Json,JsonReference> prod_func;
@@ -1065,7 +1212,10 @@ namespace detail {
 
             static std::unordered_map<string_type,function_base_type*> functions =
             {
+                {string_type{'a','b','s'}, &abs_func},
+                {string_type{'c','o','n','t','a','i','n','s'}, &contains_func},
                 {string_type{'c','e','i','l'}, &ceil_func},
+                {string_type{'f','l','o','o','r'}, &floor_func},
                 {string_type{'t','o','_','n','u','m','b','e','r'}, &to_number_func},
                 {string_type{'s','u','m'}, &sum_func},
                 {string_type{'p','r','o', 'd'}, &prod_func},

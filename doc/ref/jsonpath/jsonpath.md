@@ -248,19 +248,22 @@ Outside a filter predicate, functions can be passed paths that select from
 the root JSON value `$`. Within a filter predicate, functions can be passed either a 
 path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
 
-Function|Description|Result|Example
+Function|Description
 ----------|--------|-------|---
-[avg](functions/avg.md)|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-[ceil](functions/ceil.md)|Returns the arithmetic average of each item of an array of numbers. If the input is an empty array, returns `null`.|`double`|`$.store.book[?(@.price > avg($.store.book[*].price))].title`
-`count(array)` (until 0.161.0)|Same as [length](functions/length.md)
-[keys](functions/keys.md)|Returns an array of keys.|`array of string`|`keys($.store.book[0])[*]`
-[length](functions/length.md)|Returns the number of items in an array|`uint64_t`|`length($.store.book[*])`
-[max](functions/max.md)|Returns the maximum value of an array of numbers|`double`|`max($.store.book[*].price)`
-[min](functions/min.md)|Returns the minimum value of an array of numbers|`double`|`min($.store.book[*].price)`
-[prod](functions/prod.md)|Returns the product of the elements in an array of numbers.|`double`|`$.store.book[?(479373 < prod($..price) && prod($..price) < 479374)].title`
-[sum](functions/sum.md)|Returns the sum value of an array of numbers|`double`|`$.store.book[?(@.price > sum($.store.book[*].price) / length($.store.book[*]))].title`
-[to_number](functions/to_number.md)|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
-[tokenize](functions/tokenize.md)|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the regular expression `pattern`.|`array of string`|`$.store.book[?(tokenize(@.author,'\\s+')[1] == 'Waugh')].title`
+[abs](functions/abs.md)|Returns the average of the items in an array of numbers.
+[avg](functions/avg.md)|Returns the average of the items in an array of numbers.
+[ceil](functions/ceil.md)|Returns the smallest integer value not less than the provided number.
+[contains](functions/contains.md)|If subject is an array, returns true if the array contains an item that is equal to a provided search value, false otherwise. If subject is a string, returns true if the string contains a substring that is equal to a provided search value, false otherwise.
+count (until 0.161.0)|Same as [length](functions/length.md)
+[floor](functions/floor.md)|Returns the average of the items in an array of numbers.
+[keys](functions/keys.md)|Returns an array of keys in the provided object.
+[length](functions/length.md)|Returns the length of an array, object or string.
+[max](functions/max.md)|Returns the highest number found in an array of numbers,or the highest string in an array of strings.
+[min](functions/min.md)|Returns the lowest number found in an array of numbers, or the lowest string in an array of strings.
+[prod](functions/prod.md)|Returns the product of the items in an array of numbers.
+[sum](functions/sum.md)|Returns the sum of the items in an array of numbers.
+[to_number](functions/to_number.md)|If string, returns the parsed number. If number, returns the passed in value.
+[tokenize](functions/tokenize.md)|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the provided regular expression pattern.
 
 ### Examples
 

@@ -1,10 +1,11 @@
 ### max
 
 ```
-number max(array[number]|array[string] value)
+number|string max(array[number]|array[string] value)
 ```
 
-Returns the highest number found in the provided array.
+Returns the highest number found in an array of numbers,
+or the highest string in an array of strings.
 
 Returns null if 
 
@@ -12,7 +13,7 @@ Returns null if
 
 - the array is empty
 
-- the array contains items that are not numbers
+- the array contains items that are not all numbers or all strings
 
 ### Examples
 

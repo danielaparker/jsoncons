@@ -4,7 +4,7 @@
 number avg(array[number] value)
 ```
 
-Returns the product of the items in the provided array of numbers.
+Returns the product of the items in an array of numbers.
 
 Returns null if 
 
