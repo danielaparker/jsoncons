@@ -56,7 +56,8 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
 
 ### Paths
 
-JSONPath uses paths to select a set of nodes in a JSON value. Paths can use the dot-notation or the bracket-notation.
+It is a feature of JSONPath that it selects values in the original JSON document, and does not create JSON elements that are not in the original. 
+JSONPath uses paths to select values. Paths can use the dot-notation or the bracket-notation.
 
 Select the first (indexed 0) book in [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3) using the dot notation:
 
