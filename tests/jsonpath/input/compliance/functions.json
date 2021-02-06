@@ -108,6 +108,10 @@
      },
      "cases": [
        {
+         "expression": "ceil(2)",
+         "result": [2]
+       },
+       {
          "expression": "ceil(1.2)",
          "result": [2]
        },
@@ -158,7 +162,7 @@
        {
          "expression": "abs()",
          "result": []
-       }/*,
+       },
        {
          "expression": "unknown_function(1, 2)",
          "error": "unknown-function"
@@ -170,7 +174,7 @@
        {
          "expression": "avg($.array)",
          "result": []
-       },
+       }/*,
        {
          "expression": "avg('abc')",
          "error": "invalid-type"

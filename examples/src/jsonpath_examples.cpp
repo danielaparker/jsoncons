@@ -179,6 +179,19 @@ namespace {
         std::cout << result << "\n\n";
     }
 
+    void function_floor_example() 
+    {
+        std::string data = "[9.2750, 9.2850]";
+
+        json j = json::parse(data);
+
+        // All titles whose price is greater than the average price
+        std::string expr = "$[?(floor(@*100)/100 == 9.28))]";
+
+        json result = jsonpath::json_query(j, expr);
+        std::cout << result << "\n\n";
+    }
+
     void function_length_example() 
     {
         std::string data = R"(
@@ -596,6 +609,7 @@ void jsonpath_examples()
     function_sum_example();
     function_avg_example();
     function_length_example();
+    function_floor_example();
     std::cout << "\n";
 }
 
