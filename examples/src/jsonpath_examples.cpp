@@ -103,6 +103,120 @@ namespace {
         std::cout << pretty_print(result) << "\n\n";
     }
 
+    void function_sum_example() 
+    {
+        std::string data = R"(
+{
+    "books":
+    [
+        {
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+        )";
+
+        json j = json::parse(data);
+
+        // All titles whose price is greater than the average price
+        std::string expr = R"($.books[?(@.price > sum($.books[*].price)/length($.books[*].price))].title)";
+
+        json result = jsonpath::json_query(j, expr);
+        std::cout << result << "\n\n";
+    }
+
+    void function_avg_example() 
+    {
+        std::string data = R"(
+{
+    "books":
+    [
+        {
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+        )";
+
+        json j = json::parse(data);
+
+        // All titles whose price is greater than the average price
+        std::string expr = R"($.books[?(@.price > avg($.books[*].price))].title)";
+
+        json result = jsonpath::json_query(j, expr);
+        std::cout << result << "\n\n";
+    }
+
+    void function_length_example() 
+    {
+        std::string data = R"(
+{
+    "books":
+    [
+        {
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+        )";
+
+        json j = json::parse(data);
+
+        json result1 = jsonpath::json_query(j, "length($.books[*])");
+        std::cout << "(1) " << result1 << "\n\n";
+
+        json result2 = jsonpath::json_query(j, "length($.books[*].price)");
+        std::cout << "(2) "  << result2 << "\n\n";
+    }
+
     void json_replace_example1()
     { 
         std::ifstream is("./input/books.json");
@@ -479,6 +593,9 @@ void jsonpath_examples()
     json_replace_example4();
 
     function_tokenize_example();
+    function_sum_example();
+    function_avg_example();
+    function_length_example();
     std::cout << "\n";
 }
 
