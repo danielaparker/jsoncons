@@ -12,7 +12,7 @@ Fully compliant. The jsoncons implementation passes all [compliance tests](https
 <table border="0">
   <tr>
     <td><a href="jmespath_expression.md">jmespath_expression</a></td>
-    <td>Represents the compiled form of a JMESPath expression.</td> 
+    <td>Represents the compiled form of a JMESPath string.</td> 
   </tr>
 </table>
 
@@ -79,7 +79,7 @@ Output:
 #### jmespath_expression
 
 A [jsoncons::jmespath::jmespath_expression](jmespath_expression.md) 
-represents the compiled form of a JMESPath expression. It allows you to 
+represents the compiled form of a JMESPath string. It allows you to 
 evaluate a single compiled expression on multiple JSON documents.
 A `jmespath_expression` is immutable and thread-safe. 
 

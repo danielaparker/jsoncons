@@ -10,7 +10,7 @@ This document describes version 0.161.0 of the jsonpath extension. Version 0.161
 <table border="0">
   <tr>
     <td><a href="jsonpath_expression.md">jsonpath_expression</a></td>
-    <td>Represents the compiled form of a JSONPath expression. (since 0.161.0)</td> 
+    <td>Represents the compiled form of a JSONPath string. (since 0.161.0)</td> 
   </tr>
 </table>
 
