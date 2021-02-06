@@ -249,7 +249,7 @@ the root JSON value `$`. Within a filter predicate, functions can be passed eith
 path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
 
 Function|Description
-----------|--------|-------|---
+----------|--------
 [abs](functions/abs.md)|Returns the average of the items in an array of numbers.
 [avg](functions/avg.md)|Returns the average of the items in an array of numbers.
 [ceil](functions/ceil.md)|Returns the smallest integer value not less than the provided number.
