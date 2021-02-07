@@ -1367,6 +1367,60 @@ namespace detail {
         binary_operator
     };
 
+    inline
+    std::string to_string(token_kind kind)
+    {
+        switch (kind)
+        {
+            case token_kind::root_node:
+                return "root_node";
+            case token_kind::current_node:
+                return "current_node";
+            case token_kind::lparen:
+                return "lparen";
+            case token_kind::rparen:
+                return "rparen";
+            case token_kind::begin_union:
+                return "begin_union";
+            case token_kind::end_union:
+                return "end_union";
+            case token_kind::begin_filter:
+                return "begin_filter";
+            case token_kind::end_filter:
+                return "end_filter";
+            case token_kind::begin_expression:
+                return "begin_expression";
+            case token_kind::end_expression:
+                return "end_expression";
+            case token_kind::separator:
+                return "separator";
+            case token_kind::literal:
+                return "literal";
+            case token_kind::selector:
+                return "selector";
+            case token_kind::function:
+                return "function";
+            case token_kind::begin_function:
+                return "begin_function";
+            case token_kind::end_function:
+                return "end_function";
+            case token_kind::argument:
+                return "argument";
+            case token_kind::begin_expression_type:
+                return "begin_expression_type";
+            case token_kind::end_expression_type:
+                return "end_expression_type";
+            case token_kind::end_of_expression:
+                return "end_of_expression";
+            case token_kind::unary_operator:
+                return "unary_operator";
+            case token_kind::binary_operator:
+                return "binary_operator";
+            default:
+                return "";
+        }
+    }
+
     struct reference_arg_t
     {
         explicit reference_arg_t() = default;
@@ -1989,8 +2043,14 @@ namespace detail {
 
         std::string to_string(int level = 0) const
         {
-            std::string s("Token type: ");
-            s.append(std::to_string((int)type_));
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("path_expression token_kind: ");
+            s.append(jsoncons::jsonpath::detail::to_string(type_));
             switch (type_)
             {
                 case token_kind::selector:
@@ -1999,6 +2059,7 @@ namespace detail {
                 default:
                     break;
             }
+            s.append("\n");
             return s;
         }
     };
@@ -2150,6 +2211,7 @@ namespace detail {
     private:
         std::vector<token_type> token_list_;
     public:
+
         path_expression()
         {
         }
@@ -2211,10 +2273,13 @@ namespace detail {
             Json result(json_array_arg);
 
             //std::cout << "EVALUATE BEGIN\n";
+
+            //std::cout << "token list\n";
             //for (auto& tok : token_list_)
             //{
             //    std::cout << tok.to_string() << "\n";
             //}
+            //std::cout << "end token list\n";
 
             if (!token_list_.empty())
             {
@@ -2304,20 +2369,20 @@ namespace detail {
                             pointer ptr = nullptr;
                             //for (auto& item : stack)
                             //{
-                            //    std::cout << "selector stack input:\n";
-                            //    switch (item.tag)
-                            //    {
-                            //        case node_set_tag::single:
-                            //            std::cout << "single: " << *(item.node.ptr) << "\n";
-                            //            break;
-                            //        case node_set_tag::multi:
-                            //            for (auto& node : stack.back().nodes)
-                            //            {
-                            //                std::cout << "multi: " << *node.ptr << "\n";
-                            //            }
-                            //            break;
-                            //        default:
-                            //            break;
+                                //std::cout << "selector stack input:\n";
+                                //switch (item.tag)
+                                //{
+                                //    case node_set_tag::single:
+                                //        std::cout << "single: " << *(item.node.ptr) << "\n";
+                                //        break;
+                                //    case node_set_tag::multi:
+                                //        for (auto& node : stack.back().nodes)
+                                //        {
+                                //            std::cout << "multi: " << *node.ptr << "\n";
+                                //        }
+                                //        break;
+                                //    default:
+                                //        break;
                             //}
                             //std::cout << "\n";
                             //}
@@ -2411,6 +2476,24 @@ namespace detail {
                 }
             }
             //std::cout << "EVALUATE END\n";
+        }
+
+        std::string to_string(int level) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("path_expression\n");
+            for (const auto& item : token_list_)
+            {
+                s.append(item.to_string(level+1));
+            }
+
+            return s;
+
         }
     };
 

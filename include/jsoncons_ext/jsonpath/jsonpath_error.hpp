@@ -47,7 +47,7 @@ namespace jsoncons { namespace jsonpath {
         invalid_codepoint,
         unknown_function,
         invalid_type,
-        unbalanced_parenthesis,
+        unbalanced_parentheses,
         syntax_error,
         expected_comparator,
         expected_or,
@@ -128,8 +128,8 @@ namespace jsoncons { namespace jsonpath {
                     return "Unknown function";
                 case jsonpath_errc::invalid_type:
                     return "Invalid type";
-                case jsonpath_errc::unbalanced_parenthesis:
-                    return "Unbalanced parenthesis";
+                case jsonpath_errc::unbalanced_parentheses:
+                    return "Unbalanced parentheses";
                 case jsonpath_errc::syntax_error:
                     return "Syntax error";
                 case jsonpath_errc::expected_comparator:

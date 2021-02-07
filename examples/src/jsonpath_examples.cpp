@@ -185,11 +185,9 @@ namespace {
 
         json j = json::parse(data);
 
-        // All titles whose price is greater than the average price
-        std::string expr = "$[?(floor(@*100)/100 == 9.28))]";
-
-        json result = jsonpath::json_query(j, expr);
-        std::cout << result << "\n\n";
+        std::string expr = "floor($[0])";
+        json result1 = jsonpath::json_query(j, expr);
+        std::cout << result1 << "\n\n";
     }
 
     void function_length_example() 

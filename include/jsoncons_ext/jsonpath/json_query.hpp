@@ -239,7 +239,7 @@ namespace jsoncons { namespace jsonpath {
 
             virtual std::string to_string(int = 0) const override
             {
-                return tail_selector_ ? std::string() : tail_selector_->to_string();
+                return tail_selector_ ? tail_selector_->to_string() : std::string();
             }
         };
 
@@ -312,7 +312,8 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("identifier: ");
+                s.append("identifier\n");
+                s.append(path_selector::to_string(level+1));
                 //s.append(identifier_);
 
                 return s;
@@ -363,7 +364,8 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("root_selector");
+                s.append("root_selector\n");
+                s.append(path_selector::to_string(level+1));
 
                 return s;
             }
@@ -399,7 +401,8 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("current_node_selector");
+                s.append("current_node_selector\n");
+                s.append(path_selector::to_string(level+1));
 
                 return s;
             }
@@ -685,10 +688,10 @@ namespace jsoncons { namespace jsonpath {
                 if (level > 0)
                 {
                     s.append("\n");
-                    s.append(level * 2, ' ');
+                    s.append(level*2, ' ');
                 }
                 s.append("filter selector\n");
-                //s.append(expr_.to_string(level));
+                s.append(expr_.to_string(level+1));
 
                 return s;
             }
@@ -714,9 +717,12 @@ namespace jsoncons { namespace jsonpath {
                         node_type& ndtype,
                         result_options options) const override
             {
+                //std::cout << "expression_selector current: " << val << "\n";
+
                 std::vector<path_node_type> temp;
                 auto callback = [&temp](const string_type& p, reference v)
                 {
+                    //std::cout << "callback" << v << "\n";
                     temp.emplace_back(p, std::addressof(v));
                 };
                 expr_.evaluate(resources, path, root, val, callback, options);
@@ -741,10 +747,11 @@ namespace jsoncons { namespace jsonpath {
                 if (level > 0)
                 {
                     s.append("\n");
-                    s.append(level * 2, ' ');
+                    s.append(level*2, ' ');
                 }
                 s.append("expression selector\n");
-                //s.append(expr_.to_string(level));
+                s.append(expr_.to_string(level+1));
+                s.append(path_selector::to_string(level+1));
 
                 return s;
             }
@@ -836,7 +843,7 @@ namespace jsoncons { namespace jsonpath {
             {
                 ndtype = node_type::single;
 
-                //std::cout << "function val: " << val << "\n";
+                //std::cout << "function_expression current: " << val << "\n";
                 auto callback = [&nodes](const string_type& p, reference v)
                 {
                     nodes.emplace_back(p, std::addressof(v));
@@ -852,7 +859,8 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("function expression");
+                s.append("function_expression\n");
+                s.append(expr_.to_string(level+1));
 
                 return s;
             }
@@ -1400,7 +1408,7 @@ namespace jsoncons { namespace jsonpath {
                             {
                                 if (eval_stack.empty() || (eval_stack.back() != 0))
                                 {
-                                    ec = jsonpath_errc::syntax_error;
+                                    ec = jsonpath_errc::unbalanced_parentheses;
                                     return path_expression_type();
                                 }
                                 eval_stack.pop_back();
@@ -1485,7 +1493,7 @@ namespace jsoncons { namespace jsonpath {
                             {
                                 if (eval_stack.empty())
                                 {
-                                    ec = jsonpath_errc::syntax_error;
+                                    ec = jsonpath_errc::unbalanced_parentheses;
                                     return path_expression_type();
                                 }
                                 if (eval_stack.back() > 0)
@@ -1530,7 +1538,7 @@ namespace jsoncons { namespace jsonpath {
                             {
                                 if (eval_stack.empty())
                                 {
-                                    ec = jsonpath_errc::syntax_error;
+                                    ec = jsonpath_errc::unbalanced_parentheses;
                                     return path_expression_type();
                                 }
                                 if (eval_stack.back() > 0)
@@ -2774,6 +2782,11 @@ namespace jsoncons { namespace jsonpath {
                 ec = jsonpath_errc::unexpected_eof;
                 return path_expression_type();
             }
+            if (eval_stack.size() != 1 || eval_stack.back() != 0)
+            {
+                ec = jsonpath_errc::unbalanced_parentheses;
+                return path_expression_type();
+            }
 
             return path_expression_type(std::move(output_stack_));
         }
@@ -2813,7 +2826,7 @@ namespace jsoncons { namespace jsonpath {
             }
             if (it == operator_stack_.rend())
             {
-                ec = jsonpath_errc::unbalanced_parenthesis;
+                ec = jsonpath_errc::unbalanced_parentheses;
                 return;
             }
             ++it;
