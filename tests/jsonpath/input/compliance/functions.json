@@ -1,5 +1,5 @@
 [
-  /*{
+  {
      "given": {
          "store": {
              "book": [
@@ -88,12 +88,12 @@
          "result": ["Sayings of the Century","Sword of Honour","Moby Dick"]
        }
      ]
-  },*/
+  },
    {
      "source": "JMESPath test suite",
      "given":
      {
-       /*"foo": -1,
+       "foo": -1,
        "zero": 0,
        "numbers": [-1, 3, 4, 5],
        "array": [-1, 3, 4, 5, "a", "100"],
@@ -104,13 +104,9 @@
        "empty_list": [],
        "empty_hash": {},
        "objects": {"foo": "bar", "bar": "baz"},
-       "null_key": null*/
+       "null_key": null
      },
      "cases": [
-       {
-         "expression": "ceil(4)",
-         "result": [4]
-       }/*,
        {
          "expression": "ceil(1.2)",
          "result": [2]
@@ -174,187 +170,198 @@
        {
          "expression": "avg($.array)",
          "result": []
-       }*/ /*,
-       {
-         "expression": "avg('abc')",
-         "error": "invalid-type"
        },
        {
-         "expression": "avg(foo)",
-         "error": "invalid-type"
+         "expression": "avg('abc')",
+         "result": []
+       },
+       {
+         "expression": "avg($.foo)",
+         "result": []
+         //"error": "invalid-type"
        },
        {
          "expression": "avg(@)",
-         "error": "invalid-type"
+         "result": []
+         //"error": "invalid-type"
        },
        {
-         "expression": "avg(strings)",
-         "error": "invalid-type"
+         "expression": "avg($.strings)",
+         "result": []
+         //"error": "invalid-type"
        },
        {
-         "expression": "avg(empty_list)",
-         "result": null
+         "expression": "avg($.empty_list)",
+         "result": [null]
        },
        {
-         "expression": "ceil(`1.2`)",
-         "result": 2
+         "expression": "ceil(1.2)",
+         "result": [2]
        },
        {
-         "expression": "ceil(decimals[0])",
-         "result": 2
+         "expression": "ceil($.decimals[0])",
+         "result": [2]
        },
        {
-         "expression": "ceil(decimals[1])",
-         "result": 2
+         "expression": "ceil($.decimals[1])",
+         "result": [2]
        },
        {
-         "expression": "ceil(decimals[2])",
-         "result": -1
+         "expression": "ceil($.decimals[2])",
+         "result": [-1]
        },
        {
          "expression": "ceil('string')",
-         "error": "invalid-type"
+         "result": []
+         //"error": "invalid-type"
        },
        {
          "expression": "contains('abc', 'a')",
-         "result": true
+         "result": [true]
        },
        {
          "expression": "contains('abc', 'd')",
-         "result": false
+         "result": [false]
        },
        {
-         "expression": "contains(`false`, 'd')",
-         "error": "invalid-type"
+         "expression": "contains(false, 'd')",
+         "result" : [] 
+         //"error": "invalid-type"
        },
        {
-         "expression": "contains(strings, 'a')",
-         "result": true
+         "expression": "contains($.strings, 'a')",
+         "result": [true]
        },
        {
-         "expression": "contains(decimals, `1.2`)",
-         "result": true
+         "expression": "contains($.decimals, 1.2)",
+         "result": [true]
        },
        {
-         "expression": "contains(decimals, `false`)",
-         "result": false
-       },
+         "expression": "contains($.decimals, false)",
+         "result": [false]
+       }/*,
        {
          "expression": "ends_with(str, 'r')",
-         "result": true
+         "result": [true]
        },
        {
          "expression": "ends_with(str, 'tr')",
-         "result": true
+         "result": [true]
        },
        {
          "expression": "ends_with(str, 'Str')",
-         "result": true
+         "result": [true]
        },
        {
          "expression": "ends_with(str, 'SStr')",
-         "result": false
+         "result": [false]
        },
        {
          "expression": "ends_with(str, 'foo')",
-         "result": false
+         "result": [false]
        },
        {
          "expression": "ends_with(str, `0`)",
          "error": "invalid-type"
        },
        {
-         "expression": "floor(`1.2`)",
-         "result": 1
+         "expression": "floor(1.2)",
+         "result": [1]
        },
        {
          "expression": "floor('string')",
-         "error": "invalid-type"
+         "result: []
+         //"error": "invalid-type"
        },
        {
-         "expression": "floor(decimals[0])",
-         "result": 1
+         "expression": "floor($.decimals[0])",
+         "result": [1]
        },
        {
          "expression": "floor(foo)",
-         "result": -1
+         "result": [-1]
        },
        {
-         "expression": "floor(str)",
-         "error": "invalid-type"
+         "expression": "floor($.str)",
+         "result": []
+         //"error": "invalid-type"
        },
        {
          "expression": "length('abc')",
-         "result": 3
+         "result": [3]
        },
        {
          "expression": "length('✓foo')",
-         "result": 4
+         "result": [4]
        },
        {
          "expression": "length('')",
-         "result": 0
+         "result": [0]
        },
        {
          "expression": "length(@)",
-         "result": 12
+         "result": [12]
        },
        {
-         "expression": "length(strings[0])",
-         "result": 1
+         "expression": "length($.strings[0])",
+         "result": [1]
        },
        {
-         "expression": "length(str)",
-         "result": 3
+         "expression": "length($.str)",
+         "result": [3]
        },
        {
-         "expression": "length(array)",
-         "result": 6
+         "expression": "length($.array)",
+         "result": [6]
        },
        {
-         "expression": "length(objects)",
-         "result": 2
+         "expression": "length($.objects)",
+         "result": [2]
        },
        {
-         "expression": "length(`false`)",
-         "error": "invalid-type"
+         "expression": "length(false)",
+         "result": []
+         //"error": "invalid-type"
        },
        {
-         "expression": "length(foo)",
-         "error": "invalid-type"
+         "expression": "length($.foo)",
+         "result": []
+         //"error": "invalid-type"
        },
        {
-         "expression": "length(strings[0])",
-         "result": 1
+         "expression": "length($.strings[0])",
+         "result": [1]
        },
        {
-         "expression": "max(numbers)",
-         "result": 5
+         "expression": "max($.numbers)",
+         "result": [5]
        },
        {
-         "expression": "max(decimals)",
-         "result": 1.2
+         "expression": "max($.decimals)",
+         "result": [1.2]
        },
        {
-         "expression": "max(strings)",
-         "result": "c"
+         "expression": "max($.strings)",
+         "result": ["c"]
        },
        {
-         "expression": "max(abc)",
-         "error": "invalid-type"
+         "expression": "max($.abc)",
+         "result": []
+         //"error": "invalid-type"
        },
        {
-         "expression": "max(array)",
-         "error": "invalid-type"
+         "expression": "max($.array)",
+         "result": []
+         //"error": "invalid-type"
        },
        {
-         "expression": "max(decimals)",
-         "result": 1.2
+         "expression": "max($.decimals)",
+         "result": [1.2]
        },
        {
-         "expression": "max(empty_list)",
-         "result": null
-       },
+         "expression": "max($.empty_list)",
+         "result": []
+       }/*,
        {
          "expression": "merge(`{}`)",
          "result": {}
@@ -373,34 +380,35 @@
        },
        {
          "expression": "merge(`{\"a\": 1, \"b\": 2}`, `{\"a\": 2, \"c\": 3}`, `{\"d\": 4}`)",
-         "result": {"a": 2, "b": 2, "c": 3, "d": 4}
+         "result": {"a": 2, "b": 2, ["c"]: 3, "d": 4}
+       }*/,
+       {
+         "expression": "min($.numbers)",
+         "result": [-1]
        },
        {
-         "expression": "min(numbers)",
-         "result": -1
+         "expression": "min($.decimals)",
+         "result": [-1.5]
        },
        {
-         "expression": "min(decimals)",
-         "result": -1.5
-       },
+         "expression": "min($.abc)",
+         "result": []
+         //"error": "invalid-type"
+       }/*,
        {
-         "expression": "min(abc)",
+         "expression": "min($.array)",
          "error": "invalid-type"
        },
        {
-         "expression": "min(array)",
-         "error": "invalid-type"
+         "expression": "min($.empty_list)",
+         "result": []
        },
        {
-         "expression": "min(empty_list)",
-         "result": null
-       },
-       {
-         "expression": "min(decimals)",
+         "expression": "min($.decimals)",
          "result": -1.5
        },
        {
-         "expression": "min(strings)",
+         "expression": "min($.strings)",
          "result": "a"
        },
        {
@@ -420,7 +428,7 @@
          "result": "boolean"
        },
        {
-         "expression": "type(`false`)",
+         "expression": "type(false)",
          "result": "boolean"
        },
        {
@@ -440,23 +448,23 @@
          "result": "object"
        },
        {
-         "expression": "sort(keys(objects))",
+         "expression": "sort(keys($.objects))",
          "result": ["bar", "foo"]
        },
        {
-         "expression": "keys(foo)",
+         "expression": "keys($.foo)",
          "error": "invalid-type"
        },
        {
-         "expression": "keys(strings)",
+         "expression": "keys($.strings)",
          "error": "invalid-type"
        },
        {
-         "expression": "keys(`false`)",
+         "expression": "keys(false)",
          "error": "invalid-type"
        },
        {
-         "expression": "sort(values(objects))",
+         "expression": "sort(values($.objects))",
          "result": ["bar", "baz"]
        },
        {
@@ -464,7 +472,7 @@
          "result": []
        },
        {
-         "expression": "values(foo)",
+         "expression": "values($.foo)",
          "error": "invalid-type"
        },
        {
@@ -508,11 +516,11 @@
          "result": ""
        },
        {
-         "expression": "reverse(numbers)",
+         "expression": "reverse($.numbers)",
          "result": [5, 4, 3, -1]
        },
        {
-         "expression": "reverse(array)",
+         "expression": "reverse($.array)",
          "result": ["100", "a", 5, 4, 3, -1]
        },
        {
@@ -528,44 +536,44 @@
          "result": "dlrow olleh"
        },
        {
-         "expression": "starts_with(str, 'S')",
-         "result": true
+         "expression": "starts_with($.str, 'S')",
+         "result": [true]
        },
        {
-         "expression": "starts_with(str, 'St')",
-         "result": true
+         "expression": "starts_with($.str, 'St')",
+         "result": [true]
        },
        {
-         "expression": "starts_with(str, 'Str')",
-         "result": true
+         "expression": "starts_with($.str, 'Str')",
+         "result": [true]
        },
        {
-         "expression": "starts_with(str, 'String')",
-         "result": false
+         "expression": "starts_with($.str, 'String')",
+         "result": [false]
        },
        {
-         "expression": "starts_with(str, `0`)",
+         "expression": "starts_with($.str, `0`)",
          "error": "invalid-type"
        },
        {
-         "expression": "sum(numbers)",
+         "expression": "sum($.numbers)",
          "result": 11
        },
        {
-         "expression": "sum(decimals)",
-         "result": 0.71
+         "expression": "sum($.decimals)",
+         "result": [0].71
        },
        {
-         "expression": "sum(array)",
+         "expression": "sum($.array)",
          "error": "invalid-type"
        },
        {
-         "expression": "sum(array[].to_number(@))",
+         "expression": "sum($.array[].to_number(@))",
          "result": 111
        },
        {
          "expression": "sum(`[]`)",
-         "result": 0
+         "result": [0]
        },
        {
          "expression": "to_array('foo')",
@@ -576,7 +584,7 @@
          "result": [0]
        },
        {
-         "expression": "to_array(objects)",
+         "expression": "to_array($.objects)",
          "result": [{"foo": "bar", "bar": "baz"}]
        },
        {
@@ -592,7 +600,7 @@
          "result": "foo"
        },
        {
-         "expression": "to_string(`1.2`)",
+         "expression": "to_string(1.2)",
          "result": "1.2"
        },
        {
@@ -609,54 +617,54 @@
        },
        {
          "expression": "to_number('4')",
-         "result": 4
+         "result": [4]
        },
        {
          "expression": "to_number('notanumber')",
-         "result": null
+         "result": []
        },
        {
-         "expression": "to_number(`false`)",
-         "result": null
+         "expression": "to_number(false)",
+         "result": []
        },
        {
          "expression": "to_number(`null`)",
-         "result": null
+         "result": []
        },
        {
          "expression": "to_number(`[0]`)",
-         "result": null
+         "result": []
        },
        {
          "expression": "to_number(`{\"foo\": 0}`)",
-         "result": null
+         "result": []
        },
        {
          "expression": "\"to_string\"(`1.0`)",
          "error": "syntax"
        },
        {
-         "expression": "sort(numbers)",
+         "expression": "sort($.numbers)",
          "result": [-1, 3, 4, 5]
        },
        {
-         "expression": "sort(strings)",
-         "result": ["a", "b", "c"]
+         "expression": "sort($.strings)",
+         "result": ["a", "b", ["c"]]
        },
        {
-         "expression": "sort(decimals)",
+         "expression": "sort($.decimals)",
          "result": [-1.5, 1.01, 1.2]
        },
        {
-         "expression": "sort(array)",
+         "expression": "sort($.array)",
          "error": "invalid-type"
        },
        {
-         "expression": "sort(abc)",
+         "expression": "sort($.abc)",
          "error": "invalid-type"
        },
        {
-         "expression": "sort(empty_list)",
+         "expression": "sort($.empty_list)",
          "result": []
        },
        {
@@ -664,35 +672,26 @@
          "error": "invalid-type"
        },
        {
-         "expression": "not_null(unknown_key, str)",
+         "expression": "not_null($.unknown_key, str)",
          "result": "Str"
        },
        {
-         "expression": "not_null(unknown_key, foo.bar, empty_list, str)",
+         "expression": "not_null($.unknown_key, foo.bar, empty_list, str)",
          "result": []
        },
        {
-         "expression": "not_null(unknown_key, null_key, empty_list, str)",
+         "expression": "not_null($.unknown_key, null_key, empty_list, str)",
          "result": []
        },
        {
          "expression": "not_null(all, expressions, are_null)",
-         "result": null
+         "result": []
        },
        {
          "expression": "not_null()",
          "error": "invalid-arity"
-       },
-       {
-         "comment": "function projection on single arg function",
-         "expression": "numbers[].to_string(@)",
-         "result": ["-1", "3", "4", "5"]
-       },
-       {
-         "comment": "function projection on single arg function",
-         "expression": "array[].to_number(@)",
-         "result": [-1, 3, 4, 5, 100]
-       }*/
+       }
+       */
      ]
    }
 ]

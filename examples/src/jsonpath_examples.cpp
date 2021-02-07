@@ -68,7 +68,7 @@ namespace {
         std::cout << "(12)\n" << result12 << "\n";
 
         // All keys in the second book
-        json result13 = jsonpath::json_query(booklist,"keys($.store.book[1])[*]");
+        json result13 = jsonpath::json_query(booklist,"keys($.store.book[1])");
         std::cout << "(13)\n" << result13 << "\n";
     }
 
@@ -188,6 +188,44 @@ namespace {
         std::string expr = "floor($[0])";
         json result1 = jsonpath::json_query(j, expr);
         std::cout << result1 << "\n\n";
+    }
+
+    void function_keys_example() 
+    {
+        std::string data = R"(
+{
+    "books":
+    [
+        {
+            "title" : "A Wild Sheep Chase",
+            "author" : "Haruki Murakami",
+            "price" : 22.72
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Sergei Lukyanenko",
+            "price" : 23.58
+        },
+        {
+            "title" : "The Comedians",
+            "author" : "Graham Greene",
+            "price" : 21.99
+        },
+        {
+            "title" : "The Night Watch",
+            "author" : "Phillips, David Atlee"
+        }
+    ]
+}
+        )";
+
+        json j = json::parse(data);
+
+        // All books that don't have a price
+        std::string expr = "$.books[?(!contains(keys(@),'price'))]";
+
+        json result = jsonpath::json_query(j, expr);
+        std::cout << result << "\n\n";
     }
 
     void function_length_example() 
@@ -608,6 +646,7 @@ void jsonpath_examples()
     function_avg_example();
     function_length_example();
     function_floor_example();
+    function_keys_example();
     std::cout << "\n";
 }
 
