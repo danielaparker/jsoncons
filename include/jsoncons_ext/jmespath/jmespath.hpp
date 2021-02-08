@@ -3431,16 +3431,13 @@ namespace jmespath {
                                     ec = jmespath_errc::unbalanced_parentheses;
                                     return jmespath_expression();
                                 }
-                                //if (state_stack_.size() > 1 && (*(state_stack_.rbegin()+1) == path_state::argument || *(state_stack_.rbegin() + 1) == path_state::expression_type))
-                                //{
-                                //    state_stack_.pop_back();
-                                //}
                                 if (eval_stack.back() > 0)
                                 {
                                     ++p_;
                                     ++column_;
                                     --eval_stack.back();
                                     push_token(rparen_arg, ec);
+                                    if (ec) {return jmespath_expression();}
                                 }
                                 else
                                 {
@@ -3530,12 +3527,14 @@ namespace jmespath {
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*': // wildcard
                                 push_token(token(jsoncons::make_unique<object_projection>()), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -3546,6 +3545,7 @@ namespace jmespath {
                                 ++column_;
                                 ++eval_stack.back();
                                 push_token(lparen_arg, ec);
+                                if (ec) {return jmespath_expression();}
                                 break;
                             }
                             case '!':
@@ -3553,12 +3553,14 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 push_token(token(context_.get_not_operator()), ec);
+                                if (ec) {return jmespath_expression();}
                                 break;
                             }
                             case '@':
                                 ++p_;
                                 ++column_;
                                 push_token(token(jsoncons::make_unique<current_node>()), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 break;
                             case '[': 
@@ -3599,12 +3601,14 @@ namespace jmespath {
                                 break;
                             case '{':
                                 push_token(begin_multi_select_hash_arg, ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::multi_select_hash;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
                                 push_token(token(jsoncons::make_unique<object_projection>()), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -3639,11 +3643,13 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 push_token(token(key_arg, buffer), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear(); 
                                 state_stack_.pop_back(); 
                                 break;
                             default:
                                 push_token(token(key_arg, buffer), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear(); 
                                 state_stack_.pop_back(); 
                                 break;
@@ -3656,11 +3662,13 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
                                 break;
                             default:
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
                                 break;
@@ -3674,6 +3682,7 @@ namespace jmespath {
                                 break;
                             case '&':
                                 push_token(token(begin_expression_type_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::expression_type;
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
@@ -3701,6 +3710,7 @@ namespace jmespath {
                                 buffer.clear();
                                 push_token(token(begin_function_arg), ec);
                                 push_token(token(f), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::expression_or_expression_type);
                                 ++p_;
@@ -3710,6 +3720,7 @@ namespace jmespath {
                             default:
                             {
                                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
                                 break;
@@ -3725,6 +3736,7 @@ namespace jmespath {
                                 break;
                             case ',':
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.emplace_back(path_state::expression_or_expression_type);
                                 ++p_;
                                 ++column_;
@@ -3739,6 +3751,7 @@ namespace jmespath {
 
                                 eval_stack.pop_back();
                                 push_token(token(end_function_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -3751,12 +3764,14 @@ namespace jmespath {
 
                     case path_state::argument:
                         push_token(argument_arg, ec);
+                        if (ec) {return jmespath_expression();}
                         state_stack_.pop_back();
                         break;
 
                     case path_state::expression_type:
                         push_token(end_expression_type_arg, ec);
                         push_token(argument_arg, ec);
+                        if (ec) {return jmespath_expression();}
                         state_stack_.pop_back();
                         break;
 
@@ -4005,6 +4020,7 @@ namespace jmespath {
                             case '\'':
                             {
                                 push_token(token(literal_arg, Json(buffer)), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); // raw_string
                                 ++p_;
@@ -4040,6 +4056,7 @@ namespace jmespath {
                                 auto j = decoder.get_result();
 
                                 push_token(token(literal_arg, std::move(j)), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 state_stack_.pop_back(); // json_value
                                 ++p_;
@@ -4105,18 +4122,21 @@ namespace jmespath {
                         {
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::expect_right_bracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': // []
                                 push_token(token(jsoncons::make_unique<flatten_projection>()), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); // bracket_specifier
                                 ++p_;
                                 ++column_;
                                 break;
                             case '?':
                                 push_token(token(begin_filter_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::filter;
                                 state_stack_.emplace_back(path_state::rhs_expression);
                                 state_stack_.emplace_back(path_state::lhs_expression);
@@ -4155,6 +4175,7 @@ namespace jmespath {
                                 else
                                 {
                                     push_token(token(begin_multi_select_list_arg), ec);
+                                    if (ec) {return jmespath_expression();}
                                     state_stack_.back() = path_state::multi_select_list;
                                     state_stack_.emplace_back(path_state::lhs_expression);                                
                                 }
@@ -4167,6 +4188,7 @@ namespace jmespath {
                                 break;
                             default:
                                 push_token(token(begin_multi_select_list_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::multi_select_list;
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
@@ -4184,12 +4206,14 @@ namespace jmespath {
                                 return jmespath_expression();
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::expect_right_bracket;
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token(begin_multi_select_list_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::multi_select_list;
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
@@ -4219,6 +4243,7 @@ namespace jmespath {
                                 if (buffer.empty())
                                 {
                                     push_token(token(jsoncons::make_unique<flatten_projection>()), ec);
+                                    if (ec) {return jmespath_expression();}
                                 }
                                 else
                                 {
@@ -4229,6 +4254,7 @@ namespace jmespath {
                                         return jmespath_expression();
                                     }
                                     push_token(token(jsoncons::make_unique<index_selector>(r.value())), ec);
+                                    if (ec) {return jmespath_expression();}
 
                                     buffer.clear();
                                 }
@@ -4278,6 +4304,7 @@ namespace jmespath {
                         {
                             case ']':
                                 push_token(token(jsoncons::make_unique<slice_projection>(slic)), ec);
+                                if (ec) {return jmespath_expression();}
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
                                 ++p_;
@@ -4317,6 +4344,7 @@ namespace jmespath {
                         {
                             case ']':
                                 push_token(token(jsoncons::make_unique<slice_projection>(slic)), ec);
+                                if (ec) {return jmespath_expression();}
                                 buffer.clear();
                                 slic = slice{};
                                 state_stack_.pop_back(); // rhs_slice_expression_step
@@ -4390,6 +4418,7 @@ namespace jmespath {
                             case '=':
                                 push_token(token(context_.get_lte_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -4397,6 +4426,7 @@ namespace jmespath {
                             default:
                                 push_token(token(context_.get_lt_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 break;
                         }
@@ -4409,6 +4439,7 @@ namespace jmespath {
                             case '=':
                                 push_token(token(context_.get_gte_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -4416,6 +4447,7 @@ namespace jmespath {
                             default:
                                 push_token(token(context_.get_gt_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -4428,6 +4460,7 @@ namespace jmespath {
                             case '=':
                                 push_token(token(context_.get_eq_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -4445,6 +4478,7 @@ namespace jmespath {
                             case '=':
                                 push_token(token(context_.get_ne_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
@@ -4480,12 +4514,14 @@ namespace jmespath {
                             case '|':
                                 push_token(token(context_.get_or_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
                                 push_token(token(pipe_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
                                 break;
                         }
@@ -4498,6 +4534,7 @@ namespace jmespath {
                             case '&':
                                 push_token(token(context_.get_and_operator()), ec);
                                 push_token(token(current_node_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
                                 ++column_;
@@ -4538,6 +4575,7 @@ namespace jmespath {
                                 break;
                             case ',':
                                 push_token(token(separator_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;
@@ -4561,6 +4599,7 @@ namespace jmespath {
                             case ']':
                             {
                                 push_token(token(end_multi_select_list_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
 
                                 ++p_;
@@ -4583,6 +4622,7 @@ namespace jmespath {
                             case ']':
                             {
                                 push_token(token(end_filter_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
@@ -4603,6 +4643,7 @@ namespace jmespath {
                                 break;
                             case ',':
                                 push_token(token(separator_arg), ec);
+                                if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::key_val_expr; 
                                 ++p_;
                                 ++column_;
@@ -4620,6 +4661,7 @@ namespace jmespath {
                             {
                                 state_stack_.pop_back();
                                 push_token(end_multi_select_hash_arg, ec);
+                                if (ec) {return jmespath_expression();}
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4656,6 +4698,7 @@ namespace jmespath {
             if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
             {
                 push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                if (ec) {return jmespath_expression();}
                 state_stack_.pop_back(); // unquoted_string
                 if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
                 {
@@ -4677,6 +4720,7 @@ namespace jmespath {
             state_stack_.pop_back();
 
             push_token(end_of_expression_arg, ec);
+            if (ec) {return jmespath_expression();}
 
             //for (auto& t : output_stack_)
             //{
