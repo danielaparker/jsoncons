@@ -3192,9 +3192,9 @@ namespace jsoncons { namespace jsonpath {
         {
         }
 
-        template <class Callback>
-        typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const string_type&,reference>::value,void>::type
-        evaluate(reference instance, Callback callback, result_options options = result_options::value)
+        template <class BinaryCallback>
+        typename std::enable_if<jsoncons::detail::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
+        evaluate(reference instance, BinaryCallback callback, result_options options = result_options::value)
         {
             string_type path = {'$'};
 
@@ -3330,7 +3330,8 @@ namespace jsoncons { namespace jsonpath {
     template<class Json, class Source, class T>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
                             is_json_type_traits_specialized<Json,T>::value,void>::type
-    json_replace(Json& instance, const Source& path, const T& new_value)
+    json_replace(Json& instance, const Source& path, T&& new_value, 
+                 result_options options = result_options::nodups)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
@@ -3347,22 +3348,23 @@ namespace jsoncons { namespace jsonpath {
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
         auto callback = [&new_value](const string_type&, reference v)
         {
-            v = new_value;
+            v = std::forward<T>(new_value);
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_options::nodups);
+        expr.evaluate(resources, output_path, instance, instance, callback, options);
     }
 
     template<class Json, class T>
     typename std::enable_if<is_json_type_traits_specialized<Json,T>::value,void>::type
-    json_replace(Json& instance, const typename Json::char_type* path, const T& new_value)
+    json_replace(Json& instance, const typename Json::char_type* path, T&& new_value, 
+                 result_options options = result_options::nodups)
     {
-        json_replace(instance, basic_string_view<typename Json::char_type>(path), new_value);
+        json_replace(instance, basic_string_view<typename Json::char_type>(path), std::forward<T>(new_value), options);
     }
 
-    template<class Json, class Source, class Op>
+    template<class Json, class Source, class UnaryCallback>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
-                            jsoncons::detail::is_unary_function_object<Op,Json>::value,void>::type
-    json_replace(Json& instance, const Source& path, Op op)
+                            jsoncons::detail::is_unary_function_object<UnaryCallback,Json>::value,void>::type
+    json_replace(Json& instance, const Source& path, UnaryCallback callback)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
@@ -3377,24 +3379,25 @@ namespace jsoncons { namespace jsonpath {
         expression_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        auto callback = [op](const string_type&, reference v)
+        auto f = [callback](const string_type&, reference v)
         {
-            v = op(v);
+            v = callback(v);
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, result_options::nodups);
+        expr.evaluate(resources, output_path, instance, instance, f, result_options::nodups);
     }
 
-    template<class Json, class Op>
-    typename std::enable_if<jsoncons::detail::is_unary_function_object<Op,Json>::value,void>::type
-    json_replace(Json& instance, const typename Json::char_type* path, Op op)
+    template<class Json, class UnaryCallback>
+    typename std::enable_if<jsoncons::detail::is_unary_function_object<UnaryCallback,Json>::value,void>::type
+    json_replace(Json& instance, const typename Json::char_type* path, UnaryCallback callback)
     {
-        json_replace(instance, basic_string_view<typename Json::char_type>(path), op);
+        json_replace(instance, basic_string_view<typename Json::char_type>(path), callback, result_options::nodups);
     }
 
-    template<class Json, class Source, class Op>
+    template<class Json, class Source, class BinaryCallback>
     typename std::enable_if<jsoncons::detail::is_sequence_of<Source,typename Json::char_type>::value &&
-                            jsoncons::detail::is_binary_function_object<Op,const typename Json::string_type&,Json&>::value,void>::type
-    json_replace(Json& instance, const Source& path, Op op)
+                            jsoncons::detail::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
+    json_replace(Json& instance, const Source& path, BinaryCallback callback, 
+                 result_options options = result_options::nodups)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
         using string_type = typename evaluator_t::string_type;
@@ -3409,14 +3412,15 @@ namespace jsoncons { namespace jsonpath {
         expression_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        expr.evaluate(resources, output_path, instance, instance, op, result_options::nodups);
+        expr.evaluate(resources, output_path, instance, instance, callback, options);
     }
 
-    template<class Json, class Op>
-    typename std::enable_if<jsoncons::detail::is_binary_function_object<Op,const typename Json::string_type&,Json&>::value,void>::type
-    json_replace(Json& instance, const typename Json::char_type* path, Op op)
+    template<class Json, class BinaryCallback>
+    typename std::enable_if<jsoncons::detail::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
+    json_replace(Json& instance, const typename Json::char_type* path, BinaryCallback callback, 
+                 result_options options = result_options::nodups)
     {
-        json_replace(instance, basic_string_view<typename Json::char_type>(path), op);
+        json_replace(instance, basic_string_view<typename Json::char_type>(path), callback, options);
     }
 
 } // namespace jsonpath
