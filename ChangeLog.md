@@ -1,5 +1,5 @@
-master
-------
+v0.161.0
+--------
 
 Enhancements to JSONPath extension
 
