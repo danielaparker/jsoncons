@@ -1,10 +1,12 @@
 v0.161.0
 --------
 
+The `jsoncons::jsonpath` extension has been rewritten, see [JSONPath extension revisited](https://github.com/danielaparker/jsoncons/issues/306).
+
 Enhancements to JSONPath extension
 
 - Added a new function `make_expression` for creating a compiled JSONPath expression for later evaluation. 
-- The `json_query` functions now takes a `result_options` parameter that allows duplicate values (i.e. values with
+- The `json_query` and `json_replace` functions now take an optional `result_options` parameter that allows duplicate values (i.e. values with
 the same node paths) to be excluded from results, and for results to be sorted in path order.
 
 Changes to `json_query`
