@@ -153,11 +153,11 @@
        },
        {
          "expression": "abs(1, 2)",
-         "result": []
+         "error": "invalid arity"
        },
        {
          "expression": "abs()",
-         "result": []
+         "error": "invalid arity"
        },
        {
          "expression": "unknown_function(1, 2)",

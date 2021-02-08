@@ -525,7 +525,7 @@ namespace detail {
         {
         }
 
-        jsoncons::optional<std::size_t> arg_count() const
+        jsoncons::optional<std::size_t> arity() const
         {
             return arg_count_;
         }
@@ -555,7 +555,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -612,7 +612,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -663,7 +663,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -713,7 +713,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -761,7 +761,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -810,7 +810,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -851,7 +851,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -892,7 +892,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -953,7 +953,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -997,7 +997,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -1044,7 +1044,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -1103,7 +1103,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -1163,7 +1163,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -1210,7 +1210,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -1255,7 +1255,7 @@ namespace detail {
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
-            if (args.size() != *this->arg_count())
+            if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
                 return resources.null_value();
@@ -1463,7 +1463,6 @@ namespace detail {
         literal,
         selector,
         function,
-        begin_function,
         end_function,
         argument,
         begin_expression_type,
@@ -1506,8 +1505,6 @@ namespace detail {
                 return "selector";
             case token_kind::function:
                 return "function";
-            case token_kind::begin_function:
-                return "begin_function";
             case token_kind::end_function:
                 return "end_function";
             case token_kind::argument:
@@ -1634,12 +1631,6 @@ namespace detail {
         explicit end_function_arg_t() = default;
     };
     constexpr end_function_arg_t end_function_arg{};
-
-    struct begin_function_arg_t
-    {
-        explicit begin_function_arg_t() = default;
-    };
-    constexpr begin_function_arg_t begin_function_arg{};
 
     struct argument_arg_t
     {
@@ -1898,11 +1889,6 @@ namespace detail {
         {
         }
 
-        token(begin_function_arg_t) noexcept
-            : type_(token_kind::begin_function)
-        {
-        }
-
         token(end_function_arg_t) noexcept
             : type_(token_kind::end_function)
         {
@@ -2090,6 +2076,11 @@ namespace detail {
                 default:
                     return 0;
             }
+        }
+
+        jsoncons::optional<std::size_t> arity() const
+        {
+            return type_ == token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
         }
 
         bool is_right_associative() const
@@ -2447,7 +2438,7 @@ namespace detail {
                             break;
                         case token_kind::function:
                         {
-                            if (tok.function_->arg_count() && *(tok.function_->arg_count()) != arg_stack.size())
+                            if (tok.function_->arity() && *(tok.function_->arity()) != arg_stack.size())
                             {
                                 //ec = jmespath_errc::invalid_arity;
                                 return;
