@@ -49,11 +49,11 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
 - Names in the dot notation may be unquoted (no spaces), single-quoted, or double-quoted.
 - Names in the square bracket notation may be single-quoted or double-quoted.
 - Wildcards are allowed in the dot notation
-- Union of completely separate paths are allowed, e.g.
+- Unions of separate JSONPath expressions are allowed, e.g.
 
     $..[@.firstName,@.address.city]
 
-- An option is provided to exclude results corresponding to duplicate paths.
+- Options are provided to exclude results corresponding to duplicate paths, and to sort results according to paths.
 
 ### Paths
 
