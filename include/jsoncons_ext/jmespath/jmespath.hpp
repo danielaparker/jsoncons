@@ -42,7 +42,6 @@ namespace jmespath {
         binary_operator,
         unary_operator,
         function,
-        begin_function,
         end_function,
         argument,
         begin_expression_type,
@@ -151,12 +150,6 @@ namespace jmespath {
         explicit end_function_arg_t() = default;
     };
     constexpr end_function_arg_t end_function_arg{};
-
-    struct begin_function_arg_t
-    {
-        explicit begin_function_arg_t() = default;
-    };
-    constexpr begin_function_arg_t begin_function_arg{};
 
     struct argument_arg_t
     {
@@ -1843,11 +1836,6 @@ namespace jmespath {
             {
             }
 
-            token(begin_function_arg_t) noexcept
-                : type_(token_kind::begin_function)
-            {
-            }
-
             token(end_function_arg_t) noexcept
                 : type_(token_kind::end_function)
             {
@@ -2149,9 +2137,6 @@ namespace jmespath {
                         break;
                     case token_kind::current_node:
                         return std::string("current_node");
-                        break;
-                    case token_kind::begin_function:
-                        return std::string("begin_function");
                         break;
                     case token_kind::end_function:
                         return std::string("end_function");
@@ -3708,7 +3693,6 @@ namespace jmespath {
                                     return jmespath_expression();
                                 }
                                 buffer.clear();
-                                push_token(token(begin_function_arg), ec);
                                 push_token(token(f), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::function_expression;
@@ -4963,15 +4947,27 @@ namespace jmespath {
                         unwind_rparen(ec);
                         std::vector<token> toks;
                         auto it = output_stack_.rbegin();
-                        while (it != output_stack_.rend() && it->type() != token_kind::begin_function)
+                        std::size_t arg_count = 0;
+                        while (it != output_stack_.rend() && it->type() != token_kind::function)
                         {
+                            if (it->type() == token_kind::argument)
+                            {
+                                ++arg_count;
+                            }
                             toks.insert(toks.begin(), std::move(*it));
                             ++it;
                         }
                         if (it == output_stack_.rend())
                         {
-                            JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
+                            ec = jmespath_errc::unbalanced_parentheses;
+                            return;
                         }
+                        if (it->arity() && arg_count != *(it->arity()))
+                        {
+                            ec = jmespath_errc::invalid_arity;
+                            return;
+                        }
+                        toks.push_back(std::move(*it));
                         ++it;
                         if (toks.front().type() != token_kind::literal)
                         {
@@ -5049,7 +5045,7 @@ namespace jmespath {
                     output_stack_.emplace_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
-                case token_kind::begin_function:
+                case token_kind::function:
                     output_stack_.emplace_back(std::move(tok));
                     operator_stack_.emplace_back(token(lparen_arg));
                     break;
@@ -5063,9 +5059,6 @@ namespace jmespath {
                     output_stack_.emplace_back(std::move(tok));
                     break;
                 case token_kind::lparen:
-                    operator_stack_.emplace_back(std::move(tok));
-                    break;
-                case token_kind::function:
                     operator_stack_.emplace_back(std::move(tok));
                     break;
                 default:
