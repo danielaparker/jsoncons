@@ -4,8 +4,8 @@ master
 Enhancements to JSONPath extension
 
 - Added a new function `make_expression` for creating a compiled JSONPath expression for later evaluation. 
-- The `json_query` functions now takes an options parameter that allows duplicate values (i.e. values with
-the same node paths) to be excluded from results.
+- The `json_query` functions now takes a `result_options` parameter that allows duplicate values (i.e. values with
+the same node paths) to be excluded from results, and for results to be sorted in path order.
 
 Changes to supported JSONPath syntax
 
@@ -27,6 +27,19 @@ to `json_query`. This is no longer allowed, a syntax error will be raised.
 letters `A-Z` and `a-z`, the underscore character `_`, and unicode coded characters 
 that are non-ascii.  All others names must be enclosed with single or double quotes. 
 In particular, names with hypens (`-`) must be enclosed with single or double quotes. 
+
+Changes to `json_query`
+
+- The parameter `result_type` has been replaced by a bitmask type `result_options`.
+For backwards compatability, `result_type` has been typedefed to `result_options`,
+and the `value` and `path` enumerators are still there. In addition, `result_options`
+provides options for excluding duplicates from results, and for results to be sorted in
+path order.
+
+Enhancements to JMESPath extension
+
+- Function arity errors are now raised during compilation of the JMESPath expression
+rather than during evaluation.
 
 v0.160.0
 --------
