@@ -4,9 +4,9 @@
 array[string] keys(object value)
 ```
 
-Returns an array of keys in the provided object.
+Returns an array of keys in the object.
 
-Returns `null` if passed a value that is not an object.
+It is a type error if the provided argument is not an object.
 
 ### Examples
 

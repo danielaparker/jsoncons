@@ -8,7 +8,7 @@ Returns the sum of the items in an array of numbers.
 
 Returns 0 if the array is empty.
 
-Returns `null` if any item in the array is not a number.
+It is a type error if any item in the array is not a number.
 
 ### Examples
 

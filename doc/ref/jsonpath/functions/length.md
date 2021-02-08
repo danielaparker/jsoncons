@@ -1,7 +1,7 @@
 ### length
 
 ```
-integer length(array|object|string value)
+integer|null length(array|object|string value)
 ```
 
 Returns the length of an array, object or string.

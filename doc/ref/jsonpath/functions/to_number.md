@@ -7,7 +7,7 @@ number to_number(string|number value)
 If string, returns the parsed number. 
 If number, returns the passed in value.
 
-Returns null if 
+It is a type error if
 
 - the provided value is not a string or number
 

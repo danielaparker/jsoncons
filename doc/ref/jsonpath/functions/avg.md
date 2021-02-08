@@ -1,16 +1,14 @@
 ### avg
 
 ```
-number avg(array[number] value)
+number|null avg(array[number] value)
 ```
 
-Returns the average of the items in an array of numbers.
+Returns the average of the items in an array of numbers, or null if the array is empty
 
-Returns null if 
+It is a type error if 
 
 - the provided value is not an array
-
-- the array is empty
 
 - the array contains items that are not numbers
 

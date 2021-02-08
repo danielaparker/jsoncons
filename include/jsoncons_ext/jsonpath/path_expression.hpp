@@ -596,6 +596,108 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    class ends_with_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+        using string_view_type = typename Json::string_view_type;
+
+        ends_with_function()
+            : function_base<Json, JsonReference>(2)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           const std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_string())
+            {
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+
+            pointer arg1_ptr = args[1];
+            if (!arg1_ptr->is_string())
+            {
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+
+            auto sv0 = arg0_ptr->template as<string_view_type>();
+            auto sv1 = arg1_ptr->template as<string_view_type>();
+
+            if (sv1.length() <= sv0.length() && sv1 == sv0.substr(sv0.length() - sv1.length()))
+            {
+                return resources.true_value();
+            }
+            else
+            {
+                return resources.false_value();
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class starts_with_function : public function_base<Json,JsonReference>
+    {
+    public:
+        using reference = typename function_base<Json,JsonReference>::reference;
+        using pointer = typename function_base<Json,JsonReference>::pointer;
+        using string_view_type = typename Json::string_view_type;
+
+        starts_with_function()
+            : function_base<Json, JsonReference>(2)
+        {
+        }
+
+        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+                           const std::vector<pointer>& args, 
+                           std::error_code& ec) const override
+        {
+            if (args.size() != *this->arg_count())
+            {
+                ec = jsonpath_errc::invalid_arity;
+                return resources.null_value();
+            }
+
+            pointer arg0_ptr = args[0];
+            if (!arg0_ptr->is_string())
+            {
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+
+            pointer arg1_ptr = args[1];
+            if (!arg1_ptr->is_string())
+            {
+                ec = jsonpath_errc::invalid_type;
+                return resources.null_value();
+            }
+
+            auto sv0 = arg0_ptr->template as<string_view_type>();
+            auto sv1 = arg1_ptr->template as<string_view_type>();
+
+            if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
+            {
+                return resources.true_value();
+            }
+            else
+            {
+                return resources.false_value();
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
     class sum_function : public function_base<Json,JsonReference>
     {
     public:
@@ -1196,6 +1298,8 @@ namespace detail {
         {
             static abs_function<Json,JsonReference> abs_func;
             static contains_function<Json,JsonReference> contains_func;
+            static starts_with_function<Json,JsonReference> starts_with_func;
+            static ends_with_function<Json,JsonReference> ends_with_func;
             static ceil_function<Json,JsonReference> ceil_func;
             static floor_function<Json, JsonReference> floor_func;
             static to_number_function<Json,JsonReference> to_number_func;
@@ -1214,6 +1318,8 @@ namespace detail {
             {
                 {string_type{'a','b','s'}, &abs_func},
                 {string_type{'c','o','n','t','a','i','n','s'}, &contains_func},
+                {string_type{'s','t','a','r','t','s','_','w','i','t','h'}, &starts_with_func},
+                {string_type{'e','n','d','s','_','w','i','t','h'}, &ends_with_func},
                 {string_type{'c','e','i','l'}, &ceil_func},
                 {string_type{'f','l','o','o','r'}, &floor_func},
                 {string_type{'t','o','_','n','u','m','b','e','r'}, &to_number_func},

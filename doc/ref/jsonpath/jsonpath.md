@@ -256,12 +256,14 @@ Function|Description
 [ceil](functions/ceil.md)|Returns the smallest integer value not less than the provided number.
 [contains](functions/contains.md)|Returns true if an array contains a provided search value, or a string contains a provided substring.
 count (until 0.161.0)|Same as [length](functions/length.md)
+[ends_with](functions/ends_with.md)|Returns true if the source string ends with the suffix string, otherwise false.
 [floor](functions/floor.md)|Returns the largest integer value not greater than the provided number.
 [keys](functions/keys.md)|Returns an array of keys in the provided object.
 [length](functions/length.md)|Returns the length of an array, object or string.
 [max](functions/max.md)|Returns the highest number found in an array of numbers,or the highest string in an array of strings.
 [min](functions/min.md)|Returns the lowest number found in an array of numbers, or the lowest string in an array of strings.
 [prod](functions/prod.md)|Returns the product of the items in an array of numbers.
+[starts_with](functions/starts_with.md)|Returns true if the source string starts with the prefix string, otherwise false.
 [sum](functions/sum.md)|Returns the sum of the items in an array of numbers.
 [to_number](functions/to_number.md)|If string, returns the parsed number. If number, returns the passed in value.
 [tokenize](functions/tokenize.md)|Returns an array of strings formed by splitting the input string into an array of strings, separated by substrings that match the provided regular expression pattern.
