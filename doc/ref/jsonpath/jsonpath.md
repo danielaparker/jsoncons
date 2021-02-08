@@ -251,7 +251,8 @@ Precedence|Operator|Associativity
 
 Support for function expressions is a jsoncons extension.
 
-Functions can be passed JSONPath paths and JSON expressions. 
+Functions can be passed JSONPath paths, single quoted strings and literal JSON values
+such as `1.5`, `true`, or `{"foo" : "bar"}`. 
 Outside a filter predicate, functions can be passed paths that select from
 the root JSON value `$`. Within a filter predicate, functions can be passed either a 
 path that selects from the root JSON value `$`, or a path that selects from the current node `@`.
