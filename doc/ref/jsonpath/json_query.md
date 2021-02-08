@@ -283,7 +283,6 @@ int main()
     std::cout << "(3) " << result3 << "\n\n";
 
     auto result4 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::path | 
                                         jsonpath::result_options::sort);
     std::cout << "(4) " << result4 << "\n\n";
 
@@ -293,7 +292,6 @@ int main()
     std::cout << "(5) " << result5 << "\n\n";
 
     auto result6 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::path | 
                                         jsonpath::result_options::nodups);
     std::cout << "(6) " << result6 << "\n\n";
 
@@ -304,7 +302,6 @@ int main()
     std::cout << "(7) " << result7 << "\n\n";
 
     auto result8 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::path | 
                                         jsonpath::result_options::nodups | 
                                         jsonpath::result_options::sort);
     std::cout << "(8) " << result8 << "\n\n";

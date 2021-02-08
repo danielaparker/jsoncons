@@ -593,7 +593,6 @@ namespace {
         std::cout << "(3) " << result3 << "\n\n";
 
         auto result4 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::path | 
                                             jsonpath::result_options::sort);
         std::cout << "(4) " << result4 << "\n\n";
 
@@ -603,7 +602,6 @@ namespace {
         std::cout << "(5) " << result5 << "\n\n";
 
         auto result6 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::path | 
                                             jsonpath::result_options::nodups);
         std::cout << "(6) " << result6 << "\n\n";
 
@@ -614,10 +612,47 @@ namespace {
         std::cout << "(7) " << result7 << "\n\n";
 
         auto result8 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::path | 
                                             jsonpath::result_options::nodups | 
                                             jsonpath::result_options::sort);
         std::cout << "(8) " << result8 << "\n\n";
+    }
+
+    void search_for_and_replace_a_value()
+    {
+        std::string data = R"(
+          { "books": [ 
+              { "author": "Nigel Rees",
+                "title": "Sayings of the Century",
+                "isbn": "0048080489",
+                "price": 8.95
+              },
+              { "author": "Evelyn Waugh",
+                "title": "Sword of Honour",
+                "isbn": "0141193557",
+                "price": 12.99
+              },
+              { "author": "Herman Melville",
+                "title": "Moby Dick",
+                "isbn": "0553213113",
+                "price": 8.99
+              }
+            ]
+          }
+        )";
+
+        json j = json::parse(data);
+
+        // Change the price of "Moby Dick" from $8.99 to $10
+        jsonpath::json_replace(j,"$.books[?(@.isbn == '0553213113')].price",10.0);
+
+        // Increase the price of "Sayings of the Century" by $1
+        auto f = [](const std::string& /*path*/, json& value) 
+        {
+            value = value.as<double>() + 1.0;
+        };
+        jsonpath::json_replace(j, "$.books[?(@.isbn == '0048080489')].price", f); // (since 0.161.0)
+
+        std::cout << pretty_print(j) << std::endl;
     }
 
 } // namespace
@@ -647,6 +682,7 @@ void jsonpath_examples()
     function_length_example();
     function_floor_example();
     function_keys_example();
+    search_for_and_replace_a_value();
     std::cout << "\n";
 }
 
