@@ -157,14 +157,13 @@ Path|Value
 `$['books'][1]['title']` | "The Night Watch"
 `$['books'][3]['title']` | "The Night Watch"
 
-In 0.161.0, [json_query](json_query.md) defaults to allowing 
-duplicates, but has an option for no duplicates.  
-[json_replace](json_replace.md) defaults to no duplicates.  
+In 0.161.0, [json_query](json_query.md) defaults to allowing
+duplicates, but has an option for no duplicates.
+[json_replace](json_replace.md) defaults to no duplicates.
 
-By default, the ordering of results is unspecified, although the user may 
-expect array ordering at least to be preserved.  In 0.161.0, jsoncons 
-provides an option for sorting results by paths.  
-
+By default, the ordering of results is unspecified, although the user may
+expect array ordering at least to be preserved.  In 0.161.0, jsoncons
+provides an option for sorting results by paths.
 
 ### Slices
 
