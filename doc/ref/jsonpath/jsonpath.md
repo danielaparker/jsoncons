@@ -109,7 +109,7 @@ JSONPath|       Description
 `()`    |Filter expression.
 `?()`   |Applies a filter expression.
 
-### Duplicates
+### Duplicates and ordering
 
 Consider the JSON instance 
 
@@ -140,6 +140,8 @@ with selector
 ```
 $.books[1,1,3].title
 ```
+Note that the second book, _The Night Watch_ by Sergei Lukyanenko, is selected twice.
+
 The majority of JSONPath implementations will produce (with duplicate paths allowed):
 
 Path|Value
@@ -155,9 +157,14 @@ Path|Value
 `$['books'][1]['title']` | "The Night Watch"
 `$['books'][3]['title']` | "The Night Watch"
 
-Since 0.161.0, the `jsonpath::json_query` function defaults to allowing duplicates, 
-but has an option for no duplicates. The `jsonpath::json_replace` function 
-always excludes duplicates.
+In 0.161.0, [json_query](json_query.md) defaults to allowing 
+duplicates, but has an option for no duplicates.  
+[json_replace](json_replace.md) defaults to no duplicates.  
+
+By default, the ordering of results is unspecified, although the user may 
+expect array ordering at least to be preserved.  In 0.161.0, jsoncons 
+provides an option for sorting results by paths.  
+
 
 ### Slices
 
