@@ -338,7 +338,7 @@ int main()
     std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
     auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                        jsonpath::result_options::path | jsonpath::result_options::nodups);
+                                        jsonpath::result_options::nodups);
     std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
 }
 ```
@@ -457,7 +457,7 @@ int main()
     json result3 = expr.evaluate(data, jsonpath::result_options::value | jsonpath::result_options::nodups);
     std::cout << "(3) " << pretty_print(result3) << "\n\n";
 
-    json result4 = expr.evaluate(data, jsonpath::result_options::path | jsonpath::result_options::nodups);
+    json result4 = expr.evaluate(data, jsonpath::result_options::nodups);
     std::cout << "(4) " << pretty_print(result4) << "\n\n";
 }
 ```
