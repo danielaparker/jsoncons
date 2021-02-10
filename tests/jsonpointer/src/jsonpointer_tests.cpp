@@ -295,7 +295,8 @@ TEST_CASE("jsonpointer concatenation")
 
         std::error_code ec;
         json j = jsonpointer::get(example, ptr, ec);
-        std::cout << j << "\n";
+        //std::cout << j << "\n";
+        CHECK(j == json("bar"));
     }
 
     SECTION("concatenate two paths")
@@ -314,7 +315,8 @@ TEST_CASE("jsonpointer concatenation")
         CHECK(it == end);
 
         json j = jsonpointer::get(example, ptr);
-        std::cout << j << "\n";
+        CHECK(j == json("qux"));
+        //std::cout << j << "\n";
     }
 }
 

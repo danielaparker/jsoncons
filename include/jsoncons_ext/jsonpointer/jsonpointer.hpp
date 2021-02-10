@@ -21,16 +21,16 @@
 
 namespace jsoncons { namespace jsonpointer {
 
-namespace detail {
+    namespace detail {
 
-enum class pointer_state 
-{
-    start,
-    escaped,
-    delim
-};
+    enum class pointer_state 
+    {
+        start,
+        escaped,
+        delim
+    };
 
-} // detail
+    } // namespace detail
 
     // json_pointer_iterator
     template <class InputIt>
@@ -356,35 +356,10 @@ enum class pointer_state
 
     namespace detail {
 
-    template <class J,class JReference>
-    class handle_type
-    {
-    public:
-        using reference = JReference;
-        using type = reference;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
-
-        handle_type(reference ref) noexcept
-            : ptr_(std::addressof(ref))
-        {
-        }
-
-        handle_type(const handle_type&) noexcept = default;
-
-        handle_type& operator=(const handle_type&) noexcept = default;
-
-        type get() const noexcept
-        {
-            return *ptr_;
-        }
-    private:
-        pointer ptr_;
-    };
-
     template<class J,class JReference>
     class jsonpointer_evaluator : public ser_context
     {
-        using type = typename handle_type<J,JReference>::type;
+        //using type = typename handle_type<J,JReference>::type;
         using char_type = typename J::char_type;
         using string_type = typename std::basic_string<char_type>;
         using string_view_type = typename J::string_view_type;
@@ -394,11 +369,12 @@ enum class pointer_state
         std::size_t line_;
         std::size_t column_;
         string_type buffer_;
-        std::vector<handle_type<J,JReference>> current_;
+        std::vector<pointer> current_;
     public:
-        type get_result() 
+        reference get_result() 
         {
-            return current_.back().get();
+            JSONCONS_ASSERT(!current_.empty());
+            return *current_.back();
         }
 
         void get(reference root, const string_view_type& path, std::error_code& ec)
@@ -423,10 +399,10 @@ enum class pointer_state
             {
                 return string_type(path);
             }
-            if (current_.back().get().is_array() && buffer_.size() == 1 && buffer_[0] == '-')
+            if (current_.back()->is_array() && buffer_.size() == 1 && buffer_[0] == '-')
             {
                 string_type p = string_type(path.substr(0,path.length()-1));
-                std::string s = std::to_string(current_.back().get().size());
+                std::string s = std::to_string(current_.back()->size());
                 for (auto c : s)
                 {
                     p.push_back(c);
@@ -446,11 +422,11 @@ enum class pointer_state
             {
                 return;
             }
-            if (current_.back().get().is_array())
+            if (current_.back()->is_array())
             {
                 if (buffer_.size() == 1 && buffer_[0] == '-')
                 {
-                    current_.back().get().push_back(value);
+                    current_.back()->push_back(value);
                 }
                 else
                 {
@@ -466,24 +442,24 @@ enum class pointer_state
                         return;
                     }
                     std::size_t index = result.value();
-                    if (index > current_.back().get().size())
+                    if (index > current_.back()->size())
                     {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    if (index == current_.back().get().size())
+                    if (index == current_.back()->size())
                     {
-                        current_.back().get().push_back(value);
+                        current_.back()->push_back(value);
                     }
                     else
                     {
-                        current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
+                        current_.back()->insert(current_.back()->array_range().begin()+index,value);
                     }
                 }
             }
-            else if (current_.back().get().is_object())
+            else if (current_.back()->is_object())
             {
-                current_.back().get().insert_or_assign(buffer_,value);
+                current_.back()->insert_or_assign(buffer_,value);
             }
             else
             {
@@ -499,11 +475,11 @@ enum class pointer_state
             {
                 return;
             }
-            if (current_.back().get().is_array())
+            if (current_.back()->is_array())
             {
                 if (buffer_.size() == 1 && buffer_[0] == '-')
                 {
-                    current_.back().get().push_back(value);
+                    current_.back()->push_back(value);
                 }
                 else
                 {
@@ -519,31 +495,31 @@ enum class pointer_state
                         return;
                     }
                     std::size_t index = result.value();
-                    if (index > current_.back().get().size())
+                    if (index > current_.back()->size())
                     {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    if (index == current_.back().get().size())
+                    if (index == current_.back()->size())
                     {
-                        current_.back().get().push_back(value);
+                        current_.back()->push_back(value);
                     }
                     else
                     {
-                        current_.back().get().insert(current_.back().get().array_range().begin()+index,value);
+                        current_.back()->insert(current_.back()->array_range().begin()+index,value);
                     }
                 }
             }
-            else if (current_.back().get().is_object())
+            else if (current_.back()->is_object())
             {
-                if (current_.back().get().contains(buffer_))
+                if (current_.back()->contains(buffer_))
                 {
                     ec = jsonpointer_errc::key_already_exists;
                     return;
                 }
                 else
                 {
-                    current_.back().get().insert_or_assign(buffer_,value);
+                    current_.back()->insert_or_assign(buffer_,value);
                 }
             }
             else
@@ -560,7 +536,7 @@ enum class pointer_state
             {
                 return;
             }
-            if (current_.back().get().is_array())
+            if (current_.back()->is_array())
             {
                 if (buffer_.size() == 1 && buffer_[0] == '-')
                 {
@@ -581,24 +557,24 @@ enum class pointer_state
                         return;
                     }
                     std::size_t index = result.value();
-                    if (index >= current_.back().get().size())
+                    if (index >= current_.back()->size())
                     {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    current_.back().get().erase(current_.back().get().array_range().begin()+index);
+                    current_.back()->erase(current_.back()->array_range().begin()+index);
                 }
             }
-            else if (current_.back().get().is_object())
+            else if (current_.back()->is_object())
             {
-                if (!current_.back().get().contains(buffer_))
+                if (!current_.back()->contains(buffer_))
                 {
                     ec = jsonpointer_errc::name_not_found;
                     return;
                 }
                 else
                 {
-                    current_.back().get().erase(buffer_);
+                    current_.back()->erase(buffer_);
                 }
             }
             else
@@ -615,7 +591,7 @@ enum class pointer_state
             {
                 return;
             }
-            if (current_.back().get().is_array())
+            if (current_.back()->is_array())
             {
                 if (buffer_.size() == 1 && buffer_[0] == '-')
                 {
@@ -636,24 +612,24 @@ enum class pointer_state
                         return;
                     }
                     std::size_t index = result.value();
-                    if (index >= current_.back().get().size())
+                    if (index >= current_.back()->size())
                     {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    (current_.back().get())[index] = value;
+                    current_.back()->at(index) = value;
                 }
             }
-            else if (current_.back().get().is_object())
+            else if (current_.back()->is_object())
             {
-                if (!current_.back().get().contains(buffer_))
+                if (!current_.back()->contains(buffer_))
                 {
                     ec = jsonpointer_errc::key_already_exists;
                     return;
                 }
                 else
                 {
-                    current_.back().get().insert_or_assign(buffer_,value);
+                    current_.back()->insert_or_assign(buffer_,value);
                 }
             }
             else
@@ -665,7 +641,7 @@ enum class pointer_state
 
         void evaluate(reference root, const string_view_type& path, std::error_code& ec)
         {
-            current_.push_back(root);
+            current_.push_back(std::addressof(root));
 
             json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
             json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
@@ -685,11 +661,11 @@ enum class pointer_state
             }
         }
 
-        static void resolve(std::vector<handle_type<J,JReference>>& current,
+        static void resolve(std::vector<pointer>& current,
                             const string_view_type& buffer,
                             std::error_code& ec)
         {
-            if (current.back().get().is_array())
+            if (current.back()->is_array())
             {
                 if (buffer.size() == 1 && buffer[0] == '-')
                 {
@@ -710,22 +686,22 @@ enum class pointer_state
                         return;
                     }
                     std::size_t index = result.value();
-                    if (index >= current.back().get().size())
+                    if (index >= current.back()->size())
                     {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    current.push_back(current.back().get().at(index));
+                    current.push_back(std::addressof(current.back()->at(index)));
                 }
             }
-            else if (current.back().get().is_object())
+            else if (current.back()->is_object())
             {
-                if (!current.back().get().contains(buffer))
+                if (!current.back()->contains(buffer))
                 {
                     ec = jsonpointer_errc::name_not_found;
                     return;
                 }
-                current.push_back(current.back().get().at(buffer));
+                current.push_back(std::addressof(current.back()->at(buffer)));
             }
             else
             {
