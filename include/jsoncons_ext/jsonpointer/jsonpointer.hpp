@@ -452,12 +452,29 @@ namespace jsoncons { namespace jsonpointer {
         {
             std::error_code ec;
 
-            std::basic_string<char_type> buffer;
-            pointer current = evaluate(std::addressof(root), path, buffer, ec);
-            if (ec)
+            pointer current = std::addressof(root);
+            if (path.empty())
             {
-                return string_type(path);
+                return string_type();
             }
+
+            std::basic_string<char_type> buffer;
+            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+            while (it != end)
+            {
+                buffer = *it;
+                it.increment(ec);
+                if (ec)
+                    return string_type(path);
+                if (it != end)
+                {
+                    current = resolve(current, buffer, ec);
+                    if (ec)
+                        return string_type(path);
+                }
+            }
+
             if (current->is_array() && buffer.size() == 1 && buffer[0] == '-')
             {
                 string_type p = string_type(path.substr(0,path.length()-1));
