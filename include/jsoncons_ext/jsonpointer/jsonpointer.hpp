@@ -578,7 +578,7 @@ namespace jsoncons { namespace jsonpointer {
                 else
                 {
                     auto r = current->insert_or_assign(buffer,value);
-                    current = std::addressof(r.first);
+                    current = std::addressof(r.first->value());
                 }
             }
             else
@@ -917,7 +917,8 @@ namespace jsoncons { namespace jsonpointer {
                 {
                     // Flatten empty array to null
                     //result.try_emplace(parent_key, null_type{});
-                    result[parent_key] = parent_value;
+                    //result[parent_key] = parent_value;
+                    result.try_emplace(parent_key, parent_value);
                 }
                 else
                 {
@@ -938,7 +939,8 @@ namespace jsoncons { namespace jsonpointer {
                 {
                     // Flatten empty object to null
                     //result.try_emplace(parent_key, null_type{});
-                    result[parent_key] = parent_value;
+                    //result[parent_key] = parent_value;
+                    result.try_emplace(parent_key, parent_value);
                 }
                 else
                 {
@@ -956,7 +958,8 @@ namespace jsoncons { namespace jsonpointer {
             default:
             {
                 // add primitive parent_value with its reference string
-                result[parent_key] = parent_value;
+                //result[parent_key] = parent_value;
+                result.try_emplace(parent_key, parent_value);
                 break;
             }
         }
