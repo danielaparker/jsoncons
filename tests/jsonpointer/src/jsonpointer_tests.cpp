@@ -30,6 +30,12 @@ void check_get_with_const_ref(const json& example, const std::string& pointer, c
 void check_contains(const json& example, const std::string& pointer, bool expected)
 {
     bool result = jsonpointer::contains(example,pointer);
+    if (result != expected)
+    {
+        std::cout << "contains failed\n";
+        std::cout << "    given: " << example << "\n";
+        std::cout << "    pointer: " << pointer << "\n";
+    }
     CHECK(result == expected);
 }
 

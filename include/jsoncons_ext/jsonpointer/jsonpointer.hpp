@@ -356,53 +356,49 @@ namespace jsoncons { namespace jsonpointer {
     namespace detail {
 
     template <class JsonPointer,class StringView>
-    void resolve(JsonPointer current, const StringView& buffer, std::error_code& ec)
+    JsonPointer resolve(JsonPointer current, const StringView& buffer, std::error_code& ec)
     {
         if (current->is_array())
         {
             if (buffer.size() == 1 && buffer[0] == '-')
             {
                 ec = jsonpointer_errc::index_exceeds_array_size;
-                return;
+                return current;
             }
-            else
+            if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
             {
-                if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
-                {
-                    ec = jsonpointer_errc::invalid_index;
-                    return;
-                }
-                auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
-                if (!result)
-                {
-                    ec = jsonpointer_errc::invalid_index;
-                    return;
-                }
-                std::size_t index = result.value();
-                if (index >= current->size())
-                {
-                    ec = jsonpointer_errc::index_exceeds_array_size;
-                    return;
-                }
-                current->push_back(current->at(index));
-                current = std::addressof(current->at(current->size()-1));
+                ec = jsonpointer_errc::invalid_index;
+                return current;
             }
+            auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+            if (!result)
+            {
+                ec = jsonpointer_errc::invalid_index;
+                return current;
+            }
+            std::size_t index = result.value();
+            if (index >= current->size())
+            {
+                ec = jsonpointer_errc::index_exceeds_array_size;
+                return current;
+            }
+            current = std::addressof(current->at(index));
         }
         else if (current->is_object())
         {
             if (!current->contains(buffer))
             {
                 ec = jsonpointer_errc::name_not_found;
-                return;
+                return current;
             }
-            current->push_back(std::addressof(current->at(buffer)));
-            current = std::addressof(current->at(current->size()-1));
+            current = std::addressof(current->at(buffer));
         }
         else
         {
             ec = jsonpointer_errc::expected_object_or_array;
-            return;
+            return current;
         }
+        return current;
     }
 
     template <class JsonPointer,class StringView,class String>
@@ -420,10 +416,11 @@ namespace jsoncons { namespace jsonpointer {
             {
                 return current;
             }
-            resolve(current, buffer, ec);
+            current = resolve(current, buffer, ec);
             if (ec)
                 return current;
         }
+        return current;
     }
 
     template<class Json,class JsonReference>
@@ -439,26 +436,21 @@ namespace jsoncons { namespace jsonpointer {
         {
         }
 
-        reference get_result() 
-        {
-            static Json j;
-            return j;
-        }
-
-        void get(reference root, const string_view_type& path, std::error_code& ec)
+        reference get(reference root, const string_view_type& path, std::error_code& ec)
         {
             std::basic_string<char_type> buffer;
 
             pointer current = evaluate(std::addressof(root), path, buffer, ec);
             if (ec)
             {
-                return;
+                return *current;
             }
             if (path.empty())
             {
-                return;
+                return *current;
             }
-            resolve(current, buffer, ec);
+            current = resolve(current, buffer, ec);
+            return *current;
         }
 
         string_type normalized_path(const Json& root, const string_view_type& path)
@@ -739,12 +731,12 @@ namespace jsoncons { namespace jsonpointer {
     {
         jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
         std::error_code ec;
-        evaluator.get(root, path, ec);
+        Json& j = evaluator.get(root, path, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
-        return evaluator.get_result();
+        return j;
     }
 
     template<class Json>
@@ -753,28 +745,26 @@ namespace jsoncons { namespace jsonpointer {
         jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
 
         std::error_code ec;
-        evaluator.get(root, path, ec);
+        const Json& j = evaluator.get(root, path, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
         }
-        return evaluator.get_result();
+        return j;
     }
 
     template<class Json>
     Json& get(Json& root, const typename Json::string_view_type& path, std::error_code& ec)
     {
         jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
-        evaluator.get(root, path, ec);
-        return evaluator.get_result();
+        return evaluator.get(root, path, ec);
     }
 
     template<class Json>
     const Json& get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
     {
         jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
-        evaluator.get(root, path, ec);
-        return evaluator.get_result();
+        return evaluator.get(root, path, ec);
     }
 
     template<class Json>
