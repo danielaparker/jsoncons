@@ -365,12 +365,7 @@ namespace jsoncons { namespace jsonpointer {
                 ec = jsonpointer_errc::index_exceeds_array_size;
                 return current;
             }
-            if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
-            {
-                ec = jsonpointer_errc::invalid_index;
-                return current;
-            }
-            auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+            auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
             if (!result)
             {
                 ec = jsonpointer_errc::invalid_index;
@@ -496,12 +491,7 @@ namespace jsoncons { namespace jsonpointer {
                 }
                 else
                 {
-                    if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+                    auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -554,12 +544,7 @@ namespace jsoncons { namespace jsonpointer {
                 }
                 else
                 {
-                    if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+                    auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -593,7 +578,7 @@ namespace jsoncons { namespace jsonpointer {
                 else
                 {
                     auto r = current->insert_or_assign(buffer,value);
-                    current = std::addressof(r->first);
+                    current = std::addressof(r.first);
                 }
             }
             else
@@ -620,12 +605,7 @@ namespace jsoncons { namespace jsonpointer {
                 }
                 else
                 {
-                    if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+                    auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -676,12 +656,7 @@ namespace jsoncons { namespace jsonpointer {
                 }
                 else
                 {
-                    if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+                    auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
@@ -1016,7 +991,7 @@ namespace jsoncons { namespace jsonpointer {
         std::size_t index = 0;
         for (const auto& item : value.object_range())
         {
-            auto r = jsoncons::detail::to_integer<std::size_t>(item.key().data(),item.key().size());
+            auto r = jsoncons::detail::to_integer_decimal<std::size_t>(item.key().data(),item.key().size());
             if (!r || (index++ != r.value()))
             {
                 safe = false;
@@ -1069,7 +1044,7 @@ namespace jsoncons { namespace jsonpointer {
             for (auto it = ptr.begin(); it != ptr.end(); )
             {
                 auto s = *it;
-                auto r = jsoncons::detail::to_integer<size_t>(s.data(), s.size());
+                auto r = jsoncons::detail::to_integer_decimal<size_t>(s.data(), s.size());
                 if (r && (index++ == r.value()))
                 {
                     if (!part->is_array())
