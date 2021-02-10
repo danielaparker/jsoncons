@@ -355,6 +355,77 @@ namespace jsoncons { namespace jsonpointer {
 
     namespace detail {
 
+    template <class JsonPointer,class StringView>
+    void resolve(JsonPointer current, const StringView& buffer, std::error_code& ec)
+    {
+        if (current->is_array())
+        {
+            if (buffer.size() == 1 && buffer[0] == '-')
+            {
+                ec = jsonpointer_errc::index_exceeds_array_size;
+                return;
+            }
+            else
+            {
+                if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
+                {
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
+                }
+                auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+                if (!result)
+                {
+                    ec = jsonpointer_errc::invalid_index;
+                    return;
+                }
+                std::size_t index = result.value();
+                if (index >= current->size())
+                {
+                    ec = jsonpointer_errc::index_exceeds_array_size;
+                    return;
+                }
+                current->push_back(current->at(index));
+                current = std::addressof(current->at(current->size()-1));
+            }
+        }
+        else if (current->is_object())
+        {
+            if (!current->contains(buffer))
+            {
+                ec = jsonpointer_errc::name_not_found;
+                return;
+            }
+            current->push_back(std::addressof(current->at(buffer)));
+            current = std::addressof(current->at(current->size()-1));
+        }
+        else
+        {
+            ec = jsonpointer_errc::expected_object_or_array;
+            return;
+        }
+    }
+
+    template <class JsonPointer,class StringView,class String>
+    JsonPointer evaluate(JsonPointer current, const StringView& path, String& buffer, std::error_code& ec)
+    {
+        json_pointer_iterator<typename StringView::iterator> it(path.begin(), path.end());
+        json_pointer_iterator<typename StringView::iterator> end(path.begin(), path.end(), path.end());
+        while (it != end)
+        {
+            buffer = *it;
+            it.increment(ec);
+            if (ec)
+                return current;
+            if (it == end)
+            {
+                return current;
+            }
+            resolve(current, buffer, ec);
+            if (ec)
+                return current;
+        }
+    }
+
     template<class Json,class JsonReference>
     class jsonpointer_evaluator
     {
@@ -363,25 +434,22 @@ namespace jsoncons { namespace jsonpointer {
         using string_view_type = typename Json::string_view_type;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-
-        pointer current_;
-        std::size_t column_;
-        string_type buffer_;
     public:
         jsonpointer_evaluator()
-            : current_(nullptr), column_(0)
         {
         }
 
         reference get_result() 
         {
-            JSONCONS_ASSERT(current_ != nullptr);
-            return *current_;
+            static Json j;
+            return j;
         }
 
         void get(reference root, const string_view_type& path, std::error_code& ec)
         {
-            evaluate(root, path, ec);
+            std::basic_string<char_type> buffer;
+
+            pointer current = evaluate(std::addressof(root), path, buffer, ec);
             if (ec)
             {
                 return;
@@ -390,21 +458,23 @@ namespace jsoncons { namespace jsonpointer {
             {
                 return;
             }
-            resolve(current_, buffer_, ec);
+            resolve(current, buffer, ec);
         }
 
         string_type normalized_path(const Json& root, const string_view_type& path)
         {
             std::error_code ec;
-            evaluate(root, path, ec);
+
+            std::basic_string<char_type> buffer;
+            pointer current = evaluate(std::addressof(root), path, buffer, ec);
             if (ec)
             {
                 return string_type(path);
             }
-            if (current_->is_array() && buffer_.size() == 1 && buffer_[0] == '-')
+            if (current->is_array() && buffer.size() == 1 && buffer[0] == '-')
             {
                 string_type p = string_type(path.substr(0,path.length()-1));
-                std::string s = std::to_string(current_->size());
+                std::string s = std::to_string(current->size());
                 for (auto c : s)
                 {
                     p.push_back(c);
@@ -419,53 +489,54 @@ namespace jsoncons { namespace jsonpointer {
 
         void add(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
-            evaluate(root, path, ec);
+            std::basic_string<char_type> buffer;
+            pointer current = evaluate(std::addressof(root), path, buffer, ec);
             if (ec)
             {
                 return;
             }
-            if (current_->is_array())
+            if (current->is_array())
             {
-                if (buffer_.size() == 1 && buffer_[0] == '-')
+                if (buffer.size() == 1 && buffer[0] == '-')
                 {
-                    current_->push_back(value);
-                    current_ = std::addressof(current_->at(current_->size()-1));
+                    current->push_back(value);
+                    current = std::addressof(current->at(current->size()-1));
                 }
                 else
                 {
-                    if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
+                    if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
                     {
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
                     std::size_t index = result.value();
-                    if (index > current_->size())
+                    if (index > current->size())
                     {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    if (index == current_->size())
+                    if (index == current->size())
                     {
-                        current_->push_back(value);
-                        current_ = std::addressof(current_->at(current_->size()-1));
+                        current->push_back(value);
+                        current = std::addressof(current->at(current->size()-1));
                     }
                     else
                     {
-                        auto it = current_->insert(current_->array_range().begin()+index,value);
-                        current_ = std::addressof(*it);
+                        auto it = current->insert(current->array_range().begin()+index,value);
+                        current = std::addressof(*it);
                     }
                 }
             }
-            else if (current_->is_object())
+            else if (current->is_object())
             {
-                auto r = current_->insert_or_assign(buffer_,value);
-                current_ = std::addressof(r.first->value());
+                auto r = current->insert_or_assign(buffer,value);
+                current = std::addressof(r.first->value());
             }
             else
             {
@@ -476,60 +547,61 @@ namespace jsoncons { namespace jsonpointer {
 
         void insert(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
-            evaluate(root, path, ec);
+            std::basic_string<char_type> buffer;
+            pointer current = evaluate(std::addressof(root), path, buffer, ec);
             if (ec)
             {
                 return;
             }
-            if (current_->is_array())
+            if (current->is_array())
             {
-                if (buffer_.size() == 1 && buffer_[0] == '-')
+                if (buffer.size() == 1 && buffer[0] == '-')
                 {
-                    current_->push_back(value);
-                    current_ = std::addressof(current_->at(current_->size()-1));
+                    current->push_back(value);
+                    current = std::addressof(current->at(current->size()-1));
                 }
                 else
                 {
-                    if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
+                    if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
                     {
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
                     if (!result)
                     {
                         ec = jsonpointer_errc::invalid_index;
                         return;
                     }
                     std::size_t index = result.value();
-                    if (index > current_->size())
+                    if (index > current->size())
                     {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    if (index == current_->size())
+                    if (index == current->size())
                     {
-                        current_->push_back(value);
-                        current_ = std::addressof(current_->at(current_->size()-1));
+                        current->push_back(value);
+                        current = std::addressof(current->at(current->size()-1));
                     }
                     else
                     {
-                        auto it = current_->insert(current_->array_range().begin()+index,value);
-                        current_ = std::addressof(*it);
+                        auto it = current->insert(current->array_range().begin()+index,value);
+                        current = std::addressof(*it);
                     }
                 }
             }
-            else if (current_->is_object())
+            else if (current->is_object())
             {
-                if (current_->contains(buffer_))
+                if (current->contains(buffer))
                 {
                     ec = jsonpointer_errc::key_already_exists;
                     return;
                 }
                 else
                 {
-                    auto r = current_->insert_or_assign(buffer_,value);
-                    current_ = std::addressof(r->first);
+                    auto r = current->insert_or_assign(buffer,value);
+                    current = std::addressof(r->first);
                 }
             }
             else
@@ -541,141 +613,12 @@ namespace jsoncons { namespace jsonpointer {
 
         void remove(Json& root, const string_view_type& path, std::error_code& ec)
         {
-            evaluate(root, path, ec);
+            std::basic_string<char_type> buffer;
+            pointer current = evaluate(std::addressof(root), path, buffer, ec);
             if (ec)
             {
                 return;
             }
-            if (current_->is_array())
-            {
-                if (buffer_.size() == 1 && buffer_[0] == '-')
-                {
-                    ec = jsonpointer_errc::index_exceeds_array_size;
-                    return;
-                }
-                else
-                {
-                    if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
-                    if (!result)
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    std::size_t index = result.value();
-                    if (index >= current_->size())
-                    {
-                        ec = jsonpointer_errc::index_exceeds_array_size;
-                        return;
-                    }
-                    current_->erase(current_->array_range().begin()+index);
-                }
-            }
-            else if (current_->is_object())
-            {
-                if (!current_->contains(buffer_))
-                {
-                    ec = jsonpointer_errc::name_not_found;
-                    return;
-                }
-                else
-                {
-                    current_->erase(buffer_);
-                }
-            }
-            else
-            {
-                ec = jsonpointer_errc::expected_object_or_array;
-                return;
-            }
-        }
-
-        void replace(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
-        {
-            evaluate(root, path, ec);
-            if (ec)
-            {
-                return;
-            }
-            if (current_->is_array())
-            {
-                if (buffer_.size() == 1 && buffer_[0] == '-')
-                {
-                    ec = jsonpointer_errc::index_exceeds_array_size;
-                    return;
-                }
-                else
-                {
-                    if (!jsoncons::detail::is_base10(buffer_.data(), buffer_.length()))
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer_.data(), buffer_.length());
-                    if (!result)
-                    {
-                        ec = jsonpointer_errc::invalid_index;
-                        return;
-                    }
-                    std::size_t index = result.value();
-                    if (index >= current_->size())
-                    {
-                        ec = jsonpointer_errc::index_exceeds_array_size;
-                        return;
-                    }
-                    current_->at(index) = value;
-                }
-            }
-            else if (current_->is_object())
-            {
-                if (!current_->contains(buffer_))
-                {
-                    ec = jsonpointer_errc::key_already_exists;
-                    return;
-                }
-                else
-                {
-                    auto r = current_->insert_or_assign(buffer_,value);
-                    current_ = std::addressof(r.first->value());
-                }
-            }
-            else
-            {
-                ec = jsonpointer_errc::expected_object_or_array;
-                return;
-            }
-        }
-
-        void evaluate(reference root, const string_view_type& path, std::error_code& ec)
-        {
-            current_ = std::addressof(root);
-
-            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
-            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
-            while (it != end)
-            {
-                buffer_ = *it;
-                it.increment(ec);
-                if (ec)
-                    return;
-                if (it == end)
-                {
-                    return;
-                }
-                resolve(current_, buffer_, ec);
-                if (ec)
-                    return;
-            }
-        }
-
-        static void resolve(pointer& current,
-                            const string_view_type& buffer,
-                            std::error_code& ec)
-        {
             if (current->is_array())
             {
                 if (buffer.size() == 1 && buffer[0] == '-')
@@ -702,8 +645,7 @@ namespace jsoncons { namespace jsonpointer {
                         ec = jsonpointer_errc::index_exceeds_array_size;
                         return;
                     }
-                    current->push_back(current->at(index));
-                    current = std::addressof(current->at(current->size()-1));
+                    current->erase(current->array_range().begin()+index);
                 }
             }
             else if (current->is_object())
@@ -713,8 +655,10 @@ namespace jsoncons { namespace jsonpointer {
                     ec = jsonpointer_errc::name_not_found;
                     return;
                 }
-                current->push_back(std::addressof(current->at(buffer)));
-                current = std::addressof(current->at(current->size()-1));
+                else
+                {
+                    current->erase(buffer);
+                }
             }
             else
             {
@@ -723,9 +667,61 @@ namespace jsoncons { namespace jsonpointer {
             }
         }
 
-        std::size_t column() const
+        void replace(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
-            return column_;
+            std::basic_string<char_type> buffer;
+            pointer current = evaluate(std::addressof(root), path, buffer, ec);
+            if (ec)
+            {
+                return;
+            }
+            if (current->is_array())
+            {
+                if (buffer.size() == 1 && buffer[0] == '-')
+                {
+                    ec = jsonpointer_errc::index_exceeds_array_size;
+                    return;
+                }
+                else
+                {
+                    if (!jsoncons::detail::is_base10(buffer.data(), buffer.length()))
+                    {
+                        ec = jsonpointer_errc::invalid_index;
+                        return;
+                    }
+                    auto result = jsoncons::detail::to_integer<std::size_t>(buffer.data(), buffer.length());
+                    if (!result)
+                    {
+                        ec = jsonpointer_errc::invalid_index;
+                        return;
+                    }
+                    std::size_t index = result.value();
+                    if (index >= current->size())
+                    {
+                        ec = jsonpointer_errc::index_exceeds_array_size;
+                        return;
+                    }
+                    current->at(index) = value;
+                }
+            }
+            else if (current->is_object())
+            {
+                if (!current->contains(buffer))
+                {
+                    ec = jsonpointer_errc::key_already_exists;
+                    return;
+                }
+                else
+                {
+                    auto r = current->insert_or_assign(buffer,value);
+                    current = std::addressof(r.first->value());
+                }
+            }
+            else
+            {
+                ec = jsonpointer_errc::expected_object_or_array;
+                return;
+            }
         }
     };
 
