@@ -356,15 +356,14 @@ namespace jsoncons { namespace jsonpointer {
 
     namespace detail {
 
-    template<class J,class JReference>
-    class jsonpointer_evaluator : public ser_context
+    template<class Json,class JsonReference>
+    class jsonpointer_evaluator
     {
-        //using type = typename handle_type<J,JReference>::type;
-        using char_type = typename J::char_type;
+        using char_type = typename Json::char_type;
         using string_type = typename std::basic_string<char_type>;
-        using string_view_type = typename J::string_view_type;
-        using reference = JReference;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JReference>::type>::value,typename J::const_pointer,typename J::pointer>::type;
+        using string_view_type = typename Json::string_view_type;
+        using reference = JsonReference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
         std::size_t line_;
         std::size_t column_;
@@ -391,7 +390,7 @@ namespace jsoncons { namespace jsonpointer {
             resolve(current_, buffer_, ec);
         }
 
-        string_type normalized_path(reference root, const string_view_type& path)
+        string_type normalized_path(const Json& root, const string_view_type& path)
         {
             std::error_code ec;
             evaluate(root, path, ec);
@@ -415,7 +414,7 @@ namespace jsoncons { namespace jsonpointer {
             }
         }
 
-        void add(reference root, const string_view_type& path, const J& value, std::error_code& ec)
+        void add(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
             evaluate(root, path, ec);
             if (ec)
@@ -468,7 +467,7 @@ namespace jsoncons { namespace jsonpointer {
             }
         }
 
-        void insert(reference root, const string_view_type& path, const J& value, std::error_code& ec)
+        void insert(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
             evaluate(root, path, ec);
             if (ec)
@@ -529,7 +528,7 @@ namespace jsoncons { namespace jsonpointer {
             }
         }
 
-        void remove(reference root, const string_view_type& path, std::error_code& ec)
+        void remove(Json& root, const string_view_type& path, std::error_code& ec)
         {
             evaluate(root, path, ec);
             if (ec)
@@ -584,7 +583,7 @@ namespace jsoncons { namespace jsonpointer {
             }
         }
 
-        void replace(reference root, const string_view_type& path, const J& value, std::error_code& ec)
+        void replace(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
             evaluate(root, path, ec);
             if (ec)
@@ -710,14 +709,12 @@ namespace jsoncons { namespace jsonpointer {
             }
         }
 
-        // ser_context
-
-        std::size_t line() const override
+        std::size_t line() const
         {
             return line_;
         }
 
-        std::size_t column() const override
+        std::size_t column() const
         {
             return column_;
         }
@@ -725,17 +722,17 @@ namespace jsoncons { namespace jsonpointer {
 
     }
 
-    template<class J>
-    std::basic_string<typename J::char_type> normalized_path(const J& root, const typename J::string_view_type& path)
+    template<class Json>
+    std::basic_string<typename Json::char_type> normalized_path(const Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
         return evaluator.normalized_path(root,path);
     }
 
-    template<class J>
-    J& get(J& root, const typename J::string_view_type& path)
+    template<class Json>
+    Json& get(Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
         std::error_code ec;
         evaluator.get(root, path, ec);
         if (ec)
@@ -745,10 +742,10 @@ namespace jsoncons { namespace jsonpointer {
         return evaluator.get_result();
     }
 
-    template<class J>
-    const J& get(const J& root, const typename J::string_view_type& path)
+    template<class Json>
+    const Json& get(const Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
 
         std::error_code ec;
         evaluator.get(root, path, ec);
@@ -759,35 +756,35 @@ namespace jsoncons { namespace jsonpointer {
         return evaluator.get_result();
     }
 
-    template<class J>
-    J& get(J& root, const typename J::string_view_type& path, std::error_code& ec)
+    template<class Json>
+    Json& get(Json& root, const typename Json::string_view_type& path, std::error_code& ec)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
         evaluator.get(root, path, ec);
         return evaluator.get_result();
     }
 
-    template<class J>
-    const J& get(const J& root, const typename J::string_view_type& path, std::error_code& ec)
+    template<class Json>
+    const Json& get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
         evaluator.get(root, path, ec);
         return evaluator.get_result();
     }
 
-    template<class J>
-    bool contains(const J& root, const typename J::string_view_type& path)
+    template<class Json>
+    bool contains(const Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,const J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
         std::error_code ec;
         evaluator.get(root, path, ec);
         return !ec ? true : false;
     }
 
-    template<class J>
-    void add(J& root, const typename J::string_view_type& path, const J& value)
+    template<class Json>
+    void add(Json& root, const typename Json::string_view_type& path, const Json& value)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         std::error_code ec;
         evaluator.add(root, path, value, ec);
@@ -797,34 +794,34 @@ namespace jsoncons { namespace jsonpointer {
         }
     }
 
-    template<class J>
-    void add(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
+    template<class Json>
+    void add(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         evaluator.add(root, path, value, ec);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    template<class J>
-    JSONCONS_DEPRECATED_MSG("Instead, use add(J&, const typename J::string_view_type&, const J&)")
-    void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value)
+    template<class Json>
+    JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&)")
+    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value)
     {
         add(root, path, value);
     }
 
-    template<class J>
-    JSONCONS_DEPRECATED_MSG("Instead, use add(J&, const typename J::string_view_type&, const J&, std::error_code&)")
-    void insert_or_assign(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
+    template<class Json>
+    JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&, std::error_code&)")
+    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
     {
         add(root, path, value, ec);
     }
 #endif
-    template<class J>
-    void insert(J& root, const typename J::string_view_type& path, const J& value)
+    template<class Json>
+    void insert(Json& root, const typename Json::string_view_type& path, const Json& value)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         std::error_code ec;
         evaluator.insert(root, path, value, ec);
@@ -834,18 +831,18 @@ namespace jsoncons { namespace jsonpointer {
         }
     }
 
-    template<class J>
-    void insert(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
+    template<class Json>
+    void insert(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         evaluator.insert(root, path, value, ec);
     }
 
-    template<class J>
-    void remove(J& root, const typename J::string_view_type& path)
+    template<class Json>
+    void remove(Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         std::error_code ec;
         evaluator.remove(root, path, ec);
@@ -855,18 +852,18 @@ namespace jsoncons { namespace jsonpointer {
         }
     }
 
-    template<class J>
-    void remove(J& root, const typename J::string_view_type& path, std::error_code& ec)
+    template<class Json>
+    void remove(Json& root, const typename Json::string_view_type& path, std::error_code& ec)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         evaluator.remove(root, path, ec);
     }
 
-    template<class J>
-    void replace(J& root, const typename J::string_view_type& path, const J& value)
+    template<class Json>
+    void replace(Json& root, const typename Json::string_view_type& path, const Json& value)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         std::error_code ec;
         evaluator.replace(root, path, value, ec);
@@ -876,10 +873,10 @@ namespace jsoncons { namespace jsonpointer {
         }
     }
 
-    template<class J>
-    void replace(J& root, const typename J::string_view_type& path, const J& value, std::error_code& ec)
+    template<class Json>
+    void replace(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<J,J&> evaluator;
+        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
 
         evaluator.replace(root, path, value, ec);
     }
