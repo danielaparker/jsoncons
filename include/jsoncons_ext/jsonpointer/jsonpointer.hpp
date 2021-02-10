@@ -396,28 +396,6 @@ namespace jsoncons { namespace jsonpointer {
         return current;
     }
 
-    template <class JsonPointer,class StringView,class String>
-    JsonPointer evaluate(JsonPointer current, const StringView& path, String& buffer, std::error_code& ec)
-    {
-        json_pointer_iterator<typename StringView::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename StringView::iterator> end(path.begin(), path.end(), path.end());
-        while (it != end)
-        {
-            buffer = *it;
-            it.increment(ec);
-            if (ec)
-                return current;
-            if (it == end)
-            {
-                return current;
-            }
-            current = resolve(current, buffer, ec);
-            if (ec)
-                return current;
-        }
-        return current;
-    }
-
     template<class Json,class JsonReference>
     class jsonpointer_evaluator
     {
@@ -433,18 +411,25 @@ namespace jsoncons { namespace jsonpointer {
 
         reference get(reference root, const string_view_type& path, std::error_code& ec)
         {
-            std::basic_string<char_type> buffer;
-
-            pointer current = evaluate(std::addressof(root), path, buffer, ec);
-            if (ec)
-            {
-                return *current;
-            }
+            pointer current = std::addressof(root);
             if (path.empty())
             {
                 return *current;
             }
-            current = resolve(current, buffer, ec);
+
+            std::basic_string<char_type> buffer;
+            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+            while (it != end)
+            {
+                buffer = *it;
+                it.increment(ec);
+                if (ec)
+                    return *current;
+                current = resolve(current, buffer, ec);
+                if (ec)
+                    return *current;
+            }
             return *current;
         }
 
@@ -493,11 +478,22 @@ namespace jsoncons { namespace jsonpointer {
 
         void add(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
+            pointer current = std::addressof(root);
             std::basic_string<char_type> buffer;
-            pointer current = evaluate(std::addressof(root), path, buffer, ec);
-            if (ec)
+            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+            while (it != end)
             {
-                return;
+                buffer = *it;
+                it.increment(ec);
+                if (ec)
+                    return;
+                if (it != end)
+                {
+                    current = resolve(current, buffer, ec);
+                    if (ec)
+                        return;
+                }
             }
             if (current->is_array())
             {
@@ -527,8 +523,8 @@ namespace jsoncons { namespace jsonpointer {
                     }
                     else
                     {
-                        auto it = current->insert(current->array_range().begin()+index,value);
-                        current = std::addressof(*it);
+                        auto it2 = current->insert(current->array_range().begin()+index,value);
+                        current = std::addressof(*it2);
                     }
                 }
             }
@@ -546,11 +542,22 @@ namespace jsoncons { namespace jsonpointer {
 
         void insert(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
+            pointer current = std::addressof(root);
             std::basic_string<char_type> buffer;
-            pointer current = evaluate(std::addressof(root), path, buffer, ec);
-            if (ec)
+            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+            while (it != end)
             {
-                return;
+                buffer = *it;
+                it.increment(ec);
+                if (ec)
+                    return;
+                if (it != end)
+                {
+                    current = resolve(current, buffer, ec);
+                    if (ec)
+                        return;
+                }
             }
             if (current->is_array())
             {
@@ -580,8 +587,8 @@ namespace jsoncons { namespace jsonpointer {
                     }
                     else
                     {
-                        auto it = current->insert(current->array_range().begin()+index,value);
-                        current = std::addressof(*it);
+                        auto it2 = current->insert(current->array_range().begin()+index,value);
+                        current = std::addressof(*it2);
                     }
                 }
             }
@@ -607,11 +614,22 @@ namespace jsoncons { namespace jsonpointer {
 
         void remove(Json& root, const string_view_type& path, std::error_code& ec)
         {
+            pointer current = std::addressof(root);
             std::basic_string<char_type> buffer;
-            pointer current = evaluate(std::addressof(root), path, buffer, ec);
-            if (ec)
+            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+            while (it != end)
             {
-                return;
+                buffer = *it;
+                it.increment(ec);
+                if (ec)
+                    return;
+                if (it != end)
+                {
+                    current = resolve(current, buffer, ec);
+                    if (ec)
+                        return;
+                }
             }
             if (current->is_array())
             {
@@ -658,11 +676,22 @@ namespace jsoncons { namespace jsonpointer {
 
         void replace(Json& root, const string_view_type& path, const Json& value, std::error_code& ec)
         {
+            pointer current = std::addressof(root);
             std::basic_string<char_type> buffer;
-            pointer current = evaluate(std::addressof(root), path, buffer, ec);
-            if (ec)
+            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
+            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+            while (it != end)
             {
-                return;
+                buffer = *it;
+                it.increment(ec);
+                if (ec)
+                    return;
+                if (it != end)
+                {
+                    current = resolve(current, buffer, ec);
+                    if (ec)
+                        return;
+                }
             }
             if (current->is_array())
             {
