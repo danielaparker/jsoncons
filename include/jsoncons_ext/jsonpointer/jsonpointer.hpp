@@ -89,63 +89,65 @@ namespace jsoncons { namespace jsonpointer {
         json_pointer_iterator& increment(std::error_code& ec)
         {
             q_ = p_;
-            buffer_.clear();
-
-            bool done = false;
-            while (p_ != end_input_ && !done)
+            if (p_ != end_input_)
             {
-                switch (state_)
+                buffer_.clear();
+                bool done = false;
+                while (p_ != end_input_ && !done)
                 {
-                    case jsonpointer::detail::pointer_state::start: 
-                        switch (*p_)
-                        {
-                            case '/':
-                                state_ = jsonpointer::detail::pointer_state::delim;
-                                break;
-                            default:
-                                ec = jsonpointer_errc::expected_slash;
-                                done = true;
-                                break;
-                        };
-                        break;
-                    case jsonpointer::detail::pointer_state::delim: 
-                        switch (*p_)
-                        {
-                            case '/':
-                                state_ = jsonpointer::detail::pointer_state::delim;
-                                done = true;
-                                break;
-                            case '~':
-                                state_ = jsonpointer::detail::pointer_state::escaped;
-                                break;
-                            default:
-                                buffer_.push_back(*p_);
-                                break;
-                        };
-                        break;
-                    case jsonpointer::detail::pointer_state::escaped: 
-                        switch (*p_)
-                        {
-                            case '0':
-                                buffer_.push_back('~');
-                                state_ = jsonpointer::detail::pointer_state::delim;
-                                break;
-                            case '1':
-                                buffer_.push_back('/');
-                                state_ = jsonpointer::detail::pointer_state::delim;
-                                break;
-                            default:
-                                ec = jsonpointer_errc::expected_0_or_1;
-                                done = true;
-                                break;
-                        };
-                        break;
-                    default:
-                        JSONCONS_UNREACHABLE();
-                        break;
+                    switch (state_)
+                    {
+                        case jsonpointer::detail::pointer_state::start: 
+                            switch (*p_)
+                            {
+                                case '/':
+                                    state_ = jsonpointer::detail::pointer_state::delim;
+                                    break;
+                                default:
+                                    ec = jsonpointer_errc::expected_slash;
+                                    done = true;
+                                    break;
+                            };
+                            break;
+                        case jsonpointer::detail::pointer_state::delim: 
+                            switch (*p_)
+                            {
+                                case '/':
+                                    state_ = jsonpointer::detail::pointer_state::delim;
+                                    done = true;
+                                    break;
+                                case '~':
+                                    state_ = jsonpointer::detail::pointer_state::escaped;
+                                    break;
+                                default:
+                                    buffer_.push_back(*p_);
+                                    break;
+                            };
+                            break;
+                        case jsonpointer::detail::pointer_state::escaped: 
+                            switch (*p_)
+                            {
+                                case '0':
+                                    buffer_.push_back('~');
+                                    state_ = jsonpointer::detail::pointer_state::delim;
+                                    break;
+                                case '1':
+                                    buffer_.push_back('/');
+                                    state_ = jsonpointer::detail::pointer_state::delim;
+                                    break;
+                                default:
+                                    ec = jsonpointer_errc::expected_0_or_1;
+                                    done = true;
+                                    break;
+                            };
+                            break;
+                        default:
+                            JSONCONS_UNREACHABLE();
+                            break;
+                    }
+                    ++p_;
+                    ++column_;
                 }
-                ++p_;
-                ++column_;
             }
             return *this;
         }
@@ -407,30 +409,6 @@ namespace jsoncons { namespace jsonpointer {
     public:
         jsonpointer_evaluator()
         {
-        }
-
-        reference get(reference root, const string_view_type& path, std::error_code& ec)
-        {
-            pointer current = std::addressof(root);
-            if (path.empty())
-            {
-                return *current;
-            }
-
-            std::basic_string<char_type> buffer;
-            json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
-            json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
-            while (it != end)
-            {
-                buffer = *it;
-                it.increment(ec);
-                if (ec)
-                    return *current;
-                current = resolve(current, buffer, ec);
-                if (ec)
-                    return *current;
-            }
-            return *current;
         }
 
         string_type normalized_path(const Json& root, const string_view_type& path)
@@ -747,12 +725,59 @@ namespace jsoncons { namespace jsonpointer {
         return evaluator.normalized_path(root,path);
     }
 
+    // get
+
+    template<class Json>
+    Json& get(Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+    {
+        if (path.empty())
+        {
+            return root;
+        }
+
+        Json* current = std::addressof(root);
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        while (it != end)
+        {
+            current = jsoncons::jsonpointer::detail::resolve(current, *it, ec);
+            if (ec)
+                return *current;
+            it.increment(ec);
+            if (ec)
+                return *current;
+        }
+        return *current;
+    }
+
+    template<class Json>
+    const Json& get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+    {
+        if (path.empty())
+        {
+            return root;
+        }
+
+        const Json* current = std::addressof(root);
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        while (it != end)
+        {
+            current = jsoncons::jsonpointer::detail::resolve(current, *it, ec);
+            if (ec)
+                return *current;
+            it.increment(ec);
+            if (ec)
+                return *current;
+        }
+        return *current;
+    }
+
     template<class Json>
     Json& get(Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
         std::error_code ec;
-        Json& j = evaluator.get(root, path, ec);
+        Json& j = get(root, path, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -763,10 +788,8 @@ namespace jsoncons { namespace jsonpointer {
     template<class Json>
     const Json& get(const Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
-
         std::error_code ec;
-        const Json& j = evaluator.get(root, path, ec);
+        const Json& j = get(root, path, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -774,26 +797,13 @@ namespace jsoncons { namespace jsonpointer {
         return j;
     }
 
-    template<class Json>
-    Json& get(Json& root, const typename Json::string_view_type& path, std::error_code& ec)
-    {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,Json&> evaluator;
-        return evaluator.get(root, path, ec);
-    }
-
-    template<class Json>
-    const Json& get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
-    {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
-        return evaluator.get(root, path, ec);
-    }
+    // contains
 
     template<class Json>
     bool contains(const Json& root, const typename Json::string_view_type& path)
     {
-        jsoncons::jsonpointer::detail::jsonpointer_evaluator<Json,const Json&> evaluator;
         std::error_code ec;
-        evaluator.get(root, path, ec);
+        get(root, path, ec);
         return !ec ? true : false;
     }
 
