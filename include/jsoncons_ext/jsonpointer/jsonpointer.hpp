@@ -357,8 +357,8 @@ namespace jsoncons { namespace jsonpointer {
 
     namespace detail {
 
-    template <class JsonPointer,class StringView>
-    JsonPointer resolve(JsonPointer current, const StringView& buffer, std::error_code& ec)
+    template <class Json>
+    const Json* resolve(const Json* current, const typename Json::string_view_type& buffer, std::error_code& ec)
     {
         if (current->is_array())
         {
@@ -389,6 +389,58 @@ namespace jsoncons { namespace jsonpointer {
                 return current;
             }
             current = std::addressof(current->at(buffer));
+        }
+        else
+        {
+            ec = jsonpointer_errc::expected_object_or_array;
+            return current;
+        }
+        return current;
+    }
+
+    template <class Json>
+    Json* resolve(Json* current, const typename Json::string_view_type& buffer, bool create_on_missing, std::error_code& ec)
+    {
+        if (current->is_array())
+        {
+            if (buffer.size() == 1 && buffer[0] == '-')
+            {
+                ec = jsonpointer_errc::index_exceeds_array_size;
+                return current;
+            }
+            auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
+            if (!result)
+            {
+                ec = jsonpointer_errc::invalid_index;
+                return current;
+            }
+            std::size_t index = result.value();
+            if (index >= current->size())
+            {
+                ec = jsonpointer_errc::index_exceeds_array_size;
+                return current;
+            }
+            current = std::addressof(current->at(index));
+        }
+        else if (current->is_object())
+        {
+            if (!current->contains(buffer))
+            {
+                if (create_on_missing)
+                {
+                    auto r = current->try_emplace(buffer, Json());
+                    current = std::addressof(r.first->value());
+                }
+                else
+                {
+                    ec = jsonpointer_errc::name_not_found;
+                    return current;
+                }
+            }
+            else
+            {
+                current = std::addressof(current->at(buffer));
+            }
         }
         else
         {
@@ -475,7 +527,7 @@ namespace jsoncons { namespace jsonpointer {
         json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
         while (it != end)
         {
-            current = jsoncons::jsonpointer::detail::resolve(current, *it, ec);
+            current = jsoncons::jsonpointer::detail::resolve(current, *it, false, ec);
             if (ec)
                 return *current;
             it.increment(ec);
@@ -560,7 +612,7 @@ namespace jsoncons { namespace jsonpointer {
                 return;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
                 if (ec)
                     return;
             }
@@ -657,7 +709,7 @@ namespace jsoncons { namespace jsonpointer {
                 return;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
                 if (ec)
                     return;
             }
@@ -745,7 +797,7 @@ namespace jsoncons { namespace jsonpointer {
                 return;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
                 if (ec)
                     return;
             }
@@ -823,7 +875,7 @@ namespace jsoncons { namespace jsonpointer {
                 return;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
                 if (ec)
                     return;
             }
