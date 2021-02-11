@@ -689,27 +689,10 @@ namespace jsoncons { namespace jsonpointer {
         }
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    template<class Json>
-    JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&)")
-    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value)
-    {
-        add(root, path, value);
-    }
-
-    template<class Json>
-    JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&, std::error_code&)")
-    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
-    {
-        add(root, path, value, ec);
-    }
-#endif
-
-    // insert
+    // add_no_replace
 
     template<class Json, class T>
-    void insert(Json& root, 
+    void add_no_replace(Json& root, 
                 const typename Json::string_view_type& path, 
                 T&& value, 
                 bool create_if_missing,
@@ -788,22 +771,22 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json, class T>
-    void insert(Json& root, 
+    void add_no_replace(Json& root, 
                 const typename Json::string_view_type& path, 
                 T&& value, 
                 std::error_code& ec)
     {
-        insert(root, path, std::forward<T>(value), false, ec);
+        add_no_replace(root, path, std::forward<T>(value), false, ec);
     }
 
     template<class Json, class T>
-    void insert(Json& root, 
+    void add_no_replace(Json& root, 
                 const typename Json::string_view_type& path, 
                 T&& value,
                 bool create_if_missing = false)
     {
         std::error_code ec;
-        insert(root, path, std::forward<T>(value), create_if_missing, ec);
+        add_no_replace(root, path, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -1281,6 +1264,50 @@ namespace jsoncons { namespace jsonpointer {
             return unflatten_to_object(value,options);
         }
     }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+
+    template<class Json>
+    JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&)")
+    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value)
+    {
+        add(root, path, value);
+    }
+
+    template<class Json>
+    JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&, std::error_code&)")
+    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
+    {
+        add(root, path, value, ec);
+    }
+    template<class Json, class T>
+    void insert(Json& root, 
+                const typename Json::string_view_type& path, 
+                T&& value, 
+                bool create_if_missing,
+                std::error_code& ec)
+    {
+        add_no_replace(root,path,std::forward<T>(value),create_if_missing,ec);
+    }
+
+    template<class Json, class T>
+    void insert(Json& root, 
+                const typename Json::string_view_type& path, 
+                T&& value, 
+                std::error_code& ec)
+    {
+        add_no_replace(root, path, std::forward<T>(value), ec);
+    }
+
+    template<class Json, class T>
+    void insert(Json& root, 
+                const typename Json::string_view_type& path, 
+                T&& value,
+                bool create_if_missing = false)
+    {
+        add_no_replace(root, path, std::forward<T>(value), create_if_missing);
+    }
+#endif
 
 } // namespace jsonpointer
 } // namespace jsoncons

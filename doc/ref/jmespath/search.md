@@ -5,11 +5,11 @@
 
 template<Json>
 Json search(const Json& doc, 
-            const typename Json::string_view_type& expr); (1)
+            const Json::string_view_type& expr); (1)
 
 template<Json>
 Json search(const Json& doc, 
-            const typename Json::string_view_type& expr,
+            const Json::string_view_type& expr,
             std::error_code& ec); (2)
 ```
 

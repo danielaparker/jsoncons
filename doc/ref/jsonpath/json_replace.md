@@ -9,7 +9,7 @@ void json_replace(Json& root, const Source& expr, T&& new_value,
                   result_options options = result_options::nodups); 
 
 template<class Json, class T>
-void json_replace(Json& root, const typename Json::char_type* expr, T&& new_value, 
+void json_replace(Json& root, const Json::char_type* expr, T&& new_value, 
                   result_options options = result_options::nodups);                          (1)
 ```
 ```c++
@@ -17,7 +17,7 @@ template<class Json, class Source, class UnaryCallback>
 void json_replace(Json& root, const Source& expr, UnaryCallback callback); 
 
 template<class Json, class UnaryCallback>
-void json_replace(Json& root, const typename Json::char_type* expr, UnaryCallback callback); (2) (until 0.161.0)
+void json_replace(Json& root, const Json::char_type* expr, UnaryCallback callback); (2) (until 0.161.0)
 ```
 ```c++
 template<class Json, class Source, class BinaryCallback>
@@ -25,7 +25,7 @@ void json_replace(Json& root, const Source& expr, BinaryCallback callback,
                   result_options options = result_options::nodups); 
 
 template<class Json, class BinaryCallback>
-void json_replace(Json& root, const typename Json::char_type* expr, BinaryCallback callback, 
+void json_replace(Json& root, const Json::char_type* expr, BinaryCallback callback, 
                   result_options options = result_options::nodups);                          (3) (since 0.161.0)
 ```
 

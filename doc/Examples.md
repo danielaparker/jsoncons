@@ -1459,7 +1459,7 @@ namespace jsoncons {
     template<class Json>
     struct json_type_traits<Json, ns::book>
     {
-        using allocator_type = typename Json::allocator_type;
+        using allocator_type = Json::allocator_type;
 
         static bool is(const Json& j) noexcept
         {

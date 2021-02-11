@@ -425,7 +425,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
         }
 
         json doc;
-        jsonpointer::insert(doc, ptr, "str", true);
+        jsonpointer::add_no_replace(doc, ptr, "str", true);
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
         CHECK(doc == expected);
     }
@@ -440,7 +440,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
         }
 
         json doc = json::parse(R"({"foo":{}})");
-        jsonpointer::insert(doc, ptr, "str", true);
+        jsonpointer::add_no_replace(doc, ptr, "str", true);
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
         CHECK(doc == expected);
     }

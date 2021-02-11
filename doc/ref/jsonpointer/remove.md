@@ -5,14 +5,31 @@ Removes a `json` element.
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class J>
-void remove(J& target, const typename J::string_view_type& path); (1)
+template<class Json>
+void remove(Json& target, const Json::string_view_type& path); (1)
 
-template<class J>
-void remove(J& target, const typename J::string_view_type& path, std::error_code& ec); (2)
+template<class Json>
+void remove(Json& target, const Json::string_view_type& path, 
+            std::error_code& ec);                              (2)
 ```
 
 Removes the value at the location specifed by `path`.
+
+#### Parameters
+<table>
+  <tr>
+    <td>target</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>JSON Pointer</td> 
+  </tr>
+  <tr>
+    <td><code>ec</code></td>
+    <td>out-parameter for reporting errors in the non-throwing overload</td> 
+  </tr>
+</table>
 
 #### Return value
 

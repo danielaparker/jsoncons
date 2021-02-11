@@ -5,14 +5,44 @@ Replace a `json` element or member.
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class J>
-void replace(J& target, const typename J::string_view_type& path, const J& value); 
+template<class Json, class T>
+void replace(Json& target, const Json::string_view_type& path, 
+             T&& value, bool create_if_missing = false);              (1)
 
-template<class J>
-void replace(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); 
+template<class Json, class T>
+void replace(Json& target, const Json::string_view_type& path, 
+             T&& value, std::error_code& ec);                         (2)
+
+template<class Json, class T>
+void replace(Json& target, const Json::string_view_type& path, 
+             T&& value, bool create_if_missing, std::error_code& ec); (3)
 ```
 
 Replaces the value at the location specified by `path` with a new value. 
+
+#### Parameters
+<table>
+  <tr>
+    <td>target</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>JSON Pointer</td> 
+  </tr>
+  <tr>
+    <td>value</td>
+    <td>Replacement value</td> 
+  </tr>
+  <tr>
+    <td><code>create_if_missing</code> (since 0.162.0)</td>
+    <td>Create key-object pairs when object key is missing</td> 
+  </tr>
+  <tr>
+    <td><code>ec</code></td>
+    <td>out-parameter for reporting errors in the non-throwing overload</td> 
+  </tr>
+</table>
 
 #### Return value
 

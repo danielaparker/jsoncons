@@ -13,7 +13,7 @@ and a value of some other type. `json_type_traits` implementations must speciali
 template <class Json, class T, class Enable=void>
 struct json_type_traits
 {
-    using allocator_type = typename Json::allocator_type;
+    using allocator_type = Json::allocator_type;
 
     static constexpr bool is(const Json&) noexcept;
 

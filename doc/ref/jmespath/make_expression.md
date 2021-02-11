@@ -4,10 +4,10 @@
 #include <jsoncons_ext/jmespath/jmespath.hpp>
 
 template <class Json>
-jmespath_expression<Json> make_expression(const typename json::string_view_type& expr); (1)
+jmespath_expression<Json> make_expression(const json::string_view_type& expr); (1)
 
 template <class Json>
-jmespath_expression<Json> make_expression(const typename json::string_view_type& expr,
+jmespath_expression<Json> make_expression(const json::string_view_type& expr,
                                           std::error_code& ec); (2)
 ```
 

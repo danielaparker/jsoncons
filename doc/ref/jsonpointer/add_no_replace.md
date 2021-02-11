@@ -1,15 +1,22 @@
-### jsoncons::jsonpointer::insert
+### jsoncons::jsonpointer::add_no_replace
 
-Adds a `json` value.
+Adds a value to an object or inserts it into an array at the target location,
+if a value does not already exist at that location.
 
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
-template<class J>
-void insert(J& target, const typename J::string_view_type& path, const J& value); (1) 
+template<class Json, class T>
+void add_no_replace(Json& target, const Json::string_view_type& path, 
+                    T&& value, bool create_if_missing = false);              (1) 
 
-template<class J>
-void insert(J& target, const typename J::string_view_type& path, const J& value, std::error_code& ec); (2) 
+template<class Json, class T>
+void add_no_replace(Json& target, const Json::string_view_type& path, 
+                    T&& value, std::error_code& ec);                         (2) 
+
+template<class Json, class T>
+void add_no_replace(Json& target, const Json::string_view_type& path, 
+                    T&& value, bool create_if_missing, std::error_code& ec); (3) 
 ```
 
 Inserts a value into the target at the specified path, if the path doesn't specify an object member that already has the same key.
@@ -18,15 +25,39 @@ Inserts a value into the target at the specified path, if the path doesn't speci
 
 - If `path` specifies an object member that does not already exist, a new member is added to the object.
 
+#### Parameters
+<table>
+  <tr>
+    <td>target</td>
+    <td>JSON value</td> 
+  </tr>
+  <tr>
+    <td>path</td>
+    <td>JSON Pointer</td> 
+  </tr>
+  <tr>
+    <td>value</td>
+    <td>New value</td> 
+  </tr>
+  <tr>
+    <td><code>create_if_missing</code> (since 0.162.0)</td>
+    <td>Create key-object pairs when object key is missing</td> 
+  </tr>
+  <tr>
+    <td><code>ec</code></td>
+    <td>out-parameter for reporting errors in the non-throwing overload</td> 
+  </tr>
+</table>
+
 #### Return value
 
 None
 
 ### Exceptions
 
-(1) Throws a [jsonpointer_error](jsonpointer_error.md) if `insert` fails.
+(1) Throws a [jsonpointer_error](jsonpointer_error.md) if `add_no_replace` fails.
  
-(2) Sets the out-parameter `ec` to the [jsonpointer_error_category](jsonpointer_errc.md) if `insert` fails. 
+(2) Sets the out-parameter `ec` to the [jsonpointer_error_category](jsonpointer_errc.md) if `add_no_replace` fails. 
 
 ### Examples
 
@@ -47,7 +78,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/baz", json("qux"), ec);
+    jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -79,7 +110,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/foo/1", json("qux"), ec);
+    jsonpointer::add_no_replace(target, "/foo/1", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -111,7 +142,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/foo/-", json("qux"), ec);
+    jsonpointer::add_no_replace(target, "/foo/-", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -127,7 +158,7 @@ Output:
 {"foo":["bar","baz","qux"]}
 ```
 
-#### Attempt to insert object member at a location that already exists
+#### Attempt to add_no_replace object member at a location that already exists
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -143,7 +174,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::insert(target, "/baz", json("qux"), ec);
+    jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -159,7 +190,7 @@ Output:
 Key already exists
 ```
 
-#### Attempt to insert value to a location in an array that exceeds the size of the array
+#### Attempt to add_no_replace value to a location in an array that exceeds the size of the array
 
 ```c++
 #include <jsoncons/json.hpp>

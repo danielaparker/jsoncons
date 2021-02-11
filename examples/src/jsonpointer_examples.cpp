@@ -133,7 +133,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::insert(target, "/baz", json("qux"), ec);
+        jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -151,7 +151,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::insert(target, "/foo/1", json("qux"), ec);
+        jsonpointer::add_no_replace(target, "/foo/1", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -169,7 +169,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::insert(target, "/foo/-", json("qux"), ec);
+        jsonpointer::add_no_replace(target, "/foo/-", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -187,7 +187,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::insert(target, "/baz", json("qux"), ec);
+        jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;

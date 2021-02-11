@@ -18,7 +18,7 @@ Json json_query(const Json& root, const Source& expr,
 
 template<class Json>
 Json json_query(const Json& root, 
-                const typename Json::char_type* expr,
+                const Json::char_type* expr,
                 result_options options = result_options::value); (1) (since 0.161.0)
 ```
 ```c++
@@ -29,7 +29,7 @@ void json_query(const Json& root, const Source& expr,
 
 template<class Json, class BinaryCallback>
 void json_query(const Json& root, 
-                const typename Json::char_type* expr,
+                const Json::char_type* expr,
                 BinaryCallback callback
                 result_options options = result_options::value); (2) (since 0.161.0)
 ```

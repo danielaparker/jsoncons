@@ -4,7 +4,7 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-bool contains(const Json& doc, const typename Json::string_view_type& path);
+bool contains(const Json& doc, const Json::string_view_type& path);
 ```
 
 #### Return value
