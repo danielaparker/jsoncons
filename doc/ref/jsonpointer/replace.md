@@ -6,19 +6,19 @@ Replace a `json` element or member.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
-void replace(Json& target, const Json::string_view_type& path, 
+void replace(Json& target, const Json::string_view_type& location, 
              T&& value, bool create_if_missing = false);              (1)
 
 template<class Json, class T>
-void replace(Json& target, const Json::string_view_type& path, 
+void replace(Json& target, const Json::string_view_type& location, 
              T&& value, std::error_code& ec);                         (2)
 
 template<class Json, class T>
-void replace(Json& target, const Json::string_view_type& path, 
+void replace(Json& target, const Json::string_view_type& location, 
              T&& value, bool create_if_missing, std::error_code& ec); (3)
 ```
 
-Replaces the value at the location specified by `path` with a new value. 
+Replaces the value at the location specified by `location` with a new value. 
 
 #### Parameters
 <table>
@@ -27,7 +27,7 @@ Replaces the value at the location specified by `path` with a new value.
     <td>JSON value</td> 
   </tr>
   <tr>
-    <td>path</td>
+    <td>location</td>
     <td>JSON Pointer</td> 
   </tr>
   <tr>

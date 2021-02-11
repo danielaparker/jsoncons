@@ -1,27 +1,27 @@
 ### jsoncons::jsonpointer::get
 
-Selects a `json` value.
+Selects a value.
 
 ```c++
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-Json& get(Json& root, const Json::string_view_type& path,
+Json& get(Json& root, const Json::string_view_type& location,
           bool create_if_missing = false);                               (1)
 
 template<class Json>
-const Json& get(const Json& root, const Json::string_view_type& path);   (2)
+const Json& get(const Json& root, const Json::string_view_type& location);   (2)
 
 template<class Json>
-Json& get(Json& root, const Json::string_view_type& path, 
+Json& get(Json& root, const Json::string_view_type& location, 
           std::error_code& ec);                                          (3)
 
 template<class Json>
-const Json& get(const Json& root, const Json::string_view_type& path, 
+const Json& get(const Json& root, const Json::string_view_type& location, 
                 std::error_code& ec);                                    (4)
 
 template<class Json>
-Json& get(Json& root, const Json::string_view_type& path, 
+Json& get(Json& root, const Json::string_view_type& location, 
           bool create_if_missing, std::error_code& ec);                  (5)
 ```
 
@@ -32,7 +32,7 @@ Json& get(Json& root, const Json::string_view_type& path,
     <td>JSON value</td> 
   </tr>
   <tr>
-    <td>path</td>
+    <td>location</td>
     <td>JSON Pointer</td> 
   </tr>
   <tr>

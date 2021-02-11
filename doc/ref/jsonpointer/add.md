@@ -7,25 +7,25 @@ If a value already exists at the target location, that value is replaced.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
-void add(Json& target, const Json::string_view_type& path, 
+void add(Json& target, const Json::string_view_type& location, 
          T&& value, bool create_if_missing = false);              (1)
 
 template<class Json, class T>
-void add(Json& target, const Json::string_view_type& path, 
+void add(Json& target, const Json::string_view_type& location, 
          T&& value, std::error_code& ec);                         (2)
 
 template<class Json, class T>
-void add(Json& target, const Json::string_view_type& path, 
+void add(Json& target, const Json::string_view_type& location, 
          T&& value, bool create_if_missing, std::error_code& ec); (3) (since 0.162.0)
 ```
 
-Inserts a value into the target at the specified path, or if the path specifies an object member that already has the same key, assigns the new value to that member
+Inserts a value into the target at the specified location, or if the location specifies an object member that already has the same key, assigns the new value to that member
 
-- If `path` specifies an array index, a new value is inserted into the array at the specified index.
+- If `location` specifies an array index, a new value is inserted into the array at the specified index.
 
-- If `path` specifies an object member that does not already exist, a new member is added to the object.
+- If `location` specifies an object member that does not already exist, a new member is added to the object.
 
-- If `path` specifies an object member that does exist, that member's value is replaced.
+- If `location` specifies an object member that does exist, that member's value is replaced.
 
 #### Parameters
 <table>
@@ -34,7 +34,7 @@ Inserts a value into the target at the specified path, or if the path specifies 
     <td>JSON value</td> 
   </tr>
   <tr>
-    <td>path</td>
+    <td>location</td>
     <td>JSON Pointer</td> 
   </tr>
   <tr>

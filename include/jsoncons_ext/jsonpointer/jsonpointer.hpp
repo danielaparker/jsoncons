@@ -453,7 +453,7 @@ namespace jsoncons { namespace jsonpointer {
     } // namespace detail
 
     template<class Json>
-    std::basic_string<typename Json::char_type> normalized_path(const Json& root, const typename Json::string_view_type& path)
+    std::basic_string<typename Json::char_type> normalized_path(const Json& root, const typename Json::string_view_type& location)
     {
         using string_type = std::basic_string<typename Json::char_type>;
         using string_view_type = typename Json::string_view_type;
@@ -461,31 +461,31 @@ namespace jsoncons { namespace jsonpointer {
         std::error_code ec;
 
         const Json* current = std::addressof(root);
-        if (path.empty())
+        if (location.empty())
         {
             return string_type();
         }
 
         string_type buffer;
-        json_pointer_iterator<typename string_view_type::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_pointer_iterator<typename string_view_type::iterator> it(location.begin(), location.end());
+        json_pointer_iterator<typename string_view_type::iterator> end(location.begin(), location.end(), location.end());
         while (it != end)
         {
             buffer = *it;
             it.increment(ec);
             if (ec)
-                return string_type(path);
+                return string_type(location);
             if (it != end)
             {
                 current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
                 if (ec)
-                    return string_type(path);
+                    return string_type(location);
             }
         }
 
         if (current->is_array() && buffer.size() == 1 && buffer[0] == '-')
         {
-            string_type p = string_type(path.substr(0,path.length()-1));
+            string_type p = string_type(location.substr(0,location.length()-1));
             std::string s = std::to_string(current->size());
             for (auto c : s)
             {
@@ -495,7 +495,7 @@ namespace jsoncons { namespace jsonpointer {
         }
         else
         {
-            return string_type(path);
+            return string_type(location);
         }
     }
 
@@ -503,18 +503,18 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json>
     Json& get(Json& root, 
-              const typename Json::string_view_type& path, 
+              const typename Json::string_view_type& location, 
               bool create_if_missing,
               std::error_code& ec)
     {
-        if (path.empty())
+        if (location.empty())
         {
             return root;
         }
 
         Json* current = std::addressof(root);
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
         while (it != end)
         {
             current = jsoncons::jsonpointer::detail::resolve(current, *it, create_if_missing, ec);
@@ -528,16 +528,16 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json>
-    const Json& get(const Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+    const Json& get(const Json& root, const typename Json::string_view_type& location, std::error_code& ec)
     {
-        if (path.empty())
+        if (location.empty())
         {
             return root;
         }
 
         const Json* current = std::addressof(root);
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
         while (it != end)
         {
             current = jsoncons::jsonpointer::detail::resolve(current, *it, ec);
@@ -552,19 +552,19 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json>
     Json& get(Json& root, 
-              const typename Json::string_view_type& path, 
+              const typename Json::string_view_type& location, 
               std::error_code& ec)
     {
-        return get(root, path, false, ec);
+        return get(root, location, false, ec);
     }
 
     template<class Json>
     Json& get(Json& root, 
-              const typename Json::string_view_type& path,
+              const typename Json::string_view_type& location,
               bool create_if_missing = false)
     {
         std::error_code ec;
-        Json& j = get(root, path, create_if_missing, ec);
+        Json& j = get(root, location, create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -573,10 +573,10 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json>
-    const Json& get(const Json& root, const typename Json::string_view_type& path)
+    const Json& get(const Json& root, const typename Json::string_view_type& location)
     {
         std::error_code ec;
-        const Json& j = get(root, path, ec);
+        const Json& j = get(root, location, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -587,10 +587,10 @@ namespace jsoncons { namespace jsonpointer {
     // contains
 
     template<class Json>
-    bool contains(const Json& root, const typename Json::string_view_type& path)
+    bool contains(const Json& root, const typename Json::string_view_type& location)
     {
         std::error_code ec;
-        get(root, path, ec);
+        get(root, location, ec);
         return !ec ? true : false;
     }
 
@@ -598,7 +598,7 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json,class T>
     void add(Json& root, 
-             const typename Json::string_view_type& path, 
+             const typename Json::string_view_type& location, 
              T&& value, 
              bool create_if_missing,
              std::error_code& ec)
@@ -606,8 +606,8 @@ namespace jsoncons { namespace jsonpointer {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
         while (it != end)
         {
             buffer = *it;
@@ -668,21 +668,21 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json,class T>
     void add(Json& root, 
-             const typename Json::string_view_type& path, 
+             const typename Json::string_view_type& location, 
              T&& value, 
              std::error_code& ec)
     {
-        add(root, path, std::forward<T>(value), false, ec);
+        add(root, location, std::forward<T>(value), false, ec);
     }
 
     template<class Json,class T>
     void add(Json& root, 
-             const typename Json::string_view_type& path, 
+             const typename Json::string_view_type& location, 
              T&& value,
              bool create_if_missing = false)
     {
         std::error_code ec;
-        add(root, path, std::forward<T>(value), create_if_missing, ec);
+        add(root, location, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -693,7 +693,7 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void add_no_replace(Json& root, 
-                const typename Json::string_view_type& path, 
+                const typename Json::string_view_type& location, 
                 T&& value, 
                 bool create_if_missing,
                 std::error_code& ec)
@@ -701,8 +701,8 @@ namespace jsoncons { namespace jsonpointer {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
 
         while (it != end)
         {
@@ -772,21 +772,21 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void add_no_replace(Json& root, 
-                const typename Json::string_view_type& path, 
+                const typename Json::string_view_type& location, 
                 T&& value, 
                 std::error_code& ec)
     {
-        add_no_replace(root, path, std::forward<T>(value), false, ec);
+        add_no_replace(root, location, std::forward<T>(value), false, ec);
     }
 
     template<class Json, class T>
     void add_no_replace(Json& root, 
-                const typename Json::string_view_type& path, 
+                const typename Json::string_view_type& location, 
                 T&& value,
                 bool create_if_missing = false)
     {
         std::error_code ec;
-        add_no_replace(root, path, std::forward<T>(value), create_if_missing, ec);
+        add_no_replace(root, location, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -796,13 +796,13 @@ namespace jsoncons { namespace jsonpointer {
     // remove
 
     template<class Json>
-    void remove(Json& root, const typename Json::string_view_type& path, std::error_code& ec)
+    void remove(Json& root, const typename Json::string_view_type& location, std::error_code& ec)
     {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
 
         while (it != end)
         {
@@ -861,10 +861,10 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json>
-    void remove(Json& root, const typename Json::string_view_type& path)
+    void remove(Json& root, const typename Json::string_view_type& location)
     {
         std::error_code ec;
-        remove(root, path, ec);
+        remove(root, location, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -875,7 +875,7 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void replace(Json& root, 
-                 const typename Json::string_view_type& path, 
+                 const typename Json::string_view_type& location, 
                  T&& value, 
                  bool create_if_missing,
                  std::error_code& ec)
@@ -883,8 +883,8 @@ namespace jsoncons { namespace jsonpointer {
         Json* current = std::addressof(root);
 
         std::basic_string<typename Json::char_type> buffer;
-        json_pointer_iterator<typename Json::string_view_type::iterator> it(path.begin(), path.end());
-        json_pointer_iterator<typename Json::string_view_type::iterator> end(path.begin(), path.end(), path.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> it(location.begin(), location.end());
+        json_pointer_iterator<typename Json::string_view_type::iterator> end(location.begin(), location.end(), location.end());
 
         while (it != end)
         {
@@ -952,21 +952,21 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json, class T>
     void replace(Json& root, 
-                 const typename Json::string_view_type& path, 
+                 const typename Json::string_view_type& location, 
                  T&& value, 
                  std::error_code& ec)
     {
-        replace(root, path, std::forward<T>(value), false, ec);
+        replace(root, location, std::forward<T>(value), false, ec);
     }
 
     template<class Json, class T>
     void replace(Json& root, 
-                 const typename Json::string_view_type& path, 
+                 const typename Json::string_view_type& location, 
                  T&& value, 
                  bool create_if_missing = false)
     {
         std::error_code ec;
-        replace(root, path, std::forward<T>(value), create_if_missing, ec);
+        replace(root, location, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -1269,43 +1269,43 @@ namespace jsoncons { namespace jsonpointer {
 
     template<class Json>
     JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&)")
-    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value)
+    void insert_or_assign(Json& root, const typename Json::string_view_type& location, const Json& value)
     {
-        add(root, path, value);
+        add(root, location, value);
     }
 
     template<class Json>
     JSONCONS_DEPRECATED_MSG("Instead, use add(Json&, const typename Json::string_view_type&, const Json&, std::error_code&)")
-    void insert_or_assign(Json& root, const typename Json::string_view_type& path, const Json& value, std::error_code& ec)
+    void insert_or_assign(Json& root, const typename Json::string_view_type& location, const Json& value, std::error_code& ec)
     {
-        add(root, path, value, ec);
+        add(root, location, value, ec);
     }
     template<class Json, class T>
     void insert(Json& root, 
-                const typename Json::string_view_type& path, 
+                const typename Json::string_view_type& location, 
                 T&& value, 
                 bool create_if_missing,
                 std::error_code& ec)
     {
-        add_no_replace(root,path,std::forward<T>(value),create_if_missing,ec);
+        add_no_replace(root,location,std::forward<T>(value),create_if_missing,ec);
     }
 
     template<class Json, class T>
     void insert(Json& root, 
-                const typename Json::string_view_type& path, 
+                const typename Json::string_view_type& location, 
                 T&& value, 
                 std::error_code& ec)
     {
-        add_no_replace(root, path, std::forward<T>(value), ec);
+        add_no_replace(root, location, std::forward<T>(value), ec);
     }
 
     template<class Json, class T>
     void insert(Json& root, 
-                const typename Json::string_view_type& path, 
+                const typename Json::string_view_type& location, 
                 T&& value,
                 bool create_if_missing = false)
     {
-        add_no_replace(root, path, std::forward<T>(value), create_if_missing);
+        add_no_replace(root, location, std::forward<T>(value), create_if_missing);
     }
 #endif
 

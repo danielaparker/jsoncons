@@ -7,23 +7,23 @@ if a value does not already exist at that location.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
-void add_no_replace(Json& target, const Json::string_view_type& path, 
+void add_no_replace(Json& target, const Json::string_view_type& location, 
                     T&& value, bool create_if_missing = false);              (1) 
 
 template<class Json, class T>
-void add_no_replace(Json& target, const Json::string_view_type& path, 
+void add_no_replace(Json& target, const Json::string_view_type& location, 
                     T&& value, std::error_code& ec);                         (2) 
 
 template<class Json, class T>
-void add_no_replace(Json& target, const Json::string_view_type& path, 
+void add_no_replace(Json& target, const Json::string_view_type& location, 
                     T&& value, bool create_if_missing, std::error_code& ec); (3) 
 ```
 
-Inserts a value into the target at the specified path, if the path doesn't specify an object member that already has the same key.
+Inserts a value into the target at the specified location, if the location doesn't specify an object member that already has the same key.
 
-- If `path` specifies an array index, a new value is inserted into the array at the specified index.
+- If `location` specifies an array index, a new value is inserted into the array at the specified index.
 
-- If `path` specifies an object member that does not already exist, a new member is added to the object.
+- If `location` specifies an object member that does not already exist, a new member is added to the object.
 
 #### Parameters
 <table>
@@ -32,7 +32,7 @@ Inserts a value into the target at the specified path, if the path doesn't speci
     <td>JSON value</td> 
   </tr>
   <tr>
-    <td>path</td>
+    <td>location</td>
     <td>JSON Pointer</td> 
   </tr>
   <tr>

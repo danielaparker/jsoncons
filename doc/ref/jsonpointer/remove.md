@@ -6,14 +6,14 @@ Removes a `json` element.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json>
-void remove(Json& target, const Json::string_view_type& path); (1)
+void remove(Json& target, const Json::string_view_type& location); (1)
 
 template<class Json>
-void remove(Json& target, const Json::string_view_type& path, 
+void remove(Json& target, const Json::string_view_type& location, 
             std::error_code& ec);                              (2)
 ```
 
-Removes the value at the location specifed by `path`.
+Removes the value at the location specifed by `location`.
 
 #### Parameters
 <table>
@@ -22,7 +22,7 @@ Removes the value at the location specifed by `path`.
     <td>JSON value</td> 
   </tr>
   <tr>
-    <td>path</td>
+    <td>location</td>
     <td>JSON Pointer</td> 
   </tr>
   <tr>
