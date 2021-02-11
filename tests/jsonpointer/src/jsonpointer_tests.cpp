@@ -342,3 +342,107 @@ TEST_CASE("[jsonpointer] Inserting object after deleting it")
     CHECK(oj.size() == 1);
 }
 
+TEST_CASE("[jsonpointer] create_if_missing")
+{
+    SECTION("get from empty")
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        json result = jsonpointer::get(doc, ptr, true);
+
+        json expected = json::parse(R"({"foo":{"bar":{"baz":{}}}})");
+
+        CHECK(doc == expected);
+        CHECK(result == json());
+    }
+    SECTION("get from non-empty")
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc = json::parse(R"({"foo":{}})");
+        json result = jsonpointer::get(doc, ptr, true);
+
+        json expected = json::parse(R"({"foo":{"bar":{"baz":{}}}})");
+
+        CHECK(doc == expected);
+        CHECK(result == json());
+    }
+    SECTION("add into empty")
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        jsonpointer::add(doc, ptr, "str", true);
+
+        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+
+        CHECK(doc == expected);
+    }
+    SECTION("add into non-empty")
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc = json::parse(R"({"foo":{}})");
+        jsonpointer::add(doc, ptr, "str", true);
+
+        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+
+        CHECK(doc == expected);
+    }
+    SECTION("insert into empty")
+    {
+        std::vector<std::string> keys = { "foo","bar","baz" };
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        jsonpointer::insert(doc, ptr, "str", true);
+        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        CHECK(doc == expected);
+    }
+    SECTION("insert into non-empty")
+    {
+        std::vector<std::string> keys = { "foo","bar","baz" };
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc = json::parse(R"({"foo":{}})");
+        jsonpointer::insert(doc, ptr, "str", true);
+        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+        CHECK(doc == expected);
+    }
+}
+
