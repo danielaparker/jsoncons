@@ -44,7 +44,7 @@ enum class jsonpointer_errc
     index_exceeds_array_size,
     expected_0_or_1,
     invalid_index,
-    name_not_found,
+    key_not_found,
     key_already_exists,
     expected_object_or_array,
     end_of_input,
@@ -71,8 +71,8 @@ public:
                 return "Index exceeds array size";
             case jsonpointer_errc::expected_0_or_1:
                 return "Expected '0' or '1' after escape character '~'";
-            case jsonpointer_errc::name_not_found:
-                return "Name not found";
+            case jsonpointer_errc::key_not_found:
+                return "Key not found";
             case jsonpointer_errc::invalid_index:
                 return "Invalid array index";
             case jsonpointer_errc::key_already_exists:

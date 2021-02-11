@@ -385,7 +385,7 @@ namespace jsoncons { namespace jsonpointer {
         {
             if (!current->contains(buffer))
             {
-                ec = jsonpointer_errc::name_not_found;
+                ec = jsonpointer_errc::key_not_found;
                 return current;
             }
             current = std::addressof(current->at(buffer));
@@ -433,7 +433,7 @@ namespace jsoncons { namespace jsonpointer {
                 }
                 else
                 {
-                    ec = jsonpointer_errc::name_not_found;
+                    ec = jsonpointer_errc::key_not_found;
                     return current;
                 }
             }
@@ -862,7 +862,7 @@ namespace jsoncons { namespace jsonpointer {
         {
             if (!current->contains(buffer))
             {
-                ec = jsonpointer_errc::name_not_found;
+                ec = jsonpointer_errc::key_not_found;
                 return;
             }
             else
@@ -891,7 +891,11 @@ namespace jsoncons { namespace jsonpointer {
     // replace
 
     template<class Json, class T>
-    void replace(Json& root, const typename Json::string_view_type& path, T&& value, std::error_code& ec)
+    void replace(Json& root, 
+                 const typename Json::string_view_type& path, 
+                 T&& value, 
+                 bool create_if_missing,
+                 std::error_code& ec)
     {
         Json* current = std::addressof(root);
 
@@ -907,7 +911,7 @@ namespace jsoncons { namespace jsonpointer {
                 return;
             if (it != end)
             {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, false, ec);
+                current = jsoncons::jsonpointer::detail::resolve(current, buffer, create_if_missing, ec);
                 if (ec)
                     return;
             }
@@ -940,8 +944,15 @@ namespace jsoncons { namespace jsonpointer {
         {
             if (!current->contains(buffer))
             {
-                ec = jsonpointer_errc::key_already_exists;
-                return;
+                if (create_if_missing)
+                {
+                    current->try_emplace(buffer,std::forward<T>(value));
+                }
+                else
+                {
+                    ec = jsonpointer_errc::key_not_found;
+                    return;
+                }
             }
             else
             {
@@ -957,10 +968,22 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json, class T>
-    void replace(Json& root, const typename Json::string_view_type& path, T&& value)
+    void replace(Json& root, 
+                 const typename Json::string_view_type& path, 
+                 T&& value, 
+                 std::error_code& ec)
+    {
+        replace(root, path, std::forward<T>(value), false, ec);
+    }
+
+    template<class Json, class T>
+    void replace(Json& root, 
+                 const typename Json::string_view_type& path, 
+                 T&& value, 
+                 bool create_if_missing = false)
     {
         std::error_code ec;
-        replace(root, path, std::forward<T>(value), ec);
+        replace(root, path, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));

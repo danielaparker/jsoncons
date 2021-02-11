@@ -444,5 +444,39 @@ TEST_CASE("[jsonpointer] create_if_missing")
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
         CHECK(doc == expected);
     }
+    SECTION("replace into empty")
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        jsonpointer::replace(doc, ptr, "str", true);
+
+        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+
+        CHECK(doc == expected);
+    }
+    SECTION("replace into non-empty")
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc = json::parse(R"({"foo":{}})");
+        jsonpointer::replace(doc, ptr, "str", true);
+
+        json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
+
+        CHECK(doc == expected);
+    }
 }
 
