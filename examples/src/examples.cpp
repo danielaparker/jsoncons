@@ -413,8 +413,6 @@ int main()
 
         jsonpatch_examples();
 
-        jsonpointer_examples();
-
         json_traits_macros_examples();
 
         run_cbor_typed_array_examples();
@@ -464,6 +462,8 @@ int main()
         jsonschema_examples();
 
         jsonpath_examples();
+
+        jsonpointer_examples();
     }
     catch (const std::exception& e)
     {

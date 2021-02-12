@@ -503,6 +503,70 @@ namespace {
             jsonpointer::unflatten_options::assume_object);
         std::cout << "(3)\n" << pretty_print(unflattened2) << "\n";
     }
+
+    void get_with_create_if_missing()
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        json result = jsonpointer::get(doc, ptr, true);
+
+        std::cout << pretty_print(doc) << "\n\n";
+    }
+
+    void add_with_create_if_missing()
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        jsonpointer::add(doc, ptr, "str", true);
+
+        std::cout << pretty_print(doc) << "\n\n";
+    }
+
+    void add_no_replace_with_create_if_missing()
+    {
+        std::vector<std::string> keys = { "foo","bar","baz" };
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        jsonpointer::add_no_replace(doc, ptr, "str", true);
+
+        std::cout << pretty_print(doc) << "\n\n";
+    }
+
+    void replace_with_create_if_missing()
+    {
+        std::vector<std::string> keys = {"foo","bar","baz"};
+
+        jsonpointer::json_pointer ptr;
+        for (const auto& key : keys)
+        {
+            ptr /= key;
+        }
+
+        json doc;
+        jsonpointer::replace(doc, ptr, "str", true);
+
+        std::cout << pretty_print(doc) << "\n\n";
+    }
 } // namespace
 
 void jsonpointer_examples()
@@ -529,5 +593,9 @@ void jsonpointer_examples()
     jsonpointer_address_concatenate();
     flatten_and_unflatten();
     flatten_and_unflatten2();
+    get_with_create_if_missing();
+    add_with_create_if_missing();
+    add_no_replace_with_create_if_missing();
+    replace_with_create_if_missing();
 }
 

@@ -20,6 +20,53 @@ namespace jsoncons { namespace jsonpatch {
 
 namespace detail {
 
+    template<class Json>
+    std::basic_string<typename Json::char_type> normalized_path(const Json& root, const typename Json::string_view_type& location)
+    {
+        using string_type = std::basic_string<typename Json::char_type>;
+        using string_view_type = typename Json::string_view_type;
+
+        std::error_code ec;
+
+        const Json* current = std::addressof(root);
+        if (location.empty())
+        {
+            return string_type();
+        }
+
+        string_type buffer;
+        jsonpointer::json_pointer_iterator<typename string_view_type::iterator> it(location.begin(), location.end());
+        jsonpointer::json_pointer_iterator<typename string_view_type::iterator> end(location.begin(), location.end(), location.end());
+        while (it != end)
+        {
+            buffer = *it;
+            it.increment(ec);
+            if (ec)
+                return string_type(location);
+            if (it != end)
+            {
+                current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
+                if (ec)
+                    return string_type(location);
+            }
+        }
+
+        if (current->is_array() && buffer.size() == 1 && buffer[0] == '-')
+        {
+            string_type p = string_type(location.substr(0,location.length()-1));
+            std::string s = std::to_string(current->size());
+            for (auto c : s)
+            {
+                p.push_back(c);
+            }
+            return p;
+        }
+        else
+        {
+            return string_type(location);
+        }
+    }
+
     JSONCONS_STRING_LITERAL(test_literal,'t','e','s','t')
     JSONCONS_STRING_LITERAL(add_literal,'a','d','d')
     JSONCONS_STRING_LITERAL(remove_literal,'r','e','m','o','v','e')
@@ -253,7 +300,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                 {
                     std::error_code insert_ec;
                     Json val = operation.at(detail::value_literal<char_type>());
-                    auto npath = jsonpointer::normalized_path(target,path);
+                    auto npath = jsonpatch::detail::normalized_path(target,path);
                     jsonpointer::add_no_replace(target,npath,val,insert_ec); // try insert without replace
                     if (insert_ec) // try a replace
                     {
@@ -366,7 +413,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                             unwinder.stack.push_back({detail::op_type::add,string_type(from),val});
                             // add
                             std::error_code insert_ec;
-                            auto npath = jsonpointer::normalized_path(target,path);
+                            auto npath = jsonpatch::detail::normalized_path(target,path);
                             jsonpointer::add_no_replace(target,npath,val,insert_ec); // try insert without replace
                             if (insert_ec) // try a replace
                             {
@@ -422,7 +469,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     else
                     {
                         // add
-                        auto npath = jsonpointer::normalized_path(target,path);
+                        auto npath = jsonpatch::detail::normalized_path(target,path);
                         std::error_code insert_ec;
                         jsonpointer::add_no_replace(target,npath,val,insert_ec); // try insert without replace
                         if (insert_ec) // Failed, try a replace

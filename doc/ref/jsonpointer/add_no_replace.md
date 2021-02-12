@@ -222,3 +222,40 @@ Output:
 Index exceeds array size
 ```
 
+#### add_no_replace with create if missing
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
+
+int main()
+{
+    std::vector<std::string> keys = { "foo","bar","baz" };
+
+    jsonpointer::json_pointer ptr;
+    for (const auto& key : keys)
+    {
+        ptr /= key;
+    }
+
+    json doc;
+    jsonpointer::add_no_replace(doc, ptr, "str", true);
+
+    std::cout << pretty_print(doc) << "\n\n";
+}
+```
+Output:
+```json
+{
+    "foo": {
+        "bar": {
+            "baz": "str"
+        }
+    }
+}
+```
+

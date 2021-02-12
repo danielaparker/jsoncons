@@ -452,53 +452,6 @@ namespace jsoncons { namespace jsonpointer {
 
     } // namespace detail
 
-    template<class Json>
-    std::basic_string<typename Json::char_type> normalized_path(const Json& root, const typename Json::string_view_type& location)
-    {
-        using string_type = std::basic_string<typename Json::char_type>;
-        using string_view_type = typename Json::string_view_type;
-
-        std::error_code ec;
-
-        const Json* current = std::addressof(root);
-        if (location.empty())
-        {
-            return string_type();
-        }
-
-        string_type buffer;
-        json_pointer_iterator<typename string_view_type::iterator> it(location.begin(), location.end());
-        json_pointer_iterator<typename string_view_type::iterator> end(location.begin(), location.end(), location.end());
-        while (it != end)
-        {
-            buffer = *it;
-            it.increment(ec);
-            if (ec)
-                return string_type(location);
-            if (it != end)
-            {
-                current = jsoncons::jsonpointer::detail::resolve(current, buffer, ec);
-                if (ec)
-                    return string_type(location);
-            }
-        }
-
-        if (current->is_array() && buffer.size() == 1 && buffer[0] == '-')
-        {
-            string_type p = string_type(location.substr(0,location.length()-1));
-            std::string s = std::to_string(current->size());
-            for (auto c : s)
-            {
-                p.push_back(c);
-            }
-            return p;
-        }
-        else
-        {
-            return string_type(location);
-        }
-    }
-
     // get
 
     template<class Json>
