@@ -1,3 +1,12 @@
+master
+------
+
+Enhancements
+
+- The jsonpointer functions `get`, `add`, `add_if_absent`, and `replace`
+have an additonal overload with a `create_if_missing` parameter. If
+passed `true`, creates key-object pairs when object key is missing.
+
 v0.161.0
 --------
 
