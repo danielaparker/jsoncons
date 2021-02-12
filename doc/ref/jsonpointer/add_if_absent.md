@@ -1,4 +1,4 @@
-### jsoncons::jsonpointer::add_no_replace
+### jsoncons::jsonpointer::add_if_absent
 
 Adds a value to an object or inserts it into an array at the target location,
 if a value does not already exist at that location.
@@ -7,15 +7,15 @@ if a value does not already exist at that location.
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 
 template<class Json, class T>
-void add_no_replace(Json& target, const Json::string_view_type& location, 
+void add_if_absent(Json& target, const Json::string_view_type& location, 
                     T&& value, bool create_if_missing = false);              (1) 
 
 template<class Json, class T>
-void add_no_replace(Json& target, const Json::string_view_type& location, 
+void add_if_absent(Json& target, const Json::string_view_type& location, 
                     T&& value, std::error_code& ec);                         (2) 
 
 template<class Json, class T>
-void add_no_replace(Json& target, const Json::string_view_type& location, 
+void add_if_absent(Json& target, const Json::string_view_type& location, 
                     T&& value, bool create_if_missing, std::error_code& ec); (3) 
 ```
 
@@ -55,9 +55,9 @@ None
 
 ### Exceptions
 
-(1) Throws a [jsonpointer_error](jsonpointer_error.md) if `add_no_replace` fails.
+(1) Throws a [jsonpointer_error](jsonpointer_error.md) if `add_if_absent` fails.
  
-(2) Sets the out-parameter `ec` to the [jsonpointer_error_category](jsonpointer_errc.md) if `add_no_replace` fails. 
+(2) Sets the out-parameter `ec` to the [jsonpointer_error_category](jsonpointer_errc.md) if `add_if_absent` fails. 
 
 ### Examples
 
@@ -78,7 +78,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
+    jsonpointer::add_if_absent(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -110,7 +110,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::add_no_replace(target, "/foo/1", json("qux"), ec);
+    jsonpointer::add_if_absent(target, "/foo/1", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -142,7 +142,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::add_no_replace(target, "/foo/-", json("qux"), ec);
+    jsonpointer::add_if_absent(target, "/foo/-", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -158,7 +158,7 @@ Output:
 {"foo":["bar","baz","qux"]}
 ```
 
-#### Attempt to add_no_replace object member at a location that already exists
+#### Attempt to add_if_absent object member at a location that already exists
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -174,7 +174,7 @@ int main()
     )");
 
     std::error_code ec;
-    jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
+    jsonpointer::add_if_absent(target, "/baz", json("qux"), ec);
     if (ec)
     {
         std::cout << ec.message() << std::endl;
@@ -190,7 +190,7 @@ Output:
 Key already exists
 ```
 
-#### Attempt to add_no_replace value to a location in an array that exceeds the size of the array
+#### Attempt to add_if_absent value to a location in an array that exceeds the size of the array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -222,7 +222,7 @@ Output:
 Index exceeds array size
 ```
 
-#### add_no_replace with create if missing
+#### add_if_absent with create if missing
 
 ```c++
 #include <iostream>
@@ -243,7 +243,7 @@ int main()
     }
 
     json doc;
-    jsonpointer::add_no_replace(doc, ptr, "str", true);
+    jsonpointer::add_if_absent(doc, ptr, "str", true);
 
     std::cout << pretty_print(doc) << "\n\n";
 }

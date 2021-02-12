@@ -301,7 +301,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     std::error_code insert_ec;
                     Json val = operation.at(detail::value_literal<char_type>());
                     auto npath = jsonpatch::detail::normalized_path(target,path);
-                    jsonpointer::add_no_replace(target,npath,val,insert_ec); // try insert without replace
+                    jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
                     if (insert_ec) // try a replace
                     {
                         std::error_code select_ec;
@@ -414,7 +414,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                             // add
                             std::error_code insert_ec;
                             auto npath = jsonpatch::detail::normalized_path(target,path);
-                            jsonpointer::add_no_replace(target,npath,val,insert_ec); // try insert without replace
+                            jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
                             if (insert_ec) // try a replace
                             {
                                 std::error_code select_ec;
@@ -471,7 +471,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                         // add
                         auto npath = jsonpatch::detail::normalized_path(target,path);
                         std::error_code insert_ec;
-                        jsonpointer::add_no_replace(target,npath,val,insert_ec); // try insert without replace
+                        jsonpointer::add_if_absent(target,npath,val,insert_ec); // try insert without replace
                         if (insert_ec) // Failed, try a replace
                         {
                             std::error_code select_ec;

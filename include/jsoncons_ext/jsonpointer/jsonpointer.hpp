@@ -642,10 +642,10 @@ namespace jsoncons { namespace jsonpointer {
         }
     }
 
-    // add_no_replace
+    // add_if_absent
 
     template<class Json, class T>
-    void add_no_replace(Json& root, 
+    void add_if_absent(Json& root, 
                 const typename Json::string_view_type& location, 
                 T&& value, 
                 bool create_if_missing,
@@ -724,22 +724,22 @@ namespace jsoncons { namespace jsonpointer {
     }
 
     template<class Json, class T>
-    void add_no_replace(Json& root, 
+    void add_if_absent(Json& root, 
                 const typename Json::string_view_type& location, 
                 T&& value, 
                 std::error_code& ec)
     {
-        add_no_replace(root, location, std::forward<T>(value), false, ec);
+        add_if_absent(root, location, std::forward<T>(value), false, ec);
     }
 
     template<class Json, class T>
-    void add_no_replace(Json& root, 
+    void add_if_absent(Json& root, 
                 const typename Json::string_view_type& location, 
                 T&& value,
                 bool create_if_missing = false)
     {
         std::error_code ec;
-        add_no_replace(root, location, std::forward<T>(value), create_if_missing, ec);
+        add_if_absent(root, location, std::forward<T>(value), create_if_missing, ec);
         if (ec)
         {
             JSONCONS_THROW(jsonpointer_error(ec));
@@ -1240,7 +1240,7 @@ namespace jsoncons { namespace jsonpointer {
                 bool create_if_missing,
                 std::error_code& ec)
     {
-        add_no_replace(root,location,std::forward<T>(value),create_if_missing,ec);
+        add_if_absent(root,location,std::forward<T>(value),create_if_missing,ec);
     }
 
     template<class Json, class T>
@@ -1249,7 +1249,7 @@ namespace jsoncons { namespace jsonpointer {
                 T&& value, 
                 std::error_code& ec)
     {
-        add_no_replace(root, location, std::forward<T>(value), ec);
+        add_if_absent(root, location, std::forward<T>(value), ec);
     }
 
     template<class Json, class T>
@@ -1258,7 +1258,7 @@ namespace jsoncons { namespace jsonpointer {
                 T&& value,
                 bool create_if_missing = false)
     {
-        add_no_replace(root, location, std::forward<T>(value), create_if_missing);
+        add_if_absent(root, location, std::forward<T>(value), create_if_missing);
     }
 #endif
 

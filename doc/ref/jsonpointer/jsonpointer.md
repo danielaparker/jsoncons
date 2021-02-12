@@ -36,10 +36,10 @@ When applied to a JSON array, the character `-` indicates one past the last elem
   </tr>
   <tr>
     <td><code>insert</code> (until 0.162.0)</td>
-    <td>Same as <a href="add_no_replace.md">add_no_replace</a></td>
+    <td>Same as <a href="add_if_absent.md">add_if_absent</a></td>
   </tr>
   <tr>
-    <td><a href="add_no_replace.md">add_no_replace</a> (since 0.162.0))</td>
+    <td><a href="add_if_absent.md">add_if_absent</a> (since 0.162.0))</td>
     <td>Inserts a value in a JSON document using JSON Pointer path notation, if the path doesn't specify an object member that already has the same key.</td> 
   </tr>
   <tr>

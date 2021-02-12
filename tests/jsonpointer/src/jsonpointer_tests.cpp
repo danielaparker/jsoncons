@@ -414,7 +414,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
 
         CHECK(doc == expected);
     }
-    SECTION("add_no_replace into empty")
+    SECTION("add_if_absent into empty")
     {
         std::vector<std::string> keys = { "foo","bar","baz" };
 
@@ -425,11 +425,11 @@ TEST_CASE("[jsonpointer] create_if_missing")
         }
 
         json doc;
-        jsonpointer::add_no_replace(doc, ptr, "str", true);
+        jsonpointer::add_if_absent(doc, ptr, "str", true);
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
         CHECK(doc == expected);
     }
-    SECTION("add_no_replace into non-empty")
+    SECTION("add_if_absent into non-empty")
     {
         std::vector<std::string> keys = { "foo","bar","baz" };
 
@@ -440,7 +440,7 @@ TEST_CASE("[jsonpointer] create_if_missing")
         }
 
         json doc = json::parse(R"({"foo":{}})");
-        jsonpointer::add_no_replace(doc, ptr, "str", true);
+        jsonpointer::add_if_absent(doc, ptr, "str", true);
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
         CHECK(doc == expected);
     }

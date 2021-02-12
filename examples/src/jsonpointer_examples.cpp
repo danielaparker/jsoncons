@@ -133,7 +133,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
+        jsonpointer::add_if_absent(target, "/baz", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -151,7 +151,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::add_no_replace(target, "/foo/1", json("qux"), ec);
+        jsonpointer::add_if_absent(target, "/foo/1", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -169,7 +169,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::add_no_replace(target, "/foo/-", json("qux"), ec);
+        jsonpointer::add_if_absent(target, "/foo/-", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -187,7 +187,7 @@ namespace {
         )");
 
         std::error_code ec;
-        jsonpointer::add_no_replace(target, "/baz", json("qux"), ec);
+        jsonpointer::add_if_absent(target, "/baz", json("qux"), ec);
         if (ec)
         {
             std::cout << ec.message() << std::endl;
@@ -536,7 +536,7 @@ namespace {
         std::cout << pretty_print(doc) << "\n\n";
     }
 
-    void add_no_replace_with_create_if_missing()
+    void add_if_absent_with_create_if_missing()
     {
         std::vector<std::string> keys = { "foo","bar","baz" };
 
@@ -547,7 +547,7 @@ namespace {
         }
 
         json doc;
-        jsonpointer::add_no_replace(doc, ptr, "str", true);
+        jsonpointer::add_if_absent(doc, ptr, "str", true);
 
         std::cout << pretty_print(doc) << "\n\n";
     }
@@ -595,7 +595,7 @@ void jsonpointer_examples()
     flatten_and_unflatten2();
     get_with_create_if_missing();
     add_with_create_if_missing();
-    add_no_replace_with_create_if_missing();
+    add_if_absent_with_create_if_missing();
     replace_with_create_if_missing();
 }
 
