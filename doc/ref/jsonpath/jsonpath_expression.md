@@ -46,22 +46,13 @@ void fun(const Json::string_type& path, const Json& val);
 
 #### Static functions
 
-    template <class Source>
-    static jsonpath_expression compile(const Source& expr);    (1)
+    static jsonpath_expression compile(const string_view_type& expr);    (1)
 
-    static jsonpath_expression compile(const char_type* expr); (2)
-
-    template <class Source>
-    static jsonpath_expression compile(const Source& expr,
-                                       std::error_code& ec);   (3)
-
-    static jsonpath_expression compile(const char_type* expr,
-                                       std::error_code& ec);   (4)
+    static jsonpath_expression compile(const string_view_type& expr,
+                                       std::error_code& ec);             (2)
 
 Compiles the JSONPath expression for later evaluation. Returns a `jsonpath_expression` object 
 that represents the JSONPath expression.
-The JSONPath expression `expr` is provided as a sequential container or view of characters, 
-in (1) and (3), or as a null terminated string, in (2) and (4).
 
 #### Parameters
 

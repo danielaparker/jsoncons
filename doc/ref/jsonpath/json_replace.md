@@ -4,43 +4,27 @@
 #include <jsoncons_ext/jsonpath/json_query.hpp>
 ```
 ```c++
-template<class Json, class Source, class T>
-void json_replace(Json& root, const Source& expr, T&& new_value, 
-                  result_options options = result_options::nodups); 
-
 template<class Json, class T>
-void json_replace(Json& root, const Json::char_type* expr, T&& new_value, 
+void json_replace(Json& root, const Json::string_view_type& expr, T&& new_value, 
                   result_options options = result_options::nodups);                          (1)
 ```
 ```c++
-template<class Json, class Source, class UnaryCallback>
-void json_replace(Json& root, const Source& expr, UnaryCallback callback); 
-
 template<class Json, class UnaryCallback>
-void json_replace(Json& root, const Json::char_type* expr, UnaryCallback callback); (2) (until 0.161.0)
+void json_replace(Json& root, const Json::string_view_type& expr, UnaryCallback callback); (2) (until 0.161.0)
 ```
 ```c++
-template<class Json, class Source, class BinaryCallback>
-void json_replace(Json& root, const Source& expr, BinaryCallback callback, 
-                  result_options options = result_options::nodups); 
-
 template<class Json, class BinaryCallback>
-void json_replace(Json& root, const Json::char_type* expr, BinaryCallback callback, 
+void json_replace(Json& root, const Json::string_view_type& expr, BinaryCallback callback, 
                   result_options options = result_options::nodups);                          (3) (since 0.161.0)
 ```
 
 (1) Searches for all values that match the JSONPath expression `expr` and replaces them with the specified value
-The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, or as a null terminated string.
 
 (2) Searches for all values that match a JSONPath expression `expr` and replaces them with the result of the provided function.
-The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, or as a null terminated string. This overload has been deprecated in 0.161.0, use (3) instead.
+This overload has been deprecated in 0.161.0, use (3) instead.
 
 (3) Searches for all values that match a JSONPath expression `expr` and, for each result, 
 calls a callback provided by the user with a path and mutable reference to the value.
-The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, or as a null terminated string.
 
 #### Parameters
 

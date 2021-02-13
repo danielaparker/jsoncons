@@ -12,34 +12,23 @@ Json json_query(const Json& root,
                 const Json:string_view_type& expr,
                 result_type type = result_type::value);              (until 0.161.0)
 
-template<class Json, class Source>
-Json json_query(const Json& root, const Source& expr,
-                result_options options = result_options::value);     (since 0.161.0)
-
 template<class Json>
 Json json_query(const Json& root, 
-                const Json::char_type* expr,
+                const Json::string_view_type& expr,
                 result_options options = result_options::value); (1) (since 0.161.0)
 ```
 ```c++
-template<class Json, class Source, class BinaryCallback>
-void json_query(const Json& root, const Source& expr,
-                BinaryCallback callback
-                result_options options = result_options::value);     (since 0.161.0)
-
 template<class Json, class BinaryCallback>
 void json_query(const Json& root, 
-                const Json::char_type* expr,
+                const Json::string_view_type& expr,
                 BinaryCallback callback
                 result_options options = result_options::value); (2) (since 0.161.0)
 ```
 (1) Evaluates the Json value `root` against the JSONPath expression `expr` and returns an array of values or 
-normalized path expressions. The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, such as a `std::basic_string` or `std::basic_string_view`, or as a null terminated string.
+normalized path expressions. 
 
 (2) Evaluates the Json value `root` against the JSONPath expression `expr` and calls a provided
-callback repeatedly with the results. The JSONPath expression `expr` is provided as a sequential container 
-or view of characters, such as a `std::basic_string` or `std::basic_string_view`, or as a null terminated string.
+callback repeatedly with the results. 
 
 #### Parameters
 
@@ -50,7 +39,7 @@ or view of characters, such as a `std::basic_string` or `std::basic_string_view`
   </tr>
   <tr>
     <td><code>expr</code></td>
-    <td>JSONPath expression</td> 
+    <td>JSONPath expression string</td> 
   </tr>
   <tr>
     <td><code>callback</code></td>

@@ -904,7 +904,7 @@ namespace jsoncons { namespace jsonpath {
         path_expression_type compile(static_resources<value_type,reference>& resources, const string_view_type& path)
         {
             std::error_code ec;
-            auto result = compile(resources, path.data(), path.length(), ec);
+            auto result = compile(resources, path, ec);
             if (ec)
             {
                 JSONCONS_THROW(jsonpath_error(ec, line_, column_));
@@ -912,34 +912,8 @@ namespace jsoncons { namespace jsonpath {
             return result;
         }
 
-        path_expression_type compile(static_resources<value_type,reference>& resources, const string_view_type& path, std::error_code& ec)
-        {
-            JSONCONS_TRY
-            {
-                return compile(resources, path.data(), path.length(), ec);
-            }
-            JSONCONS_CATCH(...)
-            {
-                ec = jsonpath_errc::unidentified_error;
-            }
-        }
-
-        path_expression_type compile(static_resources<value_type,reference>& resources,
-                                     const char_type* path, 
-                                     std::size_t length)
-        {
-            std::error_code ec;
-            auto result = compile(resources, path, length, ec);
-            if (ec)
-            {
-                JSONCONS_THROW(jsonpath_error(ec, line_, column_));
-            }
-            return result;
-        }
-
-        path_expression_type compile(static_resources<value_type,reference>& resources,
-                                     const char_type* path, 
-                                     std::size_t length,
+        path_expression_type compile(static_resources<value_type,reference>& resources, 
+                                     const string_view_type& path, 
                                      std::error_code& ec)
         {
             std::size_t selector_id = 0;
@@ -950,8 +924,8 @@ namespace jsoncons { namespace jsonpath {
             uint32_t cp = 0;
             uint32_t cp2 = 0;
 
-            begin_input_ = path;
-            end_input_ = path + length;
+            begin_input_ = path.data();
+            end_input_ = path.data() + path.length();
             p_ = begin_input_;
 
             string_type s = {'$'};
@@ -3195,35 +3169,21 @@ namespace jsoncons { namespace jsonpath {
             }            
         }
 
-        template<class Source>
-        static typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,jsonpath_expression>::type
-        compile(const Source& path)
+        static jsonpath_expression compile(const string_view_type& path)
         {
             jsoncons::jsonpath::detail::static_resources<value_type,reference> resources;
 
             evaluator_t e;
-            expression_t expr = e.compile(resources, path.data(), path.length());
+            expression_t expr = e.compile(resources, path);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
 
-        static jsonpath_expression compile(const char_type* path)
-        {
-            return compile(basic_string_view<char_type>(path));
-        }
-
-        template<class Source>
-        static typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,jsonpath_expression>::type
-        compile(const Source& path, std::error_code& ec)
+        static jsonpath_expression compile(const string_view_type& path, std::error_code& ec)
         {
             jsoncons::jsonpath::detail::static_resources<value_type,reference> resources;
             evaluator_t e;
             expression_t expr = e.compile(resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
-        }
-
-        static jsonpath_expression compile(const char_type* path, std::error_code& ec)
-        {
-            return compile(string_view_type(path), ec);
         }
     };
 

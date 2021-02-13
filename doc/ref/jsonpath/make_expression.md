@@ -7,7 +7,7 @@ template <class Json,class Source>
 jsonpath_expression<Json> make_expression(const Source& expr); 
 
 template <class Json>
-jsonpath_expression<Json> make_expression(const Json::char_type* expr); (1)
+jsonpath_expression<Json> make_expression(const Json::string_view_type& expr); (1)
 ```
 ```c++
 template <class Json,class Source>
@@ -15,24 +15,20 @@ jsonpath_expression<Json> make_expression(const Source& expr,
                                         std::error_code& ec); 
 
 template <class Json>
-jsonpath_expression<Json> make_expression(const Json::char_type* expr,
+jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
                                         std::error_code& ec); (2)
 ```
 
 (1) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
-The JSONPath expression `expr` is provided as a sequential container or view of characters, 
-such as a `std::basic_string` or `std::basic_string_view`, or a null terminated string.
 
 (2) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
-The JSONPath expression `expr` is provided as a sequential container or view of characters, 
-such as a `std::basic_string` or `std::basic_string_view`, or a null terminated string.
 
 #### Parameters
 
 <table>
   <tr>
     <td><code>expr</code></td>
-    <td>JSONPath expression</td> 
+    <td>JSONPath expression string</td> 
   </tr>
   <tr>
     <td><code>ec</code></td>
