@@ -3059,17 +3059,6 @@ namespace jmespath {
                     s.push_back(' ');
                 }
                 s.append("multi_select_list\n");
-                /*for (auto& key_expr : key_toks_)
-                {
-                    for (std::size_t i = 0; i <= indent+2; ++i)
-                    {
-                        s.push_back(' ');
-                    }
-                    s.append(key_expr.key);
-                    std::string sss = key_expr.expression->to_string(indent+2);
-                    s.insert(s.end(), sss.begin(), sss.end());
-                    s.push_back('\n');
-                }*/
                 return s;
             }
         };
@@ -3622,42 +3611,16 @@ namespace jmespath {
                         break;
                     }
                     case path_state::key_expr:
-                        switch (*p_)
-                        {
-                            case '\"':
-                                ++p_;
-                                ++column_;
-                                push_token(token(key_arg, buffer), ec);
-                                if (ec) {return jmespath_expression();}
-                                buffer.clear(); 
-                                state_stack_.pop_back(); 
-                                break;
-                            default:
-                                push_token(token(key_arg, buffer), ec);
-                                if (ec) {return jmespath_expression();}
-                                buffer.clear(); 
-                                state_stack_.pop_back(); 
-                                break;
-                        }
+                        push_token(token(key_arg, buffer), ec);
+                        if (ec) {return jmespath_expression();}
+                        buffer.clear(); 
+                        state_stack_.pop_back(); 
                         break;
                     case path_state::val_expr:
-                        switch (*p_)
-                        {
-                            case '\"':
-                                ++p_;
-                                ++column_;
-                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                if (ec) {return jmespath_expression();}
-                                buffer.clear();
-                                state_stack_.pop_back(); 
-                                break;
-                            default:
-                                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                                if (ec) {return jmespath_expression();}
-                                buffer.clear();
-                                state_stack_.pop_back(); 
-                                break;
-                        }
+                        push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        if (ec) {return jmespath_expression();}
+                        buffer.clear();
+                        state_stack_.pop_back(); 
                         break;
                     case path_state::expression_or_expression_type:
                         switch (*p_)
@@ -3764,6 +3727,8 @@ namespace jmespath {
                         {
                             case '\"':
                                 state_stack_.pop_back(); // quoted_string
+                                ++p_;
+                                ++column_;
                                 break;
                             case '\\':
                                 state_stack_.emplace_back(path_state::quoted_string_escape_char);
@@ -4679,15 +4644,18 @@ namespace jmespath {
                 
             }
 
-            if (state_stack_.size() >= 3 && state_stack_.back() == path_state::unquoted_string)
+            if (state_stack_.size() >= 2)
             {
-                push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                if (ec) {return jmespath_expression();}
-                state_stack_.pop_back(); // unquoted_string
-                if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
+                if (state_stack_.back() == path_state::unquoted_string || state_stack_.back() == path_state::val_expr)
                 {
-                    buffer.clear();
-                    state_stack_.pop_back(); // val_expr
+                    push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                    if (ec) {return jmespath_expression();}
+                    state_stack_.pop_back(); // unquoted_string or path_state::val_expr
+                    if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
+                    {
+                        buffer.clear();
+                        state_stack_.pop_back(); // val_expr
+                    }
                 }
             }
             if (state_stack_.size() >= 3 && state_stack_.back() == path_state::expect_dot)

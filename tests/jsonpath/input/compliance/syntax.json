@@ -68,5 +68,27 @@
          "error": "syntax"
        }
      ]
-   }
+   },
+  {
+    "comment": "Identifiers",
+    "given": {"type": "object"},
+    "cases": [
+      {
+        "expression": "$.foo",
+        "result": []
+      },
+      {
+        "expression": "$.\"foo\"",
+        "result": []
+      },
+      {
+        "expression": "$.\"\\\\\"",
+        "result": []
+      },
+      {
+        "expression": "$.\"\\u\"",
+        "error": "syntax"
+      }
+    ]
+  }
 ]
