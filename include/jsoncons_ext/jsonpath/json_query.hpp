@@ -2005,12 +2005,8 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.emplace_back(path_state::expression_lhs);                                
                                 break;
                             default:
-                                buffer.clear();
-                                buffer.push_back(*p_);
-                                state_stack_.back() = path_state::bracketed_unquoted_name_or_union;
-                                ++p_;
-                                ++column_;
-                                break;
+                                ec = jsonpath_errc::expected_bracket_specifier_or_union;
+                                return path_expression_type();
                         }
                         break;
                     case path_state::union_element:

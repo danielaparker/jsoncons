@@ -124,18 +124,18 @@ TEST_CASE("jsonpath-tests")
     SECTION("compliance")
     {
 #if defined(JSONCONS_HAS_STD_REGEX)
-        jsonpath_tests("./jsonpath/input/compliance/regex.json");
+        //jsonpath_tests("./jsonpath/input/compliance/regex.json");
 #endif
-        jsonpath_tests("./jsonpath/input/compliance/identifiers.json");
-        jsonpath_tests("./jsonpath/input/compliance/dot-notation.json"); 
-        jsonpath_tests("./jsonpath/input/compliance/slice.json");
-        jsonpath_tests("./jsonpath/input/compliance/indices.json");
-        jsonpath_tests("./jsonpath/input/compliance/wildcard.json");
-        jsonpath_tests("./jsonpath/input/compliance/recursive-descent.json"); 
-        jsonpath_tests("./jsonpath/input/compliance/union.json");       
-        jsonpath_tests("./jsonpath/input/compliance/filters.json");
-        jsonpath_tests("./jsonpath/input/compliance/functions.json");
-        jsonpath_tests("./jsonpath/input/compliance/expressions.json");
+        //jsonpath_tests("./jsonpath/input/compliance/identifiers.json");
+        //jsonpath_tests("./jsonpath/input/compliance/dot-notation.json"); 
+        //jsonpath_tests("./jsonpath/input/compliance/slice.json");
+        //jsonpath_tests("./jsonpath/input/compliance/indices.json");
+        //jsonpath_tests("./jsonpath/input/compliance/wildcard.json");
+        //jsonpath_tests("./jsonpath/input/compliance/recursive-descent.json"); 
+        //jsonpath_tests("./jsonpath/input/compliance/union.json");       
+        //jsonpath_tests("./jsonpath/input/compliance/filters.json");
+        //jsonpath_tests("./jsonpath/input/compliance/functions.json");
+        //jsonpath_tests("./jsonpath/input/compliance/expressions.json");
         jsonpath_tests("./jsonpath/input/compliance/syntax.json");
     }
 }
