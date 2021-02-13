@@ -1,5 +1,5 @@
 [
-   /*{
+   {
      "comment": "Empty string",
      "given": {"type": "object"},
      "cases": [
@@ -54,15 +54,15 @@
          "error": "syntax"
        }
      ]
-   },*/
+   },
    {
      "comment": "Bracket notation without quotes",
      "given": {"key1": "value1", "key2": "value2"},
      "cases": [
-       /*{
+       {
          "expression": "$[key1]",
          "error": "syntax"
-       },*/
+       },
        {
          "expression": "$['key1',key2]",
          "error": "syntax"

@@ -136,7 +136,7 @@ TEST_CASE("jsonpath-tests")
         jsonpath_tests("./jsonpath/input/compliance/filters.json");
         jsonpath_tests("./jsonpath/input/compliance/functions.json");
         jsonpath_tests("./jsonpath/input/compliance/expressions.json");
-        //jsonpath_tests("./jsonpath/input/compliance/syntax.json");
+        jsonpath_tests("./jsonpath/input/compliance/syntax.json");
     }
 }
 
