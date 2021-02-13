@@ -136,8 +136,6 @@ namespace jsoncons { namespace jsonpath {
         double_quoted_string,
         bracketed_unquoted_name_or_union,
         union_expression,
-        single_quoted_name_or_union,
-        double_quoted_name_or_union,
         identifier_or_union,
         bracket_specifier_or_union,
         bracketed_wildcard,
@@ -1960,12 +1958,14 @@ namespace jsoncons { namespace jsonpath {
                                 ++column_;
                                 break;
                             case '\'':
-                                state_stack_.back() = path_state::single_quoted_name_or_union;
+                                state_stack_.back() = path_state::identifier_or_union;
+                                state_stack_.push_back(path_state::single_quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\"':
-                                state_stack_.back() = path_state::double_quoted_name_or_union;
+                                state_stack_.back() = path_state::identifier_or_union;
+                                state_stack_.push_back(path_state::double_quoted_string);
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2488,38 +2488,6 @@ namespace jsoncons { namespace jsonpath {
                                 ec = jsonpath_errc::expected_right_bracket;
                                 return path_expression_type();
                         }
-                        break;
-                    case path_state::single_quoted_name_or_union:
-                        switch (*p_)
-                        {
-                            case '\'':
-                                state_stack_.back() = path_state::identifier_or_union;
-                                break;
-                            case '\\':
-                                state_stack_.emplace_back(path_state::quoted_string_escape_char);
-                                break;
-                            default:
-                                buffer.push_back(*p_);
-                                break;
-                        };
-                        ++p_;
-                        ++column_;
-                        break;
-                    case path_state::double_quoted_name_or_union: 
-                        switch (*p_)
-                        {
-                            case '\"':
-                                state_stack_.back() = path_state::identifier_or_union;
-                                break;
-                            case '\\':
-                                state_stack_.emplace_back(path_state::quoted_string_escape_char);
-                                break;
-                            default:
-                                buffer.push_back(*p_);
-                                break;
-                        };
-                        ++p_;
-                        ++column_;
                         break;
                     case path_state::quoted_string_escape_char:
                         switch (*p_)
