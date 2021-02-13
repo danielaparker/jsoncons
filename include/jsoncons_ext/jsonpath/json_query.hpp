@@ -1928,10 +1928,12 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '(':
                             {
+                                push_token(token_type(begin_union_arg), ec);
                                 push_token(token_type(begin_expression_arg), ec);
                                 push_token(lparen_arg, ec);
                                 if (ec) {return path_expression_type();}
-                                state_stack_.back() = path_state::expression;
+                                state_stack_.back() = path_state::union_expression; // union
+                                state_stack_.emplace_back(path_state::expression);
                                 state_stack_.emplace_back(path_state::filter_expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 ++eval_stack.back();
@@ -2013,6 +2015,19 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.back() = path_state::index_or_slice;
                                 state_stack_.emplace_back(path_state::integer);
                                 break;
+                            case '(':
+                            {
+                                push_token(token_type(begin_expression_arg), ec);
+                                push_token(lparen_arg, ec);
+                                if (ec) {return path_expression_type();}
+                                state_stack_.back() = path_state::expression;
+                                state_stack_.emplace_back(path_state::filter_expression_rhs);
+                                state_stack_.emplace_back(path_state::path_or_literal_or_function);
+                                ++eval_stack.back();
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
                             case '?':
                             {
                                 push_token(token_type(begin_filter_arg), ec);
@@ -2723,13 +2738,12 @@ namespace jsoncons { namespace jsonpath {
                             case ' ':case '\t':case '\r':case '\n':
                                 advance_past_space_character();
                                 break;
+                            case ',':
                             case ']':
                             {
                                 push_token(token_type(end_expression_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
-                                ++p_;
-                                ++column_;
                                 break;
                             }
                             default:

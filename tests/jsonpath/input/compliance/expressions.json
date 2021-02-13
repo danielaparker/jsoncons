@@ -13,6 +13,11 @@
             "comment" : "Dot notation after filter expression",
             "expression": "$[(@.length - 1)]",
             "result": ["fifth"]
+         },
+         {
+            "comment" : "Dot notation after filter expression",
+            "expression": "$[(@.length - 1),(@.length - 2)]",
+            "result": ["fifth","forth"]
          }
      ]
 }
