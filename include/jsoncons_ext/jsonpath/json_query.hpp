@@ -2485,25 +2485,6 @@ namespace jsoncons { namespace jsonpath {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case '.':
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
-                                if (ec) {return path_expression_type();}
-                                buffer.clear();
-                                state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::expression_lhs);                                
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '[':
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
-                                if (ec) {return path_expression_type();}
-                                state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::expression_lhs);                                
-                                ++p_;
-                                ++column_;
-                                break;
                             case ',': 
                                 push_token(token_type(begin_union_arg), ec);
                                 push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
@@ -2511,7 +2492,7 @@ namespace jsoncons { namespace jsonpath {
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
-                                state_stack_.emplace_back(path_state::expression_lhs);                                
+                                state_stack_.emplace_back(path_state::union_element);                                
                                 ++p_;
                                 ++column_;
                                 break;
