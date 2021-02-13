@@ -308,6 +308,21 @@
                 "comment" : "JSONPath union of multiple different paths",
                 "expression" : "$['name',@.address.city]",
                 "result" : ["John","Nara"]
+            },
+            {
+                "comment" : "JSONPath union of multiple different paths",
+                "expression" : "$['name',*]",
+                "result" : ["John",{"city":"Nara"},26,"John"]
+            },
+            {
+                "comment" : "JSONPath union of multiple different paths",
+                "expression" : "$['name',?(@.name == 'John')]",
+                "result" : ["John"]
+            },
+            {
+                "comment" : "JSONPath union of multiple different paths",
+                "expression" : "$['name',?(@.city == 'Nara')]",
+                "result" : ["John",{"city":"Nara"}]
             }
         ]
     }

@@ -2024,11 +2024,18 @@ namespace jsoncons { namespace jsonpath {
                                 ++column_;
                                 break;
                             }
+                            case '*':
+                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
+                                if (ec) {return path_expression_type();}
+                                state_stack_.back() = path_state::expression_rhs;
+                                ++p_;
+                                ++column_;
+                                break;
                             case '$':
                                 push_token(token_type(root_node_arg), ec);
                                 push_token(token_type(jsoncons::make_unique<root_selector>(selector_id++)), ec);
                                 if (ec) {return path_expression_type();}
-                                state_stack_.back() = path_state::expression_rhs;                                
+                                state_stack_.back() = path_state::expression_rhs;
                                 ++p_;
                                 ++column_;
                                 break;
