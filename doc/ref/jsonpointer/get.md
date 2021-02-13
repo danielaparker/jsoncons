@@ -243,7 +243,7 @@ Output:
 (12) 8
 ```
 
-#### get with create if missing
+#### Get a value at a location after creating objects when missing an object key
 
 ```c++
 #include <iostream>

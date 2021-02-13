@@ -94,7 +94,7 @@ Output:
 {"baz":"qux","foo":"bar"}
 ```
 
-#### Insert an element to the second position in an array
+#### Add an element to the second position in an array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -126,7 +126,7 @@ Output:
 {"foo":["bar","qux","baz"]}
 ```
 
-#### Insert a value at the end of an array
+#### Add a value at the end of an array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -158,7 +158,7 @@ Output:
 {"foo":["bar","baz","qux"]}
 ```
 
-#### Attempt to add_if_absent object member at a location that already exists
+#### Try to add an object member at a location that already exists
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -190,7 +190,7 @@ Output:
 Key already exists
 ```
 
-#### Attempt to add_if_absent value to a location in an array that exceeds the size of the array
+#### Try to add a value to a location in an array that exceeds the size of the array
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -222,7 +222,7 @@ Output:
 Index exceeds array size
 ```
 
-#### add_if_absent with create if missing
+#### Add a value to a location after creating objects when missing an object key
 
 ```c++
 #include <iostream>
