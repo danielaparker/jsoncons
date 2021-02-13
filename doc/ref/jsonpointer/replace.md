@@ -128,7 +128,7 @@ Output:
 }
 ```
 
-#### Replace a value at a location after creating objects when missing an object key
+#### Replace a value at a location after creating objects when missing object keys
 
 ```c++
 #include <iostream>

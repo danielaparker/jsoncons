@@ -165,7 +165,7 @@ m~n
 (3) "qux"
 ```
 
-#### Add a value to a location after creating objects when missing an object key (since 0.162.0)
+#### Add a value to a location after creating objects when missing object keys (since 0.162.0)
 
 ```c++
 #include <iostream>

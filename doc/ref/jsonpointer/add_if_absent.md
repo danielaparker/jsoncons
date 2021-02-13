@@ -222,7 +222,7 @@ Output:
 Index exceeds array size
 ```
 
-#### Add a value to a location after creating objects when missing an object key
+#### Add a value to a location after creating objects when missing object keys
 
 ```c++
 #include <iostream>
