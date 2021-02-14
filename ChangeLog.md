@@ -1,11 +1,22 @@
 master
 ------
 
-Enhancements
+Enhancements to jsonpointer
 
 - The jsonpointer functions `get`, `add`, `add_if_absent`, and `replace`
 have an additonal overload with a `create_if_missing` parameter. If
-passed `true`, creates key-object pairs when object key is missing.
+passed `true`, creates key-object pairs when object keys are missing.
+
+Enhancements to jsonpath
+
+- Improved syntax checking for JSONPath unions
+- Simplified function signatures for `make_expression`, `json_query`,
+and `json_replace`.
+
+Changes:
+
+- The jsonpointer function `insert` has been deprecated and renamed to `add_if_absent`,
+for consistency with the other names.
 
 v0.161.0
 --------
