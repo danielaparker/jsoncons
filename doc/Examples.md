@@ -2969,10 +2969,10 @@ int main()
         ptr /= key;
     }
 
-    json doc;
-    jsonpointer::add(doc, ptr, "str", true);
+    json j;
+    jsonpointer::add(j, ptr, "str", true);
 
-    std::cout << pretty_print(doc) << "\n\n";
+    std::cout << pretty_print(j) << "\n\n";
 }
 ```
 
