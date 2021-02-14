@@ -49,6 +49,7 @@
 ### Construct
 
 [Construct a json object](#C1)  
+[Insert a value into a location after creating objects when missing object keys](#C3)  
 [Construct a json array](#C2)  
 [Construct a json byte string](#C6)  
 [Construct a multidimensional json array](#C7)  
@@ -2917,6 +2918,63 @@ json file_settings( json_object_arg,{
         {"Limit File Size To", 10000}
     });
 };
+```
+
+<div id="C3"/>
+
+#### Insert a value into a location after creating objects when missing object keys
+
+Suppose you have
+
+```c++
+json j; // empty object
+
+std::vector<std::string> keys = {"foo","bar","baz"}; // vector of keys
+```
+and wish to construct:
+```json
+{"foo":{"bar":{"baz":"str"}}}
+```
+
+You can accomplish this in a loop as follows:
+
+```c++
+json* ptr = &j;
+
+for (const auto& item : keys)
+{
+    auto r = ptr->try_emplace(item, json());
+    ptr = &r.first->value();
+}
+*ptr = "str";
+}
+```
+
+Since 0.162.0, you can also accomplish this with [jsonpointer::add](https://github.com/danielaparker/jsoncons/blob/master/doc/ref/jsonpointer/add.md):
+
+```c++
+#include <iostream>
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
+
+using jsoncons::json;
+namespace jsonpointer = jsoncons::jsonpointer;
+
+int main()
+{
+    std::vector<std::string> keys = {"foo","bar","baz"};
+
+    jsonpointer::json_pointer ptr;
+    for (const auto& key : keys)
+    {
+        ptr /= key;
+    }
+
+    json doc;
+    jsonpointer::add(doc, ptr, "str", true);
+
+    std::cout << pretty_print(doc) << "\n\n";
+}
 ```
 
 <div id="C2"/>
