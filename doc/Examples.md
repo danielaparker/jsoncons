@@ -2944,7 +2944,7 @@ json* ptr = &j;
 for (const auto& item : keys)
 {
     auto r = ptr->try_emplace(item, json());
-    ptr = &r.first->value();
+    ptr = std::addressof(r.first->value());
 }
 *ptr = "str";
 ```
