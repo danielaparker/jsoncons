@@ -141,7 +141,6 @@
                 "patch": [
                     { "op": "test", "path": "/baz", "value": "bar" }
                   ],
-                "result":  { "baz": "qux" },
                 "error": "path error"
              }
          ]
@@ -190,7 +189,6 @@
                 "patch": [
                     { "op": "add", "path": "/baz/bat", "value": "qux" }
                   ],
-                "result":  { "foo": "bar" },
                 "error": "nonexistent target"
              }
          ]
@@ -226,10 +224,6 @@
                 "patch": [
                     {"op": "test", "path": "/~01", "value": "10"}
                   ],
-                "result":  {
-                    "/": 9,
-                    "~1": 10
-                  },
                 "error" : "The document value is numeric, whereas the value being tested for is a string."
              }
          ]

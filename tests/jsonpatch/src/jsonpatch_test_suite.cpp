@@ -54,6 +54,25 @@ void jsonpatch_tests(const std::string& fpath)
                 }
                 CHECK(target == expected);
             }
+            else if (test_case.contains("error"))
+            {
+                json target = test_group.at("given");
+                std::error_code ec;
+                jsonpatch::apply_patch(target, patch, ec);
+                const json& expected = test_group.at("given");
+                if (target != expected)
+                {
+                    if (test_case.contains("comment"))
+                    {
+                        std::cout << "\n" << test_case["comment"] << "\n";
+                    }
+                    std::cout << "Input: " << pretty_print(test_group.at("given")) << "\n\n";
+                    std::cout << "Patch: " << pretty_print(patch) << "\n\n";
+                    std::cout << "Target: " << pretty_print(target) << "\n\n";
+                    std::cout << "Expected: " << pretty_print(expected) << "\n\n";
+                }
+                CHECK(target == expected);
+            }
         }
     }
 }

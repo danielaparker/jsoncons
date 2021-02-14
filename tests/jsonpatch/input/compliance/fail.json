@@ -9,7 +9,6 @@
                      { "op": "add", "path": "/foo", "value": [ "bar", "baz" ] },
                      { "op": "add", "path": "/baz/bat", "value": "qux" } // nonexistent target
                  ],
-                "result": { "foo": "bar"},
                 "error" : "fail"
              }
          ]
@@ -27,10 +26,6 @@
                      { "op": "remove", "path": "/foo/2" },
                      { "op": "remove", "path": "/foo/2" } // nonexistent target
                  ],
-                "result": {
-                     "baz": "boo",
-                     "foo": [ "bar", "qux", "baz" ]
-                 },
                 "error" : "fail"
              }
          ]
@@ -50,10 +45,6 @@
                      { "op": "replace", "path": "/foo/2", "value" : "qux" },
                      { "op": "remove", "path": "/foo/3" } // nonexistent target
                  ],
-                "result": {
-                     "baz": ["boo"],
-                     "foo": [ "bar", "qux", "baz" ]
-                 },
                 "error" : "fail"
              }
          ]
