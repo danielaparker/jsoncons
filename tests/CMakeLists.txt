@@ -48,8 +48,15 @@ set(JSONCONS_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/include)
 set(JSONCONS_THIRD_PARTY_INCLUDE_DIR ${JSONCONS_PROJECT_DIR}/third_party)
 
 set(CATCH_INCLUDE_DIR ${JSONCONS_THIRD_PARTY_INCLUDE_DIR}/catch)
-add_library(Catch INTERFACE)
-target_include_directories (Catch INTERFACE ${CATCH_INCLUDE_DIR})
+add_library(catch INTERFACE)
+
+if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
+    target_compile_features(catch INTERFACE cxx_range_for)  # for C++11 - flags
+else()
+    target_compile_features(catch INTERFACE cxx_std_11)
+endif()
+
+target_include_directories (catch INTERFACE ${CATCH_INCLUDE_DIR})
 
 add_executable(unit_tests 
                src/main.cpp
@@ -158,7 +165,7 @@ add_executable(unit_tests
 )
 
 if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
-    target_compile_features(unit_tests INTERFACE cxx_range_for) # for C++11 - flags
+    target_compile_features(unit_tests INTERFACE cxx_range_for)  # for C++11 - flags
 else()
     target_compile_features(unit_tests INTERFACE cxx_std_11)
 endif()
@@ -189,5 +196,5 @@ target_include_directories (unit_tests
                             PRIVATE ${JSONCONS_TESTS_DIR}
                             PRIVATE ${JSONCONS_THIRD_PARTY_INCLUDE_DIR})
 
-target_link_libraries(unit_tests Catch)
+target_link_libraries(unit_tests catch)
 
