@@ -157,7 +157,11 @@ add_executable(unit_tests
                src/wjson_tests.cpp
 )
 
-target_compile_features(unit_tests INTERFACE cxx_std_11)
+if (${CMAKE_VERSION} VERSION_LESS "3.8.0")
+    target_compile_features(unit_tests INTERFACE cxx_range_for) # for C++11 - flags
+else()
+    target_compile_features(unit_tests INTERFACE cxx_std_11)
+endif()
 
 target_compile_options(unit_tests PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>: /EHsc /MP /bigobj /W4>
