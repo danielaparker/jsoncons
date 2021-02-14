@@ -93,6 +93,19 @@ namespace detail {
             op_type op;
             string_type path;
             Json value;
+
+            entry(op_type op, const string_type& path, const Json& value)
+                : op(op), path(path), value(value)
+            {
+            }
+
+            entry(const entry&) = default;
+
+            entry(entry&&) = default;
+
+            entry& operator=(const entry&) = default;
+
+            entry& operator=(entry&&) = default;
         };
 
         Json& target;
@@ -322,13 +335,13 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                             }
                             else
                             {
-                                unwinder.stack.push_back({detail::op_type::replace,npath,orig_val});
+                                unwinder.stack.emplace_back(detail::op_type::replace,npath,orig_val);
                             }
                         }
                     }
                     else // insert without replace succeeded
                     {
-                        unwinder.stack.push_back({detail::op_type::remove,npath,Json::null()});
+                        unwinder.stack.emplace_back(detail::op_type::remove,npath,Json::null());
                     }
                 }
             }
@@ -351,7 +364,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                     else
                     {
-                        unwinder.stack.push_back({detail::op_type::add,string_type(path),val});
+                        unwinder.stack.emplace_back(detail::op_type::add,string_type(path),val);
                     }
                 }
             }
@@ -379,7 +392,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                     }
                     else
                     {
-                        unwinder.stack.push_back({detail::op_type::replace,string_type(path),val});
+                        unwinder.stack.emplace_back(detail::op_type::replace,string_type(path),val);
                     }
                 }
             }
@@ -410,7 +423,7 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                         }
                         else
                         {
-                            unwinder.stack.push_back({detail::op_type::add,string_type(from),val});
+                            unwinder.stack.emplace_back(detail::op_type::add,string_type(from),val);
                             // add
                             std::error_code insert_ec;
                             auto npath = jsonpatch::detail::normalized_path(target,path);
@@ -436,14 +449,14 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                                     }
                                     else
                                     {
-                                        unwinder.stack.push_back({jsoncons::jsonpatch::detail::op_type::replace,npath,orig_val });
+                                        unwinder.stack.emplace_back(jsoncons::jsonpatch::detail::op_type::replace,npath,orig_val);
                                     }
                                     
                                 }
                             }
                             else
                             {
-                                unwinder.stack.push_back({detail::op_type::remove,npath,Json::null()});
+                                unwinder.stack.emplace_back(detail::op_type::remove,npath,Json::null());
                             }
                         }           
                     }
@@ -492,13 +505,13 @@ void apply_patch(Json& target, const Json& patch, std::error_code& patch_ec)
                                 }
                                 else
                                 {
-                                    unwinder.stack.push_back({jsoncons::jsonpatch::detail::op_type::replace,npath,orig_val });
+                                    unwinder.stack.emplace_back(jsoncons::jsonpatch::detail::op_type::replace,npath,orig_val);
                                 }
                             }
                         }
                         else
                         {
-                            unwinder.stack.push_back({detail::op_type::remove,npath,Json::null()});
+                            unwinder.stack.emplace_back(detail::op_type::remove,npath,Json::null());
                         }
                     }
                 }
