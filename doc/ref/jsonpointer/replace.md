@@ -142,14 +142,14 @@ int main()
 {
     std::vector<std::string> keys = {"foo","bar","baz"};
 
-    jsonpointer::json_pointer ptr;
+    jsonpointer::json_pointer location;
     for (const auto& key : keys)
     {
-        ptr /= key;
+        location /= key;
     }
 
     json doc;
-    jsonpointer::replace(doc, ptr, "str", true);
+    jsonpointer::replace(doc, location, "str", true);
 
     std::cout << pretty_print(doc) << "\n\n";
 }

@@ -236,14 +236,14 @@ int main()
 {
     std::vector<std::string> keys = { "foo","bar","baz" };
 
-    jsonpointer::json_pointer ptr;
+    jsonpointer::json_pointer location;
     for (const auto& key : keys)
     {
-        ptr /= key;
+        location /= key;
     }
 
     json doc;
-    jsonpointer::add_if_absent(doc, ptr, "str", true);
+    jsonpointer::add_if_absent(doc, location, "str", true);
 
     std::cout << pretty_print(doc) << "\n\n";
 }

@@ -179,14 +179,14 @@ int main()
 {
     std::vector<std::string> keys = {"foo","bar","baz"};
 
-    jsonpointer::json_pointer ptr;
+    jsonpointer::json_pointer location;
     for (const auto& key : keys)
     {
-        ptr /= key;
+        location /= key;
     }
 
     json doc;
-    jsonpointer::add(doc, ptr, "str", true);
+    jsonpointer::add(doc, location, "str", true);
 
     std::cout << pretty_print(doc) << "\n\n";
 }

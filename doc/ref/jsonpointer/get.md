@@ -257,14 +257,14 @@ int main()
 {
     std::vector<std::string> keys = {"foo","bar","baz"};
 
-    jsonpointer::json_pointer ptr;
+    jsonpointer::json_pointer location;
     for (const auto& key : keys)
     {
-        ptr /= key;
+        location /= key;
     }
 
     json doc;
-    json result = jsonpointer::get(doc, ptr, true);
+    json result = jsonpointer::get(doc, location, true);
 
     std::cout << pretty_print(doc) << "\n\n";
 }
