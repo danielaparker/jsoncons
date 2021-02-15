@@ -1,5 +1,5 @@
-master
-------
+v0.162.0
+--------
 
 Enhancements to jsonpointer
 
@@ -10,8 +10,7 @@ passed `true`, creates key-object pairs when object keys are missing.
 Enhancements to jsonpath
 
 - Improved syntax checking for JSONPath unions
-- Simplified function signatures for `make_expression`, `json_query`,
-and `json_replace`.
+- Simplified function signatures for `make_expression`, `json_query`, and `json_replace`.
 
 Changes:
 
