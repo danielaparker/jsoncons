@@ -131,6 +131,7 @@ add_executable(unit_tests
                src/json_type_traits_tests.cpp
                src/json_validation_tests.cpp
                jsonpatch/src/jsonpatch_tests.cpp
+               jsonpatch/src/jsonpatch_test_suite.cpp
                jsonpath/src/jsonpath_flatten_tests.cpp
                jsonpath/src/jsonpath_test_suite.cpp
                jsonpath/src/jsonpath_json_query_tests.cpp
