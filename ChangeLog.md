@@ -1,3 +1,8 @@
+master
+------
+
+- Fixed [gcc sign-compare warning](https://github.com/danielaparker/jsoncons/issues/307)
+
 v0.162.0
 --------
 
