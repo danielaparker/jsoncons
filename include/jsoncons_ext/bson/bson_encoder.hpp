@@ -431,13 +431,13 @@ private:
             default:
             {
                 bool more;
-                if (val <= (std::numeric_limits<int32_t>::max)())
+                if (val <= static_cast<uint64_t>((std::numeric_limits<int32_t>::max)()))
                 {
                     before_value(jsoncons::bson::detail::bson_format::int32_cd);
                     jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
                     more = true;
                 }
-                else if (val <= (uint64_t)(std::numeric_limits<int64_t>::max)())
+                else if (val <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
                     before_value(jsoncons::bson::detail::bson_format::int64_cd);
                     jsoncons::detail::native_to_little(static_cast<uint64_t>(val),std::back_inserter(buffer_));
