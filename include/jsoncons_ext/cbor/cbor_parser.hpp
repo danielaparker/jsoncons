@@ -712,7 +712,7 @@ private:
         {
             return 0;
         }
-        std::size_t len = (std::size_t)u;
+        std::size_t len = static_cast<std::size_t>(u);
         if (len != u)
         {
             ec = cbor_errc::number_too_large;

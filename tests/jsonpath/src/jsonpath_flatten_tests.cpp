@@ -43,20 +43,20 @@ TEST_CASE("jsonpath flatten test")
     {
         json result = jsonpath::flatten(input);
 
-        REQUIRE(result.is_object());
-        REQUIRE(result.size() == 9);
+        REQUIRE(result.is_object()); //-V521
+        REQUIRE(result.size() == 9); //-V521
 
         //std::cout << pretty_print(result) << "\n";
 
-        CHECK(result["$['application']"].as<std::string>() == std::string("hiking"));
-        CHECK(result["$['reputons'][0]['assertion']"].as<std::string>() == std::string("advanced"));
-        CHECK(result["$['reputons'][0]['rated']"].as<std::string>() == std::string("Marilyn C"));
-        CHECK(result["$['reputons'][0]['rater']"].as<std::string>() == std::string("HikingAsylum"));
-        CHECK(result["$['reputons'][0]['rating']"].as<double>() == Approx(0.9).epsilon(0.0000001));
-        CHECK(result["$['reputons'][1]['assertion']"].as<std::string>() == std::string("intermediate"));
-        CHECK(result["$['reputons'][1]['rated']"].as<std::string>() == std::string("Hongmin"));
-        CHECK(result["$['reputons'][1]['rater']"].as<std::string>() == std::string("HikingAsylum"));
-        CHECK(result["$['reputons'][1]['rating']"].as<double>() == Approx(0.75).epsilon(0.0000001));
+        CHECK(result["$['application']"].as<std::string>() == std::string("hiking")); //-V521
+        CHECK(result["$['reputons'][0]['assertion']"].as<std::string>() == std::string("advanced")); //-V521
+        CHECK(result["$['reputons'][0]['rated']"].as<std::string>() == std::string("Marilyn C")); //-V521
+        CHECK(result["$['reputons'][0]['rater']"].as<std::string>() == std::string("HikingAsylum")); //-V521
+        CHECK(result["$['reputons'][0]['rating']"].as<double>() == Approx(0.9).epsilon(0.0000001)); //-V521
+        CHECK(result["$['reputons'][1]['assertion']"].as<std::string>() == std::string("intermediate")); //-V521
+        CHECK(result["$['reputons'][1]['rated']"].as<std::string>() == std::string("Hongmin")); //-V521
+        CHECK(result["$['reputons'][1]['rater']"].as<std::string>() == std::string("HikingAsylum")); //-V521
+        CHECK(result["$['reputons'][1]['rating']"].as<double>() == Approx(0.75).epsilon(0.0000001)); //-V521
 
         //std::cout << pretty_print(result) << "\n";
     }
@@ -68,7 +68,7 @@ TEST_CASE("jsonpath flatten test")
 
         json original = jsonpath::unflatten(result);
         //std::cout << pretty_print(original) << "\n";
-        CHECK(original == input);
+        CHECK(original == input); //-V521
     }
 }
 
@@ -83,7 +83,7 @@ TEST_CASE("jsonpath flatten array test")
 
         json original = jsonpath::unflatten(result);
         //std::cout << pretty_print(original) << "\n";
-        CHECK(original == input);
+        CHECK(original == input); //-V521
     }
 
 }
@@ -101,7 +101,7 @@ TEST_CASE("jsonpath flatten with single quote test")
         json result = jsonpath::flatten(input);
 
         json original = jsonpath::unflatten(result);
-        CHECK(original == input);
+        CHECK(original == input); //-V521
     }
 }
 
@@ -112,11 +112,11 @@ namespace {
                        const std::string& value)
     {
     	auto result = jsoncons::jsonpath::json_query(doc, path);
-    	CHECK_FALSE(result.empty()); // must match
-        CHECK_FALSE(result.size() > 1); // too many matches
+    	CHECK_FALSE(result.empty()); // must match //-V521
+        CHECK_FALSE(result.size() > 1); // too many matches //-V521
 
         auto matched_value = result[0].as<std::string>();
-        CHECK(value == matched_value);
+        CHECK(value == matched_value); //-V521
     }
 
 } // namespace

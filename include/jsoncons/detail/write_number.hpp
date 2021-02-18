@@ -312,7 +312,7 @@ namespace detail {
                 return false;
             }
         }
-        dump_buffer(buffer, length, decimal_point, result);
+        dump_buffer(buffer, static_cast<std::size_t>(length), decimal_point, result);
         return true;
     }
 

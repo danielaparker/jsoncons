@@ -149,7 +149,7 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             return false;
         } 
-        stack_.push_back(stack_item(cbor_container_type::indefinite_length_object));
+        stack_.emplace_back(cbor_container_type::indefinite_length_object);
         
         sink_.push_back(0xbf);
         return true;
@@ -162,7 +162,7 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             return false;
         } 
-        stack_.push_back(stack_item(cbor_container_type::object, length));
+        stack_.emplace_back(cbor_container_type::object, length);
 
         if (length <= 0x17)
         {
@@ -237,7 +237,7 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             return false;
         } 
-        stack_.push_back(stack_item(cbor_container_type::indefinite_length_array));
+        stack_.emplace_back(cbor_container_type::indefinite_length_array);
         sink_.push_back(0x9f);
         return true;
     }
@@ -249,7 +249,7 @@ private:
             ec = cbor_errc::max_nesting_depth_exceeded;
             return false;
         } 
-        stack_.push_back(stack_item(cbor_container_type::array, length));
+        stack_.emplace_back(cbor_container_type::array, length);
         if (length <= 0x17)
         {
             jsoncons::detail::native_to_big(static_cast<uint8_t>(0x80 + length), 

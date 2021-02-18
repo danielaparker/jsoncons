@@ -114,7 +114,7 @@ namespace jsoncons {
                 // if the URI is not opaque and the path is not already prefixed
                 // with a '/', add one.
                 path_.first = uri_.length();
-                if (!host.empty() && (!path.empty() && path.front() != '/')) 
+                if (!host.empty() && (path.front() != '/')) 
                 {
                     uri_.push_back('/');
                 }

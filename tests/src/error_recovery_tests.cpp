@@ -17,7 +17,7 @@ class relaxed_error_handler
 {
 public:
 
-    bool operator()(std::error_code ec,
+    bool operator()(const std::error_code& ec,
                     const ser_context&) noexcept 
     {
         if (ec == jsoncons::json_errc::extra_comma)

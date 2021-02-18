@@ -47,13 +47,13 @@ void container_example1()
     std::array<unsigned long, 4> array1 {{1, 2, 3, 4}};
     json j_array1(array1);
 
-    std::set<std::string> set1{"one", "two", "three", "four", "one"};
-    json j_set1(set1); // only one entry for "one" is used
+    std::set<std::string> set1{"one", "two", "three", "four"};
+    json j_set1(set1); 
     std::cout << j_set1 << std::endl;
     // ["four", "one", "three", "two"]
 
-    std::unordered_set<std::string> uset1{"one", "two", "three", "four", "one"};
-    json j_uset1(uset1); // only one entry for "one" is used
+    std::unordered_set<std::string> uset1{"one", "two", "three", "four"};
+    json j_uset1(uset1); 
     std::cout << j_uset1 << std::endl;
     // maybe ["two", "three", "four", "one"]
 

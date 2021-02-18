@@ -918,7 +918,6 @@ namespace jsoncons { namespace jsonpath {
         {
             std::size_t selector_id = 0;
 
-            string_type function_name;
             string_type buffer;
             int64_t json_text_level = 0;
             uint32_t cp = 0;

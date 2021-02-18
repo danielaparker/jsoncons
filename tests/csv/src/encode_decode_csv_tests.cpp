@@ -76,11 +76,11 @@ TEST_CASE("encode decode csv source")
     SECTION("from string")
     {
         cpp_type v = csv::decode_csv<cpp_type>(input, options);
-        REQUIRE(v.size() == 2);
-        CHECK(std::get<0>(v[0]) == "a");
-        CHECK(std::get<1>(v[0]) == 1);
-        CHECK(std::get<0>(v[1]) == "b");
-        CHECK(std::get<1>(v[1]) == 2);
+        REQUIRE(v.size() == 2); //-V521
+        CHECK(std::get<0>(v[0]) == "a"); //-V521
+        CHECK(std::get<1>(v[0]) == 1); //-V521
+        CHECK(std::get<0>(v[1]) == "b"); //-V521
+        CHECK(std::get<1>(v[1]) == 2); //-V521
 
         std::string s2;
         csv::encode_csv(v, s2, options);
@@ -88,21 +88,21 @@ TEST_CASE("encode decode csv source")
         json j1 = csv::decode_csv<json>(input);
         json j2 = csv::decode_csv<json>(s2);
 
-        CHECK(j2 == j1);
+        CHECK(j2 == j1); //-V521
 
         json j3 = csv::decode_csv<json>(s2.begin(), s2.end());
-        CHECK(j3 == j1);
+        CHECK(j3 == j1); //-V521
     }
 
     SECTION("from stream")
     {
         std::stringstream is(input);
         cpp_type v = csv::decode_csv<cpp_type>(is, options);
-        REQUIRE(v.size() == 2);
-        CHECK(std::get<0>(v[0]) == "a");
-        CHECK(std::get<1>(v[0]) == 1);
-        CHECK(std::get<0>(v[1]) == "b");
-        CHECK(std::get<1>(v[1]) == 2);
+        REQUIRE(v.size() == 2); //-V521
+        CHECK(std::get<0>(v[0]) == "a"); //-V521
+        CHECK(std::get<1>(v[0]) == 1); //-V521
+        CHECK(std::get<0>(v[1]) == "b"); //-V521
+        CHECK(std::get<1>(v[1]) == 2); //-V521
 
         std::stringstream ss2;
         csv::encode_csv(v, ss2, options);
@@ -110,17 +110,17 @@ TEST_CASE("encode decode csv source")
         json j1 = csv::decode_csv<json>(input);
 
         json j2 = csv::decode_csv<json>(ss2);
-        CHECK(j2 == j1);
+        CHECK(j2 == j1); //-V521
     }
 
     SECTION("from iterator")
     {
         cpp_type v = csv::decode_csv<cpp_type>(input.begin(), input.end(), options);
-        REQUIRE(v.size() == 2);
-        CHECK(std::get<0>(v[0]) == "a");
-        CHECK(std::get<1>(v[0]) == 1);
-        CHECK(std::get<0>(v[1]) == "b");
-        CHECK(std::get<1>(v[1]) == 2);
+        REQUIRE(v.size() == 2); //-V521
+        CHECK(std::get<0>(v[0]) == "a"); //-V521
+        CHECK(std::get<1>(v[0]) == 1); //-V521
+        CHECK(std::get<0>(v[1]) == "b"); //-V521
+        CHECK(std::get<1>(v[1]) == 2); //-V521
 
         std::stringstream ss2;
         csv::encode_csv(v, ss2, options);
@@ -128,7 +128,7 @@ TEST_CASE("encode decode csv source")
         json j1 = csv::decode_csv<json>(input);
         json j2 = csv::decode_csv<json>(ss2);
 
-        CHECK(j2 == j1);
+        CHECK(j2 == j1); //-V521
     }
 
     SECTION("from custom iterator")
@@ -137,11 +137,11 @@ TEST_CASE("encode decode csv source")
         MyIterator end(input.data() + input.length());
 
         cpp_type v = csv::decode_csv<cpp_type>(it, end, options);
-        REQUIRE(v.size() == 2);
-        CHECK(std::get<0>(v[0]) == "a");
-        CHECK(std::get<1>(v[0]) == 1);
-        CHECK(std::get<0>(v[1]) == "b");
-        CHECK(std::get<1>(v[1]) == 2);
+        REQUIRE(v.size() == 2); //-V521
+        CHECK(std::get<0>(v[0]) == "a"); //-V521
+        CHECK(std::get<1>(v[0]) == 1); //-V521
+        CHECK(std::get<0>(v[1]) == "b"); //-V521
+        CHECK(std::get<1>(v[1]) == 2); //-V521
 
         std::stringstream ss2;
         csv::encode_csv(v, ss2, options);
@@ -149,7 +149,7 @@ TEST_CASE("encode decode csv source")
         json j1 = csv::decode_csv<json>(input);
         json j2 = csv::decode_csv<json>(ss2);
 
-        CHECK(j2 == j1);
+        CHECK(j2 == j1); //-V521
     }
 }
 

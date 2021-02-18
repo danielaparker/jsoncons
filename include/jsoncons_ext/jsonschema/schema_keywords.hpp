@@ -846,7 +846,7 @@ namespace jsonschema {
             if (it != sch.object_range().end()) 
             {
                 for (const auto& prop : it->value().object_range())
-                    pattern_properties_.push_back(
+                    pattern_properties_.emplace_back(
                         std::make_pair(
                             std::regex(prop.key(), std::regex::ECMAScript),
                             builder->build(prop.value(), uris, {prop.key()})));
@@ -1141,7 +1141,7 @@ namespace jsonschema {
                     else 
                     {
                         item_validator = *item;
-                        item++;
+                        ++item;
                     }
 
                     if (!item_validator)

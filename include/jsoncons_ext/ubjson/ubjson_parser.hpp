@@ -788,7 +788,7 @@ private:
                 int32_t val = jsoncons::detail::big_to_native<int32_t>(buf, sizeof(buf));
                 if (val >= 0)
                 {
-                    length = val;
+                    length = static_cast<std::size_t>(val);
                 }
                 else
                 {

@@ -309,7 +309,7 @@ namespace jsonschema {
                 {
                     uri_wrapper relative(id); 
                     uri_wrapper new_uri = relative.resolve(new_uris.back());
-                    new_uris.push_back(new_uri.string()); 
+                    new_uris.emplace_back(new_uri.string()); 
                 }
             }
         }

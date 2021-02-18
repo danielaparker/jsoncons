@@ -41,7 +41,6 @@ TEST_CASE("serialize array to msgpack")
 
 TEST_CASE("Too many and too few items in MessagePack object or array")
 {
-    std::error_code ec{};
     std::vector<uint8_t> v;
     msgpack::msgpack_bytes_encoder encoder(v);
 

@@ -40,7 +40,6 @@ TEST_CASE("serialize array to ubjson")
 
 TEST_CASE("Too many and too few items in UBJSON object or array")
 {
-    std::error_code ec{};
     std::vector<uint8_t> v;
     ubjson::ubjson_bytes_encoder encoder(v);
 

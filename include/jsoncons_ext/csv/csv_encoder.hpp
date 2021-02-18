@@ -333,7 +333,7 @@ private:
                 buffered_line_[string_type(name)] = std::basic_string<CharT>();
                 if (stack_[0].count_ == 0 && options_.column_names().size() == 0)
                 {
-                    strings_buffer_.push_back(string_type(name));
+                    strings_buffer_.emplace_back(name);
                 }
                 break;
             }
@@ -341,7 +341,7 @@ private:
             {
                 if (strings_buffer_.empty())
                 {
-                    strings_buffer_.push_back(string_type(name));
+                    strings_buffer_.emplace_back(name);
                 }
                 else
                 {

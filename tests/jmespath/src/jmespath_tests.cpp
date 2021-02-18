@@ -22,7 +22,7 @@ using namespace jsoncons;
 void jmespath_tests(const std::string& fpath)
 {
     std::fstream is(fpath);
-    REQUIRE(is);
+    REQUIRE(is); //-V521
 
     json tests = json::parse(is);
     for (const auto& test_group : tests.array_range())
@@ -49,7 +49,7 @@ void jmespath_tests(const std::string& fpath)
                         std::cout << "Actual: " << pretty_print(actual) << "\n\n";
                         std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                     }
-                    CHECK(actual == expected);
+                    CHECK(actual == expected); //-V521
                 }
                 else if (test_case.contains("error"))
                 {
@@ -61,7 +61,7 @@ void jmespath_tests(const std::string& fpath)
                     std::cout << "Input:\n" << pretty_print(root) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Actual: " << pretty_print(actual) << "\n\n";
-                    CHECK(false);
+                    CHECK(false); //-V521
                 }
 
             }
@@ -78,7 +78,7 @@ void jmespath_tests(const std::string& fpath)
                     std::cout << "Input\n" << pretty_print(root) << "\n\n";
                     std::cout << "Expression: " << expr << "\n\n";
                     std::cout << "Expected: " << expected << "\n\n";
-                    CHECK(false);
+                    CHECK(false); //-V521
                 }
             }
         }

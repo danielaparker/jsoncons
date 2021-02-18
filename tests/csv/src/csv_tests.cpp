@@ -1084,21 +1084,21 @@ TEST_CASE("csv_test1_repeat")
     CHECK(result2[1].level == 1);
     CHECK(0 == result2[1].rep_count);
     CHECK(result2[2].col_type == csv::csv_column_type::repeat_t);
-    CHECK(result2[2].level == 1);
-    CHECK(1 == result2[2].rep_count);
+    CHECK(result2[2].level == 1); //-V521
+    CHECK(1 == result2[2].rep_count); //-V521
 
     std::vector<csv::csv_type_info> result3;
     jsoncons::csv::detail::parse_column_types(std::string("string,[float]*"), result3);
-    REQUIRE(result3.size() == 3);
-    CHECK(result3[0].col_type == csv::csv_column_type::string_t);
-    CHECK(result3[0].level == 0);
-    CHECK(0 == result3[0].rep_count);
-    CHECK(result3[1].col_type == csv::csv_column_type::float_t);
-    CHECK(result3[1].level == 1);
-    CHECK(0 == result3[1].rep_count);
-    CHECK(result3[2].col_type == csv::csv_column_type::repeat_t);
-    CHECK(result3[2].level == 0);
-    CHECK(1 == result3[2].rep_count);
+    REQUIRE(result3.size() == 3); //-V521
+    CHECK(result3[0].col_type == csv::csv_column_type::string_t); //-V521
+    CHECK(result3[0].level == 0); //-V521
+    CHECK(0 == result3[0].rep_count); //-V521
+    CHECK(result3[1].col_type == csv::csv_column_type::float_t); //-V521
+    CHECK(result3[1].level == 1); //-V521
+    CHECK(0 == result3[1].rep_count); //-V521
+    CHECK(result3[2].col_type == csv::csv_column_type::repeat_t); //-V521
+    CHECK(result3[2].level == 0); //-V521
+    CHECK(1 == result3[2].rep_count); //-V521
 }
 
 TEST_CASE("csv_test1_repeat2")
@@ -1131,15 +1131,15 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    REQUIRE(j.size() == 4);
-    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
-    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
-    CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF"));
-    CHECK(j[1]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
-    CHECK(j[2]["country_code"].as<std::string>() == std::string("VUT"));
-    CHECK(j[2]["name"].as<std::string>() == std::string("VANUATU"));
-    CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF"));
-    CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
+    REQUIRE(j.size() == 4); //-V521
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
+    CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF")); //-V521
+    CHECK(j[1]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF")); //-V521
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("VUT")); //-V521
+    CHECK(j[2]["name"].as<std::string>() == std::string("VANUATU")); //-V521
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF")); //-V521
+    CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS")); //-V521
 
     //std::cout << pretty_print(j) << std::endl;
 }
@@ -1167,17 +1167,17 @@ WLF,WALLIS & FUTUNA ISLANDS
     json j = decoder.get_result();
 
     //std::cout << pretty_print(j) << "\n";
-    REQUIRE(j.size() == 5);
+    REQUIRE(j.size() == 5); //-V521
 
-    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
-    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
-    CHECK(!j[1].contains("country_code")); // ok, no delimiter
-    CHECK(j[2]["country_code"].as<std::string>() == std::string("ATF"));
-    CHECK(j[2]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
-    CHECK(j[3]["country_code"].as<std::string>() == std::string("VUT"));
-    CHECK(j[3]["name"].as<std::string>() == std::string("VANUATU"));
-    CHECK(j[4]["country_code"].as<std::string>() == std::string("WLF"));
-    CHECK(j[4]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
+    CHECK(!j[1].contains("country_code")); // ok, no delimiter //-V521
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("ATF")); //-V521
+    CHECK(j[2]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF")); //-V521
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("VUT")); //-V521
+    CHECK(j[3]["name"].as<std::string>() == std::string("VANUATU")); //-V521
+    CHECK(j[4]["country_code"].as<std::string>() == std::string("WLF")); //-V521
+    CHECK(j[4]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS")); //-V521
 }
 
 TEST_CASE("line_with_one_space")
@@ -1200,16 +1200,16 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    REQUIRE(j.size() == 5);
-    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
-    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
-    CHECK(j[1]["country_code"].as<std::string>() == std::string(" ")); // ok, one space, no delimiter
-    CHECK(j[2]["country_code"].as<std::string>() == std::string("ATF"));
-    CHECK(j[2]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
-    CHECK(j[3]["country_code"].as<std::string>() == std::string("VUT"));
-    CHECK(j[3]["name"].as<std::string>() == std::string("VANUATU"));
-    CHECK(j[4]["country_code"].as<std::string>() == std::string("WLF"));
-    CHECK(j[4]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
+    REQUIRE(j.size() == 5); //-V521
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
+    CHECK(j[1]["country_code"].as<std::string>() == std::string(" ")); // ok, one space, no delimiter //-V521
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("ATF")); //-V521
+    CHECK(j[2]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF")); //-V521
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("VUT")); //-V521
+    CHECK(j[3]["name"].as<std::string>() == std::string("VANUATU")); //-V521
+    CHECK(j[4]["country_code"].as<std::string>() == std::string("WLF")); //-V521
+    CHECK(j[4]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS")); //-V521
 
     //std::cout << pretty_print(j) << std::endl;
 }
@@ -1235,15 +1235,15 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
-    REQUIRE(j.size() == 4);
-    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW"));
-    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA"));
-    CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF"));
-    CHECK(j[1]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF"));
-    CHECK(j[2]["country_code"].as<std::string>() == std::string("VUT"));
-    CHECK(j[2]["name"].as<std::string>() == std::string("VANUATU"));
-    CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF"));
-    CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS"));
+    REQUIRE(j.size() == 4); //-V521
+    CHECK(j[0]["country_code"].as<std::string>() == std::string("ABW")); //-V521
+    CHECK(j[0]["name"].as<std::string>() == std::string("ARUBA")); //-V521
+    CHECK(j[1]["country_code"].as<std::string>() == std::string("ATF")); //-V521
+    CHECK(j[1]["name"].as<std::string>() == std::string("FRENCH SOUTHERN TERRITORIES, D.R. OF")); //-V521
+    CHECK(j[2]["country_code"].as<std::string>() == std::string("VUT")); //-V521
+    CHECK(j[2]["name"].as<std::string>() == std::string("VANUATU")); //-V521
+    CHECK(j[3]["country_code"].as<std::string>() == std::string("WLF")); //-V521
+    CHECK(j[3]["name"].as<std::string>() == std::string("WALLIS & FUTUNA ISLANDS")); //-V521
 
     //std::cout << pretty_print(j) << std::endl;
 }
@@ -1257,10 +1257,10 @@ TEST_CASE("Test decode_csv, terminating newline")
         csv::csv_options options;
         options.assume_header(true);
         auto j = csv::decode_csv<json>(data,options);
-        REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
-        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
-        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+        REQUIRE(j.is_array()); //-V521
+        REQUIRE(j.size() == 2); //-V521
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
 
     SECTION("From stream")
@@ -1270,10 +1270,10 @@ TEST_CASE("Test decode_csv, terminating newline")
         csv::csv_options options;
         options.assume_header(true);
         auto j = csv::decode_csv<json>(is,options);
-        REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
-        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
-        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+        REQUIRE(j.is_array()); //-V521
+        REQUIRE(j.size() == 2); //-V521
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
 
     SECTION("m_columns")
@@ -1282,10 +1282,10 @@ TEST_CASE("Test decode_csv, terminating newline")
         options.assume_header(true)
                .mapping(csv::mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
-        REQUIRE(j.is_object());
-        REQUIRE(j.size() == 1);
-        CHECK(j["some label"][0].as<std::string>() == std::string("some value"));
-        CHECK(j["some label"][1].as<std::string>() == std::string("another value"));
+        REQUIRE(j.is_object()); //-V521
+        REQUIRE(j.size() == 1); //-V521
+        CHECK(j["some label"][0].as<std::string>() == std::string("some value")); //-V521
+        CHECK(j["some label"][1].as<std::string>() == std::string("another value")); //-V521
     }
 }
 
@@ -1298,10 +1298,10 @@ TEST_CASE("Test decode_csv, no terminating newline")
         csv::csv_options options;
         options.assume_header(true);
         auto j = csv::decode_csv<json>(data,options);
-        REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
-        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
-        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+        REQUIRE(j.is_array()); //-V521
+        REQUIRE(j.size() == 2); //-V521
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
 
     SECTION("From stream")
@@ -1311,10 +1311,10 @@ TEST_CASE("Test decode_csv, no terminating newline")
         csv::csv_options options;
         options.assume_header(true);
         auto j = csv::decode_csv<json>(is,options);
-        REQUIRE(j.is_array());
-        REQUIRE(j.size() == 2);
-        CHECK(j[0]["some label"].as<std::string>() == std::string("some value"));
-        CHECK(j[1]["some label"].as<std::string>() == std::string("another value"));
+        REQUIRE(j.is_array()); //-V521
+        REQUIRE(j.size() == 2); //-V521
+        CHECK(j[0]["some label"].as<std::string>() == std::string("some value")); //-V521
+        CHECK(j[1]["some label"].as<std::string>() == std::string("another value")); //-V521
     }
 
     SECTION("m_columns")
@@ -1323,10 +1323,10 @@ TEST_CASE("Test decode_csv, no terminating newline")
         options.assume_header(true)
                .mapping(csv::mapping_kind::m_columns);
         auto j = csv::decode_csv<json>(data,options);
-        REQUIRE(j.is_object());
-        REQUIRE(j.size() == 1);
-        CHECK(j["some label"][0].as<std::string>() == std::string("some value"));
-        CHECK(j["some label"][1].as<std::string>() == std::string("another value"));
+        REQUIRE(j.is_object()); //-V521
+        REQUIRE(j.size() == 1); //-V521
+        CHECK(j["some label"][0].as<std::string>() == std::string("some value")); //-V521
+        CHECK(j["some label"][1].as<std::string>() == std::string("another value")); //-V521
     }
 }
 
@@ -1344,10 +1344,10 @@ TEST_CASE("test encode_csv")
 
         auto j2 = csv::decode_csv<json>(ss, options);
 
-        REQUIRE(j2.is_array());
-        REQUIRE(j2.size() == 1);
-        CHECK(j2[0]["a"].as<int>() == 1);
-        CHECK(j2[0]["b"].as<int>() == 2);
+        REQUIRE(j2.is_array()); //-V521
+        REQUIRE(j2.size() == 1); //-V521
+        CHECK(j2[0]["a"].as<int>() == 1); //-V521
+        CHECK(j2[0]["b"].as<int>() == 2); //-V521
     }
 }
 
@@ -1376,7 +1376,7 @@ TEST_CASE("test_type_inference")
         options.mapping(csv::mapping_kind::n_rows);
 
         ojson j = csv::decode_csv<ojson>(input,options);
-        REQUIRE(j == expected);
+        REQUIRE(j == expected); //-V521
     }
 
     SECTION("n_objects")
@@ -1423,7 +1423,7 @@ TEST_CASE("test_type_inference")
                .mapping(csv::mapping_kind::n_objects);
         ojson j = csv::decode_csv<ojson>(input,options);
 
-        REQUIRE(j == expected);
+        REQUIRE(j == expected); //-V521
     }
     
     SECTION("m_columns")
@@ -1444,7 +1444,7 @@ TEST_CASE("test_type_inference")
                .mapping(csv::mapping_kind::m_columns);
         ojson j = csv::decode_csv<ojson>(input,options);
 
-        REQUIRE(j == expected);
+        REQUIRE(j == expected); //-V521
     }
 }
 
@@ -1463,13 +1463,13 @@ EUR_LIBOR_06M,2015-10-27,0.0000001
            .lossless_number(true);
 
     ojson j = csv::decode_csv<ojson>(input,options);
-    REQUIRE(j.size() == 3);
-    CHECK(j[0]["rate"].tag() == semantic_tag::bigdec);
-    CHECK((j[0]["rate"].as<std::string>() == "0.0000214"));
-    CHECK(j[1]["rate"].tag() == semantic_tag::bigdec);
-    CHECK((j[1]["rate"].as<std::string>() == "0.0000143"));
-    CHECK(j[2]["rate"].tag() == semantic_tag::bigdec);
-    CHECK((j[2]["rate"].as<std::string>() == "0.0000001"));
+    REQUIRE(j.size() == 3); //-V521
+    CHECK(j[0]["rate"].tag() == semantic_tag::bigdec); //-V521
+    CHECK((j[0]["rate"].as<std::string>() == "0.0000214")); //-V521
+    CHECK(j[1]["rate"].tag() == semantic_tag::bigdec); //-V521
+    CHECK((j[1]["rate"].as<std::string>() == "0.0000143")); //-V521
+    CHECK(j[2]["rate"].tag() == semantic_tag::bigdec); //-V521
+    CHECK((j[2]["rate"].as<std::string>() == "0.0000001")); //-V521
 }
 
 // Test case contributed by karimhm
@@ -1483,14 +1483,14 @@ TEST_CASE("csv detect bom")
     
     std::istringstream is(input);
     ojson j = csv::decode_csv<ojson>(is, options);
-    REQUIRE(j.size() == 1);
+    REQUIRE(j.size() == 1); //-V521
     ojson station = j[0];
     
     JSONCONS_TRY {
         auto it = station.find("stop_id");
-        REQUIRE((it != station.object_range().end()));
+        REQUIRE((it != station.object_range().end())); //-V521
         std::string stop_id = it->value().as<std::string>();
-        CHECK((stop_id == "8220B007612"));
+        CHECK((stop_id == "8220B007612")); //-V521
     } JSONCONS_CATCH (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
@@ -1521,7 +1521,7 @@ TEST_CASE("csv_reader constructors")
         reader.read();
 
         my_json j = decoder.get_result();
-        CHECK(j.size() == 3);
+        CHECK(j.size() == 3); //-V521
         //std::cout << pretty_print(j) << "\n";
     }
 }
@@ -1541,7 +1541,7 @@ TEST_CASE("infinite loop")
         csv::csv_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
-        CHECK(!ec);
+        CHECK(!ec); //-V521
     }
     SECTION("Invalid character follows quoted field")
     {
@@ -1555,6 +1555,6 @@ TEST_CASE("infinite loop")
         csv::csv_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
-        CHECK(ec == csv::csv_errc::unexpected_char_between_fields);
+        CHECK(ec == csv::csv_errc::unexpected_char_between_fields); //-V521
     }
 }

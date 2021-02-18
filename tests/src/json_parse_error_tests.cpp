@@ -12,7 +12,7 @@
 
 using namespace jsoncons;
 
-void test_parse_error(const std::string& text, std::error_code ec)
+void test_parse_error(const std::string& text, const std::error_code& ec)
 {
     REQUIRE_THROWS(json::parse(text));
     JSONCONS_TRY
@@ -30,7 +30,7 @@ void test_parse_error(const std::string& text, std::error_code ec)
     }
 }
 
-void test_parse_ec(const std::string& text, std::error_code expected)
+void test_parse_ec(const std::string& text, const std::error_code& expected)
 {
     std::error_code ec;
 

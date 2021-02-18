@@ -299,12 +299,12 @@ TEST_CASE("test_from_stl_container")
     CHECK(3 == j_array[2].as<int>());
     CHECK(4 == j_array[3].as<int>());
 
-    std::set<std::string> a_set{"one", "two", "three", "four", "one"};
-    json j_set(a_set); // only one entry for "one" is used
+    std::set<std::string> a_set{"one", "two", "three", "four"};
+    json j_set(a_set); 
     // ["four", "one", "three", "two"]
 
-    std::unordered_set<std::string> a_uset{"one", "two", "three", "four", "one"};
-    json j_uset(a_uset); // only one entry for "one" is used
+    std::unordered_set<std::string> a_uset{"one", "two", "three", "four"};
+    json j_uset(a_uset); 
     // maybe ["two", "three", "four", "one"]
 
     std::multiset<std::string> a_mset{"one", "two", "one", "four"};

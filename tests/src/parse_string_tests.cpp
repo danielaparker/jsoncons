@@ -25,7 +25,7 @@ public:
     {
     }
 
-    bool operator()(std::error_code ec, const ser_context&) noexcept
+    bool operator()(const std::error_code& ec, const ser_context&) noexcept
     {
         return ec == value_; // if returns true, use default processing
     }

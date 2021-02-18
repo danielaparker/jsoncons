@@ -17,7 +17,6 @@ namespace
     std::vector<char> read_bytes(const std::string& filename)
     {
         std::vector<char> bytes;
-        std::string in_file = "./bson/input/test34.bson";
         std::ifstream is(filename, std::ifstream::binary);
         REQUIRE(is);
         is.seekg (0, is.end);

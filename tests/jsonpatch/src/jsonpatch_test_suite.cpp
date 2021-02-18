@@ -52,7 +52,7 @@ void jsonpatch_tests(const std::string& fpath)
                     std::cout << "Target: " << pretty_print(target) << "\n\n";
                     std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                 }
-                CHECK(target == expected);
+                CHECK(target == expected); //-V521
             }
             else if (test_case.contains("error"))
             {
@@ -71,7 +71,7 @@ void jsonpatch_tests(const std::string& fpath)
                     std::cout << "Target: " << pretty_print(target) << "\n\n";
                     std::cout << "Expected: " << pretty_print(expected) << "\n\n";
                 }
-                CHECK(target == expected);
+                CHECK(target == expected); //-V521
             }
         }
     }

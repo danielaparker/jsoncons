@@ -663,8 +663,6 @@ TEST_CASE("test_pass1")
     std::ifstream is(in_file);
     REQUIRE(is);
 
-    std::error_code err;
-
     JSONCONS_TRY
     {
         json::parse(is);
@@ -682,8 +680,6 @@ TEST_CASE("test_pass2")
     std::ifstream is(in_file);
     REQUIRE(is);
 
-    std::error_code err;
-
     JSONCONS_TRY
     {
         json::parse(is);
@@ -700,8 +696,6 @@ TEST_CASE("test_pass3")
     std::string in_file = "./input/JSON_checker/pass3.json";
     std::ifstream is(in_file);
     REQUIRE(is);
-
-    std::error_code err;
 
     JSONCONS_TRY
     {

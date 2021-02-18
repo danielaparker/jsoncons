@@ -18,6 +18,7 @@
 **/build
 *PVS-Studio*
 examples/output
+**/tests.suppress
 
 examples/build/cmake/build_llvm.sh
 examples/build/cmake/build_llvm

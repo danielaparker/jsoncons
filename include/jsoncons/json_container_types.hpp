@@ -565,21 +565,23 @@ namespace jsoncons {
         {
         }
 
-        json_object& operator=(const json_object& val)
-        {
-            allocator_holder<allocator_type>::operator=(val.get_allocator());
-            members_ = val.members_;
-        }
-
         json_object(json_object&& val)
             : allocator_holder<allocator_type>(val.get_allocator()), 
               members_(std::move(val.members_))
         {
         }
 
+        json_object& operator=(const json_object& val)
+        {
+            allocator_holder<allocator_type>::operator=(val.get_allocator());
+            members_ = val.members_;
+            return *this;
+        }
+
         json_object& operator=(json_object&& val)
         {
             val.swap(*this);
+            return *this;
         }
 
         json_object(const json_object& val, const allocator_type& alloc) 
@@ -1265,23 +1267,11 @@ namespace jsoncons {
         {
         }
 
-        json_object& operator=(const json_object& val)
-        {
-            allocator_holder<allocator_type>::operator=(val.get_allocator());
-            members_ = val.members_;
-            index_ = val.index_;
-        }
-
         json_object(json_object&& val)
             : allocator_holder<allocator_type>(val.get_allocator()), 
               members_(std::move(val.members_)),
               index_(std::move(val.index_))
         {
-        }
-
-        json_object& operator=(json_object&& val)
-        {
-            val.swap(*this);
         }
 
         json_object(const json_object& val, const allocator_type& alloc) 
@@ -1388,6 +1378,20 @@ namespace jsoncons {
         ~json_object() noexcept
         {
             destroy();
+        }
+
+        json_object& operator=(json_object&& val)
+        {
+            val.swap(*this);
+            return *this;
+        }
+
+        json_object& operator=(const json_object& val)
+        {
+            allocator_holder<allocator_type>::operator=(val.get_allocator());
+            members_ = val.members_;
+            index_ = val.index_;
+            return *this;
         }
 
         void swap(json_object& val) noexcept

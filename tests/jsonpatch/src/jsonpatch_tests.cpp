@@ -19,7 +19,7 @@ using jsoncons::json;
 namespace jsonpatch = jsoncons::jsonpatch;
 using namespace jsoncons::literals;
 
-void check_patch(json& target, const json& patch, std::error_code expected_ec, const json& expected)
+void check_patch(json& target, const json& patch, const std::error_code& expected_ec, const json& expected)
 {
     std::error_code ec;
     jsonpatch::apply_patch(target, patch, ec);
@@ -27,8 +27,8 @@ void check_patch(json& target, const json& patch, std::error_code expected_ec, c
     {
         std::cout << "target:\n" << target << std::endl;
     }
-    CHECK(ec == expected_ec);
-    CHECK(target == expected);
+    CHECK(ec == expected_ec); //-V521
+    CHECK(target == expected); //-V521
 }
 
 TEST_CASE("testing_a_value_success")
