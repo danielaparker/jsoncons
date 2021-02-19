@@ -1,7 +1,8 @@
-master
-------
+v0.162.1
+--------
 
-- Fixed [gcc sign-compare warning](https://github.com/danielaparker/jsoncons/issues/307)
+- Fixed an innocuous [gcc sign-compare warning](https://github.com/danielaparker/jsoncons/issues/307)
+Wsign-compare enabled for gcc test builds.
 
 v0.162.0
 --------
