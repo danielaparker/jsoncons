@@ -927,8 +927,6 @@ namespace jsoncons { namespace jsonpath {
             end_input_ = path.data() + path.length();
             p_ = begin_input_;
 
-            string_type s = {'$'};
-
             slice slic;
 
             std::vector<int64_t> eval_stack;

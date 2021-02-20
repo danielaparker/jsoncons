@@ -113,7 +113,6 @@ namespace jsoncons { namespace jsonpointer {
                             switch (*p_)
                             {
                                 case '/':
-                                    state_ = jsonpointer::detail::pointer_state::delim;
                                     done = true;
                                     break;
                                 case '~':

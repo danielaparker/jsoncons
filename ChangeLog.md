@@ -1,8 +1,9 @@
 v0.162.1
 --------
 
-- Fixed a [gcc warning with -Wsign-compare](https://github.com/danielaparker/jsoncons/issues/307)
-`-Wsign-compare` enabled for gcc test builds.
+- Fixed a [gcc warning with -Wsign-compare](https://github.com/danielaparker/jsoncons/issues/307) 
+- `-Wsign-compare` enabled for gcc test builds
+- Fixed some PVS-Studio warnings
 
 v0.162.0
 --------

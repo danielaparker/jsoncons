@@ -1439,8 +1439,6 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json& patch) const override final
         {
-            std::string ptr_s = instance_location.string();
-
             auto type = type_mapping_[(uint8_t) instance.type()];
 
             if (type)

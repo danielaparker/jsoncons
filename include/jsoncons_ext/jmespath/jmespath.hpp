@@ -2195,7 +2195,7 @@ namespace jmespath {
                 {
                     case token_kind::literal:
                     {
-                        stack.push_back(parameter(&t.value_));
+                        stack.emplace_back(&t.value_);
                         break;
                     }
                     case token_kind::begin_expression_type:
@@ -2205,7 +2205,7 @@ namespace jmespath {
                         JSONCONS_ASSERT(output_stack[i].is_expression());
                         JSONCONS_ASSERT(!stack.empty());
                         stack.pop_back();
-                        stack.push_back(parameter(output_stack[i].expression_.get()));
+                        stack.emplace_back(output_stack[i].expression_.get());
                         break;
                     }
                     case token_kind::pipe:

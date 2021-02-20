@@ -833,7 +833,7 @@ public:
         return *this;
     }
 
-    basic_csv_options& line_delimiter(string_type value)
+    basic_csv_options& line_delimiter(const string_type& value)
     {
         this->line_delimiter_ = value;
         return *this;

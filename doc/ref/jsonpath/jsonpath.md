@@ -247,18 +247,24 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
 
-### Union
+### Unions
 
-In jsoncons, a union element can be
+In jsoncons, a JSONPath union element can be
 
 - an index or slice expression
 - a single quoted name
 - a double quoted name
-- an expression
+- an expression, e.g. `(@.length-1)`
 - a filter
-- a wildcard
-- an absolute path
-- a relative path
+- a wildcard, i.e. `*`
+- a path relative to the root of the JSON document (begins with `$`)
+- a path relative to the current node (begins with `@`)
+
+To illustrate, the path expression below selects the second, third, and fourth titles from [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3):
+
+```
+"$.store.book[:-2:1,(@.length-2),?(@.author=='J. R. R. Tolkien')].title"
+```
 
 ### Function expressions
 

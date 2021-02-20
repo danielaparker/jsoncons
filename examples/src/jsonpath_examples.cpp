@@ -660,9 +660,12 @@ namespace {
         std::ifstream is("./input/store.json");
         json store = json::parse(is);
 
-        std::string path = "$.store.book[:2:2,(@.length-2),?(@.author=='J. R. R. Tolkien')].title";
-        auto result = jsonpath::json_query(store, path);
-        std::cout << result << "\n\n";
+        std::string path = "$.store.book[:-2:1,(@.length-2),?(@.author=='J. R. R. Tolkien')].title";
+        auto result1 = jsonpath::json_query(store, path);
+        std::cout << "(1) " << result1 << "\n\n";
+
+        auto result2 = jsonpath::json_query(store, path, jsonpath::result_options::path);
+        std::cout << "(2) " << result2 << "\n\n";
     }
 
 } // namespace
