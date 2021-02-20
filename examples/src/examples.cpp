@@ -461,9 +461,9 @@ int main()
 
         jsonschema_examples();
 
-        jsonpath_examples();
-
         jsonpointer_examples();
+
+        jsonpath_examples();
     }
     catch (const std::exception& e)
     {

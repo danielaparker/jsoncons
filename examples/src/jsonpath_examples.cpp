@@ -655,6 +655,16 @@ namespace {
         std::cout << pretty_print(j) << std::endl;
     }
 
+    void union_example() 
+    {
+        std::ifstream is("./input/store.json");
+        json store = json::parse(is);
+
+        std::string path = "$.store.book[:2:2,(@.length-2),?(@.author=='J. R. R. Tolkien')].title";
+        auto result = jsonpath::json_query(store, path);
+        std::cout << result << "\n\n";
+    }
+
 } // namespace
 
 void jsonpath_examples()
@@ -683,6 +693,8 @@ void jsonpath_examples()
     function_floor_example();
     function_keys_example();
     search_for_and_replace_a_value();
+
+    union_example();
     std::cout << "\n";
 }
 

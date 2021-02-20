@@ -107,8 +107,8 @@ JSONPath|       Description
 `[]`    |Subscript operator. 
 `[,]`   |Union.
 `[start:end:step]`      |Array slice operator borrowed from ECMASCRIPT 4.
-`()`    |Filter expression.
-`?()`   |Applies a filter expression.
+`()`    |Expression.
+`?()`   |Filter by expression.
 
 ### Duplicates and ordering
 
@@ -246,6 +246,19 @@ Precedence|Operator|Associativity
 6 |`==` `!=`        |Left 
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
+
+### Union
+
+In jsoncons, a union element can be
+
+- an index or slice expression
+- a single quoted name
+- a double quoted name
+- an expression
+- a filter
+- a wildcard
+- an absolute path
+- a relative path
 
 ### Function expressions
 
