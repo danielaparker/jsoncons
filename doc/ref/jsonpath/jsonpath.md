@@ -51,7 +51,7 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
 - Wildcards are allowed in the dot notation
 - Unions of separate JSONPath expressions are allowed, e.g.
 
-    $..[@.firstName,@.address.city]
+    $..['firstName',@.address.city]
 
 - Options are provided to exclude results corresponding to duplicate paths, and to sort results according to paths.
 
