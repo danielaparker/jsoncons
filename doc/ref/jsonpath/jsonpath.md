@@ -468,38 +468,42 @@ int main()
     json data = json::parse(is);
 
     json result1 = expr.evaluate(data);
-    std::cout << "(1) " << pretty_print(result1) << "\n\n";
+    std::cout << "(1)\n" << pretty_print(result1) << "\n\n";
 
     json result2 = expr.evaluate(data, jsonpath::result_options::path);
-    std::cout << "(2) " << pretty_print(result2) << "\n\n";
+    std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
     json result3 = expr.evaluate(data, jsonpath::result_options::value | jsonpath::result_options::nodups);
-    std::cout << "(3) " << pretty_print(result3) << "\n\n";
+    std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
     json result4 = expr.evaluate(data, jsonpath::result_options::nodups);
-    std::cout << "(4) " << pretty_print(result4) << "\n\n";
+    std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
 }
 ```
 Output:
 ```
-(1) [
+(1) 
+[
     "The Night Watch",
     "The Night Watch",
     "The Night Watch"
 ]
 
-(2) [
+(2) 
+[
     "$['books'][1]['title']",
     "$['books'][1]['title']",
     "$['books'][3]['title']"
 ]
 
-(3) [
+(3) 
+[
     "The Night Watch",
     "The Night Watch"
 ]
 
-(4) [
+(4) 
+[
     "$['books'][1]['title']",
     "$['books'][3]['title']"
 ]
