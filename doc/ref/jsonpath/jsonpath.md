@@ -91,11 +91,11 @@ Recursively select all book titles under '$.store':
 
 Union of a subset of books identified by index:
 
-    $.store[book[0],book[1],book[3]]
+    $.store[@.book[0],@.book[1],@.book[3]]
 
 Union of the fourth book and all books with price > 10:
 
-    $.store[book[3],book[?(@.price > 10)]]
+    $.store[@.book[3],@.book[?(@.price > 10)]]
 
 JSONPath|       Description
 --------|--------------------------------
