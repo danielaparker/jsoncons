@@ -225,14 +225,14 @@ Operator|       Description
 `<=`    |Left is less or equal to right
 `>`     |Left is greater than right
 `>=`    |Left is greater than or equal to right
-'=~'    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
+`=~`    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
 
 Unary operators
 
 Operator|       Description
 --------|--------------------------------
-`!`     |Not right
-`-`     |Negates right
+`!`     |Negate right
+`-`     |Unary minus
 
 Operator precedence
 
