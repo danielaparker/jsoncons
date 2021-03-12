@@ -1,3 +1,8 @@
+v0.162.2
+--------
+
+- Fixed a sign-compare warning 
+
 v0.162.1
 --------
 
