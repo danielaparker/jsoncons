@@ -185,7 +185,7 @@ endif()
 
 if (NOT CMAKE_SYSTEM_NAME STREQUAL Windows)
 target_compile_options(unit_tests PRIVATE
-    $<$<CXX_COMPILER_ID:Clang>:-Werror -Wall -Wextra -Wimplicit-fallthrough -Wcast-align -Wcast-qual -Wsign-compare>
+    $<$<CXX_COMPILER_ID:Clang>:-Werror -Wall -Wextra -Wimplicit-fallthrough -Wcast-align -Wcast-qual -Wsign-compare -pedantic>
 )
 endif()
 
