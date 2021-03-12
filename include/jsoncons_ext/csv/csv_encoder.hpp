@@ -612,9 +612,9 @@ private:
     }
 
     bool visit_uint64(uint64_t val, 
-                         semantic_tag, 
-                         const ser_context&,
-                         std::error_code&) override
+                      semantic_tag, 
+                      const ser_context&,
+                      std::error_code&) override
     {
         JSONCONS_ASSERT(!stack_.empty());
         switch (stack_.back().item_kind_)

@@ -667,7 +667,7 @@ namespace msgpack {
                 }
                 default:
                 {
-                    if (val <= (std::numeric_limits<int8_t>::max)())
+                    if (val <= static_cast<uint64_t>((std::numeric_limits<int8_t>::max)()))
                     {
                         // positive fixnum stores 7-bit positive integer
                         sink_.push_back(static_cast<uint8_t>(val));
