@@ -858,7 +858,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,char>::value,double>::type
-    operator()(const CharT* s, std::size_t length) const
+    operator()(const CharT* s, std::size_t) const
     {
         char *end = nullptr;
         double val = strtold_l(s, &end, locale_);
@@ -871,7 +871,7 @@ public:
 
     template <class CharT>
     typename std::enable_if<std::is_same<CharT,wchar_t>::value,double>::type
-    operator()(const CharT* s, std::size_t length) const
+    operator()(const CharT* s, std::size_t) const
     {
         CharT *end = nullptr;
         double val = wcstold_l(s, &end, locale_);
