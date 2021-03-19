@@ -19,22 +19,146 @@
 #include <jsoncons/json_type.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 
-
 namespace jsoncons { 
 namespace jsonpath {
+
+    struct reference_arg_t
+    {
+        explicit reference_arg_t() = default;
+    };
+    constexpr reference_arg_t reference_arg{};
+
+    struct const_reference_arg_t
+    {
+        explicit const_reference_arg_t() = default;
+    };
+    constexpr const_reference_arg_t const_reference_arg{};
+
+    struct literal_arg_t
+    {
+        explicit literal_arg_t() = default;
+    };
+    constexpr literal_arg_t literal_arg{};
+
+    struct begin_expression_type_arg_t
+    {
+        explicit begin_expression_type_arg_t() = default;
+    };
+    constexpr begin_expression_type_arg_t begin_expression_type_arg{};
+
+    struct end_expression_type_arg_t
+    {
+        explicit end_expression_type_arg_t() = default;
+    };
+    constexpr end_expression_type_arg_t end_expression_type_arg{};
+
+    struct end_of_expression_arg_t
+    {
+        explicit end_of_expression_arg_t() = default;
+    };
+    constexpr end_of_expression_arg_t end_of_expression_arg{};
+
+    struct separator_arg_t
+    {
+        explicit separator_arg_t() = default;
+    };
+    constexpr separator_arg_t separator_arg{};
+
+    struct lparen_arg_t
+    {
+        explicit lparen_arg_t() = default;
+    };
+    constexpr lparen_arg_t lparen_arg{};
+
+    struct rparen_arg_t
+    {
+        explicit rparen_arg_t() = default;
+    };
+    constexpr rparen_arg_t rparen_arg{};
+
+    struct begin_union_arg_t
+    {
+        explicit begin_union_arg_t() = default;
+    };
+    constexpr begin_union_arg_t begin_union_arg{};
+
+    struct end_union_arg_t
+    {
+        explicit end_union_arg_t() = default;
+    };
+    constexpr end_union_arg_t end_union_arg{};
+
+    struct begin_filter_arg_t
+    {
+        explicit begin_filter_arg_t() = default;
+    };
+    constexpr begin_filter_arg_t begin_filter_arg{};
+
+    struct end_filter_arg_t
+    {
+        explicit end_filter_arg_t() = default;
+    };
+    constexpr end_filter_arg_t end_filter_arg{};
+
+    struct begin_expression_arg_t
+    {
+        explicit begin_expression_arg_t() = default;
+    };
+    constexpr begin_expression_arg_t begin_expression_arg{};
+
+    struct end_expression_arg_t
+    {
+        explicit end_expression_arg_t() = default;
+    };
+    constexpr end_expression_arg_t end_expression_arg{};
+
+    struct current_node_arg_t
+    {
+        explicit current_node_arg_t() = default;
+    };
+    constexpr current_node_arg_t current_node_arg{};
+
+    struct root_node_arg_t
+    {
+        explicit root_node_arg_t() = default;
+    };
+    constexpr root_node_arg_t root_node_arg{};
+
+    struct end_function_arg_t
+    {
+        explicit end_function_arg_t() = default;
+    };
+    constexpr end_function_arg_t end_function_arg{};
+
+    struct argument_arg_t
+    {
+        explicit argument_arg_t() = default;
+    };
+    constexpr argument_arg_t argument_arg{};
 
     template <class CharT>
     class path_component
     {
+        enum class component_kind {root,current,identifier,index};
     public:
         using string_type = std::basic_string<CharT>;
     private:
-        enum class component_kind {identifier,index};
 
         component_kind kind_;
         string_type identifier_;
         std::size_t index_;
     public:
+        path_component(root_node_arg_t)
+            : kind_(component_kind::root)
+        {
+            identifier_.push_back('$');
+        }
+        path_component(current_node_arg_t)
+            : kind_(component_kind::current)
+        {
+            identifier_.push_back('@');
+        }
+
         path_component(const string_type& identifier)
             : kind_(component_kind::identifier), identifier_(identifier)
         {
@@ -52,7 +176,7 @@ namespace jsonpath {
 
         bool is_identifier() const
         {
-            return kind_ == component_kind::identifier;
+            return kind_ == component_kind::identifier || kind_ == component_kind::root || kind_ == component_kind::current;
         }
 
         bool is_index() const
@@ -70,7 +194,7 @@ namespace jsonpath {
             return index_;
         }
 
-        bool operator==(const path_component& other)
+        bool operator==(const path_component& other) const
         {
             if (is_identifier() && other.is_identifier())
             {
@@ -86,7 +210,7 @@ namespace jsonpath {
             }
         }
 
-        bool operator<(const path_component& other)
+        bool operator<(const path_component& other) const
         {
             if (is_identifier() && other.is_identifier())
             {
@@ -106,14 +230,20 @@ namespace jsonpath {
         {
             switch (kind_)
             {
-                case path_component::identifier:
+                case component_kind::root:
+                    buffer.push_back('$');
+                    break;
+                case component_kind::current:
+                    buffer.push_back('@');
+                    break;
+                case component_kind::identifier:
                     buffer.push_back('[');
                     buffer.push_back('\'');
                     buffer.append(identifier_);
                     buffer.push_back('\'');
                     buffer.push_back(']');
                     break;
-                case path_component::index:
+                case component_kind::index:
                     buffer.push_back('[');
                     jsoncons::detail::from_integer(index_,buffer);
                     buffer.push_back(']');
@@ -121,6 +251,29 @@ namespace jsonpath {
             }
         }
     };
+
+    template <class CharT>
+    bool operator==(const path_component<CharT>& lhs,const path_component<CharT>& rhs)
+    {
+        return lhs.operator==(rhs);
+    }
+
+    template <class CharT>
+    bool operator<(const path_component<CharT>& lhs,const path_component<CharT>& rhs)
+    {
+        return lhs.operator<(rhs);
+    }
+
+    template <class CharT>
+    std::basic_string<CharT> to_string(const std::vector<path_component<CharT>>& path)
+    {
+        std::basic_string<CharT> buffer;
+        for (const auto& component : path)
+        {
+            component.to_string(buffer);
+        }
+        return buffer;
+    }
 
     enum class result_options {value=1,path=2,nodups=4|path,sort=8|path};
 
@@ -164,6 +317,69 @@ namespace jsonpath {
         return a;
     }
 
+} // namespace jsonpath
+} // namespace jsoncons
+
+namespace std {
+    template <class CharT>
+    struct less<std::vector<jsoncons::jsonpath::path_component<CharT>>>
+    {
+       bool operator()(const std::vector<jsoncons::jsonpath::path_component<CharT>>& k1, 
+                       const std::vector<jsoncons::jsonpath::path_component<CharT>>& k2) const
+       {
+            if (k1.empty() && k2.empty())
+            {
+                return false;
+            }
+            if (k1.empty())
+            {
+                return true;
+            }
+
+            std::size_t length = k1.size() < k2.size() ? k2.size() : k1.size();
+            for (std::size_t i = 0; i < length; ++i)
+            {
+                if (k1[i] < k2[i])
+                {
+                    return true;
+                }
+                else if (k1[i] > k2[i])
+                {
+                    return false;
+                }
+            }
+            return length == k2.size() ? false : true;
+       }
+    };
+    template <class CharT>
+    struct hash<std::vector<jsoncons::jsonpath::path_component<CharT>>>
+    {
+       std::size_t operator()(const std::vector<jsoncons::jsonpath::path_component<CharT>>& k1) const
+       {
+            if (k1.empty())
+            {
+                return 0;
+            }
+
+            std::size_t hash = 0;
+            for (const auto& item : k1)
+            {
+                if (item.is_identifier())
+                {
+                    hash += std::hash<typename jsoncons::jsonpath::path_component<CharT>::string_type>()(item.identifier());
+                }
+                else if (item.is_index())
+                {
+                    hash += std::hash<std::size_t>()(item.index());
+                }
+            }
+            return hash;
+       }
+    };
+}
+
+namespace jsoncons { 
+namespace jsonpath { 
 namespace detail {
 
     enum class node_type {single=1, multi};
@@ -1623,120 +1839,6 @@ namespace detail {
         }
     }
 
-    struct reference_arg_t
-    {
-        explicit reference_arg_t() = default;
-    };
-    constexpr reference_arg_t reference_arg{};
-
-    struct const_reference_arg_t
-    {
-        explicit const_reference_arg_t() = default;
-    };
-    constexpr const_reference_arg_t const_reference_arg{};
-
-    struct literal_arg_t
-    {
-        explicit literal_arg_t() = default;
-    };
-    constexpr literal_arg_t literal_arg{};
-
-    struct begin_expression_type_arg_t
-    {
-        explicit begin_expression_type_arg_t() = default;
-    };
-    constexpr begin_expression_type_arg_t begin_expression_type_arg{};
-
-    struct end_expression_type_arg_t
-    {
-        explicit end_expression_type_arg_t() = default;
-    };
-    constexpr end_expression_type_arg_t end_expression_type_arg{};
-
-    struct end_of_expression_arg_t
-    {
-        explicit end_of_expression_arg_t() = default;
-    };
-    constexpr end_of_expression_arg_t end_of_expression_arg{};
-
-    struct separator_arg_t
-    {
-        explicit separator_arg_t() = default;
-    };
-    constexpr separator_arg_t separator_arg{};
-
-    struct lparen_arg_t
-    {
-        explicit lparen_arg_t() = default;
-    };
-    constexpr lparen_arg_t lparen_arg{};
-
-    struct rparen_arg_t
-    {
-        explicit rparen_arg_t() = default;
-    };
-    constexpr rparen_arg_t rparen_arg{};
-
-    struct begin_union_arg_t
-    {
-        explicit begin_union_arg_t() = default;
-    };
-    constexpr begin_union_arg_t begin_union_arg{};
-
-    struct end_union_arg_t
-    {
-        explicit end_union_arg_t() = default;
-    };
-    constexpr end_union_arg_t end_union_arg{};
-
-    struct begin_filter_arg_t
-    {
-        explicit begin_filter_arg_t() = default;
-    };
-    constexpr begin_filter_arg_t begin_filter_arg{};
-
-    struct end_filter_arg_t
-    {
-        explicit end_filter_arg_t() = default;
-    };
-    constexpr end_filter_arg_t end_filter_arg{};
-
-    struct begin_expression_arg_t
-    {
-        explicit begin_expression_arg_t() = default;
-    };
-    constexpr begin_expression_arg_t begin_expression_arg{};
-
-    struct end_expression_arg_t
-    {
-        explicit end_expression_arg_t() = default;
-    };
-    constexpr end_expression_arg_t end_expression_arg{};
-
-    struct current_node_arg_t
-    {
-        explicit current_node_arg_t() = default;
-    };
-    constexpr current_node_arg_t current_node_arg{};
-
-    struct root_node_arg_t
-    {
-        explicit root_node_arg_t() = default;
-    };
-    constexpr root_node_arg_t root_node_arg{};
-
-    struct end_function_arg_t
-    {
-        explicit end_function_arg_t() = default;
-    };
-    constexpr end_function_arg_t end_function_arg{};
-
-    struct argument_arg_t
-    {
-        explicit argument_arg_t() = default;
-    };
-    constexpr argument_arg_t argument_arg{};
-
     template <class Json,class JsonReference>
     struct path_node
     {
@@ -1744,17 +1846,22 @@ namespace detail {
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+        using path_component_type = path_component<char_type>;
 
-        string_type path;
+        std::vector<path_component_type> path;
         pointer ptr;
 
         path_node() = default;
-        path_node(const string_type& p, const pointer& valp)
+        path_node(const std::vector<path_component_type>& p, const pointer& valp)
             : path(p),ptr(valp)
         {
         }
+        path_node(const pointer& valp)
+            : ptr(valp)
+        {
+        }
 
-        path_node(string_type&& p, pointer&& valp) noexcept
+        path_node(std::vector<path_component_type>&& p, pointer&& valp) noexcept
             : path(std::move(p)),ptr(valp)
         {
         }
@@ -1873,6 +1980,7 @@ namespace detail {
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
         using reference = JsonReference;
         using path_node_type = path_node<Json,JsonReference>;
+        using path_component_type = path_component<char_type>;
 
         selector_base(bool is_path,
                       std::size_t precedence_level = 0)
@@ -1898,40 +2006,32 @@ namespace detail {
             return true;
         }
 
-        static string_type generate_path(const string_view_type& path, 
-                                         std::size_t index, 
-                                         result_options options) 
+        static std::vector<path_component_type> generate_path(const std::vector<path_component_type>& path, 
+                                                              std::size_t index, 
+                                                              result_options options) 
         {
-            string_type s;
+            std::vector<path_component_type> s(path);
             if ((options & result_options::path) == result_options::path)
             {
-                s.append(path.data(), path.length());
-                s.push_back('[');
-                jsoncons::detail::from_integer(index,s);
-                s.push_back(']');
+                s.emplace_back(index);
             }
             return s;
         }
 
-        static string_type generate_path(const string_view_type& path, 
-                                         const string_view_type& identifier, 
-                                         result_options options) 
+        static std::vector<path_component_type> generate_path(const std::vector<path_component_type>& path, 
+                                                              const string_type& identifier, 
+                                                              result_options options) 
         {
-            string_type s;
+            std::vector<path_component_type> s(path);
             if ((options & result_options::path) == result_options::path)
             {
-                s.append(path.data(), path.length());
-                s.push_back('[');
-                s.push_back('\'');
-                s.append(identifier.data(),identifier.length());
-                s.push_back('\'');
-                s.push_back(']');
+                s.emplace_back(identifier);
             }
             return s;
         }
 
         virtual void select(dynamic_resources<Json,JsonReference>& resources,
-                            const string_type& path, 
+                            const std::vector<path_component_type>& path, 
                             reference root,
                             reference val, 
                             std::vector<path_node_type>& nodes,
@@ -2404,6 +2504,7 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
+        using path_component_type = path_component<char_type>;
     private:
         std::vector<token_type> token_list_;
     public:
@@ -2425,7 +2526,7 @@ namespace detail {
         path_expression& operator=(path_expression&& expr) = default;
 
         Json evaluate(dynamic_resources<Json,JsonReference>& resources, 
-                      const string_type& path, 
+                      const std::vector<path_component_type>& path, 
                       reference root,
                       reference instance,
                       result_options options) const
@@ -2434,7 +2535,7 @@ namespace detail {
 
             if ((options & result_options::value) == result_options::value)
             {
-                auto callback = [&result](const string_type&, reference val)
+                auto callback = [&result](const std::vector<path_component_type>&, reference val)
                 {
                     result.push_back(val);
                 };
@@ -2442,9 +2543,9 @@ namespace detail {
             }
             else if ((options & result_options::path) == result_options::path)
             {
-                auto callback = [&result](const string_type& path, reference)
+                auto callback = [&result](const std::vector<path_component_type>& path, reference)
                 {
-                    result.push_back(path);
+                    result.emplace_back(jsoncons::jsonpath::to_string(path));
                 };
                 evaluate(resources, path, root, instance, callback, options);
             }
@@ -2453,9 +2554,9 @@ namespace detail {
         }
 
         template <class Callback>
-        typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const string_type&,reference>::value,void>::type
+        typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const std::vector<path_component_type>&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
-                 const string_type& ipath, 
+                 const std::vector<path_component_type>& ipath, 
                  reference root,
                  reference current, 
                  Callback callback,
@@ -2465,7 +2566,7 @@ namespace detail {
 
             std::vector<node_set<Json,JsonReference>> stack;
             std::vector<pointer> arg_stack;
-            string_type path(ipath);
+            std::vector<path_component_type> path(ipath);
             Json result(json_array_arg);
 
             //std::cout << "EVALUATE BEGIN\n";
@@ -2486,7 +2587,7 @@ namespace detail {
                     { 
                         case token_kind::literal:
                         {
-                            stack.emplace_back(path_node_type(string_type(), &tok.get_value(reference_arg_type(), resources)));
+                            stack.emplace_back(path_node_type(&tok.get_value(reference_arg_type(), resources)));
                             break;
                         }
                         case token_kind::unary_operator:
@@ -2496,7 +2597,7 @@ namespace detail {
                             stack.pop_back();
 
                             reference r = tok.unary_operator_->evaluate(resources, *ptr, ec);
-                            stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
+                            stack.emplace_back(path_node_type(std::addressof(r)));
                             break;
                         }
                         case token_kind::binary_operator:
@@ -2508,16 +2609,16 @@ namespace detail {
                             stack.pop_back();
 
                             reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
-                            stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
+                            stack.emplace_back(path_node_type(std::addressof(r)));
                             break;
                         }
                         case token_kind::root_node:
                             //std::cout << "root: " << root << "\n";
-                            stack.emplace_back(path_node_type(string_type(),std::addressof(root)));
+                            stack.emplace_back(path_node_type(std::addressof(root)));
                             break;
                         case token_kind::current_node:
                             //std::cout << "current: " << current << "\n";
-                            stack.emplace_back(path_node_type(string_type(),std::addressof(current)));
+                            stack.emplace_back(path_node_type(std::addressof(current)));
                             break;
                         case token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
@@ -2556,7 +2657,7 @@ namespace detail {
                             }
                             //std::cout << "function result: " << r << "\n";
                             arg_stack.clear();
-                            stack.emplace_back(path_node_type(string_type(),std::addressof(r)));
+                            stack.emplace_back(path_node_type(std::addressof(r)));
                             break;
                         }
                         case token_kind::selector:
@@ -2620,7 +2721,7 @@ namespace detail {
                                     }
                                     else
                                     {
-                                        std::unordered_set<string_type> index;
+                                        std::unordered_set<std::vector<path_component_type>> index;
                                         std::vector<path_node_type> temp2;
                                         for (auto&& node : temp)
                                         {
