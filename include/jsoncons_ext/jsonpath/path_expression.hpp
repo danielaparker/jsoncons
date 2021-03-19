@@ -12,6 +12,7 @@
 #include <unordered_map> // std::unordered_map
 #include <unordered_set> // std::unordered_set
 #include <limits> // std::numeric_limits
+#include <set> // std::set
 #include <utility> // std::move
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
@@ -259,10 +260,55 @@ namespace jsonpath {
     }
 
     template <class CharT>
+    bool operator!=(const path_component<CharT>& lhs, const path_component<CharT>& rhs)
+    {
+        return !(lhs.operator==(rhs));
+    }
+
+    template <class CharT>
     bool operator<(const path_component<CharT>& lhs,const path_component<CharT>& rhs)
     {
         return lhs.operator<(rhs);
     }
+
+    template <class CharT>
+    struct path_equal_to
+    {
+        bool operator()(const std::vector<path_component<CharT>>& lhs, const std::vector<path_component<CharT>>& rhs) const
+        {
+            std::size_t length = (std::min)(lhs.size(),rhs.size());
+            for (std::size_t i = 0; i < length; ++i)
+            {
+                if (lhs[i] != rhs[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    };
+
+    template <class CharT>
+    struct path_less
+    {
+       bool operator()(const std::vector<path_component<CharT>>& lhs, 
+                       const std::vector<path_component<CharT>>& rhs) const
+       {
+           std::size_t length = (std::min)(lhs.size(),rhs.size());
+           for (std::size_t i = 0; i < length; ++i)
+           {
+               if (lhs[i] < rhs[i])
+               {
+                   return true;
+               }
+               else if (rhs[i] < lhs[i])
+               {
+                   return false;
+               }
+           }
+           return false;
+       }
+    };
 
     template <class CharT>
     std::basic_string<CharT> to_string(const std::vector<path_component<CharT>>& path)
@@ -317,69 +363,6 @@ namespace jsonpath {
         return a;
     }
 
-} // namespace jsonpath
-} // namespace jsoncons
-
-namespace std {
-    template <class CharT>
-    struct less<std::vector<jsoncons::jsonpath::path_component<CharT>>>
-    {
-       bool operator()(const std::vector<jsoncons::jsonpath::path_component<CharT>>& k1, 
-                       const std::vector<jsoncons::jsonpath::path_component<CharT>>& k2) const
-       {
-            if (k1.empty() && k2.empty())
-            {
-                return false;
-            }
-            if (k1.empty())
-            {
-                return true;
-            }
-
-            std::size_t length = k1.size() < k2.size() ? k2.size() : k1.size();
-            for (std::size_t i = 0; i < length; ++i)
-            {
-                if (k1[i] < k2[i])
-                {
-                    return true;
-                }
-                else if (k1[i] > k2[i])
-                {
-                    return false;
-                }
-            }
-            return length == k2.size() ? false : true;
-       }
-    };
-    template <class CharT>
-    struct hash<std::vector<jsoncons::jsonpath::path_component<CharT>>>
-    {
-       std::size_t operator()(const std::vector<jsoncons::jsonpath::path_component<CharT>>& k1) const
-       {
-            if (k1.empty())
-            {
-                return 0;
-            }
-
-            std::size_t hash = 0;
-            for (const auto& item : k1)
-            {
-                if (item.is_identifier())
-                {
-                    hash += std::hash<typename jsoncons::jsonpath::path_component<CharT>::string_type>()(item.identifier());
-                }
-                else if (item.is_index())
-                {
-                    hash += std::hash<std::size_t>()(item.index());
-                }
-            }
-            return hash;
-       }
-    };
-}
-
-namespace jsoncons { 
-namespace jsonpath { 
 namespace detail {
 
     enum class node_type {single=1, multi};
@@ -594,7 +577,6 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
-            //std::cout << "eq_operator: lhs: " << lhs << ", rhs: " << rhs << "\n";
             return lhs == rhs ? resources.true_value() : resources.false_value();
         }
     };
@@ -2721,7 +2703,8 @@ namespace detail {
                                     }
                                     else
                                     {
-                                        std::unordered_set<std::vector<path_component_type>> index;
+                                        //std::unordered_set<std::vector<path_component_type>,std::hash<std::vector<path_component_type>>,path_equal_to<char_type>> index;
+                                        std::set<std::vector<path_component_type>,path_less<char_type>> index;
                                         std::vector<path_node_type> temp2;
                                         for (auto&& node : temp)
                                         {
