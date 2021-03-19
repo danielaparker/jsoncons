@@ -3232,7 +3232,6 @@ namespace jsoncons { namespace jsonpath {
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, const Json&>;
         using reference = typename evaluator_t::reference;
-        using path_component_type = typename evaluator_t::path_component_type;
 
         auto expression = make_expression<Json>(path);
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
@@ -3246,7 +3245,7 @@ namespace jsoncons { namespace jsonpath {
             result_options options = result_options::nodups)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
-        using string_type = typename evaluator_t::string_type;
+        //using string_type = typename evaluator_t::string_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using expression_t = typename evaluator_t::path_expression_type;
@@ -3271,7 +3270,7 @@ namespace jsoncons { namespace jsonpath {
     json_replace(Json& instance, const typename Json::string_view_type& path , UnaryCallback callback)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
-        using string_type = typename evaluator_t::string_type;
+        //using string_type = typename evaluator_t::string_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using expression_t = typename evaluator_t::path_expression_type;
@@ -3297,7 +3296,7 @@ namespace jsoncons { namespace jsonpath {
                  result_options options = result_options::nodups)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
-        using string_type = typename evaluator_t::string_type;
+        //using string_type = typename evaluator_t::string_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using expression_t = typename evaluator_t::path_expression_type;
