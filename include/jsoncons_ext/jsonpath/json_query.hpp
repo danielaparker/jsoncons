@@ -3150,7 +3150,11 @@ namespace jsoncons { namespace jsonpath {
             std::vector<path_component_type> path = { path_component_type(root_node_arg) };
 
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-            expr_.evaluate(resources, path, instance, instance, callback, options);
+            auto f = [&callback](const std::vector<path_component_type>& path, reference val)
+            {
+                callback(to_string(path), val);
+            };
+            expr_.evaluate(resources, path, instance, instance, f, options);
         }
 
         Json evaluate(reference instance, result_options options = result_options::value)
@@ -3226,7 +3230,13 @@ namespace jsoncons { namespace jsonpath {
                Callback callback,
                result_options options = result_options::value)
     {
+        using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, const Json&>;
+        using reference = typename evaluator_t::reference;
+        using path_component_type = typename evaluator_t::path_component_type;
+
         auto expression = make_expression<Json>(path);
+        jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
+
         expression.evaluate(instance, callback, options);
     }
 
