@@ -289,7 +289,7 @@ namespace jsonpath {
     };
 
     template <class CharT>
-    struct path_less
+    struct nodups_path_less
     {
        bool operator()(const std::vector<path_component<CharT>>& lhs, 
                        const std::vector<path_component<CharT>>& rhs) const
@@ -1833,7 +1833,6 @@ namespace detail {
         std::vector<path_component_type> path;
         pointer ptr;
 
-        path_node() = default;
         path_node(const std::vector<path_component_type>& p, const pointer& valp)
             : path(p),ptr(valp)
         {
@@ -1863,9 +1862,9 @@ namespace detail {
             return *this;
         }
     };
-
+ 
     template <class Json,class JsonReference>
-    struct path_node_compare
+    struct path_node_less
     {
         bool operator()(const path_node<Json,JsonReference>& a,
                         const path_node<Json,JsonReference>& b) const noexcept
@@ -1875,12 +1874,20 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    struct path_node_equivalent
+    struct nodups_path_node_equal
     {
-        bool operator()(const path_node<Json,JsonReference>& a,
-                        const path_node<Json,JsonReference>& b) const noexcept
+        bool operator()(const path_node<Json,JsonReference>& lhs,
+                        const path_node<Json,JsonReference>& rhs) const noexcept
         {
-            return a.path == b.path;
+            std::size_t length = (std::min)(lhs.path.size(),rhs.path.size());
+            for (std::size_t i = 0; i < length; ++i)
+            {
+                if (lhs.path[i] != rhs.path[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     };
 
@@ -2479,8 +2486,8 @@ namespace detail {
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
         using path_node_type = path_node<Json,JsonReference>;
-        using path_node_compare_type = path_node_compare<Json,JsonReference>;
-        using path_node_equivalent_type = path_node_equivalent<Json,JsonReference>;
+        using path_node_less_type = path_node_less<Json,JsonReference>;
+        using path_node_equivalent_type = nodups_path_node_equal<Json,JsonReference>;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
@@ -2690,7 +2697,7 @@ namespace detail {
 
                                 if ((options & result_options::sort) == result_options::sort)
                                 {
-                                    std::sort(temp.begin(), temp.end(), path_node_compare_type());
+                                    std::sort(temp.begin(), temp.end(), path_node_less_type());
                                 }
 
                                 if ((options & result_options::nodups) == result_options::nodups)
@@ -2704,7 +2711,7 @@ namespace detail {
                                     else
                                     {
                                         //std::unordered_set<std::vector<path_component_type>,std::hash<std::vector<path_component_type>>,path_equal_to<char_type>> index;
-                                        std::set<std::vector<path_component_type>,path_less<char_type>> index;
+                                        std::set<std::vector<path_component_type>,nodups_path_less<char_type>> index;
                                         std::vector<path_node_type> temp2;
                                         for (auto&& node : temp)
                                         {
