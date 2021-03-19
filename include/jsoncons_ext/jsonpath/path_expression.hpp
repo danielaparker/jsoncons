@@ -23,6 +23,105 @@
 namespace jsoncons { 
 namespace jsonpath {
 
+    template <class CharT>
+    class path_component
+    {
+    public:
+        using string_type = std::basic_string<CharT>;
+    private:
+        enum class component_kind {identifier,index};
+
+        component_kind kind_;
+        string_type identifier_;
+        std::size_t index_;
+    public:
+        path_component(const string_type& identifier)
+            : kind_(component_kind::identifier), identifier_(identifier)
+        {
+        }
+
+        path_component(std::size_t index)
+            : kind_(component_kind::index), index_(index)
+        {
+        }
+
+        path_component(const path_component&) = default;
+        path_component(path_component&&) = default;
+        path_component& operator=(const path_component&) = default;
+        path_component& operator=(path_component&&) = default;
+
+        bool is_identifier() const
+        {
+            return kind_ == component_kind::identifier;
+        }
+
+        bool is_index() const
+        {
+            return kind_ == component_kind::index;
+        }
+
+        const string_type& identifier() const
+        {
+            return identifier_;
+        }
+
+        std::size_t index() const
+        {
+            return index_;
+        }
+
+        bool operator==(const path_component& other)
+        {
+            if (is_identifier() && other.is_identifier())
+            {
+                return identifier_ == other.identifier_;
+            }
+            else if (is_index() && other.is_index())
+            {
+                return index_ == other.index_;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        bool operator<(const path_component& other)
+        {
+            if (is_identifier() && other.is_identifier())
+            {
+                return identifier_ < other.identifier_;
+            }
+            else if (is_index() && other.is_index())
+            {
+                return index_ < other.index_;
+            }
+            else
+            {
+                return is_index() ? true : false;
+            }
+        }
+
+        void to_string(string_type& buffer) const
+        {
+            switch (kind_)
+            {
+                case path_component::identifier:
+                    buffer.push_back('[');
+                    buffer.push_back('\'');
+                    buffer.append(identifier_);
+                    buffer.push_back('\'');
+                    buffer.push_back(']');
+                    break;
+                case path_component::index:
+                    buffer.push_back('[');
+                    jsoncons::detail::from_integer(index_,buffer);
+                    buffer.push_back(']');
+                    break;
+            }
+        }
+    };
+
     enum class result_options {value=1,path=2,nodups=4|path,sort=8|path};
 
     using result_type = result_options;
