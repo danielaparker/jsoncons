@@ -1,3 +1,11 @@
+master
+------
+
+Bugs fixed:
+
+- Fixed a jsonpath issue with removal of duplicates with the `result_options::nodups`
+flag in the case of a union with different paths
+
 v0.162.3
 --------
 
