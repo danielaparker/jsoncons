@@ -44,6 +44,10 @@ void jsonpath_tests(const std::string& fpath)
                 {
                     flags |= jsonpath::result_options::nodups;
                 }
+                if (test_case.contains("sort") && test_case.at("sort").as<bool>())
+                {
+                    flags |= jsonpath::result_options::sort;
+                }
                 auto expression = jsoncons::jsonpath::make_expression<json>(jsoncons::string_view(expr));
                 if (test_case.contains("result"))
                 {
