@@ -1,3 +1,8 @@
+v0.162.3
+--------
+
+- Fixed a sign-compare warning in android builds, [\#309](https://github.com/danielaparker/jsoncons/issues/309) 
+
 v0.162.2
 --------
 
