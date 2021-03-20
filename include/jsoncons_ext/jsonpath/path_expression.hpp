@@ -2487,7 +2487,7 @@ namespace detail {
         using string_view_type = typename Json::string_view_type;
         using path_node_type = path_node<Json,JsonReference>;
         using path_node_less_type = path_node_less<Json,JsonReference>;
-        using path_node_equivalent_type = nodups_path_node_equal<Json,JsonReference>;
+        using nodups_path_node_equal_type = nodups_path_node_equal<Json,JsonReference>;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
@@ -2704,35 +2704,25 @@ namespace detail {
                                 {
                                     if ((options & result_options::sort) == result_options::sort)
                                     {
-                                        auto last = std::unique(temp.begin(),temp.end(),path_node_equivalent_type());
+                                        auto last = std::unique(temp.begin(),temp.end(),nodups_path_node_equal_type());
                                         temp.erase(last,temp.end());
                                         stack.emplace_back(std::move(temp), ndtype);
                                     }
                                     else
                                     {
-                                        //std::unordered_set<std::vector<path_component_type>,std::hash<std::vector<path_component_type>>,path_equal_to<char_type>> index;
-                                        std::set<std::vector<path_component_type>,nodups_path_less<char_type>> index;
-                                        for (const auto& node : temp)
-                                        {
-                                            auto it = index.find(node.path);
-                                            if (it == index.end())
-                                            {
-                                                index.emplace(node.path);
-                                            }
-                                            else if (it->size() > node.path.size())
-                                            {
-                                                index.erase(it);
-                                                index.emplace(node.path);
-                                            }
-                                            //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                        }
+                                        std::vector<path_node_type> index(temp);
+                                        std::sort(index.begin(), index.end(), path_node_less_type());
+                                        auto last = std::unique(index.begin(),index.end(),nodups_path_node_equal_type());
+                                        index.erase(last,index.end());
+
                                         std::vector<path_node_type> temp2;
                                         temp2.reserve(index.size());
                                         for (auto&& node : temp)
                                         {
                                             //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                            auto it = index.find(node.path);
-                                            if (it != index.end() && it->size() == node.path.size())
+                                            auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
+
+                                            if (it != index.end() && it->path == node.path) 
                                             {
                                                 temp2.emplace_back(std::move(node));
                                                 index.erase(it);
