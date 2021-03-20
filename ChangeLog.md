@@ -1,3 +1,8 @@
+v0.162.3
+--------
+
+- Fixed a sign-compare warning in android builds
+
 v0.162.2
 --------
 

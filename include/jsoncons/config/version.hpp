@@ -11,7 +11,7 @@
     
 #define JSONCONS_VERSION_MAJOR 0
 #define JSONCONS_VERSION_MINOR 162
-#define JSONCONS_VERSION_PATCH 2
+#define JSONCONS_VERSION_PATCH 3
 
 namespace jsoncons {
 
