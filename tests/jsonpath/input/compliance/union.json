@@ -359,6 +359,12 @@
                 "expression": "$['books',@['books'][0]]",
                 "path" : ["$['books']"],
                 "nodups" : true             
+             },
+             {
+                "comment" : "union with path and no duplicates",
+                "expression": "$[@['books'][0],'books']",
+                "path" : ["$['books']"],
+                "nodups" : true             
              }
          ]
     }

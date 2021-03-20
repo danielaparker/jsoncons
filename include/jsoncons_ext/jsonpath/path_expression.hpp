@@ -2712,14 +2712,30 @@ namespace detail {
                                     {
                                         //std::unordered_set<std::vector<path_component_type>,std::hash<std::vector<path_component_type>>,path_equal_to<char_type>> index;
                                         std::set<std::vector<path_component_type>,nodups_path_less<char_type>> index;
+                                        for (const auto& node : temp)
+                                        {
+                                            auto it = index.find(node.path);
+                                            if (it == index.end())
+                                            {
+                                                index.emplace(node.path);
+                                            }
+                                            else if (it->size() > node.path.size())
+                                            {
+                                                index.erase(it);
+                                                index.emplace(node.path);
+                                            }
+                                            //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
+                                        }
                                         std::vector<path_node_type> temp2;
+                                        temp2.reserve(index.size());
                                         for (auto&& node : temp)
                                         {
                                             //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                            if (index.count(node.path) == 0)
+                                            auto it = index.find(node.path);
+                                            if (it != index.end() && it->size() == node.path.size())
                                             {
-                                                index.emplace(node.path);
                                                 temp2.emplace_back(std::move(node));
+                                                index.erase(it);
                                             }
                                         }
                                         stack.emplace_back(std::move(temp2), ndtype);
