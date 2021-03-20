@@ -336,5 +336,30 @@
                 "result": ["fifth","forth"]
              }
          ]
+    },
+    {
+        "given": {
+           "books":
+                 [
+                     {"title" : "A Wild Sheep Chase"},
+                     {"title" : "The Night Watch"},
+                     {"title" : "The Comedians"},
+                     {"title" : "The Night Watch"},
+                     {"title" : "Norwegian Wood"},
+                     {"title" : "Infinite Jest"},
+                     {"title" : "Kafka on the Shore"},
+                     {"title" : "Life"},
+                     {"title" : "The Immortal Life of Henrietta Lacks"},
+                     {"title" : "I Am a Cat"}
+                 ]
+          },
+         "cases": [
+             {
+                "comment" : "union with path and no duplicates",
+                "expression": "$['books',@['books'][0]]",
+                "path" : ["$['books']"],
+                "nodups" : true             
+             }
+         ]
     }
 ]
