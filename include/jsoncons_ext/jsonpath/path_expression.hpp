@@ -512,7 +512,11 @@ namespace detail {
         virtual JsonReference evaluate(dynamic_resources<Json,JsonReference>&,
                              JsonReference, 
                              JsonReference, 
+
                              std::error_code&) const = 0;
+
+    protected:
+        ~binary_operator() = default;
     };
 
     // Implementations
