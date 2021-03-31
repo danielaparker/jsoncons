@@ -2472,6 +2472,9 @@ namespace detail {
                 case node_set_tag::multi:
                     nodes.~vector();
                     break;
+                case node_set_tag::single:
+                    node.~path_node_type();
+                    break;
                 default:
                     break;
             }
