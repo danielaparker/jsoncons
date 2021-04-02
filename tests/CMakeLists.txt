@@ -179,7 +179,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_
     message(STATUS Version " ${CMAKE_CXX_COMPILER_VERSION}")
     # older GCC versions don't support 
    target_compile_options(unit_tests PRIVATE
-       $<$<CXX_COMPILER_ID:GNU>:-Werror -Wall -Wextra -Wcast-align -Wcast-qual -Wimplicit-fallthrough -Wsign-compare -pedantic>
+       $<$<CXX_COMPILER_ID:GNU>:-Wnon-virtual-dtor -Werror -Wall -Wextra -Wcast-align -Wcast-qual -Wimplicit-fallthrough -Wsign-compare -pedantic>
    )
 endif()
 
