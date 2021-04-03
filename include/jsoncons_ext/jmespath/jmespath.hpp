@@ -409,13 +409,14 @@ namespace jmespath {
         {
             std::size_t precedence_level_;
             bool is_right_associative_;
+
+        protected:
+            ~unary_operator() = default; // virtual destructor not needed
         public:
             unary_operator(std::size_t precedence_level, bool is_right_associative)
                 : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
             {
             }
-
-            // virtual destructor not needed
 
             std::size_t precedence_level() const 
             {
