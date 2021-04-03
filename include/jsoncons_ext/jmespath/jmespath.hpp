@@ -447,13 +447,14 @@ namespace jmespath {
         {
             std::size_t precedence_level_;
             bool is_right_associative_;
+        protected:
+            ~binary_operator() = default; // virtual destructor not needed
         public:
             binary_operator(std::size_t precedence_level, bool is_right_associative = false)
                 : precedence_level_(precedence_level), is_right_associative_(is_right_associative)
             {
             }
 
-            // virtual destructor not needed
 
             std::size_t precedence_level() const 
             {
@@ -2283,6 +2284,8 @@ namespace jmespath {
 
         class or_operator final : public binary_operator
         {
+        protected:
+            ~or_operator() = default; // virtual destructor not needed
         public:
             or_operator()
                 : binary_operator(9)
@@ -2319,6 +2322,8 @@ namespace jmespath {
 
         class and_operator final : public binary_operator
         {
+        protected:
+            ~and_operator() = default; // virtual destructor not needed
         public:
             and_operator()
                 : binary_operator(8)
@@ -2351,6 +2356,8 @@ namespace jmespath {
 
         class eq_operator final : public binary_operator
         {
+        protected:
+            ~eq_operator() = default; // virtual destructor not needed
         public:
             eq_operator()
                 : binary_operator(6)
@@ -2376,6 +2383,8 @@ namespace jmespath {
 
         class ne_operator final : public binary_operator
         {
+        protected:
+            ~ne_operator() = default; // virtual destructor not needed
         public:
             ne_operator()
                 : binary_operator(6)
@@ -2401,6 +2410,8 @@ namespace jmespath {
 
         class lt_operator final : public binary_operator
         {
+        protected:
+            ~lt_operator() = default; // virtual destructor not needed
         public:
             lt_operator()
                 : binary_operator(5)
@@ -2430,6 +2441,8 @@ namespace jmespath {
 
         class lte_operator final : public binary_operator
         {
+        protected:
+            ~lte_operator() = default; // virtual destructor not needed
         public:
             lte_operator()
                 : binary_operator(5)
@@ -2459,6 +2472,8 @@ namespace jmespath {
 
         class gt_operator final : public binary_operator
         {
+        protected:
+            ~gt_operator() = default; // virtual destructor not needed
         public:
             gt_operator()
                 : binary_operator(5)
@@ -2488,6 +2503,8 @@ namespace jmespath {
 
         class gte_operator final : public binary_operator
         {
+        protected:
+            ~gte_operator() = default; // virtual destructor not needed
         public:
             gte_operator()
                 : binary_operator(5)
