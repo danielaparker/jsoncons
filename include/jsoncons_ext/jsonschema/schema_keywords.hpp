@@ -31,6 +31,8 @@ namespace jsonschema {
     public:
         using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
+        virtual ~schema_builder() = default;
+
         virtual schema_pointer build(const Json& schema,
                                      const std::vector<uri_wrapper>& uris,
                                      const std::vector<std::string>& keys) = 0;
