@@ -357,26 +357,26 @@
              {
                 "comment" : "union with path and no duplicates",
                 "expression": "$['books',@['books'][0]]",
-                "path" : ["$['books']"],
+                "path" : ["$['books']","$['books'][0]"],
                 "nodups" : true             
              },
              {
                 "comment" : "union with path and no duplicates",
                 "expression": "$[@['books'][0],'books']",
-                "path" : ["$['books']"],
+                "path" : ["$['books'][0]","$['books']"],
                 "nodups" : true             
              },
              {
                 "comment" : "union with path and no duplicates",
                 "expression": "$['books',@['books'][0]]",
-                "path" : ["$['books']"],
+                "path" : ["$['books']","$['books'][0]"],
                 "nodups" : true,             
                 "sort" : true             
              },
              {
                 "comment" : "union with path and no duplicates",
                 "expression": "$[@['books'][0],'books']",
-                "path" : ["$['books']"],
+                "path" : ["$['books']","$['books'][0]"],
                 "nodups" : true,             
                 "sort" : true             
              }

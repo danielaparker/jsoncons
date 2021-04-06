@@ -12,7 +12,6 @@
 #include <unordered_map> // std::unordered_map
 #include <unordered_set> // std::unordered_set
 #include <limits> // std::numeric_limits
-#include <set> // std::set
 #include <utility> // std::move
 #if defined(JSONCONS_HAS_STD_REGEX)
 #include <regex>
@@ -260,12 +259,6 @@ namespace jsonpath {
     }
 
     template <class CharT>
-    bool operator!=(const path_component<CharT>& lhs, const path_component<CharT>& rhs)
-    {
-        return !(lhs.operator==(rhs));
-    }
-
-    template <class CharT>
     bool operator<(const path_component<CharT>& lhs,const path_component<CharT>& rhs)
     {
         return lhs.operator<(rhs);
@@ -324,6 +317,69 @@ namespace jsonpath {
         return a;
     }
 
+} // namespace jsonpath
+} // namespace jsoncons
+
+namespace std {
+    template <class CharT>
+    struct less<std::vector<jsoncons::jsonpath::path_component<CharT>>>
+    {
+       bool operator()(const std::vector<jsoncons::jsonpath::path_component<CharT>>& k1, 
+                       const std::vector<jsoncons::jsonpath::path_component<CharT>>& k2) const
+       {
+            if (k1.empty() && k2.empty())
+            {
+                return false;
+            }
+            if (k1.empty())
+            {
+                return true;
+            }
+
+            std::size_t length = k1.size() < k2.size() ? k2.size() : k1.size();
+            for (std::size_t i = 0; i < length; ++i)
+            {
+                if (k1[i] < k2[i])
+                {
+                    return true;
+                }
+                else if (k1[i] > k2[i])
+                {
+                    return false;
+                }
+            }
+            return length == k2.size() ? false : true;
+       }
+    };
+    template <class CharT>
+    struct hash<std::vector<jsoncons::jsonpath::path_component<CharT>>>
+    {
+       std::size_t operator()(const std::vector<jsoncons::jsonpath::path_component<CharT>>& k1) const
+       {
+            if (k1.empty())
+            {
+                return 0;
+            }
+
+            std::size_t hash = 0;
+            for (const auto& item : k1)
+            {
+                if (item.is_identifier())
+                {
+                    hash += std::hash<typename jsoncons::jsonpath::path_component<CharT>::string_type>()(item.identifier());
+                }
+                else if (item.is_index())
+                {
+                    hash += std::hash<std::size_t>()(item.index());
+                }
+            }
+            return hash;
+       }
+    };
+}
+
+namespace jsoncons { 
+namespace jsonpath { 
 namespace detail {
 
     enum class node_type {single=1, multi};
@@ -473,11 +529,7 @@ namespace detail {
         virtual JsonReference evaluate(dynamic_resources<Json,JsonReference>&,
                              JsonReference, 
                              JsonReference, 
-
                              std::error_code&) const = 0;
-
-    protected:
-        ~binary_operator() = default;
     };
 
     // Implementations
@@ -542,6 +594,7 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
+            //std::cout << "eq_operator: lhs: " << lhs << ", rhs: " << rhs << "\n";
             return lhs == rhs ? resources.true_value() : resources.false_value();
         }
     };
@@ -1798,6 +1851,7 @@ namespace detail {
         std::vector<path_component_type> path;
         pointer ptr;
 
+        path_node() = default;
         path_node(const std::vector<path_component_type>& p, const pointer& valp)
             : path(p),ptr(valp)
         {
@@ -1827,9 +1881,9 @@ namespace detail {
             return *this;
         }
     };
- 
+
     template <class Json,class JsonReference>
-    struct path_node_less
+    struct path_node_compare
     {
         bool operator()(const path_node<Json,JsonReference>& a,
                         const path_node<Json,JsonReference>& b) const noexcept
@@ -1839,23 +1893,12 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    struct path_node_equal
+    struct path_node_equivalent
     {
-        bool operator()(const path_node<Json,JsonReference>& lhs,
-                        const path_node<Json,JsonReference>& rhs) const noexcept
+        bool operator()(const path_node<Json,JsonReference>& a,
+                        const path_node<Json,JsonReference>& b) const noexcept
         {
-            if (lhs.path.size() != rhs.path.size())
-            {
-                return false;
-            }
-            for (std::size_t i = 0; i < lhs.path.size(); ++i)
-            {
-                if (lhs.path[i] != rhs.path[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return a.path == b.path;
         }
     };
 
@@ -2440,9 +2483,6 @@ namespace detail {
                 case node_set_tag::multi:
                     nodes.~vector();
                     break;
-                case node_set_tag::single:
-                    node.~path_node_type();
-                    break;
                 default:
                     break;
             }
@@ -2457,8 +2497,8 @@ namespace detail {
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
         using path_node_type = path_node<Json,JsonReference>;
-        using path_node_less_type = path_node_less<Json,JsonReference>;
-        using path_node_equal_type = path_node_equal<Json,JsonReference>;
+        using path_node_compare_type = path_node_compare<Json,JsonReference>;
+        using path_node_equivalent_type = path_node_equivalent<Json,JsonReference>;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
@@ -2668,35 +2708,28 @@ namespace detail {
 
                                 if ((options & result_options::sort) == result_options::sort)
                                 {
-                                    std::sort(temp.begin(), temp.end(), path_node_less_type());
+                                    std::sort(temp.begin(), temp.end(), path_node_compare_type());
                                 }
 
                                 if ((options & result_options::nodups) == result_options::nodups)
                                 {
                                     if ((options & result_options::sort) == result_options::sort)
                                     {
-                                        auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
+                                        auto last = std::unique(temp.begin(),temp.end(),path_node_equivalent_type());
                                         temp.erase(last,temp.end());
                                         stack.emplace_back(std::move(temp), ndtype);
                                     }
                                     else
                                     {
-                                        std::vector<path_node_type> index(temp);
-                                        std::sort(index.begin(), index.end(), path_node_less_type());
-                                        auto last = std::unique(index.begin(),index.end(),path_node_equal_type());
-                                        index.erase(last,index.end());
-
+                                        std::unordered_set<std::vector<path_component_type>> index;
                                         std::vector<path_node_type> temp2;
-                                        temp2.reserve(index.size());
                                         for (auto&& node : temp)
                                         {
                                             //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                            auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
-
-                                            if (it != index.end() && it->path == node.path) 
+                                            if (index.count(node.path) == 0)
                                             {
+                                                index.emplace(node.path);
                                                 temp2.emplace_back(std::move(node));
-                                                index.erase(it);
                                             }
                                         }
                                         stack.emplace_back(std::move(temp2), ndtype);
