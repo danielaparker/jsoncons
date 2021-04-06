@@ -371,11 +371,11 @@ namespace detail {
     class dynamic_resources;
 
     template <class Json,class JsonReference>
-    class unary_operator
+    struct unary_operator
     {
         std::size_t precedence_level_;
         bool is_right_associative_;
-    public:
+
         unary_operator(std::size_t precedence_level,
                        bool is_right_associative)
             : precedence_level_(precedence_level),
@@ -488,13 +488,11 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class binary_operator
+    struct binary_operator
     {
         std::size_t precedence_level_;
         bool is_right_associative_;
-    protected:
-        ~binary_operator() = default;
-    public:
+
         binary_operator(std::size_t precedence_level,
                         bool is_right_associative = false)
             : precedence_level_(precedence_level),
@@ -2473,6 +2471,9 @@ namespace detail {
             {
                 case node_set_tag::multi:
                     nodes.~vector();
+                    break;
+                case node_set_tag::single:
+                    node.~path_node_type();
                     break;
                 default:
                     break;
