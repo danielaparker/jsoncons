@@ -1,3 +1,20 @@
+v0.163.1
+--------
+
+Bugs fixed:
+
+- Reversed change made in 0.163.0 to removal of duplicates with the `result_options::nodups`,
+reverting to previous behaviour (only consider as duplicates nodes with the exact same path
+starting from the root.) That seems to be the consensus.
+
+- Fixed a memory leak in jsoncons::jsonpath::node_set, see [\#314](https://github.com/danielaparker/jsoncons/pull/314),
+also related, [\#316](https://github.com/danielaparker/jsoncons/issues/316)
+
+- Fixed some gcc warnings about non-virtual destructors in the jsonpath, jmespath, and
+jsonschema extensions by making the destructors protected, see [\#313](https://github.com/danielaparker/jsoncons/pull/313). 
+Added the gcc compiler flag `-Wnon-virtual-dtor` for gcc in the `tests/CMakeLists.txt` file.
+
+
 v0.163.0
 --------
 
