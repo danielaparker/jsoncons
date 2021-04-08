@@ -1556,7 +1556,7 @@ namespace detail {
         {
         }
 
-        function_base_type* get_function(const string_type& name, std::error_code& ec) const
+        const function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
             static abs_function<Json,JsonReference> abs_func;
             static contains_function<Json,JsonReference> contains_func;
@@ -1576,7 +1576,7 @@ namespace detail {
             static tokenize_function<Json,JsonReference> tokenize_func;
 #endif
 
-            static std::unordered_map<string_type,function_base_type*> functions =
+            static std::unordered_map<string_type,const function_base_type*> functions =
             {
                 {string_type{'a','b','s'}, &abs_func},
                 {string_type{'c','o','n','t','a','i','n','s'}, &contains_func},
@@ -1625,75 +1625,75 @@ namespace detail {
             return unary_operators_.back().get();
         }
 
-        binary_operator<Json,JsonReference>* get_or_operator() const
+        const binary_operator<Json,JsonReference>* get_or_operator() const
         {
             static or_operator<Json,JsonReference> oper;
 
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_and_operator() const
+        const binary_operator<Json,JsonReference>* get_and_operator() const
         {
             static and_operator<Json,JsonReference> oper;
 
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_eq_operator() const
+        const binary_operator<Json,JsonReference>* get_eq_operator() const
         {
             static eq_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_ne_operator() const
+        const binary_operator<Json,JsonReference>* get_ne_operator() const
         {
             static ne_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_lt_operator() const
+        const binary_operator<Json,JsonReference>* get_lt_operator() const
         {
             static lt_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_lte_operator() const
+        const binary_operator<Json,JsonReference>* get_lte_operator() const
         {
             static lte_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_gt_operator() const
+        const binary_operator<Json,JsonReference>* get_gt_operator() const
         {
             static gt_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_gte_operator() const
+        const binary_operator<Json,JsonReference>* get_gte_operator() const
         {
             static gte_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_plus_operator() const
+        const binary_operator<Json,JsonReference>* get_plus_operator() const
         {
             static plus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_minus_operator() const
+        const binary_operator<Json,JsonReference>* get_minus_operator() const
         {
             static minus_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_mult_operator() const
+        const binary_operator<Json,JsonReference>* get_mult_operator() const
         {
             static mult_operator<Json,JsonReference> oper;
             return &oper;
         }
 
-        binary_operator<Json,JsonReference>* get_div_operator() const
+        const binary_operator<Json,JsonReference>* get_div_operator() const
         {
             static div_operator<Json,JsonReference> oper;
             return &oper;
@@ -2018,7 +2018,7 @@ namespace detail {
             std::unique_ptr<selector_base_type> selector_;
             const unary_operator<Json,JsonReference>* unary_operator_;
             const binary_operator<Json,JsonReference>* binary_operator_;
-            function_base<Json,JsonReference>* function_;
+            const function_base<Json,JsonReference>* function_;
             Json value_;
         };
     public:
@@ -2106,7 +2106,7 @@ namespace detail {
             new (&selector_) std::unique_ptr<selector_base_type>(std::move(expression));
         }
 
-        token(function_base<Json,JsonReference>* function) noexcept
+        token(const function_base<Json,JsonReference>* function) noexcept
             : type_(token_kind::function),
               function_(function)
         {

@@ -1825,9 +1825,9 @@ namespace jmespath {
             union
             {
                 std::unique_ptr<expression_base> expression_;
-                unary_operator* unary_operator_;
-                binary_operator* binary_operator_;
-                function_base* function_;
+                const unary_operator* unary_operator_;
+                const binary_operator* binary_operator_;
+                const function_base* function_;
                 Json value_;
                 string_type key_;
             };
@@ -1910,19 +1910,19 @@ namespace jmespath {
                 new (&expression_) std::unique_ptr<expression_base>(std::move(expression));
             }
 
-            token(unary_operator* expression) noexcept
+            token(const unary_operator* expression) noexcept
                 : type_(token_kind::unary_operator),
                   unary_operator_(expression)
             {
             }
 
-            token(binary_operator* expression) noexcept
+            token(const binary_operator* expression) noexcept
                 : type_(token_kind::binary_operator),
                   binary_operator_(expression)
             {
             }
 
-            token(function_base* function) noexcept
+            token(const function_base* function) noexcept
                 : type_(token_kind::function),
                   function_(function)
             {
@@ -3114,7 +3114,7 @@ namespace jmespath {
             static_resources(static_resources&& expr) = default;
             static_resources& operator=(static_resources&& expr) = default;
 
-            function_base* get_function(const string_type& name, std::error_code& ec) const
+            const function_base* get_function(const string_type& name, std::error_code& ec) const
             {
                 static abs_function abs_func;
                 static avg_function avg_func;
@@ -3137,13 +3137,13 @@ namespace jmespath {
                 static values_function values_func;
                 static reverse_function reverse_func;
                 static starts_with_function starts_with_func;
-                static sum_function sum_func;
+                static const sum_function sum_func;
                 static to_array_function to_array_func;
                 static to_number_function to_number_func;
                 static to_string_function to_string_func;
                 static not_null_function not_null_func;
 
-                using function_dictionary = std::unordered_map<string_type,function_base*>;
+                using function_dictionary = std::unordered_map<string_type,const function_base*>;
                 static const function_dictionary functions_ =
                 {
                     {string_type{'a','b','s'}, &abs_func},
@@ -3182,60 +3182,60 @@ namespace jmespath {
                 return it->second;
             }
 
-            unary_operator* get_not_operator() const
+            const unary_operator* get_not_operator() const
             {
-                static not_expression not_oper;
+                static const not_expression not_oper;
 
                 return &not_oper;
             }
 
-            binary_operator* get_or_operator() const
+            const binary_operator* get_or_operator() const
             {
-                static or_operator or_oper;
+                static const or_operator or_oper;
 
                 return &or_oper;
             }
 
-            binary_operator* get_and_operator() const
+            const binary_operator* get_and_operator() const
             {
-                static and_operator and_oper;
+                static const and_operator and_oper;
 
                 return &and_oper;
             }
 
-            binary_operator* get_eq_operator() const
+            const binary_operator* get_eq_operator() const
             {
-                static eq_operator eq_oper;
+                static const eq_operator eq_oper;
                 return &eq_oper;
             }
 
-            binary_operator* get_ne_operator() const
+            const binary_operator* get_ne_operator() const
             {
-                static ne_operator ne_oper;
+                static const ne_operator ne_oper;
                 return &ne_oper;
             }
 
-            binary_operator* get_lt_operator() const
+            const binary_operator* get_lt_operator() const
             {
-                static lt_operator lt_oper;
+                static const lt_operator lt_oper;
                 return &lt_oper;
             }
 
-            binary_operator* get_lte_operator() const
+            const binary_operator* get_lte_operator() const
             {
-                static lte_operator lte_oper;
+                static const lte_operator lte_oper;
                 return &lte_oper;
             }
 
-            binary_operator* get_gt_operator() const
+            const binary_operator* get_gt_operator() const
             {
-                static gt_operator gt_oper;
+                static const gt_operator gt_oper;
                 return &gt_oper;
             }
 
-            binary_operator* get_gte_operator() const
+            const binary_operator* get_gte_operator() const
             {
-                static gte_operator gte_oper;
+                static const gte_operator gte_oper;
                 return &gte_oper;
             }
         };
