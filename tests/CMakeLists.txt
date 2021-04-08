@@ -95,6 +95,7 @@ add_executable(unit_tests
                src/encode_decode_json_tests.cpp
                src/error_recovery_tests.cpp
                fuzz_regression/src/fuzz_regression_tests.cpp
+               jmespath/src/jmespath_expression_tests.cpp
                jmespath/src/jmespath_tests.cpp
                src/json_array_tests.cpp
                src/json_as_tests.cpp

@@ -3104,70 +3104,75 @@ namespace jmespath {
 
         class static_resources
         {
-            abs_function abs_func_;
-            avg_function avg_func_;
-            ceil_function ceil_func_;
-            contains_function contains_func_;
-            ends_with_function ends_with_func_;
-            floor_function floor_func_;
-            join_function join_func_;
-            length_function length_func_;
-            max_function max_func_;
-            max_by_function max_by_func_;
-            map_function map_func_;
-            merge_function merge_func_;
-            min_function min_func_;
-            min_by_function min_by_func_;
-            type_function type_func_;
-            sort_function sort_func_;
-            sort_by_function sort_by_func_;
-            keys_function keys_func_;
-            values_function values_func_;
-            reverse_function reverse_func_;
-            starts_with_function starts_with_func_;
-            sum_function sum_func_;
-            to_array_function to_array_func_;
-            to_number_function to_number_func_;
-            to_string_function to_string_func_;
-            not_null_function not_null_func_;
-
-            using function_dictionary = std::unordered_map<string_type,function_base*>;
-            const function_dictionary functions_ =
-            {
-                {string_type{'a','b','s'}, &abs_func_},
-                {string_type{'a','v','g'}, &avg_func_},
-                {string_type{'c','e','i', 'l'}, &ceil_func_},
-                {string_type{'c','o','n', 't', 'a', 'i', 'n', 's'}, &contains_func_},
-                {string_type{'e','n','d', 's', '_', 'w', 'i', 't', 'h'}, &ends_with_func_},
-                {string_type{'f','l','o', 'o', 'r'}, &floor_func_},
-                {string_type{'j','o','i', 'n'}, &join_func_},
-                {string_type{'l','e','n', 'g', 't', 'h'}, &length_func_},
-                {string_type{'m','a','x'}, &max_func_},
-                {string_type{'m','a','x','_','b','y'}, &max_by_func_},
-                {string_type{'m','a','p'}, &map_func_},
-                {string_type{'m','i','n'}, &min_func_},
-                {string_type{'m','i','n','_','b','y'}, &min_by_func_},
-                {string_type{'m','e','r', 'g', 'e'}, &merge_func_},
-                {string_type{'t','y','p', 'e'}, &type_func_},
-                {string_type{'s','o','r', 't'}, &sort_func_},
-                {string_type{'s','o','r', 't','_','b','y'}, &sort_by_func_},
-                {string_type{'k','e','y', 's'}, &keys_func_},
-                {string_type{'v','a','l', 'u','e','s'}, &values_func_},
-                {string_type{'r','e','v', 'e', 'r', 's','e'}, &reverse_func_},
-                {string_type{'s','t','a', 'r','t','s','_','w','i','t','h'}, &starts_with_func_},
-                {string_type{'s','u','m'}, &sum_func_},
-                {string_type{'t','o','_','a','r','r','a','y',}, &to_array_func_},
-                {string_type{'t','o','_', 'n', 'u', 'm','b','e','r'}, &to_number_func_},
-                {string_type{'t','o','_', 's', 't', 'r','i','n','g'}, &to_string_func_},
-                {string_type{'n','o','t', '_', 'n', 'u','l','l'}, &not_null_func_}
-            };
-
             std::vector<std::unique_ptr<Json>> temp_storage_;
 
         public:
 
+            static_resources() = default;
+            static_resources(const static_resources& expr) = delete;
+            static_resources& operator=(const static_resources& expr) = delete;
+            static_resources(static_resources&& expr) = default;
+            static_resources& operator=(static_resources&& expr) = default;
+
             function_base* get_function(const string_type& name, std::error_code& ec) const
             {
+                static abs_function abs_func;
+                static avg_function avg_func;
+                static ceil_function ceil_func;
+                static contains_function contains_func;
+                static ends_with_function ends_with_func;
+                static floor_function floor_func;
+                static join_function join_func;
+                static length_function length_func;
+                static max_function max_func;
+                static max_by_function max_by_func;
+                static map_function map_func;
+                static merge_function merge_func;
+                static min_function min_func;
+                static min_by_function min_by_func;
+                static type_function type_func;
+                static sort_function sort_func;
+                static sort_by_function sort_by_func;
+                static keys_function keys_func;
+                static values_function values_func;
+                static reverse_function reverse_func;
+                static starts_with_function starts_with_func;
+                static sum_function sum_func;
+                static to_array_function to_array_func;
+                static to_number_function to_number_func;
+                static to_string_function to_string_func;
+                static not_null_function not_null_func;
+
+                using function_dictionary = std::unordered_map<string_type,function_base*>;
+                static const function_dictionary functions_ =
+                {
+                    {string_type{'a','b','s'}, &abs_func},
+                    {string_type{'a','v','g'}, &avg_func},
+                    {string_type{'c','e','i', 'l'}, &ceil_func},
+                    {string_type{'c','o','n', 't', 'a', 'i', 'n', 's'}, &contains_func},
+                    {string_type{'e','n','d', 's', '_', 'w', 'i', 't', 'h'}, &ends_with_func},
+                    {string_type{'f','l','o', 'o', 'r'}, &floor_func},
+                    {string_type{'j','o','i', 'n'}, &join_func},
+                    {string_type{'l','e','n', 'g', 't', 'h'}, &length_func},
+                    {string_type{'m','a','x'}, &max_func},
+                    {string_type{'m','a','x','_','b','y'}, &max_by_func},
+                    {string_type{'m','a','p'}, &map_func},
+                    {string_type{'m','i','n'}, &min_func},
+                    {string_type{'m','i','n','_','b','y'}, &min_by_func},
+                    {string_type{'m','e','r', 'g', 'e'}, &merge_func},
+                    {string_type{'t','y','p', 'e'}, &type_func},
+                    {string_type{'s','o','r', 't'}, &sort_func},
+                    {string_type{'s','o','r', 't','_','b','y'}, &sort_by_func},
+                    {string_type{'k','e','y', 's'}, &keys_func},
+                    {string_type{'v','a','l', 'u','e','s'}, &values_func},
+                    {string_type{'r','e','v', 'e', 'r', 's','e'}, &reverse_func},
+                    {string_type{'s','t','a', 'r','t','s','_','w','i','t','h'}, &starts_with_func},
+                    {string_type{'s','u','m'}, &sum_func},
+                    {string_type{'t','o','_','a','r','r','a','y',}, &to_array_func},
+                    {string_type{'t','o','_', 'n', 'u', 'm','b','e','r'}, &to_number_func},
+                    {string_type{'t','o','_', 's', 't', 'r','i','n','g'}, &to_string_func},
+                    {string_type{'n','o','t', '_', 'n', 'u','l','l'}, &not_null_func}
+                };
                 auto it = functions_.find(name);
                 if (it == functions_.end())
                 {
@@ -3237,22 +3242,25 @@ namespace jmespath {
 
         class jmespath_expression
         {
-            static_resources context_;
+            static_resources resources_;
             std::vector<token> output_stack_;
         public:
             jmespath_expression()
             {
             }
 
+            jmespath_expression(const jmespath_expression& expr) = delete;
+            jmespath_expression& operator=(const jmespath_expression& expr) = delete;
+
             jmespath_expression(jmespath_expression&& expr)
-                : context_(std::move(expr.context_)),
+                : resources_(std::move(expr.resources_)),
                   output_stack_(std::move(expr.output_stack_))
             {
             }
 
             jmespath_expression(static_resources&& resources,
                                 std::vector<token>&& output_stack)
-                : context_(std::move(resources)), output_stack_(std::move(output_stack))
+                : resources_(std::move(resources)), output_stack_(std::move(output_stack))
             {
             }
 
@@ -3307,7 +3315,7 @@ namespace jmespath {
         const char_type* end_input_;
         const char_type* p_;
 
-        static_resources context_;
+        static_resources resources_;
         std::vector<path_state> state_stack_;
 
         std::vector<token> output_stack_;
@@ -3528,7 +3536,7 @@ namespace jmespath {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token(context_.get_not_operator()), ec);
+                                push_token(token(resources_.get_not_operator()), ec);
                                 if (ec) {return jmespath_expression();}
                                 break;
                             }
@@ -3652,7 +3660,7 @@ namespace jmespath {
                             case '(':
                             {
                                 eval_stack.push_back(0);
-                                auto f = context_.get_function(buffer, ec);
+                                auto f = resources_.get_function(buffer, ec);
                                 if (ec)
                                 {
                                     return jmespath_expression();
@@ -4367,7 +4375,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(context_.get_lte_operator()), ec);
+                                push_token(token(resources_.get_lte_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
@@ -4375,7 +4383,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(context_.get_lt_operator()), ec);
+                                push_token(token(resources_.get_lt_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back();
@@ -4388,7 +4396,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(context_.get_gte_operator()), ec);
+                                push_token(token(resources_.get_gte_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
@@ -4396,7 +4404,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             default:
-                                push_token(token(context_.get_gt_operator()), ec);
+                                push_token(token(resources_.get_gt_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
@@ -4409,7 +4417,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(context_.get_eq_operator()), ec);
+                                push_token(token(resources_.get_eq_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
@@ -4427,7 +4435,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token(context_.get_ne_operator()), ec);
+                                push_token(token(resources_.get_ne_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
@@ -4463,7 +4471,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '|':
-                                push_token(token(context_.get_or_operator()), ec);
+                                push_token(token(resources_.get_or_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
@@ -4483,7 +4491,7 @@ namespace jmespath {
                         switch(*p_)
                         {
                             case '&':
-                                push_token(token(context_.get_and_operator()), ec);
+                                push_token(token(resources_.get_and_operator()), ec);
                                 push_token(token(current_node_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); // expect_and
@@ -4687,7 +4695,7 @@ namespace jmespath {
                 return jmespath_expression();
             }
 
-            return jmespath_expression(std::move(context_), std::move(output_stack_));
+            return jmespath_expression(std::move(resources_), std::move(output_stack_));
         }
 
         void advance_past_space_character(std::error_code& ec)
