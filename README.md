@@ -50,7 +50,9 @@ _"I’m using your library for an external interface to pass data, as well as usin
 
 _"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
 
-_"the ability to have an xpath like facility is so useful"_
+_"the JSONPath feature of this library, it's great"_
+
+-"We use JMESPath implementation quite extensively"_ 
 
 _"I finally decided on jsoncons after evaluating quite a few json libraries out there."_
 

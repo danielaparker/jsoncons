@@ -1,3 +1,10 @@
+v0.163.2
+--------
+
+Bugs fixed:
+
+- Fixed a jmespath issue with reusing compiled expressions, see [\#317](https://github.com/danielaparker/jsoncons/issues/317)
+
 v0.163.1
 --------
 
