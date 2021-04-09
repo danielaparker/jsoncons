@@ -52,7 +52,7 @@ _"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
 
 _"the JSONPath feature of this library, it's great"_
 
--"We use JMESPath implementation quite extensively"_ 
+_"We use JMESPath implementation quite extensively"_ 
 
 _"I finally decided on jsoncons after evaluating quite a few json libraries out there."_
 
