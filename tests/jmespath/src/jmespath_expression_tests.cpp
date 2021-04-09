@@ -38,13 +38,14 @@ TEST_CASE("jmespath_expression tests")
             }
         )";
 
-        auto expr = jmespath::jmespath_expression<json>::compile("sum(people[].age)");
+        auto expr = jmespath::make_expression<json>("sum(people[].age)");
 
         json doc = json::parse(jtext);
 
         json result = expr.evaluate(doc);
-        std::cout << pretty_print(result) << "\n\n";
+        CHECK(result == json(75.0));
     }    
+
     SECTION("Test 2")
     {
         std::string jtext = R"(
@@ -60,56 +61,17 @@ TEST_CASE("jmespath_expression tests")
 
         json doc = json::parse(jtext);
 
-        std::unique_ptr<jmespath::jmespath_expression<json>> expr1;
-        expr1 = jsoncons::make_unique<jmespath::jmespath_expression<json >>(jmespath::jmespath_expression<json>::compile("group.value"));
-        json result1 = expr1->evaluate(doc);
-        std::cout << pretty_print(result1) << "\n\n";
+        auto expr1 = jmespath::make_expression<json>("group.value");
+        json result1 = expr1.evaluate(doc);
+        CHECK(result1 == json(1));
 
-        std::unique_ptr<jmespath::jmespath_expression<json>> expr2;
-        expr2 = jsoncons::make_unique<jmespath::jmespath_expression<json >>(jmespath::jmespath_expression<json>::compile("array[0].value"));
-        json result2 = expr2->evaluate(doc);
-        std::cout << pretty_print(result2) << "\n\n";
+        auto expr2 = jmespath::make_expression<json>("array[0].value");
+        json result2 = expr2.evaluate(doc);
+        CHECK(result2 == json(2));
 
-        std::unique_ptr<jmespath::jmespath_expression<json>> expr3;
-        expr3 = jsoncons::make_unique<jmespath::jmespath_expression<json >>(jmespath::jmespath_expression<json>::compile("nullable.value"));
-        json result3 = expr3->evaluate(doc);
-        std::cout << pretty_print(result3) << "\n\n";
-    }    
-    SECTION("Test 3")
-    {
-        std::string jtext = R"(
-{
-    "group": {
-      "value": 1
-    },
-    "array": [
-      {"value": 2}
-    ]
-}
-        )";
-
-        json doc = json::parse(jtext);
-
-        std::unique_ptr<jmespath::jmespath_expression<json>> expr1;
-        {
-            expr1 = jsoncons::make_unique<jmespath::jmespath_expression<json >>(jmespath::jmespath_expression<json>::compile("group.value"));
-        }
-        json result1 = expr1->evaluate(doc);
-        std::cout << pretty_print(result1) << "\n\n";
-
-        std::unique_ptr<jmespath::jmespath_expression<json>> expr2;
-        {
-            expr2 = jsoncons::make_unique<jmespath::jmespath_expression<json >>(jmespath::jmespath_expression<json>::compile("array[0].value"));
-        }
-        json result2 = expr2->evaluate(doc);
-        std::cout << pretty_print(result2) << "\n\n";
-
-        std::unique_ptr<jmespath::jmespath_expression<json>> expr3;
-        {
-            expr3 = jsoncons::make_unique<jmespath::jmespath_expression<json >>(jmespath::jmespath_expression<json>::compile("nullable.value"));
-        }
-        json result3 = expr3->evaluate(doc);
-        std::cout << pretty_print(result3) << "\n\n";
+        auto expr3 = jmespath::make_expression<json>("nullable.value");
+        json result3 = expr3.evaluate(doc);
+        CHECK(result3 == json::null());
     }    
 }
 

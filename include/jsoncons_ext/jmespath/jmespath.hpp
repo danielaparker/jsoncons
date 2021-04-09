@@ -4677,8 +4677,12 @@ namespace jmespath {
                 }
             }
 
-            JSONCONS_ASSERT(state_stack_.size() == 1);
-            JSONCONS_ASSERT(state_stack_.back() == path_state::rhs_expression);
+            if (!(state_stack_.size() == 1 && state_stack_.back() == path_state::rhs_expression))
+            {
+                ec = jmespath_errc::unexpected_end_of_input;
+                return jmespath_expression();
+            }
+
             state_stack_.pop_back();
 
             push_token(end_of_expression_arg, ec);
