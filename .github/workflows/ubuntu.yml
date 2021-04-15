@@ -82,3 +82,26 @@ jobs:
       run: cmake --build build --parallel 10
     - name: test
       run: cd build ; ctest -j 10 --output-on-failure
+
+  gcc_build_48:
+    name: GCC 4.8
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: install_gcc
+      run: |
+           sudo apt update
+           sudo apt install gcc-4.8 g++-4.8
+      shell: bash
+    - name: cmake
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
+      env:
+        CC:   gcc-4.8
+        CXX:  g++-4.8
+    - name: build
+      run: cmake --build build --parallel 10
+    - name: test
+      run: cd build ; ctest -j 10 --output-on-failure
+
+
