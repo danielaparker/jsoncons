@@ -89,10 +89,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: install_gcc
+    - name: Install
       run: |
-           sudo apt update
-           sudo apt install gcc-4.8 g++-4.8
+           sudo apt-get update -y -qq && sudo apt-get install -y -qq g++-4.8 binutils
       shell: bash
     - name: cmake
       run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
