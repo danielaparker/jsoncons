@@ -3,6 +3,28 @@ name: Ubuntu
 on: [push, pull_request]
 
 jobs:
+  gcc_build_4.8:
+    name: GCC 4.8
+    runs-on: ubuntu-18.04
+    needs: linux-debug
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: install_gcc
+      run: |
+           sudo apt update
+           sudo apt install gcc-4.8 g++-4.8
+      shell: bash
+    - name: cmake
+      run: cmake -S . -B build -DJSONCONS_SANITIZE=ON -DCMAKE_BUILD_TYPE=Debug -DJSONCONS_BUILD_TESTS=On
+      env:
+        CC:   gcc-4.8
+        CXX:  g++-4.8
+    - name: build
+      run: cmake --build build --parallel 10
+    - name: test
+      run: cd build ; ctest -j 10 --output-on-failure
+
   gcc_build:
     runs-on: ubuntu-latest
 
