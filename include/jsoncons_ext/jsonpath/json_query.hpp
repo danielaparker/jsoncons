@@ -3224,7 +3224,7 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json,class Callback>
-    typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const typename Json::string_type&,const Json&>::value,void>::type
+    typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const std::basic_string<typename Json::char_type>&,const Json&>::value,void>::type
     json_query(const Json& instance, 
                const typename Json::string_view_type& path , 
                Callback callback,
@@ -3291,7 +3291,7 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json, class BinaryCallback>
-    typename std::enable_if<jsoncons::detail::is_binary_function_object<BinaryCallback,const typename Json::string_type&,Json&>::value,void>::type
+    typename std::enable_if<jsoncons::detail::is_binary_function_object<BinaryCallback,const std::basic_string<typename Json::char_type>&,Json&>::value,void>::type
     json_replace(Json& instance, const typename Json::string_view_type& path , BinaryCallback callback, 
                  result_options options = result_options::nodups)
     {
