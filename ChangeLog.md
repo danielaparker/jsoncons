@@ -1,3 +1,12 @@
+v0.163.3
+--------
+
+Bugs fixed:
+
+- Fixed a jsonpath issue where the two overloads of json_query and json_replace
+that took a callback function argument used a deprecated typedef in an
+SFINAE condition. 
+
 v0.163.2
 --------
 
