@@ -297,7 +297,7 @@ namespace jsoncons { namespace jsonpath {
                 else if (val.is_string() && identifier_ == length_literal<char_type>())
                 {
                     string_view_type sv = val.as_string_view();
-                    std::size_t count = unicons::u32_length(sv.begin(), sv.end());
+                    std::size_t count = unicode_traits::u32_length(sv.begin(), sv.end());
                     pointer ptr = resources.create_json(count);
                     this->evaluate_tail(resources, generate_path(path, identifier_, options), 
                                             root, *ptr, nodes, ndtype, options);
@@ -2610,7 +2610,7 @@ namespace jsoncons { namespace jsonpath {
                         {
                             return path_expression_type();
                         }
-                        if (unicons::is_high_surrogate(cp))
+                        if (unicode_traits::is_high_surrogate(cp))
                         {
                             ++p_;
                             ++column_;
@@ -2618,7 +2618,7 @@ namespace jsoncons { namespace jsonpath {
                         }
                         else
                         {
-                            unicons::convert(&cp, &cp + 1, std::back_inserter(buffer));
+                            unicode_traits::convert(&cp, &cp + 1, std::back_inserter(buffer));
                             ++p_;
                             ++column_;
                             state_stack_.pop_back();
@@ -2688,7 +2688,7 @@ namespace jsoncons { namespace jsonpath {
                             return path_expression_type();
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
-                        unicons::convert(&codepoint, &codepoint + 1, std::back_inserter(buffer));
+                        unicode_traits::convert(&codepoint, &codepoint + 1, std::back_inserter(buffer));
                         state_stack_.pop_back();
                         ++p_;
                         ++column_;

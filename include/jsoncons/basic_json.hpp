@@ -2693,8 +2693,8 @@ public:
         json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(options,err_handler);
 
-        auto result = unicons::skip_bom(s.begin(), s.end());
-        if (result.ec != unicons::encoding_errc())
+        auto result = unicode_traits::skip_bom(s.begin(), s.end());
+        if (result.ec != unicode_traits::encoding_errc())
         {
             JSONCONS_THROW(ser_error(result.ec));
         }

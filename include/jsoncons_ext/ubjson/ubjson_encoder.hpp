@@ -227,8 +227,8 @@ private:
 
     bool visit_key(const string_view_type& name, const ser_context&, std::error_code& ec) override
     {
-        auto sink = unicons::validate(name.begin(), name.end());
-        if (sink.ec != unicons::conv_errc())
+        auto sink = unicode_traits::validate(name.begin(), name.end());
+        if (sink.ec != unicode_traits::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             return false;
@@ -268,8 +268,8 @@ private:
             }
         }
 
-        auto sink = unicons::validate(sv.begin(), sv.end());
-        if (sink.ec != unicons::conv_errc())
+        auto sink = unicode_traits::validate(sv.begin(), sv.end());
+        if (sink.ec != unicode_traits::conv_errc())
         {
             ec = ubjson_errc::invalid_utf8_text_string;
             return false;

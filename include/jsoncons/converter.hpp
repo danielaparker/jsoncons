@@ -115,8 +115,8 @@ namespace jsoncons {
         from_(Into& bytes, const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             std::string u;
-            auto retval = unicons::convert(s.begin(), s.end(), std::back_inserter(u));
-            if (retval.ec != unicons::conv_errc())
+            auto retval = unicode_traits::convert(s.begin(), s.end(), std::back_inserter(u));
+            if (retval.ec != unicode_traits::conv_errc())
             {
                 ec = conv_errc::not_utf8;
                 return;
@@ -281,8 +281,8 @@ namespace jsoncons {
             converter<std::string> convert{ dummy_ };
             std::string u = convert.from(bytes, tag, ec);
 
-            auto retval = unicons::convert(u.begin(), u.end(), std::back_inserter(s));
-            if (retval.ec != unicons::conv_errc())
+            auto retval = unicode_traits::convert(u.begin(), u.end(), std::back_inserter(s));
+            if (retval.ec != unicode_traits::conv_errc())
             {
                 ec = conv_errc::not_wide_char;
             }

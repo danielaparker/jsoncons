@@ -340,8 +340,8 @@ namespace msgpack {
 
         void write_string_value(const string_view_type& sv) 
         {
-            auto sink = unicons::validate(sv.begin(), sv.end());
-            if (sink.ec != unicons::conv_errc())
+            auto sink = unicode_traits::validate(sv.begin(), sv.end());
+            if (sink.ec != unicode_traits::conv_errc())
             {
                 JSONCONS_THROW(ser_error(msgpack_errc::invalid_utf8_text_string));
             }

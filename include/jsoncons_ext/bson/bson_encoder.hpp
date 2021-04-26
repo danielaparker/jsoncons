@@ -262,8 +262,8 @@ private:
         buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
         std::size_t string_offset = buffer_.size();
 
-        auto sink = unicons::validate(sv.begin(), sv.end());
-        if (sink.ec != unicons::conv_errc())
+        auto sink = unicode_traits::validate(sv.begin(), sv.end());
+        if (sink.ec != unicode_traits::conv_errc())
         {
             ec = bson_errc::invalid_utf8_text_string;
             return false;

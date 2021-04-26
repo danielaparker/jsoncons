@@ -958,7 +958,7 @@ namespace jmespath {
                     case json_type::string_value:
                     {
                         auto sv0 = arg0_ptr->template as<string_view_type>();
-                        auto length = unicons::u32_length(sv0.begin(), sv0.end());
+                        auto length = unicode_traits::u32_length(sv0.begin(), sv0.end());
                         return *resources.create_json(length);
                     }
                     default:
@@ -1559,10 +1559,10 @@ namespace jmespath {
                     {
                         string_view_type sv = arg0_ptr->as_string_view();
                         std::basic_string<char32_t> buf;
-                        unicons::convert(sv.begin(), sv.end(), std::back_inserter(buf));
+                        unicode_traits::convert(sv.begin(), sv.end(), std::back_inserter(buf));
                         std::reverse(buf.begin(), buf.end());
                         string_type s;
-                        unicons::convert(buf.begin(), buf.end(), std::back_inserter(s));
+                        unicode_traits::convert(buf.begin(), buf.end(), std::back_inserter(s));
                         return *resources.create_json(s);
                     }
                     case json_type::array_value:
@@ -3889,7 +3889,7 @@ namespace jmespath {
                         {
                             return jmespath_expression();
                         }
-                        if (unicons::is_high_surrogate(cp))
+                        if (unicode_traits::is_high_surrogate(cp))
                         {
                             ++p_;
                             ++column_;
@@ -3897,7 +3897,7 @@ namespace jmespath {
                         }
                         else
                         {
-                            unicons::convert(&cp, &cp + 1, std::back_inserter(buffer));
+                            unicode_traits::convert(&cp, &cp + 1, std::back_inserter(buffer));
                             ++p_;
                             ++column_;
                             state_stack_.pop_back();
@@ -3967,7 +3967,7 @@ namespace jmespath {
                             return jmespath_expression();
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
-                        unicons::convert(&codepoint, &codepoint + 1, std::back_inserter(buffer));
+                        unicode_traits::convert(&codepoint, &codepoint + 1, std::back_inserter(buffer));
                         state_stack_.pop_back();
                         ++p_;
                         ++column_;

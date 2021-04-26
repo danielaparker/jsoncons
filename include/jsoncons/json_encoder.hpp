@@ -97,8 +97,8 @@ namespace detail {
                     else if (is_control_character(c) || escape_all_non_ascii)
                     {
                         // convert utf8 to codepoint
-                        unicons::sequence_generator<const CharT*> g(it, end, unicons::conv_flags::strict);
-                        if (g.done() || g.status() != unicons::conv_errc())
+                        unicode_traits::sequence_generator<const CharT*> g(it, end, unicode_traits::conv_flags::strict);
+                        if (g.done() || g.status() != unicode_traits::conv_errc())
                         {
                             JSONCONS_THROW(ser_error(json_errc::illegal_codepoint));
                         }

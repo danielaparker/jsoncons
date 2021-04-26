@@ -23,7 +23,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
 
-namespace jsoncons { namespace unicons {
+namespace jsoncons { namespace unicode_traits {
 
     enum class encoding_kind {undetected,utf8,utf16le,utf16be,utf32le,utf32be};
 
@@ -61,8 +61,18 @@ namespace jsoncons { namespace unicons {
         const uint8_t bom_utf8[] = {0xef,0xbb,0xbf}; 
         const uint8_t bom_utf16le[] = {0xff,0xfe}; 
         const uint8_t bom_utf16be[] = {0xfe,0xff}; 
+        const uint8_t bom_utf32le[] = {0xff,0xfe,0x00,0x00}; 
+        const uint8_t bom_utf32be[] = {0x00,0x00,0xfe,0xff}; 
 
-        if (length >= 2 && !memcmp(data,bom_utf16le,2))
+        if (length >= 4 && !memcmp(data,bom_utf16le,4))
+        {
+            return detect_encoding_result<Byte>{data+4,encoding_kind::utf16le};
+        }
+        else if (length >= 4 && !memcmp(data,bom_utf16be,4))
+        {
+            return detect_encoding_result<Byte>{data+4,encoding_kind::utf16be};
+        }
+        else if (length >= 2 && !memcmp(data,bom_utf16le,2))
         {
             return detect_encoding_result<Byte>{data+2,encoding_kind::utf16le};
         }
@@ -87,7 +97,6 @@ namespace jsoncons { namespace unicons {
         detect_encoding_result<Byte> r = detect_encoding_from_bom(data,length);
         if (r.kind != encoding_kind::undetected)
         {
-            std::cout << "has bom\n";
             return r;
         }
         else if (length < 4)
@@ -216,7 +225,7 @@ namespace jsoncons { namespace unicons {
     public:
         virtual const char* name() const noexcept
         {
-            return "unicons conversion error";
+            return "unicode_traits conversion error";
         }
         virtual std::string message(int ev) const
         {
@@ -254,17 +263,17 @@ namespace jsoncons { namespace unicons {
         return std::error_code(static_cast<int>(result),unicode_traits_error_category());
     }
 
-} // unicons
+} // unicode_traits
 } // jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::unicons::conv_errc> : public true_type
+    struct is_error_code_enum<jsoncons::unicode_traits::conv_errc> : public true_type
     {
     };
 }
 
-namespace jsoncons { namespace unicons {
+namespace jsoncons { namespace unicode_traits {
 
     // encoding_errc
 
@@ -283,7 +292,7 @@ namespace jsoncons { namespace unicons {
     public:
         virtual const char* name() const noexcept
         {
-            return "unicons encoding error";
+            return "unicode_traits encoding error";
         }
         virtual std::string message(int ev) const
         {
@@ -1273,7 +1282,7 @@ namespace jsoncons { namespace unicons {
                                    sequence<InputIt>>::type 
     sequence_at(InputIt first, InputIt last, std::size_t index) 
     {
-        sequence_generator<InputIt> g(first, last, unicons::conv_flags::strict);
+        sequence_generator<InputIt> g(first, last, unicode_traits::conv_flags::strict);
 
         std::size_t count = 0;
         while (!g.done() && count < index)
@@ -1383,7 +1392,7 @@ namespace jsoncons { namespace unicons {
                                    std::size_t>::type 
     u32_length(InputIt first, InputIt last) noexcept
     {
-        sequence_generator<InputIt> g(first, last, unicons::conv_flags::strict);
+        sequence_generator<InputIt> g(first, last, unicode_traits::conv_flags::strict);
 
         std::size_t count = 0;
         while (!g.done())
@@ -1490,18 +1499,18 @@ namespace jsoncons { namespace unicons {
                                    skip_bom_result<Iterator>>::type 
     skip_bom(Iterator first, Iterator last) noexcept
     {
-        auto result = unicons::detect_encoding(first,last);
+        auto result = unicode_traits::detect_encoding(first,last);
         switch (result.ec)
         {
-        case unicons::encoding::u8:
+        case unicode_traits::encoding::u8:
             return skip_bom_result<Iterator>{result.it,encoding_errc()};
             break;
-        case unicons::encoding::u16le:
-        case unicons::encoding::u16be:
+        case unicode_traits::encoding::u16le:
+        case unicode_traits::encoding::u16be:
             return skip_bom_result<Iterator>{result.it,encoding_errc::expected_u8_found_u16};
             break;
-        case unicons::encoding::u32le:
-        case unicons::encoding::u32be:
+        case unicode_traits::encoding::u32le:
+        case unicode_traits::encoding::u32be:
             return skip_bom_result<Iterator>{result.it,encoding_errc::expected_u8_found_u32};
             break;
         default:
@@ -1558,12 +1567,12 @@ namespace jsoncons { namespace unicons {
         }
     }
 
-} // unicons
+} // unicode_traits
 } // jsoncons
 
 namespace std {
     template<>
-    struct is_error_code_enum<jsoncons::unicons::encoding_errc> : public true_type
+    struct is_error_code_enum<jsoncons::unicode_traits::encoding_errc> : public true_type
     {
     };
 }

@@ -2372,7 +2372,7 @@ escape_u4:
                 state_ = json_parse_state::escape_u4;
                 return;
             }
-            if (unicons::is_high_surrogate(cp_))
+            if (unicode_traits::is_high_surrogate(cp_))
             {
                 ++input_ptr_;
                 ++position_;
@@ -2380,7 +2380,7 @@ escape_u4:
             }
             else
             {
-                unicons::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
+                unicode_traits::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
                 sb = ++input_ptr_;
                 ++position_;
                 state_ = json_parse_state::string;
@@ -2501,7 +2501,7 @@ escape_u8:
                 return;
             }
             uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-            unicons::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
+            unicode_traits::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
             sb = ++input_ptr_;
             ++position_;
             goto string_u1;
@@ -2510,13 +2510,13 @@ escape_u8:
         JSONCONS_UNREACHABLE();               
     }
 
-    void translate_conv_errc(unicons::conv_errc result, std::error_code& ec)
+    void translate_conv_errc(unicode_traits::conv_errc result, std::error_code& ec)
     {
         switch (result)
         {
-        case unicons::conv_errc():
+        case unicode_traits::conv_errc():
             break;
-        case unicons::conv_errc::over_long_utf8_sequence:
+        case unicode_traits::conv_errc::over_long_utf8_sequence:
             more_ = err_handler_(json_errc::over_long_utf8_sequence, *this);
             if (!more_)
             {
@@ -2524,7 +2524,7 @@ escape_u8:
                 return;
             }
             break;
-        case unicons::conv_errc::unpaired_high_surrogate:
+        case unicode_traits::conv_errc::unpaired_high_surrogate:
             more_ = err_handler_(json_errc::unpaired_high_surrogate, *this);
             if (!more_)
             {
@@ -2532,7 +2532,7 @@ escape_u8:
                 return;
             }
             break;
-        case unicons::conv_errc::expected_continuation_byte:
+        case unicode_traits::conv_errc::expected_continuation_byte:
             more_ = err_handler_(json_errc::expected_continuation_byte, *this);
             if (!more_)
             {
@@ -2540,7 +2540,7 @@ escape_u8:
                 return;
             }
             break;
-        case unicons::conv_errc::illegal_surrogate_value:
+        case unicode_traits::conv_errc::illegal_surrogate_value:
             more_ = err_handler_(json_errc::illegal_surrogate_value, *this);
             if (!more_)
             {
@@ -2682,8 +2682,8 @@ private:
     void end_string_value(const CharT* s, std::size_t length, basic_json_visitor<CharT>& visitor, std::error_code& ec) 
     {
         string_view_type sv(s, length);
-        auto result = unicons::validate(s,s+length);
-        if (result.ec != unicons::conv_errc())
+        auto result = unicode_traits::validate(s,s+length);
+        if (result.ec != unicode_traits::conv_errc())
         {
             translate_conv_errc(result.ec,ec);
             position_ += (result.it - s);

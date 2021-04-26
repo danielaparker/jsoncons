@@ -443,8 +443,8 @@ private:
                 {
                     return;
                 }
-                auto result = unicons::validate(text_buffer_.begin(),text_buffer_.end());
-                if (result.ec != unicons::conv_errc())
+                auto result = unicode_traits::validate(text_buffer_.begin(),text_buffer_.end());
+                if (result.ec != unicode_traits::conv_errc())
                 {
                     ec = cbor_errc::invalid_utf8_text_string;
                     more_ = false;

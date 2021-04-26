@@ -87,8 +87,8 @@ public:
          begin_(false)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicons::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicons::encoding_errc())
+        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicode_traits::encoding_errc())
         {
             JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
         }
@@ -175,8 +175,8 @@ public:
          begin_(false)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicons::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicons::encoding_errc())
+        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicode_traits::encoding_errc())
         {
             ec = result.ec;
             return;
@@ -256,8 +256,8 @@ public:
         }
         else if (begin_)
         {
-            auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
-            if (result.ec != unicons::encoding_errc())
+            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
+            if (result.ec != unicode_traits::encoding_errc())
             {
                 ec = result.ec;
                 return;
@@ -387,8 +387,8 @@ public:
          begin_(false)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicons::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicons::encoding_errc())
+        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicode_traits::encoding_errc())
         {
             JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
         }
@@ -484,8 +484,8 @@ public:
          begin_(false)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicons::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicons::encoding_errc())
+        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicode_traits::encoding_errc())
         {
             ec = result.ec;
             return;

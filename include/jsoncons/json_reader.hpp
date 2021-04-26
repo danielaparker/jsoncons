@@ -80,10 +80,10 @@ private:
     bool visit_key(const string_view_type& name, const ser_context& context, std::error_code& ec) override
     {
         std::basic_string<CharT> target;
-        auto result = unicons::convert(
+        auto result = unicode_traits::convert(
             name.begin(), name.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
-        if (result.ec != unicons::conv_errc())
+            unicode_traits::conv_flags::strict);
+        if (result.ec != unicode_traits::conv_errc())
         {
             JSONCONS_THROW(ser_error(result.ec,context.line(),context.column()));
         }
@@ -93,10 +93,10 @@ private:
     bool visit_string(const string_view_type& value, semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         std::basic_string<CharT> target;
-        auto result = unicons::convert(
+        auto result = unicode_traits::convert(
             value.begin(), value.end(), std::back_inserter(target), 
-            unicons::conv_flags::strict);
-        if (result.ec != unicons::conv_errc())
+            unicode_traits::conv_flags::strict);
+        if (result.ec != unicode_traits::conv_errc())
         {
             ec = result.ec;
             return false;
@@ -295,8 +295,8 @@ public:
          buffer_(alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicons::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicons::encoding_errc())
+        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
+        if (result.ec != unicode_traits::encoding_errc())
         {
             JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
         }
@@ -492,8 +492,8 @@ private:
         }
         else if (begin_)
         {
-            auto result = unicons::skip_bom(buffer_.begin(), buffer_.end());
-            if (result.ec != unicons::encoding_errc())
+            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
+            if (result.ec != unicode_traits::encoding_errc())
             {
                 ec = result.ec;
                 return;
