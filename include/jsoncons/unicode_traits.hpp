@@ -65,13 +65,13 @@ namespace jsoncons { namespace unicode_traits {
         const uint8_t bom_utf32le[] = {0xff,0xfe,0x00,0x00}; 
         const uint8_t bom_utf32be[] = {0x00,0x00,0xfe,0xff}; 
 
-        if (length >= 4 && !memcmp(data,bom_utf16le,4))
+        if (length >= 4 && !memcmp(data,bom_utf32le,4))
         {
-            return detect_encoding_result<Byte>{data+4,encoding_kind::utf16le};
+            return detect_encoding_result<Byte>{data+4,encoding_kind::utf32le};
         }
-        else if (length >= 4 && !memcmp(data,bom_utf16be,4))
+        else if (length >= 4 && !memcmp(data,bom_utf32be,4))
         {
-            return detect_encoding_result<Byte>{data+4,encoding_kind::utf16be};
+            return detect_encoding_result<Byte>{data+4,encoding_kind::utf32be};
         }
         else if (length >= 2 && !memcmp(data,bom_utf16le,2))
         {
