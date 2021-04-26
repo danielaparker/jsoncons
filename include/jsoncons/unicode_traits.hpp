@@ -20,6 +20,7 @@
 #include <iterator>
 #include <type_traits>
 #include <system_error>
+#include <limits>
 #include <jsoncons/config/compiler_support.hpp>
 #include <jsoncons/detail/more_type_traits.hpp>
 
