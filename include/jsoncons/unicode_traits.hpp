@@ -430,19 +430,19 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     struct convert_result
     {
-        CharT* it;
+        const CharT* it;
         conv_errc ec;
     };
 
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
                             && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, OutputIt target, conv_flags flags=conv_flags::strict) 
+    convert(const CharT* data, std::size_t length, OutputIt target, conv_flags flags=conv_flags::strict) 
     {
         (void)flags;
 
         conv_errc  result = conv_errc();
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             std::size_t len = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)] + 1;
@@ -471,13 +471,13 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
                                    && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
             OutputIt target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             uint32_t ch = 0;
@@ -545,13 +545,13 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
                                    && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data < last) 
         {
             uint32_t ch = 0;
@@ -625,12 +625,12 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
                                    && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data < last) {
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
@@ -721,13 +721,13 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
                                    && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
             OutputIt target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             uint32_t ch = *data++;
@@ -776,13 +776,13 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
                                    && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             uint32_t ch = *data++;
@@ -824,12 +824,12 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
                                    && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
             OutputIt target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data < last) {
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
@@ -905,13 +905,13 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
                                    && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             uint32_t ch = *data++;
@@ -947,13 +947,13 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT,class OutputIt>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
                                    && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
-    convert(CharT* data, std::size_t length, 
+    convert(const CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             uint32_t ch = *data++;
@@ -983,10 +983,10 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t),
                             convert_result<CharT>>::type 
-    validate(CharT* data, std::size_t length) noexcept
+    validate(const CharT* data, std::size_t length) noexcept
     {
         conv_errc  result = conv_errc();
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[static_cast<uint8_t>(*data)]) + 1;
@@ -1008,11 +1008,11 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t),
                             convert_result<CharT>>::type 
-    validate(CharT* data, std::size_t length)  noexcept
+    validate(const CharT* data, std::size_t length)  noexcept
     {
         conv_errc  result = conv_errc();
 
-        CharT* last = data + length;
+        const CharT* last = data + length;
         while (data != last) 
         {
             uint32_t ch = *data++;
@@ -1053,7 +1053,7 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t),
                             convert_result<CharT>>::type 
-    validate(CharT* data, std::size_t length) noexcept
+    validate(const CharT* data, std::size_t length) noexcept
     {
         conv_errc  result = conv_errc();
 
