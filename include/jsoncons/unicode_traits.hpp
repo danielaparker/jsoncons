@@ -29,9 +29,9 @@ namespace jsoncons { namespace unicode_traits {
     enum class encoding_kind {undetected,utf8,utf16le,utf16be,utf32le,utf32be};
 
     inline
-    std::string to_string(encoding_kind kind)
+    std::string to_string(encoding_kind encoding)
     {
-        switch (kind)
+        switch (encoding)
         {
             case encoding_kind::utf8:
                 return "utf8";
@@ -52,7 +52,7 @@ namespace jsoncons { namespace unicode_traits {
     struct detect_encoding_result
     {
         const Byte* ptr;
-        encoding_kind kind;
+        encoding_kind encoding;
     };
 
     template <class Byte>
@@ -96,7 +96,7 @@ namespace jsoncons { namespace unicode_traits {
     detect_json_encoding(const Byte* data, std::size_t length)
     {
         detect_encoding_result<Byte> r = detect_encoding_from_bom(data,length);
-        if (r.kind != encoding_kind::undetected)
+        if (r.encoding != encoding_kind::undetected)
         {
             return r;
         }
