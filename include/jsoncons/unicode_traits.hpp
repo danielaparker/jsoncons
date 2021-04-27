@@ -13,8 +13,8 @@
  * Unicode Standard."
 */
 
-#ifndef JSONCONS_UNICONS_UNICODE_TRAITS_HPP
-#define JSONCONS_UNICONS_UNICODE_TRAITS_HPP
+#ifndef JSONCONS_UNICODE_TRAITS_UNICODE_TRAITS_HPP
+#define JSONCONS_UNICODE_TRAITS_UNICODE_TRAITS_HPP
 
 #include <string>
 #include <iterator>
@@ -399,30 +399,14 @@ namespace jsoncons { namespace unicode_traits {
         static constexpr bool value = (sizeof(T1) == sizeof(T2));
     }; 
 
-    template<class OutputIt, class CharT, class Enable = void>
-    struct is_compatible_output_iterator : std::false_type {};
+    template<class Container, class CharT, class Enable = void>
+    struct is_compatible_back_insertable : std::false_type {};
 
-    template<class OutputIt, class CharT>
-    struct is_compatible_output_iterator<OutputIt,CharT,
-        typename std::enable_if<is_output_iterator<OutputIt,CharT>::value
-                                && std::is_void<typename std::iterator_traits<OutputIt>::value_type>::value
-                                && std::is_integral<typename OutputIt::container_type::value_type>::value 
-                                && !std::is_void<typename OutputIt::container_type::value_type>::value
-                                && is_same_size<typename OutputIt::container_type::value_type,CharT>::value>::type
-    > : std::true_type {};
-
-    template<class OutputIt, class CharT>
-    struct is_compatible_output_iterator<OutputIt,CharT,
-        typename std::enable_if<is_output_iterator<OutputIt,CharT>::value
-                                && std::is_integral<typename std::iterator_traits<OutputIt>::value_type>::value 
-                                && is_same_size<typename std::iterator_traits<OutputIt>::value_type,CharT>::value>::type
-    > : std::true_type {};
-
-    template<class OutputIt, class CharT>
-    struct is_compatible_output_iterator<OutputIt,CharT,
-        typename std::enable_if<is_output_iterator<OutputIt,CharT>::value
-                                && std::is_void<typename std::iterator_traits<OutputIt>::value_type>::value
-                                && is_same_size<typename OutputIt::char_type,CharT>::value>::type
+    template<class Container, class CharT>
+    struct is_compatible_back_insertable<Container,CharT,
+        typename std::enable_if<jsoncons::detail::is_back_insertable<Container>::value
+                                && std::is_integral<typename Container::value_type>::value 
+                                && is_same_size<typename Container::value_type,CharT>::value>::type
     > : std::true_type {};
 
     // convert
@@ -434,10 +418,10 @@ namespace jsoncons { namespace unicode_traits {
         conv_errc ec;
     };
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
-                            && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
-    convert(const CharT* data, std::size_t length, OutputIt target, conv_flags flags=conv_flags::strict) 
+                            && is_compatible_back_insertable<Container,uint8_t>::value,convert_result<CharT>>::type 
+    convert(const CharT* data, std::size_t length, Container& target, conv_flags flags=conv_flags::strict) 
     {
         (void)flags;
 
@@ -456,23 +440,24 @@ namespace jsoncons { namespace unicode_traits {
             }
 
             switch (len) {
-                case 4: *target++ = (static_cast<uint8_t>(*data++));
+                case 4: target.push_back(static_cast<uint8_t>(*data++));
                     JSONCONS_FALLTHROUGH;
-                case 3: *target++ = (static_cast<uint8_t>(*data++));
+                case 3: target.push_back(static_cast<uint8_t>(*data++));
                     JSONCONS_FALLTHROUGH;
-                case 2: *target++ = (static_cast<uint8_t>(*data++));
+                case 2: target.push_back(static_cast<uint8_t>(*data++));
                     JSONCONS_FALLTHROUGH;
-                case 1: *target++ = (static_cast<uint8_t>(*data++));
+                case 1: target.push_back(static_cast<uint8_t>(*data++));
             }
         }
         return convert_result<CharT>{data,result} ;
     }
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
-                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint16_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-            OutputIt target, 
+            Container& target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
@@ -519,10 +504,10 @@ namespace jsoncons { namespace unicode_traits {
                         result = conv_errc::source_illegal;
                         break;
                     } else {
-                        *target++ = (replacement_char);
+                        target.push_back(replacement_char);
                     }
                 } else {
-                    *target++ = ((uint16_t)ch); /* normal case */
+                    target.push_back((uint16_t)ch); /* normal case */
                 }
             } else if (ch > max_utf16) {
                 if (flags == conv_flags::strict) {
@@ -530,24 +515,25 @@ namespace jsoncons { namespace unicode_traits {
                     data -= (extra_bytes_to_read+1); /* return to the start */
                     break; /* Bail out; shouldn't continue */
                 } else {
-                    *target++ = (replacement_char);
+                    target.push_back(replacement_char);
                 }
             } else {
                 /* target is a character in range 0xFFFF - 0x10FFFF. */
                 ch -= half_base;
-                *target++ = ((uint16_t)((ch >> half_shift) + sur_high_start));
-                *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
+                target.push_back((uint16_t)((ch >> half_shift) + sur_high_start));
+                target.push_back((uint16_t)((ch & half_mask) + sur_low_start));
             }
         }
         return convert_result<CharT>{data,result} ;
     }
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
-                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint32_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-                     OutputIt target, 
-                     conv_flags flags = conv_flags::strict) 
+            Container& target, 
+            conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
@@ -607,14 +593,14 @@ namespace jsoncons { namespace unicode_traits {
                         result = conv_errc::source_illegal;
                         break;
                     } else {
-                        *target++ = (replacement_char);
+                        target.push_back(replacement_char);
                     }
                 } else {
-                    *target++ = (ch);
+                    target.push_back(ch);
                 }
             } else { /* i.e., ch > max_legal_utf32 */
                 result = conv_errc::source_illegal;
-                *target++ = (replacement_char);
+                target.push_back(replacement_char);
             }
         }
         return convert_result<CharT>{data,result} ;
@@ -622,11 +608,12 @@ namespace jsoncons { namespace unicode_traits {
 
     // utf16
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
-                                   && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint8_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-                     OutputIt target, 
+                     Container& target, 
                      conv_flags flags = conv_flags::strict) {
         conv_errc  result = conv_errc();
 
@@ -696,33 +683,34 @@ namespace jsoncons { namespace unicode_traits {
             switch (bytes_to_write) 
             {
             case 4: 
-                *target++ = (byte1);
-                *target++ = (byte2);
-                *target++ = (byte3);
-                *target++ = (byte4);
+                target.push_back(byte1);
+                target.push_back(byte2);
+                target.push_back(byte3);
+                target.push_back(byte4);
                 break;
             case 3: 
-                *target++ = (byte1);
-                *target++ = (byte2);
-                *target++ = (byte3);
+                target.push_back(byte1);
+                target.push_back(byte2);
+                target.push_back(byte3);
                 break;
             case 2: 
-                *target++ = (byte1);
-                *target++ = (byte2);
+                target.push_back(byte1);
+                target.push_back(byte2);
                 break;
             case 1: 
-                *target++ = (byte1);
+                target.push_back(byte1);
                 break;
             }
         }
         return convert_result<CharT>{data,result} ;
     }
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
-                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint16_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-            OutputIt target, 
+            Container& target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
@@ -739,8 +727,8 @@ namespace jsoncons { namespace unicode_traits {
                     uint32_t ch2 = *data;
                     /* If ptr's a low surrogate, */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
-                        *target++ = ((uint16_t)ch);
-                        *target++ = ((uint16_t)ch2);
+                        target.push_back((uint16_t)ch);
+                        target.push_back((uint16_t)ch2);
                         ++data;
                     } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
                         --data; /* return to the illegal value itself */
@@ -762,22 +750,23 @@ namespace jsoncons { namespace unicode_traits {
                 }
                 else
                 {
-                    *target++ = ((uint16_t)ch);
+                    target.push_back((uint16_t)ch);
                 }
             }
             else
             {
-                *target++ = ((uint16_t)ch);
+                target.push_back((uint16_t)ch);
             }
         }
         return convert_result<CharT>{data,result} ;
     }
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
-                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint32_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-                     OutputIt target, 
+                     Container& target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
@@ -814,18 +803,19 @@ namespace jsoncons { namespace unicode_traits {
                     break;
                 }
             }
-            *target++ = (ch);
+            target.push_back(ch);
         }
         return convert_result<CharT>{data,result} ;
     }
 
     // utf32
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
-                                   && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint8_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-            OutputIt target, 
+            Container& target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
@@ -880,33 +870,34 @@ namespace jsoncons { namespace unicode_traits {
             switch (bytes_to_write) 
             {
             case 4: 
-                *target++ = (byte1);
-                *target++ = (byte2);
-                *target++ = (byte3);
-                *target++ = (byte4);
+                target.push_back(byte1);
+                target.push_back(byte2);
+                target.push_back(byte3);
+                target.push_back(byte4);
                 break;
             case 3: 
-                *target++ = (byte1);
-                *target++ = (byte2);
-                *target++ = (byte3);
+                target.push_back(byte1);
+                target.push_back(byte2);
+                target.push_back(byte3);
                 break;
             case 2: 
-                *target++ = (byte1);
-                *target++ = (byte2);
+                target.push_back(byte1);
+                target.push_back(byte2);
                 break;
             case 1: 
-                *target++ = (byte1);
+                target.push_back(byte1);
                 break;
             }
         }
         return convert_result<CharT>{data,result} ;
     }
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
-                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint16_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-                     OutputIt target, 
+                     Container& target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
@@ -923,32 +914,33 @@ namespace jsoncons { namespace unicode_traits {
                         result = conv_errc::source_illegal;
                         break;
                     } else {
-                        *target++ = (replacement_char);
+                        target.push_back(replacement_char);
                     }
                 } else {
-                    *target++ = ((uint16_t)ch); /* normal case */
+                    target.push_back((uint16_t)ch); /* normal case */
                 }
             } else if (ch > max_legal_utf32) {
                 if (flags == conv_flags::strict) {
                     result = conv_errc::source_illegal;
                 } else {
-                    *target++ = (replacement_char);
+                    target.push_back(replacement_char);
                 }
             } else {
                 /* target is a character in range 0xFFFF - 0x10FFFF. */
                 ch -= half_base;
-                *target++ = ((uint16_t)((ch >> half_shift) + sur_high_start));
-                *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
+                target.push_back((uint16_t)((ch >> half_shift) + sur_high_start));
+                target.push_back((uint16_t)((ch & half_mask) + sur_low_start));
             }
         }
         return convert_result<CharT>{data,result} ;
     }
 
-    template <class CharT,class OutputIt>
+    template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
-                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
+                            && is_compatible_back_insertable<Container,uint32_t>::value,
+                            convert_result<CharT>>::type 
     convert(const CharT* data, std::size_t length, 
-                     OutputIt target, 
+                     Container& target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
@@ -967,11 +959,11 @@ namespace jsoncons { namespace unicode_traits {
             }
             if (ch <= max_legal_utf32)
             {
-                *target++ = (ch);
+                target.push_back(ch);
             }
             else
             {
-                *target++ = (replacement_char);
+                target.push_back(replacement_char);
                 result = conv_errc::source_illegal;
             }
         }

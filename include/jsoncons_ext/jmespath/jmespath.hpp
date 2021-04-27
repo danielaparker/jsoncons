@@ -1559,10 +1559,10 @@ namespace jmespath {
                     {
                         string_view_type sv = arg0_ptr->as_string_view();
                         std::basic_string<char32_t> buf;
-                        unicode_traits::convert(sv.data(), sv.size(), std::back_inserter(buf));
+                        unicode_traits::convert(sv.data(), sv.size(), buf);
                         std::reverse(buf.begin(), buf.end());
                         string_type s;
-                        unicode_traits::convert(buf.data(), buf.size(), std::back_inserter(s));
+                        unicode_traits::convert(buf.data(), buf.size(), s);
                         return *resources.create_json(s);
                     }
                     case json_type::array_value:
@@ -3897,7 +3897,7 @@ namespace jmespath {
                         }
                         else
                         {
-                            unicode_traits::convert(&cp, 1, std::back_inserter(buffer));
+                            unicode_traits::convert(&cp, 1, buffer);
                             ++p_;
                             ++column_;
                             state_stack_.pop_back();
@@ -3967,7 +3967,7 @@ namespace jmespath {
                             return jmespath_expression();
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
-                        unicode_traits::convert(&codepoint, 1, std::back_inserter(buffer));
+                        unicode_traits::convert(&codepoint, 1, buffer);
                         state_stack_.pop_back();
                         ++p_;
                         ++column_;

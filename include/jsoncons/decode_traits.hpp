@@ -93,7 +93,7 @@ namespace jsoncons {
             T s;
             if (!ec)
             {
-                unicode_traits::convert(val.data(), val.size(), std::back_inserter(s));
+                unicode_traits::convert(val.data(), val.size(), s);
             }
             return s;
         }

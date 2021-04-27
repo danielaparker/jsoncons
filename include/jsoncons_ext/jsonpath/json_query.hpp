@@ -2618,7 +2618,7 @@ namespace jsoncons { namespace jsonpath {
                         }
                         else
                         {
-                            unicode_traits::convert(&cp, 1, std::back_inserter(buffer));
+                            unicode_traits::convert(&cp, 1, buffer);
                             ++p_;
                             ++column_;
                             state_stack_.pop_back();
@@ -2688,7 +2688,7 @@ namespace jsoncons { namespace jsonpath {
                             return path_expression_type();
                         }
                         uint32_t codepoint = 0x10000 + ((cp & 0x3FF) << 10) + (cp2 & 0x3FF);
-                        unicode_traits::convert(&codepoint, 1, std::back_inserter(buffer));
+                        unicode_traits::convert(&codepoint, 1, buffer);
                         state_stack_.pop_back();
                         ++p_;
                         ++column_;

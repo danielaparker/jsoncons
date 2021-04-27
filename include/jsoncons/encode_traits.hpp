@@ -153,7 +153,7 @@ namespace jsoncons {
                            std::error_code& ec)
         {
             std::basic_string<CharT> s;
-            unicode_traits::convert(val.data(), val.size(), std::back_inserter(s));
+            unicode_traits::convert(val.data(), val.size(), s);
             encoder.string_value(s,semantic_tag::none,ser_context(),ec);
         }
     };
