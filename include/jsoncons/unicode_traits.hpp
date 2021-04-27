@@ -560,10 +560,11 @@ namespace jsoncons { namespace unicode_traits {
         ch = *first++;
         if (flags == conv_flags::strict ) {
             /* UTF-16 surrogate values are illegal in UTF-32 */
-            if (is_surrogate(ch)) {
+            if (is_surrogate(ch)) 
+            {
                 --first; /* return to the illegal value itself */
                 result = conv_errc::illegal_surrogate_value;
-                break;
+                return convert_result<CharT>{first,result} ;
             }
         }
         if (!(ch <= max_legal_utf32))
