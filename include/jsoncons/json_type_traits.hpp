@@ -401,7 +401,7 @@ has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
         {
             auto s = j.as_string();
             T val;
-            unicode_traits::convert(s.data(), s.size(), std::back_inserter(val));
+            unicode_traits::convert(s.data(), s.size(), val);
             return val;
         }
 
