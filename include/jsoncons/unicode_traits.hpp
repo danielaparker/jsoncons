@@ -442,6 +442,7 @@ namespace jsoncons { namespace unicode_traits {
             return convert_result<CharT>{first, result};
         }
         // The cases all fall through. See "Note A" below.
+        ch = 0;
         switch (extra_bytes_to_read) 
         {
             case 5: 
