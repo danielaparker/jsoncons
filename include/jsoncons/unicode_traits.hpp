@@ -428,6 +428,10 @@ namespace jsoncons { namespace unicode_traits {
                  CodepointT& ch, 
                  conv_flags flags = conv_flags::strict) 
     {
+        if (first >= last)
+        {
+            return convert_result<CharT>{first, conv_errc::source_exhausted};
+        }
         conv_errc  result = conv_errc();
 
         unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)];
@@ -507,6 +511,10 @@ namespace jsoncons { namespace unicode_traits {
                  CodepointT& ch, 
                  conv_flags flags = conv_flags::strict) 
     {
+        if (first >= last)
+        {
+            return convert_result<CharT>{first, conv_errc::source_exhausted};
+        }
         conv_errc  result = conv_errc();
 
         ch = *first++;
@@ -556,6 +564,10 @@ namespace jsoncons { namespace unicode_traits {
                  CodepointT& ch, 
                  conv_flags flags = conv_flags::strict) 
     {
+        if (first >= last)
+        {
+            return convert_result<CharT>{first, conv_errc::source_exhausted};
+        }
         conv_errc  result = conv_errc();
 
         ch = *first++;
@@ -626,7 +638,6 @@ namespace jsoncons { namespace unicode_traits {
         const CharT* last = data + length;
         while (data != last) 
         {
-            uint32_t ch = 0;
             unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)];
             if (extra_bytes_to_read >= last - data) 
             {
@@ -641,6 +652,7 @@ namespace jsoncons { namespace unicode_traits {
             /*
              * The cases all fall through. See "Note A" below.
              */
+            uint32_t ch = 0;
             switch (extra_bytes_to_read) {
                 case 5: ch += static_cast<uint8_t>(*data++); ch <<= 6; /* remember, illegal UTF-8 */
                     JSONCONS_FALLTHROUGH;
