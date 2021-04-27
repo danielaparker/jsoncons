@@ -430,7 +430,7 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     struct convert_result
     {
-        const CharT* it;
+        const CharT* ptr;
         conv_errc ec;
     };
 
@@ -641,12 +641,12 @@ namespace jsoncons { namespace unicode_traits {
                 /* If the 16 bits following the high surrogate are in the data buffer... */
                 if (data < last) {
                     uint32_t ch2 = *data;
-                    /* If it's a low surrogate, convert to uint32_t. */
+                    /* If ptr's a low surrogate, convert to uint32_t. */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
                         ch = ((ch - sur_high_start) << half_shift)
                             + (ch2 - sur_low_start) + half_base;
                         ++data;
-                    } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
+                    } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
                         --data; /* return to the illegal value itself */
                         result = conv_errc::unpaired_high_surrogate;
                         break;
@@ -737,12 +737,12 @@ namespace jsoncons { namespace unicode_traits {
                 /* If the 16 bits following the high surrogate are in the data buffer... */
                 if (data < last) {
                     uint32_t ch2 = *data;
-                    /* If it's a low surrogate, */
+                    /* If ptr's a low surrogate, */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
                         *target++ = ((uint16_t)ch);
                         *target++ = ((uint16_t)ch2);
                         ++data;
-                    } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
+                    } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
                         --data; /* return to the illegal value itself */
                         result = conv_errc::unpaired_high_surrogate;
                         break;
@@ -791,12 +791,12 @@ namespace jsoncons { namespace unicode_traits {
                 /* If the 16 bits following the high surrogate are in the data buffer... */
                 if (data < last) {
                     uint32_t ch2 = *data;
-                    /* If it's a low surrogate, convert to UTF32. */
+                    /* If ptr's a low surrogate, convert to UTF32. */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end ) {
                         ch = ((ch - sur_high_start) << half_shift)
                             + (ch2 - sur_low_start) + half_base;
                         ++data;
-                    } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
+                    } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
                         --data; /* return to the illegal value itself */
                         result = conv_errc::source_illegal;
                         break;
@@ -1022,7 +1022,7 @@ namespace jsoncons { namespace unicode_traits {
                 /* If the 16 bits following the high surrogate are in the data buffer... */
                 if (data < last) {
                     uint32_t ch2 = *data;
-                    /* If it's a low surrogate, */
+                    /* If ptr's a low surrogate, */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
                         ++data;
                     } else {

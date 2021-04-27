@@ -2686,7 +2686,7 @@ private:
         if (result.ec != unicode_traits::conv_errc())
         {
             translate_conv_errc(result.ec,ec);
-            position_ += (result.it - s);
+            position_ += (result.ptr - s);
             return;
         }
         switch (parent())
