@@ -820,7 +820,8 @@ namespace jsoncons { namespace unicode_traits {
     {
         conv_errc  result = conv_errc();
         const CharT* last = data + length;
-        while (data < last) {
+        while (data < last) 
+        {
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
             const uint32_t byteMark = 0x80; 
@@ -1274,121 +1275,6 @@ namespace jsoncons { namespace unicode_traits {
             length_ = 1;
         }
     };
-
-    template <class Iterator>
-    sequence_generator<Iterator> make_sequence_generator(Iterator first, Iterator last,
-        conv_flags flags = conv_flags::strict)
-    {
-        return sequence_generator<Iterator>(first, last, flags);
-    }
-
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value 
-                                   && (sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t) || sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)),
-                                   sequence<InputIt>>::type 
-    sequence_at(InputIt first, InputIt last, std::size_t index) 
-    {
-        sequence_generator<InputIt> g(first, last, unicode_traits::conv_flags::strict);
-
-        std::size_t count = 0;
-        while (!g.done() && count < index)
-        {
-            g.next();
-            ++count;
-        }
-        return (!g.done() && count == index) ? g.get() : sequence<InputIt>(last,0);
-    }
-
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t),
-                                   sequence<InputIt>>::type 
-    sequence_at(InputIt first, InputIt last, std::size_t index) 
-    {
-        std::size_t size = std::distance(first,last);
-        return index < size ? sequence<InputIt>(first+index,1) : sequence<InputIt>(last,0);
-    }
-
-    // u8_length
-
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t),size_t>::type 
-    u8_length(InputIt first, InputIt last) noexcept
-    {
-        return std::distance(first,last);
-    }
-
-    // utf16
-
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t),size_t>::type 
-    u8_length(InputIt first, InputIt last) noexcept
-    {
-        conv_flags flags = conv_flags::strict;
-        std::size_t count = 0;
-        for (InputIt p = first; p != last; ++p)
-        {
-            uint32_t ch = *p;
-            if (is_high_surrogate(ch)) {
-                /* If the 16 bits following the high surrogate are in the p buffer... */
-                if (p < last) {
-                    uint32_t ch2 = *(++p);
-                    /* If it's a low surrogate, convert to uint32_t. */
-                    if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
-                        ch = ((ch - sur_high_start) << half_shift)
-                            + (ch2 - sur_low_start) + half_base;
-                   
-                    } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
-                        break;
-                    }
-                } else { /* We don't have the 16 bits following the high surrogate. */
-                    break;
-                }
-            } else if (flags == conv_flags::strict) {
-                /* UTF-16 surrogate values are illegal in UTF-32 */
-                if (is_low_surrogate(ch)) {
-                    break;
-                }
-            }
-            if (ch < (uint32_t)0x80) {      
-                ++count;
-            } else if (ch < (uint32_t)0x800) {     
-                count += 2;
-            } else if (ch < (uint32_t)0x10000) {   
-                count += 3;
-            } else if (ch < (uint32_t)0x110000) {  
-                count += 4;
-            } else {                            
-                count += 3;
-            }
-        }
-        return count;
-    }
-
-
-    // utf32
-
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t),size_t>::type 
-    u8_length(InputIt first, InputIt last) noexcept
-    {
-        std::size_t count = 0;
-        for (InputIt p = first; p < last; ++p)
-        {
-            uint32_t ch = *p;
-            if (ch < (uint32_t)0x80) {      
-                ++count;
-            } else if (ch < (uint32_t)0x800) {     
-                count += 2;
-            } else if (ch < (uint32_t)0x10000) {   
-                count += 3;
-            } else if (ch <= max_legal_utf32) {  
-                count += 4;
-            } else {                            
-                count += 3;
-            }
-        }
-        return count;
-    }
 
     // u32_length
 
