@@ -354,7 +354,7 @@ namespace jsoncons { namespace unicode_traits {
 
             switch (static_cast<uint8_t>(*first)) 
             {
-                /* no fall-through in this inner switch */
+                // no fall-through in this inner switch
                 case 0xE0: if (a < 0xA0) return conv_errc::source_illegal; break;
                 case 0xED: if (a > 0x9F) return conv_errc::source_illegal; break;
                 case 0xF0: if (a < 0x90) return conv_errc::source_illegal; break;
@@ -417,6 +417,165 @@ namespace jsoncons { namespace unicode_traits {
         const CharT* ptr;
         conv_errc ec;
     };
+
+    // to_codepoint
+
+    template <class CharT,class CodepointT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
+                            && std::is_integral<CodepointT>::value && sizeof(CodepointT) == sizeof(uint32_t),
+                            convert_result<CharT>>::type 
+    to_codepoint(const CharT* first, const CharT* last, 
+                 CodepointT& ch, 
+                 conv_flags flags = conv_flags::strict) 
+    {
+        conv_errc  result = conv_errc();
+
+        unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)];
+        if (extra_bytes_to_read >= last - first) 
+        {
+            result = conv_errc::source_exhausted; 
+            return convert_result<CharT>{first, result};
+        }
+        // Do this check whether lenient or strict 
+        if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc()) 
+        {
+            return convert_result<CharT>{first, result};
+        }
+        // The cases all fall through. See "Note A" below.
+        switch (extra_bytes_to_read) 
+        {
+            case 5: 
+                ch += static_cast<uint8_t>(*first++); 
+                ch <<= 6;
+                JSONCONS_FALLTHROUGH;
+            case 4: 
+                ch += static_cast<uint8_t>(*first++); 
+                ch <<= 6;
+                JSONCONS_FALLTHROUGH;
+            case 3: 
+                ch += static_cast<uint8_t>(*first++); 
+                ch <<= 6;
+                JSONCONS_FALLTHROUGH;
+            case 2: 
+                ch += static_cast<uint8_t>(*first++); 
+                ch <<= 6;
+                JSONCONS_FALLTHROUGH;
+            case 1: 
+                ch += static_cast<uint8_t>(*first++); 
+                ch <<= 6;
+                JSONCONS_FALLTHROUGH;
+            case 0: 
+                ch += static_cast<uint8_t>(*first++);
+                break;
+        }
+        ch -= offsets_from_utf8[extra_bytes_to_read];
+
+        if (ch <= max_legal_utf32) {
+            /*
+             * UTF-16 surrogate values are illegal in UTF-32, and anything
+             * over Plane 17 (> 0x10FFFF) is illegal.
+             */
+            if (is_surrogate(ch) ) 
+            {
+                if (flags == conv_flags::strict) 
+                {
+                    first -= (extra_bytes_to_read+1); // return to the illegal value itself
+                    result = conv_errc::source_illegal;
+                    return convert_result<CharT>{first, result};
+                } 
+                else
+                {
+                    ch = replacement_char;
+                }
+            }
+        } 
+        else // i.e., ch > max_legal_utf32
+        { 
+            result = conv_errc::source_illegal;
+            ch = replacement_char;
+        }
+
+        return convert_result<CharT>{first,result} ;
+    }
+
+    template <class CharT,class CodepointT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
+                            && std::is_integral<CodepointT>::value && sizeof(CodepointT) == sizeof(uint32_t),
+                            convert_result<CharT>>::type 
+    to_codepoint(const CharT* first, const CharT* last, 
+                 CodepointT& ch, 
+                 conv_flags flags = conv_flags::strict) 
+    {
+        conv_errc  result = conv_errc();
+
+        ch = *first++;
+        // If we have a surrogate pair, convert to UTF32 first. 
+        if (is_high_surrogate(ch)) {
+            // If the 16 bits following the high surrogate are in the first buffer... 
+            if (first < last) 
+            {
+                uint32_t ch2 = *first;
+                // If ptr's a low surrogate, convert to UTF32. 
+                if (ch2 >= sur_low_start && ch2 <= sur_low_end ) {
+                    ch = ((ch - sur_high_start) << half_shift)
+                        + (ch2 - sur_low_start) + half_base;
+                    ++first;
+                } 
+                else if (flags == conv_flags::strict) // ptr's an unpaired high surrogate 
+                { 
+                    --first; /* return to the illegal value itself */
+                    result = conv_errc::source_illegal;
+                    return convert_result<CharT>{first, result};
+                }
+            } 
+            else 
+            { /* We don't have the 16 bits following the high surrogate. */
+                --first; /* return to the high surrogate */
+                result = conv_errc::source_exhausted;
+                return convert_result<CharT>{first, result};
+            }
+        } else if (flags == conv_flags::strict) {
+            /* UTF-16 surrogate values are illegal in UTF-32 */
+            if (is_low_surrogate(ch) ) 
+            {
+                --first; /* return to the illegal value itself */
+                result = conv_errc::source_illegal;
+                return convert_result<CharT>{first, result};
+            }
+        }
+        
+        return convert_result<CharT>{first,result} ;
+    }
+
+    template <class CharT,class CodepointT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
+                            && std::is_integral<CodepointT>::value && sizeof(CodepointT) == sizeof(uint32_t),
+                            convert_result<CharT>>::type 
+    to_codepoint(const CharT* first, const CharT* last, 
+                 CodepointT& ch, 
+                 conv_flags flags = conv_flags::strict) 
+    {
+        conv_errc  result = conv_errc();
+
+        ch = *first++;
+        if (flags == conv_flags::strict ) {
+            /* UTF-16 surrogate values are illegal in UTF-32 */
+            if (is_surrogate(ch)) {
+                --first; /* return to the illegal value itself */
+                result = conv_errc::illegal_surrogate_value;
+                break;
+            }
+        }
+        if (!(ch <= max_legal_utf32))
+        {
+            ch = replacement_char;
+            result = conv_errc::source_illegal;
+        }
+
+        return convert_result<CharT>{first,result} ;
+    }
+
+    // convert
 
     template <class CharT,class Container>
     typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)

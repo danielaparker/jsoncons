@@ -96,14 +96,18 @@ namespace detail {
                     }
                     else if (is_control_character(c) || escape_all_non_ascii)
                     {
-                        // convert utf8 to codepoint
-                        unicode_traits::sequence_generator<const CharT*> g(it, end, unicode_traits::conv_flags::strict);
-                        if (g.done() || g.status() != unicode_traits::conv_errc())
+                        // convert to codepoint
+                        uint32_t cp;
+                        auto r = unicode_traits::to_codepoint(it, end, cp, unicode_traits::conv_flags::strict);
+                        //unicode_traits::sequence_generator<const CharT*> g(it, end, unicode_traits::conv_flags::strict);
+                        //if (g.done() || g.status() != unicode_traits::conv_errc())
+                        if (r.ec != unicode_traits::conv_errc())
                         {
                             JSONCONS_THROW(ser_error(json_errc::illegal_codepoint));
                         }
-                        uint32_t cp = g.get().codepoint();
-                        it += (g.get().length() - 1);
+                        //uint32_t cp = g.get().codepoint();
+                        //it += (g.get().length() - 1);
+                        it = r.ptr;
                         if (is_non_ascii_codepoint(cp) || is_control_character(c))
                         {
                             if (cp > 0xFFFF)
