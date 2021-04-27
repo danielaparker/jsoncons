@@ -81,7 +81,7 @@ private:
     {
         std::basic_string<CharT> target;
         auto result = unicode_traits::convert(
-            name.begin(), name.end(), std::back_inserter(target), 
+            name.data(), name.size(), std::back_inserter(target), 
             unicode_traits::conv_flags::strict);
         if (result.ec != unicode_traits::conv_errc())
         {
@@ -94,7 +94,7 @@ private:
     {
         std::basic_string<CharT> target;
         auto result = unicode_traits::convert(
-            value.begin(), value.end(), std::back_inserter(target), 
+            value.data(), value.size(), std::back_inserter(target), 
             unicode_traits::conv_flags::strict);
         if (result.ec != unicode_traits::conv_errc())
         {

@@ -234,7 +234,7 @@ private:
                     return;
                 }
 
-                auto result = unicode_traits::validate(text_buffer_.begin(),text_buffer_.end());
+                auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
                 if (result.ec != unicode_traits::conv_errc())
                 {
                     ec = msgpack_errc::invalid_utf8_text_string;
@@ -425,7 +425,7 @@ private:
                         return;
                     }
 
-                    auto result = unicode_traits::validate(text_buffer_.begin(),text_buffer_.end());
+                    auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
                     if (result.ec != unicode_traits::conv_errc())
                     {
                         ec = msgpack_errc::invalid_utf8_text_string;

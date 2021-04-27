@@ -338,7 +338,7 @@ private:
 
     void write_string(const string_view& sv)
     {
-        auto sink = unicode_traits::validate(sv.begin(), sv.end());
+        auto sink = unicode_traits::validate(sv.data(), sv.size());
         if (sink.ec != unicode_traits::conv_errc())
         {
             JSONCONS_THROW(ser_error(cbor_errc::invalid_utf8_text_string));

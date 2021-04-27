@@ -2380,7 +2380,7 @@ escape_u4:
             }
             else
             {
-                unicode_traits::convert(&cp_, &cp_ + 1, std::back_inserter(string_buffer_));
+                unicode_traits::convert(&cp_, 1, std::back_inserter(string_buffer_));
                 sb = ++input_ptr_;
                 ++position_;
                 state_ = json_parse_state::string;
@@ -2501,7 +2501,7 @@ escape_u8:
                 return;
             }
             uint32_t cp = 0x10000 + ((cp_ & 0x3FF) << 10) + (cp2_ & 0x3FF);
-            unicode_traits::convert(&cp, &cp + 1, std::back_inserter(string_buffer_));
+            unicode_traits::convert(&cp, 1, std::back_inserter(string_buffer_));
             sb = ++input_ptr_;
             ++position_;
             goto string_u1;
@@ -2682,7 +2682,7 @@ private:
     void end_string_value(const CharT* s, std::size_t length, basic_json_visitor<CharT>& visitor, std::error_code& ec) 
     {
         string_view_type sv(s, length);
-        auto result = unicode_traits::validate(s,s+length);
+        auto result = unicode_traits::validate(s, length);
         if (result.ec != unicode_traits::conv_errc())
         {
             translate_conv_errc(result.ec,ec);

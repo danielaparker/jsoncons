@@ -602,7 +602,7 @@ private:
                  std::error_code& ec) override
     {
         std::basic_string<typename To::char_type> target;
-        auto result = unicode_traits::convert(name.begin(),name.end(),std::back_inserter(target),unicode_traits::conv_flags::strict);
+        auto result = unicode_traits::convert(name.data(), name.size(),std::back_inserter(target),unicode_traits::conv_flags::strict);
         if (result.ec != unicode_traits::conv_errc())
         {
             ec = result.ec;
@@ -616,7 +616,8 @@ private:
                       std::error_code& ec) override
     {
         std::basic_string<typename To::char_type> target;
-        auto result = unicode_traits::convert(value.begin(),value.end(),std::back_inserter(target),unicode_traits::conv_flags::strict);
+        auto result = unicode_traits::convert(value.data(), value.size(),
+                                              std::back_inserter(target),unicode_traits::conv_flags::strict);
         if (result.ec != unicode_traits::conv_errc())
         {
             JSONCONS_THROW(ser_error(result.ec));

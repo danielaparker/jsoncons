@@ -401,14 +401,14 @@ has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
         {
             auto s = j.as_string();
             T val;
-            unicode_traits::convert(s.begin(), s.end(), std::back_inserter(val));
+            unicode_traits::convert(s.data(), s.size(), std::back_inserter(val));
             return val;
         }
 
         static Json to_json(const T& val)
         {
             std::basic_string<char_type> s;
-            unicode_traits::convert(val.begin(), val.end(), std::back_inserter(s));
+            unicode_traits::convert(val.data(), val.size(), std::back_inserter(s));
 
             return Json(s, semantic_tag::none);
         }
@@ -416,7 +416,7 @@ has_can_convert = jsoncons::detail::is_detected<traits_can_convert_t, Json, T>;
         static Json to_json(const T& val, const allocator_type& alloc)
         {
             std::basic_string<char_type> s;
-            unicode_traits::convert(val.begin(), val.end(), std::back_inserter(s));
+            unicode_traits::convert(val.data(), val.size(), std::back_inserter(s));
             return Json(s, semantic_tag::none, alloc);
         }
     };

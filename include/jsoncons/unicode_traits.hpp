@@ -427,66 +427,68 @@ namespace jsoncons { namespace unicode_traits {
 
     // convert
 
-    template <class Iterator>
+    template <class CharT>
     struct convert_result
     {
-        Iterator it;
+        CharT* it;
         conv_errc ec;
     };
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                            && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, OutputIt target, conv_flags flags=conv_flags::strict) 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
+                            && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, OutputIt target, conv_flags flags=conv_flags::strict) 
     {
         (void)flags;
 
         conv_errc  result = conv_errc();
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
-            std::size_t length = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)] + 1;
-            if (length > (std::size_t)(last - first))
+            std::size_t len = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)] + 1;
+            if (len > (std::size_t)(last - data))
             {
-                return convert_result<InputIt>{first, conv_errc::source_exhausted};
+                return convert_result<CharT>{data, conv_errc::source_exhausted};
             }
-            if ((result=is_legal_utf8(first, length)) != conv_errc())
+            if ((result=is_legal_utf8(data, len)) != conv_errc())
             {
-                return convert_result<InputIt>{first,result};
+                return convert_result<CharT>{data,result};
             }
 
-            switch (length) {
-                case 4: *target++ = (static_cast<uint8_t>(*first++));
+            switch (len) {
+                case 4: *target++ = (static_cast<uint8_t>(*data++));
                     JSONCONS_FALLTHROUGH;
-                case 3: *target++ = (static_cast<uint8_t>(*first++));
+                case 3: *target++ = (static_cast<uint8_t>(*data++));
                     JSONCONS_FALLTHROUGH;
-                case 2: *target++ = (static_cast<uint8_t>(*first++));
+                case 2: *target++ = (static_cast<uint8_t>(*data++));
                     JSONCONS_FALLTHROUGH;
-                case 1: *target++ = (static_cast<uint8_t>(*first++));
+                case 1: *target++ = (static_cast<uint8_t>(*data++));
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
+                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
             OutputIt target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
             uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)];
-            if (extra_bytes_to_read >= last - first) 
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)];
+            if (extra_bytes_to_read >= last - data) 
             {
                 result = conv_errc::source_exhausted; 
                 break;
             }
             /* Do this check whether lenient or strict */
-            if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc())
+            if ((result=is_legal_utf8(data, extra_bytes_to_read+1)) != conv_errc())
             {
                 break;
             }
@@ -494,17 +496,17 @@ namespace jsoncons { namespace unicode_traits {
              * The cases all fall through. See "Note A" below.
              */
             switch (extra_bytes_to_read) {
-                case 5: ch += static_cast<uint8_t>(*first++); ch <<= 6; /* remember, illegal UTF-8 */
+                case 5: ch += static_cast<uint8_t>(*data++); ch <<= 6; /* remember, illegal UTF-8 */
                     JSONCONS_FALLTHROUGH;
-                case 4: ch += static_cast<uint8_t>(*first++); ch <<= 6; /* remember, illegal UTF-8 */
+                case 4: ch += static_cast<uint8_t>(*data++); ch <<= 6; /* remember, illegal UTF-8 */
                     JSONCONS_FALLTHROUGH;
-                case 3: ch += static_cast<uint8_t>(*first++); ch <<= 6;
+                case 3: ch += static_cast<uint8_t>(*data++); ch <<= 6;
                     JSONCONS_FALLTHROUGH;
-                case 2: ch += static_cast<uint8_t>(*first++); ch <<= 6;
+                case 2: ch += static_cast<uint8_t>(*data++); ch <<= 6;
                     JSONCONS_FALLTHROUGH;
-                case 1: ch += static_cast<uint8_t>(*first++); ch <<= 6;
+                case 1: ch += static_cast<uint8_t>(*data++); ch <<= 6;
                     JSONCONS_FALLTHROUGH;
-                case 0: ch += static_cast<uint8_t>(*first++);
+                case 0: ch += static_cast<uint8_t>(*data++);
                     break;
             }
             ch -= offsets_from_utf8[extra_bytes_to_read];
@@ -513,7 +515,7 @@ namespace jsoncons { namespace unicode_traits {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_surrogate(ch) ) {
                     if (flags == conv_flags::strict) {
-                        first -= (extra_bytes_to_read+1); /* return to the illegal value itself */
+                        data -= (extra_bytes_to_read+1); /* return to the illegal value itself */
                         result = conv_errc::source_illegal;
                         break;
                     } else {
@@ -525,7 +527,7 @@ namespace jsoncons { namespace unicode_traits {
             } else if (ch > max_utf16) {
                 if (flags == conv_flags::strict) {
                     result = conv_errc::source_illegal;
-                    first -= (extra_bytes_to_read+1); /* return to the start */
+                    data -= (extra_bytes_to_read+1); /* return to the start */
                     break; /* Bail out; shouldn't continue */
                 } else {
                     *target++ = (replacement_char);
@@ -537,29 +539,30 @@ namespace jsoncons { namespace unicode_traits {
                 *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t)
+                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        while (first < last) 
+        CharT* last = data + length;
+        while (data < last) 
         {
             uint32_t ch = 0;
-            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*first)];
-            if (extra_bytes_to_read >= last - first) 
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*data)];
+            if (extra_bytes_to_read >= last - data) 
             {
                 result = conv_errc::source_exhausted; 
                 break;
             }
             /* Do this check whether lenient or strict */
-            if ((result=is_legal_utf8(first, extra_bytes_to_read+1)) != conv_errc()) {
+            if ((result=is_legal_utf8(data, extra_bytes_to_read+1)) != conv_errc()) {
                 break;
             }
             /*
@@ -568,27 +571,27 @@ namespace jsoncons { namespace unicode_traits {
             switch (extra_bytes_to_read) 
             {
                 case 5: 
-                    ch += static_cast<uint8_t>(*first++); 
+                    ch += static_cast<uint8_t>(*data++); 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 4: 
-                    ch += static_cast<uint8_t>(*first++); 
+                    ch += static_cast<uint8_t>(*data++); 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 3: 
-                    ch += static_cast<uint8_t>(*first++); 
+                    ch += static_cast<uint8_t>(*data++); 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 2: 
-                    ch += static_cast<uint8_t>(*first++); 
+                    ch += static_cast<uint8_t>(*data++); 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 1: 
-                    ch += static_cast<uint8_t>(*first++); 
+                    ch += static_cast<uint8_t>(*data++); 
                     ch <<= 6;
                     JSONCONS_FALLTHROUGH;
                 case 0: 
-                    ch += static_cast<uint8_t>(*first++);
+                    ch += static_cast<uint8_t>(*data++);
                     break;
             }
             ch -= offsets_from_utf8[extra_bytes_to_read];
@@ -600,7 +603,7 @@ namespace jsoncons { namespace unicode_traits {
                  */
                 if (is_surrogate(ch) ) {
                     if (flags == conv_flags::strict) {
-                        first -= (extra_bytes_to_read+1); /* return to the illegal value itself */
+                        data -= (extra_bytes_to_read+1); /* return to the illegal value itself */
                         result = conv_errc::source_illegal;
                         break;
                     } else {
@@ -614,47 +617,49 @@ namespace jsoncons { namespace unicode_traits {
                 *target++ = (replacement_char);
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
     // utf16
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                                   && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
+                                   && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) {
         conv_errc  result = conv_errc();
-        while (first < last) {
+
+        CharT* last = data + length;
+        while (data < last) {
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
             const uint32_t byteMark = 0x80; 
-            uint32_t ch = *first++;
-            /* If we have a surrogate pair, convert to uint32_t first. */
+            uint32_t ch = *data++;
+            /* If we have a surrogate pair, convert to uint32_t data. */
             if (is_high_surrogate(ch)) {
-                /* If the 16 bits following the high surrogate are in the first buffer... */
-                if (first < last) {
-                    uint32_t ch2 = *first;
+                /* If the 16 bits following the high surrogate are in the data buffer... */
+                if (data < last) {
+                    uint32_t ch2 = *data;
                     /* If it's a low surrogate, convert to uint32_t. */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
                         ch = ((ch - sur_high_start) << half_shift)
                             + (ch2 - sur_low_start) + half_base;
-                        ++first;
+                        ++data;
                     } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
-                        --first; /* return to the illegal value itself */
+                        --data; /* return to the illegal value itself */
                         result = conv_errc::unpaired_high_surrogate;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
-                    --first; /* return to the high surrogate */
+                    --data; /* return to the high surrogate */
                     result = conv_errc::source_exhausted;
                     break;
                 }
             } else if (flags == conv_flags::strict) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_low_surrogate(ch)) {
-                    --first; /* return to the illegal value itself */
+                    --data; /* return to the illegal value itself */
                     result = conv_errc::source_illegal;
                     break;
                 }
@@ -710,39 +715,40 @@ namespace jsoncons { namespace unicode_traits {
                 break;
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
+                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
             OutputIt target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
-            uint32_t ch = *first++;
-            /* If we have a surrogate pair, convert to uint32_t first. */
+            uint32_t ch = *data++;
+            /* If we have a surrogate pair, convert to uint32_t data. */
             if (is_high_surrogate(ch)) 
             {
-                /* If the 16 bits following the high surrogate are in the first buffer... */
-                if (first < last) {
-                    uint32_t ch2 = *first;
+                /* If the 16 bits following the high surrogate are in the data buffer... */
+                if (data < last) {
+                    uint32_t ch2 = *data;
                     /* If it's a low surrogate, */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
                         *target++ = ((uint16_t)ch);
                         *target++ = ((uint16_t)ch2);
-                        ++first;
+                        ++data;
                     } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
-                        --first; /* return to the illegal value itself */
+                        --data; /* return to the illegal value itself */
                         result = conv_errc::unpaired_high_surrogate;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
-                    --first; /* return to the high surrogate */
+                    --data; /* return to the high surrogate */
                     result = conv_errc::source_exhausted;
                     break;
                 }
@@ -750,7 +756,7 @@ namespace jsoncons { namespace unicode_traits {
             {
                 // illegal leading low surrogate
                 if (flags == conv_flags::strict) {
-                    --first; /* return to the illegal value itself */
+                    --data; /* return to the illegal value itself */
                     result = conv_errc::source_illegal;
                     break;
                 }
@@ -764,73 +770,75 @@ namespace jsoncons { namespace unicode_traits {
                 *target++ = ((uint16_t)ch);
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t)
+                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
-            uint32_t ch = *first++;
-            /* If we have a surrogate pair, convert to UTF32 first. */
+            uint32_t ch = *data++;
+            /* If we have a surrogate pair, convert to UTF32 data. */
             if (is_high_surrogate(ch)) {
-                /* If the 16 bits following the high surrogate are in the first buffer... */
-                if (first < last) {
-                    uint32_t ch2 = *first;
+                /* If the 16 bits following the high surrogate are in the data buffer... */
+                if (data < last) {
+                    uint32_t ch2 = *data;
                     /* If it's a low surrogate, convert to UTF32. */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end ) {
                         ch = ((ch - sur_high_start) << half_shift)
                             + (ch2 - sur_low_start) + half_base;
-                        ++first;
+                        ++data;
                     } else if (flags == conv_flags::strict) { /* it's an unpaired high surrogate */
-                        --first; /* return to the illegal value itself */
+                        --data; /* return to the illegal value itself */
                         result = conv_errc::source_illegal;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
-                    --first; /* return to the high surrogate */
+                    --data; /* return to the high surrogate */
                     result = conv_errc::source_exhausted;
                     break;
                 }
             } else if (flags == conv_flags::strict) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_low_surrogate(ch) ) {
-                    --first; /* return to the illegal value itself */
+                    --data; /* return to the illegal value itself */
                     result = conv_errc::source_illegal;
                     break;
                 }
             }
             *target++ = (ch);
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
     // utf32
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                                   && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
+                                   && is_compatible_output_iterator<OutputIt,uint8_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
             OutputIt target, 
             conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
-        while (first < last) {
+        CharT* last = data + length;
+        while (data < last) {
             unsigned short bytes_to_write = 0;
             const uint32_t byteMask = 0xBF;
             const uint32_t byteMark = 0x80; 
-            uint32_t ch = *first++;
+            uint32_t ch = *data++;
             if (flags == conv_flags::strict ) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_surrogate(ch)) {
-                    --first; /* return to the illegal value itself */
+                    --data; /* return to the illegal value itself */
                     result = conv_errc::illegal_surrogate_value;
                     break;
                 }
@@ -891,26 +899,27 @@ namespace jsoncons { namespace unicode_traits {
                 break;
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
+                                   && is_compatible_output_iterator<OutputIt,uint16_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
-            uint32_t ch = *first++;
+            uint32_t ch = *data++;
             if (ch <= max_bmp) { /* Target is a character <= 0xFFFF */
                 /* UTF-16 surrogate values are illegal in UTF-32; 0xffff or 0xfffe are both reserved values */
                 if (is_surrogate(ch) ) {
                     if (flags == conv_flags::strict) {
-                        --first; /* return to the illegal value itself */
+                        --data; /* return to the illegal value itself */
                         result = conv_errc::source_illegal;
                         break;
                     } else {
@@ -932,25 +941,26 @@ namespace jsoncons { namespace unicode_traits {
                 *target++ = ((uint16_t)((ch & half_mask) + sur_low_start));
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
-    template <class InputIt,class OutputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<InputIt>>::type 
-    convert(InputIt first, InputIt last, 
+    template <class CharT,class OutputIt>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t)
+                                   && is_compatible_output_iterator<OutputIt,uint32_t>::value,convert_result<CharT>>::type 
+    convert(CharT* data, std::size_t length, 
                      OutputIt target, 
                      conv_flags flags = conv_flags::strict) 
     {
         conv_errc  result = conv_errc();
 
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
-            uint32_t ch = *first++;
+            uint32_t ch = *data++;
             if (flags == conv_flags::strict ) {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
                 if (is_surrogate(ch)) {
-                    --first; /* return to the illegal value itself */
+                    --data; /* return to the illegal value itself */
                     result = conv_errc::illegal_surrogate_value;
                     break;
                 }
@@ -965,92 +975,95 @@ namespace jsoncons { namespace unicode_traits {
                 result = conv_errc::source_illegal;
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
     // validate
 
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t)
-                                   ,convert_result<InputIt>>::type 
-    validate(InputIt first, InputIt last) noexcept
+    template <class CharT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t),
+                            convert_result<CharT>>::type 
+    validate(CharT* data, std::size_t length) noexcept
     {
         conv_errc  result = conv_errc();
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
-            std::size_t length = static_cast<std::size_t>(trailing_bytes_for_utf8[static_cast<uint8_t>(*first)]) + 1;
-            if (length > (std::size_t)(last - first))
+            std::size_t len = static_cast<std::size_t>(trailing_bytes_for_utf8[static_cast<uint8_t>(*data)]) + 1;
+            if (len > (std::size_t)(last - data))
             {
-                return convert_result<InputIt>{first, conv_errc::source_exhausted};
+                return convert_result<CharT>{data, conv_errc::source_exhausted};
             }
-            if ((result=is_legal_utf8(first, length)) != conv_errc())
+            if ((result=is_legal_utf8(data, len)) != conv_errc())
             {
-                return convert_result<InputIt>{first,result} ;
+                return convert_result<CharT>{data,result} ;
             }
-            first += length;
+            data += len;
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
     // utf16
 
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)
-                                   ,convert_result<InputIt>>::type 
-    validate(InputIt first, InputIt last)  noexcept
+    template <class CharT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t),
+                            convert_result<CharT>>::type 
+    validate(CharT* data, std::size_t length)  noexcept
     {
         conv_errc  result = conv_errc();
 
-        while (first != last) 
+        CharT* last = data + length;
+        while (data != last) 
         {
-            uint32_t ch = *first++;
-            /* If we have a surrogate pair, validate to uint32_t first. */
+            uint32_t ch = *data++;
+            /* If we have a surrogate pair, validate to uint32_t data. */
             if (is_high_surrogate(ch)) 
             {
-                /* If the 16 bits following the high surrogate are in the first buffer... */
-                if (first < last) {
-                    uint32_t ch2 = *first;
+                /* If the 16 bits following the high surrogate are in the data buffer... */
+                if (data < last) {
+                    uint32_t ch2 = *data;
                     /* If it's a low surrogate, */
                     if (ch2 >= sur_low_start && ch2 <= sur_low_end) {
-                        ++first;
+                        ++data;
                     } else {
-                        --first; /* return to the illegal value itself */
+                        --data; /* return to the illegal value itself */
                         result = conv_errc::unpaired_high_surrogate;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
-                    --first; /* return to the high surrogate */
+                    --data; /* return to the high surrogate */
                     result = conv_errc::source_exhausted;
                     break;
                 }
             } else if (is_low_surrogate(ch)) 
             {
                 /* UTF-16 surrogate values are illegal in UTF-32 */
-                --first; /* return to the illegal value itself */
+                --data; /* return to the illegal value itself */
                 result = conv_errc::source_illegal;
                 break;
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data,result} ;
     }
 
 
     // utf32
 
 
-    template <class InputIt>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t)
-                                   ,convert_result<InputIt>>::type 
-    validate(InputIt first, InputIt last) noexcept
+    template <class CharT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t),
+                            convert_result<CharT>>::type 
+    validate(CharT* data, std::size_t length) noexcept
     {
         conv_errc  result = conv_errc();
 
-        while (first != last) 
+        const CharT* last = data + length;
+        while (data != last) 
         {
-            uint32_t ch = *first++;
+            uint32_t ch = *data++;
             /* UTF-16 surrogate values are illegal in UTF-32 */
             if (is_surrogate(ch)) {
-                --first; /* return to the illegal value itself */
+                --data; /* return to the illegal value itself */
                 result = conv_errc::illegal_surrogate_value;
                 break;
             }
@@ -1059,7 +1072,7 @@ namespace jsoncons { namespace unicode_traits {
                 result = conv_errc::source_illegal;
             }
         }
-        return convert_result<InputIt>{first,result} ;
+        return convert_result<CharT>{data, result} ;
     }
 
     // sequence 
