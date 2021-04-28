@@ -1679,7 +1679,7 @@ namespace jsoncons { namespace unicode_traits {
     count_codepoints(const CharT* data, std::size_t length, 
                      conv_flags flags = conv_flags::strict) 
     {
-        conv_errc  result = conv_errc();
+        conv_errc result = conv_errc();
 
         const CharT* ptr = data;
         const CharT* last = data + length;
@@ -1702,6 +1702,7 @@ namespace jsoncons { namespace unicode_traits {
                 result = conv_errc::source_illegal;
             }
         }
+        (void)result;
         return ptr - data;
     }
 
