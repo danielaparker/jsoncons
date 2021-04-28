@@ -297,7 +297,7 @@ namespace jsoncons { namespace jsonpath {
                 else if (val.is_string() && identifier_ == length_literal<char_type>())
                 {
                     string_view_type sv = val.as_string_view();
-                    std::size_t count = unicode_traits::count_codepoints(sv.begin(), sv.end());
+                    std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
                     pointer ptr = resources.create_json(count);
                     this->evaluate_tail(resources, generate_path(path, identifier_, options), 
                                             root, *ptr, nodes, ndtype, options);

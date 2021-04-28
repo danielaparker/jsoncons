@@ -309,7 +309,7 @@ namespace jsonschema {
 
             if (min_length_) 
             {
-                std::size_t length = unicode_traits::count_codepoints(content.begin(), content.end());
+                std::size_t length = unicode_traits::count_codepoints(content.data(), content.size());
                 if (length < *min_length_) 
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected minLength: ") + std::to_string(*min_length_)
@@ -323,7 +323,7 @@ namespace jsonschema {
 
             if (max_length_) 
             {
-                std::size_t length = unicode_traits::count_codepoints(content.begin(), content.end());
+                std::size_t length = unicode_traits::count_codepoints(content.data(), content.size());
                 if (length > *max_length_)
                 {
                     reporter.error(validation_output(instance_location.string(), std::string("Expected maxLength: ") + std::to_string(*max_length_)

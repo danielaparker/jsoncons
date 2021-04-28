@@ -1488,7 +1488,7 @@ namespace detail {
                 case json_type::string_value:
                 {
                     auto sv0 = arg0_ptr->template as<string_view_type>();
-                    auto length = unicode_traits::count_codepoints(sv0.begin(), sv0.end());
+                    auto length = unicode_traits::count_codepoints(sv0.data(), sv0.size());
                     return *resources.create_json(length);
                 }
                 default:
