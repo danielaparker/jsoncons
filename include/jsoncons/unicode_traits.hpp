@@ -13,8 +13,8 @@
  * Unicode Standard."
 */
 
-#ifndef JSONCONS_UNICODE_TRAITS_UNICODE_TRAITS_HPP
-#define JSONCONS_UNICODE_TRAITS_UNICODE_TRAITS_HPP
+#ifndef JSONCONS_UNICODE_TRAITS_HPP
+#define JSONCONS_UNICODE_TRAITS_HPP
 
 #include <string>
 #include <iterator>
@@ -52,15 +52,6 @@ namespace jsoncons { namespace unicode_traits {
     struct is_char32<CharT, typename std::enable_if<std::is_integral<CharT>::value &&
                                                    !std::is_same<CharT,bool>::value &&
                                                    (std::is_same<CharT,char32_t>::value || (!std::is_same<CharT,char16_t>::value && sizeof(uint32_t) == sizeof(CharT)))>::type> : std::true_type {};
-
-    // is_character
-    template <typename CharT, typename Enable=void>
-    struct is_character : std::false_type {};
-
-    template <typename CharT>
-    struct is_character<CharT, typename std::enable_if<is_char8<CharT>::value || 
-                                                       is_char16<CharT>::value ||
-                                                       is_char32<CharT>::value>::type> : std::true_type {};
 
     enum class encoding_kind {undetected,utf8,utf16le,utf16be,utf32le,utf32be};
 
