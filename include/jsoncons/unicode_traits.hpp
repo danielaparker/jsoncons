@@ -1449,13 +1449,14 @@ namespace jsoncons { namespace unicode_traits {
         }
     };
 
-    // u32_length
+    // count_codepoints
 
+#if 0
     template <class InputIt>
     typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value 
                                    && (sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint8_t) || sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint16_t)),
                                    std::size_t>::type 
-    u32_length(InputIt first, InputIt last) noexcept
+    count_codepoints(InputIt first, InputIt last) noexcept
     {
         sequence_generator<InputIt> g(first, last, unicode_traits::conv_flags::strict);
 
@@ -1471,11 +1472,11 @@ namespace jsoncons { namespace unicode_traits {
     template <class InputIt>
     typename std::enable_if<std::is_integral<typename std::iterator_traits<InputIt>::value_type>::value && sizeof(typename std::iterator_traits<InputIt>::value_type) == sizeof(uint32_t),
                                    std::size_t>::type 
-    u32_length(InputIt first, InputIt last) noexcept
+    count_codepoints(InputIt first, InputIt last) noexcept
     {
         return std::distance(first,last);
     }
-
+#endif
     enum class encoding {u8,u16le,u16be,u32le,u32be,undetected};
 
     template <class Iterator>
@@ -1550,6 +1551,158 @@ namespace jsoncons { namespace unicode_traits {
                 }
             }
         }
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint8_t),
+                            std::size_t>::type 
+    count_codepoints(const CharT* data, std::size_t length, 
+                     conv_flags flags = conv_flags::strict) 
+    {
+        conv_errc  result = conv_errc();
+
+        const CharT* ptr = data;
+        const CharT* last = data + length;
+        while (ptr < last) 
+        {
+            uint32_t ch = 0;
+            unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*ptr)];
+            if (extra_bytes_to_read >= last - ptr) 
+            {
+                result = conv_errc::source_exhausted; 
+                break;
+            }
+            /* Do this check whether lenient or strict */
+            if ((result=is_legal_utf8(ptr, extra_bytes_to_read+1)) != conv_errc()) {
+                break;
+            }
+            /*
+             * The cases all fall through. See "Note A" below.
+             */
+            switch (extra_bytes_to_read) 
+            {
+                case 5: 
+                    ch += static_cast<uint8_t>(*ptr++); 
+                    ch <<= 6;
+                    JSONCONS_FALLTHROUGH;
+                case 4: 
+                    ch += static_cast<uint8_t>(*ptr++); 
+                    ch <<= 6;
+                    JSONCONS_FALLTHROUGH;
+                case 3: 
+                    ch += static_cast<uint8_t>(*ptr++); 
+                    ch <<= 6;
+                    JSONCONS_FALLTHROUGH;
+                case 2: 
+                    ch += static_cast<uint8_t>(*ptr++); 
+                    ch <<= 6;
+                    JSONCONS_FALLTHROUGH;
+                case 1: 
+                    ch += static_cast<uint8_t>(*ptr++); 
+                    ch <<= 6;
+                    JSONCONS_FALLTHROUGH;
+                case 0: 
+                    ch += static_cast<uint8_t>(*ptr++);
+                    break;
+            }
+            ch -= offsets_from_utf8[extra_bytes_to_read];
+
+            if (ch <= max_legal_utf32) {
+                /*
+                 * UTF-16 surrogate values are illegal in UTF-32, and anything
+                 * over Plane 17 (> 0x10FFFF) is illegal.
+                 */
+                if (is_surrogate(ch) ) {
+                    if (flags == conv_flags::strict) {
+                        ptr -= (extra_bytes_to_read+1); /* return to the illegal value itself */
+                        result = conv_errc::source_illegal;
+                        break;
+                    } else {
+                    }
+                } else {
+                }
+            } else { /* i.e., ch > max_legal_utf32 */
+                result = conv_errc::source_illegal;
+            }
+        }
+        return ptr - data;
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint16_t),
+                            std::size_t>::type 
+    count_codepoints(const CharT* data, std::size_t length, 
+                     conv_flags flags = conv_flags::strict) 
+    {
+        conv_errc  result = conv_errc();
+
+        const CharT* ptr = data;
+        const CharT* last = ptr + length;
+        while (ptr != last) 
+        {
+            uint32_t ch = *ptr++;
+            /* If we have a surrogate pair, convert to UTF32 ptr. */
+            if (is_high_surrogate(ch)) {
+                /* If the 16 bits following the high surrogate are in the ptr buffer... */
+                if (ptr < last) {
+                    uint32_t ch2 = *ptr;
+                    /* If ptr's a low surrogate, convert to UTF32. */
+                    if (ch2 >= sur_low_start && ch2 <= sur_low_end ) {
+                        ch = ((ch - sur_high_start) << half_shift)
+                            + (ch2 - sur_low_start) + half_base;
+                        ++ptr;
+                    } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
+                        --ptr; /* return to the illegal value itself */
+                        result = conv_errc::source_illegal;
+                        break;
+                    }
+                } else { /* We don't have the 16 bits following the high surrogate. */
+                    --ptr; /* return to the high surrogate */
+                    result = conv_errc::source_exhausted;
+                    break;
+                }
+            } else if (flags == conv_flags::strict) {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (is_low_surrogate(ch) ) {
+                    --ptr; /* return to the illegal value itself */
+                    result = conv_errc::source_illegal;
+                    break;
+                }
+            }
+        }
+        return ptr - data;
+    }
+
+    template <class CharT>
+    typename std::enable_if<std::is_integral<CharT>::value && sizeof(CharT) == sizeof(uint32_t),
+                            std::size_t>::type 
+    count_codepoints(const CharT* data, std::size_t length, 
+                     conv_flags flags = conv_flags::strict) 
+    {
+        conv_errc  result = conv_errc();
+
+        const CharT* ptr = data;
+        const CharT* last = data + length;
+        while (ptr != last) 
+        {
+            uint32_t ch = *ptr++;
+            if (flags == conv_flags::strict ) {
+                /* UTF-16 surrogate values are illegal in UTF-32 */
+                if (is_surrogate(ch)) {
+                    --ptr; /* return to the illegal value itself */
+                    result = conv_errc::illegal_surrogate_value;
+                    break;
+                }
+            }
+            if (ch <= max_legal_utf32)
+            {
+            }
+            else
+            {
+                result = conv_errc::source_illegal;
+            }
+        }
+        return ptr - data;
     }
 
     template <class Iterator>
