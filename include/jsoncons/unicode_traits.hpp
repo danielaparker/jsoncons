@@ -1361,7 +1361,7 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     typename std::enable_if<is_char8<CharT>::value, std::size_t>::type 
     count_codepoints(const CharT* data, std::size_t length, 
-                     conv_flags flags = conv_flags::strict) 
+                     conv_flags flags = conv_flags::strict) noexcept
     {
         conv_errc ec = conv_errc();
 
@@ -1438,7 +1438,7 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     typename std::enable_if<is_char16<CharT>::value, std::size_t>::type 
     count_codepoints(const CharT* data, std::size_t length, 
-                     conv_flags flags = conv_flags::strict) 
+                     conv_flags flags = conv_flags::strict) noexcept
     {
         conv_errc  ec = conv_errc();
 
@@ -1486,7 +1486,7 @@ namespace jsoncons { namespace unicode_traits {
     template <class CharT>
     typename std::enable_if<is_char32<CharT>::value, std::size_t>::type 
     count_codepoints(const CharT* data, std::size_t length, 
-                     conv_flags flags = conv_flags::strict) 
+                     conv_flags flags = conv_flags::strict) noexcept
     {
         conv_errc ec = conv_errc();
 
