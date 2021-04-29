@@ -440,7 +440,7 @@ namespace jsoncons { namespace unicode_traits {
                             convert_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
-                 conv_flags flags = conv_flags::strict) 
+                 conv_flags flags = conv_flags::strict) noexcept
     {
         ch = 0;
         if (first >= last)
@@ -522,7 +522,7 @@ namespace jsoncons { namespace unicode_traits {
                             convert_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
-                 conv_flags flags = conv_flags::strict) 
+                 conv_flags flags = conv_flags::strict) noexcept
     {
         ch = 0;
         if (first >= last)
@@ -577,7 +577,7 @@ namespace jsoncons { namespace unicode_traits {
                             convert_result<CharT>>::type 
     to_codepoint(const CharT* first, const CharT* last, 
                  CodepointT& ch, 
-                 conv_flags flags = conv_flags::strict) 
+                 conv_flags flags = conv_flags::strict) noexcept
     {
         ch = 0;
         if (first >= last)
