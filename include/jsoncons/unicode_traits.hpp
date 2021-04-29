@@ -1363,21 +1363,22 @@ namespace jsoncons { namespace unicode_traits {
     count_codepoints(const CharT* data, std::size_t length, 
                      conv_flags flags = conv_flags::strict) 
     {
-        conv_errc  result = conv_errc();
+        conv_errc ec = conv_errc();
 
+        std::size_t count = 0;
         const CharT* ptr = data;
         const CharT* last = data + length;
-        while (ptr < last) 
+        for (; ptr < last; ++count) 
         {
             uint32_t ch = 0;
             unsigned short extra_bytes_to_read = trailing_bytes_for_utf8[static_cast<uint8_t>(*ptr)];
             if (extra_bytes_to_read >= last - ptr) 
             {
-                result = conv_errc::source_exhausted; 
+                ec = conv_errc::source_exhausted; 
                 break;
             }
             /* Do this check whether lenient or strict */
-            if ((result=is_legal_utf8(ptr, extra_bytes_to_read+1)) != conv_errc()) 
+            if ((ec=is_legal_utf8(ptr, extra_bytes_to_read+1)) != conv_errc()) 
             {
                 break;
             }
@@ -1421,17 +1422,17 @@ namespace jsoncons { namespace unicode_traits {
                 {
                     if (flags == conv_flags::strict) {
                         ptr -= (extra_bytes_to_read+1); /* return to the illegal value itself */
-                        result = conv_errc::source_illegal;
+                        ec = conv_errc::source_illegal;
                         break;
                     } else {
                     }
                 } else {
                 }
             } else { /* i.e., ch > max_legal_utf32 */
-                result = conv_errc::source_illegal;
+                ec = conv_errc::source_illegal;
             }
         }
-        return ptr - data;
+        return ec == conv_errc() ? count : 0;
     }
 
     template <class CharT>
@@ -1439,11 +1440,12 @@ namespace jsoncons { namespace unicode_traits {
     count_codepoints(const CharT* data, std::size_t length, 
                      conv_flags flags = conv_flags::strict) 
     {
-        conv_errc  result = conv_errc();
+        conv_errc  ec = conv_errc();
 
+        std::size_t count = 0;
         const CharT* ptr = data;
         const CharT* last = ptr + length;
-        while (ptr != last) 
+        for (; ptr != last; ++count) 
         {
             uint32_t ch = *ptr++;
             /* If we have a surrogate pair, convert to UTF32 ptr. */
@@ -1460,12 +1462,12 @@ namespace jsoncons { namespace unicode_traits {
                         ++ptr;
                     } else if (flags == conv_flags::strict) { /* ptr's an unpaired high surrogate */
                         --ptr; /* return to the illegal value itself */
-                        result = conv_errc::source_illegal;
+                        ec = conv_errc::source_illegal;
                         break;
                     }
                 } else { /* We don't have the 16 bits following the high surrogate. */
                     --ptr; /* return to the high surrogate */
-                    result = conv_errc::source_exhausted;
+                    ec = conv_errc::source_exhausted;
                     break;
                 }
             } else if (flags == conv_flags::strict) {
@@ -1473,12 +1475,12 @@ namespace jsoncons { namespace unicode_traits {
                 if (is_low_surrogate(ch) ) 
                 {
                     --ptr; /* return to the illegal value itself */
-                    result = conv_errc::source_illegal;
+                    ec = conv_errc::source_illegal;
                     break;
                 }
             }
         }
-        return ptr - data;
+        return ec == conv_errc() ? count : 0;
     }
 
     template <class CharT>
@@ -1488,9 +1490,10 @@ namespace jsoncons { namespace unicode_traits {
     {
         conv_errc ec = conv_errc();
 
+        std::size_t count = 0;
         const CharT* ptr = data;
         const CharT* last = data + length;
-        while (ptr != last) 
+        for (; ptr != last; ++count) 
         {
             uint32_t ch = *ptr++;
             if (flags == conv_flags::strict ) 
@@ -1507,7 +1510,7 @@ namespace jsoncons { namespace unicode_traits {
                 ec = conv_errc::source_illegal;
             }
         }
-        return ec == conv_errc() ? ptr - data : 0;
+        return ec == conv_errc() ? count : 0;
     }
 
     template <class Iterator>
