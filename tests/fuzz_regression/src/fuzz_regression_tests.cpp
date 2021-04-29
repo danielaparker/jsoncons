@@ -17,6 +17,7 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
+#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -579,6 +580,34 @@ TEST_CASE("oss-fuzz issues")
         {
             std::error_code ec;
             reader.read(ec);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    }
+#endif
+    // Fuzz target: fuzz_json_encoder
+    // Issue: Container-overflow READ 1
+    SECTION("issue 33781")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_json_encoder-5639543840702464";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::string s2;
+        json_string_encoder visitor(s2);
+
+        json_reader reader(is, visitor);
+        try
+        {
+            std::error_code ec;
+            reader.read(ec);
+            if (ec)
+            {
+                std::cout << ec.message() << "\n";
+            }
         }
         catch (const std::exception& e)
         {
