@@ -23,6 +23,33 @@
 namespace jsoncons {
 namespace detail {
 
+    // is_char8
+    template <typename CharT, typename Enable=void>
+    struct is_char8 : std::false_type {};
+
+    template <typename CharT>
+    struct is_char8<CharT, typename std::enable_if<std::is_integral<CharT>::value &&
+                                                   !std::is_same<CharT,bool>::value &&
+                                                   sizeof(uint8_t) == sizeof(CharT)>::type> : std::true_type {};
+
+    // is_char16
+    template <typename CharT, typename Enable=void>
+    struct is_char16 : std::false_type {};
+
+    template <typename CharT>
+    struct is_char16<CharT, typename std::enable_if<std::is_integral<CharT>::value &&
+                                                   !std::is_same<CharT,bool>::value &&
+                                                   (std::is_same<CharT,char16_t>::value || sizeof(uint16_t) == sizeof(CharT))>::type> : std::true_type {};
+
+    // is_char32
+    template <typename CharT, typename Enable=void>
+    struct is_char32 : std::false_type {};
+
+    template <typename CharT>
+    struct is_char32<CharT, typename std::enable_if<std::is_integral<CharT>::value &&
+                                                   !std::is_same<CharT,bool>::value &&
+                                                   (std::is_same<CharT,char32_t>::value || (!std::is_same<CharT,char16_t>::value && sizeof(uint32_t) == sizeof(CharT)))>::type> : std::true_type {};
+
     // is_int128
 
     template <class T, class Enable=void>
