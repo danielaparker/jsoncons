@@ -342,23 +342,15 @@ public:
         {
             if (parser_.source_exhausted())
             {
-                if (!source_.eof())
+                buffer_reader_.read(source_, ec);
+                if (ec) return;
+                if (buffer_reader_.eof())
                 {
-                    //read_buffer(ec);
-                    buffer_reader_.read(source_, ec);
-                    if (ec) return;
-                    if (buffer_reader_.eof())
-                    {
-                        eof_ = true;
-                    }
-                    else
-                    {
-                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
-                    }
+                    eof_ = true;
                 }
                 else
                 {
-                    eof_ = true;
+                    parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
             }
             parser_.parse_some(visitor_, ec);
@@ -370,23 +362,15 @@ public:
             parser_.skip_whitespace();
             if (parser_.source_exhausted())
             {
-                if (!source_.eof())
+                buffer_reader_.read(source_, ec);
+                if (ec) return;
+                if (buffer_reader_.eof())
                 {
-                    //read_buffer(ec);
-                    buffer_reader_.read(source_, ec);
-                    if (ec) return;
-                    if (buffer_reader_.eof())
-                    {
-                        eof_ = true;
-                    }
-                    else
-                    {
-                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
-                    }
+                    eof_ = true;
                 }
                 else
                 {
-                    eof_ = true;
+                    parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
             }
             else
@@ -434,23 +418,15 @@ public:
             {
                 if (parser_.source_exhausted())
                 {
-                    if (!source_.eof())
+                    buffer_reader_.read(source_, ec);
+                    if (ec) return;
+                    if (buffer_reader_.eof())
                     {
-                        //read_buffer(ec);     
-                        buffer_reader_.read(source_, ec);
-                        if (ec) return;
-                        if (buffer_reader_.eof())
-                        {
-                            eof_ = true;
-                        }
-                        else
-                        {
-                            parser_.update(buffer_reader_.data(),buffer_reader_.length());
-                        }
+                        eof_ = true;
                     }
                     else
                     {
-                        eof_ = true;
+                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
                     }
                 }
                 if (!eof_)
