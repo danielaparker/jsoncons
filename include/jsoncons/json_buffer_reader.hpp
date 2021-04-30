@@ -33,15 +33,9 @@ namespace jsoncons {
 
     public:
 
-        json_buffer_reader(const Allocator& alloc = Allocator())
-            : buffer_(alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
-        {
-        }
-
         json_buffer_reader(std::size_t buffer_length, const Allocator& alloc = Allocator())
             : buffer_(buffer_length, alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
         {
-            JSONCONS_ASSERT(buffer_length >= 4);
         }
 
         bool eof() const
@@ -56,7 +50,6 @@ namespace jsoncons {
 
         void buffer_length(std::size_t length)
         {
-            JSONCONS_ASSERT(length >= 4);
             buffer_.resize(length);
         }
 

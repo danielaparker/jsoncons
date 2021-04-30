@@ -282,7 +282,7 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : visitor_(visitor),
          parser_(options,err_handler,alloc),
-         buffer_reader_(alloc)
+         buffer_reader_(0, alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
