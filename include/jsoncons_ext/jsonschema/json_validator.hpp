@@ -102,7 +102,7 @@ namespace jsonschema {
 
         // Validate input JSON against a JSON Schema with a provided error reporter
         template <class Reporter>
-        typename std::enable_if<jsoncons::detail::is_unary_function_object_exact<Reporter,void,validation_output>::value,Json>::type
+        typename std::enable_if<type_traits::is_unary_function_object_exact<Reporter,void,validation_output>::value,Json>::type
         validate(const Json& instance, const Reporter& reporter) const
         {
             uri_wrapper instance_location("#");

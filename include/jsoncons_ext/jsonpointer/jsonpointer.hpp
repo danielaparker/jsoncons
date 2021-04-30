@@ -256,7 +256,7 @@ namespace jsoncons { namespace jsonpointer {
         }
 
         template <class IntegerType>
-        typename std::enable_if<jsoncons::detail::is_integer<IntegerType>::value, basic_json_pointer&>::type
+        typename std::enable_if<type_traits::is_integer<IntegerType>::value, basic_json_pointer&>::type
         operator/=(IntegerType val)
         {
             string_type s;
@@ -333,7 +333,7 @@ namespace jsoncons { namespace jsonpointer {
     };
 
     template <class CharT,class IntegerType>
-    typename std::enable_if<jsoncons::detail::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
+    typename std::enable_if<type_traits::is_integer<IntegerType>::value, basic_json_pointer<CharT>>::type
     operator/(const basic_json_pointer<CharT>& lhs, IntegerType rhs)
     {
         basic_json_pointer<CharT> p(lhs);

@@ -232,7 +232,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<detail::is_basic_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<type_traits::is_basic_string<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
     get(std::error_code& ec) const
     {
         converter<T> conv;
@@ -280,7 +280,7 @@ public:
     }
 
     template<class T, class CharT_ = CharT>
-    typename std::enable_if<detail::is_basic_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
+    typename std::enable_if<type_traits::is_basic_string_view<T>::value && std::is_same<typename T::value_type, CharT_>::value, T>::type
         get(std::error_code& ec) const
     {
         T s;
@@ -315,7 +315,7 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<detail::is_list_like<T>::value &&
+    typename std::enable_if<type_traits::is_list_like<T>::value &&
                             std::is_same<typename T::value_type,uint8_t>::value,T>::type
     get(std::error_code& ec) const
     {
@@ -333,7 +333,7 @@ public:
     }
 
     template <class IntegerType>
-    typename std::enable_if<detail::is_integer<IntegerType>::value, IntegerType>::type
+    typename std::enable_if<type_traits::is_integer<IntegerType>::value, IntegerType>::type
     get(std::error_code& ec) const
     {
         switch (event_type_)
@@ -372,7 +372,7 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<detail::is_bool<T>::value, T>::type
+    typename std::enable_if<type_traits::is_bool<T>::value, T>::type
         get(std::error_code& ec) const
     {
         return as_bool(ec);

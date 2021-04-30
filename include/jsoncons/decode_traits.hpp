@@ -47,7 +47,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct decode_traits<T,CharT,
-        typename std::enable_if<detail::is_primitive<T>::value
+        typename std::enable_if<type_traits::is_primitive<T>::value
     >::type>
     {
         template <class Json,class TempAllocator>
@@ -64,7 +64,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct decode_traits<T,CharT,
-        typename std::enable_if<detail::is_basic_string<T>::value &&
+        typename std::enable_if<type_traits::is_basic_string<T>::value &&
                                 std::is_same<typename T::value_type,CharT>::value
     >::type>
     {
@@ -80,7 +80,7 @@ namespace jsoncons {
 
     template <class T, class CharT>
     struct decode_traits<T,CharT,
-        typename std::enable_if<detail::is_basic_string<T>::value &&
+        typename std::enable_if<type_traits::is_basic_string<T>::value &&
                                 !std::is_same<typename T::value_type,CharT>::value
     >::type>
     {
@@ -147,9 +147,9 @@ namespace jsoncons {
     template <class T, class CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::is_back_insertable<T>::value &&
-                 !detail::is_typed_array<T>::value 
+                 type_traits::is_list_like<T>::value &&
+                 type_traits::is_back_insertable<T>::value &&
+                 !type_traits::is_typed_array<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;
@@ -291,9 +291,9 @@ namespace jsoncons {
     template <class T, class CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::is_back_insertable_byte_container<T>::value &&
-                 jsoncons::detail::is_typed_array<T>::value
+                 type_traits::is_list_like<T>::value &&
+                 type_traits::is_back_insertable_byte_container<T>::value &&
+                 type_traits::is_typed_array<T>::value
     >::type>
     {
         using value_type = typename T::value_type;
@@ -347,10 +347,10 @@ namespace jsoncons {
     template <class T, class CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 jsoncons::detail::is_back_insertable<T>::value &&
-                 !jsoncons::detail::is_back_insertable_byte_container<T>::value &&
-                 jsoncons::detail::is_typed_array<T>::value
+                 type_traits::is_list_like<T>::value &&
+                 type_traits::is_back_insertable<T>::value &&
+                 !type_traits::is_back_insertable_byte_container<T>::value &&
+                 type_traits::is_typed_array<T>::value
     >::type>
     {
         using value_type = typename T::value_type;
@@ -387,9 +387,9 @@ namespace jsoncons {
     template <class T, class CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                 jsoncons::detail::is_list_like<T>::value &&
-                 !jsoncons::detail::is_back_insertable<T>::value &&
-                 jsoncons::detail::is_insertable<T>::value 
+                 type_traits::is_list_like<T>::value &&
+                 !type_traits::is_back_insertable<T>::value &&
+                 type_traits::is_insertable<T>::value 
     >::type>
     {
         using value_type = typename T::value_type;
@@ -461,8 +461,8 @@ namespace jsoncons {
     template <class T, class CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                jsoncons::detail::is_map_like<T>::value &&
-                                jsoncons::detail::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
+                                type_traits::is_map_like<T>::value &&
+                                type_traits::is_constructible_from_const_pointer_and_size<typename T::key_type>::value
     >::type>
     {
         using mapped_type = typename T::mapped_type;
@@ -503,7 +503,7 @@ namespace jsoncons {
     template <class T, class CharT>
     struct decode_traits<T,CharT,
         typename std::enable_if<!is_json_type_traits_declared<T>::value && 
-                                jsoncons::detail::is_map_like<T>::value &&
+                                type_traits::is_map_like<T>::value &&
                                 std::is_integral<typename T::key_type>::value
     >::type>
     {

@@ -16,7 +16,7 @@ namespace csv {
 
     template <class T,class Container>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type 
+                            type_traits::is_back_insertable_char_container<Container>::value>::type 
     encode_csv(const T& j, Container& s, const basic_csv_encode_options<typename Container::value_type>& options = basic_csv_encode_options<typename Container::value_type>())
     {
         using char_type = typename Container::value_type;
@@ -26,7 +26,7 @@ namespace csv {
 
     template <class T,class Container>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type 
+                            type_traits::is_back_insertable_char_container<Container>::value>::type 
     encode_csv(const T& val, Container& s, const basic_csv_encode_options<typename Container::value_type>& options = basic_csv_encode_options<typename Container::value_type>())
     {
         using char_type = typename Container::value_type;
@@ -66,7 +66,7 @@ namespace csv {
 
     template <class T, class Container, class TempAllocator>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type 
+                            type_traits::is_back_insertable_char_container<Container>::value>::type 
     encode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                const T& j, Container& s, const basic_csv_encode_options<typename Container::value_type>& options = basic_csv_encode_options<typename Container::value_type>())
     {
@@ -77,7 +77,7 @@ namespace csv {
 
     template <class T, class Container, class TempAllocator>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type 
+                            type_traits::is_back_insertable_char_container<Container>::value>::type 
     encode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                const T& val, Container& s, const basic_csv_encode_options<typename Container::value_type>& options = basic_csv_encode_options<typename Container::value_type>())
     {

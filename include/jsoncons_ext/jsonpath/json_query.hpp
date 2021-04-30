@@ -3144,7 +3144,7 @@ namespace jsoncons { namespace jsonpath {
         }
 
         template <class BinaryCallback>
-        typename std::enable_if<jsoncons::detail::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
+        typename std::enable_if<type_traits::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options::value)
         {
             std::vector<path_component_type> path = { path_component_type(root_node_arg) };
@@ -3224,7 +3224,7 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json,class Callback>
-    typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const std::basic_string<typename Json::char_type>&,const Json&>::value,void>::type
+    typename std::enable_if<type_traits::is_binary_function_object<Callback,const std::basic_string<typename Json::char_type>&,const Json&>::value,void>::type
     json_query(const Json& instance, 
                const typename Json::string_view_type& path , 
                Callback callback,
@@ -3266,7 +3266,7 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json, class UnaryCallback>
-    typename std::enable_if<jsoncons::detail::is_unary_function_object<UnaryCallback,Json>::value,void>::type
+    typename std::enable_if<type_traits::is_unary_function_object<UnaryCallback,Json>::value,void>::type
     json_replace(Json& instance, const typename Json::string_view_type& path , UnaryCallback callback)
     {
         using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, Json&>;
@@ -3291,7 +3291,7 @@ namespace jsoncons { namespace jsonpath {
     }
 
     template<class Json, class BinaryCallback>
-    typename std::enable_if<jsoncons::detail::is_binary_function_object<BinaryCallback,const std::basic_string<typename Json::char_type>&,Json&>::value,void>::type
+    typename std::enable_if<type_traits::is_binary_function_object<BinaryCallback,const std::basic_string<typename Json::char_type>&,Json&>::value,void>::type
     json_replace(Json& instance, const typename Json::string_view_type& path , BinaryCallback callback, 
                  result_options options = result_options::nodups)
     {

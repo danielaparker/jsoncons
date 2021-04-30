@@ -24,7 +24,7 @@ namespace cbor {
 
     template<class T, class Source>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
+                            type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -41,7 +41,7 @@ namespace cbor {
 
     template<class T, class Source>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
+                            type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
     {
@@ -127,7 +127,7 @@ namespace cbor {
 
     template<class T, class Source, class TempAllocator>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
+                            type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())
@@ -145,7 +145,7 @@ namespace cbor {
 
     template<class T, class Source, class TempAllocator>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_byte_sequence<Source>::value,T>::type 
+                            type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const Source& v, 
                 const cbor_decode_options& options = cbor_decode_options())

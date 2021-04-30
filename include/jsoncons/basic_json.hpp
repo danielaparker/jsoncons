@@ -53,7 +53,7 @@ namespace detail {
 
     template<class T>
     struct is_basic_json<T,
-        typename std::enable_if<detail::is_detected<detail::basic_json_t,typename std::decay<T>::type>::value>::type
+        typename std::enable_if<type_traits::is_detected<detail::basic_json_t,typename std::decay<T>::type>::value>::type
     > : std::true_type {};
 
 namespace detail {
@@ -713,7 +713,7 @@ private:
             ptr_ = std::allocator_traits<array_allocator>::allocate(alloc, 1);
             JSONCONS_TRY
             {
-                std::allocator_traits<array_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                std::allocator_traits<array_allocator>::construct(alloc, type_traits::to_plain_pointer(ptr_), std::forward<Args>(args)...);
             }
             JSONCONS_CATCH(...)
             {
@@ -725,7 +725,7 @@ private:
         void destroy() noexcept
         {
             array_allocator alloc(ptr_->get_allocator());
-            std::allocator_traits<array_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+            std::allocator_traits<array_allocator>::destroy(alloc, type_traits::to_plain_pointer(ptr_));
             std::allocator_traits<array_allocator>::deallocate(alloc, ptr_,1);
         }
     public:
@@ -807,7 +807,7 @@ private:
             ptr_ = std::allocator_traits<object_allocator>::allocate(alloc, 1);
             JSONCONS_TRY
             {
-                std::allocator_traits<object_allocator>::construct(alloc, jsoncons::detail::to_plain_pointer(ptr_), std::forward<Args>(args)...);
+                std::allocator_traits<object_allocator>::construct(alloc, type_traits::to_plain_pointer(ptr_), std::forward<Args>(args)...);
             }
             JSONCONS_CATCH(...)
             {
@@ -879,7 +879,7 @@ private:
         void destroy() noexcept
         {
             object_allocator alloc(ptr_->get_allocator());
-            std::allocator_traits<object_allocator>::destroy(alloc, jsoncons::detail::to_plain_pointer(ptr_));
+            std::allocator_traits<object_allocator>::destroy(alloc, type_traits::to_plain_pointer(ptr_));
             std::allocator_traits<object_allocator>::deallocate(alloc, ptr_,1);
         }
     };
@@ -2685,7 +2685,7 @@ public:
 
     template <class Source>
     static
-    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,basic_json>::type
+    typename std::enable_if<type_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
     parse(const Source& s, 
           const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
           std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing())
@@ -2712,7 +2712,7 @@ public:
 
     template <class Source>
     static
-    typename std::enable_if<jsoncons::detail::is_sequence_of<Source,char_type>::value,basic_json>::type
+    typename std::enable_if<type_traits::is_sequence_of<Source,char_type>::value,basic_json>::type
     parse(const Source& s, 
                 std::function<bool(json_errc,const ser_context&)> err_handler)
     {
@@ -3022,21 +3022,21 @@ public:
 
     template <class IntegerType>
     basic_json(IntegerType val, semantic_tag tag, 
-               typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)
+               typename std::enable_if<type_traits::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)
     {
         construct<uint64_storage>(val, tag);
     }
 
     template <class IntegerType>
     basic_json(IntegerType val, semantic_tag tag, Allocator, 
-               typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)
+               typename std::enable_if<type_traits::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(uint64_t), int>::type = 0)
     {
         construct<uint64_storage>(val, tag);
     }
 
     template <class IntegerType>
     basic_json(IntegerType val, semantic_tag, Allocator alloc = Allocator(),
-               typename std::enable_if<jsoncons::detail::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
+               typename std::enable_if<type_traits::is_unsigned_integer<IntegerType>::value && sizeof(uint64_t) < sizeof(IntegerType), int>::type = 0)
     {
         std::basic_string<CharT> s;
         jsoncons::detail::from_integer(val, s);
@@ -3052,21 +3052,21 @@ public:
 
     template <class IntegerType>
     basic_json(IntegerType val, semantic_tag tag,
-               typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),int>::type = 0)
+               typename std::enable_if<type_traits::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),int>::type = 0)
     {
         construct<int64_storage>(val, tag);
     }
 
     template <class IntegerType>
     basic_json(IntegerType val, semantic_tag tag, Allocator,
-               typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),int>::type = 0)
+               typename std::enable_if<type_traits::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),int>::type = 0)
     {
         construct<int64_storage>(val, tag);
     }
 
     template <class IntegerType>
     basic_json(IntegerType val, semantic_tag, Allocator alloc = Allocator(),
-               typename std::enable_if<jsoncons::detail::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
+               typename std::enable_if<type_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),int>::type = 0)
     {
         std::basic_string<CharT> s;
         jsoncons::detail::from_integer(val, s);
@@ -3104,7 +3104,7 @@ public:
     basic_json(byte_string_arg_t, const Source& source, 
                semantic_tag tag = semantic_tag::none,
                const Allocator& alloc = Allocator(),
-               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
+               typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
     {
         auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
         construct<byte_string_storage>(tag, bytes.data(), bytes.size(), 0, alloc);
@@ -3114,7 +3114,7 @@ public:
     basic_json(byte_string_arg_t, const Source& source, 
                uint64_t ext_tag,
                const Allocator& alloc = Allocator(),
-               typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
+               typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
     {
         auto bytes = jsoncons::span<const uint8_t>(reinterpret_cast<const uint8_t*>(source.data()), source.size());
         construct<byte_string_storage>(semantic_tag::ext, bytes.data(), bytes.size(), ext_tag, alloc);
@@ -3171,7 +3171,7 @@ public:
 
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump(Container& s,
          const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
     {
@@ -3184,7 +3184,7 @@ public:
     }
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump_pretty(Container& s,
                     const basic_json_encode_options<char_type>& options = basic_json_encode_options<CharT>()) const
     {
@@ -3221,7 +3221,7 @@ public:
     // Legacy
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump(Container& s, 
               indenting line_indent) const
     {
@@ -3235,7 +3235,7 @@ public:
     }
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump(Container& s,
               const basic_json_encode_options<char_type>& options, 
               indenting line_indent) const
@@ -3288,7 +3288,7 @@ public:
 
     // dump
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump(Container& s,
               const basic_json_encode_options<char_type>& options, 
               std::error_code& ec) const
@@ -3298,7 +3298,7 @@ public:
     }
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump(Container& s, 
               std::error_code& ec) const
     {
@@ -3324,7 +3324,7 @@ public:
     // dump_pretty
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump_pretty(Container& s,
                      const basic_json_encode_options<char_type>& options, 
                      std::error_code& ec) const
@@ -3334,7 +3334,7 @@ public:
     }
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump_pretty(Container& s, 
                      std::error_code& ec) const
     {
@@ -3357,7 +3357,7 @@ public:
 
     // legacy
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump(Container& s,
               const basic_json_encode_options<char_type>& options, 
               indenting line_indent,
@@ -3374,7 +3374,7 @@ public:
     }
 
     template <class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+    typename std::enable_if<type_traits::is_back_insertable_char_container<Container>::value>::type
     dump(Container& s, 
               indenting line_indent,
               std::error_code& ec) const
@@ -3744,7 +3744,7 @@ public:
     template<class U=Allocator>
     void create_object_implicitly()
     {
-        create_object_implicitly(jsoncons::detail::is_stateless<U>());
+        create_object_implicitly(type_traits::is_stateless<U>());
     }
 
     void create_object_implicitly(std::false_type)
@@ -3817,8 +3817,8 @@ public:
     }
 
     template<class T>
-    typename std::enable_if<(!jsoncons::detail::is_basic_string<T>::value && 
-                             jsoncons::detail::is_back_insertable_byte_container<T>::value) ||
+    typename std::enable_if<(!type_traits::is_basic_string<T>::value && 
+                             type_traits::is_back_insertable_byte_container<T>::value) ||
                             is_basic_byte_string<T>::value,T>::type
     as(byte_string_arg_t, semantic_tag hint) const
     {
@@ -3914,15 +3914,15 @@ public:
     }
 
     template <class IntegerType>
-    typename std::enable_if<detail::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),bool>::type
+    typename std::enable_if<type_traits::is_signed_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),bool>::type
     is_integer() const noexcept
     {
         switch (storage())
         {
             case storage_kind::int64_value:
-                return (as_integer<int64_t>() >= (jsoncons::detail::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)());
+                return (as_integer<int64_t>() >= (type_traits::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (type_traits::integer_limits<IntegerType>::max)());
             case storage_kind::uint64_value:
-                return as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<IntegerType>::max)());
+                return as_integer<uint64_t>() <= static_cast<uint64_t>((type_traits::integer_limits<IntegerType>::max)());
             case storage_kind::json_const_pointer:
                 return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:
@@ -3931,7 +3931,7 @@ public:
     }
 
     template <class IntegerType>
-    typename std::enable_if<detail::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),bool>::type
+    typename std::enable_if<type_traits::is_signed_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),bool>::type
     is_integer() const noexcept
     {
         switch (storage())
@@ -3943,9 +3943,9 @@ public:
                 return result ? true : false;
             }
             case storage_kind::int64_value:
-                return (as_integer<int64_t>() >= (jsoncons::detail::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)());
+                return (as_integer<int64_t>() >= (type_traits::integer_limits<IntegerType>::lowest)()) && (as_integer<int64_t>() <= (type_traits::integer_limits<IntegerType>::max)());
             case storage_kind::uint64_value:
-                return as_integer<uint64_t>() <= static_cast<uint64_t>((jsoncons::detail::integer_limits<IntegerType>::max)());
+                return as_integer<uint64_t>() <= static_cast<uint64_t>((type_traits::integer_limits<IntegerType>::max)());
             case storage_kind::json_const_pointer:
                 return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:
@@ -3954,15 +3954,15 @@ public:
     }
 
     template <class IntegerType>
-    typename std::enable_if<detail::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),bool>::type
+    typename std::enable_if<type_traits::is_unsigned_integer<IntegerType>::value && sizeof(IntegerType) <= sizeof(int64_t),bool>::type
     is_integer() const noexcept
     {
         switch (storage())
         {
             case storage_kind::int64_value:
-                return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+                return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (type_traits::integer_limits<IntegerType>::max)();
             case storage_kind::uint64_value:
-                return as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+                return as_integer<uint64_t>() <= (type_traits::integer_limits<IntegerType>::max)();
             case storage_kind::json_const_pointer:
                 return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:
@@ -3971,7 +3971,7 @@ public:
     }
 
     template <class IntegerType>
-    typename std::enable_if<detail::is_unsigned_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),bool>::type
+    typename std::enable_if<type_traits::is_unsigned_integer<IntegerType>::value && sizeof(int64_t) < sizeof(IntegerType),bool>::type
     is_integer() const noexcept
     {
         switch (storage())
@@ -3983,9 +3983,9 @@ public:
                 return result ? true : false;
             }
             case storage_kind::int64_value:
-                return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+                return as_integer<int64_t>() >= 0 && static_cast<uint64_t>(as_integer<int64_t>()) <= (type_traits::integer_limits<IntegerType>::max)();
             case storage_kind::uint64_value:
-                return as_integer<uint64_t>() <= (jsoncons::detail::integer_limits<IntegerType>::max)();
+                return as_integer<uint64_t>() <= (type_traits::integer_limits<IntegerType>::max)();
             case storage_kind::json_const_pointer:
                 return cast<json_const_pointer_storage>().value()->template is_integer<IntegerType>();
             default:

@@ -35,7 +35,7 @@ namespace jsoncons {
     template <class Base>
     class json_runtime_error<Base,
                              typename std::enable_if<std::is_convertible<Base*,std::exception*>::value &&
-                                                     jsoncons::detail::is_constructible_from_string<Base>::value>::type> 
+                                                     type_traits::is_constructible_from_string<Base>::value>::type> 
         : public Base, public virtual json_exception
     {
     public:

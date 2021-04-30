@@ -21,7 +21,7 @@ namespace jsoncons {
 
     template <class T, class Container>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+                            type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(const T& val,
                 Container& s, 
                 const basic_json_encode_options<typename Container::value_type>& options = 
@@ -35,7 +35,7 @@ namespace jsoncons {
 
     template <class T, class Container>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+                            type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(const T& val,
                 Container& s, 
                 const basic_json_encode_options<typename Container::value_type>& options = basic_json_encode_options<typename Container::value_type>())
@@ -72,7 +72,7 @@ namespace jsoncons {
 
     template <class T, class Container>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+                            type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json_pretty(const T& val,
                        Container& s, 
                        const basic_json_encode_options<typename Container::value_type>& options = basic_json_encode_options<typename Container::value_type>())
@@ -85,7 +85,7 @@ namespace jsoncons {
 
     template <class T, class Container>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+                            type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json_pretty(const T& val,
                        Container& s, 
                        const basic_json_encode_options<typename Container::value_type>& options = basic_json_encode_options<typename Container::value_type>())
@@ -202,7 +202,7 @@ namespace jsoncons {
 
     template <class T, class Container, class TempAllocator>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+                            type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
                 Container& s, 
@@ -224,7 +224,7 @@ namespace jsoncons {
 
     template <class T, class Container, class TempAllocator>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_char_container<Container>::value>::type
+                            type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
                 Container& s,

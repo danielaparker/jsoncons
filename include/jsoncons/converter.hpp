@@ -23,9 +23,9 @@ namespace jsoncons {
 
     // Into list like of bytes
     template <class Into>
-    class converter<Into,typename std::enable_if<(!jsoncons::detail::is_basic_string<Into>::value && 
-                                                   jsoncons::detail::is_back_insertable_byte_container<Into>::value) ||
-                                                 jsoncons::detail::is_basic_byte_string<Into>::value>::type>
+    class converter<Into,typename std::enable_if<(!type_traits::is_basic_string<Into>::value && 
+                                                   type_traits::is_back_insertable_byte_container<Into>::value) ||
+                                                   jsoncons::detail::is_basic_byte_string<Into>::value>::type>
     {
         using value_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
@@ -78,7 +78,7 @@ namespace jsoncons {
 
         template <class CharT>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<detail::is_narrow_character<CharT>::value>::type
+        typename std::enable_if<type_traits::is_narrow_character<CharT>::value>::type
         from_(Into& bytes, const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             switch (tag)
@@ -111,7 +111,7 @@ namespace jsoncons {
         }
 
         template <class CharT>
-        typename std::enable_if<detail::is_wide_character<CharT>::value>::type
+        typename std::enable_if<type_traits::is_wide_character<CharT>::value>::type
         from_(Into& bytes, const jsoncons::basic_string_view<CharT>& s, semantic_tag tag, std::error_code& ec) const
         {
             std::string u;
@@ -127,7 +127,7 @@ namespace jsoncons {
 
     // Into string
     template <class Into>
-    class converter<Into,typename std::enable_if<detail::is_basic_string<Into>::value>::type>
+    class converter<Into,typename std::enable_if<type_traits::is_basic_string<Into>::value>::type>
     {
         using char_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
@@ -138,7 +138,7 @@ namespace jsoncons {
         {}
         template<class Integer>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<detail::is_integer<Integer>::value,Into>::type
+        typename std::enable_if<type_traits::is_integer<Integer>::value,Into>::type
         from(Integer val, semantic_tag, std::error_code&) const
         {
             Into s;
@@ -148,7 +148,7 @@ namespace jsoncons {
 
         template<class Integer>
         JSONCONS_CPP14_CONSTEXPR 
-        typename std::enable_if<detail::is_integer<Integer>::value,Into>::type
+        typename std::enable_if<type_traits::is_integer<Integer>::value,Into>::type
         from(Integer val, semantic_tag, const allocator_type& alloc, std::error_code&) const
         {
             Into s(alloc);
@@ -257,7 +257,7 @@ namespace jsoncons {
 
         template <class ChT = char_type>
         JSONCONS_CPP14_CONSTEXPR
-        typename std::enable_if<jsoncons::detail::is_byte<ChT>::value>::type
+        typename std::enable_if<type_traits::is_byte<ChT>::value>::type
         from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code&) const
         {
             switch (tag)
@@ -275,7 +275,7 @@ namespace jsoncons {
         }
 
         template <class ChT = char_type>
-        typename std::enable_if<!jsoncons::detail::is_byte<ChT>::value>::type
+        typename std::enable_if<!type_traits::is_byte<ChT>::value>::type
         from_(Into& s, const byte_string_view& bytes, semantic_tag tag, std::error_code& ec) const
         {
             converter<std::string> convert{ dummy_ };

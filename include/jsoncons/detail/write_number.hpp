@@ -32,7 +32,7 @@ namespace detail {
     // from_integer
 
     template<class Integer,class Result>
-    typename std::enable_if<jsoncons::detail::is_integer<Integer>::value,std::size_t>::type
+    typename std::enable_if<type_traits::is_integer<Integer>::value,std::size_t>::type
     from_integer(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;
@@ -79,7 +79,7 @@ namespace detail {
     // integer_to_string_hex
 
     template<class Integer,class Result>
-    typename std::enable_if<jsoncons::detail::is_integer<Integer>::value,std::size_t>::type
+    typename std::enable_if<type_traits::is_integer<Integer>::value,std::size_t>::type
     integer_to_string_hex(Integer value, Result& result)
     {
         using char_type = typename Result::value_type;

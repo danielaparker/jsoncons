@@ -21,7 +21,7 @@ namespace jsoncons {
 
     template <class T, class Source>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_sequence_of<Source,typename T::char_type>::value,T>::type
+                            type_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
     decode_json(const Source& s,
                 const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
     {
@@ -39,7 +39,7 @@ namespace jsoncons {
 
     template <class T, class Source>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_char_sequence<Source>::value,T>::type
+                            type_traits::is_char_sequence<Source>::value,T>::type
     decode_json(const Source& s,
                 const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
     {
@@ -129,7 +129,7 @@ namespace jsoncons {
 
     template <class T,class Source,class TempAllocator>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_sequence_of<Source,typename T::char_type>::value,T>::type
+                            type_traits::is_sequence_of<Source,typename T::char_type>::value,T>::type
     decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const Source& s,
                 const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())
@@ -149,7 +149,7 @@ namespace jsoncons {
 
     template <class T,class Source,class TempAllocator>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_char_sequence<Source>::value,T>::type
+                            type_traits::is_char_sequence<Source>::value,T>::type
     decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const Source& s,
                 const basic_json_decode_options<typename Source::value_type>& options = basic_json_decode_options<typename Source::value_type>())

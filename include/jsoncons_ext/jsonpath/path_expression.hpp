@@ -2514,7 +2514,7 @@ namespace detail {
         }
 
         template <class Callback>
-        typename std::enable_if<jsoncons::detail::is_binary_function_object<Callback,const std::vector<path_component_type>&,reference>::value,void>::type
+        typename std::enable_if<type_traits::is_binary_function_object<Callback,const std::vector<path_component_type>&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  const std::vector<path_component_type>& ipath, 
                  reference root,

@@ -587,7 +587,7 @@ namespace jsoncons {
 
         template <class Source>
         bytes_source(const Source& source,
-                     typename std::enable_if<jsoncons::detail::is_byte_sequence<Source>::value,int>::type = 0)
+                     typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
             : data_(reinterpret_cast<const uint8_t*>(source.data())), 
               current_(data_), 
               end_(data_+source.size())
@@ -746,8 +746,8 @@ namespace jsoncons {
         template <class Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                jsoncons::detail::has_reserve<Container>::value &&
-                                jsoncons::detail::has_data_exact<value_type*,Container>::value 
+                                type_traits::has_reserve<Container>::value &&
+                                type_traits::has_data_exact<value_type*,Container>::value 
             , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {
@@ -769,8 +769,8 @@ namespace jsoncons {
         template <class Container>
         static
         typename std::enable_if<std::is_convertible<value_type,typename Container::value_type>::value &&
-                                jsoncons::detail::has_reserve<Container>::value &&
-                                !detail::has_data_exact<value_type*, Container>::value 
+                                type_traits::has_reserve<Container>::value &&
+                                !type_traits::has_data_exact<value_type*, Container>::value 
             , std::size_t>::type
         read(Source& source, Container& v, std::size_t length)
         {

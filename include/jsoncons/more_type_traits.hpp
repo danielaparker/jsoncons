@@ -21,7 +21,7 @@
 #include <jsoncons/config/compiler_support.hpp>
 
 namespace jsoncons {
-namespace detail {
+namespace type_traits {
 
     // is_char8
     template <typename CharT, typename Enable=void>
@@ -287,7 +287,7 @@ namespace detail {
            typename std::enable_if<is_character<T>::value && (sizeof(T) != sizeof(char))
     >::type> : std::true_type {};
 
-    // is_int
+    // is_bool
 
     template <class T, class Enable=void>
     struct is_bool : std::false_type {};
@@ -297,7 +297,7 @@ namespace detail {
                    typename std::enable_if<std::is_same<T,bool>::value
     >::type> : std::true_type {};
 
-    // is_uint
+    // is_u8_u16_u32_or_u64
 
     template <class T, class Enable=void>
     struct is_u8_u16_u32_or_u64 : std::false_type {};
@@ -736,7 +736,7 @@ namespace impl {
     using
     is_binary_function_object_exact = is_detected_exact<T,binary_function_object_t, FunctionObject, Arg1, Arg2>;
 
-} // detail
+} // type_traits
 } // jsoncons
 
 #endif

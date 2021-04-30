@@ -515,7 +515,7 @@ namespace jsonschema {
     }
 
     template <class Json,class URIResolver>
-    typename std::enable_if<jsoncons::detail::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
+    typename std::enable_if<type_traits::is_unary_function_object_exact<URIResolver,Json,std::string>::value,std::shared_ptr<json_schema<Json>>>::type
     make_schema(const Json& schema, const URIResolver& resolver)
     {
         schema_loader<Json> loader(resolver);

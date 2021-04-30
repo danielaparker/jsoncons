@@ -90,7 +90,7 @@ namespace detail {
     }
 
     template <class InputIt, class F, class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<type_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64_generic(InputIt first, InputIt last, 
                           const uint8_t reverse_alphabet[256],
                           F f,
@@ -205,7 +205,7 @@ namespace detail {
     // decode
 
     template <class InputIt, class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<type_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64url(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -233,7 +233,7 @@ namespace detail {
     }
 
     template <class InputIt, class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<type_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base64(InputIt first, InputIt last, Container& result)
     {
         static constexpr uint8_t reverse_alphabet[256] = {
@@ -261,7 +261,7 @@ namespace detail {
     }
 
     template <class InputIt,class Container>
-    typename std::enable_if<jsoncons::detail::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
+    typename std::enable_if<type_traits::is_back_insertable_byte_container<Container>::value,decode_result<InputIt>>::type 
     decode_base16(InputIt first, InputIt last, Container& result)
     {
         std::size_t len = std::distance(first,last);
@@ -357,7 +357,7 @@ namespace detail {
     
         template <class Container>
         constexpr explicit byte_string_view(const Container& cont,
-                          typename std::enable_if<jsoncons::detail::is_byte_sequence<Container>::value,int>::type = 0) 
+                          typename std::enable_if<type_traits::is_byte_sequence<Container>::value,int>::type = 0) 
             : data_(reinterpret_cast<const uint8_t*>(cont.data())), size_(cont.size())
         {
         }

@@ -22,7 +22,7 @@ namespace msgpack {
 
     template<class T, class Container>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
+                            type_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_msgpack(const T& j, 
                    Container& v, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -35,7 +35,7 @@ namespace msgpack {
 
     template<class T, class Container>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
+                            type_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_msgpack(const T& val, 
                    Container& v, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -80,7 +80,7 @@ namespace msgpack {
 
     template<class T, class Container, class TempAllocator>
     typename std::enable_if<is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
+                            type_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc, const T& j, 
                    Container& v, 
                    const msgpack_encode_options& options = msgpack_encode_options())
@@ -93,7 +93,7 @@ namespace msgpack {
 
     template<class T, class Container, class TempAllocator>
     typename std::enable_if<!is_basic_json<T>::value &&
-                            jsoncons::detail::is_back_insertable_byte_container<Container>::value,void>::type 
+                            type_traits::is_back_insertable_byte_container<Container>::value,void>::type 
     encode_msgpack(temp_allocator_arg_t, const TempAllocator& temp_alloc, 
                    const T& val, Container& v, 
                    const msgpack_encode_options& options = msgpack_encode_options())
