@@ -147,6 +147,68 @@ private:
     }
 };
 
+template<class CharT,class Allocator=std::allocator<char>>
+class json_buffer_reader 
+{
+public:
+    using char_type = CharT;
+private:
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char_type> char_allocator_type;
+
+    std::vector<char_type,char_allocator_type> buffer_;
+    const char_type* data_;
+    std::size_t length_;
+    bool begin_;
+
+public:
+    json_buffer_reader(std::size_t buffer_size)
+        : buffer_(buffer_size), data_(nullptr), length_(0), begin_(false)
+    {
+    }
+
+    json_buffer_reader(std::size_t buffer_size, const Allocator& alloc)
+        : buffer_(buffer_size, alloc), data_(nullptr), length_(0), begin_(false)
+    {
+    }
+
+    std::size_t buffer_size() const
+    {
+        return buffer_.size();
+    }
+
+    void buffer_size(std::size_t size)
+    {
+        buffer_.resize(size);
+    }
+
+    const char_type* data() const {return data_;}
+    std::size_t length() const {return length_;}
+
+    template <class Source>
+    void read(Source& source, std::error_code& ec)
+    {
+        data_ = buffer_.data();
+        length_ = source.read(buffer_.data(), buffer_.size());
+
+        if (!buffer_.empty())
+        {
+            if (begin_)
+            {
+                auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
+                if (result.ec != unicode_traits::encoding_errc())
+                {
+                    ec = result.ec;
+                    return;
+                }
+                std::size_t offset = result.it - buffer_.begin();
+                data_ += offset;
+                length_ -= offset;
+                begin_ = false;
+            }
+        }
+    }
+};
+
 template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
 class basic_json_reader 
 {
@@ -154,9 +216,8 @@ public:
     using char_type = CharT;
     using source_type = Src;
     using string_view_type = jsoncons::basic_string_view<CharT>;
-    using temp_allocator_type = Allocator;
 private:
-    typedef typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
+    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> char_allocator_type;
 
     static constexpr size_t default_max_buffer_length = 16384;
 
@@ -168,9 +229,7 @@ private:
 
     source_type source_;
     bool eof_;
-    bool begin_;
-    std::size_t buffer_length_;
-    std::vector<CharT,char_allocator_type> buffer_;
+    json_buffer_reader<CharT,Allocator> buffer_reader_;
 
     // Noncopyable and nonmoveable
     basic_json_reader(const basic_json_reader&) = delete;
@@ -273,11 +332,8 @@ public:
          parser_(options,err_handler,alloc),
          source_(std::forward<Source>(source)),
          eof_(false),
-         begin_(true),
-         buffer_length_(default_max_buffer_length),
-         buffer_(alloc)
+         buffer_reader_(default_max_buffer_length, alloc)
     {
-        buffer_.reserve(buffer_length_);
     }
 
     template <class Source>
@@ -290,9 +346,7 @@ public:
        : visitor_(visitor),
          parser_(options,err_handler,alloc),
          eof_(false),
-         begin_(false),
-         buffer_length_(0),
-         buffer_(alloc)
+         buffer_reader_(0, alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
@@ -304,17 +358,29 @@ public:
         parser_.update(sv.data()+offset,sv.size()-offset);
     }
 
-    std::size_t buffer_length() const
+    std::size_t buffer_size() const
     {
-        return buffer_length_;
+        return buffer_reader_.buffer_size();
     }
 
+    void buffer_size(std::size_t size)
+    {
+        buffer_reader_.buffer_size(size);
+    }
+
+#if !defined(JSONCONS_NO_DEPRECATED)
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size()")
+    std::size_t buffer_length() const
+    {
+        return buffer_reader_.buffer_size();
+    }
+
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size(std::size_t)")
     void buffer_length(std::size_t length)
     {
-        buffer_length_ = length;
-        buffer_.reserve(buffer_length_);
+        buffer_reader_.buffer_size(length);
     }
-#if !defined(JSONCONS_NO_DEPRECATED)
+
     JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth() on options")
     int max_nesting_depth() const
     {
@@ -351,8 +417,17 @@ public:
             {
                 if (!source_.eof())
                 {
-                    read_buffer(ec);
+                    //read_buffer(ec);
+                    buffer_reader_.read(source_, ec);
                     if (ec) return;
+                    if (buffer_reader_.length() == 0)
+                    {
+                        eof_ = true;
+                    }
+                    else
+                    {
+                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                    }
                 }
                 else
                 {
@@ -370,8 +445,17 @@ public:
             {
                 if (!source_.eof())
                 {
-                    read_buffer(ec);
+                    //read_buffer(ec);
+                    buffer_reader_.read(source_, ec);
                     if (ec) return;
+                    if (buffer_reader_.length() == 0)
+                    {
+                        eof_ = true;
+                    }
+                    else
+                    {
+                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                    }
                 }
                 else
                 {
@@ -425,8 +509,17 @@ public:
                 {
                     if (!source_.eof())
                     {
-                        read_buffer(ec);     
+                        //read_buffer(ec);     
+                        buffer_reader_.read(source_, ec);
                         if (ec) return;
+                        if (buffer_reader_.length() == 0)
+                        {
+                            eof_ = true;
+                        }
+                        else
+                        {
+                            parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                        }
                     }
                     else
                     {
@@ -464,49 +557,19 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length()")
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size()")
     std::size_t buffer_capacity() const
     {
-        return buffer_length_;
+        return buffer_reader_.buffer_size();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(std::size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size(std::size_t)")
     void buffer_capacity(std::size_t length)
     {
-        buffer_length_ = length;
-        buffer_.reserve(buffer_length_);
+        buffer_reader_.buffer_size(length);
     }
 #endif
 
-private:
-
-    void read_buffer(std::error_code& ec)
-    {
-        buffer_.clear();
-        buffer_.resize(buffer_length_);
-        std::size_t count = source_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<std::size_t>(count));
-        if (buffer_.size() == 0)
-        {
-            eof_ = true;
-        }
-        else if (begin_)
-        {
-            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
-            if (result.ec != unicode_traits::encoding_errc())
-            {
-                ec = result.ec;
-                return;
-            }
-            std::size_t offset = result.it - buffer_.begin();
-            parser_.update(buffer_.data()+offset,buffer_.size()-offset);
-            begin_ = false;
-        }
-        else
-        {
-            parser_.update(buffer_.data(),buffer_.size());
-        }
-    }
 };
 
 using json_reader = basic_json_reader<char>;
