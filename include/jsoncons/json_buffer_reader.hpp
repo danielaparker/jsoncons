@@ -34,7 +34,7 @@ namespace jsoncons {
     public:
 
         json_buffer_reader(const Allocator& alloc = Allocator())
-            : buffer_(alloc), data_(nullptr), length_(0), bof_(true), eof_(true)
+            : buffer_(alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
         {
         }
 

@@ -167,7 +167,6 @@ private:
     basic_json_parser<CharT,Allocator> parser_;
 
     source_type source_;
-    bool eof_;
     json_buffer_reader<CharT,Allocator> buffer_reader_;
 
     // Noncopyable and nonmoveable
@@ -270,7 +269,6 @@ public:
        : visitor_(visitor),
          parser_(options,err_handler,alloc),
          source_(std::forward<Source>(source)),
-         eof_(false),
          buffer_reader_(default_max_buffer_length, alloc)
     {
     }
@@ -284,7 +282,6 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : visitor_(visitor),
          parser_(options,err_handler,alloc),
-         eof_(false),
          buffer_reader_(alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
@@ -344,11 +341,7 @@ public:
             {
                 buffer_reader_.read(source_, ec);
                 if (ec) return;
-                if (buffer_reader_.eof())
-                {
-                    eof_ = true;
-                }
-                else
+                if (!buffer_reader_.eof())
                 {
                     parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
@@ -357,18 +350,14 @@ public:
             if (ec) return;
         }
         
-        while (!eof_)
+        while (!buffer_reader_.eof())
         {
             parser_.skip_whitespace();
             if (parser_.source_exhausted())
             {
                 buffer_reader_.read(source_, ec);
                 if (ec) return;
-                if (buffer_reader_.eof())
-                {
-                    eof_ = true;
-                }
-                else
+                if (!buffer_reader_.eof())
                 {
                     parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
@@ -407,29 +396,25 @@ public:
             ec = json_errc::source_error;
             return;
         }   
-        if (eof_)
+        if (buffer_reader_.eof())
         {
             parser_.check_done(ec);
             if (ec) return;
         }
         else
         {
-            while (!eof_)
+            while (!buffer_reader_.eof())
             {
                 if (parser_.source_exhausted())
                 {
                     buffer_reader_.read(source_, ec);
                     if (ec) return;
-                    if (buffer_reader_.eof())
-                    {
-                        eof_ = true;
-                    }
-                    else
+                    if (!buffer_reader_.eof())
                     {
                         parser_.update(buffer_reader_.data(),buffer_reader_.length());
                     }
                 }
-                if (!eof_)
+                if (!buffer_reader_.eof())
                 {
                     parser_.check_done(ec);
                     if (ec) return;
@@ -440,7 +425,7 @@ public:
 
     bool eof() const
     {
-        return eof_;
+        return buffer_reader_.eof();
     }
 
     void read()
