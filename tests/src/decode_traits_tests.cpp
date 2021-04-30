@@ -13,7 +13,7 @@ TEST_CASE("decode_traits primitive")
 {
     SECTION("is_primitive")
     {
-        CHECK(detail::is_primitive<uint64_t>::value);
+        CHECK(type_traits::is_primitive<uint64_t>::value);
     }
     SECTION("uint64_t")
     {
