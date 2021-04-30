@@ -347,7 +347,7 @@ public:
                     //read_buffer(ec);
                     buffer_reader_.read(source_, ec);
                     if (ec) return;
-                    if (buffer_reader_.length() == 0)
+                    if (buffer_reader_.eof())
                     {
                         eof_ = true;
                     }
@@ -375,7 +375,7 @@ public:
                     //read_buffer(ec);
                     buffer_reader_.read(source_, ec);
                     if (ec) return;
-                    if (buffer_reader_.length() == 0)
+                    if (buffer_reader_.eof())
                     {
                         eof_ = true;
                     }
@@ -439,7 +439,7 @@ public:
                         //read_buffer(ec);     
                         buffer_reader_.read(source_, ec);
                         if (ec) return;
-                        if (buffer_reader_.length() == 0)
+                        if (buffer_reader_.eof())
                         {
                             eof_ = true;
                         }

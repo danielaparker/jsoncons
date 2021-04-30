@@ -68,27 +68,34 @@ namespace jsoncons {
         {
             if (!eof_)
             {
-                data_ = buffer_.data();
-                length_ = source.read(buffer_.data(), buffer_.size());
-
-                if (buffer_.empty())
+                if (source.eof())
                 {
                     eof_ = true;
                 }
                 else
                 {
-                    if (bof_)
+                    data_ = buffer_.data();
+                    length_ = source.read(buffer_.data(), buffer_.size());
+
+                    if (buffer_.empty())
                     {
-                        auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
-                        if (result.ec != unicode_traits::encoding_errc())
+                        eof_ = true;
+                    }
+                    else
+                    {
+                        if (bof_)
                         {
-                            ec = result.ec;
-                            return;
+                            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
+                            if (result.ec != unicode_traits::encoding_errc())
+                            {
+                                ec = result.ec;
+                                return;
+                            }
+                            std::size_t offset = result.it - buffer_.begin();
+                            data_ += offset;
+                            length_ -= offset;
+                            bof_ = false;
                         }
-                        std::size_t offset = result.it - buffer_.begin();
-                        data_ += offset;
-                        length_ -= offset;
-                        bof_ = false;
                     }
                 }
             }
