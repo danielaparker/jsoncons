@@ -8,7 +8,7 @@
 #define JSONCONS_CONVERTER_HPP
 
 #include <system_error> // std::error_code
-#include <jsoncons/detail/more_type_traits.hpp>
+#include <jsoncons/more_type_traits.hpp>
 #include <jsoncons/byte_string.hpp>
 #include <jsoncons/json_type.hpp>
 #include <jsoncons/conv_error.hpp>

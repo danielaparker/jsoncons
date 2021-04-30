@@ -17,7 +17,7 @@
 #include <jsoncons/json_type_traits.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/conv_error.hpp>
-#include <jsoncons/detail/more_type_traits.hpp>
+#include <jsoncons/more_type_traits.hpp>
 
 namespace jsoncons {
 

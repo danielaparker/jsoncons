@@ -18,7 +18,7 @@
 #include <jsoncons/json_options.hpp>
 #include <jsoncons/detail/grisu3.hpp>
 #include <jsoncons/detail/parse_number.hpp>
-#include <jsoncons/detail/more_type_traits.hpp>
+#include <jsoncons/more_type_traits.hpp>
 
 namespace jsoncons { 
 namespace detail {

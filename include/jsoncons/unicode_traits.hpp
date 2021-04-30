@@ -22,7 +22,7 @@
 #include <system_error>
 #include <limits>
 #include <jsoncons/config/compiler_support.hpp>
-#include <jsoncons/detail/more_type_traits.hpp>
+#include <jsoncons/more_type_traits.hpp>
 
 namespace jsoncons { namespace unicode_traits {
 

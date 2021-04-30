@@ -12,7 +12,7 @@
 #include <system_error> // std::error_code
 #include <jsoncons/unicode_traits.hpp> // unicode_traits::convert
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons/detail/more_type_traits.hpp>
+#include <jsoncons/more_type_traits.hpp>
 
 namespace jsoncons {
 

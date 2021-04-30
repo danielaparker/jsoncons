@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_DETAIL_MORE_TYPE_TRAITS_HPP
-#define JSONCONS_DETAIL_MORE_TYPE_TRAITS_HPP
+#ifndef JSONCONS_MORE_TYPE_TRAITS_HPP
+#define JSONCONS_MORE_TYPE_TRAITS_HPP
 
 #include <stdexcept>
 #include <string>
@@ -100,7 +100,7 @@ namespace detail {
     };
 
     template <class T>
-    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && jsoncons::detail::is_int128_type<T>::value>::type>
+    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && is_int128_type<T>::value>::type>
     {
     public:
         static constexpr bool is_specialized = true;
@@ -122,7 +122,7 @@ namespace detail {
     };
 
     template <class T>
-    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && jsoncons::detail::is_uint128_type<T>::value>::type>
+    class integer_limits<T,typename std::enable_if<!std::is_integral<T>::value && is_uint128_type<T>::value>::type>
     {
     public:
         static constexpr bool is_specialized = true;
@@ -657,7 +657,7 @@ namespace impl {
     struct is_typed_array
     <
         T, 
-        typename std::enable_if<jsoncons::detail::is_list_like<T>::value && 
+        typename std::enable_if<is_list_like<T>::value && 
                                 (std::is_same<typename std::decay<typename T::value_type>::type,uint8_t>::value ||  
                                  std::is_same<typename std::decay<typename T::value_type>::type,uint16_t>::value ||
                                  std::is_same<typename std::decay<typename T::value_type>::type,uint32_t>::value ||
