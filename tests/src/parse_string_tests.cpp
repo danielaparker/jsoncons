@@ -67,7 +67,7 @@ TEST_CASE("test_parse_small_string4")
 {
     std::string input = "\"Str\\\"ing\"";
 
-    for (std::size_t i = 2; i < input.length(); ++i)
+    for (std::size_t i = 4; i < input.length(); ++i)
     {
         std::istringstream is(input);
         json_decoder<json> decoder;
@@ -88,7 +88,7 @@ TEST_CASE("test_parse_big_string1")
 {
     std::string input = "\"Big Str\\\"ing\"";
 
-    for (std::size_t i = 2; i < input.length(); ++i)
+    for (std::size_t i = 4; i < input.length(); ++i)
     {
         std::istringstream is(input);
         json_decoder<json> decoder;
@@ -110,23 +110,19 @@ TEST_CASE("test_parse_big_string2")
 {
     std::string input = "\"Big\t Str\\\"ing\"";
 
-    //for (std::size_t i = 2; i < input.length(); ++i)
-    //{
-        std::istringstream is(input);
-        json_decoder<json> decoder;
-        lenient_error_handler err_handler(json_errc::illegal_character_in_string);
-        JSONCONS_TRY
-        {
-            json_reader reader(is, decoder, err_handler);
-            //reader.buffer_length(i);
-            reader.read_next();
-        }
-        JSONCONS_CATCH (const std::exception&)
-        {
-        }
-        CHECK(decoder.is_valid());
-        CHECK(std::string("Big\t Str\"ing") == decoder.get_result().as<std::string>());
-    //}
+    std::istringstream is(input);
+    json_decoder<json> decoder;
+    lenient_error_handler err_handler(json_errc::illegal_character_in_string);
+    JSONCONS_TRY
+    {
+        json_reader reader(is, decoder, err_handler);
+        reader.read_next();
+    }
+    JSONCONS_CATCH (const std::exception&)
+    {
+    }
+    CHECK(decoder.is_valid());
+    CHECK(std::string("Big\t Str\"ing") == decoder.get_result().as<std::string>());
 }
 
 

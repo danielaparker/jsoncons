@@ -18,6 +18,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_parser.hpp>
+#include <jsoncons/json_buffer_reader.hpp>
 
 namespace jsoncons {
 
@@ -144,68 +145,6 @@ private:
     bool visit_null(semantic_tag tag, const ser_context& context, std::error_code& ec) override
     {
         return other_visitor_.null_value(tag, context, ec);
-    }
-};
-
-template<class CharT,class Allocator=std::allocator<char>>
-class json_buffer_reader 
-{
-public:
-    using char_type = CharT;
-private:
-    typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char_type> char_allocator_type;
-
-    std::vector<char_type,char_allocator_type> buffer_;
-    const char_type* data_;
-    std::size_t length_;
-    bool begin_;
-
-public:
-    json_buffer_reader(std::size_t buffer_length)
-        : buffer_(buffer_length), data_(nullptr), length_(0), begin_(false)
-    {
-    }
-
-    json_buffer_reader(std::size_t buffer_length, const Allocator& alloc)
-        : buffer_(buffer_length, alloc), data_(nullptr), length_(0), begin_(false)
-    {
-    }
-
-    std::size_t buffer_length() const
-    {
-        return buffer_.size();
-    }
-
-    void buffer_length(std::size_t size)
-    {
-        buffer_.resize(size);
-    }
-
-    const char_type* data() const {return data_;}
-    std::size_t length() const {return length_;}
-
-    template <class Source>
-    void read(Source& source, std::error_code& ec)
-    {
-        data_ = buffer_.data();
-        length_ = source.read(buffer_.data(), buffer_.size());
-
-        if (!buffer_.empty())
-        {
-            if (begin_)
-            {
-                auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
-                if (result.ec != unicode_traits::encoding_errc())
-                {
-                    ec = result.ec;
-                    return;
-                }
-                std::size_t offset = result.it - buffer_.begin();
-                data_ += offset;
-                length_ -= offset;
-                begin_ = false;
-            }
-        }
     }
 };
 
@@ -346,7 +285,7 @@ public:
        : visitor_(visitor),
          parser_(options,err_handler,alloc),
          eof_(false),
-         buffer_reader_(0, alloc)
+         buffer_reader_(alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
