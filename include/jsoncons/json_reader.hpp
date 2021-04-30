@@ -161,22 +161,22 @@ private:
     bool begin_;
 
 public:
-    json_buffer_reader(std::size_t buffer_size)
-        : buffer_(buffer_size), data_(nullptr), length_(0), begin_(false)
+    json_buffer_reader(std::size_t buffer_length)
+        : buffer_(buffer_length), data_(nullptr), length_(0), begin_(false)
     {
     }
 
-    json_buffer_reader(std::size_t buffer_size, const Allocator& alloc)
-        : buffer_(buffer_size, alloc), data_(nullptr), length_(0), begin_(false)
+    json_buffer_reader(std::size_t buffer_length, const Allocator& alloc)
+        : buffer_(buffer_length, alloc), data_(nullptr), length_(0), begin_(false)
     {
     }
 
-    std::size_t buffer_size() const
+    std::size_t buffer_length() const
     {
         return buffer_.size();
     }
 
-    void buffer_size(std::size_t size)
+    void buffer_length(std::size_t size)
     {
         buffer_.resize(size);
     }
@@ -358,29 +358,17 @@ public:
         parser_.update(sv.data()+offset,sv.size()-offset);
     }
 
-    std::size_t buffer_size() const
+    std::size_t buffer_length() const
     {
-        return buffer_reader_.buffer_size();
+        return buffer_reader_.buffer_length();
     }
 
-    void buffer_size(std::size_t size)
+    void buffer_length(std::size_t size)
     {
-        buffer_reader_.buffer_size(size);
+        buffer_reader_.buffer_length(size);
     }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size()")
-    std::size_t buffer_length() const
-    {
-        return buffer_reader_.buffer_size();
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size(std::size_t)")
-    void buffer_length(std::size_t length)
-    {
-        buffer_reader_.buffer_size(length);
-    }
-
     JSONCONS_DEPRECATED_MSG("Instead, use max_nesting_depth() on options")
     int max_nesting_depth() const
     {
@@ -557,16 +545,16 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size()")
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length()")
     std::size_t buffer_capacity() const
     {
-        return buffer_reader_.buffer_size();
+        return buffer_reader_.buffer_length();
     }
 
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_size(std::size_t)")
+    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(std::size_t)")
     void buffer_capacity(std::size_t length)
     {
-        buffer_reader_.buffer_size(length);
+        buffer_reader_.buffer_length(length);
     }
 #endif
 
