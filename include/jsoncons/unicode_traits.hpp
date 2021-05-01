@@ -55,9 +55,9 @@ namespace jsoncons { namespace unicode_traits {
         encoding_kind encoding;
     };
 
-    template <class Byte>
-    typename std::enable_if<type_traits::is_byte<Byte>::value,detect_encoding_result<Byte>>::type
-    detect_encoding_from_bom(const Byte* data, std::size_t length)
+    template <class CharT>
+    typename std::enable_if<type_traits::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
+    detect_encoding_from_bom(const CharT* data, std::size_t length)
     {
         const uint8_t bom_utf8[] = {0xef,0xbb,0xbf}; 
         const uint8_t bom_utf16le[] = {0xff,0xfe}; 
@@ -67,62 +67,62 @@ namespace jsoncons { namespace unicode_traits {
 
         if (length >= 4 && !memcmp(data,bom_utf32le,4))
         {
-            return detect_encoding_result<Byte>{data+4,encoding_kind::utf32le};
+            return detect_encoding_result<CharT>{data+4,encoding_kind::utf32le};
         }
         else if (length >= 4 && !memcmp(data,bom_utf32be,4))
         {
-            return detect_encoding_result<Byte>{data+4,encoding_kind::utf32be};
+            return detect_encoding_result<CharT>{data+4,encoding_kind::utf32be};
         }
         else if (length >= 2 && !memcmp(data,bom_utf16le,2))
         {
-            return detect_encoding_result<Byte>{data+2,encoding_kind::utf16le};
+            return detect_encoding_result<CharT>{data+2,encoding_kind::utf16le};
         }
         else if (length >= 2 && !memcmp(data,bom_utf16be,2))
         {
-            return detect_encoding_result<Byte>{data+2,encoding_kind::utf16be};
+            return detect_encoding_result<CharT>{data+2,encoding_kind::utf16be};
         }
         else if (length >= 3 && !memcmp(data,bom_utf8,3))
         {
-            return detect_encoding_result<Byte>{data+3,encoding_kind::utf8};
+            return detect_encoding_result<CharT>{data+3,encoding_kind::utf8};
         }
         else
         {
-            return detect_encoding_result<Byte>{data,encoding_kind::undetected};
+            return detect_encoding_result<CharT>{data,encoding_kind::undetected};
         }
     }
 
-    template <class Byte>
-    typename std::enable_if<type_traits::is_byte<Byte>::value,detect_encoding_result<Byte>>::type
-    detect_json_encoding(const Byte* data, std::size_t length)
+    template <class CharT>
+    typename std::enable_if<type_traits::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
+    detect_json_encoding(const CharT* data, std::size_t length)
     {
-        detect_encoding_result<Byte> r = detect_encoding_from_bom(data,length);
+        detect_encoding_result<CharT> r = detect_encoding_from_bom(data,length);
         if (r.encoding != encoding_kind::undetected)
         {
             return r;
         }
         else if (length < 4)
         {
-            return detect_encoding_result<Byte>{data,encoding_kind::utf8};
+            return detect_encoding_result<CharT>{data,encoding_kind::utf8};
         }
         else if (*data == 0 && *(data+1) == 0 && *(data+2) == 0)
         {
-            return detect_encoding_result<Byte>{data,encoding_kind::utf32be};
+            return detect_encoding_result<CharT>{data,encoding_kind::utf32be};
         }
         else if (*data == 0 && *(data+2) == 0)
         {
-            return detect_encoding_result<Byte>{data,encoding_kind::utf16be};
+            return detect_encoding_result<CharT>{data,encoding_kind::utf16be};
         }
         else if (*(data+1) == 0 && *(data+2) == 0 && *(data+3) == 0)
         {
-            return detect_encoding_result<Byte>{data,encoding_kind::utf32le};
+            return detect_encoding_result<CharT>{data,encoding_kind::utf32le};
         }
         else if (*(data+1) == 0 && *(data+3) == 0)
         {
-            return detect_encoding_result<Byte>{data,encoding_kind::utf16le};
+            return detect_encoding_result<CharT>{data,encoding_kind::utf16le};
         }
         else
         {
-            return detect_encoding_result<Byte>{data,encoding_kind::utf8};
+            return detect_encoding_result<CharT>{data,encoding_kind::utf8};
         }
     }
 
