@@ -21,6 +21,7 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/source.hpp>
+#include <jsoncons/json_buffer_reader.hpp>
 
 namespace jsoncons {
 
@@ -39,10 +40,7 @@ private:
     source_type source_;
     basic_json_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
-    std::vector<CharT,char_allocator_type> buffer_;
-    std::size_t buffer_length_;
-    bool eof_;
-    bool begin_;
+    json_buffer_reader<CharT,Allocator> buffer_reader_;
 
     // Noncopyable and nonmoveable
     basic_json_cursor(const basic_json_cursor&) = delete;
@@ -61,12 +59,8 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_(alloc),
-         buffer_length_(default_max_buffer_length),
-         eof_(false),
-         begin_(true)
+         buffer_reader_(default_max_buffer_length, alloc)
     {
-        buffer_.reserve(buffer_length_);
         if (!done())
         {
             next();
@@ -81,10 +75,7 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options, err_handler, alloc),
          cursor_visitor_(accept_all),
-         buffer_(alloc),
-         buffer_length_(0),
-         eof_(false),
-         begin_(false)
+         buffer_reader_(0, alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
@@ -148,12 +139,8 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_(alloc),
-         buffer_length_(default_max_buffer_length),
-         eof_(false),
-         begin_(true)
+         buffer_reader_(default_max_buffer_length, alloc)
     {
-        buffer_.reserve(buffer_length_);
         if (!done())
         {
             next(ec);
@@ -169,10 +156,7 @@ public:
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : parser_(options, err_handler, alloc),
          cursor_visitor_(accept_all),
-         buffer_(alloc),
-         buffer_length_(0),
-         eof_(false),
-         begin_(false)
+         buffer_reader_(0, alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
@@ -191,13 +175,12 @@ public:
 
     std::size_t buffer_length() const
     {
-        return buffer_length_;
+        return buffer_reader_.buffer_length();
     }
 
-    void buffer_length(std::size_t length)
+    void buffer_length(std::size_t size)
     {
-        buffer_length_ = length;
-        buffer_.reserve(buffer_length_);
+        buffer_reader_.buffer_length(size);
     }
 
     bool done() const override
@@ -244,34 +227,6 @@ public:
         read_next(ec);
     }
 
-    void read_buffer(std::error_code& ec)
-    {
-        buffer_.clear();
-        buffer_.resize(buffer_length_);
-        std::size_t count = source_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<std::size_t>(count));
-        if (buffer_.size() == 0)
-        {
-            eof_ = true;
-        }
-        else if (begin_)
-        {
-            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
-            if (result.ec != unicode_traits::encoding_errc())
-            {
-                ec = result.ec;
-                return;
-            }
-            std::size_t offset = result.it - buffer_.begin();
-            parser_.update(buffer_.data()+offset,buffer_.size()-offset);
-            begin_ = false;
-        }
-        else
-        {
-            parser_.update(buffer_.data(),buffer_.size());
-        }
-    }
-
     void check_done()
     {
         std::error_code ec;
@@ -294,28 +249,25 @@ public:
             ec = json_errc::source_error;
             return;
         }   
-        if (eof_)
+        if (buffer_reader_.eof())
         {
             parser_.check_done(ec);
             if (ec) return;
         }
         else
         {
-            while (!eof_)
+            while (!buffer_reader_.eof())
             {
                 if (parser_.source_exhausted())
                 {
-                    if (!source_.eof())
+                    buffer_reader_.read(source_, ec);
+                    if (ec) return;
+                    if (!buffer_reader_.eof())
                     {
-                        read_buffer(ec);     
-                        if (ec) return;
-                    }
-                    else
-                    {
-                        eof_ = true;
+                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
                     }
                 }
-                if (!eof_)
+                if (!buffer_reader_.eof())
                 {
                     parser_.check_done(ec);
                     if (ec) return;
@@ -326,7 +278,7 @@ public:
 
     bool eof() const
     {
-        return eof_;
+        return buffer_reader_.eof();
     }
 
     std::size_t line() const override
@@ -346,171 +298,6 @@ public:
         return basic_staj_filter_view<CharT>(cursor, pred);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    template <class Source>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
-                      const Allocator& alloc = Allocator(),
-                      typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
-       : source_(source),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(filter),
-         buffer_(alloc),
-         buffer_length_(default_max_buffer_length),
-         eof_(false),
-         begin_(true)
-    {
-        buffer_.reserve(buffer_length_);
-        if (!done())
-        {
-            next();
-        }
-    }
-
-    template <class Source>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
-                      std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
-                      const Allocator& alloc = Allocator(),
-                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
-       : parser_(options, err_handler, alloc),
-         cursor_visitor_(filter),
-         buffer_(alloc),
-         buffer_length_(0),
-         eof_(false),
-         begin_(false)
-    {
-        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicode_traits::encoding_errc())
-        {
-            JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
-        }
-        std::size_t offset = result.it - sv.begin();
-        parser_.update(sv.data()+offset,sv.size()-offset);
-        if (!done())
-        {
-            next();
-        }
-    }
-
-    template <class Source>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_json_cursor(Source&& source,
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      std::error_code& ec)
-        : basic_json_cursor(std::forward<Source>(source),
-                                 filter,
-                                 basic_json_decode_options<CharT>(),
-                                 default_json_parsing(),
-                                 ec)
-    {
-    }
-
-    template <class Source>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::error_code& ec)
-        : basic_json_cursor(std::forward<Source>(source),
-                            filter,
-                            options,
-                            default_json_parsing(),
-                            ec)
-    {
-    }
-
-    template <class Source>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_json_cursor(Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec)
-        : basic_json_cursor(std::allocator_arg, Allocator(), 
-                            std::forward<Source>(source),
-                            filter,
-                            options,
-                            err_handler,
-                            ec)
-    {
-    }
-
-    template <class Source>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
-                      Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec,
-                      typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
-       : source_(source),
-         parser_(options,err_handler,alloc),
-         cursor_visitor_(filter),
-         buffer_(alloc),
-         buffer_length_(default_max_buffer_length),
-         eof_(false),
-         begin_(true)
-    {
-        buffer_.reserve(buffer_length_);
-        if (!done())
-        {
-            next(ec);
-        }
-    }
-
-    template <class Source>
-    JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_json_cursor(std::allocator_arg_t, const Allocator& alloc,
-                      Source&& source, 
-                      std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> filter,
-                      const basic_json_decode_options<CharT>& options,
-                      std::function<bool(json_errc,const ser_context&)> err_handler,
-                      std::error_code& ec,
-                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
-       : parser_(options, err_handler, alloc),
-         cursor_visitor_(filter),
-         buffer_(alloc),
-         buffer_length_(0),
-         eof_(false),
-         begin_(false)
-    {
-        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicode_traits::encoding_errc())
-        {
-            ec = result.ec;
-            return;
-        }
-        std::size_t offset = result.it - sv.begin();
-        parser_.update(sv.data()+offset,sv.size()-offset);
-        if (!done())
-        {
-            next(ec);
-        }
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&)")
-    void read(basic_json_visitor<CharT>& visitor)
-    {
-        read_to(visitor);
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use read_to(basic_json_visitor<CharT>&, std::error_code&)")
-    void read(basic_json_visitor<CharT>& visitor,
-                 std::error_code& ec)
-    {
-        read_to(visitor, ec);
-    }
-#endif
 private:
 
     static bool accept_all(const basic_staj_event<CharT>&, const ser_context&) 
@@ -525,14 +312,11 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                if (!source_.eof())
+                buffer_reader_.read(source_, ec);
+                if (ec) return;
+                if (!buffer_reader_.eof())
                 {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
+                    parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
             }
             parser_.parse_some(cursor_visitor_, ec);
@@ -547,14 +331,11 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                if (!source_.eof())
+                buffer_reader_.read(source_, ec);
+                if (ec) return;
+                if (!buffer_reader_.eof())
                 {
-                    read_buffer(ec);
-                    if (ec) return;
-                }
-                else
-                {
-                    eof_ = true;
+                    parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
             }
             parser_.parse_some(visitor, ec);
