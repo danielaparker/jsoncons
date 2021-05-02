@@ -127,12 +127,12 @@ public:
          buffer_reader_(0,alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
-        auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
-        if (result.ec != unicode_traits::encoding_errc())
+        auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
+        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
         {
-            JSONCONS_THROW(ser_error(result.ec,parser_.line(),parser_.column()));
+            JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser_.line(),parser_.column()));
         }
-        std::size_t offset = result.it - sv.begin();
+        std::size_t offset = (r.ptr - sv.data());
         parser_.update(sv.data()+offset,sv.size()-offset);
     }
 

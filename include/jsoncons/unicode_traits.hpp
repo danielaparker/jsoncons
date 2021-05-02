@@ -92,6 +92,13 @@ namespace jsoncons { namespace unicode_traits {
     }
 
     template <class CharT>
+    typename std::enable_if<type_traits::is_char16<CharT>::value || type_traits::is_char32<CharT>::value,detect_encoding_result<CharT>>::type
+    detect_encoding_from_bom(const CharT* data, std::size_t)
+    {
+        return detect_encoding_result<CharT>{data,encoding_kind::undetected};
+    }
+
+    template <class CharT>
     typename std::enable_if<type_traits::is_char8<CharT>::value,detect_encoding_result<CharT>>::type
     detect_json_encoding(const CharT* data, std::size_t length)
     {
@@ -124,6 +131,13 @@ namespace jsoncons { namespace unicode_traits {
         {
             return detect_encoding_result<CharT>{data,encoding_kind::utf8};
         }
+    }
+
+    template <class CharT>
+    typename std::enable_if<type_traits::is_char16<CharT>::value || type_traits::is_char32<CharT>::value,detect_encoding_result<CharT>>::type
+    detect_json_encoding(const CharT* data, std::size_t)
+    {
+        return detect_encoding_result<CharT>{data,encoding_kind::undetected};
     }
 
     /*

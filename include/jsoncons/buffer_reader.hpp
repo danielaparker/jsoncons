@@ -75,21 +75,17 @@ namespace jsoncons {
                     {
                         eof_ = true;
                     }
-                    else
+                    else if (bof_)
                     {
-                        if (bof_)
+                        auto r = unicode_traits::detect_encoding_from_bom(buffer_.data(), length_);
+                        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                         {
-                            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
-                            if (result.ec != unicode_traits::encoding_errc())
-                            {
-                                ec = result.ec;
-                                return;
-                            }
-                            std::size_t offset = result.it - buffer_.begin();
-                            data_ += offset;
-                            length_ -= offset;
-                            bof_ = false;
+                            ec = json_errc::illegal_unicode_character;
+                            return;
                         }
+                        length_ -= (r.ptr - data_);
+                        data_ = r.ptr;
+                        bof_ = false;
                     }
                 }
             }
@@ -155,21 +151,17 @@ namespace jsoncons {
                     {
                         eof_ = true;
                     }
-                    else
+                    else if (bof_)
                     {
-                        if (bof_)
+                        auto r = unicode_traits::detect_json_encoding(buffer_.data(), length_);
+                        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                         {
-                            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
-                            if (result.ec != unicode_traits::encoding_errc())
-                            {
-                                ec = result.ec;
-                                return;
-                            }
-                            std::size_t offset = result.it - buffer_.begin();
-                            data_ += offset;
-                            length_ -= offset;
-                            bof_ = false;
+                            ec = json_errc::illegal_unicode_character;
+                            return;
                         }
+                        length_ -= (r.ptr - data_);
+                        data_ = r.ptr;
+                        bof_ = false;
                     }
                 }
             }

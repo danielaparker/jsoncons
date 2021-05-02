@@ -2693,12 +2693,12 @@ public:
         json_decoder<basic_json> decoder;
         basic_json_parser<char_type> parser(options,err_handler);
 
-        auto result = unicode_traits::skip_bom(s.begin(), s.end());
-        if (result.ec != unicode_traits::encoding_errc())
+        auto r = unicode_traits::detect_encoding_from_bom(s.data(), s.size());
+        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
         {
-            JSONCONS_THROW(ser_error(result.ec));
+            JSONCONS_THROW(ser_error(json_errc::illegal_unicode_character,parser.line(),parser.column()));
         }
-        std::size_t offset = result.it - s.begin();
+        std::size_t offset = (r.ptr - s.data());
         parser.update(s.data()+offset,s.size()-offset);
         parser.parse_some(decoder);
         parser.finish_parse(decoder);

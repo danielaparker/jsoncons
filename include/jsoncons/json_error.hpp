@@ -43,7 +43,8 @@ namespace jsoncons {
         over_long_utf8_sequence,
         illegal_codepoint,
         illegal_surrogate_value,
-        unpaired_high_surrogate
+        unpaired_high_surrogate,
+        illegal_unicode_character
     };
 
     class json_error_category_impl
@@ -116,7 +117,9 @@ namespace jsoncons {
                     return "UTF-16 surrogate values are illegal in UTF-32";
                 case json_errc::unpaired_high_surrogate:
                     return "Expected low surrogate following the high surrogate";
-               default:
+                case json_errc::illegal_unicode_character:
+                    return "Illegal unicode character";
+                default:
                     return "Unknown JSON parser error";
                 }
         }
