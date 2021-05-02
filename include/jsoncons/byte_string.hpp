@@ -801,22 +801,19 @@ namespace detail {
 
     using byte_string = basic_byte_string<std::allocator<uint8_t>>;
 
-namespace detail {
+    namespace type_traits {
 
-    template <typename T>
-    struct is_basic_byte_string
-    : std::false_type
-    {};
+        template <typename T>
+        struct is_basic_byte_string
+        : std::false_type
+        {};
 
-    template <typename Allocator>
-    struct is_basic_byte_string<basic_byte_string<Allocator>>
-    : std::true_type
-    {};
+        template <typename Allocator>
+        struct is_basic_byte_string<basic_byte_string<Allocator>>
+        : std::true_type
+        {};
 
-} // namespace detail
-
-    template <typename T>
-    using is_basic_byte_string = jsoncons::detail::is_basic_byte_string<typename std::decay<T>::type>;
+    } // namespace type_traits
 
 } // namespace jsoncons
 

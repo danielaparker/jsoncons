@@ -1080,7 +1080,7 @@ has_can_convert = type_traits::is_detected<traits_can_convert_t, Json, T>;
 
     template<class Json, class T>
     struct json_type_traits<Json, T,
-                            typename std::enable_if<jsoncons::detail::is_basic_byte_string<T>::value>::type>
+                            typename std::enable_if<type_traits::is_basic_byte_string<T>::value>::type>
     {
     public:
         using allocator_type = typename Json::allocator_type;

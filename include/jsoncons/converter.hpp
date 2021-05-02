@@ -25,7 +25,7 @@ namespace jsoncons {
     template <class Into>
     class converter<Into,typename std::enable_if<(!type_traits::is_basic_string<Into>::value && 
                                                    type_traits::is_back_insertable_byte_container<Into>::value) ||
-                                                   jsoncons::detail::is_basic_byte_string<Into>::value>::type>
+                                                   type_traits::is_basic_byte_string<Into>::value>::type>
     {
         using value_type = typename Into::value_type;
         using allocator_type = typename Into::allocator_type;
