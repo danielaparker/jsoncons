@@ -67,7 +67,7 @@ add_executable(unit_tests
                bson/src/bson_encoder_tests.cpp
                bson/src/bson_reader_tests.cpp
                bson/src/bson_test_suite.cpp
-               bson/src/buffer_tests.cpp
+               bson/src/buffer_reader_tests.cpp
                bson/src/encode_decode_bson_tests.cpp
                src/byte_string_tests.cpp
                cbor/src/cbor_bitset_traits_tests.cpp
