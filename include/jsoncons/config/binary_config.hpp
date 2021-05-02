@@ -45,7 +45,7 @@
 #endif
 
 namespace jsoncons { 
-namespace detail { 
+namespace binary { 
 
     struct uint128_holder
     {
@@ -220,7 +220,7 @@ namespace detail {
         return val2;
     }
 
-} // detail
+} // binary
 } // jsoncons
 
 #endif

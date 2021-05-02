@@ -4006,7 +4006,7 @@ namespace jsoncons {
                     return to_double(as_cstring(), as_string_view().length());
                 }
                 case storage_kind::half_value:
-                    return jsoncons::detail::decode_half(cast<half_storage>().value());
+                    return binary::decode_half(cast<half_storage>().value());
                 case storage_kind::double_value:
                     return cast<double_storage>().value();
                 case storage_kind::int64_value:

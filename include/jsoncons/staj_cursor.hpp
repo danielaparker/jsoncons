@@ -414,7 +414,7 @@ private:
                 return static_cast<double>(value_.uint64_value_);
             case staj_event_type::half_value:
             {
-                double x = jsoncons::detail::decode_half(value_.half_value_);
+                double x = binary::decode_half(value_.half_value_);
                 return static_cast<double>(x);
             }
             default:

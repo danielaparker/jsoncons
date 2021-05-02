@@ -265,7 +265,7 @@ namespace jsoncons {
 
         bool visit_half_(std::false_type, uint16_t value)
         {
-            v_.push_back(static_cast<value_type>(jsoncons::detail::decode_half(value)));
+            v_.push_back(static_cast<value_type>(binary::decode_half(value)));
             return true;
         }
 

@@ -132,14 +132,14 @@ namespace msgpack {
             {
                 // map 16
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::map16_cd);
-                jsoncons::detail::native_to_big(static_cast<uint16_t>(length), 
+                binary::native_to_big(static_cast<uint16_t>(length), 
                                       std::back_inserter(sink_));
             }
             else if (length <= 4294967295)
             {
                 // map 32
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::map32_cd);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(length),
+                binary::native_to_big(static_cast<uint32_t>(length),
                                       std::back_inserter(sink_));
             }
 
@@ -190,13 +190,13 @@ namespace msgpack {
             {
                 // array 16
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::array16_cd);
-                jsoncons::detail::native_to_big(static_cast<uint16_t>(length),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint16_t>(length),std::back_inserter(sink_));
             }
             else if (length <= (std::numeric_limits<uint32_t>::max)())
             {
                 // array 32
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::array32_cd);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
             }
             return true;
         }
@@ -247,14 +247,14 @@ namespace msgpack {
                     // timestamp 32
                     sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext4_cd);
                     sink_.push_back(0xff);
-                    jsoncons::detail::native_to_big(static_cast<uint32_t>(data64), std::back_inserter(sink_));
+                    binary::native_to_big(static_cast<uint32_t>(data64), std::back_inserter(sink_));
                 }
                 else 
                 {
                     // timestamp 64
                     sink_.push_back(jsoncons::msgpack::detail::msgpack_format::fixext8_cd);
                     sink_.push_back(0xff);
-                    jsoncons::detail::native_to_big(static_cast<uint64_t>(data64), std::back_inserter(sink_));
+                    binary::native_to_big(static_cast<uint64_t>(data64), std::back_inserter(sink_));
                 }
             }
             else 
@@ -263,8 +263,8 @@ namespace msgpack {
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext8_cd);
                 sink_.push_back(0x0c); // 12
                 sink_.push_back(0xff);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(nanoseconds), std::back_inserter(sink_));
-                jsoncons::detail::native_to_big(static_cast<uint64_t>(seconds), std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint32_t>(nanoseconds), std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint64_t>(seconds), std::back_inserter(sink_));
             }
         }
 
@@ -362,13 +362,13 @@ namespace msgpack {
             {
                 // str 16 stores a byte array whose length is upto (2^16)-1 bytes
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::str16_cd);
-                jsoncons::detail::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
             }
             else if (length <= (std::numeric_limits<uint32_t>::max)())
             {
                 // str 32 stores a byte array whose length is upto (2^32)-1 bytes
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::str32_cd);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
             }
 
             for (auto c : sv)
@@ -394,13 +394,13 @@ namespace msgpack {
             {
                 // bin 16 stores a byte array whose length is upto (2^16)-1 bytes
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::bin16_cd);
-                jsoncons::detail::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
             }
             else if (length <= (std::numeric_limits<uint32_t>::max)())
             {
                 // bin 32 stores a byte array whose length is upto (2^32)-1 bytes
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::bin32_cd);
-                jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
             }
 
             for (auto c : b)
@@ -450,13 +450,13 @@ namespace msgpack {
                     else if (length <= (std::numeric_limits<uint16_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext16_cd);
-                        jsoncons::detail::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
+                        binary::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
                         sink_.push_back(static_cast<uint8_t>(ext_tag));
                     }
                     else if (length <= (std::numeric_limits<uint32_t>::max)())
                     {
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::ext32_cd);
-                        jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+                        binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
                         sink_.push_back(static_cast<uint8_t>(ext_tag));
                     }
                     break;
@@ -481,13 +481,13 @@ namespace msgpack {
             {
                 // float 32
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::float32_cd);
-                jsoncons::detail::native_to_big(valf,std::back_inserter(sink_));
+                binary::native_to_big(valf,std::back_inserter(sink_));
             }
             else
             {
                 // float 64
                 sink_.push_back(jsoncons::msgpack::detail::msgpack_format::float64_cd);
-                jsoncons::detail::native_to_big(val,std::back_inserter(sink_));
+                binary::native_to_big(val,std::back_inserter(sink_));
             }
 
             // write double
@@ -563,19 +563,19 @@ namespace msgpack {
                         {
                             // uint 16 stores a 16-bit big-endian unsigned integer
                             sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint16_cd);
-                            jsoncons::detail::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
                         }
                         else if (val <= (std::numeric_limits<uint32_t>::max)())
                         {
                             // uint 32 stores a 32-bit big-endian unsigned integer
                             sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint32_cd);
-                            jsoncons::detail::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
                         }
                         else if (val <= (std::numeric_limits<int64_t>::max)())
                         {
                             // int 64 stores a 64-bit big-endian signed integer
                             sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint64_cd);
-                            jsoncons::detail::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
                         }
                     }
                     else
@@ -583,31 +583,31 @@ namespace msgpack {
                         if (val >= -32)
                         {
                             // negative fixnum stores 5-bit negative integer
-                            jsoncons::detail::native_to_big(static_cast<int8_t>(val), std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<int8_t>(val), std::back_inserter(sink_));
                         }
                         else if (val >= (std::numeric_limits<int8_t>::lowest)())
                         {
                             // int 8 stores a 8-bit signed integer
                             sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int8_cd);
-                            jsoncons::detail::native_to_big(static_cast<int8_t>(val),std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<int8_t>(val),std::back_inserter(sink_));
                         }
                         else if (val >= (std::numeric_limits<int16_t>::lowest)())
                         {
                             // int 16 stores a 16-bit big-endian signed integer
                             sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int16_cd);
-                            jsoncons::detail::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
                         }
                         else if (val >= (std::numeric_limits<int32_t>::lowest)())
                         {
                             // int 32 stores a 32-bit big-endian signed integer
                             sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int32_cd);
-                            jsoncons::detail::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
                         }
                         else if (val >= (std::numeric_limits<int64_t>::lowest)())
                         {
                             // int 64 stores a 64-bit big-endian signed integer
                             sink_.push_back(jsoncons::msgpack::detail::msgpack_format::int64_cd);
-                            jsoncons::detail::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+                            binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
                         }
                     }
                 }
@@ -682,19 +682,19 @@ namespace msgpack {
                     {
                         // uint 16 stores a 16-bit big-endian unsigned integer
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint16_cd);
-                        jsoncons::detail::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
+                        binary::native_to_big(static_cast<uint16_t>(val),std::back_inserter(sink_));
                     }
                     else if (val <= (std::numeric_limits<uint32_t>::max)())
                     {
                         // uint 32 stores a 32-bit big-endian unsigned integer
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint32_cd);
-                        jsoncons::detail::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
+                        binary::native_to_big(static_cast<uint32_t>(val),std::back_inserter(sink_));
                     }
                     else if (val <= (std::numeric_limits<uint64_t>::max)())
                     {
                         // uint 64 stores a 64-bit big-endian unsigned integer
                         sink_.push_back(jsoncons::msgpack::detail::msgpack_format::uint64_cd);
-                        jsoncons::detail::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
+                        binary::native_to_big(static_cast<uint64_t>(val),std::back_inserter(sink_));
                     }
                     break;
                 }

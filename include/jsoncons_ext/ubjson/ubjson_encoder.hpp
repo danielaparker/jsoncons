@@ -246,7 +246,7 @@ private:
     bool visit_null(semantic_tag, const ser_context&, std::error_code&) override
     {
         // nil
-        jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::null_type), std::back_inserter(sink_));
+        binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::null_type), std::back_inserter(sink_));
         end_value();
         return true;
     }
@@ -291,22 +291,22 @@ private:
         if (length <= (std::numeric_limits<uint8_t>::max)())
         {
             sink_.push_back('U');
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(length), std::back_inserter(sink_));
+            binary::native_to_big(static_cast<uint8_t>(length), std::back_inserter(sink_));
         }
         else if (length <= (std::size_t)(std::numeric_limits<int16_t>::max)())
         {
             sink_.push_back('I');
-            jsoncons::detail::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
+            binary::native_to_big(static_cast<uint16_t>(length), std::back_inserter(sink_));
         }
         else if (length <= (uint32_t)(std::numeric_limits<int32_t>::max)())
         {
             sink_.push_back('l');
-            jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+            binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
         }
         else if (length <= (uint64_t)(std::numeric_limits<int64_t>::max)())
         {
             sink_.push_back('L');
-            jsoncons::detail::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
+            binary::native_to_big(static_cast<uint32_t>(length),std::back_inserter(sink_));
         }
     }
 
@@ -318,8 +318,8 @@ private:
 
         const size_t length = b.size();
         sink_.push_back(jsoncons::ubjson::detail::ubjson_format::start_array_marker);
-        jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::type_marker), std::back_inserter(sink_));
-        jsoncons::detail::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::uint8_type), std::back_inserter(sink_));
+        binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::type_marker), std::back_inserter(sink_));
+        binary::native_to_big(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::uint8_type), std::back_inserter(sink_));
         put_length(length);
 
         for (auto c : b)
@@ -341,13 +341,13 @@ private:
         {
             // float 32
             sink_.push_back(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::float32_type));
-            jsoncons::detail::native_to_big(valf,std::back_inserter(sink_));
+            binary::native_to_big(valf,std::back_inserter(sink_));
         }
         else
         {
             // float 64
             sink_.push_back(static_cast<uint8_t>(jsoncons::ubjson::detail::ubjson_format::float64_type));
-            jsoncons::detail::native_to_big(val,std::back_inserter(sink_));
+            binary::native_to_big(val,std::back_inserter(sink_));
         }
 
         // write double
@@ -367,25 +367,25 @@ private:
             {
                 // uint 8 stores a 8-bit unsigned integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::uint8_type);
-                jsoncons::detail::native_to_big(static_cast<uint8_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<uint8_t>(val),std::back_inserter(sink_));
             }
             else if (val <= (std::numeric_limits<int16_t>::max)())
             {
                 // uint 16 stores a 16-bit big-endian unsigned integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int16_type);
-                jsoncons::detail::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
             }
             else if (val <= (std::numeric_limits<int32_t>::max)())
             {
                 // uint 32 stores a 32-bit big-endian unsigned integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int32_type);
-                jsoncons::detail::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
             }
             else if (val <= (std::numeric_limits<int64_t>::max)())
             {
                 // int 64 stores a 64-bit big-endian signed integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int64_type);
-                jsoncons::detail::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
             }
             else
             {
@@ -398,25 +398,25 @@ private:
             {
                 // int 8 stores a 8-bit signed integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int8_type);
-                jsoncons::detail::native_to_big(static_cast<int8_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int8_t>(val),std::back_inserter(sink_));
             }
             else if (val >= (std::numeric_limits<int16_t>::lowest)())
             {
                 // int 16 stores a 16-bit big-endian signed integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int16_type);
-                jsoncons::detail::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
             }
             else if (val >= (std::numeric_limits<int32_t>::lowest)())
             {
                 // int 32 stores a 32-bit big-endian signed integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int32_type);
-                jsoncons::detail::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
             }
             else if (val >= (std::numeric_limits<int64_t>::lowest)())
             {
                 // int 64 stores a 64-bit big-endian signed integer
                 sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int64_type);
-                jsoncons::detail::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+                binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
             }
         }
         end_value();
@@ -431,22 +431,22 @@ private:
         if (val <= (std::numeric_limits<uint8_t>::max)())
         {
             sink_.push_back(jsoncons::ubjson::detail::ubjson_format::uint8_type);
-            jsoncons::detail::native_to_big(static_cast<uint8_t>(val),std::back_inserter(sink_));
+            binary::native_to_big(static_cast<uint8_t>(val),std::back_inserter(sink_));
         }
         else if (val <= static_cast<uint64_t>((std::numeric_limits<int16_t>::max)()))
         {
             sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int16_type);
-            jsoncons::detail::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
+            binary::native_to_big(static_cast<int16_t>(val),std::back_inserter(sink_));
         }
         else if (val <= static_cast<uint64_t>((std::numeric_limits<int32_t>::max)()))
         {
             sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int32_type);
-            jsoncons::detail::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
+            binary::native_to_big(static_cast<int32_t>(val),std::back_inserter(sink_));
         }
         else if (val <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
         {
             sink_.push_back(jsoncons::ubjson::detail::ubjson_format::int64_type);
-            jsoncons::detail::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
+            binary::native_to_big(static_cast<int64_t>(val),std::back_inserter(sink_));
         }
         end_value();
         return true;

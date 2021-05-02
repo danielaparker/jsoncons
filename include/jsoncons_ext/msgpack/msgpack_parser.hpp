@@ -277,7 +277,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    float val = jsoncons::detail::big_to_native<float>(buf, sizeof(buf));
+                    float val = binary::big_to_native<float>(buf, sizeof(buf));
                     more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -291,7 +291,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    double val = jsoncons::detail::big_to_native<double>(buf, sizeof(buf));
+                    double val = binary::big_to_native<double>(buf, sizeof(buf));
                     more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -318,7 +318,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    uint16_t val = jsoncons::detail::big_to_native<uint16_t>(buf, sizeof(buf));
+                    uint16_t val = binary::big_to_native<uint16_t>(buf, sizeof(buf));
                     more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -332,7 +332,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf, sizeof(buf));
+                    uint32_t val = binary::big_to_native<uint32_t>(buf, sizeof(buf));
                     more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -346,7 +346,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    uint64_t val = jsoncons::detail::big_to_native<uint64_t>(buf, sizeof(buf));
+                    uint64_t val = binary::big_to_native<uint64_t>(buf, sizeof(buf));
                     more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -360,7 +360,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    int8_t val = jsoncons::detail::big_to_native<int8_t>(buf, sizeof(buf));
+                    int8_t val = binary::big_to_native<int8_t>(buf, sizeof(buf));
                     more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -374,7 +374,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    int16_t val = jsoncons::detail::big_to_native<int16_t>(buf, sizeof(buf));
+                    int16_t val = binary::big_to_native<int16_t>(buf, sizeof(buf));
                     more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -388,7 +388,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    int32_t val = jsoncons::detail::big_to_native<int32_t>(buf, sizeof(buf));
+                    int32_t val = binary::big_to_native<int32_t>(buf, sizeof(buf));
                     more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -402,7 +402,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    int64_t val = jsoncons::detail::big_to_native<int64_t>(buf, sizeof(buf));
+                    int64_t val = binary::big_to_native<int64_t>(buf, sizeof(buf));
                     more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                     break;
                 }
@@ -483,7 +483,7 @@ private:
                         return;
                     }
 
-                    int8_t ext_type = jsoncons::detail::big_to_native<int8_t>(buf, sizeof(buf));
+                    int8_t ext_type = binary::big_to_native<int8_t>(buf, sizeof(buf));
 
                     bool is_timestamp = false; 
                     if (ext_type == -1)
@@ -501,7 +501,7 @@ private:
                             more_ = false;
                             return;
                         }
-                        uint32_t val = jsoncons::detail::big_to_native<uint32_t>(buf32, sizeof(buf32));
+                        uint32_t val = binary::big_to_native<uint32_t>(buf32, sizeof(buf32));
                         more_ = visitor.uint64_value(val, semantic_tag::epoch_second, *this, ec);
                     }
                     else if (is_timestamp && len == 8)
@@ -513,7 +513,7 @@ private:
                             more_ = false;
                             return;
                         }
-                        uint64_t data64 = jsoncons::detail::big_to_native<uint64_t>(buf64, sizeof(buf64));
+                        uint64_t data64 = binary::big_to_native<uint64_t>(buf64, sizeof(buf64));
                         uint64_t sec = data64 & 0x00000003ffffffffL;
                         uint64_t nsec = data64 >> 34;
 
@@ -534,7 +534,7 @@ private:
                             more_ = false;
                             return;
                         }
-                        uint32_t nsec = jsoncons::detail::big_to_native<uint32_t>(buf1, sizeof(buf1));
+                        uint32_t nsec = binary::big_to_native<uint32_t>(buf1, sizeof(buf1));
 
                         uint8_t buf2[sizeof(int64_t)];
                         if (source_.read(buf2, sizeof(int64_t)) != sizeof(int64_t))
@@ -543,7 +543,7 @@ private:
                             more_ = false;
                             return;
                         }
-                        int64_t sec = jsoncons::detail::big_to_native<int64_t>(buf2, sizeof(buf2));
+                        int64_t sec = binary::big_to_native<int64_t>(buf2, sizeof(buf2));
 
                         bigint nano(sec);
 
@@ -669,7 +669,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                uint8_t len = jsoncons::detail::big_to_native<uint8_t>(buf, sizeof(buf));
+                uint8_t len = binary::big_to_native<uint8_t>(buf, sizeof(buf));
                 return static_cast<std::size_t>(len);
             }
 
@@ -686,7 +686,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                uint16_t len = jsoncons::detail::big_to_native<uint16_t>(buf, sizeof(buf));
+                uint16_t len = binary::big_to_native<uint16_t>(buf, sizeof(buf));
                 return static_cast<std::size_t>(len);
             }
 
@@ -703,7 +703,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                uint32_t len = jsoncons::detail::big_to_native<uint32_t>(buf, sizeof(buf));
+                uint32_t len = binary::big_to_native<uint32_t>(buf, sizeof(buf));
                 return static_cast<std::size_t>(len);
             }
             case jsoncons::msgpack::detail::msgpack_format::fixext1_cd: 

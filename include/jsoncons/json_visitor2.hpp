@@ -515,7 +515,7 @@ namespace jsoncons {
                              const ser_context& context,
                              std::error_code& ec)
         {
-            return visit_double(jsoncons::detail::decode_half(value),
+            return visit_double(binary::decode_half(value),
                              tag,
                              context,
                              ec);
@@ -1315,7 +1315,7 @@ namespace jsoncons {
                 key_.clear();
                 jsoncons::string_sink<string_type> sink(key_);
                 jsoncons::detail::write_double f{float_chars_format::general,0};
-                double x = jsoncons::detail::decode_half(value);
+                double x = binary::decode_half(value);
                 f(x, sink);
             }
 

@@ -176,7 +176,7 @@ namespace jsoncons {
         {
             Into s;
             jsoncons::detail::write_double f{float_chars_format::general,0};
-            double x = jsoncons::detail::decode_half(val);
+            double x = binary::decode_half(val);
             f(x, s);
             return s;
         }
@@ -185,7 +185,7 @@ namespace jsoncons {
         {
             Into s(alloc);
             jsoncons::detail::write_double f{float_chars_format::general,0};
-            double x = jsoncons::detail::decode_half(val);
+            double x = binary::decode_half(val);
             f(x, s);
             return s;
         }

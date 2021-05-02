@@ -881,7 +881,7 @@ private:
             {
                 uint8_t buf[sizeof(uint16_t)];
                 source_.read(buf, sizeof(uint16_t));
-                val = jsoncons::detail::big_to_native<uint16_t>(buf, sizeof(buf));
+                val = binary::big_to_native<uint16_t>(buf, sizeof(buf));
                 break;
             }
 
@@ -889,7 +889,7 @@ private:
             {
                 uint8_t buf[sizeof(uint32_t)];
                 source_.read(buf, sizeof(uint32_t));
-                val = jsoncons::detail::big_to_native<uint32_t>(buf, sizeof(buf));
+                val = binary::big_to_native<uint32_t>(buf, sizeof(buf));
                 break;
             }
 
@@ -897,7 +897,7 @@ private:
             {
                 uint8_t buf[sizeof(uint64_t)];
                 source_.read(buf, sizeof(uint64_t));
-                val = jsoncons::detail::big_to_native<uint64_t>(buf, sizeof(buf));
+                val = binary::big_to_native<uint64_t>(buf, sizeof(buf));
                 break;
             }
             default:
@@ -953,7 +953,7 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = jsoncons::detail::big_to_native<uint16_t>(buf, sizeof(buf));
+                            auto x = binary::big_to_native<uint16_t>(buf, sizeof(buf));
                             val = static_cast<int64_t>(-1)- x;
                             break;
                         }
@@ -967,7 +967,7 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = jsoncons::detail::big_to_native<uint32_t>(buf, sizeof(buf));
+                            auto x = binary::big_to_native<uint32_t>(buf, sizeof(buf));
                             val = static_cast<int64_t>(-1)- x;
                             break;
                         }
@@ -981,7 +981,7 @@ private:
                                 more_ = false;
                                 return val;
                             }
-                            auto x = jsoncons::detail::big_to_native<uint64_t>(buf, sizeof(buf));
+                            auto x = binary::big_to_native<uint64_t>(buf, sizeof(buf));
                             val = static_cast<int64_t>(-1)- static_cast<int64_t>(x);
                             break;
                         }
@@ -1037,7 +1037,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                val = jsoncons::detail::big_to_native<float>(buf, sizeof(buf));
+                val = binary::big_to_native<float>(buf, sizeof(buf));
                 break;
             }
 
@@ -1050,7 +1050,7 @@ private:
                     more_ = false;
                     return 0;
                 }
-                val = jsoncons::detail::big_to_native<double>(buf, sizeof(buf));
+                val = binary::big_to_native<double>(buf, sizeof(buf));
                 break;
             }
             default:
@@ -1585,7 +1585,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<uint16_t>(data[i]);
+                            data[i] = binary::byte_swap<uint16_t>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
@@ -1611,7 +1611,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<uint32_t>(data[i]);
+                            data[i] = binary::byte_swap<uint32_t>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const uint32_t>(data,size), semantic_tag::none, *this, ec);
@@ -1637,7 +1637,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<uint64_t>(data[i]);
+                            data[i] = binary::byte_swap<uint64_t>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const uint64_t>(data,size), semantic_tag::none, *this, ec);
@@ -1677,7 +1677,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<int16_t>(data[i]);
+                            data[i] = binary::byte_swap<int16_t>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const int16_t>(data,size), semantic_tag::none, *this, ec);
@@ -1703,7 +1703,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<int32_t>(data[i]);
+                            data[i] = binary::byte_swap<int32_t>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const int32_t>(data,size), semantic_tag::none, *this, ec);
@@ -1729,7 +1729,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<int64_t>(data[i]);
+                            data[i] = binary::byte_swap<int64_t>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const int64_t>(data,size), semantic_tag::none, *this, ec);
@@ -1755,7 +1755,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<uint16_t>(data[i]);
+                            data[i] = binary::byte_swap<uint16_t>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(half_arg, jsoncons::span<const uint16_t>(data,size), semantic_tag::none, *this, ec);
@@ -1781,7 +1781,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<float>(data[i]);
+                            data[i] = binary::byte_swap<float>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const float>(data,size), semantic_tag::none, *this, ec);
@@ -1808,7 +1808,7 @@ private:
                     {
                         for (std::size_t i = 0; i < size; ++i)
                         {
-                            data[i] = jsoncons::detail::byte_swap<double>(data[i]);
+                            data[i] = binary::byte_swap<double>(data[i]);
                         }
                     }
                     more_ = visitor.typed_array(jsoncons::span<const double>(data,size), semantic_tag::none, *this, ec);

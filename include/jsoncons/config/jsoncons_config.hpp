@@ -127,7 +127,7 @@ namespace jsoncons
 #endif // !defined(JSONCONS_HAS_STD_MAKE_UNIQUE)
 
 namespace jsoncons {
-namespace detail {
+namespace binary {
 
     // native_to_big
 
@@ -239,7 +239,7 @@ namespace detail {
         return byte_swap(val);
     }
 
-} // detail
+} // binary
 } // jsoncons
 
 #define JSONCONS_EXPAND(X) X    

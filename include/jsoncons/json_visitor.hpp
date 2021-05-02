@@ -694,7 +694,7 @@ namespace jsoncons {
                              const ser_context& context,
                              std::error_code& ec)
         {
-            return visit_double(jsoncons::detail::decode_half(value),
+            return visit_double(binary::decode_half(value),
                              tag,
                              context,
                              ec);

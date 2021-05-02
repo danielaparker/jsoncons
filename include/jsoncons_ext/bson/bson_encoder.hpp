@@ -151,7 +151,7 @@ private:
         buffer_.push_back(0x00);
 
         std::size_t length = buffer_.size() - stack_.back().offset();
-        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
+        binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
         if (stack_.empty())
@@ -193,7 +193,7 @@ private:
         buffer_.push_back(0x00);
 
         std::size_t length = buffer_.size() - stack_.back().offset();
-        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
+        binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+stack_.back().offset());
 
         stack_.pop_back();
         if (stack_.empty())
@@ -274,7 +274,7 @@ private:
         }
         buffer_.push_back(0x00);
         std::size_t length = buffer_.size() - string_offset;
-        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
+        binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
     }
@@ -302,7 +302,7 @@ private:
             buffer_.push_back(c);
         }
         std::size_t length = buffer_.size() - string_offset - 1;
-        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
+        binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
     }
@@ -330,7 +330,7 @@ private:
             buffer_.push_back(c);
         }
         std::size_t length = buffer_.size() - string_offset - 1;
-        jsoncons::detail::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
+        binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
     }
@@ -362,11 +362,11 @@ private:
                     return false;
                 }
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                jsoncons::detail::native_to_little(val*millis_in_second,std::back_inserter(buffer_));
+                binary::native_to_little(val*millis_in_second,std::back_inserter(buffer_));
                 return true;
             case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                jsoncons::detail::native_to_little(val,std::back_inserter(buffer_));
+                binary::native_to_little(val,std::back_inserter(buffer_));
                 return true;
             case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
@@ -374,19 +374,19 @@ private:
                 {
                     val /= nanos_in_milli;
                 }
-                jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+                binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 return true;
             default:
             {
                 if (val >= (std::numeric_limits<int32_t>::lowest)() && val <= (std::numeric_limits<int32_t>::max)())
                 {
                     before_value(jsoncons::bson::detail::bson_format::int32_cd);
-                    jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+                    binary::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
                 }
                 else 
                 {
                     before_value(jsoncons::bson::detail::bson_format::int64_cd);
-                    jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+                    binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 }
                 return true;
             }
@@ -414,11 +414,11 @@ private:
                     return false;
                 }
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                jsoncons::detail::native_to_little(static_cast<int64_t>(val*millis_in_second),std::back_inserter(buffer_));
+                binary::native_to_little(static_cast<int64_t>(val*millis_in_second),std::back_inserter(buffer_));
                 return true;
             case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
-                jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+                binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 return true;
             case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::detail::bson_format::datetime_cd);
@@ -426,7 +426,7 @@ private:
                 {
                     val /= nanos_in_second;
                 }
-                jsoncons::detail::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
+                binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 return true;
             default:
             {
@@ -434,13 +434,13 @@ private:
                 if (val <= static_cast<uint64_t>((std::numeric_limits<int32_t>::max)()))
                 {
                     before_value(jsoncons::bson::detail::bson_format::int32_cd);
-                    jsoncons::detail::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
+                    binary::native_to_little(static_cast<uint32_t>(val),std::back_inserter(buffer_));
                     more = true;
                 }
                 else if (val <= static_cast<uint64_t>((std::numeric_limits<int64_t>::max)()))
                 {
                     before_value(jsoncons::bson::detail::bson_format::int64_cd);
-                    jsoncons::detail::native_to_little(static_cast<uint64_t>(val),std::back_inserter(buffer_));
+                    binary::native_to_little(static_cast<uint64_t>(val),std::back_inserter(buffer_));
                     more = true;
                 }
                 else
@@ -464,7 +464,7 @@ private:
             return false;
         }
         before_value(jsoncons::bson::detail::bson_format::double_cd);
-        jsoncons::detail::native_to_little(val,std::back_inserter(buffer_));
+        binary::native_to_little(val,std::back_inserter(buffer_));
         return true;
     }
 
