@@ -21,7 +21,7 @@ namespace jsoncons {
 namespace ubjson {
 
     template<class T, class Source>
-    typename std::enable_if<is_basic_json<T>::value &&
+    typename std::enable_if<type_traits::is_basic_json<T>::value &&
                             type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_ubjson(const Source& v, 
                   const ubjson_decode_options& options = ubjson_decode_options())
@@ -38,7 +38,7 @@ namespace ubjson {
     }
 
     template<class T, class Source>
-    typename std::enable_if<!is_basic_json<T>::value &&
+    typename std::enable_if<!type_traits::is_basic_json<T>::value &&
                             type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_ubjson(const Source& v, 
                   const ubjson_decode_options& options = ubjson_decode_options())
@@ -56,7 +56,7 @@ namespace ubjson {
     }
 
     template<class T>
-    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    typename std::enable_if<type_traits::is_basic_json<T>::value,T>::type 
     decode_ubjson(std::istream& is, 
                   const ubjson_decode_options& options = ubjson_decode_options())
     {
@@ -72,7 +72,7 @@ namespace ubjson {
     }
 
     template<class T>
-    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    typename std::enable_if<!type_traits::is_basic_json<T>::value,T>::type 
     decode_ubjson(std::istream& is, 
                   const ubjson_decode_options& options = ubjson_decode_options())
     {
@@ -89,7 +89,7 @@ namespace ubjson {
     }
 
     template<class T, class InputIt>
-    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    typename std::enable_if<type_traits::is_basic_json<T>::value,T>::type 
     decode_ubjson(InputIt first, InputIt last,
                 const ubjson_decode_options& options = ubjson_decode_options())
     {
@@ -105,7 +105,7 @@ namespace ubjson {
     }
 
     template<class T, class InputIt>
-    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    typename std::enable_if<!type_traits::is_basic_json<T>::value,T>::type 
     decode_ubjson(InputIt first, InputIt last,
                 const ubjson_decode_options& options = ubjson_decode_options())
     {
@@ -124,7 +124,7 @@ namespace ubjson {
     // With leading allocator parameter
 
     template<class T, class Source, class TempAllocator>
-    typename std::enable_if<is_basic_json<T>::value &&
+    typename std::enable_if<type_traits::is_basic_json<T>::value &&
                             type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   const Source& v, 
@@ -142,7 +142,7 @@ namespace ubjson {
     }
 
     template<class T, class Source, class TempAllocator>
-    typename std::enable_if<!is_basic_json<T>::value &&
+    typename std::enable_if<!type_traits::is_basic_json<T>::value &&
                             type_traits::is_byte_sequence<Source>::value,T>::type 
     decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   const Source& v, 
@@ -161,7 +161,7 @@ namespace ubjson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<is_basic_json<T>::value,T>::type 
+    typename std::enable_if<type_traits::is_basic_json<T>::value,T>::type 
     decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   std::istream& is, 
                   const ubjson_decode_options& options = ubjson_decode_options())
@@ -178,7 +178,7 @@ namespace ubjson {
     }
 
     template<class T,class TempAllocator>
-    typename std::enable_if<!is_basic_json<T>::value,T>::type 
+    typename std::enable_if<!type_traits::is_basic_json<T>::value,T>::type 
     decode_ubjson(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                   std::istream& is, 
                   const ubjson_decode_options& options = ubjson_decode_options())

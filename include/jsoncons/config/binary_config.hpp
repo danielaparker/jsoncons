@@ -53,8 +53,6 @@ namespace detail {
         uint64_t hi;
     };
 
-    namespace detail {
-
     static inline bool add_check_overflow(std::size_t v1, std::size_t v2, std::size_t *r)
     {
     #if ((defined(__GNUC__) && (__GNUC__ >= 5)) && !defined(__INTEL_COMPILER)) || __has_builtin(__builtin_add_overflow)
@@ -64,8 +62,6 @@ namespace detail {
         *r = v1 + v2;
         return v1 > v1 + v2;
     #endif
-    }
-
     }
 
     #if defined(__apple_build_version__) && ((__clang_major__ < 8) || ((__clang_major__ == 8) && (__clang_minor__ < 1)))

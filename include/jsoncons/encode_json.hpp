@@ -20,7 +20,7 @@ namespace jsoncons {
     // to string
 
     template <class T, class Container>
-    typename std::enable_if<is_basic_json<T>::value &&
+    typename std::enable_if<type_traits::is_basic_json<T>::value &&
                             type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(const T& val,
                 Container& s, 
@@ -34,7 +34,7 @@ namespace jsoncons {
     }
 
     template <class T, class Container>
-    typename std::enable_if<!is_basic_json<T>::value &&
+    typename std::enable_if<!type_traits::is_basic_json<T>::value &&
                             type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(const T& val,
                 Container& s, 
@@ -49,7 +49,7 @@ namespace jsoncons {
     // to stream
 
     template <class T, class CharT>
-    typename std::enable_if<is_basic_json<T>::value>::type
+    typename std::enable_if<type_traits::is_basic_json<T>::value>::type
     encode_json(const T& val,
                 std::basic_ostream<CharT>& os, 
                 const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
@@ -59,7 +59,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT>
-    typename std::enable_if<!is_basic_json<T>::value>::type
+    typename std::enable_if<!type_traits::is_basic_json<T>::value>::type
     encode_json(const T& val,
                 std::basic_ostream<CharT>& os, 
                 const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
@@ -71,7 +71,7 @@ namespace jsoncons {
     // encode_json_pretty
 
     template <class T, class Container>
-    typename std::enable_if<is_basic_json<T>::value &&
+    typename std::enable_if<type_traits::is_basic_json<T>::value &&
                             type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json_pretty(const T& val,
                        Container& s, 
@@ -84,7 +84,7 @@ namespace jsoncons {
     }
 
     template <class T, class Container>
-    typename std::enable_if<!is_basic_json<T>::value &&
+    typename std::enable_if<!type_traits::is_basic_json<T>::value &&
                             type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json_pretty(const T& val,
                        Container& s, 
@@ -96,7 +96,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT>
-    typename std::enable_if<is_basic_json<T>::value>::type
+    typename std::enable_if<type_traits::is_basic_json<T>::value>::type
     encode_json_pretty(const T& val,
                        std::basic_ostream<CharT>& os, 
                        const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
@@ -106,7 +106,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT>
-    typename std::enable_if<!is_basic_json<T>::value>::type
+    typename std::enable_if<!type_traits::is_basic_json<T>::value>::type
     encode_json_pretty(const T& val,
                        std::basic_ostream<CharT>& os, 
                        const basic_json_encode_options<CharT>& options = basic_json_encode_options<CharT>())
@@ -201,7 +201,7 @@ namespace jsoncons {
 //end legacy
 
     template <class T, class Container, class TempAllocator>
-    typename std::enable_if<is_basic_json<T>::value &&
+    typename std::enable_if<type_traits::is_basic_json<T>::value &&
                             type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
@@ -223,7 +223,7 @@ namespace jsoncons {
     }
 
     template <class T, class Container, class TempAllocator>
-    typename std::enable_if<!is_basic_json<T>::value &&
+    typename std::enable_if<!type_traits::is_basic_json<T>::value &&
                             type_traits::is_back_insertable_char_container<Container>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
@@ -254,7 +254,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT, class TempAllocator>
-    typename std::enable_if<is_basic_json<T>::value>::type
+    typename std::enable_if<type_traits::is_basic_json<T>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
                 std::basic_ostream<CharT>& os, 
@@ -274,7 +274,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT, class TempAllocator>
-    typename std::enable_if<!is_basic_json<T>::value>::type
+    typename std::enable_if<!type_traits::is_basic_json<T>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
                 std::basic_ostream<CharT>& os, 
@@ -294,7 +294,7 @@ namespace jsoncons {
     }
 
     template <class T, class CharT, class TempAllocator>
-    typename std::enable_if<!is_basic_json<T>::value>::type
+    typename std::enable_if<!type_traits::is_basic_json<T>::value>::type
     encode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
                 const T& val,
                 basic_json_visitor<CharT>& encoder)
