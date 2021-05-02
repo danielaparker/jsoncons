@@ -290,57 +290,6 @@ namespace std {
 
 namespace jsoncons { namespace unicode_traits {
 
-    // encoding_errc
-
-    enum class encoding_errc
-    {
-        success = 0,
-        expected_u8_found_u16 = 1,
-        expected_u8_found_u32,
-        expected_u16_found_fffe,
-        expected_u32_found_fffe
-    };
-
-    class Encoding_errc_impl_
-       : public std::error_category
-    {
-    public:
-        virtual const char* name() const noexcept
-        {
-            return "unicode_traits encoding error";
-        }
-        virtual std::string message(int ev) const
-        {
-            switch (static_cast<encoding_errc>(ev))
-            {
-            case encoding_errc::expected_u8_found_u16:
-                return "Expected UTF-8, found UTF-16";
-            case encoding_errc::expected_u8_found_u32:
-                return "Expected UTF-8, found UTF-32";
-            case encoding_errc::expected_u16_found_fffe:
-                return "Expected UTF-16, found non character";
-            case encoding_errc::expected_u32_found_fffe:
-                return "Expected UTF-32, found non character";
-            default:
-                return "";
-                break;
-            }
-        }
-    };
-
-    inline
-    const std::error_category& encoding_error_category()
-    {
-        static Encoding_errc_impl_ instance;
-        return instance;
-    }
-
-    inline 
-    std::error_code make_error_code(encoding_errc result)
-    {
-        return std::error_code(static_cast<int>(result),encoding_error_category());
-    }
-
     // utf8
 
     template <class CharT>
@@ -1373,95 +1322,8 @@ namespace jsoncons { namespace unicode_traits {
         return ec == conv_errc() && ptr == last ? count : 0;
     }
 
-    template <class Iterator>
-    struct skip_bom_result
-    {
-        Iterator it;
-        encoding_errc ec;
-    };
-
-    template <class Iterator>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint8_t),
-                                   skip_bom_result<Iterator>>::type 
-    skip_bom(Iterator first, Iterator last) noexcept
-    {
-        auto result = unicode_traits::detect_encoding(first,last);
-        switch (result.ec)
-        {
-        case unicode_traits::encoding::u8:
-            return skip_bom_result<Iterator>{result.it,encoding_errc()};
-            break;
-        case unicode_traits::encoding::u16le:
-        case unicode_traits::encoding::u16be:
-            return skip_bom_result<Iterator>{result.it,encoding_errc::expected_u8_found_u16};
-            break;
-        case unicode_traits::encoding::u32le:
-        case unicode_traits::encoding::u32be:
-            return skip_bom_result<Iterator>{result.it,encoding_errc::expected_u8_found_u32};
-            break;
-        default:
-            return skip_bom_result<Iterator>{result.it,encoding_errc()};
-            break;
-        }
-    }
-
-    template <class Iterator>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint16_t),
-                                   skip_bom_result<Iterator>>::type 
-    skip_bom(Iterator first, Iterator last) noexcept
-    {
-        if (first == last)
-        {
-            return skip_bom_result<Iterator>{first,encoding_errc()};
-        }
-        uint16_t bom = static_cast<uint16_t>(*first);
-        if (bom == 0xFEFF)                  
-        {
-            return skip_bom_result<Iterator>{++first,encoding_errc()};
-        }
-        else if (bom == 0xFFFE) 
-        {
-            return skip_bom_result<Iterator>{last,encoding_errc::expected_u16_found_fffe};
-        }
-        else
-        {
-            return skip_bom_result<Iterator>{first,encoding_errc()};
-        }
-    }
-
-    template <class Iterator>
-    typename std::enable_if<std::is_integral<typename std::iterator_traits<Iterator>::value_type>::value && sizeof(typename std::iterator_traits<Iterator>::value_type) == sizeof(uint32_t),
-                            skip_bom_result<Iterator>>::type 
-    skip_bom(Iterator first, Iterator last) noexcept
-    {
-        if (first == last)
-        {
-            return skip_bom_result<Iterator>{first,encoding_errc()};
-        }
-        uint32_t bom = static_cast<uint32_t>(*first);
-        if (bom == 0xFEFF0000)                  
-        {
-            return skip_bom_result<Iterator>{++first,encoding_errc()};
-        }
-        else if (bom == 0xFFFE0000) 
-        {
-            return skip_bom_result<Iterator>{last,encoding_errc::expected_u32_found_fffe};
-        }
-        else
-        {
-            return skip_bom_result<Iterator>{first,encoding_errc()};
-        }
-    }
-
 } // unicode_traits
 } // jsoncons
-
-namespace std {
-    template<>
-    struct is_error_code_enum<jsoncons::unicode_traits::encoding_errc> : public true_type
-    {
-    };
-}
 
 #endif
 

@@ -601,7 +601,7 @@ TEST_CASE("oss-fuzz issues")
                 reader.next(ec);
             }
         }
-        CHECK((ec == conv_errc::not_string || ec == unicode_traits::encoding_errc::expected_u8_found_u32)); //-V521
+        CHECK(ec == conv_errc::not_string); //-V521
     }
 }
 
