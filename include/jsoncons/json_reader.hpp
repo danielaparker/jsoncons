@@ -18,7 +18,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_parser.hpp>
-#include <jsoncons/json_buffer_reader.hpp>
+#include <jsoncons/buffer_reader.hpp>
 
 namespace jsoncons {
 

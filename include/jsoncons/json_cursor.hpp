@@ -21,7 +21,7 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/json_buffer_reader.hpp>
+#include <jsoncons/buffer_reader.hpp>
 
 namespace jsoncons {
 
