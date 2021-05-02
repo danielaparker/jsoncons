@@ -12,7 +12,7 @@
 #include <fstream>
 
 using namespace jsoncons;
-
+ 
 TEST_CASE("test_assignment")
 {
     json root;

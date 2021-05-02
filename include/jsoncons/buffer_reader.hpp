@@ -7,10 +7,14 @@
 #ifndef JSONCONS_BUFFER_READER_HPP
 #define JSONCONS_BUFFER_READER_HPP
 
+#include <cstddef>
 #include <string>
 #include <vector>
 #include <stdexcept>
 #include <system_error>
+#include <memory> // std::allocator_traits
+#include <vector> // std::vector
+#include <jsoncons/unicode_traits.hpp>
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
 
@@ -35,7 +39,7 @@ namespace jsoncons {
     public:
 
         buffer_reader(std::size_t buffer_length, const Allocator& alloc = Allocator())
-            : buffer_(buffer_length, alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
+            : buffer_(buffer_length, CharT(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
         {
         }
 
@@ -94,7 +98,7 @@ namespace jsoncons {
 
     // json_buffer_reader
 
-    template<class CharT,class Allocator=std::allocator<char>>
+    template<class CharT,class Allocator>
     class json_buffer_reader 
     {
     public:
@@ -110,8 +114,8 @@ namespace jsoncons {
 
     public:
 
-        json_buffer_reader(std::size_t buffer_length, const Allocator& alloc = Allocator())
-            : buffer_(buffer_length, alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
+        json_buffer_reader(std::size_t buffer_length, const Allocator& alloc)
+            : buffer_(buffer_length, CharT(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
         {
         }
 
