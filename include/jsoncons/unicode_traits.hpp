@@ -16,6 +16,7 @@
 #ifndef JSONCONS_UNICODE_TRAITS_HPP
 #define JSONCONS_UNICODE_TRAITS_HPP
 
+#include <cstring>
 #include <string>
 #include <iterator>
 #include <type_traits>
