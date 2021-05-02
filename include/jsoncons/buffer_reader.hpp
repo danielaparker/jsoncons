@@ -15,6 +15,7 @@
 #include <memory> // std::allocator_traits
 #include <vector> // std::vector
 #include <jsoncons/unicode_traits.hpp>
+#include <jsoncons/json_error.hpp> // json_errc
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_exception.hpp>
 
