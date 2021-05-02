@@ -21,6 +21,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
+#include <jsoncons/buffer_reader.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 
 namespace jsoncons { namespace csv {
@@ -50,10 +51,8 @@ class basic_csv_reader
 
     basic_csv_parser<CharT,Allocator> parser_;
     Src source_;
-    std::size_t buffer_length_;
-    bool eof_;
-    bool begin_;
-    std::vector<CharT, char_allocator_type> buffer_;
+    buffer_reader<CharT,Allocator> buffer_reader_;
+
 public:
     // Structural characters
     static constexpr size_t default_max_buffer_length = 16384;
@@ -112,12 +111,8 @@ public:
        : visitor_(visitor),
          parser_(options, err_handler, alloc),
          source_(std::forward<Source>(source)),
-         buffer_length_(default_max_buffer_length),
-         eof_(false),
-         begin_(true),
-         buffer_(alloc)
+         buffer_reader_(default_max_buffer_length,alloc)
     {
-        buffer_.reserve(buffer_length_);
     }
 
     template <class Source>
@@ -129,10 +124,7 @@ public:
                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
        : visitor_(visitor),
          parser_(options, err_handler, alloc),
-         buffer_length_(0),
-         eof_(false),
-         begin_(false),
-         buffer_(alloc)
+         buffer_reader_(0,alloc)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
         auto result = unicode_traits::skip_bom(sv.begin(), sv.end());
@@ -173,35 +165,19 @@ public:
 
     bool eof() const
     {
-        return eof_;
+        return buffer_reader_.eof();
     }
 
     std::size_t buffer_length() const
     {
-        return buffer_length_;
+        return buffer_reader_.buffer_length();
     }
 
-    void buffer_length(std::size_t length)
+    void buffer_length(std::size_t size)
     {
-        buffer_length_ = length;
-        buffer_.reserve(buffer_length_);
+        buffer_reader_.buffer_length(size);
     }
 
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length()")
-    std::size_t buffer_capacity() const
-    {
-        return buffer_length_;
-    }
-
-    JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(std::size_t)")
-    void buffer_capacity(std::size_t length)
-    {
-        buffer_length_ = length;
-        buffer_.reserve(buffer_length_);
-    }
-#endif
 private:
 
     void read_internal(std::error_code& ec)
@@ -215,52 +191,17 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                if (!source_.eof())
+                buffer_reader_.read(source_, ec);
+                if (ec) return;
+                if (!buffer_reader_.eof())
                 {
-                    read_buffer(ec);
-                    if (ec)
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    parser_.update(buffer_.data(),0);
-                    eof_ = true;
+                    parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
             }
             parser_.parse_some(visitor_, ec);
             if (ec) return;
         }
     }
-    void read_buffer(std::error_code& ec)
-    {
-        buffer_.clear();
-        buffer_.resize(buffer_length_);
-        std::size_t count = source_.read(buffer_.data(), buffer_length_);
-        buffer_.resize(static_cast<std::size_t>(count));
-        if (buffer_.size() == 0)
-        {
-            eof_ = true;
-        }
-        else if (begin_)
-        {
-            auto result = unicode_traits::skip_bom(buffer_.begin(), buffer_.end());
-            if (result.ec != unicode_traits::encoding_errc())
-            {
-                ec = result.ec;
-                return;
-            }
-            std::size_t offset = result.it - buffer_.begin();
-            parser_.update(buffer_.data()+offset,buffer_.size()-offset);
-            begin_ = false;
-        }
-        else
-        {
-            parser_.update(buffer_.data(),buffer_.size());
-        }
-    }
-
 };
 
 using csv_reader = basic_csv_reader<char>;
