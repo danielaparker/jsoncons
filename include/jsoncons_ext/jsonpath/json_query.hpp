@@ -1905,7 +1905,7 @@ namespace jsoncons { namespace jsonpath {
                                 ++column_;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_comma_or_right_bracket;
                                 return path_expression_type();
                         }
                         break;
@@ -2731,7 +2731,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_comma_or_right_bracket;
                                 return path_expression_type();
                         }
                         break;
@@ -2752,7 +2752,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_comma_or_right_bracket;
                                 return path_expression_type();
                         }
                         break;

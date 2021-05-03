@@ -48,7 +48,8 @@ namespace jsoncons { namespace jsonpath {
         expected_comparator,
         expected_or,
         expected_and,
-        expected_comma_or_right_parenthesis
+        expected_comma_or_right_parenthesis,
+        expected_comma_or_right_bracket
     };
 
     class jsonpath_error_category_impl
@@ -129,6 +130,8 @@ namespace jsoncons { namespace jsonpath {
                     return "Expected operator '&&'";
                 case jsonpath_errc::expected_comma_or_right_parenthesis:
                     return "Expected comma or right parenthesis";
+                case jsonpath_errc::expected_comma_or_right_bracket:
+                    return "Expected comma or right bracket";
                 default:
                     return "Unknown jsonpath parser error";
             }
