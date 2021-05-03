@@ -1438,11 +1438,32 @@ namespace jsoncons { namespace jsonpath {
                     }
                     case path_state::argument:
                     {
+                        switch(*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case ',':
+                            case ')':
+                            {
+                                push_token(argument_arg, ec);
+                                if (ec) {return path_expression_type();}
+                                state_stack_.pop_back();
+                                break;
+                            }
+                            default:
+                                ec = jsonpath_errc::expected_comma_or_right_parenthesis;
+                                return path_expression_type();
+                        }
+                        break;
+                    }
+                    /*case path_state::argument:
+                    {
                         push_token(argument_arg, ec);
                         if (ec) {return path_expression_type();}
                         state_stack_.pop_back();
                         break;
-                    }
+                    }*/
                     case path_state::unquoted_string: 
                         switch (*p_)
                         {
