@@ -113,6 +113,12 @@ namespace jsonpath {
     };
     constexpr end_expression_arg_t end_expression_arg{};
 
+    struct end_expression2_arg_t
+    {
+        explicit end_expression2_arg_t() = default;
+    };
+    constexpr end_expression2_arg_t end_expression2_arg{};
+
     struct current_node_arg_t
     {
         explicit current_node_arg_t() = default;
@@ -1721,6 +1727,7 @@ namespace detail {
         end_filter,
         begin_expression,
         end_expression,
+        end_expression2,
         separator,
         literal,
         selector,
@@ -2100,6 +2107,11 @@ namespace detail {
         {
         }
 
+        token(end_expression2_arg_t) noexcept
+            : type_(token_kind::end_expression2)
+        {
+        }
+
         token(std::unique_ptr<selector_base_type>&& expression)
             : type_(token_kind::selector)
         {
@@ -2308,6 +2320,10 @@ namespace detail {
             {
                 case token_kind::selector:
                     s.append(selector_->to_string(level+1));
+                    break;
+                case token_kind::literal:
+                    s.append(" ");
+                    s.append(value_.to_string());
                     break;
                 default:
                     break;
@@ -2562,13 +2578,17 @@ namespace detail {
                         }
                         case token_kind::binary_operator:
                         {
+                            std::cout << "binary operator: " << stack.size() << "\n";
                             JSONCONS_ASSERT(stack.size() >= 2);
                             pointer rhs = stack.back().to_pointer(resources);
+                            std::cout << "rhs: " << *rhs << "\n";
                             stack.pop_back();
                             pointer lhs = stack.back().to_pointer(resources);
+                            std::cout << "lhs: " << *lhs << "\n";
                             stack.pop_back();
 
                             reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
+                            std::cout << "Evaluate binary expression: " << r << "\n";
                             stack.emplace_back(path_node_type(std::addressof(r)));
                             break;
                         }
@@ -2603,12 +2623,12 @@ namespace detail {
                                 //ec = jmespath_errc::invalid_arity;
                                 return;
                             }
-                            //std::cout << "function arg stack:\n";
-                            //for (auto& item : arg_stack)
-                            //{
-                            //    std::cout << *item << "\n";
-                            //}
-                            //std::cout << "\n";
+                            std::cout << "function arg stack:\n";
+                            for (auto& item : arg_stack)
+                            {
+                                std::cout << *item << "\n";
+                            }
+                            std::cout << "\n";
 
                             reference r = tok.function_->evaluate(resources, arg_stack, ec);
                             if (ec)
@@ -2622,7 +2642,10 @@ namespace detail {
                         }
                         case token_kind::selector:
                         {
-                            JSONCONS_ASSERT(!stack.empty());
+                            if (stack.empty())
+                            {
+                                stack.emplace_back(path_node_type(std::addressof(Json::null())));
+                            }
                             pointer ptr = nullptr;
                             //for (auto& item : stack)
                             //{
@@ -2704,15 +2727,14 @@ namespace detail {
                                 }
                                 else
                                 {
+                                    std::cout << "selector output " << temp.size() << "\n";
+                                    for (auto& item : temp)
+                                    {
+                                        std::cout << *item.ptr << "\n";
+                                    }
+                                    std::cout << "\n";
                                     stack.emplace_back(std::move(temp), ndtype);
                                 }
-
-                                //std::cout << "selector output\n";
-                                //for (auto& item : temp)
-                                //{
-                                //    std::cout << *item.ptr << "\n";
-                                //}
-                                //std::cout << "\n";
 
                             }
                             break;
@@ -2727,6 +2749,7 @@ namespace detail {
                 switch (item.tag)
                 {
                     case node_set_tag::single:
+                        std::cout << "result: " << *item.node.ptr << "\n";
                         callback(item.node.path, *item.node.ptr);
                         break;
                     case node_set_tag::multi:

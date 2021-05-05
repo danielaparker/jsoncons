@@ -705,7 +705,7 @@ namespace jsoncons { namespace jsonpath {
             }
         };
 
-        class expression_selector final : public path_selector
+        class bracket_expression_selector final : public path_selector
         {
             path_expression_type expr_;
 
@@ -713,7 +713,7 @@ namespace jsoncons { namespace jsonpath {
             using path_component_type = typename selector_base_type::path_component_type;
             using path_selector::generate_path;
 
-            expression_selector(path_expression_type&& expr)
+            bracket_expression_selector(path_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
             {
             }
@@ -726,7 +726,7 @@ namespace jsoncons { namespace jsonpath {
                         node_type& ndtype,
                         result_options options) const override
             {
-                //std::cout << "expression_selector current: " << val << "\n";
+                //std::cout << "bracket_expression_selector current: " << val << "\n";
 
                 std::vector<path_node_type> temp;
                 auto callback = [&temp](const std::vector<path_component_type>& p, reference v)
@@ -748,6 +748,53 @@ namespace jsoncons { namespace jsonpath {
                         this->evaluate_tail(resources, generate_path(path, j.as_string(), options), root, val.at(j.as_string_view()), nodes, ndtype, options);
                     }
                 }
+            }
+
+            std::string to_string(int level = 0) const override
+            {
+                std::string s;
+                if (level > 0)
+                {
+                    s.append("\n");
+                    s.append(level*2, ' ');
+                }
+                s.append("bracket expression selector\n");
+                s.append(expr_.to_string(level+1));
+                s.append(path_selector::to_string(level+1));
+
+                return s;
+            }
+        };
+
+        class expression_selector final : public path_selector
+        {
+            path_expression_type expr_;
+
+        public:
+            using path_component_type = typename selector_base_type::path_component_type;
+            using path_selector::generate_path;
+
+            expression_selector(path_expression_type&& expr)
+                : path_selector(), expr_(std::move(expr))
+            {
+            }
+
+            void select(dynamic_resources<Json,JsonReference>& resources,
+                        const std::vector<path_component_type>& path, 
+                        reference root,
+                        reference val, 
+                        std::vector<path_node_type>& nodes,
+                        node_type&,
+                        result_options options) const override
+            {
+                //std::cout << "bracket_expression_selector current: " << val << "\n";
+
+                auto callback = [&nodes](const std::vector<path_component_type>& p, reference v)
+                {
+                    //std::cout << "callback" << v << "\n";
+                    nodes.emplace_back(p, std::addressof(v));
+                };
+                expr_.evaluate(resources, path, root, val, callback, options); // fixit
             }
 
             std::string to_string(int level = 0) const override
@@ -1391,8 +1438,14 @@ namespace jsoncons { namespace jsonpath {
                             case ',':
                                 push_token(token_type(current_node_arg), ec);
                                 if (ec) {return path_expression_type();}
+                                push_token(argument_arg, ec);
+                                push_token(token_type(begin_expression_arg), ec);
+                                push_token(lparen_arg, ec);
+                                if (ec) {return path_expression_type();}
+                                //push_token(token_type(current_node_arg), ec);
+                                if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::argument);
-                                state_stack_.emplace_back(path_state::path_rhs);
+                                state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 ++p_;
                                 ++column_;
@@ -1429,8 +1482,12 @@ namespace jsoncons { namespace jsonpath {
                                 state_stack_.pop_back();
                                 break;
                             default:
-                                state_stack_.back() = path_state::argument;
-                                state_stack_.emplace_back(path_state::path_rhs);
+                                push_token(token_type(begin_expression_arg), ec);
+                                push_token(lparen_arg, ec);
+                                //push_token(token_type(current_node_arg), ec);
+                                if (ec) {return path_expression_type();}
+                                state_stack_.emplace_back(path_state::argument);
+                                state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 break;
                         }
@@ -1446,7 +1503,9 @@ namespace jsoncons { namespace jsonpath {
                             case ',':
                             case ')':
                             {
+                                push_token(token_type(end_expression2_arg), ec);
                                 push_token(argument_arg, ec);
+                                //push_token(argument_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 break;
@@ -2823,6 +2882,11 @@ namespace jsoncons { namespace jsonpath {
                 return path_expression_type();
             }
 
+            for (const auto& tok : output_stack_)
+            {
+                std::cout << tok.to_string() << "\n";
+            }
+
             return path_expression_type(std::move(output_stack_));
         }
 
@@ -2914,6 +2978,50 @@ namespace jsoncons { namespace jsonpath {
                     break;
                 case token_kind::end_expression:
                 {
+                    std::cout << "token_kind::end_expression\n";
+                    for (const auto& t : output_stack_)
+                    {
+                        std::cout << t.to_string() << "\n";
+                    }
+                    std::cout << "/token_kind::end_expression\n";
+                    unwind_rparen(ec);
+                    if (ec)
+                    {
+                        return;
+                    }
+                    std::vector<token_type> toks;
+                    auto it = output_stack_.rbegin();
+                    while (it != output_stack_.rend() && it->type() != token_kind::begin_expression)
+                    {
+                        toks.insert(toks.begin(), std::move(*it));
+                        ++it;
+                    }
+                    if (it == output_stack_.rend())
+                    {
+                        ec = jsonpath_errc::unbalanced_parentheses;
+                        return;
+                    }
+                    ++it;
+                    output_stack_.erase(it.base(),output_stack_.end());
+
+                    if (!output_stack_.empty() && output_stack_.back().is_path())
+                    {
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<bracket_expression_selector>(path_expression_type(std::move(toks))));
+                    }
+                    else
+                    {
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<bracket_expression_selector>(path_expression_type(std::move(toks)))));
+                    }
+                    break;
+                }
+                case token_kind::end_expression2:
+                {
+                    std::cout << "token_kind::end_expression\n";
+                    for (const auto& t : output_stack_)
+                    {
+                        std::cout << t.to_string() << "\n";
+                    }
+                    std::cout << "/token_kind::end_expression\n";
                     unwind_rparen(ec);
                     if (ec)
                     {
@@ -3018,6 +3126,7 @@ namespace jsoncons { namespace jsonpath {
                 }
                 case token_kind::end_function:
                 {
+                    std::cout << "token_kind::end_function\n";
                     unwind_rparen(ec);
                     if (ec)
                     {
