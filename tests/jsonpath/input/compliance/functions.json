@@ -112,6 +112,10 @@
          "result": [2]
        },
        {
+         "expression": "ceil(1.2*2)",
+         "result": [3]
+       },
+       {
          "expression": "ceil($.decimals[0])",
          "result": [2]
        },

@@ -1,5 +1,65 @@
 [
-   {
+  {
+     "given": {
+         "store": {
+             "book": [
+                 {
+                     "category": "reference",
+                     "author": "Nigel Rees",
+                     "title": "Sayings of the Century",
+                     "price": 8.95
+                 },
+                 {
+                     "category": "fiction",
+                     "author": "Evelyn Waugh",
+                     "title": "Sword of Honour",
+                     "price": 12.99
+                 },
+                 {
+                     "category": "fiction",
+                     "author": "Herman Melville",
+                     "title": "Moby Dick",
+                     "isbn": "0-553-21311-3",
+                     "price": 8.99
+                 },
+                 {
+                     "category": "fiction",
+                     "author": "J. R. R. Tolkien",
+                     "title": "The Lord of the Rings",
+                     "isbn": "0-395-19395-8",
+                     "price": 22.99
+                 }
+             ],
+             "bicycle": {
+                 "color": "red",
+                 "price": 19.95
+             }
+         }
+     },
+     "cases": [
+       {
+         "comment" : "sum in filter",
+         "expression": "$.store.book[?(@.price > sum($.store.book[*].price) / length($.store.book[*]))].title",
+         "result": ["The Lord of the Rings"]
+       }/*,
+       {
+         "comment" : "sum",
+         "expression": "sum($.store.book[*].price)",
+         "result": [53.92]
+       },
+       {
+         "comment" : "sum",
+         "expression": "length($.store.book[*])",
+         "result": [4]
+       },
+       {
+         "comment" : "sum in filter",
+         "expression": "$.store.book[?(@.price > avg($.store.book[*].price))].title",
+         "result": ["The Lord of the Rings"]
+       }*/
+     ]
+  },
+  {
      "source": "JMESPath test suite",
      "given":
      {
@@ -20,11 +80,19 @@
        /*{
          "expression": "ceil(1.2)",
          "result": [3]
-       },*/
+       },
        {
          "expression": "ceil(1.2*2)",
          "result": [3]
-       }
+       },
+       {
+         "expression": "contains('abc', 'a')",
+         "result": [true]
+       },
+       {
+         "expression": "length(@)",
+         "result": [12]
+       }*/
      ]
    }
 ]
