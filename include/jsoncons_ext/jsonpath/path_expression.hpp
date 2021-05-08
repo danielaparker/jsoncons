@@ -482,6 +482,11 @@ namespace detail {
 
                              std::error_code&) const = 0;
 
+        virtual std::string to_string(int = 0) const
+        {
+            return "binary operator";
+        }
+
     protected:
         ~binary_operator() = default;
     };
@@ -513,6 +518,17 @@ namespace detail {
                 return rhs;
             }
         }
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("or operator");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -535,6 +551,18 @@ namespace detail {
                 return lhs;
             }
         }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("and operator");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -550,6 +578,18 @@ namespace detail {
         {
             return lhs == rhs ? resources.true_value() : resources.false_value();
         }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("equal operator");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -564,6 +604,18 @@ namespace detail {
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             return lhs != rhs ? resources.true_value() : resources.false_value();
+        }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("not equal operator");
+            return s;
         }
     };
 
@@ -588,6 +640,18 @@ namespace detail {
             }
             return resources.null_value();
         }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("less than operator");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -611,6 +675,18 @@ namespace detail {
             }
             return resources.null_value();
         }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("less than or equal operator");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -624,6 +700,8 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
+            std::cout << "operator> lhs: " << lhs << ", rhs: " << rhs << "\n";
+
             if (lhs.is_number() && rhs.is_number())
             {
                 return lhs > rhs ? resources.true_value() : resources.false_value();
@@ -633,6 +711,18 @@ namespace detail {
                 return lhs > rhs ? resources.true_value() : resources.false_value();
             }
             return resources.null_value();
+        }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("greater than operator");
+            return s;
         }
     };
 
@@ -656,6 +746,18 @@ namespace detail {
                 return lhs >= rhs ? resources.true_value() : resources.false_value();
             }
             return resources.null_value();
+        }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("greater than or equal operator");
+            return s;
         }
     };
 
@@ -687,6 +789,18 @@ namespace detail {
                 return *resources.create_json((lhs.as_double() + rhs.as_double()));
             }
         }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("plus operator");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -716,6 +830,18 @@ namespace detail {
             {
                 return *resources.create_json((lhs.as_double() - rhs.as_double()));
             }
+        }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("minus operator");
+            return s;
         }
     };
 
@@ -747,6 +873,18 @@ namespace detail {
                 return *resources.create_json((lhs.as_double() * rhs.as_double()));
             }
         }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("multiply operator");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -760,6 +898,8 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
+            std::cout << "operator/ lhs: " << lhs << ", rhs: " << rhs << "\n";
+
             if (!(lhs.is_number() && rhs.is_number()))
             {
                 return resources.null_value();
@@ -776,6 +916,18 @@ namespace detail {
             {
                 return *resources.create_json((lhs.as_double() / rhs.as_double()));
             }
+        }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("divide operator");
+            return s;
         }
     };
 
@@ -804,6 +956,17 @@ namespace detail {
                                    const std::vector<pointer>& args, 
                                    std::error_code& ec) const = 0;
 
+        virtual std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("function");
+            return s;
+        }
     };  
 
     template <class Json,class JsonReference>
@@ -861,6 +1024,18 @@ namespace detail {
                 }
             }
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("contains function");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -911,6 +1086,18 @@ namespace detail {
             {
                 return resources.false_value();
             }
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("ends_with function");
+            return s;
         }
     };
 
@@ -963,6 +1150,18 @@ namespace detail {
                 return resources.false_value();
             }
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("starts_with function");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -994,6 +1193,8 @@ namespace detail {
                 ec = jsonpath_errc::invalid_type;
                 return resources.null_value();
             }
+            std::cout << "sum function arg: " << *arg0_ptr << "\n";
+
             double sum = 0;
             for (auto& j : arg0_ptr->array_range())
             {
@@ -1006,6 +1207,18 @@ namespace detail {
             }
 
             return *resources.create_json(sum);
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("sum function");
+            return s;
         }
     };
 
@@ -1058,6 +1271,18 @@ namespace detail {
             }
             return *j;
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("tokenize function");
+            return s;
+        }
     };
 
 #endif // defined(JSONCONS_HAS_STD_REGEX)
@@ -1101,6 +1326,18 @@ namespace detail {
                     return resources.null_value();
             }
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("ceil function");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -1141,6 +1378,18 @@ namespace detail {
                     ec = jsonpath_errc::invalid_type;
                     return resources.null_value();
             }
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("floor function");
+            return s;
         }
     };
 
@@ -1203,6 +1452,18 @@ namespace detail {
                     return resources.null_value();
             }
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("to_number function");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -1246,6 +1507,18 @@ namespace detail {
             }
 
             return *resources.create_json(prod);
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("prod function");
+            return s;
         }
     };
 
@@ -1293,6 +1566,18 @@ namespace detail {
             }
 
             return *resources.create_json(sum / static_cast<double>(arg0_ptr->size()));
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("to_string function");
+            return s;
         }
     };
 
@@ -1352,6 +1637,18 @@ namespace detail {
             }
 
             return arg0_ptr->at(index);
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("min function");
+            return s;
         }
     };
 
@@ -1413,6 +1710,18 @@ namespace detail {
 
             return arg0_ptr->at(index);
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("max function");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -1459,6 +1768,18 @@ namespace detail {
                 }
             }
         }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("abs function");
+            return s;
+        }
     };
 
     template <class Json,class JsonReference>
@@ -1485,7 +1806,7 @@ namespace detail {
             }
 
             pointer arg0_ptr = args[0];
-            //std::cout << "arg: " << *arg0_ptr << "\n";
+            std::cout << "length function arg: " << *arg0_ptr << "\n";
 
             switch (arg0_ptr->type())
             {
@@ -1504,6 +1825,18 @@ namespace detail {
                     return resources.null_value();
                 }
             }
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("length function");
+            return s;
         }
     };
 
@@ -1545,6 +1878,18 @@ namespace detail {
                 result->emplace_back(item.key());
             }
             return *result;
+        }
+
+        std::string to_string(int level = 0) const
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("keys function");
+            return s;
         }
     };
 
@@ -1767,6 +2112,8 @@ namespace detail {
                 return "begin_expression";
             case token_kind::end_index_expression:
                 return "end_index_expression";
+            case token_kind::end_argument_expression:
+                return "end_argument_expression";
             case token_kind::separator:
                 return "separator";
             case token_kind::literal:
@@ -2310,23 +2657,60 @@ namespace detail {
         std::string to_string(int level = 0) const
         {
             std::string s;
-            if (level > 0)
-            {
-                s.append("\n");
-                s.append(level*2, ' ');
-            }
-            s.append("path_expression token_kind: ");
-            s.append(jsoncons::jsonpath::detail::to_string(type_));
             switch (type_)
             {
+                case token_kind::root_node:
+                    if (level > 0)
+                    {
+                        s.append("\n");
+                        s.append(level*2, ' ');
+                    }
+                    s.append("root node");
+                    return s;
+                case token_kind::current_node:
+                    if (level > 0)
+                    {
+                        s.append("\n");
+                        s.append(level*2, ' ');
+                    }
+                    s.append("current node");
+                    return s;
+                case token_kind::argument:
+                    if (level > 0)
+                    {
+                        s.append("\n");
+                        s.append(level*2, ' ');
+                    }
+                    s.append("argument");
+                    return s;
                 case token_kind::selector:
-                    s.append(selector_->to_string(level+1));
+                    s.append(selector_->to_string(level));
                     break;
                 case token_kind::literal:
-                    s.append(" ");
-                    //s.append(value_.to_string());
+                {
+                    if (level > 0)
+                    {
+                        s.append("\n");
+                        s.append(level*2, ' ');
+                    }
+                    auto sbuf = value_.to_string();
+                    unicode_traits::convert(sbuf.data(), sbuf.size(), s);
+                    break;
+                }
+                case token_kind::binary_operator:
+                    s.append(binary_operator_->to_string(level));
+                    break;
+                case token_kind::function:
+                    s.append(function_->to_string(level));
                     break;
                 default:
+                    if (level > 0)
+                    {
+                        s.append("\n");
+                        s.append(level*2, ' ');
+                    }
+                    s.append("token kind: ");
+                    s.append(jsoncons::jsonpath::detail::to_string(type_));
                     break;
             }
             s.append("\n");
@@ -2546,13 +2930,12 @@ namespace detail {
             std::vector<path_component_type> path(ipath);
             Json result(json_array_arg);
 
-            //std::cout << "EVALUATE BEGIN\n";
-            //std::cout << "token list\n";
+            //std::cout << "EVALUATE TOKENS\n";
             //for (auto& tok : token_list_)
             //{
             //    std::cout << tok.to_string() << "\n";
             //}
-            //std::cout << "end token list\n";
+            //std::cout << "\n";
 
             if (!token_list_.empty())
             {
@@ -2773,7 +3156,7 @@ namespace detail {
                 s.append("\n");
                 s.append(level*2, ' ');
             }
-            s.append("path_expression\n");
+            s.append("expression\n");
             for (const auto& item : token_list_)
             {
                 s.append(item.to_string(level+1));
