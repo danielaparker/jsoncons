@@ -1025,7 +1025,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1088,7 +1088,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1151,7 +1151,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1209,7 +1209,7 @@ namespace detail {
             return *resources.create_json(sum);
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1272,7 +1272,7 @@ namespace detail {
             return *j;
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1327,7 +1327,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1380,7 +1380,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1453,7 +1453,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1509,7 +1509,7 @@ namespace detail {
             return *resources.create_json(prod);
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1568,7 +1568,7 @@ namespace detail {
             return *resources.create_json(sum / static_cast<double>(arg0_ptr->size()));
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1639,7 +1639,7 @@ namespace detail {
             return arg0_ptr->at(index);
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1711,7 +1711,7 @@ namespace detail {
             return arg0_ptr->at(index);
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1769,7 +1769,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1827,7 +1827,7 @@ namespace detail {
             }
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
@@ -1880,7 +1880,7 @@ namespace detail {
             return *result;
         }
 
-        std::string to_string(int level = 0) const
+        std::string to_string(int level = 0) const override
         {
             std::string s;
             if (level > 0)
