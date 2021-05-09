@@ -1,38 +1,26 @@
 [
-     {"given" : [
-         {
-             "price": 8.95
-         },
-         {
-             "price": 12.99
-         }
-     ],
+     {"given" : {
+          "array": [-1, 3, 4, 5, "a", "100"],
+          "decimals": [1.01, 1.2, -1.5],
+          "empty_hash": {},
+          "empty_list": [],
+          "false": false,
+          "foo": -1,
+          "null_key": null,
+          "numbers": [-1, 3, 4, 5],
+          "objects": {
+              "bar": "baz",
+              "foo": "bar"
+          },
+          "str": "Str",
+          "strings": ["a", "b", "c"],
+          "zero": 0
+      },
      "cases": [
-       /*
        {
-         "comment" : "sum in filter",
-         "expression": "$.store.book[?(@.price > sum($.store.book[*].price) / length($.store.book[*]))]",
-         "result": ["The Lord of the Rings"]
-       },
-       {
-         "comment" : "sum",
-         "expression": "sum($.store.book[*].price)",
-         "result": [53.92]
-       },
-       {
-         "comment" : "sum",
-         "expression": "length($.store.book[*])",
-         "result": [4]
-       },
-       {
-         "comment" : "sum in filter",
-         "expression": "$[?(@.price > avg($[*].price))]",
-         "result": [{"price":12.99}]
-       },*/
-       {
-         "comment" : "sum in filter",
-         "expression": "$[?(@.price > sum($[*].price) / length($[*]))]",
-         "result": [{"price":12.99}]
+         "comment" : "contains",
+         "expression": "contains('abc', 'a')",
+         "result": [true]
        }
      ]
   }

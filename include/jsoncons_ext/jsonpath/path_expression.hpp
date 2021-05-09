@@ -523,7 +523,7 @@ namespace detail {
             std::string s;
             if (level > 0)
             {
-                s.append("\n");
+                //s.append("\n");
                 s.append(level*2, ' ');
             }
             s.append("or operator");
@@ -700,7 +700,7 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
-            std::cout << "operator> lhs: " << lhs << ", rhs: " << rhs << "\n";
+            //std::cout << "operator> lhs: " << lhs << ", rhs: " << rhs << "\n";
 
             if (lhs.is_number() && rhs.is_number())
             {
@@ -898,7 +898,7 @@ namespace detail {
 
         JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
-            std::cout << "operator/ lhs: " << lhs << ", rhs: " << rhs << "\n";
+            //std::cout << "operator/ lhs: " << lhs << ", rhs: " << rhs << "\n";
 
             if (!(lhs.is_number() && rhs.is_number()))
             {
@@ -1193,7 +1193,7 @@ namespace detail {
                 ec = jsonpath_errc::invalid_type;
                 return resources.null_value();
             }
-            std::cout << "sum function arg: " << *arg0_ptr << "\n";
+            //std::cout << "sum function arg: " << *arg0_ptr << "\n";
 
             double sum = 0;
             for (auto& j : arg0_ptr->array_range())
@@ -1806,7 +1806,7 @@ namespace detail {
             }
 
             pointer arg0_ptr = args[0];
-            std::cout << "length function arg: " << *arg0_ptr << "\n";
+            //std::cout << "length function arg: " << *arg0_ptr << "\n";
 
             switch (arg0_ptr->type())
             {
@@ -2713,7 +2713,7 @@ namespace detail {
                     s.append(jsoncons::jsonpath::detail::to_string(type_));
                     break;
             }
-            s.append("\n");
+            //s.append("\n");
             return s;
         }
     };
@@ -3156,7 +3156,7 @@ namespace detail {
                 s.append("\n");
                 s.append(level*2, ' ');
             }
-            s.append("expression\n");
+            s.append("expression ");
             for (const auto& item : token_list_)
             {
                 s.append(item.to_string(level+1));

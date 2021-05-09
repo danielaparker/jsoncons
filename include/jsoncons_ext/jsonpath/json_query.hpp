@@ -274,10 +274,9 @@ namespace jsoncons { namespace jsonpath {
                         node_type& ndtype,
                         result_options options) const override
             {
-                std::string buf;
-                buf.append("identifier selector: ");
-                unicode_traits::convert(identifier_.data(),identifier_.size(),buf);
-                std::cout << buf << "\n";
+                //std::string buf;
+                //buf.append("identifier selector: ");
+                //unicode_traits::convert(identifier_.data(),identifier_.size(),buf);
 
                 ndtype = node_type::single;
                 if (val.is_object())
@@ -327,10 +326,10 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("identifier ");
+                s.append("identifier selector ");
                 unicode_traits::convert(identifier_.data(),identifier_.size(),s);
                 s.append(path_selector::to_string(level+1));
-                s.append("\n");
+                //s.append("\n");
 
                 return s;
             }
@@ -381,7 +380,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("root_selector\n");
+                s.append("root_selector ");
                 s.append(path_selector::to_string(level+1));
 
                 return s;
@@ -420,7 +419,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("current_node_selector\n");
+                s.append("current_node_selector");
                 s.append(path_selector::to_string(level+1));
 
                 return s;
@@ -520,7 +519,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("wildcard\n");
+                s.append("wildcard selector");
                 s.append(path_selector::to_string(level));
 
                 return s;
@@ -574,7 +573,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("wildcard\n");
+                s.append("wildcard selector");
                 s.append(path_selector::to_string(level));
 
                 return s;
@@ -624,11 +623,11 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("union selector\n");
+                s.append("union selector ");
                 for (auto& expr : expressions_)
                 {
                     s.append(expr.to_string(level+1));
-                    s.push_back('\n');
+                    //s.push_back('\n');
                 }
 
                 return s;
@@ -718,7 +717,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("filter selector\n");
+                s.append("filter selector ");
                 s.append(expr_.to_string(level+1));
 
                 return s;
@@ -778,7 +777,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("bracket expression selector\n");
+                s.append("bracket expression selector ");
                 s.append(expr_.to_string(level+1));
                 s.append(path_selector::to_string(level+1));
 
@@ -825,7 +824,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("expression selector\n");
+                s.append("expression selector ");
                 s.append(expr_.to_string(level+1));
                 s.append(path_selector::to_string(level+1));
 
@@ -937,7 +936,7 @@ namespace jsoncons { namespace jsonpath {
                     s.append("\n");
                     s.append(level*2, ' ');
                 }
-                s.append("function_expression\n");
+                s.append("function_expression ");
                 s.append(expr_.to_string(level+1));
 
                 return s;
@@ -1459,11 +1458,8 @@ namespace jsoncons { namespace jsonpath {
                             case ',':
                                 push_token(token_type(current_node_arg), ec);
                                 if (ec) {return path_expression_type();}
-                                //push_token(argument_arg, ec);
                                 push_token(token_type(begin_expression_arg), ec);
-                                push_token(lparen_arg, ec);
                                 if (ec) {return path_expression_type();}
-                                //push_token(token_type(current_node_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1504,8 +1500,6 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             default:
                                 push_token(token_type(begin_expression_arg), ec);
-                                push_token(lparen_arg, ec);
-                                //push_token(token_type(current_node_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::one_or_more_arguments;
                                 state_stack_.emplace_back(path_state::argument);
@@ -1527,8 +1521,6 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ',':
                                 push_token(token_type(begin_expression_arg), ec);
-                                push_token(lparen_arg, ec);
-                                //push_token(token_type(current_node_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1923,7 +1915,7 @@ namespace jsoncons { namespace jsonpath {
                                 ++column_;
                                 break;
                             default:
-                                std::cout << "Parse: gt_operator\n";
+                                //std::cout << "Parse: gt_operator\n";
                                 push_token(token_type(resources.get_gt_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); 
@@ -2929,12 +2921,18 @@ namespace jsoncons { namespace jsonpath {
                 return path_expression_type();
             }
 
-            std::cout << "\nTokens\n\n";
-            for (const auto& tok : output_stack_)
+            //std::cout << "\nTokens\n\n";
+            //for (const auto& tok : output_stack_)
+            //{
+            //    std::cout << tok.to_string() << "\n";
+            //}
+            //std::cout << "\n";
+
+            if (!operator_stack_.empty())
             {
-                std::cout << tok.to_string() << "\n";
+                ec = jsonpath_errc::unexpected_eof;
+                return path_expression_type();
             }
-            std::cout << "\n";
 
             return path_expression_type(std::move(output_stack_));
         }
@@ -2983,7 +2981,7 @@ namespace jsoncons { namespace jsonpath {
 
         void push_token(token_type&& tok, std::error_code& ec)
         {
-            std::cout << tok.to_string() << "\n";
+            //std::cout << tok.to_string() << "\n";
             switch (tok.type())
             {
                 case token_kind::begin_filter:
@@ -3278,19 +3276,19 @@ namespace jsoncons { namespace jsonpath {
                 default:
                     break;
             }
-            std::cout << "  " << "Output Stack\n";
-            for (auto&& t : output_stack_)
-            {
-                std::cout << t.to_string(2) << "\n";
-            }
-            if (!operator_stack_.empty())
-            {
-                std::cout << "  " << "Operator Stack\n";
-                for (auto&& t : operator_stack_)
-                {
-                    std::cout << t.to_string(2) << "\n";
-                }
-            }
+            //std::cout << "  " << "Output Stack\n";
+            //for (auto&& t : output_stack_)
+            //{
+            //    std::cout << t.to_string(2) << "\n";
+            //}
+            //if (!operator_stack_.empty())
+            //{
+            //    std::cout << "  " << "Operator Stack\n";
+            //    for (auto&& t : operator_stack_)
+            //    {
+            //        std::cout << t.to_string(2) << "\n";
+            //    }
+            //}
         }
 
         uint32_t append_to_codepoint(uint32_t cp, int c, std::error_code& ec)
