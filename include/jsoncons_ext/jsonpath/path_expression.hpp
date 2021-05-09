@@ -107,11 +107,11 @@ namespace jsonpath {
     };
     constexpr begin_expression_arg_t begin_expression_arg{};
 
-    struct end_expression_arg_t
+    struct end_index_expression_arg_t
     {
-        explicit end_expression_arg_t() = default;
+        explicit end_index_expression_arg_t() = default;
     };
-    constexpr end_expression_arg_t end_expression_arg{};
+    constexpr end_index_expression_arg_t end_index_expression_arg{};
 
     struct end_argument_expression_arg_t
     {
@@ -2450,7 +2450,7 @@ namespace detail {
         {
         }
 
-        token(end_expression_arg_t) noexcept
+        token(end_index_expression_arg_t) noexcept
             : type_(token_kind::end_index_expression)
         {
         }

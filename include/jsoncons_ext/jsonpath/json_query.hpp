@@ -654,7 +654,7 @@ namespace jsoncons { namespace jsonpath {
             return !is_false(nodes);
         }
 
-        class filter_selector final : public path_selector
+        class filter_expression_selector final : public path_selector
         {
             path_expression_type expr_;
 
@@ -662,7 +662,7 @@ namespace jsoncons { namespace jsonpath {
             using path_component_type = typename selector_base_type::path_component_type;
             using path_selector::generate_path;
 
-            filter_selector(path_expression_type&& expr)
+            filter_expression_selector(path_expression_type&& expr)
                 : path_selector(), expr_(std::move(expr))
             {
             }
@@ -2844,7 +2844,7 @@ namespace jsoncons { namespace jsonpath {
                             case ',':
                             case ']':
                             {
-                                push_token(token_type(end_expression_arg), ec);
+                                push_token(token_type(end_index_expression_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 break;
@@ -3018,11 +3018,11 @@ namespace jsoncons { namespace jsonpath {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_expression_selector>(path_expression_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_selector>(path_expression_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_expression_selector>(path_expression_type(std::move(toks)))));
                     }
                     //std::cout << "push_token end_filter 2\n";
                     //for (const auto& tok2 : output_stack_)
