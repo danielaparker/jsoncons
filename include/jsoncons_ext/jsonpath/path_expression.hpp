@@ -2851,7 +2851,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class json_selector
+    class path_expression
     {
     public:
         using char_type = typename Json::char_type;
@@ -2870,21 +2870,21 @@ namespace detail {
         std::vector<token_type> token_list_;
     public:
 
-        json_selector()
+        path_expression()
         {
         }
 
-        json_selector(json_selector&& expr)
+        path_expression(path_expression&& expr)
             : token_list_(std::move(expr.token_list_))
         {
         }
 
-        json_selector(std::vector<token_type>&& token_stack)
+        path_expression(std::vector<token_type>&& token_stack)
             : token_list_(std::move(token_stack))
         {
         }
 
-        json_selector& operator=(json_selector&& expr) = default;
+        path_expression& operator=(path_expression&& expr) = default;
 
         Json evaluate(dynamic_resources<Json,JsonReference>& resources, 
                       const std::vector<path_component_type>& path, 
@@ -2949,32 +2949,6 @@ namespace detail {
                             stack.emplace_back(path_node_type(&tok.get_value(reference_arg_type(), resources)));
                             break;
                         }
-                        case token_kind::unary_operator:
-                        {
-                            JSONCONS_ASSERT(stack.size() >= 1);
-                            pointer ptr = stack.back().to_pointer(resources);
-                            stack.pop_back();
-
-                            reference r = tok.unary_operator_->evaluate(resources, *ptr, ec);
-                            stack.emplace_back(path_node_type(std::addressof(r)));
-                            break;
-                        }
-                        case token_kind::binary_operator:
-                        {
-                            //std::cout << "binary operator: " << stack.size() << "\n";
-                            JSONCONS_ASSERT(stack.size() >= 2);
-                            pointer rhs = stack.back().to_pointer(resources);
-                            //std::cout << "rhs: " << *rhs << "\n";
-                            stack.pop_back();
-                            pointer lhs = stack.back().to_pointer(resources);
-                            //std::cout << "lhs: " << *lhs << "\n";
-                            stack.pop_back();
-
-                            reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
-                            //std::cout << "Evaluate binary expression: " << r << "\n";
-                            stack.emplace_back(path_node_type(std::addressof(r)));
-                            break;
-                        }
                         case token_kind::root_node:
                             //std::cout << "root: " << root << "\n";
                             stack.emplace_back(path_node_type(std::addressof(root)));
@@ -2983,46 +2957,6 @@ namespace detail {
                             //std::cout << "current: " << current << "\n";
                             stack.emplace_back(path_node_type(std::addressof(current)));
                             break;
-                        case token_kind::argument:
-                            JSONCONS_ASSERT(!stack.empty());
-                            //std::cout << "argument stack items " << stack.size() << "\n";
-                            //for (auto& item : stack)
-                            //{
-                            //    std::cout << *item.to_pointer(resources) << "\n";
-                            //}
-                            //std::cout << "\n";
-                            arg_stack.push_back(stack.back().to_pointer(resources));
-                            //for (auto& item : arg_stack)
-                            //{
-                            //    std::cout << *item << "\n";
-                            //}
-                            //std::cout << "\n";
-                            stack.pop_back();
-                            break;
-                        case token_kind::function:
-                        {
-                            if (tok.function_->arity() && *(tok.function_->arity()) != arg_stack.size())
-                            {
-                                //ec = jmespath_errc::invalid_arity;
-                                return;
-                            }
-                            //std::cout << "function arg stack:\n";
-                            //for (auto& item : arg_stack)
-                            //{
-                            //    std::cout << *item << "\n";
-                            //}
-                            //std::cout << "\n";
-
-                            reference r = tok.function_->evaluate(resources, arg_stack, ec);
-                            if (ec)
-                            {
-                                return;
-                            }
-                            //std::cout << "function result: " << r << "\n";
-                            arg_stack.clear();
-                            stack.emplace_back(path_node_type(std::addressof(r)));
-                            break;
-                        }
                         case token_kind::selector:
                         {
                             if (stack.empty())
