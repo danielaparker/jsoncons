@@ -2944,17 +2944,12 @@ namespace detail {
                     //std::cout << "Token: " << tok.to_string() << "\n";
                     switch (tok.type())
                     { 
-                        case token_kind::literal:
-                        {
-                            stack.emplace_back(path_node_type(&tok.get_value(reference_arg_type(), resources)));
-                            break;
-                        }
                         case token_kind::root_node:
-                            //std::cout << "root: " << root << "\n";
+                            //std::cout << "root\n";
                             stack.emplace_back(path_node_type(std::addressof(root)));
                             break;
                         case token_kind::current_node:
-                            //std::cout << "current: " << current << "\n";
+                            //std::cout << "current\n";
                             stack.emplace_back(path_node_type(std::addressof(current)));
                             break;
                         case token_kind::selector:
