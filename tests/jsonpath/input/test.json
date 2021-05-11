@@ -1,27 +1,12 @@
 [
-     {"given" : {
-          "array": [-1, 3, 4, 5, "a", "100"],
-          "decimals": [1.01, 1.2, -1.5],
-          "empty_hash": {},
-          "empty_list": [],
-          "false": false,
-          "foo": -1,
-          "null_key": null,
-          "numbers": [-1, 3, 4, 5],
-          "objects": {
-              "bar": "baz",
-              "foo": "bar"
-          },
-          "str": "Str",
-          "strings": ["a", "b", "c"],
-          "zero": 0
-      },
-     "cases": [
-       {
-         "comment" : "contains",
-         "expression": "contains('abc', 'a')",
-         "result": [true]
-       }
-     ]
-  }
+   {
+        "given" : "The cat sat on the mat",
+        "cases" : [
+            {
+                "comment" : "tokenize",
+                "expression" : "tokenize($,'\\\\s+')[*]",
+                "result" : ["The","cat","sat","on","the","mat"]
+            }
+        ]
+    }
 ]

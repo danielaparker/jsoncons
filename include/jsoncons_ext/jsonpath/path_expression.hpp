@@ -2926,9 +2926,7 @@ namespace detail {
             std::error_code ec;
 
             std::vector<node_set<Json,JsonReference>> stack;
-            std::vector<pointer> arg_stack;
             std::vector<path_component_type> path(ipath);
-            Json result(json_array_arg);
 
             //std::cout << "EVALUATE TOKENS\n";
             //for (auto& tok : token_list_)
@@ -3174,7 +3172,6 @@ namespace detail {
             std::vector<node_set<Json,JsonReference>> stack;
             std::vector<pointer> arg_stack;
             std::vector<path_component_type> path(ipath);
-            Json result(json_array_arg);
 
             //std::cout << "EVALUATE TOKENS\n";
             //for (auto& tok : token_list_)
