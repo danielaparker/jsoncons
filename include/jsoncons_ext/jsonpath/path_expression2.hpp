@@ -2053,7 +2053,6 @@ namespace detail {
     {
         root_node,
         current_node,
-        expression,
         lparen,
         rparen,
         begin_union,
@@ -2066,9 +2065,10 @@ namespace detail {
         separator,
         literal,
         selector,
+        argument,
         function,
         end_function,
-        argument,
+        expression,
         end_of_expression,
         unary_operator,
         binary_operator
@@ -2113,6 +2113,8 @@ namespace detail {
                 return "end_function";
             case token_kind::argument:
                 return "argument";
+            case token_kind::expression:
+                return "expression";
             case token_kind::end_of_expression:
                 return "end_of_expression";
             case token_kind::unary_operator:
@@ -2357,7 +2359,7 @@ namespace detail {
     };
 
     template <class Json, class JsonReference>
-    class expression_base
+    class argument_base
     {
     public:
         using char_type = typename Json::char_type;
@@ -2368,7 +2370,7 @@ namespace detail {
         using path_node_type = path_node<Json,JsonReference>;
         using path_component_type = path_component<char_type>;
 
-        virtual ~expression_base() noexcept = default;
+        virtual ~argument_base() noexcept = default;
 
         virtual reference evaluate_single(dynamic_resources<Json,JsonReference>& resources,
                                           const std::vector<path_component_type>& path, 
@@ -2385,14 +2387,14 @@ namespace detail {
     {
     public:
         using selector_base_type = selector_base<Json,JsonReference>;
-        using expression_base_type = expression_base<Json,JsonReference>;
+        using argument_base_type = argument_base<Json,JsonReference>;
 
         token_kind type_;
 
         union
         {
             std::unique_ptr<selector_base_type> selector_;
-            std::unique_ptr<expression_base_type> expression_;
+            std::unique_ptr<argument_base_type> argument_;
             const unary_operator<Json,JsonReference>* unary_operator_;
             const binary_operator<Json,JsonReference>* binary_operator_;
             const function_base<Json,JsonReference>* function_;
@@ -2488,10 +2490,10 @@ namespace detail {
             new (&selector_) std::unique_ptr<selector_base_type>(std::move(expr));
         }
 
-        token(std::unique_ptr<expression_base_type>&& expr)
+        token(std::unique_ptr<argument_base_type>&& expr)
             : type_(token_kind::expression)
         {
-            new (&expression_) std::unique_ptr<expression_base_type>(std::move(expr));
+            new (&argument_) std::unique_ptr<argument_base_type>(std::move(expr));
         }
 
         token(const function_base<Json,JsonReference>* function) noexcept
@@ -2501,7 +2503,7 @@ namespace detail {
         }
 
         token(argument_arg_t) noexcept
-            : type_(token_kind::argument)
+            : type_(token_kind::expression)
         {
         }
 
@@ -2537,7 +2539,7 @@ namespace detail {
                             selector_ = std::move(other.selector_);
                             break;
                         case token_kind::expression:
-                            expression_ = std::move(other.expression_);
+                            argument_ = std::move(other.argument_);
                             break;
                         case token_kind::unary_operator:
                             unary_operator_ = other.unary_operator_;
@@ -2594,6 +2596,11 @@ namespace detail {
             return type_ == token_kind::selector && selector_->is_path(); 
         }
 
+        bool is_argument() const
+        {
+            return type_ == token_kind::expression; 
+        }
+
         bool is_operator() const
         {
             return type_ == token_kind::unary_operator || 
@@ -2644,7 +2651,7 @@ namespace detail {
                     new (&selector_) std::unique_ptr<selector_base_type>(std::move(other.selector_));
                     break;
                 case token_kind::expression:
-                    new (&expression_) std::unique_ptr<expression_base_type>(std::move(other.expression_));
+                    new (&argument_) std::unique_ptr<argument_base_type>(std::move(other.argument_));
                     break;
                 case token_kind::unary_operator:
                     unary_operator_ = other.unary_operator_;
@@ -2671,7 +2678,7 @@ namespace detail {
                     selector_.~unique_ptr();
                     break;
                 case token_kind::expression:
-                    expression_.~unique_ptr();
+                    argument_.~unique_ptr();
                     break;
                 case token_kind::literal:
                     value_.~Json();
@@ -2702,19 +2709,11 @@ namespace detail {
                     }
                     s.append("current node");
                     break;
-                case token_kind::argument:
-                    if (level > 0)
-                    {
-                        s.append("\n");
-                        s.append(level*2, ' ');
-                    }
-                    s.append("argument");
+                case token_kind::expression:
+                    s.append(argument_->to_string(level));
                     break;
                 case token_kind::selector:
                     s.append(selector_->to_string(level));
-                    break;
-                case token_kind::expression:
-                    s.append(expression_->to_string(level));
                     break;
                 case token_kind::literal:
                 {
@@ -2743,7 +2742,6 @@ namespace detail {
                     s.append(jsoncons::jsonpath::detail::to_string(type_));
                     break;
             }
-            //s.append("\n");
             return s;
         }
     };
@@ -3387,6 +3385,40 @@ namespace detail {
                             stack.emplace_back(path_node_type(std::addressof(r)));
                             break;
                         }
+                        case token_kind::expression:
+                        {
+                            if (stack.empty())
+                            {
+                                stack.emplace_back(path_node_type(std::addressof(current)));
+                            }
+                            pointer ptr = nullptr;
+                            switch (stack.back().tag)
+                            {
+                                case node_set_tag::single:
+                                    ptr = stack.back().node.ptr;
+                                    break;
+                                case node_set_tag::multi:
+                                    if (!stack.back().nodes.empty())
+                                    {
+                                        ptr = stack.back().nodes.back().ptr;
+                                    }
+                                    ptr = stack.back().to_pointer(resources);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (ptr)
+                            {
+                                reference ref = tok.argument_->evaluate_single(resources, path, root, *ptr, options, ec);
+                                if (!ec)
+                                {
+                                    stack.emplace_back(path_node_type(std::addressof(ref)));
+                                }
+                            }
+
+                            break;
+                        }
+
                         case token_kind::selector:
                         {
                             if (stack.empty())

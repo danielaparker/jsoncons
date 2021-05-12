@@ -824,7 +824,7 @@ namespace jsoncons { namespace jsonpath {
             }
         };
 
-        class argument_expression final : public expression_base<Json,JsonReference>
+        class argument final : public argument_base<Json,JsonReference>
         {
             expression_tree_type expr_;
 
@@ -832,7 +832,7 @@ namespace jsoncons { namespace jsonpath {
             using path_component_type = typename selector_base_type::path_component_type;
             using path_selector::generate_path;
 
-            argument_expression(expression_tree_type&& expr)
+            argument(expression_tree_type&& expr)
                 : expr_(std::move(expr))
             {
             }
