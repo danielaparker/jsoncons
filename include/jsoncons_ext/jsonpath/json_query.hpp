@@ -676,30 +676,30 @@ namespace jsoncons { namespace jsonpath {
             void select(dynamic_resources<Json,JsonReference>& resources,
                         const std::vector<path_component_type>& path, 
                         reference root,
-                        reference val, 
+                        reference current, 
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
                         result_options options) const override
             {
-                if (val.is_array())
+                if (current.is_array())
                 {
-                    for (std::size_t i = 0; i < val.size(); ++i)
+                    for (std::size_t i = 0; i < current.size(); ++i)
                     {
                         std::error_code ec;
-                        auto& r = expr_.evaluate_single(resources, generate_path(path, i, options), root, val[i], options, ec);
+                        reference r = expr_.evaluate_single(resources, generate_path(path, i, options), root, current[i], options, ec);
                         bool t = ec ? false : detail::is_true(r);
                         if (t)
                         {
-                            this->evaluate_tail(resources, generate_path(path,i,options), root, val[i], nodes, ndtype, options);
+                            this->evaluate_tail(resources, generate_path(path,i,options), root, current[i], nodes, ndtype, options);
                         }
                     }
                 }
-                else if (val.is_object())
+                else if (current.is_object())
                 {
-                    for (auto& member : val.object_range())
+                    for (auto& member : current.object_range())
                     {
                         std::error_code ec;
-                        auto& r = expr_.evaluate_single(resources, generate_path(path, member.key(), options), root, member.value(), options, ec);
+                        reference r = expr_.evaluate_single(resources, generate_path(path, member.key(), options), root, member.value(), options, ec);
                         bool t = ec ? false : detail::is_true(r);
                         if (t)
                         {
@@ -740,31 +740,26 @@ namespace jsoncons { namespace jsonpath {
             void select(dynamic_resources<Json,JsonReference>& resources,
                         const std::vector<path_component_type>& path, 
                         reference root,
-                        reference val, 
+                        reference current, 
                         std::vector<path_node_type>& nodes,
                         node_type& ndtype,
                         result_options options) const override
             {
-                //std::cout << "index_expression_selector current: " << val << "\n";
+                //std::cout << "index_expression_selector current: " << current << "\n";
 
-                std::vector<path_node_type> temp;
-                auto callback = [&temp](const std::vector<path_component_type>& p, reference v)
+                std::error_code ec;
+                reference j = expr_.evaluate_single(resources, path, root, current, options, ec);
+
+                if (!ec)
                 {
-                    //std::cout << "callback" << v << "\n";
-                    temp.emplace_back(p, std::addressof(v));
-                };
-                expr_.evaluate(resources, path, root, val, callback, options); // fixit
-                if (!temp.empty())
-                {
-                    auto& j = *temp.back().ptr;
-                    if (j.template is<std::size_t>() && val.is_array())
+                    if (j.template is<std::size_t>() && current.is_array())
                     {
                         std::size_t start = j.template as<std::size_t>();
-                        this->evaluate_tail(resources, generate_path(path, start, options), root, val.at(start), nodes, ndtype, options);
+                        this->evaluate_tail(resources, generate_path(path, start, options), root, current.at(start), nodes, ndtype, options);
                     }
-                    else if (j.is_string() && val.is_object())
+                    else if (j.is_string() && current.is_object())
                     {
-                        this->evaluate_tail(resources, generate_path(path, j.as_string(), options), root, val.at(j.as_string_view()), nodes, ndtype, options);
+                        this->evaluate_tail(resources, generate_path(path, j.as_string(), options), root, current.at(j.as_string_view()), nodes, ndtype, options);
                     }
                 }
             }
