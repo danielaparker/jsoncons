@@ -812,11 +812,8 @@ namespace jsoncons { namespace jsonpath {
                         node_type&,
                         result_options options) const override
             {
-                //std::cout << "index_expression_selector current: " << val << "\n";
-
                 auto callback = [&nodes](const std::vector<path_component_type>& p, reference v)
                 {
-                    //std::cout << "callback" << v << "\n";
                     nodes.emplace_back(p, std::addressof(v));
                 };
                 expr_.evaluate(resources, path, root, val, callback, options); // fixit
