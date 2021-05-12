@@ -666,11 +666,11 @@ namespace jsoncons { namespace jsonpath {
                     for (std::size_t i = 0; i < current.size(); ++i)
                     {
                         std::error_code ec;
-                        reference r = expr_.evaluate_single(resources, generate_path(path, i, options), root, current[i], options, ec);
+                        reference r = expr_.evaluate_single(resources, path, root, current[i], options, ec);
                         bool t = ec ? false : detail::is_true(r);
                         if (t)
                         {
-                            this->evaluate_tail(resources, generate_path(path,i,options), root, current[i], nodes, ndtype, options);
+                            this->evaluate_tail(resources, path, root, current[i], nodes, ndtype, options);
                         }
                     }
                 }
@@ -679,11 +679,11 @@ namespace jsoncons { namespace jsonpath {
                     for (auto& member : current.object_range())
                     {
                         std::error_code ec;
-                        reference r = expr_.evaluate_single(resources, generate_path(path, member.key(), options), root, member.value(), options, ec);
+                        reference r = expr_.evaluate_single(resources, path, root, member.value(), options, ec);
                         bool t = ec ? false : detail::is_true(r);
                         if (t)
                         {
-                            this->evaluate_tail(resources, generate_path(path,member.key(),options), root, member.value(), nodes, ndtype, options);
+                            this->evaluate_tail(resources, path, root, member.value(), nodes, ndtype, options);
                         }
                     }
                 }
@@ -735,11 +735,11 @@ namespace jsoncons { namespace jsonpath {
                     if (j.template is<std::size_t>() && current.is_array())
                     {
                         std::size_t start = j.template as<std::size_t>();
-                        this->evaluate_tail(resources, generate_path(path, start, options), root, current.at(start), nodes, ndtype, options);
+                        this->evaluate_tail(resources, path, root, current.at(start), nodes, ndtype, options);
                     }
                     else if (j.is_string() && current.is_object())
                     {
-                        this->evaluate_tail(resources, generate_path(path, j.as_string(), options), root, current.at(j.as_string_view()), nodes, ndtype, options);
+                        this->evaluate_tail(resources, path, root, current.at(j.as_string_view()), nodes, ndtype, options);
                     }
                 }
             }
