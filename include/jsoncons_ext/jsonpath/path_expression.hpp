@@ -2291,6 +2291,7 @@ namespace detail {
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
         using reference = JsonReference;
+        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<Json,JsonReference>;
         using path_component_type = path_component<char_type>;
 
@@ -2349,6 +2350,18 @@ namespace detail {
                             std::vector<path_node_type>& nodes,
                             node_type& ndtype,
                             result_options options) const = 0;
+
+        jsoncons::optional<pointer> evaluate_single(dynamic_resources<Json,JsonReference>& resources,
+                                                    const std::vector<path_component_type>& path, 
+                                                    reference root,
+                                                    reference val, 
+                                                    result_options options) const
+        {
+            node_type ndtype;
+            std::vector<path_node_type> nodes;
+            select(resources,path,root,val,nodes,ndtype,options);
+            return nodes.size() == 1 ? jsoncons::optional<pointer>(nodes.back().ptr) : jsoncons::optional<pointer>();
+        }
 
         virtual void append_selector(std::unique_ptr<selector_base>&&) 
         {
@@ -2867,7 +2880,7 @@ namespace detail {
             const_reference_arg_t,reference_arg_t>::type;
         using path_component_type = path_component<char_type>;
     private:
-        std::vector<token_type> token_list_;
+        std::unique_ptr<selector_base<Json,JsonReference>> selector_;
     public:
 
         path_expression()
@@ -2875,12 +2888,12 @@ namespace detail {
         }
 
         path_expression(path_expression&& expr)
-            : token_list_(std::move(expr.token_list_))
+            : selector_(std::move(expr.selector_))
         {
         }
 
-        path_expression(std::vector<token_type>&& token_stack)
-            : token_list_(std::move(token_stack))
+        path_expression(std::unique_ptr<selector_base<Json,JsonReference>>&& selector)
+            : selector_(std::move(selector))
         {
         }
 
@@ -2935,125 +2948,58 @@ namespace detail {
             //}
             //std::cout << "\n";
 
-            if (!token_list_.empty())
+            std::vector<path_node_type> temp;
+            node_type ndtype = node_type();
+            selector_->select(resources, path, root, current, temp, ndtype, options);
+
+            if ((options & result_options::sort) == result_options::sort)
             {
-                for (auto& tok : token_list_)
+                std::sort(temp.begin(), temp.end(), path_node_less_type());
+            }
+
+            if ((options & result_options::nodups) == result_options::nodups)
+            {
+                if ((options & result_options::sort) == result_options::sort)
                 {
-                    //std::cout << "Token: " << tok.to_string() << "\n";
-                    switch (tok.type())
-                    { 
-                        case token_kind::root_node:
-                            //std::cout << "root\n";
-                            stack.emplace_back(path_node_type(std::addressof(root)));
-                            break;
-                        case token_kind::current_node:
-                            //std::cout << "current\n";
-                            stack.emplace_back(path_node_type(std::addressof(current)));
-                            break;
-                        case token_kind::selector:
+                    auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
+                    temp.erase(last,temp.end());
+                    stack.emplace_back(std::move(temp), ndtype);
+                }
+                else
+                {
+                    std::vector<path_node_type> index(temp);
+                    std::sort(index.begin(), index.end(), path_node_less_type());
+                    auto last = std::unique(index.begin(),index.end(),path_node_equal_type());
+                    index.erase(last,index.end());
+
+                    std::vector<path_node_type> temp2;
+                    temp2.reserve(index.size());
+                    for (auto&& node : temp)
+                    {
+                        //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
+                        auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
+
+                        if (it != index.end() && it->path == node.path) 
                         {
-                            if (stack.empty())
-                            {
-                                stack.emplace_back(path_node_type(std::addressof(current)));
-                            }
-                            pointer ptr = nullptr;
-                            //for (auto& item : stack)
-                            //{
-                                //std::cout << "selector stack input:\n";
-                                //switch (item.tag)
-                                //{
-                                //    case node_set_tag::single:
-                                //        std::cout << "single: " << *(item.node.ptr) << "\n";
-                                //        break;
-                                //    case node_set_tag::multi:
-                                //        for (auto& node : stack.back().nodes)
-                                //        {
-                                //            std::cout << "multi: " << *node.ptr << "\n";
-                                //        }
-                                //        break;
-                                //    default:
-                                //        break;
-                            //}
-                            //std::cout << "\n";
-                            //}
-                            switch (stack.back().tag)
-                            {
-                                case node_set_tag::single:
-                                    ptr = stack.back().node.ptr;
-                                    break;
-                                case node_set_tag::multi:
-                                    if (!stack.back().nodes.empty())
-                                    {
-                                        ptr = stack.back().nodes.back().ptr;
-                                    }
-                                    ptr = stack.back().to_pointer(resources);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            if (ptr)
-                            {
-                                //std::cout << "selector item: " << *ptr << "\n";
-                                stack.pop_back();
-                                std::vector<path_node_type> temp;
-                                node_type ndtype = node_type();
-                                tok.selector_->select(resources, path, root, *ptr, temp, ndtype, options);
-
-                                if ((options & result_options::sort) == result_options::sort)
-                                {
-                                    std::sort(temp.begin(), temp.end(), path_node_less_type());
-                                }
-
-                                if ((options & result_options::nodups) == result_options::nodups)
-                                {
-                                    if ((options & result_options::sort) == result_options::sort)
-                                    {
-                                        auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
-                                        temp.erase(last,temp.end());
-                                        stack.emplace_back(std::move(temp), ndtype);
-                                    }
-                                    else
-                                    {
-                                        std::vector<path_node_type> index(temp);
-                                        std::sort(index.begin(), index.end(), path_node_less_type());
-                                        auto last = std::unique(index.begin(),index.end(),path_node_equal_type());
-                                        index.erase(last,index.end());
-
-                                        std::vector<path_node_type> temp2;
-                                        temp2.reserve(index.size());
-                                        for (auto&& node : temp)
-                                        {
-                                            //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                            auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
-
-                                            if (it != index.end() && it->path == node.path) 
-                                            {
-                                                temp2.emplace_back(std::move(node));
-                                                index.erase(it);
-                                            }
-                                        }
-                                        stack.emplace_back(std::move(temp2), ndtype);
-                                    }
-                                }
-                                else
-                                {
-                                    //std::cout << "selector output " << temp.size() << "\n";
-                                    //for (auto& item : temp)
-                                    //{
-                                    //    std::cout << *item.ptr << "\n";
-                                    //}
-                                    //std::cout << "\n";
-                                    stack.emplace_back(std::move(temp), ndtype);
-                                }
-
-                            }
-                            break;
+                            temp2.emplace_back(std::move(node));
+                            index.erase(it);
                         }
-                        default:
-                            break;
                     }
+                    stack.emplace_back(std::move(temp2), ndtype);
                 }
             }
+            else
+            {
+                //std::cout << "selector output " << temp.size() << "\n";
+                //for (auto& item : temp)
+                //{
+                //    std::cout << *item.ptr << "\n";
+                //}
+                //std::cout << "\n";
+                stack.emplace_back(std::move(temp), ndtype);
+            }
+
+            
             for (auto& item : stack)
             {
                 switch (item.tag)
@@ -3084,10 +3030,7 @@ namespace detail {
                 s.append(level*2, ' ');
             }
             s.append("expression ");
-            for (const auto& item : token_list_)
-            {
-                s.append(item.to_string(level+1));
-            }
+            s.append(selector_->to_string(level+1));
 
             return s;
 
@@ -3272,6 +3215,8 @@ namespace detail {
                             {
                                 stack.emplace_back(path_node_type(std::addressof(current)));
                             }
+
+
                             pointer ptr = nullptr;
                             //for (auto& item : stack)
                             //{

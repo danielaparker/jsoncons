@@ -2935,13 +2935,13 @@ namespace jsoncons { namespace jsonpath {
             //}
             //std::cout << "\n";
 
-            if (!operator_stack_.empty())
+            if (output_stack_.empty() || !operator_stack_.empty())
             {
                 ec = jsonpath_errc::unexpected_eof;
                 return path_expression_type();
             }
 
-            return path_expression_type(std::move(output_stack_));
+            return path_expression_type(std::move(output_stack_.back().selector_));
         }
 
         void advance_past_space_character()
@@ -3159,7 +3159,7 @@ namespace jsoncons { namespace jsonpath {
                         {
                             toks.emplace(toks.begin(), current_node_arg);
                         }
-                        expressions.emplace(expressions.begin(), path_expression_type(std::move(toks)));
+                        expressions.emplace(expressions.begin(), path_expression_type(std::move(toks.back().selector_)));
                     }
                     if (it == output_stack_.rend())
                     {
