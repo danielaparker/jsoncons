@@ -685,13 +685,10 @@ namespace jsoncons { namespace jsonpath {
                 {
                     for (std::size_t i = 0; i < val.size(); ++i)
                     {
-                        std::vector<path_node_type> temp;
-                        auto callback = [&temp](const std::vector<path_component_type>& p, reference v)
-                        {
-                            temp.emplace_back(p, std::addressof(v));
-                        };
-                        expr_.evaluate(resources, generate_path(path, i, options), root, val[i], callback, options);
-                        if (is_true(temp))
+                        std::error_code ec;
+                        auto& r = expr_.evaluate_single(resources, generate_path(path, i, options), root, val[i], options, ec);
+                        bool t = ec ? false : detail::is_true(r);
+                        if (t)
                         {
                             this->evaluate_tail(resources, generate_path(path,i,options), root, val[i], nodes, ndtype, options);
                         }
@@ -701,13 +698,10 @@ namespace jsoncons { namespace jsonpath {
                 {
                     for (auto& member : val.object_range())
                     {
-                        std::vector<path_node_type> temp;
-                        auto callback = [&temp](const std::vector<path_component_type>& p, reference v)
-                        {
-                            temp.emplace_back(p, std::addressof(v));
-                        };
-                        expr_.evaluate(resources, generate_path(path, member.key(), options), root, member.value(), callback, options);
-                        if (is_true(temp))
+                        std::error_code ec;
+                        auto& r = expr_.evaluate_single(resources, generate_path(path, member.key(), options), root, member.value(), options, ec);
+                        bool t = ec ? false : detail::is_true(r);
+                        if (t)
                         {
                             this->evaluate_tail(resources, generate_path(path,member.key(),options), root, member.value(), nodes, ndtype, options);
                         }

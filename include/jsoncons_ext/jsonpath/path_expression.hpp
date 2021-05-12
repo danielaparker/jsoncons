@@ -3129,8 +3129,8 @@ namespace detail {
                         {
                             if (tok.function_->arity() && *(tok.function_->arity()) != arg_stack.size())
                             {
-                                //ec = jmespath_errc::invalid_arity;
-                                return;
+                                ec = jsonpath_errc::invalid_arity;
+                                return resources.null_value();
                             }
                             //std::cout << "function arg stack:\n";
                             //for (auto& item : arg_stack)
@@ -3142,7 +3142,7 @@ namespace detail {
                             reference r = tok.function_->evaluate(resources, arg_stack, ec);
                             if (ec)
                             {
-                                return;
+                                return resources.null_value();
                             }
                             //std::cout << "function result: " << r << "\n";
                             arg_stack.clear();
@@ -3259,7 +3259,7 @@ namespace detail {
             //{
             //    std::cout << "Stack size: " << stack.size() << "\n";
             //}
-            return stack.empty() ? resources.null_value() : *(stack.back().to_pointer());
+            return stack.empty() ? resources.null_value() : *(stack.back().to_pointer(resources));
         }
  
         template <class Callback>
