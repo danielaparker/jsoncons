@@ -3115,15 +3115,7 @@ namespace jsoncons { namespace jsonpath {
                     }
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
-
-                    if (!output_stack_.empty() && output_stack_.back().is_path())
-                    {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<argument_expression_selector>(expression_tree_type(std::move(toks))));
-                    }
-                    else
-                    {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression_selector>(expression_tree_type(std::move(toks)))));
-                    }
+                    output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression_selector>(expression_tree_type(std::move(toks)))));
                     break;
                 }
                 case token_kind::selector:
