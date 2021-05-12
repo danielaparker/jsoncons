@@ -3166,6 +3166,38 @@ namespace detail {
                             stack.emplace_back(path_node_type(std::addressof(r)));
                             break;
                         }
+                        case token_kind::expression:
+                        {
+                            if (stack.empty())
+                            {
+                                stack.emplace_back(path_node_type(std::addressof(current)));
+                            }
+
+                            pointer ptr = nullptr;
+                            switch (stack.back().tag)
+                            {
+                                case node_set_tag::single:
+                                    ptr = stack.back().node.ptr;
+                                    break;
+                                case node_set_tag::multi:
+                                    if (!stack.back().nodes.empty())
+                                    {
+                                        ptr = stack.back().nodes.back().ptr;
+                                    }
+                                    ptr = stack.back().to_pointer(resources);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (ptr)
+                            {
+                                stack.pop_back();
+                                reference ref = tok.expression_->evaluate_single(resources, path, root, *ptr, options, ec);
+                                //std::cout << "ref2: " << ref << "\n";
+                                stack.emplace_back(path_node_type(std::addressof(ref)));
+                            }
+                            break;
+                        }
                         case token_kind::selector:
                         {
                             if (stack.empty())
@@ -3385,6 +3417,38 @@ namespace detail {
                             //std::cout << "function result: " << r << "\n";
                             arg_stack.clear();
                             stack.emplace_back(path_node_type(std::addressof(r)));
+                            break;
+                        }
+                        case token_kind::expression:
+                        {
+                            if (stack.empty())
+                            {
+                                stack.emplace_back(path_node_type(std::addressof(current)));
+                            }
+
+                            pointer ptr = nullptr;
+                            switch (stack.back().tag)
+                            {
+                                case node_set_tag::single:
+                                    ptr = stack.back().node.ptr;
+                                    break;
+                                case node_set_tag::multi:
+                                    if (!stack.back().nodes.empty())
+                                    {
+                                        ptr = stack.back().nodes.back().ptr;
+                                    }
+                                    ptr = stack.back().to_pointer(resources);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            if (ptr)
+                            {
+                                stack.pop_back();
+                                reference ref = tok.expression_->evaluate_single(resources, path, root, *ptr, options, ec);
+                                //std::cout << "ref: " << ref << "\n";
+                                stack.emplace_back(path_node_type(std::addressof(ref)));
+                            }
                             break;
                         }
                         case token_kind::selector:
