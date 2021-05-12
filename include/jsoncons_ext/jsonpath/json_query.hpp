@@ -3145,21 +3145,25 @@ namespace jsoncons { namespace jsonpath {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_union)
                     {
-                        std::vector<token_type> toks;
+                        if (it->type() == token_kind::selector)
+                        {
+                            expressions.emplace(expressions.begin(), path_expression_type(std::move(it->selector_)));
+                        }
+                        //std::vector<token_type> toks;
                         do
                         {
-                            toks.insert(toks.begin(), std::move(*it));
+                            //toks.insert(toks.begin(), std::move(*it));
                             ++it;
                         } while (it != output_stack_.rend() && it->type() != token_kind::begin_union && it->type() != token_kind::separator);
                         if (it->type() == token_kind::separator)
                         {
                             ++it;
                         }
-                        if (!(toks.front().type() == token_kind::literal || toks.front().type() == token_kind::current_node || toks.front().type() == token_kind::root_node))
-                        {
-                            toks.emplace(toks.begin(), current_node_arg);
-                        }
-                        expressions.emplace(expressions.begin(), path_expression_type(std::move(toks.back().selector_)));
+                        //if (!(toks.front().type() == token_kind::literal || toks.front().type() == token_kind::current_node || toks.front().type() == token_kind::root_node))
+                        //{
+                        //    toks.emplace(toks.begin(), current_node_arg);
+                        //}
+                        //expressions.emplace(expressions.begin(), path_expression_type(std::move(toks.back().selector_)));
                     }
                     if (it == output_stack_.rend())
                     {
