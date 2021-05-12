@@ -2938,32 +2938,27 @@ namespace detail {
         {
             std::error_code ec;
 
-            std::vector<node_set<Json,JsonReference>> stack;
             std::vector<path_component_type> path(ipath);
-
-            //std::cout << "EVALUATE TOKENS\n";
-            //for (auto& tok : token_list_)
-            //{
-            //    std::cout << tok.to_string() << "\n";
-            //}
-            //std::cout << "\n";
 
             std::vector<path_node_type> temp;
             node_type ndtype = node_type();
             selector_->select(resources, path, root, current, temp, ndtype, options);
 
-            if ((options & result_options::sort) == result_options::sort)
+            if (temp.size() > 1 && (options & result_options::sort) == result_options::sort)
             {
                 std::sort(temp.begin(), temp.end(), path_node_less_type());
             }
 
-            if ((options & result_options::nodups) == result_options::nodups)
+            if (temp.size() > 1 && (options & result_options::nodups) == result_options::nodups)
             {
                 if ((options & result_options::sort) == result_options::sort)
                 {
                     auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
                     temp.erase(last,temp.end());
-                    stack.emplace_back(std::move(temp), ndtype);
+                    for (auto& node : temp)
+                    {
+                        callback(node.path, *node.ptr);
+                    }
                 }
                 else
                 {
@@ -2976,7 +2971,6 @@ namespace detail {
                     temp2.reserve(index.size());
                     for (auto&& node : temp)
                     {
-                        //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
                         auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
 
                         if (it != index.end() && it->path == node.path) 
@@ -2985,40 +2979,19 @@ namespace detail {
                             index.erase(it);
                         }
                     }
-                    stack.emplace_back(std::move(temp2), ndtype);
+                    for (auto& node : temp2)
+                    {
+                        callback(node.path, *node.ptr);
+                    }
                 }
             }
             else
             {
-                //std::cout << "selector output " << temp.size() << "\n";
-                //for (auto& item : temp)
-                //{
-                //    std::cout << *item.ptr << "\n";
-                //}
-                //std::cout << "\n";
-                stack.emplace_back(std::move(temp), ndtype);
-            }
-
-            
-            for (auto& item : stack)
-            {
-                switch (item.tag)
+                for (auto& node : temp)
                 {
-                    case node_set_tag::single:
-                        //std::cout << "result: " << *item.node.ptr << "\n";
-                        callback(item.node.path, *item.node.ptr);
-                        break;
-                    case node_set_tag::multi:
-                        for (auto& node : item.nodes)
-                        {
-                            callback(node.path, *node.ptr);
-                        }
-                        break;
-                    default:
-                        break;
+                    callback(node.path, *node.ptr);
                 }
             }
-            //std::cout << "EVALUATE END\n";
         }
 
         std::string to_string(int level) const
