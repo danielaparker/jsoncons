@@ -2972,7 +2972,6 @@ namespace detail {
                     for (auto&& node : temp)
                     {
                         auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
-
                         if (it != index.end() && it->path == node.path) 
                         {
                             temp2.emplace_back(std::move(node));
@@ -3189,7 +3188,6 @@ namespace detail {
                                 stack.emplace_back(path_node_type(std::addressof(current)));
                             }
 
-
                             pointer ptr = nullptr;
                             //for (auto& item : stack)
                             //{
@@ -3288,6 +3286,11 @@ namespace detail {
                     }
                 }
             }
+
+            //if (stack.size() != 1)
+            //{
+            //    std::cout << "Stack size: " << stack.size() << "\n";
+            //}
             for (auto& item : stack)
             {
                 switch (item.tag)
