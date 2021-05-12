@@ -640,26 +640,6 @@ namespace jsoncons { namespace jsonpath {
             }
         };
 
-        static bool is_false(const std::vector<path_node_type>& nodes)
-        {
-            if (nodes.size() != 1)
-            {
-                return nodes.empty();
-            }
-            auto valp = nodes.front().ptr; 
-            return ((valp->is_array() && valp->empty()) ||
-                     (valp->is_object() && valp->empty()) ||
-                     (valp->is_string() && valp->as_string_view().empty()) ||
-                     (valp->is_bool() && !valp->as_bool()) ||
-                     (valp->is_number() && *valp == Json(0)) ||
-                     valp->is_null());
-        }
-
-        static bool is_true(const std::vector<path_node_type>& nodes)
-        {
-            return !is_false(nodes);
-        }
-
         class filter_expression_selector final : public path_selector
         {
             expression_tree_type expr_;
