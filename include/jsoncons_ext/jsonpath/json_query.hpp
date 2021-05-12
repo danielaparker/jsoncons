@@ -885,14 +885,12 @@ namespace jsoncons { namespace jsonpath {
                         result_options options) const override
             {
                 ndtype = node_type::single;
-
-                //std::cout << "function_selector current: " << current << "\n";
-                auto callback = [&](const std::vector<path_component_type>& p, reference v)
+                std::error_code ec;
+                reference ref = expr_.evaluate_single(resources, path, root, current, options, ec);
+                if (!ec)
                 {
-                    this->evaluate_tail(resources, p, root, v, nodes, ndtype, options);
-                    //nodes.emplace_back(p, std::addressof(v));
-                };
-                expr_.evaluate(resources, path, root, current, callback, options);
+                    this->evaluate_tail(resources, path, root, ref, nodes, ndtype, options);
+                }
             }
 
             std::string to_string(int level = 0) const override
