@@ -100,7 +100,7 @@ Union of the fourth book and all books with price > 10:
 JSONPath|       Description
 --------|--------------------------------
 `$`|    Represents the root JSON value
-`@`|    Represents the current node in an expression.
+`@`|    Represents the current value being evaluated. 
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
@@ -276,7 +276,7 @@ In jsoncons, a JSONPath union element can be
 - a filter
 - a wildcard, i.e. `*`
 - a path relative to the root of the JSON document (begins with `$`)
-- a path relative to the current node (begins with `@`)
+- a path relative to the current value (begins with `@`)
 
 To illustrate, the path expression below selects the second, third, and fourth titles from [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3):
 
