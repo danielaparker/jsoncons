@@ -240,6 +240,9 @@ An expression is considered false if it evaluates to any of the following values
 
 It is considered true if it is not false.
 
+The ordering operators `>`, `>=`, `<`, `<=` are only valid if both left and right are numbers,
+or if both left and right are strings. Otherwise the item will be excluded from the result set.
+
 #### Unary operators
 
 Operator|       Description
