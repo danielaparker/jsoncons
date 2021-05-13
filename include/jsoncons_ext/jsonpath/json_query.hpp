@@ -231,7 +231,7 @@ namespace jsoncons { namespace jsonpath {
                                reference root,
                                reference val,
                                std::vector<path_node_type>& nodes,
-                               node_type& ndtype,
+                               node_kind& ndtype,
                                result_options options) const
             {
                 if (!tail_selector_)
@@ -277,14 +277,14 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference val,
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 //std::string buf;
                 //buf.append("identifier selector: ");
                 //unicode_traits::convert(identifier_.data(),identifier_.size(),buf);
 
-                ndtype = node_type::single;
+                ndtype = node_kind::single;
                 if (val.is_object())
                 {
                     auto it = val.find(identifier_);
@@ -358,7 +358,7 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference,
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 if (resources.is_cached(id_))
@@ -408,11 +408,11 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference current,
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 //std::cout << "current_node_selector: " << current << "\n";
-                ndtype = node_type::single;
+                ndtype = node_kind::single;
                 this->evaluate_tail(resources, path, 
                                     root, current, nodes, ndtype, options);
             }
@@ -449,10 +449,10 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference val,
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
-                ndtype = node_type::single;
+                ndtype = node_kind::single;
                 if (val.is_array())
                 {
                     int64_t slen = static_cast<int64_t>(val.size());
@@ -493,13 +493,13 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference val,
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 //std::cout << "wildcard_selector: " << val << "\n";
-                ndtype = node_type::multi; // always multi
+                ndtype = node_kind::multi; // always multi
 
-                node_type tmptype;
+                node_kind tmptype;
                 if (val.is_array())
                 {
                     for (std::size_t i = 0; i < val.size(); ++i)
@@ -548,7 +548,7 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference val,
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 //std::cout << "wildcard_selector: " << val << "\n";
@@ -604,11 +604,11 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference val, 
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 //std::cout << "union_selector select val: " << val << "\n";
-                ndtype = node_type::multi;
+                ndtype = node_kind::multi;
 
                 auto callback = [&](const std::vector<path_component_type>& p, reference v)
                 {
@@ -658,7 +658,7 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference current, 
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 if (current.is_array())
@@ -722,7 +722,7 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference current, 
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
                 //std::cout << "index_expression_selector current: " << current << "\n";
@@ -815,10 +815,10 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference current,
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
-                ndtype = node_type::multi;
+                ndtype = node_kind::multi;
 
                 if (current.is_array())
                 {
@@ -881,10 +881,10 @@ namespace jsoncons { namespace jsonpath {
                         reference root,
                         reference current, 
                         std::vector<path_node_type>& nodes,
-                        node_type& ndtype,
+                        node_kind& ndtype,
                         result_options options) const override
             {
-                ndtype = node_type::single;
+                ndtype = node_kind::single;
                 std::error_code ec;
                 reference ref = expr_.evaluate_single(resources, root, current, options, ec);
                 if (!ec)

@@ -320,7 +320,7 @@ namespace jsonpath {
 
 namespace detail {
 
-    enum class node_type {single=1, multi};
+    enum class node_kind{unknown, single, multi};
 
     template <class Json,class JsonReference>
     class dynamic_resources;
@@ -2201,7 +2201,7 @@ namespace detail {
     class dynamic_resources
     {
         std::vector<std::unique_ptr<Json>> temp_json_values_;
-        std::unordered_map<std::size_t,std::pair<std::vector<path_node<Json,JsonReference>>,node_type>> cache_;
+        std::unordered_map<std::size_t,std::pair<std::vector<path_node<Json,JsonReference>>,node_kind>> cache_;
     public:
 
         bool is_cached(std::size_t id) const
@@ -2209,12 +2209,12 @@ namespace detail {
             return cache_.find(id) != cache_.end();
         }
 
-        void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val, node_type ndtype) 
+        void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val, node_kind ndtype) 
         {
             cache_.emplace(id,std::make_pair(val,ndtype));
         }
 
-        void retrieve_from_cache(std::size_t id, std::vector<path_node<Json,JsonReference>>& nodes, node_type& ndtype) 
+        void retrieve_from_cache(std::size_t id, std::vector<path_node<Json,JsonReference>>& nodes, node_kind& ndtype) 
         {
             auto it = cache_.find(id);
             if (it != cache_.end())
@@ -2331,7 +2331,7 @@ namespace detail {
                             reference root,
                             reference val, 
                             std::vector<path_node_type>& nodes,
-                            node_type& ndtype,
+                            node_kind& ndtype,
                             result_options options) const = 0;
 
         jsoncons::optional<pointer> evaluate_single(dynamic_resources<Json,JsonReference>& resources,
@@ -2340,7 +2340,7 @@ namespace detail {
                                                     reference val, 
                                                     result_options options) const
         {
-            node_type ndtype;
+            node_kind ndtype;
             std::vector<path_node_type> nodes;
             select(resources,path,root,val,nodes,ndtype,options);
             return nodes.size() == 1 ? jsoncons::optional<pointer>(nodes.back().ptr) : jsoncons::optional<pointer>();
@@ -2748,138 +2748,6 @@ namespace detail {
         }
     };
 
-    enum class node_set_tag {none,single,multi};
-
-    template <class Json,class JsonReference>
-    struct node_set
-    {
-        using path_node_type = path_node<Json,JsonReference>;
-        using pointer = typename path_node_type::pointer;
-
-        node_set_tag tag;
-        union
-        {
-            path_node_type node;
-            std::vector<path_node_type> nodes;
-        };
-
-        node_set() noexcept
-            : tag(node_set_tag::none), node()
-        {
-        }
-        node_set(path_node_type&& node) noexcept
-            : tag(node_set_tag::single),
-            node(std::move(node))
-        {
-        }
-        node_set(std::vector<path_node_type>&& nds, node_type ndtype) noexcept
-        {
-            if (nds.empty())
-            {
-                tag = node_set_tag::none;
-            }
-            else if (nds.size() == 1 && (ndtype == node_type::single || ndtype == node_type()))
-            {
-                tag = node_set_tag::single;
-                new (&node)path_node_type(nds.back());
-            }
-            else
-            {
-                tag = node_set_tag::multi;
-                new (&nodes) std::vector<path_node_type>(nds);
-            }
-        }
-
-        node_set(node_set&& other) noexcept
-        {
-            construct(std::forward<node_set>(other));
-        }
-
-        ~node_set() noexcept
-        {
-            destroy();
-        }
-
-        node_set& operator=(node_set&& other)
-        {
-            if (&other != this)
-            {
-                if (tag == other.tag)
-                {
-                    switch (tag)
-                    {
-                        case node_set_tag::single:
-                            node = std::move(other.node);
-                            break;
-                        case node_set_tag::multi:
-                            nodes = std::move(other.nodes);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    destroy();
-                    construct(std::forward<node_set>(other));
-                }
-            }
-            return *this;
-        }
-
-        pointer to_pointer(dynamic_resources<Json,JsonReference>& resources) const
-        {
-            switch (tag)
-            {
-                case node_set_tag::single:
-                    return node.ptr;
-                case node_set_tag::multi:
-                {
-                    auto j = resources.create_json(json_array_arg);
-                    j->reserve(nodes.size());
-                    for (auto& item : nodes)
-                    {
-                        j->emplace_back(*item.ptr);
-                    }
-                    return j;
-                }
-                default:
-                    return &resources.null_value();
-            }
-        }
-
-        void construct(node_set&& other) noexcept
-        {
-            tag = other.tag;
-            switch (tag)
-            {
-                case node_set_tag::single:
-                    new (&node) path_node_type(std::move(other.node));
-                    break;
-                case node_set_tag::multi:
-                    new (&nodes) std::vector<path_node_type>(std::move(other.nodes));
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void destroy() noexcept 
-        {
-            switch(tag)
-            {
-                case node_set_tag::multi:
-                    nodes.~vector();
-                    break;
-                case node_set_tag::single:
-                    node.~path_node_type();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
     template <class Json,class JsonReference>
     class path_expression
     {
@@ -2958,7 +2826,7 @@ namespace detail {
             std::vector<path_component_type> path(ipath);
 
             std::vector<path_node_type> temp;
-            node_type ndtype = node_type();
+            node_kind ndtype = node_kind();
             selector_->select(resources, path, root, current, temp, ndtype, options);
 
             if (temp.size() > 1 && (options & result_options::sort) == result_options::sort)
@@ -3214,7 +3082,7 @@ namespace detail {
                                 //std::cout << "selector item: " << *ptr << "\n";
                                 stack.pop_back();
                                 std::vector<path_node_type> temp;
-                                node_type ndtype = node_type();
+                                node_kind ndtype = node_kind();
                                 tok.selector_->select(resources, path, root, *ptr, temp, ndtype, options);
                                 
                                 if ((options & result_options::sort) == result_options::sort)
@@ -3228,8 +3096,7 @@ namespace detail {
                                     {
                                         auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
                                         temp.erase(last,temp.end());
-                                        node_set<Json,JsonReference> ns(std::move(temp), ndtype);
-                                        stack.emplace_back(ns.to_pointer(resources));
+                                        stack.emplace_back(nodes_to_pointer(temp, ndtype, resources));
                                     }
                                     else
                                     {
@@ -3251,8 +3118,7 @@ namespace detail {
                                                 index.erase(it);
                                             }
                                         }
-                                        node_set<Json,JsonReference> ns(std::move(temp2), ndtype);
-                                        stack.emplace_back(ns.to_pointer(resources));
+                                        stack.emplace_back(nodes_to_pointer(temp2, ndtype, resources));
                                     }
                                 }
                                 else
@@ -3263,8 +3129,7 @@ namespace detail {
                                     //    std::cout << *item.ptr << "\n";
                                     //}
                                     //std::cout << "\n";
-                                    node_set<Json,JsonReference> ns(std::move(temp), ndtype);
-                                    stack.emplace_back(ns.to_pointer(resources));
+                                    stack.emplace_back(nodes_to_pointer(temp, ndtype, resources));
                                 }
 
                             }
@@ -3299,6 +3164,30 @@ namespace detail {
 
             return s;
 
+        }
+    private:
+        static pointer nodes_to_pointer(std::vector<path_node_type>& nodes,
+                                        node_kind tag,
+                                        dynamic_resources<Json,JsonReference>& resources)
+        {
+            if (nodes.empty())
+            {
+                return std::addressof(resources.null_value());
+            }
+            else if (nodes.size() == 1 && (tag == node_kind::single || tag == node_kind()))
+            {
+                return nodes.back().ptr;
+            }
+            else
+            {
+                auto j = resources.create_json(json_array_arg);
+                j->reserve(nodes.size());
+                for (auto& item : nodes)
+                {
+                    j->emplace_back(*item.ptr);
+                }
+                return j;
+            }
         }
     };
 
