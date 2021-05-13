@@ -207,7 +207,7 @@ $[-3::-1]  | All items except the last two, reversed
 
 ### Filter expressions
 
-JSONPath uses filter expressions `[?(<expr>)]` to restrict the set of nodes returned by a path.
+JSONPath uses filter expressions `[?(<expr>)]` to restrict the set of nodes returned by a path, e.g. `$..book[?(@.price<10)]`.
 
 [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
 
