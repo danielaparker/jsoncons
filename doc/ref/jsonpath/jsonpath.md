@@ -227,7 +227,7 @@ Operator|       Description
 `<=`    |Left is less than or equal to right
 `>`     |Left is greater than right
 `>=`    |Left is greater than or equal to right
-`=~`    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
+`=~`    |Left matches regular expression, e.g. [?(@.author =~ /Evelyn.*?/)]
 
 An expression is considered false if it evaluates to any of the following values:
 
