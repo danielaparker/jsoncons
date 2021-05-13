@@ -260,7 +260,7 @@ Precedence|Operator|Associativity
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
 
-A parenthetical expression allows these precedence rules to be overriden, e.g. (a || b) && c.
+The precedence rules may be overriden with explicit parentheses, e.g. (a || b) && c.
 
 ### Unions
 
