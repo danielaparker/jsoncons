@@ -3068,7 +3068,7 @@ namespace detail {
                                   result_options options,
                                   std::error_code& ec) const
         {
-            std::vector<node_set<Json,JsonReference>> stack;
+            std::vector<pointer> stack;
             std::vector<pointer> arg_stack;
             std::vector<path_component_type> path = {path_component_type(current_node_arg)};
 
@@ -3088,42 +3088,42 @@ namespace detail {
                     { 
                         case token_kind::literal:
                         {
-                            stack.emplace_back(path_node_type(&tok.get_value(reference_arg_type(), resources)));
+                            stack.emplace_back(std::addressof(tok.get_value(reference_arg_type(), resources)));
                             break;
                         }
                         case token_kind::unary_operator:
                         {
                             JSONCONS_ASSERT(stack.size() >= 1);
-                            pointer ptr = stack.back().to_pointer(resources);
+                            pointer ptr = stack.back();
                             stack.pop_back();
 
                             reference r = tok.unary_operator_->evaluate(resources, *ptr, ec);
-                            stack.emplace_back(path_node_type(std::addressof(r)));
+                            stack.emplace_back(std::addressof(r));
                             break;
                         }
                         case token_kind::binary_operator:
                         {
                             //std::cout << "binary operator: " << stack.size() << "\n";
                             JSONCONS_ASSERT(stack.size() >= 2);
-                            pointer rhs = stack.back().to_pointer(resources);
+                            pointer rhs = stack.back();
                             //std::cout << "rhs: " << *rhs << "\n";
                             stack.pop_back();
-                            pointer lhs = stack.back().to_pointer(resources);
+                            pointer lhs = stack.back();
                             //std::cout << "lhs: " << *lhs << "\n";
                             stack.pop_back();
 
                             reference r = tok.binary_operator_->evaluate(resources, *lhs, *rhs, ec);
                             //std::cout << "Evaluate binary expression: " << r << "\n";
-                            stack.emplace_back(path_node_type(std::addressof(r)));
+                            stack.emplace_back(std::addressof(r));
                             break;
                         }
                         case token_kind::root_node:
                             //std::cout << "root: " << root << "\n";
-                            stack.emplace_back(path_node_type(std::addressof(root)));
+                            stack.emplace_back(std::addressof(root));
                             break;
                         case token_kind::current_node:
                             //std::cout << "current: " << current << "\n";
-                            stack.emplace_back(path_node_type(std::addressof(current)));
+                            stack.emplace_back(std::addressof(current));
                             break;
                         case token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
@@ -3133,7 +3133,7 @@ namespace detail {
                             //    std::cout << *item.to_pointer(resources) << "\n";
                             //}
                             //std::cout << "\n";
-                            arg_stack.push_back(stack.back().to_pointer(resources));
+                            arg_stack.push_back(stack.back());
                             //for (auto& item : arg_stack)
                             //{
                             //    std::cout << *item << "\n";
@@ -3162,23 +3162,23 @@ namespace detail {
                             }
                             //std::cout << "function result: " << r << "\n";
                             arg_stack.clear();
-                            stack.emplace_back(path_node_type(std::addressof(r)));
+                            stack.emplace_back(std::addressof(r));
                             break;
                         }
                         case token_kind::expression:
                         {
                             if (stack.empty())
                             {
-                                stack.emplace_back(path_node_type(std::addressof(current)));
+                                stack.emplace_back(std::addressof(current));
                             }
 
-                            pointer ptr = stack.back().to_pointer(resources);
+                            pointer ptr = stack.back();
                             if (ptr)
                             {
                                 stack.pop_back();
                                 reference ref = tok.expression_->evaluate_single(resources, path, root, *ptr, options, ec);
                                 //std::cout << "ref2: " << ref << "\n";
-                                stack.emplace_back(path_node_type(std::addressof(ref)));
+                                stack.emplace_back(std::addressof(ref));
                             }
                             break;
                         }
@@ -3186,10 +3186,10 @@ namespace detail {
                         {
                             if (stack.empty())
                             {
-                                stack.emplace_back(path_node_type(std::addressof(current)));
+                                stack.emplace_back(std::addressof(current));
                             }
 
-                            pointer ptr = stack.back().to_pointer(resources);
+                            pointer ptr = stack.back();
                             //for (auto& item : stack)
                             //{
                                 //std::cout << "selector stack input:\n";
@@ -3216,7 +3216,7 @@ namespace detail {
                                 std::vector<path_node_type> temp;
                                 node_type ndtype = node_type();
                                 tok.selector_->select(resources, path, root, *ptr, temp, ndtype, options);
-
+                                
                                 if ((options & result_options::sort) == result_options::sort)
                                 {
                                     std::sort(temp.begin(), temp.end(), path_node_less_type());
@@ -3228,7 +3228,8 @@ namespace detail {
                                     {
                                         auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
                                         temp.erase(last,temp.end());
-                                        stack.emplace_back(std::move(temp), ndtype);
+                                        node_set<Json,JsonReference> ns(std::move(temp), ndtype);
+                                        stack.emplace_back(ns.to_pointer(resources));
                                     }
                                     else
                                     {
@@ -3250,7 +3251,8 @@ namespace detail {
                                                 index.erase(it);
                                             }
                                         }
-                                        stack.emplace_back(std::move(temp2), ndtype);
+                                        node_set<Json,JsonReference> ns(std::move(temp2), ndtype);
+                                        stack.emplace_back(ns.to_pointer(resources));
                                     }
                                 }
                                 else
@@ -3261,7 +3263,8 @@ namespace detail {
                                     //    std::cout << *item.ptr << "\n";
                                     //}
                                     //std::cout << "\n";
-                                    stack.emplace_back(std::move(temp), ndtype);
+                                    node_set<Json,JsonReference> ns(std::move(temp), ndtype);
+                                    stack.emplace_back(ns.to_pointer(resources));
                                 }
 
                             }
@@ -3277,7 +3280,7 @@ namespace detail {
             //{
             //    std::cout << "Stack size: " << stack.size() << "\n";
             //}
-            return stack.empty() ? resources.null_value() : *(stack.back().to_pointer(resources));
+            return stack.empty() ? resources.null_value() : *stack.back();
         }
  
         std::string to_string(int level) const
