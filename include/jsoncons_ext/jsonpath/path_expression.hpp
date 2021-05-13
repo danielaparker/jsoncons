@@ -3063,7 +3063,6 @@ namespace detail {
         expression_tree& operator=(expression_tree&& expr) = default;
 
         reference evaluate_single(dynamic_resources<Json,JsonReference>& resources, 
-                                  const std::vector<path_component_type>& ipath, 
                                   reference root,
                                   reference current,
                                   result_options options,
@@ -3071,7 +3070,7 @@ namespace detail {
         {
             std::vector<node_set<Json,JsonReference>> stack;
             std::vector<pointer> arg_stack;
-            std::vector<path_component_type> path(ipath);
+            std::vector<path_component_type> path = {path_component_type(current_node_arg)};
 
             //std::cout << "EVALUATE TOKENS\n";
             //for (auto& tok : token_list_)
