@@ -219,8 +219,8 @@ Operator|       Description
 `/`     |Left divided by right
 `+`     |Left plus right
 `-`     |Left minus right
-`&&`    |Left and right
-<code>&#124;&#124;</code>    |Left or right
+`&&`    |Left is true and right is true
+<code>&#124;&#124;</code>|Left is true or right is true
 `==`    |Left is equal to right 
 `!=`    |Left is not equal to right
 `<`     |Left is less than right
@@ -228,6 +228,17 @@ Operator|       Description
 `>`     |Left is greater than right
 `>=`    |Left is greater than or equal to right
 `=~`    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
+
+An expression is considered false if it evaluates to any of the following values:
+
+- empty array: [],
+- empty object: {},
+- empty string: "",
+- false,
+- null,
+- zero.
+
+It is considered true if it is not false.
 
 #### Unary operators
 
@@ -248,8 +259,6 @@ Precedence|Operator|Associativity
 6 |`==` `!=`        |Left 
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
-
-#### Parenthetical expressions
 
 A parenthetical expression allows the precedence order of an expression to be overriden, e.g. (a || b) && c.
 
