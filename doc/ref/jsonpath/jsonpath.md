@@ -112,7 +112,7 @@ JSONPath|       Description
 
 ### Duplicates and ordering
 
-Consider the JSON instance 
+Consider the JSON document 
 
 ```json
 {
