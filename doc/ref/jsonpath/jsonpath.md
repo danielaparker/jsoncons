@@ -211,6 +211,8 @@ JSONPath uses filter predicates to restrict the set of nodes returned by a path.
 
 [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
 
+#### Binary operators
+
 Operator|       Description
 --------|--------------------------------
 `*`     |Left times right
@@ -227,14 +229,14 @@ Operator|       Description
 `>=`    |Left is greater than or equal to right
 `=~`    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
 
-Unary operators
+#### Unary operators
 
 Operator|       Description
 --------|--------------------------------
 `!`     |Negate right
 `-`     |Unary minus
 
-Operator precedence
+#### Operator precedence
 
 Precedence|Operator|Associativity
 ----------|--------|-----------
@@ -246,6 +248,10 @@ Precedence|Operator|Associativity
 6 |`==` `!=`        |Left 
 7 |`&&`             |Left 
 8 |<code>&#124;&#124;</code> |Left 
+
+#### Parenthetical expressions
+
+A parenthetical expression allows the precedence order of an expression to be overriden, e.g. (a || b) && c.
 
 ### Unions
 
