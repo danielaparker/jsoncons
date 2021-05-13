@@ -3173,22 +3173,7 @@ namespace detail {
                                 stack.emplace_back(path_node_type(std::addressof(current)));
                             }
 
-                            pointer ptr = nullptr;
-                            switch (stack.back().tag)
-                            {
-                                case node_set_tag::single:
-                                    ptr = stack.back().node.ptr;
-                                    break;
-                                case node_set_tag::multi:
-                                    if (!stack.back().nodes.empty())
-                                    {
-                                        ptr = stack.back().nodes.back().ptr;
-                                    }
-                                    ptr = stack.back().to_pointer(resources);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            pointer ptr = stack.back().to_pointer(resources);
                             if (ptr)
                             {
                                 stack.pop_back();
@@ -3205,7 +3190,7 @@ namespace detail {
                                 stack.emplace_back(path_node_type(std::addressof(current)));
                             }
 
-                            pointer ptr = nullptr;
+                            pointer ptr = stack.back().to_pointer(resources);
                             //for (auto& item : stack)
                             //{
                                 //std::cout << "selector stack input:\n";
@@ -3225,21 +3210,6 @@ namespace detail {
                             //}
                             //std::cout << "\n";
                             //}
-                            switch (stack.back().tag)
-                            {
-                                case node_set_tag::single:
-                                    ptr = stack.back().node.ptr;
-                                    break;
-                                case node_set_tag::multi:
-                                    if (!stack.back().nodes.empty())
-                                    {
-                                        ptr = stack.back().nodes.back().ptr;
-                                    }
-                                    ptr = stack.back().to_pointer(resources);
-                                    break;
-                                default:
-                                    break;
-                            }
                             if (ptr)
                             {
                                 //std::cout << "selector item: " << *ptr << "\n";
