@@ -100,7 +100,7 @@ Union of the fourth book and all books with price > 10:
 JSONPath|       Description
 --------|--------------------------------
 `$`|    Represents the root JSON value
-`@`|    Represents the current value being evaluated. 
+`@`|    Represents the value currently being processed. 
 `.` or `[]`|    Child operator
 `..`    |Recursive descent. JSONPath borrows this syntax from [E4X](https://en.wikipedia.org/wiki/ECMAScript_for_XML).
 `*` |   Wildcard. All objects/elements regardless their names.
