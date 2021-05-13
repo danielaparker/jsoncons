@@ -224,7 +224,7 @@ Operator|       Description
 `==`    |Left is equal to right 
 `!=`    |Left is not equal to right
 `<`     |Left is less than right
-`<=`    |Left is less or equal to right
+`<=`    |Left is less than or equal to right
 `>`     |Left is greater than right
 `>=`    |Left is greater than or equal to right
 `=~`    |Left matches regular expression [?(@.author =~ /Evelyn.*?/)]
