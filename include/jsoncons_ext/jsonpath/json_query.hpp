@@ -1194,8 +1194,7 @@ namespace jsoncons { namespace jsonpath {
                                 {
                                     return path_expression_type();
                                 }
-                                json j = decoder.get_result();
-                                push_token(token_type(literal_arg, /*decoder.get_result()*/ std::move(j)), ec);
+                                push_token(token_type(literal_arg, decoder.get_result()), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
