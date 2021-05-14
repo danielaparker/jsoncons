@@ -8,33 +8,33 @@ enum class result_type {value,path};
 
 ```c++
 template<class Json>
-Json json_query(const Json& root, 
+Json json_query(const Json& root value, 
                 const Json:string_view_type& expr,
                 result_type type = result_type::value);              (until 0.161.0)
 
 template<class Json>
-Json json_query(const Json& root, 
+Json json_query(const Json& root value, 
                 const Json::string_view_type& expr,
                 result_options options = result_options::value); (1) (since 0.161.0)
 ```
 ```c++
 template<class Json, class BinaryCallback>
-void json_query(const Json& root, 
+void json_query(const Json& root value, 
                 const Json::string_view_type& expr,
                 BinaryCallback callback
                 result_options options = result_options::value); (2) (since 0.161.0)
 ```
-(1) Evaluates the Json value `root` against the JSONPath expression `expr` and returns an array of values or 
+(1) Evaluates the root value against the JSONPath expression `expr` and returns an array of values or 
 normalized path expressions. 
 
-(2) Evaluates the Json value `root` against the JSONPath expression `expr` and calls a provided
+(2) Evaluates the root value against the JSONPath expression `expr` and calls a provided
 callback repeatedly with the results. 
 
 #### Parameters
 
 <table>
   <tr>
-    <td><code>root</code></td>
+    <td><code>root value</code></td>
     <td>Json value</td> 
   </tr>
   <tr>
@@ -119,58 +119,58 @@ namespace jsonpath = jsoncons::jsonpath;
 int main()
 {
     std::ifstream is("./input/store.json");
-    json instance = json::parse(is);
+    json root_value = json::parse(is);
 
     // The authors of books that are cheaper than $10
-    json result1 = jsonpath::json_query(instance, "$.store.book[?(@.price < 10)].author");
+    json result1 = jsonpath::json_query(root_value, "$.store.book[?(@.price < 10)].author");
     std::cout << "(1) " << result1 << "\n";
 
     // The number of books
-    json result2 = jsonpath::json_query(instance, "$..book.length");
+    json result2 = jsonpath::json_query(root_value, "$..book.length");
     std::cout << "(2) " << result2 << "\n";
 
     // The third book
-    json result3 = jsonpath::json_query(instance, "$..book[2]");
+    json result3 = jsonpath::json_query(root_value, "$..book[2]");
     std::cout << "(3)\n" << pretty_print(result3) << "\n";
 
     // All books whose author's name starts with Evelyn
-    json result4 = jsonpath::json_query(instance, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
+    json result4 = jsonpath::json_query(root_value, "$.store.book[?(@.author =~ /Evelyn.*?/)]");
     std::cout << "(4)\n" << pretty_print(result4) << "\n";
 
     // The titles of all books that have isbn number
-    json result5 = jsonpath::json_query(instance, "$..book[?(@.isbn)].title");
+    json result5 = jsonpath::json_query(root_value, "$..book[?(@.isbn)].title");
     std::cout << "(5) " << result5 << "\n";
 
     // All authors and titles of books
-    json result6 = jsonpath::json_query(instance, "$['store']['book']..['author','title']");
+    json result6 = jsonpath::json_query(root_value, "$['store']['book']..['author','title']");
     std::cout << "(6)\n" << pretty_print(result6) << "\n";
 
     // Union of two ranges of book titles
-    json result7 = jsonpath::json_query(instance, "$..book[1:2,2:4].title");
+    json result7 = jsonpath::json_query(root_value, "$..book[1:2,2:4].title");
     std::cout << "(7)\n" << pretty_print(result7) << "\n";
 
     // Union of a subset of book titles identified by index
-    json result8 = jsonpath::json_query(instance, "$.store[book[0].title,book[1].title,book[3].title]");
+    json result8 = jsonpath::json_query(root_value, "$.store[book[0].title,book[1].title,book[3].title]");
     std::cout << "(8)\n" << pretty_print(result8) << "\n";
 
     // Union of third book title and all book titles with price > 10
-    json result9 = jsonpath::json_query(instance, "$.store[book[3].title,book[?(@.price > 10)].title]");
+    json result9 = jsonpath::json_query(root_value, "$.store[book[3].title,book[?(@.price > 10)].title]");
     std::cout << "(9)\n" << pretty_print(result9) << "\n";
 
     // Intersection of book titles with category fiction and price < 15
-    json result10 = jsonpath::json_query(instance, "$.store.book[?(@.category == 'fiction')][?(@.price < 15)].title");
+    json result10 = jsonpath::json_query(root_value, "$.store.book[?(@.category == 'fiction')][?(@.price < 15)].title");
     std::cout << "(10)\n" << pretty_print(result10) << "\n";
 
     // Normalized path expressions
-    json result11 = jsonpath::json_query(instance, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_options::path);
+    json result11 = jsonpath::json_query(root_value, "$.store.book[?(@.author =~ /Evelyn.*?/)]", jsonpath::result_options::path);
     std::cout << "(11)\n" << pretty_print(result11) << "\n";
 
     // All titles whose author's second name is 'Waugh'
-    json result12 = jsonpath::json_query(instance,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
+    json result12 = jsonpath::json_query(root_value,"$.store.book[?(tokenize(@.author,'\\\\s+')[1] == 'Waugh')].title");
     std::cout << "(12)\n" << result12 << "\n";
 
     // All keys in the second book
-    json result13 = jsonpath::json_query(instance,"keys($.store.book[1])[*]");
+    json result13 = jsonpath::json_query(root_value,"keys($.store.book[1])[*]");
     std::cout << "(13)\n" << result13 << "\n";
 }
 ```
