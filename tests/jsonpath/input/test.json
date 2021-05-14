@@ -1,46 +1,64 @@
 [
-  {
-     "given": {
-         "store": {
-             "book": [
-                 {
-                     "category": "reference",
-                     "author": "Nigel Rees",
-                     "title": "Sayings of the Century",
-                     "price": 8.95
-                 },
-                 {
-                     "category": "fiction",
-                     "author": "Evelyn Waugh",
-                     "title": "Sword of Honour",
-                     "price": 12.99
-                 },
-                 {
-                     "category": "fiction",
-                     "author": "Herman Melville",
-                     "title": "Moby Dick",
-                     "isbn": "0-553-21311-3",
-                     "price": 8.99
-                 },
-                 {
-                     "category": "fiction",
-                     "author": "J. R. R. Tolkien",
-                     "title": "The Lord of the Rings",
-                     "isbn": "0-395-19395-8",
-                     "price": 22.99
-                 }
-             ],
-             "bicycle": {
-                 "color": "red",
-                 "price": 19.95
-             }
-         }
-     },
-     "cases": [
-       {
-         "comment" : "length",
-         "expression": "length($.store.book[*])",
-         "result": [4]
-       }     ]
-   }
+    {
+        "given" : [
+           {
+             "d": [
+               "v1",
+               "v2"
+             ]
+           },
+           {
+             "d": [
+               "a",
+               "b"
+             ]
+           },
+           {
+             "d": "v1"
+           },
+           {
+             "d": "v2"
+           },
+           {
+             "d": {}
+           },
+           {
+             "d": []
+           },
+           {
+             "d": null
+           },
+           {
+             "d": -1
+           },
+           {
+             "d": 0
+           },
+           {
+             "d": 1
+           },
+           {
+             "d": "['v1','v2']"
+           },
+           {
+             "d": "['v1', 'v2']"
+           },
+           {
+             "d": "v1,v2"
+           },
+           {
+             "d": "[\"v1\", \"v2\"]"
+           },
+           {
+             "d": "[\"v1\",\"v2\"]"
+           }
+         ],
+        "cases" : [
+            {
+                "comment" : "Filter expression with equals array",
+                "expression" : "$[?(@.d==[\"v1\",\"v2\"])]",
+                "result" :  [{"d": ["v1", "v2"]}]
+            }
+        ]
+    }
 ]

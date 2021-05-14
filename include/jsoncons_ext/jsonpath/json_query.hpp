@@ -127,6 +127,7 @@ namespace jsoncons { namespace jsonpath {
         identifier_or_function_expr,
         name_or_left_bracket,
         unquoted_string,
+        anything,
         number,
         function_expression,
         argument,
@@ -963,7 +964,6 @@ namespace jsoncons { namespace jsonpath {
             std::size_t selector_id = 0;
 
             string_type buffer;
-            int64_t json_text_level = 0;
             uint32_t cp = 0;
             uint32_t cp2 = 0;
 
@@ -1098,9 +1098,7 @@ namespace jsoncons { namespace jsonpath {
                             }
                             default:
                             {
-                                state_stack_.back() = path_state::json_text_or_function;
-                                state_stack_.emplace_back(path_state::json_text_or_function_name);
-                                json_text_level = 0;
+                                state_stack_.back() = path_state::json_text_or_function_name;
                                 break;
                             }
                         }
@@ -1182,62 +1180,46 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '{':
                             case '[':
-                                ++json_text_level;
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                                break;
-                            case '}':
-                            case ']':
-                                --json_text_level;
-                                if (json_text_level == 0)
+                            {
+                                json_decoder<Json> decoder;
+                                basic_json_parser<char_type> parser;
+                                parser.update(p_,end_input_ - p_);
+                                parser.parse_some(decoder, ec);
+                                if (ec)
                                 {
-                                    state_stack_.pop_back(); 
+                                    return path_expression_type();
                                 }
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
+                                parser.finish_parse(decoder, ec);
+                                if (ec)
+                                {
+                                    return path_expression_type();
+                                }
+                                json j = decoder.get_result();
+                                push_token(token_type(literal_arg, /*decoder.get_result()*/ std::move(j)), ec);
+                                if (ec) {return path_expression_type();}
+                                buffer.clear();
+                                state_stack_.pop_back();
+                                p_ = parser.current();
+                                column_ = column_ + parser.column() - 1;
                                 break;
+                            }
                             case '-':case '0':case '1':case '2':case '3':case '4':case '5':case '6':case '7':case '8':case '9':
-                                if (json_text_level == 0)
-                                {
-                                    state_stack_.back() = path_state::number;
-                                }
-                                else
-                                {
-                                    state_stack_.emplace_back(path_state::number);
-                                }
+                                state_stack_.back() = path_state::json_text_or_function;
+                                state_stack_.emplace_back(path_state::number);
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
                                 break;
                             case '\"':
-                                if (json_text_level == 0)
-                                {
-                                    state_stack_.back() = path_state::json_text_string;
-                                }
-                                else
-                                {
-                                    state_stack_.emplace_back(path_state::json_text_string);
-                                }
-                                buffer.push_back(*p_);
-                                ++p_;
-                                ++column_;
-                                break;
-                            case ':':
+                                state_stack_.back() = path_state::json_text_or_function;
+                                state_stack_.emplace_back(path_state::json_text_string);
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                if (json_text_level == 0)
-                                {
-                                    state_stack_.back() = path_state::unquoted_string;
-                                }
-                                else
-                                {
-                                    state_stack_.emplace_back(path_state::unquoted_string);
-                                }
+                                state_stack_.back() = path_state::json_text_or_function;
+                                state_stack_.emplace_back(path_state::unquoted_string);
                                 buffer.push_back(*p_);
                                 ++p_;
                                 ++column_;
@@ -1519,13 +1501,6 @@ namespace jsoncons { namespace jsonpath {
                         }
                         break;
                     }
-                    /*case path_state::argument:
-                    {
-                        push_token(argument_arg, ec);
-                        if (ec) {return path_expression_type();}
-                        state_stack_.pop_back();
-                        break;
-                    }*/
                     case path_state::unquoted_string: 
                         switch (*p_)
                         {
