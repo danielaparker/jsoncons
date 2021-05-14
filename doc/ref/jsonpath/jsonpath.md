@@ -107,8 +107,8 @@ JSONPath|       Description
 `[]`    |Subscript operator. 
 `[,]`   |Union.
 `[start:end:step]`      |Array slice operator borrowed from ECMASCRIPT 4.
-`()`    |Expression.
-`?()`   |Filter by expression.
+`(<expr>)`    |Expression that evaluates to an identifier or index
+`?(<expr>)`   |Filter by expression.
 
 ### Duplicates and ordering
 
