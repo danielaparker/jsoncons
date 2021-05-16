@@ -867,17 +867,17 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                switch (arg0_ptr->type())
+                reference arg0 = args[0].value();
+                switch (arg0.type())
                 {
                     case json_type::uint64_value:
                     case json_type::int64_value:
                     {
-                        return *resources.create_json(arg0_ptr->template as<double>());
+                        return *resources.create_json(arg0.template as<double>());
                     }
                     case json_type::double_value:
                     {
-                        return *resources.create_json(std::floor(arg0_ptr->template as<double>()));
+                        return *resources.create_json(std::floor(arg0.template as<double>()));
                     }
                     default:
                         ec = jmespath_errc::invalid_type;
@@ -1488,8 +1488,8 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (!arg0_ptr->is_object())
+                reference arg0 = args[0].value();
+                if (!arg0.is_object())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
@@ -1498,7 +1498,7 @@ namespace jmespath {
                 auto result = resources.create_json(json_array_arg);
                 result->reserve(args.size());
 
-                for (auto& item : arg0_ptr->object_range())
+                for (auto& item : arg0.object_range())
                 {
                     result->emplace_back(item.key());
                 }
@@ -1524,8 +1524,8 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (!arg0_ptr->is_object())
+                reference arg0 = args[0].value();
+                if (!arg0.is_object())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
@@ -1534,7 +1534,7 @@ namespace jmespath {
                 auto result = resources.create_json(json_array_arg);
                 result->reserve(args.size());
 
-                for (auto& item : arg0_ptr->object_range())
+                for (auto& item : arg0.object_range())
                 {
                     result->emplace_back(item.value());
                 }
@@ -1560,12 +1560,12 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                switch (arg0_ptr->type())
+                reference arg0 = args[0].value();
+                switch (arg0.type())
                 {
                     case json_type::string_value:
                     {
-                        string_view_type sv = arg0_ptr->as_string_view();
+                        string_view_type sv = arg0.as_string_view();
                         std::basic_string<char32_t> buf;
                         unicode_traits::convert(sv.data(), sv.size(), buf);
                         std::reverse(buf.begin(), buf.end());
@@ -1575,7 +1575,7 @@ namespace jmespath {
                     }
                     case json_type::array_value:
                     {
-                        auto result = resources.create_json(*arg0_ptr);
+                        auto result = resources.create_json(arg0);
                         std::reverse(result->array_range().begin(),result->array_range().end());
                         return *result;
                     }
@@ -1604,22 +1604,22 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (!arg0_ptr->is_string())
+                reference arg0 = args[0].value();
+                if (!arg0.is_string())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
 
-                pointer arg1_ptr = args[1].value_;
-                if (!arg1_ptr->is_string())
+                reference arg1 = args[1].value();
+                if (!arg1.is_string())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
 
-                auto sv0 = arg0_ptr->template as<string_view_type>();
-                auto sv1 = arg1_ptr->template as<string_view_type>();
+                auto sv0 = arg0.template as<string_view_type>();
+                auto sv1 = arg1.template as<string_view_type>();
 
                 if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
                 {
