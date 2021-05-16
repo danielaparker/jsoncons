@@ -647,20 +647,18 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                switch (arg0_ptr->type())
+                const Json& arg0 = args[0].value();
+                switch (arg0.type())
                 {
                     case json_type::uint64_value:
-                        return *arg0_ptr;
+                        return arg0;
                     case json_type::int64_value:
                     {
-                        pointer j_ptr = arg0_ptr->template as<int64_t>() >= 0 ? arg0_ptr : resources.create_json(std::abs(arg0_ptr->template as<int64_t>()));
-                        return *j_ptr;
+                        return arg0.template as<int64_t>() >= 0 ? arg0 : *resources.create_json(std::abs(arg0.template as<int64_t>()));
                     }
                     case json_type::double_value:
                     {
-                        pointer j_ptr = arg0_ptr->template as<double>() >= 0 ? arg0_ptr : resources.create_json(std::abs(arg0_ptr->template as<double>()));
-                        return *j_ptr;
+                        return arg0.template as<double>() >= 0 ? arg0 : *resources.create_json(std::abs(arg0.template as<double>()));
                     }
                     default:
                     {
