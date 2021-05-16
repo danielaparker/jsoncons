@@ -1429,20 +1429,20 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (!arg0_ptr->is_array())
+                const Json& arg0 = args[0].value();
+                if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
-                if (arg0_ptr->size() <= 1)
+                if (arg0.size() <= 1)
                 {
-                    return *arg0_ptr;
+                    return arg0;
                 }
 
                 const auto& expr = args[1].expression();
 
-                auto v = resources.create_json(*arg0_ptr);
+                auto v = resources.create_json(arg0);
                 std::stable_sort((v->array_range()).begin(), (v->array_range()).end(),
                     [&expr,&resources,&ec](reference lhs, reference rhs) -> bool
                 {
