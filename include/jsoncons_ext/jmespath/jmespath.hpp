@@ -588,6 +588,16 @@ namespace jmespath {
                 return type_ == parameter_type::expression;
             }
 
+            const Json& value() const
+            {
+                return *value_;
+            }
+
+            const expression_base& expression() const
+            {
+                return *expression_;
+            }
+
             parameter_type type() const
             {
                 return type_;
@@ -1430,14 +1440,14 @@ namespace jmespath {
                     return *arg0_ptr;
                 }
 
-                auto& expr = args[1].expression_;
+                const auto& expr = args[1].expression();
 
                 auto v = resources.create_json(*arg0_ptr);
                 std::stable_sort((v->array_range()).begin(), (v->array_range()).end(),
                     [&expr,&resources,&ec](reference lhs, reference rhs) -> bool
                 {
                     std::error_code ec2;
-                    reference key1 = expr->evaluate(lhs, resources, ec2);
+                    reference key1 = expr.evaluate(lhs, resources, ec2);
                     bool is_number = key1.is_number();
                     bool is_string = key1.is_string();
                     if (!(is_number || is_string))
@@ -1445,7 +1455,7 @@ namespace jmespath {
                         ec = jmespath_errc::invalid_type;
                     }
 
-                    reference key2 = expr->evaluate(rhs, resources, ec2);
+                    reference key2 = expr.evaluate(rhs, resources, ec2);
                     if (!(key2.is_number() == is_number && key2.is_string() == is_string))
                     {
                         ec = jmespath_errc::invalid_type;
