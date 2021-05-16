@@ -647,7 +647,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 switch (arg0.type())
                 {
                     case json_type::uint64_value:
@@ -687,7 +687,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -731,7 +731,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 switch (arg0.type())
                 {
                     case json_type::uint64_value:
@@ -769,8 +769,8 @@ namespace jmespath {
                 }
 
 
-                const Json& arg0 = args[0].value();
-                const Json& arg1 = args[1].value();
+                reference arg0 = args[0].value();
+                reference arg1 = args[1].value();
 
                 switch (arg0.type())
                 {
@@ -821,14 +821,14 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_string())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
 
-                const Json& arg1 = args[1].value();
+                reference arg1 = args[1].value();
                 if (!arg1.is_string())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -898,8 +898,8 @@ namespace jmespath {
             {
                 JSONCONS_ASSERT(args.size() == *this->arity());
 
-                const Json& arg0 = args[0].value();
-                const Json& arg1 = args[1].value();
+                reference arg0 = args[0].value();
+                reference arg1 = args[1].value();
 
                 if (!(args[0].is_value() && args[1].is_value()))
                 {
@@ -956,7 +956,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
 
                 switch (arg0.type())
                 {
@@ -996,7 +996,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -1051,7 +1051,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -1114,7 +1114,7 @@ namespace jmespath {
                 }
                 const auto& expr = args[0].expression();
 
-                const Json& arg0 = args[1].value();
+                reference arg0 = args[1].value();
                 if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -1161,7 +1161,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -1216,7 +1216,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -1285,7 +1285,7 @@ namespace jmespath {
                     }
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_object())
                 {
                     ec = jmespath_errc::invalid_type;
@@ -1299,7 +1299,7 @@ namespace jmespath {
                 auto result = resources.create_json(arg0);
                 for (std::size_t i = 1; i < args.size(); ++i)
                 {
-                    const Json& argi = args[i].value();
+                    reference argi = args[i].value();
                     if (!argi.is_object())
                     {
                         ec = jmespath_errc::invalid_type;
@@ -1333,9 +1333,9 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
+                reference arg0 = args[0].value();
 
-                switch (arg0_ptr->type())
+                switch (arg0.type())
                 {
                     case json_type::int64_value:
                     case json_type::uint64_value:
@@ -1375,35 +1375,35 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (!arg0_ptr->is_array())
+                reference arg0 = args[0].value();
+                if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
-                if (arg0_ptr->size() <= 1)
+                if (arg0.size() <= 1)
                 {
-                    return *arg0_ptr;
+                    return arg0;
                 }
 
-                bool is_number = arg0_ptr->at(0).is_number();
-                bool is_string = arg0_ptr->at(0).is_string();
+                bool is_number = arg0.at(0).is_number();
+                bool is_string = arg0.at(0).is_string();
                 if (!is_number && !is_string)
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
 
-                for (std::size_t i = 1; i < arg0_ptr->size(); ++i)
+                for (std::size_t i = 1; i < arg0.size(); ++i)
                 {
-                    if (arg0_ptr->at(i).is_number() != is_number || arg0_ptr->at(i).is_string() != is_string)
+                    if (arg0.at(i).is_number() != is_number || arg0.at(i).is_string() != is_string)
                     {
                         ec = jmespath_errc::invalid_type;
                         return resources.null_value();
                     }
                 }
 
-                auto v = resources.create_json(*arg0_ptr);
+                auto v = resources.create_json(arg0);
                 std::stable_sort((v->array_range()).begin(), (v->array_range()).end());
                 return *v;
             }
@@ -1427,7 +1427,7 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                const Json& arg0 = args[0].value();
+                reference arg0 = args[0].value();
                 if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
