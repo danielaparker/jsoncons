@@ -548,8 +548,8 @@ namespace jmespath {
                 }
             }
 
-            parameter(pointer value) noexcept
-                : type_(parameter_type::value), value_(value)
+            parameter(reference value) noexcept
+                : type_(parameter_type::value), value_(std::addressof(value))
             {
             }
 
@@ -1650,14 +1650,14 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (!arg0_ptr->is_array())
+                reference arg0 = args[0].value();
+                if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
                 double sum = 0;
-                for (auto& j : arg0_ptr->array_range())
+                for (auto& j : arg0.array_range())
                 {
                     if (!j.is_number())
                     {
@@ -1689,15 +1689,15 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (arg0_ptr->is_array())
+                reference arg0 = args[0].value();
+                if (arg0.is_array())
                 {
-                    return *arg0_ptr;
+                    return arg0;
                 }
                 else
                 {
                     auto result = resources.create_json(json_array_arg);
-                    result->push_back(*arg0_ptr);
+                    result->push_back(arg0);
                     return *result;
                 }
             }
@@ -1726,16 +1726,16 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                switch (arg0_ptr->type())
+                reference arg0 = args[0].value();
+                switch (arg0.type())
                 {
                     case json_type::int64_value:
                     case json_type::uint64_value:
                     case json_type::double_value:
-                        return *arg0_ptr;
+                        return arg0;
                     case json_type::string_value:
                     {
-                        auto sv = arg0_ptr->as_string_view();
+                        auto sv = arg0.as_string_view();
                         auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
                         if (result1)
                         {
@@ -1749,7 +1749,7 @@ namespace jmespath {
                         jsoncons::detail::to_double_t to_double;
                         try
                         {
-                            auto s = arg0_ptr->as_string();
+                            auto s = arg0.as_string();
                             double d = to_double(s.c_str(), s.length());
                             return *resources.create_json(d);
                         }
@@ -1787,8 +1787,8 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                return *resources.create_json(arg0_ptr->template as<string_type>());
+                reference arg0 = args[0].value();
+                return *resources.create_json(arg0.template as<string_type>());
             }
 
             std::string to_string(std::size_t = 0) const override
@@ -2205,7 +2205,7 @@ namespace jmespath {
                 {
                     case token_kind::literal:
                     {
-                        stack.emplace_back(&t.value_);
+                        stack.emplace_back(t.value_);
                         break;
                     }
                     case token_kind::begin_expression_type:
@@ -2221,39 +2221,39 @@ namespace jmespath {
                     case token_kind::pipe:
                     {
                         JSONCONS_ASSERT(!stack.empty());
-                        root_ptr = stack.back().value_;
+                        root_ptr = std::addressof(stack.back().value());
                         break;
                     }
                     case token_kind::current_node:
-                        stack.push_back(root_ptr);
+                        stack.emplace_back(*root_ptr);
                         break;
                     case token_kind::expression:
                     {
                         JSONCONS_ASSERT(!stack.empty());
-                        pointer ptr = stack.back().value_;
+                        pointer ptr = std::addressof(stack.back().value());
                         stack.pop_back();
                         auto& ref = t.expression_->evaluate(*ptr, resources, ec);
-                        stack.push_back(std::addressof(ref));
+                        stack.emplace_back(ref);
                         break;
                     }
                     case token_kind::unary_operator:
                     {
                         JSONCONS_ASSERT(stack.size() >= 1);
-                        pointer ptr = stack.back().value_;
+                        pointer ptr = std::addressof(stack.back().value());
                         stack.pop_back();
                         reference r = t.unary_operator_->evaluate(*ptr, resources, ec);
-                        stack.push_back(std::addressof(r));
+                        stack.emplace_back(r);
                         break;
                     }
                     case token_kind::binary_operator:
                     {
                         JSONCONS_ASSERT(stack.size() >= 2);
-                        pointer rhs = stack.back().value_;
+                        pointer rhs = std::addressof(stack.back().value());
                         stack.pop_back();
-                        pointer lhs = stack.back().value_;
+                        pointer lhs = std::addressof(stack.back().value());
                         stack.pop_back();
                         reference r = t.binary_operator_->evaluate(*lhs,*rhs, resources, ec);
-                        stack.push_back(std::addressof(r));
+                        stack.emplace_back(r);
                         break;
                     }
                     case token_kind::argument:
@@ -2277,7 +2277,7 @@ namespace jmespath {
                             return std::addressof(resources.null_value());
                         }
                         arg_stack.clear();
-                        stack.push_back(std::addressof(r));
+                        stack.emplace_back(r);
                         break;
                     }
                     default:
@@ -2285,7 +2285,7 @@ namespace jmespath {
                 }
             }
             JSONCONS_ASSERT(stack.size() == 1);
-            return stack.back().value_;
+            return std::addressof(stack.back().value());
         }
 
         // Implementations
