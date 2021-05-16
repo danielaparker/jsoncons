@@ -687,19 +687,19 @@ namespace jmespath {
                     return resources.null_value();
                 }
 
-                pointer arg0_ptr = args[0].value_;
-                if (!arg0_ptr->is_array())
+                const Json& arg0 = args[0].value();
+                if (!arg0.is_array())
                 {
                     ec = jmespath_errc::invalid_type;
                     return resources.null_value();
                 }
-                if (arg0_ptr->empty())
+                if (arg0.empty())
                 {
                     return resources.null_value();
                 }
 
                 double sum = 0;
-                for (auto& j : arg0_ptr->array_range())
+                for (auto& j : arg0.array_range())
                 {
                     if (!j.is_number())
                     {
@@ -709,7 +709,7 @@ namespace jmespath {
                     sum += j.template as<double>();
                 }
 
-                return sum == 0 ? resources.null_value() : *resources.create_json(sum/arg0_ptr->size());
+                return sum == 0 ? resources.null_value() : *resources.create_json(sum/arg0.size());
             }
         };
 
