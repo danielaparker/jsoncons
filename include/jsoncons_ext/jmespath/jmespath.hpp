@@ -520,11 +520,11 @@ namespace jmespath {
 
         // parameter
 
-        enum class parameter_type{value, expression};
+        enum class parameter_kind{value, expression};
 
-        struct parameter
+        class parameter
         {
-            parameter_type type_;
+            parameter_kind type_;
 
             union
             {
@@ -532,15 +532,17 @@ namespace jmespath {
                 pointer value_;
             };
 
+        public:
+
             parameter(const parameter& other) noexcept
                 : type_(other.type_)
             {
                 switch (type_)
                 {
-                    case parameter_type::expression:
+                    case parameter_kind::expression:
                         expression_ = other.expression_;
                         break;
-                    case parameter_type::value:
+                    case parameter_kind::value:
                         value_ = other.value_;
                         break;
                     default:
@@ -549,12 +551,12 @@ namespace jmespath {
             }
 
             parameter(reference value) noexcept
-                : type_(parameter_type::value), value_(std::addressof(value))
+                : type_(parameter_kind::value), value_(std::addressof(value))
             {
             }
 
             parameter(expression_base* expression) noexcept
-                : type_(parameter_type::expression), expression_(expression)
+                : type_(parameter_kind::expression), expression_(expression)
             {
             }
 
@@ -565,10 +567,10 @@ namespace jmespath {
                     type_ = other.type_;
                     switch (type_)
                     {
-                        case parameter_type::expression:
+                        case parameter_kind::expression:
                             expression_ = other.expression_;
                             break;
-                        case parameter_type::value:
+                        case parameter_kind::value:
                             value_ = other.value_;
                             break;
                         default:
@@ -580,12 +582,12 @@ namespace jmespath {
 
             bool is_value() const
             {
-                return type_ == parameter_type::value;
+                return type_ == parameter_kind::value;
             }
 
             bool is_expression() const
             {
-                return type_ == parameter_type::expression;
+                return type_ == parameter_kind::expression;
             }
 
             const Json& value() const
@@ -596,11 +598,6 @@ namespace jmespath {
             const expression_base& expression() const
             {
                 return *expression_;
-            }
-
-            parameter_type type() const
-            {
-                return type_;
             }
         };
 
@@ -1809,9 +1806,9 @@ namespace jmespath {
             {
                 for (auto& param : args)
                 {
-                    if (param.is_value() && !param.value_->is_null())
+                    if (param.is_value() && !param.value().is_null())
                     {
-                        return *(param.value_);
+                        return param.value();
                     }
                 }
                 return resources.null_value();
