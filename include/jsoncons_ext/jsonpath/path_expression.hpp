@@ -972,7 +972,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1042,7 +1042,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1106,7 +1106,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1169,7 +1169,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1232,7 +1232,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1294,7 +1294,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1348,7 +1348,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1402,7 +1402,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1476,7 +1476,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1533,7 +1533,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1593,7 +1593,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1665,7 +1665,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1738,7 +1738,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1798,7 +1798,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
@@ -1857,7 +1857,7 @@ namespace detail {
         {
         }
 
-        reference evaluate(dynamic_resources<Json,JsonReference>& resources,
+        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<pointer>& args, 
                            std::error_code& ec) const override
         {
