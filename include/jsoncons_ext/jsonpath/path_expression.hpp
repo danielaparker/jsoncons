@@ -919,6 +919,30 @@ namespace detail {
         }
     };
 
+    template <class Json>
+    class parameter
+    {
+        const Json* value_;
+    public:
+        parameter(const Json* value) noexcept
+            : value_(value)
+        {
+        }
+
+        parameter(const parameter& other) noexcept = default;
+
+        parameter(parameter&& other) noexcept = default;
+
+        parameter& operator=(const parameter& other) noexcept = default;
+
+        parameter& operator=(parameter&& other) noexcept = default;
+
+        const Json& value() const
+        {
+            return *value_;
+        }
+    };
+
     // function_base
     template <class Json,class JsonReference>
     class function_base
@@ -928,6 +952,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+        using parameter_type = parameter<Json>;
 
         function_base(jsoncons::optional<std::size_t> arg_count)
             : arg_count_(arg_count)
@@ -941,7 +966,7 @@ namespace detail {
 
         virtual ~function_base() = default;
 
-        virtual value_type evaluate(const std::vector<pointer>& args, 
+        virtual value_type evaluate(const std::vector<parameter_type>& args, 
                                     std::error_code& ec) const = 0;
 
         virtual std::string to_string(int level = 0) const
@@ -964,6 +989,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         contains_function()
@@ -971,7 +997,7 @@ namespace detail {
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -980,15 +1006,15 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            pointer arg1_ptr = args[1];
+            auto arg0= args[0].value();
+            auto arg1= args[1].value();
 
-            switch (arg0_ptr->type())
+            switch (arg0.type())
             {
                 case json_type::array_value:
-                    for (auto& j : arg0_ptr->array_range())
+                    for (auto& j : arg0.array_range())
                     {
-                        if (j == *arg1_ptr)
+                        if (j == arg1)
                         {
                             return value_type(true);
                         }
@@ -996,13 +1022,13 @@ namespace detail {
                     return value_type(false);
                 case json_type::string_value:
                 {
-                    if (!arg1_ptr->is_string())
+                    if (!arg1.is_string())
                     {
                         ec = jsonpath_errc::invalid_type;
                         return value_type::null();
                     }
-                    auto sv0 = arg0_ptr->template as<string_view_type>();
-                    auto sv1 = arg1_ptr->template as<string_view_type>();
+                    auto sv0 = arg0.template as<string_view_type>();
+                    auto sv1 = arg1.template as<string_view_type>();
                     return sv0.find(sv1) != string_view_type::npos ? value_type(true) : value_type(false);
                 }
                 default:
@@ -1033,6 +1059,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         ends_with_function()
@@ -1040,7 +1067,7 @@ namespace detail {
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1049,22 +1076,22 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_string())
+            auto arg0= args[0].value();
+            if (!arg0.is_string())
             {
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
 
-            pointer arg1_ptr = args[1];
-            if (!arg1_ptr->is_string())
+            auto arg1= args[1].value();
+            if (!arg1.is_string())
             {
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
 
-            auto sv0 = arg0_ptr->template as<string_view_type>();
-            auto sv1 = arg1_ptr->template as<string_view_type>();
+            auto sv0 = arg0.template as<string_view_type>();
+            auto sv1 = arg1.template as<string_view_type>();
 
             if (sv1.length() <= sv0.length() && sv1 == sv0.substr(sv0.length() - sv1.length()))
             {
@@ -1096,6 +1123,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         starts_with_function()
@@ -1103,7 +1131,7 @@ namespace detail {
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1112,22 +1140,22 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_string())
+            auto arg0= args[0].value();
+            if (!arg0.is_string())
             {
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
 
-            pointer arg1_ptr = args[1];
-            if (!arg1_ptr->is_string())
+            auto arg1= args[1].value();
+            if (!arg1.is_string())
             {
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
 
-            auto sv0 = arg0_ptr->template as<string_view_type>();
-            auto sv1 = arg1_ptr->template as<string_view_type>();
+            auto sv0 = arg0.template as<string_view_type>();
+            auto sv1 = arg1.template as<string_view_type>();
 
             if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
             {
@@ -1159,13 +1187,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         sum_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1174,17 +1203,17 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_array())
+            auto arg0= args[0].value();
+            if (!arg0.is_array())
             {
-                //std::cout << "arg: " << *arg0_ptr << "\n";
+                //std::cout << "arg: " << arg0 << "\n";
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
-            //std::cout << "sum function arg: " << *arg0_ptr << "\n";
+            //std::cout << "sum function arg: " << arg0 << "\n";
 
             double sum = 0;
-            for (auto& j : arg0_ptr->array_range())
+            for (auto& j : arg0.array_range())
             {
                 if (!j.is_number())
                 {
@@ -1219,6 +1248,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
 
@@ -1227,7 +1257,7 @@ namespace detail {
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1236,14 +1266,14 @@ namespace detail {
                 return value_type::null();
             }
 
-            if (!args[0]->is_string() || !args[1]->is_string())
+            if (!args[0].value().is_string() || !args[1].value().is_string())
             {
-                //std::cout << "arg: " << *arg0_ptr << "\n";
+                //std::cout << "arg: " << arg0 << "\n";
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
-            auto arg0 = args[0]->template as<string_type>();
-            auto arg1 = args[1]->template as<string_type>();
+            auto arg0 = args[0].value().template as<string_type>();
+            auto arg1 = args[1].value().template as<string_type>();
 
             std::regex::flag_type options = std::regex_constants::ECMAScript; 
             std::basic_regex<char_type> pieces_regex(arg1, options);
@@ -1282,13 +1312,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         ceil_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1297,17 +1328,17 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            switch (arg0_ptr->type())
+            auto arg0= args[0].value();
+            switch (arg0.type())
             {
                 case json_type::uint64_value:
                 case json_type::int64_value:
                 {
-                    return value_type(arg0_ptr->template as<double>());
+                    return value_type(arg0.template as<double>());
                 }
                 case json_type::double_value:
                 {
-                    return value_type(std::ceil(arg0_ptr->template as<double>()));
+                    return value_type(std::ceil(arg0.template as<double>()));
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
@@ -1335,13 +1366,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         floor_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1350,17 +1382,17 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            switch (arg0_ptr->type())
+            auto arg0= args[0].value();
+            switch (arg0.type())
             {
                 case json_type::uint64_value:
                 case json_type::int64_value:
                 {
-                    return value_type(arg0_ptr->template as<double>());
+                    return value_type(arg0.template as<double>());
                 }
                 case json_type::double_value:
                 {
-                    return value_type(std::floor(arg0_ptr->template as<double>()));
+                    return value_type(std::floor(arg0.template as<double>()));
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
@@ -1388,13 +1420,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         to_number_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1403,16 +1436,16 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            switch (arg0_ptr->type())
+            auto arg0= args[0].value();
+            switch (arg0.type())
             {
                 case json_type::int64_value:
                 case json_type::uint64_value:
                 case json_type::double_value:
-                    return *arg0_ptr;
+                    return arg0;
                 case json_type::string_value:
                 {
-                    auto sv = arg0_ptr->as_string_view();
+                    auto sv = arg0.as_string_view();
                     auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
                     if (result1)
                     {
@@ -1426,7 +1459,7 @@ namespace detail {
                     jsoncons::detail::to_double_t to_double;
                     try
                     {
-                        auto s = arg0_ptr->as_string();
+                        auto s = arg0.as_string();
                         double d = to_double(s.c_str(), s.length());
                         return value_type(d);
                     }
@@ -1461,13 +1494,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         prod_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1476,15 +1510,15 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_array() || arg0_ptr->empty())
+            auto arg0= args[0].value();
+            if (!arg0.is_array() || arg0.empty())
             {
-                //std::cout << "arg: " << *arg0_ptr << "\n";
+                //std::cout << "arg: " << arg0 << "\n";
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
             double prod = 1;
-            for (auto& j : arg0_ptr->array_range())
+            for (auto& j : arg0.array_range())
             {
                 if (!j.is_number())
                 {
@@ -1517,13 +1551,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         avg_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1532,18 +1567,18 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_array())
+            auto arg0= args[0].value();
+            if (!arg0.is_array())
             {
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
-            if (arg0_ptr->empty())
+            if (arg0.empty())
             {
                 return value_type::null();
             }
             double sum = 0;
-            for (auto& j : arg0_ptr->array_range())
+            for (auto& j : arg0.array_range())
             {
                 if (!j.is_number())
                 {
@@ -1553,7 +1588,7 @@ namespace detail {
                 sum += j.template as<double>();
             }
 
-            return value_type(sum / static_cast<double>(arg0_ptr->size()));
+            return value_type(sum / static_cast<double>(arg0.size()));
         }
 
         std::string to_string(int level = 0) const override
@@ -1576,13 +1611,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         min_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1591,19 +1627,19 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_array())
+            auto arg0= args[0].value();
+            if (!arg0.is_array())
             {
-                //std::cout << "arg: " << *arg0_ptr << "\n";
+                //std::cout << "arg: " << arg0 << "\n";
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
-            if (arg0_ptr->empty())
+            if (arg0.empty())
             {
                 return value_type::null();
             }
-            bool is_number = arg0_ptr->at(0).is_number();
-            bool is_string = arg0_ptr->at(0).is_string();
+            bool is_number = arg0.at(0).is_number();
+            bool is_string = arg0.at(0).is_string();
             if (!is_number && !is_string)
             {
                 ec = jsonpath_errc::invalid_type;
@@ -1611,20 +1647,20 @@ namespace detail {
             }
 
             std::size_t index = 0;
-            for (std::size_t i = 1; i < arg0_ptr->size(); ++i)
+            for (std::size_t i = 1; i < arg0.size(); ++i)
             {
-                if (!(arg0_ptr->at(i).is_number() == is_number && arg0_ptr->at(i).is_string() == is_string))
+                if (!(arg0.at(i).is_number() == is_number && arg0.at(i).is_string() == is_string))
                 {
                     ec = jsonpath_errc::invalid_type;
                     return value_type::null();
                 }
-                if (arg0_ptr->at(i) < arg0_ptr->at(index))
+                if (arg0.at(i) < arg0.at(index))
                 {
                     index = i;
                 }
             }
 
-            return arg0_ptr->at(index);
+            return arg0.at(index);
         }
 
         std::string to_string(int level = 0) const override
@@ -1647,13 +1683,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         max_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1662,20 +1699,20 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_array())
+            auto arg0= args[0].value();
+            if (!arg0.is_array())
             {
-                //std::cout << "arg: " << *arg0_ptr << "\n";
+                //std::cout << "arg: " << arg0 << "\n";
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
             }
-            if (arg0_ptr->empty())
+            if (arg0.empty())
             {
                 return value_type::null();
             }
 
-            bool is_number = arg0_ptr->at(0).is_number();
-            bool is_string = arg0_ptr->at(0).is_string();
+            bool is_number = arg0.at(0).is_number();
+            bool is_string = arg0.at(0).is_string();
             if (!is_number && !is_string)
             {
                 ec = jsonpath_errc::invalid_type;
@@ -1683,20 +1720,20 @@ namespace detail {
             }
 
             std::size_t index = 0;
-            for (std::size_t i = 1; i < arg0_ptr->size(); ++i)
+            for (std::size_t i = 1; i < arg0.size(); ++i)
             {
-                if (!(arg0_ptr->at(i).is_number() == is_number && arg0_ptr->at(i).is_string() == is_string))
+                if (!(arg0.at(i).is_number() == is_number && arg0.at(i).is_string() == is_string))
                 {
                     ec = jsonpath_errc::invalid_type;
                     return value_type::null();
                 }
-                if (arg0_ptr->at(i) > arg0_ptr->at(index))
+                if (arg0.at(i) > arg0.at(index))
                 {
                     index = i;
                 }
             }
 
-            return arg0_ptr->at(index);
+            return arg0.at(index);
         }
 
         std::string to_string(int level = 0) const override
@@ -1719,13 +1756,14 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
 
         abs_function()
             : function_base<Json, JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1734,18 +1772,18 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            switch (arg0_ptr->type())
+            auto arg0= args[0].value();
+            switch (arg0.type())
             {
                 case json_type::uint64_value:
-                    return *arg0_ptr;
+                    return arg0;
                 case json_type::int64_value:
                 {
-                    return arg0_ptr->template as<int64_t>() >= 0 ? *arg0_ptr : value_type(std::abs(arg0_ptr->template as<int64_t>()));
+                    return arg0.template as<int64_t>() >= 0 ? arg0 : value_type(std::abs(arg0.template as<int64_t>()));
                 }
                 case json_type::double_value:
                 {
-                    return arg0_ptr->template as<double>() >= 0 ? *arg0_ptr : value_type(std::abs(arg0_ptr->template as<double>()));
+                    return arg0.template as<double>() >= 0 ? arg0 : value_type(std::abs(arg0.template as<double>()));
                 }
                 default:
                 {
@@ -1776,13 +1814,14 @@ namespace detail {
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
         using string_view_type = typename Json::string_view_type;
+        using parameter_type = parameter<Json>;
 
         length_function()
             : function_base<Json,JsonReference>(1)
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1791,17 +1830,17 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            //std::cout << "length function arg: " << *arg0_ptr << "\n";
+            auto arg0= args[0].value();
+            //std::cout << "length function arg: " << arg0 << "\n";
 
-            switch (arg0_ptr->type())
+            switch (arg0.type())
             {
                 case json_type::object_value:
                 case json_type::array_value:
-                    return value_type(arg0_ptr->size());
+                    return value_type(arg0.size());
                 case json_type::string_value:
                 {
-                    auto sv0 = arg0_ptr->template as<string_view_type>();
+                    auto sv0 = arg0.template as<string_view_type>();
                     auto length = unicode_traits::count_codepoints(sv0.data(), sv0.size());
                     return value_type(length);
                 }
@@ -1833,6 +1872,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
+        using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         keys_function()
@@ -1840,7 +1880,7 @@ namespace detail {
         {
         }
 
-        value_type evaluate(const std::vector<pointer>& args, 
+        value_type evaluate(const std::vector<parameter_type>& args, 
                             std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
@@ -1849,8 +1889,8 @@ namespace detail {
                 return value_type::null();
             }
 
-            pointer arg0_ptr = args[0];
-            if (!arg0_ptr->is_object())
+            auto arg0= args[0].value();
+            if (!arg0.is_object())
             {
                 ec = jsonpath_errc::invalid_type;
                 return value_type::null();
@@ -1859,7 +1899,7 @@ namespace detail {
             value_type result(json_array_arg);
             result.reserve(args.size());
 
-            for (auto& item : arg0_ptr->object_range())
+            for (auto& item : arg0.object_range())
             {
                 result.emplace_back(item.key());
             }
@@ -2897,6 +2937,7 @@ namespace detail {
         using value_type = Json;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
+        using parameter_type = parameter<Json>;
         using token_type = token<Json,JsonReference>;
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
@@ -2928,7 +2969,7 @@ namespace detail {
                                    std::error_code& ec) const
         {
             std::vector<pointer> stack;
-            std::vector<pointer> arg_stack;
+            std::vector<parameter_type> arg_stack;
             std::vector<path_component_type> path = {path_component_type(current_node_arg)};
 
             //std::cout << "EVALUATE TOKENS\n";
@@ -2992,7 +3033,7 @@ namespace detail {
                             //    std::cout << *item.to_pointer(resources) << "\n";
                             //}
                             //std::cout << "\n";
-                            arg_stack.push_back(stack.back());
+                            arg_stack.emplace_back(stack.back());
                             //for (auto& item : arg_stack)
                             //{
                             //    std::cout << *item << "\n";
