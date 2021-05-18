@@ -944,14 +944,12 @@ namespace detail {
     };
 
     // function_base
-    template <class Json,class JsonReference>
+    template <class Json>
     class function_base
     {
         jsoncons::optional<std::size_t> arg_count_;
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using parameter_type = parameter<Json>;
 
         function_base(jsoncons::optional<std::size_t> arg_count)
@@ -982,18 +980,16 @@ namespace detail {
         }
     };  
 
-    template <class Json,class JsonReference>
-    class contains_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class contains_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         contains_function()
-            : function_base<Json, JsonReference>(2)
+            : function_base<Json>(2)
         {
         }
 
@@ -1052,18 +1048,16 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class ends_with_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class ends_with_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         ends_with_function()
-            : function_base<Json, JsonReference>(2)
+            : function_base<Json>(2)
         {
         }
 
@@ -1116,18 +1110,16 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class starts_with_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class starts_with_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         starts_with_function()
-            : function_base<Json, JsonReference>(2)
+            : function_base<Json>(2)
         {
         }
 
@@ -1180,17 +1172,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class sum_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class sum_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         sum_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1241,19 +1231,17 @@ namespace detail {
 
 #if defined(JSONCONS_HAS_STD_REGEX)
 
-    template <class Json,class JsonReference>
-    class tokenize_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class tokenize_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
 
         tokenize_function()
-            : function_base<Json, JsonReference>(2)
+            : function_base<Json>(2)
         {
         }
 
@@ -1305,17 +1293,15 @@ namespace detail {
 
 #endif // defined(JSONCONS_HAS_STD_REGEX)
 
-    template <class Json,class JsonReference>
-    class ceil_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class ceil_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         ceil_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1359,17 +1345,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class floor_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class floor_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         floor_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1413,17 +1397,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class to_number_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class to_number_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         to_number_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1487,17 +1469,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class prod_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class prod_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         prod_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1544,17 +1524,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class avg_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class avg_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         avg_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1604,17 +1582,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class min_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class min_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         min_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1676,17 +1652,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class max_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class max_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         max_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1749,17 +1723,15 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class abs_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class abs_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
 
         abs_function()
-            : function_base<Json, JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1806,18 +1778,16 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class length_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class length_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using string_view_type = typename Json::string_view_type;
         using parameter_type = parameter<Json>;
 
         length_function()
-            : function_base<Json,JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1865,18 +1835,16 @@ namespace detail {
         }
     };
 
-    template <class Json,class JsonReference>
-    class keys_function : public function_base<Json,JsonReference>
+    template <class Json>
+    class keys_function : public function_base<Json>
     {
     public:
         using value_type = Json;
-        using reference = JsonReference;
-        using pointer = typename function_base<Json,JsonReference>::pointer;
         using parameter_type = parameter<Json>;
         using string_view_type = typename Json::string_view_type;
 
         keys_function()
-            : function_base<Json,JsonReference>(1)
+            : function_base<Json>(1)
         {
         }
 
@@ -1925,7 +1893,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
         using reference = JsonReference;
-        using function_base_type = function_base<Json,JsonReference>;
+        using function_base_type = function_base<Json>;
 
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
@@ -1936,22 +1904,22 @@ namespace detail {
 
         const function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
-            static abs_function<Json,JsonReference> abs_func;
-            static contains_function<Json,JsonReference> contains_func;
-            static starts_with_function<Json,JsonReference> starts_with_func;
-            static ends_with_function<Json,JsonReference> ends_with_func;
-            static ceil_function<Json,JsonReference> ceil_func;
-            static floor_function<Json, JsonReference> floor_func;
-            static to_number_function<Json,JsonReference> to_number_func;
-            static sum_function<Json,JsonReference> sum_func;
-            static prod_function<Json,JsonReference> prod_func;
-            static avg_function<Json,JsonReference> avg_func;
-            static min_function<Json,JsonReference> min_func;
-            static max_function<Json,JsonReference> max_func;
-            static length_function<Json,JsonReference> length_func;
-            static keys_function<Json,JsonReference> keys_func;
+            static abs_function<Json> abs_func;
+            static contains_function<Json> contains_func;
+            static starts_with_function<Json> starts_with_func;
+            static ends_with_function<Json> ends_with_func;
+            static ceil_function<Json> ceil_func;
+            static floor_function<Json> floor_func;
+            static to_number_function<Json> to_number_func;
+            static sum_function<Json> sum_func;
+            static prod_function<Json> prod_func;
+            static avg_function<Json> avg_func;
+            static min_function<Json> min_func;
+            static max_function<Json> max_func;
+            static length_function<Json> length_func;
+            static keys_function<Json> keys_func;
 #if defined(JSONCONS_HAS_STD_REGEX)
-            static tokenize_function<Json,JsonReference> tokenize_func;
+            static tokenize_function<Json> tokenize_func;
 #endif
 
             static std::unordered_map<string_type,const function_base_type*> functions =
@@ -2424,7 +2392,7 @@ namespace detail {
             std::unique_ptr<expression_base_type> expression_;
             const unary_operator<Json,JsonReference>* unary_operator_;
             const binary_operator<Json,JsonReference>* binary_operator_;
-            const function_base<Json,JsonReference>* function_;
+            const function_base<Json>* function_;
             Json value_;
         };
     public:
@@ -2523,7 +2491,7 @@ namespace detail {
             new (&expression_) std::unique_ptr<expression_base_type>(std::move(expr));
         }
 
-        token(const function_base<Json,JsonReference>* function) noexcept
+        token(const function_base<Json>* function) noexcept
             : type_(token_kind::function),
               function_(function)
         {
