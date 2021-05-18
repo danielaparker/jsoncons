@@ -925,6 +925,7 @@ namespace detail {
     {
         jsoncons::optional<std::size_t> arg_count_;
     public:
+        using value_type = Json;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
 
@@ -940,9 +941,9 @@ namespace detail {
 
         virtual ~function_base() = default;
 
-        virtual reference evaluate(dynamic_resources<Json,JsonReference>& resources,
-                                   const std::vector<pointer>& args, 
-                                   std::error_code& ec) const = 0;
+        virtual value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
+                                    const std::vector<pointer>& args, 
+                                    std::error_code& ec) const = 0;
 
         virtual std::string to_string(int level = 0) const
         {
@@ -961,7 +962,8 @@ namespace detail {
     class contains_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
         using string_view_type = typename Json::string_view_type;
 
@@ -1030,7 +1032,8 @@ namespace detail {
     class ends_with_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
         using string_view_type = typename Json::string_view_type;
 
@@ -1093,7 +1096,8 @@ namespace detail {
     class starts_with_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
         using string_view_type = typename Json::string_view_type;
 
@@ -1156,7 +1160,8 @@ namespace detail {
     class sum_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         sum_function()
@@ -1216,7 +1221,8 @@ namespace detail {
     class tokenize_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
@@ -1279,7 +1285,8 @@ namespace detail {
     class ceil_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         ceil_function()
@@ -1332,7 +1339,8 @@ namespace detail {
     class floor_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         floor_function()
@@ -1385,7 +1393,8 @@ namespace detail {
     class to_number_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         to_number_function()
@@ -1458,7 +1467,8 @@ namespace detail {
     class prod_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         prod_function()
@@ -1514,7 +1524,8 @@ namespace detail {
     class avg_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         avg_function()
@@ -1573,7 +1584,8 @@ namespace detail {
     class min_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         min_function()
@@ -1644,7 +1656,8 @@ namespace detail {
     class max_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         max_function()
@@ -1716,7 +1729,8 @@ namespace detail {
     class abs_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
 
         abs_function()
@@ -1774,7 +1788,8 @@ namespace detail {
     class length_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
         using string_view_type = typename Json::string_view_type;
 
@@ -1832,7 +1847,8 @@ namespace detail {
     class keys_function : public function_base<Json,JsonReference>
     {
     public:
-        using reference = typename function_base<Json,JsonReference>::reference;
+        using value_type = Json;
+        using reference = JsonReference;
         using pointer = typename function_base<Json,JsonReference>::pointer;
         using string_view_type = typename Json::string_view_type;
 
@@ -2129,6 +2145,7 @@ namespace detail {
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using value_type = Json;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_component_type = path_component<char_type>;
@@ -2273,6 +2290,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
+        using value_type = Json;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<Json,JsonReference>;
@@ -2334,18 +2352,6 @@ namespace detail {
                             node_kind& ndtype,
                             result_options options) const = 0;
 
-        jsoncons::optional<pointer> evaluate_single(dynamic_resources<Json,JsonReference>& resources,
-                                                    const std::vector<path_component_type>& path, 
-                                                    reference root,
-                                                    reference val, 
-                                                    result_options options) const
-        {
-            node_kind ndtype;
-            std::vector<path_node_type> nodes;
-            select(resources,path,root,val,nodes,ndtype,options);
-            return nodes.size() == 1 ? jsoncons::optional<pointer>(nodes.back().ptr) : jsoncons::optional<pointer>();
-        }
-
         virtual void append_selector(std::unique_ptr<selector_base>&&) 
         {
         }
@@ -2363,6 +2369,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = jsoncons::basic_string_view<char_type, std::char_traits<char_type>>;
+        using value_type = Json;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<Json,JsonReference>;
@@ -2370,12 +2377,12 @@ namespace detail {
 
         virtual ~expression_base() noexcept = default;
 
-        virtual reference evaluate_single(dynamic_resources<Json,JsonReference>& resources,
-                                          const std::vector<path_component_type>& path, 
-                                          reference root,
-                                          reference val, 
-                                          result_options options,
-                                          std::error_code& ec) const = 0;
+        virtual value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
+                                           const std::vector<path_component_type>& path, 
+                                           reference root,
+                                           reference val, 
+                                           result_options options,
+                                           std::error_code& ec) const = 0;
 
         virtual std::string to_string(int level = 0) const = 0;
     };
@@ -2758,6 +2765,7 @@ namespace detail {
         using path_node_type = path_node<Json,JsonReference>;
         using path_node_less_type = path_node_less<Json,JsonReference>;
         using path_node_equal_type = path_node_equal<Json,JsonReference>;
+        using value_type = Json;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
@@ -2904,6 +2912,7 @@ namespace detail {
         using path_node_type = path_node<Json,JsonReference>;
         using path_node_less_type = path_node_less<Json,JsonReference>;
         using path_node_equal_type = path_node_equal<Json,JsonReference>;
+        using value_type = Json;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
         using token_type = token<Json,JsonReference>;
@@ -2930,11 +2939,11 @@ namespace detail {
 
         expression_tree& operator=(expression_tree&& expr) = default;
 
-        reference evaluate_single(dynamic_resources<Json,JsonReference>& resources, 
-                                  reference root,
-                                  reference current,
-                                  result_options options,
-                                  std::error_code& ec) const
+        value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources, 
+                                   reference root,
+                                   reference current,
+                                   result_options options,
+                                   std::error_code& ec) const
         {
             std::vector<pointer> stack;
             std::vector<pointer> arg_stack;
@@ -3044,9 +3053,9 @@ namespace detail {
                             if (ptr)
                             {
                                 stack.pop_back();
-                                reference ref = tok.expression_->evaluate_single(resources, path, root, *ptr, options, ec);
+                                value_type ref = tok.expression_->evaluate_single(resources, path, root, *ptr, options, ec);
                                 //std::cout << "ref2: " << ref << "\n";
-                                stack.emplace_back(std::addressof(ref));
+                                stack.emplace_back(resources.create_json(std::move(ref)));
                             }
                             break;
                         }

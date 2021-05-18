@@ -667,7 +667,7 @@ namespace jsoncons { namespace jsonpath {
                     for (std::size_t i = 0; i < current.size(); ++i)
                     {
                         std::error_code ec;
-                        reference r = expr_.evaluate_single(resources, root, current[i], options, ec);
+                        value_type r = expr_.evaluate_single(resources, root, current[i], options, ec);
                         bool t = ec ? false : detail::is_true(r);
                         if (t)
                         {
@@ -680,7 +680,7 @@ namespace jsoncons { namespace jsonpath {
                     for (auto& member : current.object_range())
                     {
                         std::error_code ec;
-                        reference r = expr_.evaluate_single(resources, root, member.value(), options, ec);
+                        value_type r = expr_.evaluate_single(resources, root, member.value(), options, ec);
                         bool t = ec ? false : detail::is_true(r);
                         if (t)
                         {
@@ -729,7 +729,7 @@ namespace jsoncons { namespace jsonpath {
                 //std::cout << "index_expression_selector current: " << current << "\n";
 
                 std::error_code ec;
-                reference j = expr_.evaluate_single(resources, root, current, options, ec);
+                value_type j = expr_.evaluate_single(resources, root, current, options, ec);
 
                 if (!ec)
                 {
@@ -773,14 +773,14 @@ namespace jsoncons { namespace jsonpath {
             {
             }
 
-            reference evaluate_single(dynamic_resources<Json,JsonReference>& resources,
-                                      const std::vector<path_component_type>&, 
-                                      reference root,
-                                      reference current, 
-                                      result_options options,
-                                      std::error_code& ec) const override
+            value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
+                                       const std::vector<path_component_type>&, 
+                                       reference root,
+                                       reference current, 
+                                       result_options options,
+                                       std::error_code& ec) const override
             {
-                reference ref = expr_.evaluate_single(resources, root, current, options, ec);
+                value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
                 return ec ? resources.null_value() : ref; 
             }
 
@@ -887,10 +887,10 @@ namespace jsoncons { namespace jsonpath {
             {
                 ndtype = node_kind::single;
                 std::error_code ec;
-                reference ref = expr_.evaluate_single(resources, root, current, options, ec);
+                value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
                 if (!ec)
                 {
-                    this->evaluate_tail(resources, path, root, ref, nodes, ndtype, options);
+                    this->evaluate_tail(resources, path, root, *resources.create_json(std::move(ref)), nodes, ndtype, options);
                 }
             }
 
