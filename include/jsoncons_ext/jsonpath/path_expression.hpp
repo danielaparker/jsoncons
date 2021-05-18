@@ -941,8 +941,7 @@ namespace detail {
 
         virtual ~function_base() = default;
 
-        virtual value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                                    const std::vector<pointer>& args, 
+        virtual value_type evaluate(const std::vector<pointer>& args, 
                                     std::error_code& ec) const = 0;
 
         virtual std::string to_string(int level = 0) const
@@ -972,14 +971,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -992,25 +990,25 @@ namespace detail {
                     {
                         if (j == *arg1_ptr)
                         {
-                            return resources.true_value();
+                            return value_type(true);
                         }
                     }
-                    return resources.false_value();
+                    return value_type(false);
                 case json_type::string_value:
                 {
                     if (!arg1_ptr->is_string())
                     {
                         ec = jsonpath_errc::invalid_type;
-                        return resources.null_value();
+                        return value_type::null();
                     }
                     auto sv0 = arg0_ptr->template as<string_view_type>();
                     auto sv1 = arg1_ptr->template as<string_view_type>();
-                    return sv0.find(sv1) != string_view_type::npos ? resources.true_value() : resources.false_value();
+                    return sv0.find(sv1) != string_view_type::npos ? value_type(true) : value_type(false);
                 }
                 default:
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
             }
         }
@@ -1042,28 +1040,27 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_string())
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg1_ptr = args[1];
             if (!arg1_ptr->is_string())
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
 
             auto sv0 = arg0_ptr->template as<string_view_type>();
@@ -1071,11 +1068,11 @@ namespace detail {
 
             if (sv1.length() <= sv0.length() && sv1 == sv0.substr(sv0.length() - sv1.length()))
             {
-                return resources.true_value();
+                return value_type(true);
             }
             else
             {
-                return resources.false_value();
+                return value_type(false);
             }
         }
 
@@ -1106,28 +1103,27 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_string())
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg1_ptr = args[1];
             if (!arg1_ptr->is_string())
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
 
             auto sv0 = arg0_ptr->template as<string_view_type>();
@@ -1135,11 +1131,11 @@ namespace detail {
 
             if (sv1.length() <= sv0.length() && sv1 == sv0.substr(0, sv1.length()))
             {
-                return resources.true_value();
+                return value_type(true);
             }
             else
             {
-                return resources.false_value();
+                return value_type(false);
             }
         }
 
@@ -1169,14 +1165,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1184,7 +1179,7 @@ namespace detail {
             {
                 //std::cout << "arg: " << *arg0_ptr << "\n";
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
             //std::cout << "sum function arg: " << *arg0_ptr << "\n";
 
@@ -1194,12 +1189,12 @@ namespace detail {
                 if (!j.is_number())
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
                 sum += j.template as<double>();
             }
 
-            return *resources.create_json(sum);
+            return value_type(sum);
         }
 
         std::string to_string(int level = 0) const override
@@ -1232,21 +1227,20 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             if (!args[0]->is_string() || !args[1]->is_string())
             {
                 //std::cout << "arg: " << *arg0_ptr << "\n";
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
             auto arg0 = args[0]->template as<string_type>();
             auto arg1 = args[1]->template as<string_type>();
@@ -1257,13 +1251,13 @@ namespace detail {
             std::regex_token_iterator<typename string_type::const_iterator> rit ( arg0.begin(), arg0.end(), pieces_regex, -1);
             std::regex_token_iterator<typename string_type::const_iterator> rend;
 
-            auto j = resources.create_json(json_array_arg);
-            while (rit!=rend) 
+            value_type j(json_array_arg);
+            while (rit != rend) 
             {
-                j->emplace_back(rit->str());
+                j.emplace_back(rit->str());
                 ++rit;
             }
-            return *j;
+            return j;
         }
 
         std::string to_string(int level = 0) const override
@@ -1294,14 +1288,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1310,15 +1303,15 @@ namespace detail {
                 case json_type::uint64_value:
                 case json_type::int64_value:
                 {
-                    return *resources.create_json(arg0_ptr->template as<double>());
+                    return value_type(arg0_ptr->template as<double>());
                 }
                 case json_type::double_value:
                 {
-                    return *resources.create_json(std::ceil(arg0_ptr->template as<double>()));
+                    return value_type(std::ceil(arg0_ptr->template as<double>()));
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
             }
         }
 
@@ -1348,14 +1341,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1364,15 +1356,15 @@ namespace detail {
                 case json_type::uint64_value:
                 case json_type::int64_value:
                 {
-                    return *resources.create_json(arg0_ptr->template as<double>());
+                    return value_type(arg0_ptr->template as<double>());
                 }
                 case json_type::double_value:
                 {
-                    return *resources.create_json(std::floor(arg0_ptr->template as<double>()));
+                    return value_type(std::floor(arg0_ptr->template as<double>()));
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
             }
         }
 
@@ -1402,14 +1394,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1425,28 +1416,28 @@ namespace detail {
                     auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
                     if (result1)
                     {
-                        return *resources.create_json(result1.value());
+                        return value_type(result1.value());
                     }
                     auto result2 = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
                     if (result2)
                     {
-                        return *resources.create_json(result2.value());
+                        return value_type(result2.value());
                     }
                     jsoncons::detail::to_double_t to_double;
                     try
                     {
                         auto s = arg0_ptr->as_string();
                         double d = to_double(s.c_str(), s.length());
-                        return *resources.create_json(d);
+                        return value_type(d);
                     }
                     catch (const std::exception&)
                     {
-                        return resources.null_value();
+                        return value_type::null();
                     }
                 }
                 default:
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
             }
         }
 
@@ -1476,14 +1467,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1491,7 +1481,7 @@ namespace detail {
             {
                 //std::cout << "arg: " << *arg0_ptr << "\n";
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
             double prod = 1;
             for (auto& j : arg0_ptr->array_range())
@@ -1499,12 +1489,12 @@ namespace detail {
                 if (!j.is_number())
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
                 prod *= j.template as<double>();
             }
 
-            return *resources.create_json(prod);
+            return value_type(prod);
         }
 
         std::string to_string(int level = 0) const override
@@ -1533,25 +1523,24 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_array())
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
             if (arg0_ptr->empty())
             {
-                return resources.null_value();
+                return value_type::null();
             }
             double sum = 0;
             for (auto& j : arg0_ptr->array_range())
@@ -1559,12 +1548,12 @@ namespace detail {
                 if (!j.is_number())
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
                 sum += j.template as<double>();
             }
 
-            return *resources.create_json(sum / static_cast<double>(arg0_ptr->size()));
+            return value_type(sum / static_cast<double>(arg0_ptr->size()));
         }
 
         std::string to_string(int level = 0) const override
@@ -1593,14 +1582,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1608,18 +1596,18 @@ namespace detail {
             {
                 //std::cout << "arg: " << *arg0_ptr << "\n";
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
             if (arg0_ptr->empty())
             {
-                return resources.null_value();
+                return value_type::null();
             }
             bool is_number = arg0_ptr->at(0).is_number();
             bool is_string = arg0_ptr->at(0).is_string();
             if (!is_number && !is_string)
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
 
             std::size_t index = 0;
@@ -1628,7 +1616,7 @@ namespace detail {
                 if (!(arg0_ptr->at(i).is_number() == is_number && arg0_ptr->at(i).is_string() == is_string))
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
                 if (arg0_ptr->at(i) < arg0_ptr->at(index))
                 {
@@ -1665,14 +1653,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1680,11 +1667,11 @@ namespace detail {
             {
                 //std::cout << "arg: " << *arg0_ptr << "\n";
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
             if (arg0_ptr->empty())
             {
-                return resources.null_value();
+                return value_type::null();
             }
 
             bool is_number = arg0_ptr->at(0).is_number();
@@ -1692,7 +1679,7 @@ namespace detail {
             if (!is_number && !is_string)
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
 
             std::size_t index = 0;
@@ -1701,7 +1688,7 @@ namespace detail {
                 if (!(arg0_ptr->at(i).is_number() == is_number && arg0_ptr->at(i).is_string() == is_string))
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
                 if (arg0_ptr->at(i) > arg0_ptr->at(index))
                 {
@@ -1738,14 +1725,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1755,18 +1741,16 @@ namespace detail {
                     return *arg0_ptr;
                 case json_type::int64_value:
                 {
-                    pointer j_ptr = arg0_ptr->template as<int64_t>() >= 0 ? arg0_ptr : resources.create_json(std::abs(arg0_ptr->template as<int64_t>()));
-                    return *j_ptr;
+                    return arg0_ptr->template as<int64_t>() >= 0 ? *arg0_ptr : value_type(std::abs(arg0_ptr->template as<int64_t>()));
                 }
                 case json_type::double_value:
                 {
-                    pointer j_ptr = arg0_ptr->template as<double>() >= 0 ? arg0_ptr : resources.create_json(std::abs(arg0_ptr->template as<double>()));
-                    return *j_ptr;
+                    return arg0_ptr->template as<double>() >= 0 ? *arg0_ptr : value_type(std::abs(arg0_ptr->template as<double>()));
                 }
                 default:
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
             }
         }
@@ -1798,14 +1782,13 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
@@ -1815,17 +1798,17 @@ namespace detail {
             {
                 case json_type::object_value:
                 case json_type::array_value:
-                    return *resources.create_json(arg0_ptr->size());
+                    return value_type(arg0_ptr->size());
                 case json_type::string_value:
                 {
                     auto sv0 = arg0_ptr->template as<string_view_type>();
                     auto length = unicode_traits::count_codepoints(sv0.data(), sv0.size());
-                    return *resources.create_json(length);
+                    return value_type(length);
                 }
                 default:
                 {
                     ec = jsonpath_errc::invalid_type;
-                    return resources.null_value();
+                    return value_type::null();
                 }
             }
         }
@@ -1857,31 +1840,30 @@ namespace detail {
         {
         }
 
-        value_type evaluate(dynamic_resources<Json,JsonReference>& resources,
-                           const std::vector<pointer>& args, 
-                           std::error_code& ec) const override
+        value_type evaluate(const std::vector<pointer>& args, 
+                            std::error_code& ec) const override
         {
             if (args.size() != *this->arity())
             {
                 ec = jsonpath_errc::invalid_arity;
-                return resources.null_value();
+                return value_type::null();
             }
 
             pointer arg0_ptr = args[0];
             if (!arg0_ptr->is_object())
             {
                 ec = jsonpath_errc::invalid_type;
-                return resources.null_value();
+                return value_type::null();
             }
 
-            auto result = resources.create_json(json_array_arg);
-            result->reserve(args.size());
+            value_type result(json_array_arg);
+            result.reserve(args.size());
 
             for (auto& item : arg0_ptr->object_range())
             {
-                result->emplace_back(item.key());
+                result.emplace_back(item.key());
             }
-            return *result;
+            return result;
         }
 
         std::string to_string(int level = 0) const override
@@ -3032,14 +3014,14 @@ namespace detail {
                             //}
                             //std::cout << "\n";
 
-                            reference r = tok.function_->evaluate(resources, arg_stack, ec);
+                            value_type r = tok.function_->evaluate(arg_stack, ec);
                             if (ec)
                             {
                                 return resources.null_value();
                             }
                             //std::cout << "function result: " << r << "\n";
                             arg_stack.clear();
-                            stack.emplace_back(std::addressof(r));
+                            stack.emplace_back(resources.create_json(std::move(r)));
                             break;
                         }
                         case token_kind::expression:
