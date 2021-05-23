@@ -7,11 +7,11 @@ Encodes a C++ data structure into the [MessagePack](http://msgpack.org/index.htm
 
 template<class T>
 void encode_msgpack(const T& jval, std::vector<uint8_t>& v,
-                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (until v0.152.0)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (until 0.152.0)
 
 template<class T, class Container>
 void encode_msgpack(const T& jval, Container& v,
-                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (since v0.152.0)
+                 const msgpack_decode_options& options = msgpack_decode_options()); (1) (since 0.152.0)
 
 template<class T>
 void encode_msgpack(const T& jval, 
@@ -22,7 +22,7 @@ void encode_msgpack(const T& jval,
 (1) Writes a value of type T into a byte container in the MessagePack data format, using the specified (or defaulted) [options](msgpack_options.md). 
 Type 'T' must be an instantiation of [basic_json](../basic_json.md) 
 or support [json_type_traits](../json_type_traits.md). 
-Type `Container` must be back insertable and have member type `value_type` with size exactly 8 bits (since v0.152.0.)
+Type `Container` must be back insertable and have member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 (2) Writes a value of type T into a binary stream in the MessagePack data format, using the specified (or defaulted) [options](msgpack_options.md). 

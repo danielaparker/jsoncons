@@ -370,12 +370,16 @@ int main()
                                         jsonpath::result_options::path);
     std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
-    auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                        jsonpath::result_options::value | jsonpath::result_options::nodups);
+    //auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
+    //                                    jsonpath::result_options::value | jsonpath::result_options::nodups); (since 0.164)
+    auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title", 
+                                        jsonpath::result_options::nodups);                                     (since 0.164) 
     std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
-    auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                        jsonpath::result_options::nodups);
+    //auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title", 
+    //                                    jsonpath::result_options::nodups);                                (until 0.164)
+    auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title", 
+                                        jsonpath::result_options::nodups | jsonpath::result_options::path); (since 0.164)
     std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
 }
 ```

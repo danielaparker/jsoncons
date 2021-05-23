@@ -276,7 +276,7 @@ namespace jsonpath {
         return buffer;
     }
 
-    enum class result_options {value=0,path=1,nodups=2,sort=4};
+    enum class result_options {value=0, nodups=1, sort=2, path=4};
 
     using result_type = result_options;
 

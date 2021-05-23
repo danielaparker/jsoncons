@@ -27,7 +27,7 @@ static basic_json parse(std::istream& is,
 template <class InputIt>
 static basic_json parse(InputIt first, InputIt last, 
                         const basic_json_decode_options<char_type>& options = basic_json_decode_options<CharT>(), 
-                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (7) (since v0.153.0)
+                        std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing()); (7) (since 0.153.0)
               
 template <class InputIt>
 static basic_json parse(InputIt first, InputIt last, 

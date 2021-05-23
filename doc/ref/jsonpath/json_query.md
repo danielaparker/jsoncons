@@ -2,16 +2,9 @@
 
 ```c++
 #include <jsoncons_ext/jsonpath/json_query.hpp>
-
-enum class result_type {value,path};
 ```
 
 ```c++
-template<class Json>
-Json json_query(const Json& root value, 
-                const Json:string_view_type& expr,
-                result_type type = result_type::value);              (until 0.161.0)
-
 template<class Json>
 Json json_query(const Json& root value, 
                 const Json::string_view_type& expr,
@@ -266,33 +259,50 @@ int main()
     auto result2 = jsonpath::json_query(data, path, jsonpath::result_options::path);
     std::cout << "(2) " << result2 << "\n\n";
 
+    //auto result3 = jsonpath::json_query(data, path, 
+    //                                    jsonpath::result_options::value | 
+    //                                    jsonpath::result_options::sort); (until 0.164.0)
     auto result3 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::value | 
-                                        jsonpath::result_options::sort);
+                                        jsonpath::result_options::sort);   (since 0.164.0)  
     std::cout << "(3) " << result3 << "\n\n";
 
+    //auto result4 = jsonpath::json_query(data, path, 
+    //                                    jsonpath::result_options::sort);   (until 0.164.0)
     auto result4 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::sort);
+                                        jsonpath::result_options::sort | 
+                                        jsonpath::result_options::path);     (since 0.164.0)
     std::cout << "(4) " << result4 << "\n\n";
 
+    //auto result5 = jsonpath::json_query(data, path, 
+    //                                    jsonpath::result_options::value | 
+    //                                    jsonpath::result_options::nodups); (until 0.164.0)
     auto result5 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::value | 
-                                        jsonpath::result_options::nodups);
+                                        jsonpath::result_options::nodups);   (since 0.164.0)
     std::cout << "(5) " << result5 << "\n\n";
 
+    //auto result6 = jsonpath::json_query(data, path, 
+    //                                    jsonpath::result_options::nodups); (until 0.164.0)
     auto result6 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::nodups);
+                                        jsonpath::result_options::nodups | 
+                                        jsonpath::result_options::path);   (since 0.164.0)
     std::cout << "(6) " << result6 << "\n\n";
 
+    //auto result7 = jsonpath::json_query(data, path, 
+    //                                    jsonpath::result_options::value | 
+    //                                    jsonpath::result_options::nodups | 
+    //                                    jsonpath::result_options::sort);   (until 0.164.0)
     auto result7 = jsonpath::json_query(data, path, 
-                                        jsonpath::result_options::value | 
                                         jsonpath::result_options::nodups | 
-                                        jsonpath::result_options::sort);
+                                        jsonpath::result_options::sort);     (since 0.164.0)
     std::cout << "(7) " << result7 << "\n\n";
 
+    //auto result8 = jsonpath::json_query(data, path, 
+    //                                    jsonpath::result_options::nodups | 
+    //                                    jsonpath::result_options::sort);  (until 0.164.0)
     auto result8 = jsonpath::json_query(data, path, 
                                         jsonpath::result_options::nodups | 
-                                        jsonpath::result_options::sort);
+                                        jsonpath::result_options::sort |
+                                        jsonpath::result_options::path);    (since 0.164.0)
     std::cout << "(8) " << result8 << "\n\n";
 }
 ```

@@ -194,17 +194,17 @@ Constructs a new encoder that writes to the specified destination.
 
     bool byte_string_value(const byte_string_view& source, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=ser_context()); (12) (until v0.152.0)
+                           const ser_context& context=ser_context()); (12) (until 0.152.0)
 
     template <class Source>
     bool byte_string_value(const Source& souce, 
                            semantic_tag tag=semantic_tag::none, 
-                           const ser_context& context=ser_context()); (12) (since v0.152.0)
+                           const ser_context& context=ser_context()); (12) (since 0.152.0)
 
     template <class Source>
     bool byte_string_value(const Source& souce, 
                            uint64_t ext_tag, 
-                           const ser_context& context=ser_context()); (13) (since v0.152.0)
+                           const ser_context& context=ser_context()); (13) (since 0.152.0)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag = semantic_tag::none, 
@@ -267,19 +267,19 @@ Constructs a new encoder that writes to the specified destination.
     bool byte_string_value(const byte_string_view& source, 
                            semantic_tag tag, 
                            const ser_context& context,
-                           std::error_code& ec); (28) (until v0.152.0)
+                           std::error_code& ec); (28) (until 0.152.0)
 
     template <class Source>   
     bool byte_string_value(const Source& source, 
                            semantic_tag tag, 
                            const ser_context& context,
-                           std::error_code& ec); (28) (since v0.152.0)
+                           std::error_code& ec); (28) (since 0.152.0)
 
     template <class Source>   
     bool byte_string_value(const Source& source, 
                            uint64_t ext_tag, 
                            const ser_context& context,
-                           std::error_code& ec); (29) (since v0.152.0)
+                           std::error_code& ec); (29) (since 0.152.0)
 
     bool uint64_value(uint64_t value, 
                       semantic_tag tag, 
@@ -379,13 +379,13 @@ Throws a [ser_error](ser_error.md) on parse errors.
 
 (12) Writes a byte string value `source` with a generic tag.
 Type `Source` must be a container that has member functions `data()` and `size()`, 
-and member type `value_type` with size exactly 8 bits (since v0.152.0.)
+and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 
 (13) Writes a byte string value `source` with a format specific tag, `ext_tag`.
 Type `Source` must be a container that has member functions `data()` and `size()`, 
-and member type `value_type` with size exactly 8 bits (since v0.152.0.)
+and member type `value_type` with size exactly 8 bits (since 0.152.0.)
 Returns `true` if the consumer wishes to receive more events, `false` otherwise.
 Throws a [ser_error](ser_error.md) on parse errors. 
 

@@ -7,7 +7,7 @@ template<class Json>
 Json flatten(const Json& value); (1)
 
 template<class Json>
-Json unflatten(const Json& value, unflatten_options options = unflatten_options::none); (2) (since v0.150.0)
+Json unflatten(const Json& value, unflatten_options options = unflatten_options::none); (2) (since 0.150.0)
 ```
 
 (1) flattens a json object or array into a single depth object of JSON Pointer-value pairs.

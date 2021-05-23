@@ -68,19 +68,19 @@ basic_json(const byte_string_view& bytes,
 
 basic_json(byte_string_arg_t, const jsoncons::span<const uint8_t>& bytes, 
            semantic_tag tag = semantic_tag::none,
-           const Allocator& alloc = Allocator()); (21) (until v0.152)
+           const Allocator& alloc = Allocator()); (21) (until 0.152)
 
 template <class Source>
 basic_json(byte_string_arg_t, const Source& source, 
            semantic_tag tag = semantic_tag::none,
-           const Allocator& alloc = Allocator()); (21) (since v0.152)
+           const Allocator& alloc = Allocator()); (21) (since 0.152)
 
 template <class Source>
 basic_json(byte_string_arg_t, const Source& source, 
            uint64_t ext_tag,
-           const Allocator& alloc = Allocator()); (22) (since v0.152)
+           const Allocator& alloc = Allocator()); (22) (since 0.152)
 
-basic_json(json_const_pointer_arg, const basic_json* j_ptr); (23) (since v0.156.0)
+basic_json(json_const_pointer_arg, const basic_json* j_ptr); (23) (since 0.156.0)
 ```
 
 (1) Constructs an empty json object. 
@@ -132,7 +132,7 @@ Uses [half_arg_t](../half_arg_t.md) as first argument to disambiguate overloads 
 (21) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
 with a generic tag.
 Type `Source` must be a contiguous container that has member functions `data()` and `size()`, and member type `value_type` 
-with width of exactly 8 bits (since v0.152.0.)
+with width of exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.
@@ -140,7 +140,7 @@ Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambigu
 (22) Constructs a `basic_json` value for a byte string from a contiguous byte sequence provided by `source`
 with a format specific tag.
 Type `Source` must be a contiguous container that has member functions `data()` and `size()`, and member type `value_type` 
-with width of exactly 8 bits (since v0.152.0.)
+with width of exactly 8 bits (since 0.152.0.)
 Any of the values types `int8_t`, `uint8_t`, `char`, `unsigned char` and `std::byte` (since C++17) are allowed.
 
 Uses [byte_string_arg_t](../byte_string_arg_t.md) as first argument to disambiguate overloads that construct byte strings.

@@ -508,8 +508,8 @@ namespace {
                                             jsonpath::result_options::path);
         std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
-        auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
-                                            jsonpath::result_options::value | jsonpath::result_options::nodups);
+        auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title", 
+                                            jsonpath::result_options::nodups);
         std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
         auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title",
@@ -530,7 +530,7 @@ namespace {
         json result2 = expr.evaluate(data, jsonpath::result_options::path);
         std::cout << "(2) " << pretty_print(result2) << "\n\n";
 
-        json result3 = expr.evaluate(data, jsonpath::result_options::value | jsonpath::result_options::nodups);
+        json result3 = expr.evaluate(data, jsonpath::result_options::nodups);
         std::cout << "(3) " << pretty_print(result3) << "\n\n";
 
         json result4 = expr.evaluate(data, jsonpath::result_options::path | jsonpath::result_options::nodups);
@@ -587,33 +587,26 @@ namespace {
         auto result2 = jsonpath::json_query(data, path, jsonpath::result_options::path);
         std::cout << "(2) " << result2 << "\n\n";
 
-        auto result3 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::value | 
-                                            jsonpath::result_options::sort);
+        auto result3 = jsonpath::json_query(data, path, jsonpath::result_options::sort);
         std::cout << "(3) " << result3 << "\n\n";
 
         auto result4 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::sort);
+                                            jsonpath::result_options::sort | jsonpath::result_options::path);
         std::cout << "(4) " << result4 << "\n\n";
 
-        auto result5 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::value | 
-                                            jsonpath::result_options::nodups);
+        auto result5 = jsonpath::json_query(data, path, jsonpath::result_options::nodups);
         std::cout << "(5) " << result5 << "\n\n";
 
-        auto result6 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::nodups);
+        auto result6 = jsonpath::json_query(data, path, jsonpath::result_options::nodups | jsonpath::result_options::path);
         std::cout << "(6) " << result6 << "\n\n";
 
-        auto result7 = jsonpath::json_query(data, path, 
-                                            jsonpath::result_options::value | 
-                                            jsonpath::result_options::nodups | 
-                                            jsonpath::result_options::sort);
+        auto result7 = jsonpath::json_query(data, path, jsonpath::result_options::nodups | jsonpath::result_options::sort);
         std::cout << "(7) " << result7 << "\n\n";
 
         auto result8 = jsonpath::json_query(data, path, 
                                             jsonpath::result_options::nodups | 
-                                            jsonpath::result_options::sort);
+                                            jsonpath::result_options::sort |
+                                            jsonpath::result_options::path);
         std::cout << "(8) " << result8 << "\n\n";
     }
 
