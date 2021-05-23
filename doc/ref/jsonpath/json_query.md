@@ -119,7 +119,7 @@ int main()
     std::cout << "(1) " << result1 << "\n";
 
     // The number of books
-    json result2 = jsonpath::json_query(root_value, "$..book.length");
+    json result2 = jsonpath::json_query(root_value, "length($..book)");
     std::cout << "(2) " << result2 << "\n";
 
     // The third book

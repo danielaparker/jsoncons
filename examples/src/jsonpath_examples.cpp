@@ -24,7 +24,7 @@ namespace {
         std::cout << "(1) " << result1 << "\n";
 
         // The number of books
-        json result2 = jsonpath::json_query(booklist, "$..book.length");
+        json result2 = jsonpath::json_query(booklist, "length($..book)");
         std::cout << "(2) " << result2 << "\n";
 
         // The third book
@@ -423,16 +423,16 @@ namespace {
         ]
         )");
 
-        // Find all arrays of elements where result.length is 4
-        json result1 = jsonpath::json_query(j,"$..[?(@.result.length == 4)].result");
+        // Find all arrays of elements where length(@.result) is 4
+        json result1 = jsonpath::json_query(j,"$..[?(length(@.result) == 4)].result");
         std::cout << "(1) " << result1 << "\n";
 
-        // Find array of elements that has id 10 and result.length is 4
-        json result2 = jsonpath::json_query(j,"$..[?(@.id == 10)]..[?(@.result.length == 4)].result");
+        // Find array of elements that has id 10 and length(@.result) is 4
+        json result2 = jsonpath::json_query(j,"$..[?(@.id == 10)]..[?(length(@.result) == 4)].result");
         std::cout << "(2) " << result2 << "\n";
 
-        // Find all arrays of elements where result.length is 4 and that have value 3 
-        json result3 = jsonpath::json_query(j,"$..[?(@.result.length == 4 && (@.result[0] == 3 || @.result[1] == 3 || @.result[2] == 3 || @.result[3] == 3))].result");
+        // Find all arrays of elements where length(@.result) is 4 and that have value 3 
+        json result3 = jsonpath::json_query(j,"$..[?(length(@.result) == 4 && (@.result[0] == 3 || @.result[1] == 3 || @.result[2] == 3 || @.result[3] == 3))].result");
         std::cout << "(3) " << result3 << "\n";
     }
 
@@ -653,7 +653,7 @@ namespace {
         std::ifstream is("./input/store.json");
         json store = json::parse(is);
 
-        std::string path = "$.store.book[:-2:1,(@.length-2),?(@.author=='J. R. R. Tolkien')].title";
+        std::string path = "$.store.book[:-2:1,-2,?(@.author=='J. R. R. Tolkien')].title";
         auto result1 = jsonpath::json_query(store, path);
         std::cout << "(1) " << result1 << "\n\n";
 

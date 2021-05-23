@@ -107,7 +107,6 @@ JSONPath|       Description
 `[]`    |Subscript operator. 
 `[,]`   |Union.
 `[start:end:step]`      |Array slice operator borrowed from ECMASCRIPT 4.
-`(<expr>)`    |Expression that evaluates to an identifier or index
 `?(<expr>)`   |Filter by expression.
 
 ### Duplicates and ordering
@@ -169,7 +168,7 @@ provides an option for sorting results by paths.
 ### Slices
 
 jsoncons jsonpath slices have the same semantics as Python slices
-(including for negative steps since v0.153.3)
+(including for negative steps since 0.153.3)
 
 The syntax for a slice is
 ```
@@ -272,7 +271,6 @@ In jsoncons, a JSONPath union element can be
 - an index or slice expression
 - a single quoted name
 - a double quoted name
-- an expression, e.g. `(@.length-1)`
 - a filter
 - a wildcard, i.e. `*`
 - a path relative to the root of the JSON document (begins with `$`)
@@ -281,7 +279,7 @@ In jsoncons, a JSONPath union element can be
 To illustrate, the path expression below selects the second, third, and fourth titles from [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3):
 
 ```
-"$.store.book[:-2:1,(@.length-2),?(@.author=='J. R. R. Tolkien')].title"
+"$.store.book[:-2:1,-2,?(@.author=='J. R. R. Tolkien')].title"
 ```
 
 ### Function expressions
@@ -300,7 +298,6 @@ Function|Description
 [avg](functions/avg.md)|Returns the average of the items in an array of numbers.
 [ceil](functions/ceil.md)|Returns the smallest integer value not less than a given number.
 [contains](functions/contains.md)|Returns true if a source array contains a search value, or a source string contains a search string.
-count (until 0.161.0)|Same as [length](functions/length.md)
 [ends_with](functions/ends_with.md)|Returns true if the source string ends with the suffix string, otherwise false.
 [floor](functions/floor.md)|Returns the largest integer value not greater than a given number.
 [keys](functions/keys.md)|Returns an array of keys in an object.
@@ -371,15 +368,17 @@ int main()
     std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
     //auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title",
-    //                                    jsonpath::result_options::value | jsonpath::result_options::nodups); (since 0.164)
+    //                                    jsonpath::result_options::value | 
+    //                                    jsonpath::result_options::nodups);  (until 0.164.0)
     auto result3 = jsonpath::json_query(data, "$.books[1,1,3].title", 
-                                        jsonpath::result_options::nodups);                                     (since 0.164) 
+                                        jsonpath::result_options::nodups);    (since 0.164.0) 
     std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
     //auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title", 
-    //                                    jsonpath::result_options::nodups);                                (until 0.164)
+    //                                    jsonpath::result_options::nodups);  (until 0.164.0)
     auto result4 = jsonpath::json_query(data, "$.books[1,1,3].title", 
-                                        jsonpath::result_options::nodups | jsonpath::result_options::path); (since 0.164)
+                                        jsonpath::result_options::nodups | 
+                                        jsonpath::result_options::path);      (since 0.164.0)
     std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
 }
 ```
@@ -495,10 +494,14 @@ int main()
     json result2 = expr.evaluate(data, jsonpath::result_options::path);
     std::cout << "(2)\n" << pretty_print(result2) << "\n\n";
 
-    json result3 = expr.evaluate(data, jsonpath::result_options::value | jsonpath::result_options::nodups);
+    //json result3 = expr.evaluate(data, jsonpath::result_options::value |
+    //                                   jsonpath::result_options::nodups);   (until 0.164.0)
+    json result3 = expr.evaluate(data, jsonpath::result_options::nodups);     (since 0.164.0)
     std::cout << "(3)\n" << pretty_print(result3) << "\n\n";
 
-    json result4 = expr.evaluate(data, jsonpath::result_options::nodups);
+    //json result4 = expr.evaluate(data, jsonpath::result_options::nodups);   (until 0.164.0)
+    json result4 = expr.evaluate(data, jsonpath::result_options::nodups |
+                                       jsonpath::result_options::path);       (since 0.164.0)
     std::cout << "(4)\n" << pretty_print(result4) << "\n\n";
 }
 ```
