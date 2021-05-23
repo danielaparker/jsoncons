@@ -3412,8 +3412,6 @@ namespace jsoncons { namespace jsonpath {
                Callback callback,
                result_options options = result_options::value)
     {
-        using evaluator_t = typename jsoncons::jsonpath::detail::jsonpath_evaluator<Json, const Json&>;
-
         auto expr = make_expression<Json>(path);
         expr.evaluate(instance, callback, options);
     }
