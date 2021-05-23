@@ -386,3 +386,34 @@ Output:
 $['books'][0]: {"author":"Haruki Murakami","category":"fiction","price":22.72,"title":"A Wild Sheep Chase"}
 $['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,"title":"The Night Watch"}
 ```
+
+#### Custom functions
+
+```c++
+int main()
+{
+    jsonpath::custom_functions<json> funcs;
+    funcs.register_function("divide", // function name
+         2,                           // number of arguments   
+         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+         {
+           if (!(params[0].value().is_number() && params[1].value().is_number())) 
+           {
+               ec = jsonpath::jsonpath_errc::invalid_type; 
+               return json::null();
+           }
+           return json(params[0].value().as<double>() / params[1].value().as<double>());
+         }
+    );
+
+    json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+
+    json result = jsonpath::json_query(root, "$[?(divide(@.foo, @.bar) == 6)]", jsonpath::result_options(), funcs);
+
+    std::cout << result << "\n\n";
+}
+```
+Output:
+```
+[{"bar": 10,"foo": 60}]
+```

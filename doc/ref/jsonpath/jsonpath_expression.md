@@ -73,3 +73,36 @@ that represents the JSONPath expression.
 
 (2) Sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
 
+### Examples
+
+#### Custom functions
+
+```c++
+int main()
+{
+    jsonpath::custom_functions<json> funcs;
+    funcs.register_function("divide", // function name
+         2,                           // number of arguments   
+         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+         {
+           if (!(params[0].value().is_number() && params[1].value().is_number())) 
+           {
+               ec = jsonpath::jsonpath_errc::invalid_type; 
+               return json::null();
+           }
+           return json(params[0].value().as<double>() / params[1].value().as<double>());
+         }
+    );
+
+    json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+
+    auto expr = jsonpath::make_expression<json>("$[?(divide(@.foo, @.bar) == 6)]", funcs);
+    json result = expr.evaluate(root);
+
+    std::cout << result << "\n\n";
+}
+```
+Output:
+```
+[{"bar": 10,"foo": 60}]
+```

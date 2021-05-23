@@ -3332,7 +3332,7 @@ namespace jsoncons { namespace jsonpath {
         }
 
         static jsonpath_expression compile(const string_view_type& path, 
-                                           const std::vector<custom_function<Json>>& functions)
+                                           const custom_functions<Json>& functions)
         {
             jsoncons::jsonpath::detail::static_resources<value_type,reference> resources(functions);
 
@@ -3342,7 +3342,7 @@ namespace jsoncons { namespace jsonpath {
         }
 
         static jsonpath_expression compile(const string_view_type& path, 
-                                           const std::vector<custom_function<Json>>& functions, 
+                                           const custom_functions<Json>& functions, 
                                            std::error_code& ec)
         {
             jsoncons::jsonpath::detail::static_resources<value_type,reference> resources(functions);
@@ -3366,14 +3366,14 @@ namespace jsoncons { namespace jsonpath {
 
     template <class Json>
     jsonpath_expression<json> make_expression(const typename Json::string_view_type& expr, 
-                                              const std::vector<custom_function<Json>>& functions)
+                                              const custom_functions<Json>& functions)
     {
         return jsonpath_expression<Json>::compile(expr, functions);
     }
 
     template <class Json>
     jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr, 
-                                              const std::vector<custom_function<Json>>& functions, 
+                                              const custom_functions<Json>& functions, 
                                               std::error_code& ec)
     {
         return jsonpath_expression<Json>::compile(expr, functions, ec);
@@ -3392,7 +3392,7 @@ namespace jsoncons { namespace jsonpath {
     Json json_query(const Json& instance,
                     const typename Json::string_view_type& path, 
                     result_options options,
-                    const std::vector<custom_function<Json>>& functions)
+                    const custom_functions<Json>& functions)
     {
         auto expr = make_expression<Json>(path, functions);
         return expr.evaluate(instance, options);

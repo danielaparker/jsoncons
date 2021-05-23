@@ -32,6 +32,20 @@ TEST_CASE("jsonpath custom function test")
         std::cout << e.what() << std::endl;
     }
 
+    jsonpath::custom_functions<json> functions;
+    functions.register_function("divide", // function name
+         2,        // number of arguments   
+         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+         {
+            if (!(params[0].value().is_number() && params[1].value().is_number())) 
+            {
+                ec = jsonpath::jsonpath_errc::invalid_type; 
+                return json::null();
+            }
+            return json(params[0].value().as<double>() / params[1].value().as<double>());
+         }
+    );
+/*
     std::vector<jsonpath::custom_function<json>> functions = {
         {"divide", // function name
          2,        // number of arguments   
@@ -45,6 +59,7 @@ TEST_CASE("jsonpath custom function test")
             return json(params[0].value().as<double>() / params[1].value().as<double>());}
         }
     };
+*/
 
     SECTION("test 1")
     {

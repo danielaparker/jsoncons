@@ -394,6 +394,36 @@ namespace jsonpath {
         }
     };
 
+    template <class Json>
+    class custom_functions
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+        using value_type = Json;
+        using parameter_type = parameter<Json>;
+        using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
+        using const_iterator = typename std::vector<custom_function<Json>>::const_iterator;
+
+        std::vector<custom_function<Json>> functions_;
+    public:
+        void register_function(const string_type& name,
+                               jsoncons::optional<std::size_t> arity,
+                               const function_type& f)
+        {
+            functions_.emplace_back(name, arity, f);
+        }
+
+        const_iterator begin() const
+        {
+            return functions_.begin();
+        }
+
+        const_iterator end() const
+        {
+            return functions_.end();
+        }
+    };
+
 namespace detail {
 
     enum class node_kind{unknown, single, multi};
@@ -1980,7 +2010,7 @@ namespace detail {
         {
         }
 
-        static_resources(span<const custom_function<value_type>> functions)
+        static_resources(const custom_functions<Json>& functions)
         {
             for (const auto& item : functions)
             {

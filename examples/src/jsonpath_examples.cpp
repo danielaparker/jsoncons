@@ -661,27 +661,51 @@ namespace {
         std::cout << "(2) " << result2 << "\n\n";
     }
 
-    void custom_functions_with_expression()
+    void custom_functions1()
     {
-        std::vector<jsonpath::custom_function<json>> functions = {
-            {"divide", // function name
-             2,        // number of arguments   
+        jsonpath::custom_functions<json> funcs;
+        funcs.register_function("divide", // function name
+             2,                           // number of arguments   
              [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
-              {
-                if (!(params[0].value().is_number() && params[1].value().is_number())) 
-                {
-                    ec = jsonpath::jsonpath_errc::invalid_type; 
-                    return json::null();
-                }
-                return json(params[0].value().as<double>() / params[1].value().as<double>());}
-            }
-        };
+             {
+               if (!(params[0].value().is_number() && params[1].value().is_number())) 
+               {
+                   ec = jsonpath::jsonpath_errc::invalid_type; 
+                   return json::null();
+               }
+               return json(params[0].value().as<double>() / params[1].value().as<double>());
+             }
+        );
 
         json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
         std::cout << pretty_print(root) << "\n\n";
 
-        auto expr = jsonpath::make_expression<json>("$[?(divide(@.foo, @.bar) == 6)]", functions);
+        auto expr = jsonpath::make_expression<json>("$[?(divide(@.foo, @.bar) == 6)]", funcs);
         json result = expr.evaluate(root);
+
+        std::cout << pretty_print(result) << "\n\n";
+    }
+
+    void custom_functions2()
+    {
+        jsonpath::custom_functions<json> funcs;
+        funcs.register_function("divide", // function name
+             2,                           // number of arguments   
+             [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+             {
+               if (!(params[0].value().is_number() && params[1].value().is_number())) 
+               {
+                   ec = jsonpath::jsonpath_errc::invalid_type; 
+                   return json::null();
+               }
+               return json(params[0].value().as<double>() / params[1].value().as<double>());
+             }
+        );
+
+        json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+        std::cout << pretty_print(root) << "\n\n";
+
+        json result = jsonpath::json_query(root, "$[?(divide(@.foo, @.bar) == 6)]", jsonpath::result_options(), funcs);
 
         std::cout << pretty_print(result) << "\n\n";
     }
@@ -717,7 +741,8 @@ void jsonpath_examples()
 
     union_example();
 
-    custom_functions_with_expression();
+    custom_functions1();
+    custom_functions2();
     std::cout << "\n";
 }
 

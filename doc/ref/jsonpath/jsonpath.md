@@ -310,7 +310,7 @@ Function|Description
 [to_number](functions/to_number.md)|If string, returns the parsed number. If number, returns the passed in value.
 [tokenize](functions/tokenize.md)|Returns an array of strings formed by splitting the source string into an array of strings, separated by substrings that match a given regular expression pattern.
 
-The library supports augmenting the list of built in JSONPath functions with user-provided functions.
+The library supports augmenting the list of built in JSONPath functions with user-provided functions (since 0.164.0).
 
 ### Examples
 
@@ -539,7 +539,30 @@ Output:
 #### Custom functions
 
 ```c++
+int main()
+{
+    jsonpath::custom_functions<json> funcs;
+    funcs.register_function("divide", // function name
+         2,                           // number of arguments   
+         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+         {
+           if (!(params[0].value().is_number() && params[1].value().is_number())) 
+           {
+               ec = jsonpath::jsonpath_errc::invalid_type; 
+               return json::null();
+           }
+           return json(params[0].value().as<double>() / params[1].value().as<double>());
+         }
+    );
+
+    json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+
+    json result = jsonpath::json_query(root, "$[?(divide(@.foo, @.bar) == 6)]", jsonpath::result_options(), funcs);
+
+    std::cout << pretty_print(result) << "\n\n";
+}
 ```
 Output:
 ```
+[{"bar": 10,"foo": 60}]
 ```
