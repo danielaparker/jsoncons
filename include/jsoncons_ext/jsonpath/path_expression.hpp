@@ -1998,10 +1998,6 @@ namespace detail {
         {
         }
 
-        static_resources& operator=(const static_resources&) = default;
-
-        static_resources& operator=(static_resources&&) noexcept = default;
-
         const function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
             static abs_function<Json> abs_func;
