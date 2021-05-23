@@ -3381,7 +3381,7 @@ namespace jsoncons { namespace jsonpath {
 
     template<class Json>
     Json json_query(const Json& instance, 
-                    const basic_string_view<typename Json::char_type>& path, 
+                    const typename Json::string_view_type& path, 
                     result_options options = result_options::value)
     {
         auto expr = make_expression<Json>(path);
@@ -3390,7 +3390,7 @@ namespace jsoncons { namespace jsonpath {
 
     template<class Json>
     Json json_query(const Json& instance,
-                    const basic_string_view<typename Json::char_type>& path, 
+                    const typename Json::string_view_type& path, 
                     result_options options,
                     const std::vector<custom_function<Json>>& functions)
     {
@@ -3401,7 +3401,7 @@ namespace jsoncons { namespace jsonpath {
     template<class Json,class Callback>
     typename std::enable_if<type_traits::is_binary_function_object<Callback,const std::basic_string<typename Json::char_type>&,const Json&>::value,void>::type
     json_query(const Json& instance, 
-               const typename Json::string_view_type& path , 
+               const typename Json::string_view_type& path, 
                Callback callback,
                result_options options = result_options::value)
     {
