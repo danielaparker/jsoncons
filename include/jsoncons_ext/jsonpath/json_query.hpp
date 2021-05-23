@@ -3277,13 +3277,6 @@ namespace jsoncons { namespace jsonpath {
         {
         }
 
-        void register_function(const string_type& function_name, 
-                               jsoncons::optional<std::size_t> arity,
-                               const std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>& f)
-        {
-            //static_resources_.register_function(function_name, arity, f);
-        }
-
         template <class BinaryCallback>
         typename std::enable_if<type_traits::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options::value)
