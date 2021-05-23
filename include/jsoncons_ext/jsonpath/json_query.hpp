@@ -3254,20 +3254,34 @@ namespace jsoncons { namespace jsonpath {
         using string_view_type = typename evaluator_t::string_view_type;
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
+        using parameter_type = parameter<Json>;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using path_node_type = typename evaluator_t::path_node_type;
         using path_component_type = typename evaluator_t::path_component_type;
+        using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources_;
         json_selector_t expr_;
     public:
-        jsonpath_expression() = default;
-
         jsonpath_expression(jsoncons::jsonpath::detail::static_resources<value_type,reference>&& resources,
                             json_selector_t&& expr)
             : static_resources_(std::move(resources)), 
               expr_(std::move(expr))
         {
+        }
+
+        jsonpath_expression(jsoncons::jsonpath::detail::static_resources<value_type,reference>&& resources,
+                            json_selector_t&& expr, span<const function_type> custom_functions)
+            : static_resources_(std::move(resources)), 
+              expr_(std::move(expr))
+        {
+        }
+
+        void register_function(const string_type& function_name, 
+                               jsoncons::optional<std::size_t> arity,
+                               const std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>& f)
+        {
+            //static_resources_.register_function(function_name, arity, f);
         }
 
         template <class BinaryCallback>
@@ -3327,6 +3341,26 @@ namespace jsoncons { namespace jsonpath {
             json_selector_t expr = e.compile(resources, path, ec);
             return jsonpath_expression(std::move(resources), std::move(expr));
         }
+
+        static jsonpath_expression compile(const string_view_type& path, 
+                                           const std::vector<custom_function<Json>>& functions)
+        {
+            jsoncons::jsonpath::detail::static_resources<value_type,reference> resources(functions);
+
+            evaluator_t e;
+            json_selector_t expr = e.compile(resources, path);
+            return jsonpath_expression(std::move(resources), std::move(expr));
+        }
+
+        static jsonpath_expression compile(const string_view_type& path, 
+                                           const std::vector<custom_function<Json>>& functions, 
+                                           std::error_code& ec)
+        {
+            jsoncons::jsonpath::detail::static_resources<value_type,reference> resources(functions);
+            evaluator_t e;
+            json_selector_t expr = e.compile(resources, path, ec);
+            return jsonpath_expression(std::move(resources), std::move(expr));
+        }
     };
 
     template <class Json>
@@ -3341,12 +3375,37 @@ namespace jsoncons { namespace jsonpath {
         return jsonpath_expression<Json>::compile(expr, ec);
     }
 
+    template <class Json>
+    jsonpath_expression<json> make_expression(const typename Json::string_view_type& expr, 
+                                              const std::vector<custom_function<Json>>& functions)
+    {
+        return jsonpath_expression<Json>::compile(expr, functions);
+    }
+
+    template <class Json>
+    jsonpath_expression<Json> make_expression(const typename Json::string_view_type& expr, 
+                                              const std::vector<custom_function<Json>>& functions, 
+                                              std::error_code& ec)
+    {
+        return jsonpath_expression<Json>::compile(expr, functions, ec);
+    }
+
     template<class Json>
     Json json_query(const Json& instance, 
-                    const typename Json::string_view_type& path , 
+                    const basic_string_view<typename Json::char_type>& path, 
                     result_options options = result_options::value)
     {
         auto expr = make_expression<Json>(path);
+        return expr.evaluate(instance, options);
+    }
+
+    template<class Json>
+    Json json_query(const Json& instance,
+                    const basic_string_view<typename Json::char_type>& path, 
+                    result_options options,
+                    const std::vector<custom_function<Json>>& functions)
+    {
+        auto expr = make_expression<Json>(path, functions);
         return expr.evaluate(instance, options);
     }
 
@@ -3361,8 +3420,6 @@ namespace jsoncons { namespace jsonpath {
         using reference = typename evaluator_t::reference;
 
         auto expr = make_expression<Json>(path);
-        jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-
         expr.evaluate(instance, callback, options);
     }
 

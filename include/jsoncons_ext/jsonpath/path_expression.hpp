@@ -318,6 +318,82 @@ namespace jsonpath {
         return a;
     }
 
+    template <class Json>
+    class parameter
+    {
+        const Json* value_;
+    public:
+        parameter(const Json* value) noexcept
+            : value_(value)
+        {
+        }
+
+        parameter(const parameter& other) noexcept = default;
+
+        parameter(parameter&& other) noexcept = default;
+
+        parameter& operator=(const parameter& other) noexcept = default;
+
+        parameter& operator=(parameter&& other) noexcept = default;
+
+        const Json& value() const
+        {
+            return *value_;
+        }
+    };
+
+    template <class Json>
+    class custom_function
+    {
+    public:
+        using value_type = Json;
+        using char_type = typename Json::char_type;
+        using parameter_type = parameter<Json>;
+        using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
+        using string_type = std::basic_string<char_type>;
+
+        string_type function_name_;
+        optional<std::size_t> arity_;
+        function_type f_;
+
+        custom_function(const string_type& function_name,
+                        const optional<std::size_t>& arity,
+                        const function_type& f)
+            : function_name_(function_name),
+              arity_(arity),
+              f_(f)
+        {
+        }
+
+        custom_function(string_type&& function_name,
+                        optional<std::size_t>&& arity,
+                        function_type&& f)
+            : function_name_(std::move(function_name)),
+              arity_(std::move(arity)),
+              f_(std::move(f))
+        {
+        }
+
+        custom_function(const custom_function&) = default;
+
+        custom_function(custom_function&&) = default;
+
+        const string_type& name() const 
+        {
+            return function_name_;
+        }
+
+        optional<std::size_t> arity() const 
+        {
+            return arity_;
+        }
+
+        const function_type& function() const 
+        {
+            return f_;
+        }
+    };
+
 namespace detail {
 
     enum class node_kind{unknown, single, multi};
@@ -919,30 +995,6 @@ namespace detail {
         }
     };
 
-    template <class Json>
-    class parameter
-    {
-        const Json* value_;
-    public:
-        parameter(const Json* value) noexcept
-            : value_(value)
-        {
-        }
-
-        parameter(const parameter& other) noexcept = default;
-
-        parameter(parameter&& other) noexcept = default;
-
-        parameter& operator=(const parameter& other) noexcept = default;
-
-        parameter& operator=(parameter&& other) noexcept = default;
-
-        const Json& value() const
-        {
-            return *value_;
-        }
-    };
-
     // function_base
     template <class Json>
     class function_base
@@ -957,12 +1009,12 @@ namespace detail {
         {
         }
 
+        virtual ~function_base() noexcept = default;
+
         jsoncons::optional<std::size_t> arity() const
         {
             return arg_count_;
         }
-
-        virtual ~function_base() = default;
 
         virtual value_type evaluate(const std::vector<parameter_type>& args, 
                                     std::error_code& ec) const = 0;
@@ -979,6 +1031,30 @@ namespace detail {
             return s;
         }
     };  
+
+    template <class Json>
+    class decorator_function : public function_base<Json>
+    {
+    public:
+        using value_type = Json;
+        using parameter_type = parameter<Json>;
+        using string_view_type = typename Json::string_view_type;
+        using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
+    private:
+        function_type f_;
+    public:
+        decorator_function(jsoncons::optional<std::size_t> arity,
+            const function_type& f)
+            : function_base<Json>(arity), f_(f)
+        {
+        }
+
+        value_type evaluate(const std::vector<parameter_type>& args,
+            std::error_code& ec) const override
+        {
+            return f_(args, ec);
+        }
+    };
 
     template <class Json>
     class contains_function : public function_base<Json>
@@ -1892,15 +1968,39 @@ namespace detail {
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
+        using value_type = Json;
         using reference = JsonReference;
         using function_base_type = function_base<Json>;
 
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
+        std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
 
         static_resources()
         {
         }
+
+        static_resources(span<const custom_function<value_type>> functions)
+        {
+            for (const auto& item : functions)
+            {
+                custom_functions_.emplace(item.name(),
+                                          make_unique<decorator_function<Json>>(item.arity(),item.function()));
+            }
+        }
+
+        static_resources(const static_resources&) = default;
+
+        static_resources(static_resources&& other) noexcept 
+            : temp_json_values_(std::move(other.temp_json_values_)),
+              unary_operators_(std::move(other.unary_operators_)),
+              custom_functions_(std::move(other.custom_functions_))
+        {
+        }
+
+        static_resources& operator=(const static_resources&) = default;
+
+        static_resources& operator=(static_resources&&) noexcept = default;
 
         const function_base_type* get_function(const string_type& name, std::error_code& ec) const
         {
@@ -1947,10 +2047,21 @@ namespace detail {
             auto it = functions.find(name);
             if (it == functions.end())
             {
-                ec = jsonpath_errc::unknown_function;
-                return nullptr;
+                auto it2 = custom_functions_.find(name);
+                if (it2 == custom_functions_.end())
+                {
+                    ec = jsonpath_errc::unknown_function;
+                    return nullptr;
+                }
+                else
+                {
+                    return it2->second.get();
+                }
             }
-            return it->second;
+            else
+            {
+                return it->second;
+            }
         }
 
         const unary_operator<Json,JsonReference>* get_unary_not() const

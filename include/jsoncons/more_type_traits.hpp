@@ -287,6 +287,14 @@ namespace type_traits {
            typename std::enable_if<is_character<T>::value && (sizeof(T) != sizeof(char))
     >::type> : std::true_type {};
 
+    // is_cstring
+    template<typename T>
+    struct is_cstring : std::false_type
+    {};
+    template<typename T>
+    struct is_cstring<const T*> : is_character<T>
+    {};
+
     // is_bool
 
     template <class T, class Enable=void>
