@@ -3271,9 +3271,9 @@ namespace jsoncons { namespace jsonpath {
         }
 
         jsonpath_expression(jsoncons::jsonpath::detail::static_resources<value_type,reference>&& resources,
-                            json_selector_t&& expr, span<const function_type> custom_functions)
+                            json_selector_t&& expr, std::vector<function_type>&& custom_functions)
             : static_resources_(std::move(resources)), 
-              expr_(std::move(expr))
+              expr_(std::move(expr), std::move(custom_functions))
         {
         }
 
