@@ -310,6 +310,8 @@ Function|Description
 [to_number](functions/to_number.md)|If string, returns the parsed number. If number, returns the passed in value.
 [tokenize](functions/tokenize.md)|Returns an array of strings formed by splitting the source string into an array of strings, separated by substrings that match a given regular expression pattern.
 
+The library supports augmenting the list of built in JSONPath functions with user-provided functions.
+
 ### Examples
 
 The examples use the sample data file `books.json`, 
@@ -534,3 +536,10 @@ Output:
 ]
 ```
 
+#### Custom functions
+
+```c++
+```
+Output:
+```
+```

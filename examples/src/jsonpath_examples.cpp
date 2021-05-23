@@ -661,6 +661,31 @@ namespace {
         std::cout << "(2) " << result2 << "\n\n";
     }
 
+    void custom_functions_with_expression()
+    {
+        std::vector<jsonpath::custom_function<json>> functions = {
+            {"divide", // function name
+             2,        // number of arguments   
+             [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+              {
+                if (!(params[0].value().is_number() && params[1].value().is_number())) 
+                {
+                    ec = jsonpath::jsonpath_errc::invalid_type; 
+                    return json::null();
+                }
+                return json(params[0].value().as<double>() / params[1].value().as<double>());}
+            }
+        };
+
+        json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+        std::cout << pretty_print(root) << "\n\n";
+
+        auto expr = jsonpath::make_expression<json>("$[?(divide(@.foo, @.bar) == 6)]", functions);
+        json result = expr.evaluate(root);
+
+        std::cout << pretty_print(result) << "\n\n";
+    }
+
 } // namespace
 
 void jsonpath_examples()
@@ -691,6 +716,8 @@ void jsonpath_examples()
     search_for_and_replace_a_value();
 
     union_example();
+
+    custom_functions_with_expression();
     std::cout << "\n";
 }
 
