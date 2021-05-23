@@ -276,7 +276,7 @@ namespace jsonpath {
         return buffer;
     }
 
-    enum class result_options {value=1,path=2,nodups=4|path,sort=8|path};
+    enum class result_options {value=0,path=1,nodups=2,sort=4};
 
     using result_type = result_options;
 
@@ -1985,7 +1985,7 @@ namespace detail {
             for (const auto& item : functions)
             {
                 custom_functions_.emplace(item.name(),
-                                          make_unique<decorator_function<Json>>(item.arity(),item.function()));
+                                          jsoncons::make_unique<decorator_function<Json>>(item.arity(),item.function()));
             }
         }
 
@@ -2387,6 +2387,7 @@ namespace detail {
     {
         bool is_path_;
         std::size_t precedence_level_;
+
     public:
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
@@ -2425,8 +2426,9 @@ namespace detail {
                                                               std::size_t index, 
                                                               result_options options) 
         {
+            static const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             std::vector<path_component_type> s(path);
-            if ((options & result_options::path) == result_options::path)
+            if ((options & require_path) != result_options())
             {
                 s.emplace_back(index);
             }
@@ -2437,8 +2439,9 @@ namespace detail {
                                                               const string_type& identifier, 
                                                               result_options options) 
         {
+            static const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             std::vector<path_component_type> s(path);
-            if ((options & result_options::path) == result_options::path)
+            if ((options & require_path) != result_options())
             {
                 s.emplace_back(identifier);
             }
@@ -2901,19 +2904,19 @@ namespace detail {
         {
             Json result(json_array_arg);
 
-            if ((options & result_options::value) == result_options::value)
-            {
-                auto callback = [&result](const std::vector<path_component_type>&, reference val)
-                {
-                    result.push_back(val);
-                };
-                evaluate(resources, path, root, instance, callback, options);
-            }
-            else if ((options & result_options::path) == result_options::path)
+            if ((options & result_options::path) == result_options::path)
             {
                 auto callback = [&result](const std::vector<path_component_type>& path, reference)
                 {
                     result.emplace_back(jsoncons::jsonpath::to_string(path));
+                };
+                evaluate(resources, path, root, instance, callback, options);
+            }
+            else
+            {
+                auto callback = [&result](const std::vector<path_component_type>&, reference val)
+                {
+                    result.push_back(val);
                 };
                 evaluate(resources, path, root, instance, callback, options);
             }

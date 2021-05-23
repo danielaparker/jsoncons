@@ -3302,12 +3302,7 @@ namespace jsoncons { namespace jsonpath {
         {
             std::vector<path_component_type> path = {path_component_type(root_node_arg)};
 
-            if ((options & result_options::value) == result_options::value)
-            {
-                jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-                return expr_.evaluate(resources, path, instance, instance, options);
-            }
-            else if ((options & result_options::path) == result_options::path)
+            if ((options & result_options::path) == result_options::path)
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
@@ -3321,8 +3316,9 @@ namespace jsoncons { namespace jsonpath {
             }
             else
             {
-                return Json(json_array_arg);
-            }            
+                jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
+                return expr_.evaluate(resources, path, instance, instance, options);
+            }
         }
 
         static jsonpath_expression compile(const string_view_type& path)

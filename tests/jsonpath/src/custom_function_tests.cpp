@@ -60,7 +60,7 @@ TEST_CASE("jsonpath custom function test")
 
     SECTION("test 2")
     {
-        auto r = jsonpath::json_query(root, "divide($.foo, $.bar)", jsonpath::result_options::value, functions);
+        auto r = jsonpath::json_query(root, "divide($.foo, $.bar)", jsonpath::result_options(), functions);
         REQUIRE(!r.empty());
         CHECK(r[0] == json(6));
 
