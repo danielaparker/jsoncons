@@ -2,26 +2,32 @@
 
 ```c++
 #include <jsoncons_ext/jsonpath/jsonpath.hpp>
+```
 
-template <class Json,class Source>
-jsonpath_expression<Json> make_expression(const Source& expr); 
-
+```c++
 template <class Json>
-jsonpath_expression<Json> make_expression(const Json::string_view_type& expr); (1)
+jsonpath_expression<Json> make_expression(const Json::string_view_type& expr);  (1)
 ```
 ```c++
-template <class Json,class Source>
-jsonpath_expression<Json> make_expression(const Source& expr,
-                                        std::error_code& ec); 
-
 template <class Json>
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
-                                        std::error_code& ec); (2)
+                                          const custom_functions<Json>& funcs); (2) (since 0.164.0)
+```
+```c++
+template <class Json>
+jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
+                                          std::error_code& ec);                 (3)
+```
+```c++
+template <class Json>
+jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
+                                          const custom_functions<Json>& funcs,
+                                          std::error_code& ec);                 (4) (since 0.164.0)
 ```
 
-(1) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
+(1)-(2) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 
-(2) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
+(3)-(4) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 
 #### Parameters
 
@@ -123,4 +129,36 @@ Output:
 ```
 $['books'][0]: {"author":"Haruki Murakami","category":"fiction","price":22.72,"title":"A Wild Sheep Chase"}
 $['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,"title":"The Night Watch"}
+```
+
+#### Custom functions
+
+```c++
+int main()
+{
+    jsonpath::custom_functions<json> funcs;
+    funcs.register_function("divide", // function name
+         2,                           // number of arguments   
+         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
+         {
+           if (!(params[0].value().is_number() && params[1].value().is_number())) 
+           {
+               ec = jsonpath::jsonpath_errc::invalid_type; 
+               return json::null();
+           }
+           return json(params[0].value().as<double>() / params[1].value().as<double>());
+         }
+    );
+
+    json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
+
+    auto expr = jsonpath::make_expression<json>("$[?(divide(@.foo, @.bar) == 6)]", funcs);
+    json result = expr.evaluate(root);
+
+    std::cout << result << "\n\n";
+}
+```
+Output:
+```
+[{"bar": 10,"foo": 60}]
 ```

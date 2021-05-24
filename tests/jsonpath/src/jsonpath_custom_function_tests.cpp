@@ -45,21 +45,6 @@ TEST_CASE("jsonpath custom function test")
             return json(params[0].value().as<double>() / params[1].value().as<double>());
          }
     );
-/*
-    std::vector<jsonpath::custom_function<json>> functions = {
-        {"divide", // function name
-         2,        // number of arguments   
-         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
-          {
-            if (!(params[0].value().is_number() && params[1].value().is_number())) 
-            {
-                ec = jsonpath::jsonpath_errc::invalid_type; 
-                return json::null();
-            }
-            return json(params[0].value().as<double>() / params[1].value().as<double>());}
-        }
-    };
-*/
 
     SECTION("test 1")
     {
@@ -67,10 +52,6 @@ TEST_CASE("jsonpath custom function test")
         auto r = expr.evaluate(root);
         REQUIRE(!r.empty());
         CHECK(r[0] == json(6));
-
-        //auto result = jsonpath::json_query(root,"divide($.foo, $.bar)");
-        //auto expected = json::parse(R"([6])");
-        //CHECK((result == expected));
     }
 
     SECTION("test 2")
@@ -78,10 +59,15 @@ TEST_CASE("jsonpath custom function test")
         auto r = jsonpath::json_query(root, "divide($.foo, $.bar)", jsonpath::result_options(), functions);
         REQUIRE(!r.empty());
         CHECK(r[0] == json(6));
+    }
 
-        //auto result = jsonpath::json_query(root,"divide($.foo, $.bar)");
-        //auto expected = json::parse(R"([6])");
-        //CHECK((result == expected));
+    SECTION("test 3")
+    {
+        json r;
+        jsonpath::json_query(root, "divide($.foo, $.bar)", 
+            [&](const std::string&, const json& val) {r = val; },
+                             jsonpath::result_options(), functions);
+        CHECK(r == json(6));
     }
 }
 

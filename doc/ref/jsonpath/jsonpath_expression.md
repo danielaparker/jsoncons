@@ -46,10 +46,17 @@ void fun(const Json::string_type& path, const Json& val);
 
 #### Static functions
 
-    static jsonpath_expression compile(const string_view_type& expr);    (1)
+    static jsonpath_expression compile(const string_view_type& expr);           (1)
 
     static jsonpath_expression compile(const string_view_type& expr,
-                                       std::error_code& ec);             (2)
+                                       const custom_functions<Json>& funcs);    (2) (since 0.164.0)
+
+    static jsonpath_expression compile(const string_view_type& expr,
+                                       std::error_code& ec);                    (3)
+
+    static jsonpath_expression compile(const string_view_type& expr,
+                                       const custom_functions<Json>& funcs,
+                                       std::error_code& ec);                    (4) (since 0.164.0) 
 
 Compiles the JSONPath expression for later evaluation. Returns a `jsonpath_expression` object 
 that represents the JSONPath expression.
@@ -73,36 +80,3 @@ that represents the JSONPath expression.
 
 (2) Sets the out-parameter `ec` to the [jsonpath_error_category](jsonpath_errc.md) if JSONPath compilation fails. 
 
-### Examples
-
-#### Custom functions
-
-```c++
-int main()
-{
-    jsonpath::custom_functions<json> funcs;
-    funcs.register_function("divide", // function name
-         2,                           // number of arguments   
-         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
-         {
-           if (!(params[0].value().is_number() && params[1].value().is_number())) 
-           {
-               ec = jsonpath::jsonpath_errc::invalid_type; 
-               return json::null();
-           }
-           return json(params[0].value().as<double>() / params[1].value().as<double>());
-         }
-    );
-
-    json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
-
-    auto expr = jsonpath::make_expression<json>("$[?(divide(@.foo, @.bar) == 6)]", funcs);
-    json result = expr.evaluate(root);
-
-    std::cout << result << "\n\n";
-}
-```
-Output:
-```
-[{"bar": 10,"foo": 60}]
-```

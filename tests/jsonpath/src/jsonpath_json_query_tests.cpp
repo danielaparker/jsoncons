@@ -74,7 +74,7 @@ TEST_CASE("jsonpath json_query json test")
 
         json expected("Sword of Honour");
         jsonpath::json_query(j, expr, 
-            [expected](const std::string&, const json& title) {CHECK((title == expected)); });
+            [expected](const std::string&, const json& title) {CHECK((title == expected));});
     }
 }
 

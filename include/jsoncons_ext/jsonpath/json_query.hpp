@@ -3279,7 +3279,7 @@ namespace jsoncons { namespace jsonpath {
 
         template <class BinaryCallback>
         typename std::enable_if<type_traits::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
-        evaluate(reference instance, BinaryCallback callback, result_options options = result_options::value)
+        evaluate(reference instance, BinaryCallback callback, result_options options = result_options())
         {
             std::vector<path_component_type> path = { path_component_type(root_node_arg) };
 
@@ -3291,7 +3291,7 @@ namespace jsoncons { namespace jsonpath {
             expr_.evaluate(resources, path, instance, instance, f, options);
         }
 
-        Json evaluate(reference instance, result_options options = result_options::value)
+        Json evaluate(reference instance, result_options options = result_options())
         {
             std::vector<path_component_type> path = {path_component_type(root_node_arg)};
 
@@ -3382,7 +3382,7 @@ namespace jsoncons { namespace jsonpath {
     template<class Json>
     Json json_query(const Json& instance, 
                     const typename Json::string_view_type& path, 
-                    result_options options = result_options::value)
+                    result_options options = result_options())
     {
         auto expr = make_expression<Json>(path);
         return expr.evaluate(instance, options);
@@ -3403,9 +3403,21 @@ namespace jsoncons { namespace jsonpath {
     json_query(const Json& instance, 
                const typename Json::string_view_type& path, 
                Callback callback,
-               result_options options = result_options::value)
+               result_options options = result_options())
     {
         auto expr = make_expression<Json>(path);
+        expr.evaluate(instance, callback, options);
+    }
+
+    template<class Json,class Callback>
+    typename std::enable_if<type_traits::is_binary_function_object<Callback,const std::basic_string<typename Json::char_type>&,const Json&>::value,void>::type
+    json_query(const Json& instance, 
+               const typename Json::string_view_type& path, 
+               Callback callback,
+               result_options options,
+               const custom_functions<Json>& functions)
+    {
+        auto expr = make_expression<Json>(path, functions);
         expr.evaluate(instance, callback, options);
     }
 
