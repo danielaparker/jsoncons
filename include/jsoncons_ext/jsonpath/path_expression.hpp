@@ -3036,18 +3036,18 @@ namespace detail {
     class expression_tree
     {
     public:
-        using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
-        using string_view_type = typename Json::string_view_type;
         using path_node_type = path_node<Json,JsonReference>;
-        using path_node_less_type = path_node_less<Json,JsonReference>;
-        using path_node_equal_type = path_node_equal<Json,JsonReference>;
         using value_type = Json;
         using reference = typename path_node_type::reference;
         using pointer = typename path_node_type::pointer;
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using string_view_type = typename Json::string_view_type;
+        using path_node_less_type = path_node_less<Json,reference>;
+        using path_node_equal_type = path_node_equal<Json,reference>;
         using parameter_type = parameter<Json>;
-        using token_type = token<Json,JsonReference>;
-        using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
+        using token_type = token<Json,reference>;
+        using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
         using path_component_type = path_component<char_type>;
     private:
@@ -3070,7 +3070,7 @@ namespace detail {
 
         expression_tree& operator=(expression_tree&& expr) = default;
 
-        value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources, 
+        value_type evaluate_single(dynamic_resources<Json,reference>& resources, 
                                    reference root,
                                    reference current,
                                    result_options options,
