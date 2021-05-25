@@ -781,7 +781,7 @@ namespace jsoncons { namespace jsonpath {
                                        std::error_code& ec) const override
             {
                 value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
-                return ec ? resources.null_value() : ref; 
+                return ec ? Json::null() : ref; 
             }
 
             std::string to_string(int level = 0) const override

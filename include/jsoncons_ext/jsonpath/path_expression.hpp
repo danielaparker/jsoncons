@@ -2440,18 +2440,6 @@ namespace detail {
             }
         }
 
-        Json& true_value() const
-        {
-            static Json value(true, semantic_tag::none);
-            return value;
-        }
-
-        Json& false_value() const
-        {
-            static Json value(false, semantic_tag::none);
-            return value;
-        }
-
         Json& null_value() const
         {
             static Json value(null_type(), semantic_tag::none);
@@ -3224,7 +3212,7 @@ namespace detail {
                             if (tok.function_->arity() && *(tok.function_->arity()) != arg_stack.size())
                             {
                                 ec = jsonpath_errc::invalid_arity;
-                                return resources.null_value();
+                                return Json::null();
                             }
                             //std::cout << "function arg stack:\n";
                             //for (auto& item : arg_stack)
@@ -3236,7 +3224,7 @@ namespace detail {
                             value_type val = tok.function_->evaluate(arg_stack, ec);
                             if (ec)
                             {
-                                return resources.null_value();
+                                return Json::null();
                             }
                             //std::cout << "function result: " << val << "\n";
                             arg_stack.clear();
@@ -3350,7 +3338,7 @@ namespace detail {
             //{
             //    std::cout << "Stack size: " << stack.size() << "\n";
             //}
-            return stack.empty() ? resources.null_value() : stack.back().value();
+            return stack.empty() ? Json::null() : stack.back().value();
         }
  
         std::string to_string(int level) const
