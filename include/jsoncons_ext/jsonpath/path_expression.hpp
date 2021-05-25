@@ -2440,12 +2440,6 @@ namespace detail {
             }
         }
 
-        Json& null_value() const
-        {
-            static Json value(null_type(), semantic_tag::none);
-            return value;
-        }
-
         template <typename... Args>
         Json* create_json(Args&& ... args)
         {
@@ -3108,6 +3102,7 @@ namespace detail {
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
         using path_component_type = path_component<char_type>;
+        using stack_item_type = value_or_pointer<Json,JsonReference>;
     private:
         std::vector<token_type> token_list_;
     public:
@@ -3134,7 +3129,7 @@ namespace detail {
                                    result_options options,
                                    std::error_code& ec) const
         {
-            std::vector<value_or_pointer<Json,JsonReference>> stack;
+            std::vector<stack_item_type> stack;
             std::vector<parameter_type> arg_stack;
             std::vector<path_component_type> path = {path_component_type(current_node_arg)};
 
@@ -3289,7 +3284,7 @@ namespace detail {
                                 {
                                     auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
                                     temp.erase(last,temp.end());
-                                    stack.emplace_back(nodes_to_pointer(temp, ndtype, resources));
+                                    stack.emplace_back(nodes_to_stack_item(temp, ndtype));
                                 }
                                 else
                                 {
@@ -3311,7 +3306,7 @@ namespace detail {
                                             index.erase(it);
                                         }
                                     }
-                                    stack.emplace_back(nodes_to_pointer(temp2, ndtype, resources));
+                                    stack.emplace_back(nodes_to_stack_item(temp2, ndtype));
                                 }
                             }
                             else
@@ -3322,7 +3317,7 @@ namespace detail {
                                 //    std::cout << *item.ptr << "\n";
                                 //}
                                 //std::cout << "\n";
-                                stack.emplace_back(nodes_to_pointer(temp, ndtype, resources));
+                                stack.emplace_back(nodes_to_stack_item(temp, ndtype));
                             }
 
                             
@@ -3359,27 +3354,25 @@ namespace detail {
 
         }
     private:
-        static pointer nodes_to_pointer(std::vector<path_node_type>& nodes,
-                                        node_kind tag,
-                                        dynamic_resources<Json,JsonReference>& resources)
+        static stack_item_type nodes_to_stack_item(std::vector<path_node_type>& nodes, node_kind tag)
         {
             if (nodes.empty())
             {
-                return std::addressof(resources.null_value());
+                return stack_item_type(Json(null_type()));
             }
             else if (nodes.size() == 1 && (tag == node_kind::single || tag == node_kind()))
             {
-                return nodes.back().ptr;
+                return stack_item_type(nodes.back().ptr);
             }
             else
             {
-                auto j = resources.create_json(json_array_arg);
-                j->reserve(nodes.size());
+                Json j(json_array_arg);
+                j.reserve(nodes.size());
                 for (auto& item : nodes)
                 {
-                    j->emplace_back(*item.ptr);
+                    j.emplace_back(*item.ptr);
                 }
-                return j;
+                return stack_item_type(std::move(j));
             }
         }
     };
