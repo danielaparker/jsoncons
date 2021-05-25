@@ -661,21 +661,34 @@ namespace {
         std::cout << "(2) " << result2 << "\n\n";
     }
 
+    template <class Json>
+    class my_custom_functions : public jsonpath::custom_functions<Json>
+    {
+    public:
+        my_custom_functions()
+        {
+            this->register_function("divide", // function name
+                 2,                           // number of arguments   
+                 [](jsoncons::span<const jsonpath::parameter<Json>> params, 
+                    std::error_code& ec) -> Json 
+                 {
+                   const Json& arg0 = params[0].value();    
+                   const Json& arg1 = params[1].value();    
+
+                   if (!(arg0.is_number() && arg1.is_number())) 
+                   {
+                       ec = jsonpath::jsonpath_errc::invalid_type; 
+                       return Json::null();
+                   }
+                   return Json(arg0.as<double>() / arg1.as<double>());
+                 }
+            );
+        }
+    };
+
     void custom_functions1()
     {
-        jsonpath::custom_functions<json> funcs;
-        funcs.register_function("divide", // function name
-             2,                           // number of arguments   
-             [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
-             {
-               if (!(params[0].value().is_number() && params[1].value().is_number())) 
-               {
-                   ec = jsonpath::jsonpath_errc::invalid_type; 
-                   return json::null();
-               }
-               return json(params[0].value().as<double>() / params[1].value().as<double>());
-             }
-        );
+        my_custom_functions<json> funcs;
 
         json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
         std::cout << pretty_print(root) << "\n\n";
@@ -688,19 +701,7 @@ namespace {
 
     void custom_functions2()
     {
-        jsonpath::custom_functions<json> funcs;
-        funcs.register_function("divide", // function name
-             2,                           // number of arguments   
-             [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
-             {
-               if (!(params[0].value().is_number() && params[1].value().is_number())) 
-               {
-                   ec = jsonpath::jsonpath_errc::invalid_type; 
-                   return json::null();
-               }
-               return json(params[0].value().as<double>() / params[1].value().as<double>());
-             }
-        );
+        my_custom_functions<json> funcs;
 
         json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
         std::cout << pretty_print(root) << "\n\n";

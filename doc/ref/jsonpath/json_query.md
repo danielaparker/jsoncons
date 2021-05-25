@@ -405,27 +405,47 @@ $['books'][1]: {"author":"Sergei Lukyanenko","category":"fiction","price":23.58,
 #### Custom functions
 
 ```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath.hpp>
+
+using json = jsoncons::json;
+namespace jsonpath = jsoncons::jsonpath;
+
+template <class Json>
+class my_custom_functions : public jsonpath::custom_functions<Json>
+{
+public:
+    my_custom_functions()
+    {
+        this->register_function("divide", // function name
+             2,                           // number of arguments   
+             [](jsoncons::span<const jsonpath::parameter<Json>> params, 
+                std::error_code& ec) -> Json 
+             {
+               const Json& arg0 = params[0].value();    
+               const Json& arg1 = params[1].value();    
+
+               if (!(arg0.is_number() && arg1.is_number())) 
+               {
+                   ec = jsonpath::jsonpath_errc::invalid_type; 
+                   return Json::null();
+               }
+               return Json(arg0.as<double>() / arg1.as<double>());
+             }
+        );
+    }
+};
+
 int main()
 {
-    jsonpath::custom_functions<json> funcs;
-    funcs.register_function("divide", // function name
-         2,                           // number of arguments   
-         [](jsoncons::span<const jsonpath::parameter<json>> params, std::error_code& ec) -> json 
-         {
-           if (!(params[0].value().is_number() && params[1].value().is_number())) 
-           {
-               ec = jsonpath::jsonpath_errc::invalid_type; 
-               return json::null();
-           }
-           return json(params[0].value().as<double>() / params[1].value().as<double>());
-         }
-    );
-
     json root = json::parse(R"([{"foo": 60, "bar": 10},{"foo": 60, "bar": 5}])");
 
-    json result = jsonpath::json_query(root, "$[?(divide(@.foo, @.bar) == 6)]", jsonpath::result_options(), funcs);
+    json result = jsonpath::json_query(root, 
+                                       "$[?(divide(@.foo, @.bar) == 6)]", 
+                                       jsonpath::result_options(), 
+                                       my_custom_functions<json>());
 
-    std::cout << result << "\n\n";
+    std::cout << pretty_print(result) << "\n\n";
 }
 ```
 Output:
