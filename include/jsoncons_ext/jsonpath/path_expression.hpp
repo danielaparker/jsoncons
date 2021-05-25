@@ -348,11 +348,11 @@ namespace jsonpath {
         }
 
         value_or_pointer(value_or_pointer&& other) noexcept
-            : is_value_(other.is_value_), val_(value_type())
+            : is_value_(other.is_value_)
         {
             if (is_value_)
             {
-                val_ = std::move(other.val_);
+                new(&val_)value_type(std::move(other.val_));
             }
             else
             {
@@ -379,7 +379,6 @@ namespace jsonpath {
         }
     };
 
-
     template <class Json>
     class parameter
     {
@@ -389,14 +388,9 @@ namespace jsonpath {
     private:
         value_or_pointer<Json,reference> data_;
     public:
-        parameter(const Json* value) noexcept
-            : value_(value)
-        {
-        }
-
         template <class JsonReference>
         parameter(value_or_pointer<Json,JsonReference>&& data) noexcept
-            : data_(value_type())
+            : data_(nullptr)
         {
             data_.is_value_ = data.is_value_;
             if (data.is_value_)
@@ -536,9 +530,8 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual JsonReference evaluate(dynamic_resources<Json,JsonReference>&,
-                                       JsonReference, 
-                                       std::error_code&) const = 0;
+        virtual Json evaluate(JsonReference, 
+                              std::error_code&) const = 0;
     };
 
     template <class Json>
@@ -566,11 +559,10 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources,
-                             JsonReference val, 
-                             std::error_code&) const override
+        Json evaluate(JsonReference val, 
+                      std::error_code&) const override
         {
-            return is_false(val) ? resources.true_value() : resources.false_value();
+            return is_false(val) ? Json(true) : Json(false);
         }
     };
 
@@ -582,21 +574,20 @@ namespace detail {
             : unary_operator<Json,JsonReference>(1, true)
         {}
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources,
-                             JsonReference val, 
-                             std::error_code&) const override
+        Json evaluate(JsonReference val, 
+                      std::error_code&) const override
         {
             if (val.is_int64())
             {
-                return *resources.create_json(-val.template as<int64_t>());
+                return Json(-val.template as<int64_t>());
             }
             else if (val.is_double())
             {
-                return *resources.create_json(-val.as_double());
+                return Json(-val.as_double());
             }
             else
             {
-                return resources.null_value();
+                return Json::null();
             }
         }
     };
@@ -617,15 +608,14 @@ namespace detail {
         regex_operator(regex_operator&&) = default;
         regex_operator& operator=(regex_operator&&) = default;
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, 
-                             JsonReference val, 
+        Json evaluate(JsonReference val, 
                              std::error_code&) const override
         {
             if (!val.is_string())
             {
-                return resources.null_value();
+                return Json::null();
             }
-            return std::regex_search(val.as_string(), pattern_) ? resources.true_value() : resources.false_value();
+            return std::regex_search(val.as_string(), pattern_) ? Json(true) : Json(false);
         }
     };
 
@@ -651,8 +641,7 @@ namespace detail {
             return is_right_associative_;
         }
 
-        virtual JsonReference evaluate(dynamic_resources<Json,JsonReference>&,
-                             JsonReference, 
+        virtual Json evaluate(JsonReference, 
                              JsonReference, 
 
                              std::error_code&) const = 0;
@@ -677,12 +666,11 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, 
-                             std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (lhs.is_null() && rhs.is_null())
             {
-                return resources.null_value();
+                return Json::null();
             }
             if (!is_false(lhs))
             {
@@ -715,7 +703,7 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>&, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (is_true(lhs))
             {
@@ -749,9 +737,9 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
-            return lhs == rhs ? resources.true_value() : resources.false_value();
+            return lhs == rhs ? Json(true) : Json(false);
         }
 
         std::string to_string(int level = 0) const override
@@ -776,9 +764,9 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
-            return lhs != rhs ? resources.true_value() : resources.false_value();
+            return lhs != rhs ? Json(true) : Json(false);
         }
 
         std::string to_string(int level = 0) const override
@@ -803,17 +791,17 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs < rhs ? resources.true_value() : resources.false_value();
+                return lhs < rhs ? Json(true) : Json(false);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs < rhs ? resources.true_value() : resources.false_value();
+                return lhs < rhs ? Json(true) : Json(false);
             }
-            return resources.null_value();
+            return Json::null();
         }
 
         std::string to_string(int level = 0) const override
@@ -838,17 +826,17 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override 
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override 
         {
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs <= rhs ? resources.true_value() : resources.false_value();
+                return lhs <= rhs ? Json(true) : Json(false);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs <= rhs ? resources.true_value() : resources.false_value();
+                return lhs <= rhs ? Json(true) : Json(false);
             }
-            return resources.null_value();
+            return Json::null();
         }
 
         std::string to_string(int level = 0) const override
@@ -873,19 +861,19 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //std::cout << "operator> lhs: " << lhs << ", rhs: " << rhs << "\n";
 
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs > rhs ? resources.true_value() : resources.false_value();
+                return lhs > rhs ? Json(true) : Json(false);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs > rhs ? resources.true_value() : resources.false_value();
+                return lhs > rhs ? Json(true) : Json(false);
             }
-            return resources.null_value();
+            return Json::null();
         }
 
         std::string to_string(int level = 0) const override
@@ -910,17 +898,17 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (lhs.is_number() && rhs.is_number())
             {
-                return lhs >= rhs ? resources.true_value() : resources.false_value();
+                return lhs >= rhs ? Json(true) : Json(false);
             }
             else if (lhs.is_string() && rhs.is_string())
             {
-                return lhs >= rhs ? resources.true_value() : resources.false_value();
+                return lhs >= rhs ? Json(true) : Json(false);
             }
-            return resources.null_value();
+            return Json::null();
         }
 
         std::string to_string(int level = 0) const override
@@ -945,23 +933,23 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
-                return resources.null_value();
+                return Json::null();
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_json(((lhs.template as<int64_t>() + rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() + rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_json((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() + rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_json((lhs.as_double() + rhs.as_double()));
+                return Json((lhs.as_double() + rhs.as_double()));
             }
         }
 
@@ -987,23 +975,23 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
-                return resources.null_value();
+                return Json::null();
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_json(((lhs.template as<int64_t>() - rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() - rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_json((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() - rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_json((lhs.as_double() - rhs.as_double()));
+                return Json((lhs.as_double() - rhs.as_double()));
             }
         }
 
@@ -1029,23 +1017,23 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             if (!(lhs.is_number() && rhs.is_number()))
             {
-                return resources.null_value();
+                return Json::null();
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_json(((lhs.template as<int64_t>() * rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() * rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_json((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() * rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_json((lhs.as_double() * rhs.as_double()));
+                return Json((lhs.as_double() * rhs.as_double()));
             }
         }
 
@@ -1071,25 +1059,25 @@ namespace detail {
         {
         }
 
-        JsonReference evaluate(dynamic_resources<Json,JsonReference>& resources, JsonReference lhs, JsonReference rhs, std::error_code&) const override
+        Json evaluate(JsonReference lhs, JsonReference rhs, std::error_code&) const override
         {
             //std::cout << "operator/ lhs: " << lhs << ", rhs: " << rhs << "\n";
 
             if (!(lhs.is_number() && rhs.is_number()))
             {
-                return resources.null_value();
+                return Json::null();
             }
             else if (lhs.is_int64() && rhs.is_int64())
             {
-                return *resources.create_json(((lhs.template as<int64_t>() / rhs.template as<int64_t>())));
+                return Json(((lhs.template as<int64_t>() / rhs.template as<int64_t>())));
             }
             else if (lhs.is_uint64() && rhs.is_uint64())
             {
-                return *resources.create_json((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()));
+                return Json((lhs.template as<uint64_t>() / rhs.template as<uint64_t>()));
             }
             else
             {
-                return *resources.create_json((lhs.as_double() / rhs.as_double()));
+                return Json((lhs.as_double() / rhs.as_double()));
             }
         }
 
@@ -3187,8 +3175,8 @@ namespace detail {
                             auto item = std::move(stack.back());
                             stack.pop_back();
 
-                            reference r = tok.unary_operator_->evaluate(resources, item.value(), ec);
-                            stack.emplace_back(std::addressof(r));
+                            auto val = tok.unary_operator_->evaluate(item.value(), ec);
+                            stack.emplace_back(std::move(val));
                             break;
                         }
                         case token_kind::binary_operator:
@@ -3202,9 +3190,9 @@ namespace detail {
                             //std::cout << "lhs: " << *lhs << "\n";
                             stack.pop_back();
 
-                            reference r = tok.binary_operator_->evaluate(resources, lhs.value(), rhs.value(), ec);
+                            auto val = tok.binary_operator_->evaluate(lhs.value(), rhs.value(), ec);
                             //std::cout << "Evaluate binary expression: " << r << "\n";
-                            stack.emplace_back(std::addressof(r));
+                            stack.emplace_back(std::move(val));
                             break;
                         }
                         case token_kind::root_node:
