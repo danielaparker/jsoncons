@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.14)
 
 project(jsoncons CXX)
 
@@ -62,7 +62,8 @@ configure_package_config_file(cmake/Config.cmake
 
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
                                  VERSION ${${PROJECT_NAME}_VERSION}
-                                 COMPATIBILITY AnyNewerVersion)
+                                 COMPATIBILITY AnyNewerVersion
+                                 ARCH_INDEPENDENT)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
