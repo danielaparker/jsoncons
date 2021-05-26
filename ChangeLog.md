@@ -1,4 +1,32 @@
-v0.163.3
+master
+------
+
+Changes to jsonpath:
+
+- The values in the `result_options` bitmask have been changed from
+
+    enum class result_options {value=1, path=2, nodups=4|path, sort=8|path};  (until 0.164.0)
+
+to
+
+    enum class result_options {value=0, nodups=1, sort=2, path=4};            (since 0.164.0)
+
+
+In practice this means that any combination of these values that includes
+`result_options::value` has the same meaning as before, except that
+`result_options::value` can now be omitted. And any combination that includes
+`result_options::path` but not `result_options::value` has the
+same meaning as before.
+
+Enhancements to jsonpath:
+
+- Functions now allow expressions to be passed as arguments, e.g.
+
+    $.books[?(ceil(@.price*100) == 2272)]
+
+- User provided custom functions are now supported
+
+0.163.3
 --------
 
 Bugs fixed:
@@ -7,14 +35,14 @@ Bugs fixed:
 that took a callback function argument used a deprecated typedef in an
 SFINAE condition. 
 
-v0.163.2
+0.163.2
 --------
 
 Bugs fixed:
 
 - Fixed a jmespath issue with reusing compiled expressions, see [\#317](https://github.com/danielaparker/jsoncons/issues/317)
 
-v0.163.1
+0.163.1
 --------
 
 Bugs fixed:
@@ -31,7 +59,7 @@ jsonschema extensions by making the destructors protected, see [\#313](https://g
 Added the gcc compiler flag `-Wnon-virtual-dtor` for gcc in the `tests/CMakeLists.txt` file.
 
 
-v0.163.0
+0.163.0
 --------
 
 Bugs fixed:
@@ -39,24 +67,24 @@ Bugs fixed:
 - Fixed a jsonpath issue with removal of duplicates with the `result_options::nodups`
 flag in the case of a union with different paths
 
-v0.162.3
+0.162.3
 --------
 
 - Fixed a sign-compare warning in android builds, [\#309](https://github.com/danielaparker/jsoncons/issues/309) 
 
-v0.162.2
+0.162.2
 --------
 
 - Fixed a sign-compare warning 
 
-v0.162.1
+0.162.1
 --------
 
 - Fixed a [gcc warning with -Wsign-compare](https://github.com/danielaparker/jsoncons/issues/307) 
 - `-Wsign-compare` enabled for gcc test builds
 - Fixed some PVS-Studio warnings
 
-v0.162.0
+0.162.0
 --------
 
 Enhancements to jsonpointer
@@ -75,7 +103,7 @@ Changes:
 - The jsonpointer function `insert` has been deprecated and renamed to `add_if_absent`,
 for consistency with the other names.
 
-v0.161.0
+0.161.0
 --------
 
 The `jsoncons::jsonpath` extension has been rewritten, see [JSONPath extension revisited](https://github.com/danielaparker/jsoncons/issues/306).
@@ -131,7 +159,7 @@ Enhancements to JMESPath extension
 - Function arity errors are now raised during compilation of the JMESPath expression
 rather than during evaluation.
 
-v0.160.0
+0.160.0
 --------
 
 Bugs fixed:
@@ -163,7 +191,7 @@ Deprecated function removed:
 `to_string(const basic_json_encode_options<char_type>&, char_allocator_type&) const`
 has been removed (replacement is `dump`).
 
-v0.159.0
+0.159.0
 --------
 
 Bugs fixed:
@@ -185,7 +213,7 @@ and replaces them with the result of a given function, see [\#279](https://githu
 
 - New factory function `jmespath::make_expression` to create compiled JMESPath expressions.
 
-v0.158.0 
+0.158.0 
 --------
 
 Bugs fixed:
@@ -207,7 +235,7 @@ with `jsoncons::identity()` (or `std::identity()` if C++20). For the rationale f
 - Conversion errors during decode are now reported more consistently as `jsoncons::convert_error`, 
 parsing errors remain `jsoncons::ser_error` (`or std::error_code`) as before.
 
-v0.157.2
+0.157.2
 --------
 
 Warnings fixed:
@@ -222,7 +250,7 @@ and potentially other decode functions. This means that decode
 functions will throw a `ser_error` instead of an `assertion_error`
 in the presence of certain kinds of bad data. 
 
-v0.157.1
+0.157.1
 --------
 
 Bugs fixed:
@@ -240,7 +268,7 @@ Change reverted:
 anybody used it, the name `codec_error` has been typedefed 
 to `ser_error`.
 
-v0.157.0 
+0.157.0 
 --------
 
 Changes:
@@ -254,7 +282,7 @@ Enhancements:
 `match` (value matches expected), `from` (convert from type known to jsoncons) 
 and `into` (convert into type known to jsoncons), [\#267](https://github.com/danielaparker/jsoncons/issues/267)
 
- v0.156.1
+ 0.156.1
 ---------
 
 Bugs fixed:
@@ -264,7 +292,7 @@ Bugs fixed:
 - Included pull request [\#273](https://github.com/danielaparker/jsoncons/pull/273) that fixes an 
 issue with a misnamed macro (`BOOST_HAS_FLOAT128` instead of `JSONCONS_HAS_FLOAT128`) introduced in 0.156.0.
 
- v0.156.0
+ 0.156.0
 ---------
 
 Bugs Fixed:

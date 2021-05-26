@@ -70,6 +70,25 @@ namespace {
         // All keys in the second book
         json result13 = jsonpath::json_query(booklist,"keys($.store.book[1])");
         std::cout << "(13)\n" << result13 << "\n";
+
+        // 
+        json result14 = jsonpath::json_query(booklist,"$.store.book[?(ceil(@.price) == 9)]");
+        std::cout << "(14)\n" << result14 << "\n";
+
+        // 
+        json result15 = jsonpath::json_query(booklist,"$.store.book[?(ceil(@.price*100) == 895)]");
+        std::cout << "(15)\n" << result15 << "\n";
+
+        // 
+        json result16 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price) == 8)]");
+        std::cout << "(16)\n" << result16 << "\n";
+
+        // 
+        json result17 = jsonpath::json_query(booklist,"$.store.book[?(floor(@.price*100) == 895)]");
+        std::cout << "(17)\n" << result17 << "\n";
+
+        json result18 = jsonpath::json_query(booklist,"floor($.store.book[0].price*100)");
+        std::cout << "(18)\n" << result18.to_string() << "\n";
     }
 
     void function_tokenize_example() 
@@ -181,13 +200,53 @@ namespace {
 
     void function_floor_example() 
     {
-        std::string data = "[9.2750, 9.2850]";
+        std::string data = R"(
+        [
+          {
+            "number" : 8.95
+          },
+          {
+            "number" : -8.95
+          }
+        ]        
+        )";
 
         json j = json::parse(data);
 
-        std::string expr = "floor($[0])";
-        json result1 = jsonpath::json_query(j, expr);
-        std::cout << result1 << "\n\n";
+        json result1 = jsonpath::json_query(j, "$[?(floor(@.number*100) == 895)]");
+        std::cout << "(1) " << result1 << "\n\n";
+        json result2 = jsonpath::json_query(j, "$[?(floor(@.number*100) == 894)]");
+        std::cout << "(2) " << result2 << "\n\n";
+        json result3 = jsonpath::json_query(j, "$[?(floor(@.number*100) == -895)]");
+        std::cout << "(3) " << result3 << "\n\n";
+    }
+
+    void function_ceil_example() 
+    {
+        std::string data = R"(
+        {
+            "books":
+            [
+                {
+                    "title" : "A Wild Sheep Chase",
+                    "author" : "Haruki Murakami",
+                    "price" : 22.72
+                },
+                {
+                    "title" : "The Night Watch",
+                    "author" : "Sergei Lukyanenko",
+                    "price" : 23.58
+                }            
+            ]
+        }
+        )";
+
+        json j = json::parse(data);
+
+        json result1 = jsonpath::json_query(j, "$.books[?(ceil(@.price) == 23.0)]");
+        std::cout << "(1) " << result1 << "\n\n";
+        json result2 = jsonpath::json_query(j, "$.books[?(ceil(@.price*100) == 2358.0)]");
+        std::cout << "(2) " << result2 << "\n\n";
     }
 
     void function_keys_example() 
@@ -719,7 +778,6 @@ void jsonpath_examples()
 
     jsonpath_complex_examples();
     jsonpath_union();
-    json_query_examples();
     flatten_and_unflatten();
     more_json_query_examples();
     make_expression_examples();
@@ -736,7 +794,6 @@ void jsonpath_examples()
     function_sum_example();
     function_avg_example();
     function_length_example();
-    function_floor_example();
     function_keys_example();
     search_for_and_replace_a_value();
 
@@ -744,6 +801,10 @@ void jsonpath_examples()
 
     custom_functions1();
     custom_functions2();
+
+    json_query_examples();
+    function_floor_example();
+    function_ceil_example();
     std::cout << "\n";
 }
 

@@ -347,7 +347,14 @@ The examples use the sample data file `books.json`,
 }
 ```
 
-#### json_query function
+[Using json_query](#eg1)  
+[Using json_replace](#eg2)  
+[Using make_expression](#eg3)  
+[Custom functions](#eg4)  
+
+ <div id="eg1"/>
+
+#### Using json_query
 
 ```
 #include <fstream>
@@ -413,7 +420,9 @@ Output:
 ]
 ```
 
-#### json_replace function
+ <div id="eg2"/>
+
+#### Using json_replace
 
 ```
 #include <fstream>
@@ -468,12 +477,14 @@ Output:
 }
 ```
 
-#### jsonpath_expression
+ <div id="eg3"/>
 
-A [jsoncons::jsonpath::jsonpath_expression](jsonpath_expression.md) 
+#### Using make_expression
+
+A [jsoncons::jsonpath::Using make_expression](Using make_expression.md) 
 represents the compiled form of a JSONPath expression. It allows you to 
 evaluate a single compiled expression on multiple JSON documents.
-A `jsonpath_expression` is immutable and thread-safe. 
+A `Using make_expression` is immutable and thread-safe. 
 
 ```
 #include <fstream>
@@ -535,6 +546,8 @@ Output:
     "$['books'][3]['title']"
 ]
 ```
+
+ <div id="eg4"/>
 
 #### Custom functions
 

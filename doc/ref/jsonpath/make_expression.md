@@ -44,7 +44,7 @@ jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
 
 #### Return value
 
-Returns a `jsonpath_expression` object that represents the JSONPath expression.
+Returns a [jsonpath_expression](jsonpath_expression.md) object that represents the JSONPath expression.
 
 #### Exceptions
 
