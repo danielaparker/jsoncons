@@ -322,7 +322,7 @@ std::string in_file = "input/countries.json";
 std::ifstream is(in_file);
 
 json_decoder<json> decoder;
-json_reader reader(is,decoder);
+json_stream_reader reader(is,decoder);
 reader.read();
 json countries = decoder.get_result();
 
@@ -387,7 +387,7 @@ json_decoder<json> decoder;
 csv_options options;
 options.field_delimiter = '\t';
 
-json_reader reader(is,decoder);
+json_stream_reader reader(is,decoder);
 reader.read();
 json employees = decoder.get_result();
 

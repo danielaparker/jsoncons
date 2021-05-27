@@ -63,7 +63,7 @@ namespace {
         std::ifstream is("./output/book_catalog.json");
         assert(is);
 
-        json_reader reader(is, writer);
+        json_stream_reader reader(is, writer);
         reader.read();
         std::cout << "\n\n";
     }

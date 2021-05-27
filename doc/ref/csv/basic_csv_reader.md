@@ -14,12 +14,16 @@ The `basic_csv_reader` class reads a [CSV file](http://tools.ietf.org/html/rfc41
 
 `basic_csv_reader` is noncopyable and nonmoveable.
 
-Two specializations for common character types are defined:
+A number of specializations for common character types are defined:
 
-Type                       |Definition
----------------------------|------------------------------
-csv_reader            |basic_csv_reader<char>
-wcsv_reader           |basic_csv_reader<wchar_t>
+Type                  |Definition
+----------------------|------------------------------
+`csv_string_reader`   |`basic_csv_string_reader<char,string_source<char>>`         (since 0.164.4)
+`wcsv_stringreader`   |`basic_csv_string_reader<wchar_t,string_source<wchar_t>>`   (since 0.164.4)
+`csv_stream_reader`   |`basic_csv_stream_reader<char,stream_source<char>>`         (since 0.164.4)
+`wcsv_stream_reader`  |`basic_csv_stream_reader<wchar_t,stream_source<wchar_t>>`   (since 0.164.4)
+`csv_reader`          |Constructible from either a string or stream                (deprecated since 0.164.4)
+`wcsv_reader`         |Constructible from either a wide character string or stream (deprecated since 0.164.4)
 
 #### Member types
 
@@ -116,7 +120,7 @@ std::ifstream is(in_file);
 
 json_decoder<json> decoder;
 
-csv_reader reader(is,decoder);
+csv_stream_reader reader(is,decoder);
 reader.read();
 json countries = decoder.get_result();
 
@@ -158,7 +162,7 @@ csv_options options;
 options.field_delimiter = '\t'
        .assume_header = true;
 
-csv_reader reader(is,decoder,options);
+csv_stream_reader reader(is,decoder,options);
 reader.read();
 json employees = decoder.get_result();
 
@@ -217,7 +221,7 @@ csv_options options;
 options.column_names("Country Code,Name")
       .header_lines(1);
 
-csv_reader reader(is,decoder,options);
+csv_stream_reader reader(is,decoder,options);
 reader.read();
 json countries = decoder.get_result();
 
@@ -268,21 +272,21 @@ options.assume_header(true)
 
 options.mapping(mapping_kind::n_rows);
 std::istringstream is1("bond_yields.csv");
-csv_reader reader1(is1,decoder,options);
+csv_stream_reader reader1(is1,decoder,options);
 reader1.read();
 ojson val1 = decoder.get_result();
 std::cout << "\n(1)\n"<< pretty_print(val1) << "\n";
 
 options.mapping(mapping_kind::n_objects);
 std::istringstream is2("bond_yields.csv");
-csv_reader reader2(is2,decoder,options);
+csv_stream_reader reader2(is2,decoder,options);
 reader2.read();
 ojson val2 = decoder.get_result();
 std::cout << "\n(2)\n"<< pretty_print(val2) << "\n";
 
 options.mapping(mapping_kind::m_columns);
 std::istringstream is3("bond_yields.csv");
-csv_reader reader3(is3, decoder, options);
+csv_stream_reader reader3(is3, decoder, options);
 reader3.read();
 ojson val3 = decoder.get_result();
 std::cout << "\n(3)\n" << pretty_print(val3) << "\n";
@@ -352,7 +356,7 @@ int main()
     options1.assume_header(false);
     options1.column_types("string,float*");
     std::istringstream is1(bond_yields);
-    csv_reader reader1(is1, decoder1, options1);
+    csv_stream_reader reader1(is1, decoder1, options1);
     reader1.read();
     ojson val1 = decoder1.get_result();
     std::cout << "\n(1)\n" << pretty_print(val1) << "\n";
@@ -363,7 +367,7 @@ int main()
     options2.assume_header(true);
     options2.column_types("string,[float*]");
     std::istringstream is2(bond_yields);
-    csv_reader reader2(is2, decoder2, options2);
+    csv_stream_reader reader2(is2, decoder2, options2);
     reader2.read();
     ojson val2 = decoder2.get_result();
     std::cout << "\n(2)\n" << pretty_print(val2) << "\n";
@@ -410,7 +414,7 @@ const std::string holidays = R"(1,CAD,2,UK,3,EUR,4,US + UK,5,US
 
     // Default
     std::istringstream is1(holidays);
-    csv_reader reader1(is1, decoder, options);
+    csv_stream_reader reader1(is1, decoder, options);
     reader1.read();
     ojson val1 = decoder.get_result();
     std::cout << pretty_print(val1) << "\n";

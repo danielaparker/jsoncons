@@ -56,7 +56,7 @@ and a specified [parse_error_handler](parse_error_handler.md).
 (4) Constructs a `json_parser` that uses the specified [basic_json_options](basic_json_options.md)
 and a specified [parse_error_handler](parse_error_handler.md).
 
-Note: It is the programmer's responsibility to ensure that `json_reader` does not outlive any error visitor passed in the constuctor.
+Note: It is the programmer's responsibility to ensure that `json_string_reader` does not outlive any string or `error visitor` passed in the constuctor.
 
 #### Member functions
 

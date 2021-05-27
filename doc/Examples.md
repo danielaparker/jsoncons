@@ -264,7 +264,7 @@ json_reader reader(s);
 
 // or,
 // std::stringstream is(s);
-// json_reader reader(is);
+// json_stream_reader reader(is);
 
 std::error_code ec;
 reader.read(ec);
@@ -565,7 +565,7 @@ int main()
     std::ifstream is("./output/book_catalog.json");
     assert(is);
 
-    json_reader reader(is, writer);
+    json_stream_reader reader(is, writer);
     reader.read();
     std::cout << "\n\n";
 }
@@ -3539,7 +3539,7 @@ int main()
     // A filter can be passed to any function that takes a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
-    json_reader reader(is, filter1);
+    json_stream_reader reader(is, filter1);
     reader.read();
     std::cout << std::endl;
 
@@ -3707,12 +3707,13 @@ private:
 };
 
 void update_json_in_place(std::string& input,
-                     const std::vector<std::string>& path,
-                     const std::string& from,
-                     const std::string& to)
+                          const std::vector<std::string>& path,
+                          const std::string& from,
+                          const std::string& to)
 {
     string_locator locator(input.data(), input.size(), path, from);
-    jsoncons::json_reader reader(jsoncons::string_view(input), locator);
+    //jsoncons::json_reader reader(jsoncons::string_view(input), locator);        // (until 0.164.0)
+    jsoncons::json_string_reader reader(jsoncons::string_view(input), locator);   // (since 0.164.0)
     reader.read();
 
     for (auto it = locator.positions().rbegin(); it != locator.positions().rend(); ++it)

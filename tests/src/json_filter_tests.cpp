@@ -91,7 +91,7 @@ TEST_CASE("test_filter")
 
     json_stream_encoder encoder(os);
     name_fix_up_filter filter(encoder);
-    json_reader reader(is, filter);
+    json_stream_reader reader(is, filter);
     reader.read_next();
 
     CHECK(1 == filter.warnings.size());
@@ -113,7 +113,7 @@ TEST_CASE("test_filter2")
 
     rename_object_key_filter filter1("email","email2",filter2);
 
-    json_reader reader(is, filter1);
+    json_stream_reader reader(is, filter1);
     reader.read_next();
 
     CHECK(1 == filter2.warnings.size());

@@ -37,7 +37,7 @@ void test_json_reader_ec(const std::string& text, const std::error_code& expecte
 
     std::istringstream is(text);
     json_decoder<json> decoder;
-    json_reader reader(is,decoder);
+    json_stream_reader reader(is,decoder);
 
     reader.read(ec);
     //std::cerr << text << std::endl;
@@ -82,7 +82,7 @@ TEST_CASE("json_reader constructors")
 
         json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, my_allocator,
                                                               my_allocator);
-        basic_json_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, my_allocator);
+        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, my_allocator);
         reader.read();
 
         my_json j = decoder.get_result();
@@ -214,7 +214,7 @@ TEST_CASE("test_read_multiple")
     std::istringstream is(in);
 
     jsoncons::json_decoder<json> decoder;
-    json_reader reader(is,decoder);
+    json_stream_reader reader(is,decoder);
 
     REQUIRE_FALSE(reader.eof());
     reader.read_next();
@@ -251,7 +251,7 @@ TEST_CASE("json_reader read from string test")
 )";
 
     json_decoder<json> decoder;
-    json_reader reader(s, decoder);
+    json_string_reader reader(s, decoder);
     reader.read();
     json j = decoder.get_result();
 

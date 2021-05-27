@@ -738,8 +738,7 @@ int main()
     // A filter can be passed to any function that takes
     // a json_visitor ...
     std::cout << "(1) ";
-    std::istringstream is(s);
-    json_reader reader(is, filter1);
+    json_string_reader reader(s, filter1);
     reader.read();
     std::cout << std::endl;
 
@@ -899,7 +898,7 @@ Note that the underlying memory pool used by the `boost::fast_pool_allocator` is
 <div id="A10"/>
 ### Wide character support
 
-jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
+jsoncons supports wide character strings `wjson`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
 ```c++
 using jsoncons::wjson;
 

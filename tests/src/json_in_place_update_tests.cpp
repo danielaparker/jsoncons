@@ -61,7 +61,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -76,7 +76,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -90,7 +90,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -105,7 +105,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -119,7 +119,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -133,7 +133,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -147,7 +147,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -161,7 +161,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -175,7 +175,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }
@@ -189,7 +189,7 @@ TEST_CASE("json in-place update tests")
         snprintf(expected, 500, format.c_str(), "ab");
 
         my_in_place_updater updater(input, (size_t)length, "id", "ab");
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
         CHECK(std::string(input) == std::string(expected));
     }

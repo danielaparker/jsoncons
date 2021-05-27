@@ -162,7 +162,7 @@ namespace {
     void update_in_place(std::string& input, const std::string& path, std::vector<std::size_t>& positions)
     {
         string_locator updater(path, "", positions);
-        jsoncons::json_reader reader(jsoncons::string_view(input), updater);
+        jsoncons::json_string_reader reader(jsoncons::string_view(input), updater);
         reader.read();
     }
 }

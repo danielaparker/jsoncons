@@ -74,7 +74,7 @@ void name_fix_up_example1()
 
     json_stream_encoder encoder(os);
     name_fix_up_filter filter(encoder);
-    json_reader reader(is, filter);
+    json_stream_reader reader(is, filter);
     reader.read_next();
 }
 
@@ -107,7 +107,7 @@ void change_member_name_example()
     // a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
-    json_reader reader(is, filter1);
+    json_stream_reader reader(is, filter1);
     reader.read();
     std::cout << std::endl;
 

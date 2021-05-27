@@ -36,7 +36,7 @@ void test_parse_ec(const std::string& text, const std::error_code& expected)
 
     std::istringstream is(text);
     json_decoder<json> decoder;
-    json_reader reader(is,decoder);
+    json_stream_reader reader(is,decoder);
 
     reader.read(ec);
     //std::cerr << text << std::endl;
@@ -171,7 +171,7 @@ TEST_CASE("test_multiple")
     std::istringstream is(in);
 
     jsoncons::json_decoder<json> decoder;
-    json_reader reader(is,decoder);
+    json_stream_reader reader(is,decoder);
 
     REQUIRE_FALSE(reader.eof());
     reader.read_next();

@@ -78,7 +78,7 @@ namespace {
         }
 
         json_decoder<json> decoder;
-        json_reader reader(is, decoder);
+        json_stream_reader reader(is, decoder);
 
         while (!reader.eof())
         {
@@ -117,7 +117,7 @@ namespace {
 
         json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, FreelistAllocator<char>(1),
                                                               FreelistAllocator<char>(2));
-        basic_json_reader<char,stream_source<char>,FreelistAllocator<char>> reader(input, decoder, FreelistAllocator<char>(3));
+        basic_json_reader<char,string_source<char>,FreelistAllocator<char>> reader(input, decoder, FreelistAllocator<char>(3));
         reader.read();
 
         my_json j = decoder.get_result();

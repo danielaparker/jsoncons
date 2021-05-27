@@ -53,7 +53,7 @@ TEST_CASE("test_string_allocation")
         json_decoder<my_json,FreelistAllocator<char>> decoder(result_allocator_arg, alloc, alloc2);
         JSONCONS_TRY
         {
-            json_reader reader(input,decoder);
+            json_string_reader reader(input,decoder);
             reader.read_next();
         }
         JSONCONS_CATCH (const std::exception&)

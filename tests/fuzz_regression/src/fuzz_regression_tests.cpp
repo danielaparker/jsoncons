@@ -96,7 +96,7 @@ TEST_CASE("oss-fuzz issues")
         csv::csv_options options;
         options.assume_header(true);
         options.mapping(csv::mapping_kind::n_rows);
-        csv::csv_reader reader(is,visitor,options);
+        csv::csv_stream_reader reader(is,visitor,options);
 
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
@@ -315,7 +315,7 @@ TEST_CASE("oss-fuzz issues")
         std::string s2;
         csv::csv_string_encoder visitor(s2);
 
-        csv::csv_reader reader(is, visitor);
+        csv::csv_stream_reader reader(is, visitor);
         std::error_code ec;
 
         REQUIRE_NOTHROW(reader.read(ec));
@@ -356,7 +356,7 @@ TEST_CASE("oss-fuzz issues")
         std::string s2;
         csv::csv_string_encoder visitor(s2);
 
-        csv::csv_reader reader(is, visitor);
+        csv::csv_stream_reader reader(is, visitor);
         std::error_code ec;
 
         REQUIRE_NOTHROW(reader.read(ec));
@@ -552,7 +552,7 @@ TEST_CASE("oss-fuzz issues")
         std::string s2;
         json_string_encoder visitor(s2);
 
-        json_reader reader(is, visitor);
+        json_stream_reader reader(is, visitor);
         try
         {
             std::error_code ec;
@@ -576,7 +576,7 @@ TEST_CASE("oss-fuzz issues")
         std::string s2;
         json_string_encoder visitor(s2);
 
-        json_reader reader(is, visitor);
+        json_stream_reader reader(is, visitor);
         std::error_code ec;
         reader.read(ec);
     }

@@ -22,7 +22,7 @@ TEST_CASE("test_filename_invalid")
 
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();
     }
     JSONCONS_CATCH (const std::exception&)
@@ -40,7 +40,7 @@ TEST_CASE("test_exception_left_brace")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();
     }
     JSONCONS_CATCH (const ser_error& e)
@@ -60,7 +60,7 @@ TEST_CASE("test_exception_right_brace")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -81,7 +81,7 @@ TEST_CASE("test_exception_array_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -101,7 +101,7 @@ TEST_CASE("test_exception_unicode_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -122,7 +122,7 @@ TEST_CASE("test_exception_tru_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -143,7 +143,7 @@ TEST_CASE("test_exception_fals_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -164,7 +164,7 @@ TEST_CASE("test_exception_nul_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -185,7 +185,7 @@ TEST_CASE("test_exception_true_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -205,7 +205,7 @@ TEST_CASE("test_exception_false_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }
@@ -225,7 +225,7 @@ TEST_CASE("test_exception_null_eof")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(is,decoder);
+        json_stream_reader reader(is,decoder);
         reader.read_next();  // must throw
         CHECK(0 != 0);
     }

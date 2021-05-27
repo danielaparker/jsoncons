@@ -111,7 +111,7 @@ TEST_CASE("csv_test_empty_values_with_defaults x")
     csv::csv_options options;
     options.assume_header(true); 
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -162,7 +162,7 @@ TEST_CASE("m_columns_test")
            .mapping(csv::mapping_kind::m_columns);
 
     std::istringstream is(bond_yields);
-    csv::csv_reader reader(is, decoder, options);
+    csv::csv_stream_reader reader(is, decoder, options);
     reader.read();
     ojson j = decoder.get_result();
 
@@ -192,7 +192,7 @@ TEST_CASE("csv ignore_empty_value")
                .mapping(csv::mapping_kind::m_columns);
 
         std::istringstream is(bond_yields);
-        csv::csv_reader reader(is, decoder, options);
+        csv::csv_stream_reader reader(is, decoder, options);
         reader.read();
         ojson j = decoder.get_result();
         //std::cout << "\n(1)\n"<< pretty_print(j) << "\n";
@@ -213,7 +213,7 @@ TEST_CASE("csv ignore_empty_value")
                .mapping(csv::mapping_kind::n_rows);
 
         std::istringstream is(bond_yields);
-        csv::csv_reader reader(is, decoder, options);
+        csv::csv_stream_reader reader(is, decoder, options);
         reader.read();
         ojson j = decoder.get_result();
         std::cout << "\n(1)\n"<< pretty_print(j) << "\n\n";
@@ -236,7 +236,7 @@ TEST_CASE("csv_test_empty_values")
     options.assume_header(true)
            .column_types("boolean,integer,float,string");
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -284,7 +284,7 @@ TEST_CASE("csv_test_empty_values_with_defaults")
            .column_types("boolean,integer,float,string")
            .column_defaults("false,0,0.0,\"\"");
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -334,7 +334,7 @@ TEST_CASE("csv_test_empty_values_with_empty_defaults")
            .column_types("boolean,integer,float,string")
            .column_defaults(",,,");
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -376,7 +376,7 @@ TEST_CASE("csv_test1_array_1col_skip1_a")
     csv::csv_options options;
     options.header_lines(1);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -398,7 +398,7 @@ TEST_CASE("csv_test1_array_1col_skip1_b")
     options.header_lines(1)
            .infer_types(false);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -419,7 +419,7 @@ TEST_CASE("csv_test1_array_1col_a")
     csv::csv_options options;
     options.assume_header(false);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -441,7 +441,7 @@ TEST_CASE("csv_test1_array_1col_b")
     options.assume_header(false)
            .infer_types(false);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -462,7 +462,7 @@ TEST_CASE("csv_test1_array_3cols")
     csv::csv_options options;
     options.assume_header(false);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -491,7 +491,7 @@ TEST_CASE("csv_test1_array_3cols_trim_leading")
     options.assume_header(false)
            .trim_leading(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -521,7 +521,7 @@ TEST_CASE("csv_test1_array_3cols_trim_trailing")
     options.assume_header(false)
            .trim_trailing(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -552,7 +552,7 @@ TEST_CASE("csv_test1_array_3cols_trim")
            .trim(true)
            .unquoted_empty_value_is_null(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -581,7 +581,7 @@ TEST_CASE("csv_test1_array_3cols_comment")
     csv::csv_options options;
     options.comment_starter('#');
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -623,7 +623,7 @@ TEST_CASE("csv_test1_object_1col")
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -644,7 +644,7 @@ TEST_CASE("csv_test1_object_3cols")
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -670,7 +670,7 @@ TEST_CASE("csv_test1_object_3cols_header")
     options.column_names("x,y,z")
            .header_lines(1);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -697,7 +697,7 @@ TEST_CASE("csv_test1_object_3cols_bool")
            .column_types("boolean,boolean,boolean")
            .header_lines(1);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -722,7 +722,7 @@ TEST_CASE("csv_test1_object_1col_quoted")
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -743,7 +743,7 @@ TEST_CASE("csv_test1_object_3cols_quoted")
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -768,7 +768,7 @@ TEST_CASE("csv_test1_array_1col_crlf")
     csv::csv_options options;
     options.assume_header(false);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -789,7 +789,7 @@ TEST_CASE("csv_test1_array_3cols_crlf")
     csv::csv_options options;
     options.assume_header(false);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -818,7 +818,7 @@ TEST_CASE("csv_test1_object_1col_crlf")
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -839,7 +839,7 @@ TEST_CASE("csv_test1_object_3cols_crlf")
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -865,7 +865,7 @@ TEST_CASE("read_comma_delimited_file")
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json countries = decoder.get_result();
 
@@ -892,7 +892,7 @@ TEST_CASE("read_comma_delimited_file_header")
     options.column_names("Country Code,Name")
            .header_lines(1);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json countries = decoder.get_result();
     CHECK(4 == countries.size());
@@ -916,7 +916,7 @@ TEST_CASE("serialize_comma_delimited_file")
     options.assume_header(false);
 
     json_decoder<ojson> encoder1;
-    json_reader reader1(is,encoder1);
+    json_stream_reader reader1(is,encoder1);
     reader1.read();
     ojson countries1 = encoder1.get_result();
 
@@ -925,7 +925,7 @@ TEST_CASE("serialize_comma_delimited_file")
     countries1.dump(encoder);
 
     json_decoder<ojson> encoder2;
-    csv::csv_reader reader2(ss,encoder2,options);
+    csv::csv_stream_reader reader2(ss,encoder2,options);
     reader2.read();
     ojson countries2 = encoder2.get_result();
 
@@ -943,7 +943,7 @@ TEST_CASE("test_tab_delimited_file")
     options.field_delimiter('\t')
            .assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json employees = decoder.get_result();
     CHECK(4 == employees.size());
@@ -966,7 +966,7 @@ TEST_CASE("serialize_tab_delimited_file")
            .column_names("dept,employee-name,employee-no,note,comment,salary")
            .field_delimiter('\t');
 
-    json_reader reader(is,decoder);
+    json_stream_reader reader(is,decoder);
     reader.read_next();
     ojson employees1 = decoder.get_result();
 
@@ -977,7 +977,7 @@ TEST_CASE("serialize_tab_delimited_file")
     //std::cout << ss.str() << std::endl;
 
     json_decoder<ojson> encoder2;
-    csv::csv_reader reader2(ss,encoder2,options);
+    csv::csv_stream_reader reader2(ss,encoder2,options);
     reader2.read();
     ojson employees2 = encoder2.get_result();
     //std::cout << pretty_print(employees2) << std::endl;
@@ -1005,7 +1005,7 @@ TEST_CASE("csv_test1_array_3cols_grouped1")
     options.assume_header(false)
            .column_types("integer,integer*");
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -1035,7 +1035,7 @@ TEST_CASE("csv_test1_array_3cols_grouped2")
     options.assume_header(false)
            .column_types("integer,[integer,integer]*");
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json val = decoder.get_result();
 
@@ -1128,7 +1128,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
     REQUIRE(j.size() == 4); //-V521
@@ -1162,7 +1162,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     options.assume_header(true)
            .ignore_empty_lines(false);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
 
@@ -1197,7 +1197,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     csv::csv_options options;
     options.assume_header(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
     REQUIRE(j.size() == 5); //-V521
@@ -1232,7 +1232,7 @@ WLF,WALLIS & FUTUNA ISLANDS
     options.assume_header(true)
            .trim(true);
 
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     json j = decoder.get_result();
     REQUIRE(j.size() == 4); //-V521
@@ -1538,7 +1538,7 @@ TEST_CASE("infinite loop")
         csv::csv_options options;
         options.assume_header(true);
         options.mapping(csv::mapping_kind::n_rows);
-        csv::csv_reader reader(input, decoder, options);
+        csv::csv_string_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
         CHECK(!ec); //-V521
@@ -1552,7 +1552,7 @@ TEST_CASE("infinite loop")
         csv::csv_options options;
         options.assume_header(true);
         options.mapping(csv::mapping_kind::n_rows);
-        csv::csv_reader reader(input, decoder, options);
+        csv::csv_string_reader reader(input, decoder, options);
         std::error_code ec;
         reader.read(ec);
         CHECK(ec == csv::csv_errc::unexpected_char_between_fields); //-V521

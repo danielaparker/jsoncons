@@ -543,7 +543,7 @@ int main()
     // a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
-    json_reader reader(is, filter1);
+    json_stream_reader reader(is, filter1);
     reader.read();
     std::cout << std::endl;
 
@@ -656,7 +656,7 @@ Parse the input and send the json events through the filter ...
 ```c++
 std::cout << "(1) ";
 std::ifstream is("input/address-book.json");
-json_reader reader(is, filter);
+json_stream_reader reader(is, filter);
 reader.read();
 std:: << "\n";
 ```

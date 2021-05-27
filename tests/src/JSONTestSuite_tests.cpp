@@ -34,7 +34,7 @@ TEST_CASE("JSON Parsing Test Suite")
             {
                 std::ifstream is(p.path().c_str());
                 strict_json_parsing err_handler;
-                json_reader reader(is, err_handler);
+                json_stream_reader reader(is, err_handler);
                 std::error_code ec;
                 reader.read(ec);
                 if (ec)
@@ -54,7 +54,7 @@ TEST_CASE("JSON Parsing Test Suite")
             {
                 std::ifstream is(p.path().c_str());
                 strict_json_parsing err_handler;
-                json_reader reader(is, err_handler);
+                json_stream_reader reader(is, err_handler);
                 std::error_code ec;
                 reader.read(ec);
                 if (!ec)

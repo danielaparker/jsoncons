@@ -111,7 +111,7 @@ namespace jsonschema {
     {
         if (content_media_type == "application/Json")
         {
-            json_reader reader(content);
+            json_string_reader reader(content);
             std::error_code ec;
             reader.read(ec);
 

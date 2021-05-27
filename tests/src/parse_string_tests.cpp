@@ -38,7 +38,7 @@ TEST_CASE("test_parse_small_string1")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(input,decoder);
+        json_string_reader reader(input,decoder);
         reader.read_next();
     }
     JSONCONS_CATCH (const std::exception&)
@@ -54,7 +54,7 @@ TEST_CASE("test_parse_small_string2")
     json_decoder<json> decoder;
     JSONCONS_TRY
     {
-        json_reader reader(input, decoder);
+        json_string_reader reader(input, decoder);
         reader.read_next();
     }
     JSONCONS_CATCH (const std::exception&)
@@ -73,7 +73,7 @@ TEST_CASE("test_parse_small_string4")
         json_decoder<json> decoder;
         JSONCONS_TRY
         {
-            json_reader reader(is, decoder);
+            json_stream_reader reader(is, decoder);
             reader.buffer_length(i);
             reader.read_next();
         }
@@ -94,7 +94,7 @@ TEST_CASE("test_parse_big_string1")
         json_decoder<json> decoder;
         JSONCONS_TRY
         {
-            json_reader reader(is, decoder);
+            json_stream_reader reader(is, decoder);
             reader.buffer_length(i);
             reader.read_next();
         }
@@ -115,7 +115,7 @@ TEST_CASE("test_parse_big_string2")
     lenient_error_handler err_handler(json_errc::illegal_character_in_string);
     JSONCONS_TRY
     {
-        json_reader reader(is, decoder, err_handler);
+        json_stream_reader reader(is, decoder, err_handler);
         reader.read_next();
     }
     JSONCONS_CATCH (const std::exception&)

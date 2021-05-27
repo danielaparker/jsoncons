@@ -116,7 +116,7 @@ Output:
 ```
 ### Wide character support for UTF16 and UTF32 encodings
 
-jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It assumes `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4.
+jsoncons supports wide character strings with `wjson`. It assumes `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4.
 
 It is necessary to deal with UTF-16 character encoding in the Windows world because of lack of UTF-8 support in the Windows system API. 
 

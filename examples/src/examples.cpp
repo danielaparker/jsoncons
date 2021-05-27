@@ -293,7 +293,7 @@ void validation_example()
     )";
     std::stringstream is(s);
 
-    json_reader reader(is);
+    json_stream_reader reader(is);
 
     std::error_code ec;
     reader.read(ec);

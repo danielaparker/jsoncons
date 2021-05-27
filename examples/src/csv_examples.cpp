@@ -207,7 +207,7 @@ void read_write_csv_tasks()
            .trim(true)
            .ignore_empty_values(true) 
            .column_types("integer,string,string,string");
-    csv::csv_reader reader(is,decoder,options);
+    csv::csv_stream_reader reader(is,decoder,options);
     reader.read();
     ojson tasks = decoder.get_result();
 
@@ -314,7 +314,7 @@ void last_column_repeats()
     options1.header_lines(1);
     options1.column_types("string,float*");
     std::istringstream is1(bond_yields);
-    csv::csv_reader reader1(is1, decoder1, options1);
+    csv::csv_stream_reader reader1(is1, decoder1, options1);
     reader1.read();
     ojson val1 = decoder1.get_result();
     std::cout << "\n(1)\n" << pretty_print(val1) << "\n";
@@ -324,7 +324,7 @@ void last_column_repeats()
     options2.assume_header(true);
     options2.column_types("string,[float*]");
     std::istringstream is2(bond_yields);
-    csv::csv_reader reader2(is2, decoder2, options2);
+    csv::csv_stream_reader reader2(is2, decoder2, options2);
     reader2.read();
     ojson val2 = decoder2.get_result();
     std::cout << "\n(2)\n" << pretty_print(val2) << "\n";
@@ -342,7 +342,7 @@ void last_two_columns_repeat()
     csv::csv_options options1;
     options1.column_types("[integer,string]*");
     std::istringstream is1(holidays);
-    csv::csv_reader reader1(is1, decoder1, options1);
+    csv::csv_stream_reader reader1(is1, decoder1, options1);
     reader1.read();
     ojson val1 = decoder1.get_result();
     std::cout << "(1)\n" << pretty_print(val1) << "\n";
@@ -354,7 +354,7 @@ void last_two_columns_repeat()
     options2.column_names("CAD,UK,EUR,US");
     options2.column_types("[integer,string]*");
     std::istringstream is2(holidays);
-    csv::csv_reader reader2(is2, decoder2, options2);
+    csv::csv_stream_reader reader2(is2, decoder2, options2);
     reader2.read();
     ojson val2 = decoder2.get_result();
     std::cout << "(2)\n" << pretty_print(val2) << "\n";

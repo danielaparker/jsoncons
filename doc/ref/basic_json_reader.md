@@ -17,12 +17,16 @@ which omits the check for unconsumed non-whitespace characters.
 
 `basic_json_reader` is noncopyable and nonmoveable.
 
-Two specializations for common character types are defined:
+A number of specializations for common character types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-json_reader            |basic_json_reader<char>
-wjson_reader           |basic_json_reader<wchar_t>
+`json_string_reader`         |`basic_json_reader<char,string_source<char>>`       (since 0.164.4)
+`wjson_string_reader`        |`basic_json_reader<wchar_t,string_source<wchar_t>>` (since 0.164.4)
+`json_stream_reader`         |`basic_json_reader<char,stream_source<char>>`       (since 0.164.4)
+`wjson_stream_reader`        |`basic_json_reader<wchar_t,stream_source<wchar_t>>` (since 0.164.4)
+`json_reader`                |Constructible from either a string or stream                (deprecated since 0.164.4)
+`wjson_reader`               |Constructible from either a wide character string or stream (deprecated since 0.164.4)
 
 #### Member types
 
@@ -121,9 +125,7 @@ visitor passed in the constuctor, as `basic_json_reader` holds pointers to but d
 
 #### Parameters
 
-`source` - a value from which a `jsoncons::basic_string_view<char_type>` is constructible, 
-or a value from which a `source_type` is constructible. In the case that a `jsoncons::basic_string_view<char_type>` is constructible
-from `source`, `source` is dispatched immediately to the parser. Otherwise, the `json_reader` reads from a `source_type` in chunks. 
+`source` - a value from which a `source_type` is constructible.  
 
 #### Member functions
 
@@ -162,7 +164,7 @@ Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if there are any
 std::string input = R"({"field1"{}})";    
 
 json_decoder<json> decoder;
-json_reader reader(input,decoder);
+json_string_reader reader(input,decoder);
 
 try
 {
@@ -186,7 +188,7 @@ std::string input = R"({"field1":ru})";
 std::istringstream is(input);
 
 json_decoder<json> decoder;
-json_reader reader(is,decoder);
+json_stream_reader reader(is,decoder);
 
 std::error_code ec;
 reader.read(ec);
@@ -224,7 +226,7 @@ if (!is.is_open())
 }
 
 json_decoder<json> decoder;
-json_reader reader(is,decoder);
+json_stream_reader reader(is,decoder);
 
 while (!reader.eof())
 {
