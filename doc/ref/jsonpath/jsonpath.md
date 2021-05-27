@@ -211,7 +211,19 @@ JSONPath uses filter expressions `[?<expr>]` to restrict the set of nodes
 returned by a path, e.g. `$..book[?(@.price<10)]` returns the books with 
 prices less than 10. Filter expressions are applied to each element in a 
 JSON array or each member in a JSON object. The symbol `@` represents the 
-value currently being processed. 
+value currently being processed. An expression evaluates to true or false,
+if true, the array element, or value part of a member, is selected.
+
+An expression is considered false if it evaluates to any of the following values:
+
+- empty array: [],
+- empty object: {},
+- empty string: "",
+- false,
+- null,
+- zero.
+
+It is considered true if it is not false.
 
 [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) 
 does not provide any specification for the allowable filter expressions, 
@@ -236,17 +248,6 @@ Operator|       Description
 `>`     |Left is greater than right
 `>=`    |Left is greater than or equal to right
 `=~`    |Left matches regular expression, e.g. [?(@.author =~ /Evelyn.*?/)]
-
-An expression is considered false if it evaluates to any of the following values:
-
-- empty array: [],
-- empty object: {},
-- empty string: "",
-- false,
-- null,
-- zero.
-
-It is considered true if it is not false.
 
 The ordering operators `>`, `>=`, `<`, `<=` are only valid if both left and right are numbers,
 or if both left and right are strings. Otherwise the item will be excluded from the result set.
