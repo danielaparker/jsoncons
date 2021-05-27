@@ -53,6 +53,7 @@ The jsoncons implementation differs from Stefan Goessner's JavaScript implementa
 
     $..['firstName',@.address.city]
 
+- Fiter expressions, e.g. `$..book[?(@.price<10)]`, may omit the enclosing parentheses, like so `$..book[?@.price<10]`. 
 - Options are provided to exclude results corresponding to duplicate paths, and to sort results according to paths.
 
 ### Paths
@@ -206,9 +207,17 @@ $[-3::-1]  | All items except the last two, reversed
 
 ### Filter expressions
 
-JSONPath uses filter expressions `[?(<expr>)]` to restrict the set of nodes returned by a path, e.g. `$..book[?(@.price<10)]` returns the books with prices less than 10.
+JSONPath uses filter expressions `[?<expr>]` to restrict the set of nodes
+returned by a path, e.g. `$..book[?(@.price<10)]` returns the books with 
+prices less than 10. Filter expressions are applied to each element in a 
+JSON array or each member in a JSON object. The symbol `@` represents the 
+value currently being processed. 
 
-[Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) does not provide any specification for the allowable filter expressions, simply stating that expressions can be anything that the underlying script engine can handle. `jsoncons` expressions support the following comparision and arithmetic operators. 
+[Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) 
+does not provide any specification for the allowable filter expressions, 
+simply stating that expressions can be anything that the underlying script 
+engine can handle. `jsoncons` expressions support the following comparision 
+and arithmetic operators. 
 
 #### Binary operators
 
