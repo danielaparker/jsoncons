@@ -283,12 +283,13 @@ In jsoncons, a JSONPath union element can be
 - a filter
 - a wildcard, i.e. `*`
 - a path relative to the root of the JSON document (begins with `$`)
-- a path relative to the current value (begins with `@`)
+- a path relative to the current value being processed (begins with `@`)
 
-To illustrate, the path expression below selects the second, third, and fourth titles from [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3):
+To illustrate, the path expression below selects the first and second titles, 
+the last, and the third from [Stefan Goessner's store](https://goessner.net/articles/JsonPath/index.html#e3):
 
 ```
-"$.store.book[:-2:1,-2,?(@.author=='J. R. R. Tolkien')].title"
+"$.store.book[0:2,-1,?(@.author=='Herman Melville')].title"
 ```
 
 ### Function expressions

@@ -712,7 +712,7 @@ namespace {
         std::ifstream is("./input/store.json");
         json store = json::parse(is);
 
-        std::string path = "$.store.book[:-2:1,-2,?(@.author=='J. R. R. Tolkien')].title";
+        std::string path = "$.store.book[0:2,-1,?(@.author=='Herman Melville')].title";
         auto result1 = jsonpath::json_query(store, path);
         std::cout << "(1) " << result1 << "\n\n";
 
@@ -797,14 +797,14 @@ void jsonpath_examples()
     function_keys_example();
     search_for_and_replace_a_value();
 
-    union_example();
-
     custom_functions1();
     custom_functions2();
 
     json_query_examples();
     function_floor_example();
     function_ceil_example();
+
+    union_example();
     std::cout << "\n";
 }
 
