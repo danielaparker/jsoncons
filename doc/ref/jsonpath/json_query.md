@@ -8,34 +8,34 @@
 template<class Json>
 Json json_query(const Json& root value, 
                 const Json::string_view_type& expr,
-                result_options options = result_options()); (1)
-```
-```c++
-template<class Json>
+                result_options options = result_options());       (until 0.164.0)
+
+template<class Json>                                          (1)
 Json json_query(const Json& root value, 
                 const Json::string_view_type& expr,
-                result_options options,
-                const custom_functions<Json>& funcs);       (2) (since 0.164.0)
+                result_options options = result_options(),
+                const custom_functions<Json>& funcs = 
+                    custom_functions<Json>());                    (since 0.164.0)
 ```
 ```c++
 template<class Json, class BinaryCallback>
 void json_query(const Json& root value, 
                 const Json::string_view_type& expr,
                 BinaryCallback callback
-                result_options options = result_options()); (3)
-```
-```c++
-template<class Json, class BinaryCallback>
+                result_options options = result_options());       (until 0.164.0)
+
+template<class Json, class BinaryCallback>                    (2)
 void json_query(const Json& root value, 
                 const Json::string_view_type& expr,
                 BinaryCallback callback,
-                result_options options,
-                const custom_functions<Json>& funcs);       (4) (since 0.164.0)
+                result_options options = result_options(),
+                const custom_functions<Json>& funcs = 
+                    custom_functions<Json>());                      (since 0.164.0)
 ```
-(1)-(2) Evaluates the root value against the JSONPath expression `expr` and returns an array of values or 
+(1) Evaluates the root value against the JSONPath expression `expr` and returns an array of values or 
 normalized path expressions. 
 
-(3)-(4) Evaluates the root value against the JSONPath expression `expr` and calls a provided
+(2) Evaluates the root value against the JSONPath expression `expr` and calls a provided
 callback repeatedly with the results. 
 
 #### Parameters

@@ -6,28 +6,29 @@
 
 ```c++
 template <class Json>
-jsonpath_expression<Json> make_expression(const Json::string_view_type& expr);  (1)
+jsonpath_expression<Json> make_expression(const Json::string_view_type& expr);      (until 0.164.0)
+```
+```c++
+template <class Json>                                                           (1)
+jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
+                                          const custom_functions<Json>& funcs = 
+                                              custom_functions<Json>());            (since 0.164.0)
 ```
 ```c++
 template <class Json>
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
-                                          const custom_functions<Json>& funcs); (2) (since 0.164.0)
+                                          std::error_code& ec);                 (2)
 ```
 ```c++
-template <class Json>
-jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
-                                          std::error_code& ec);                 (3)
-```
-```c++
-template <class Json>
+template <class Json>                                                           
 jsonpath_expression<Json> make_expression(const Json::string_view_type& expr,
                                           const custom_functions<Json>& funcs,
-                                          std::error_code& ec);                 (4) (since 0.164.0)
+                                          std::error_code& ec);                 (3) (since 0.164.0)
 ```
 
-(1)-(2) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
+(1) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 
-(3)-(4) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
+(2-3) Makes a [jsonpath_expression](jsonpath_expression.md) from the JSONPath expression `expr`.
 
 #### Parameters
 
