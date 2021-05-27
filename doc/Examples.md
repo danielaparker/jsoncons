@@ -260,11 +260,13 @@ std::string s = R"(
 }
 )";
 
-json_reader reader(s);
+//json_reader reader(s);          // (until 0.164.0)
+json_string_reader reader(s);     // (since 0.164.0)
 
 // or,
 // std::stringstream is(s);
-// json_stream_reader reader(is);
+// json_reader reader(is);        // (until 0.164.0)
+// json_stream_reader reader(is); // (since 0.164.0)
 
 std::error_code ec;
 reader.read(ec);
@@ -3712,8 +3714,8 @@ void update_json_in_place(std::string& input,
                           const std::string& to)
 {
     string_locator locator(input.data(), input.size(), path, from);
-    //jsoncons::json_reader reader(jsoncons::string_view(input), locator);        // (until 0.164.0)
-    jsoncons::json_string_reader reader(jsoncons::string_view(input), locator);   // (since 0.164.0)
+    //jsoncons::json_reader reader(input, locator);        // (until 0.164.0)
+    jsoncons::json_string_reader reader(input, locator);   // (since 0.164.0)
     reader.read();
 
     for (auto it = locator.positions().rbegin(); it != locator.positions().rend(); ++it)

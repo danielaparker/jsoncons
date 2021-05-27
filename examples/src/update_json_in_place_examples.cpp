@@ -73,7 +73,7 @@ namespace {
                          const std::string& to)
     {
         string_locator locator(input.data(), input.size(), path, from);
-        jsoncons::json_string_reader reader(jsoncons::string_view(input), locator);
+        jsoncons::json_string_reader reader(input, locator);
         reader.read();
 
         for (auto it = locator.positions().rbegin(); it != locator.positions().rend(); ++it)

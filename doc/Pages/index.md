@@ -738,7 +738,8 @@ int main()
     // A filter can be passed to any function that takes
     // a json_visitor ...
     std::cout << "(1) ";
-    json_string_reader reader(s, filter1);
+    //json_reader reader(s, filter1);       // (until 0.164.0)
+    json_string_reader reader(s, filter1);  // (since 0.164.0)
     reader.read();
     std::cout << std::endl;
 
