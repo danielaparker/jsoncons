@@ -567,7 +567,8 @@ int main()
     std::ifstream is("./output/book_catalog.json");
     assert(is);
 
-    json_stream_reader reader(is, writer);
+    //json_reader reader(is, writer);        // (until 0.164.0)
+    json_stream_reader reader(is, writer);   // (since 0.164.0)
     reader.read();
     std::cout << "\n\n";
 }
@@ -3541,7 +3542,8 @@ int main()
     // A filter can be passed to any function that takes a json_visitor ...
     std::cout << "(1) ";
     std::istringstream is(s);
-    json_stream_reader reader(is, filter1);
+    //json_reader reader(is, filter1);        // (until 0.164.0)
+    json_stream_reader reader(is, filter1);   // (since 0.164.0)
     reader.read();
     std::cout << std::endl;
 
