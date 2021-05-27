@@ -590,7 +590,7 @@ int main()
     json result = jsonpath::json_query(root, 
                                        "$[?(divide(@.foo, @.bar) == 6)]", 
                                        jsonpath::result_options(), 
-                                       my_custom_functions<json>());
+                                       my_custom_functions<json>());   // (since 0.164.0)
 
     std::cout << pretty_print(result) << "\n\n";
 }
