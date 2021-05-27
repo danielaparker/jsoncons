@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.1)
 
 project(jsoncons CXX)
 
@@ -60,10 +60,17 @@ configure_package_config_file(cmake/Config.cmake
 
 # jsoncons is header-only and does not depend on the architecture.
 
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-                                 VERSION ${${PROJECT_NAME}_VERSION}
-                                 COMPATIBILITY AnyNewerVersion
-                                 ARCH_INDEPENDENT)
+if (${CMAKE_VERSION} VERSION_LESS "3.14.0")
+   write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+                                    VERSION ${${PROJECT_NAME}_VERSION}
+                                    COMPATIBILITY AnyNewerVersion)
+else ()
+   write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+                                    VERSION ${${PROJECT_NAME}_VERSION}
+                                    COMPATIBILITY AnyNewerVersion
+                                    ARCH_INDEPENDENT)
+endif ()
+
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION ${JSONCONS_CMAKECONFIG_INSTALL_DIR})
