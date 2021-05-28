@@ -738,8 +738,8 @@ int main()
     // A filter can be passed to any function that takes
     // a json_visitor ...
     std::cout << "(1) ";
-    std::istringstream is(s);
-    json_reader reader(is, filter1);
+    //json_reader reader(s, filter1);       // (until 0.164.0)
+    json_string_reader reader(s, filter1);  // (since 0.164.0)
     reader.read();
     std::cout << std::endl;
 
@@ -761,7 +761,7 @@ Or define and use your own filters. See [basic_json_filter](https://github.com/d
 
 [Stefan Goessner's JSONPath](http://goessner.net/articles/JsonPath/) is an XPATH inspired query language for selecting parts of a JSON structure.
 
-Example JSON file (booklist.json):
+Example JSON file (store.json):
 ```json
 { "store": {
     "book": [ 
@@ -797,7 +797,7 @@ JSONPath examples:
 
 using jsoncons::jsonpath::json_query;
 
-std::ifstream is("./input/booklist.json");
+std::ifstream is("./input/store.json");
 json booklist = json::parse(is);
 
 // The authors of books that are cheaper than $10
@@ -899,7 +899,7 @@ Note that the underlying memory pool used by the `boost::fast_pool_allocator` is
 <div id="A10"/>
 ### Wide character support
 
-jsoncons supports wide character strings and streams with `wjson` and `wjson_reader`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
+jsoncons supports wide character strings `wjson`. It supports `UTF16` encoding if `wchar_t` has size 2 (Windows) and `UTF32` encoding if `wchar_t` has size 4. You can construct a `wjson` value in exactly the same way as a `json` value, for instance:
 ```c++
 using jsoncons::wjson;
 
