@@ -1,5 +1,5 @@
-master
-------
+0.164.0
+-------
 
 Changes to jsonpath:
 
@@ -25,6 +25,20 @@ Enhancements to jsonpath:
     $.books[?(ceil(@.price*100) == 2272)]
 
 - User provided custom functions are now supported
+
+Changes to json_reader and csv_reader:
+
+- The typedefs `json_reader` and `wjson_reader` have been deprecated,
+but for backwards compatibility they are still supported.  They 
+have been replaced by `json_string_reader` and `wjson_string_reader`
+for string sources, and `json_stream_reader` and `wjson_stream_reader`,
+for stream sources. 
+
+- The typedefs `csv_reader` and `wcsv_reader` have been deprecated,
+but for backwards compatibility they are still supported.  They 
+have been replaced by `csv_string_reader` and `wcsv_string_reader`
+for string sources, and `csv_stream_reader` and `wcsv_stream_reader`,
+for stream sources. 
 
 0.163.3
 --------

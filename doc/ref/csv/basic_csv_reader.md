@@ -18,12 +18,12 @@ A number of specializations for common character types are defined:
 
 Type                  |Definition
 ----------------------|------------------------------
-`csv_string_reader`   |`basic_csv_string_reader<char,string_source<char>>`         (since 0.164.4)
-`wcsv_stringreader`   |`basic_csv_string_reader<wchar_t,string_source<wchar_t>>`   (since 0.164.4)
-`csv_stream_reader`   |`basic_csv_stream_reader<char,stream_source<char>>`         (since 0.164.4)
-`wcsv_stream_reader`  |`basic_csv_stream_reader<wchar_t,stream_source<wchar_t>>`   (since 0.164.4)
-`csv_reader`          |Constructible from either a string or stream                (deprecated since 0.164.4)
-`wcsv_reader`         |Constructible from either a wide character string or stream (deprecated since 0.164.4)
+`csv_string_reader`   |`basic_csv_string_reader<char,string_source<char>>`         (since 0.164.0)
+`wcsv_stringreader`   |`basic_csv_string_reader<wchar_t,string_source<wchar_t>>`   (since 0.164.0)
+`csv_stream_reader`   |`basic_csv_stream_reader<char,stream_source<char>>`         (since 0.164.0)
+`wcsv_stream_reader`  |`basic_csv_stream_reader<wchar_t,stream_source<wchar_t>>`   (since 0.164.0)
+`csv_reader`          |Constructible from either a string or stream                (deprecated since 0.164.0)
+`wcsv_reader`         |Constructible from either a wide character string or stream (deprecated since 0.164.0)
 
 #### Member types
 

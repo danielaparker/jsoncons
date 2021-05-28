@@ -21,12 +21,12 @@ A number of specializations for common character types are defined:
 
 Type                       |Definition
 ---------------------------|------------------------------
-`json_string_reader`         |`basic_json_reader<char,string_source<char>>`       (since 0.164.4)
-`wjson_string_reader`        |`basic_json_reader<wchar_t,string_source<wchar_t>>` (since 0.164.4)
-`json_stream_reader`         |`basic_json_reader<char,stream_source<char>>`       (since 0.164.4)
-`wjson_stream_reader`        |`basic_json_reader<wchar_t,stream_source<wchar_t>>` (since 0.164.4)
-`json_reader`                |Constructible from either a string or stream                (deprecated since 0.164.4)
-`wjson_reader`               |Constructible from either a wide character string or stream (deprecated since 0.164.4)
+`json_string_reader`         |`basic_json_reader<char,string_source<char>>`       (since 0.164.0)
+`wjson_string_reader`        |`basic_json_reader<wchar_t,string_source<wchar_t>>` (since 0.164.0)
+`json_stream_reader`         |`basic_json_reader<char,stream_source<char>>`       (since 0.164.0)
+`wjson_stream_reader`        |`basic_json_reader<wchar_t,stream_source<wchar_t>>` (since 0.164.0)
+`json_reader`                |Constructible from either a string or stream                (deprecated since 0.164.0)
+`wjson_reader`               |Constructible from either a wide character string or stream (deprecated since 0.164.0)
 
 #### Member types
 
