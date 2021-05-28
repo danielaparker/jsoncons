@@ -230,12 +230,6 @@ namespace jsoncons {
 
     // string_source
 
-    template <class CharT, class T, class Enable=void>
-    struct is_string_sourceable : std::false_type {};
-
-    template <class CharT, class T>
-    struct is_string_sourceable<CharT,T,typename std::enable_if<std::is_same<typename T::value_type, CharT>::value>::type> : std::true_type {};
-
     template <class CharT>
     class string_source 
     {
@@ -258,13 +252,13 @@ namespace jsoncons {
 
         template <class Source>
         string_source(const Source& s,
-                      typename std::enable_if<is_string_sourceable<value_type,typename std::decay<Source>::type>::value>::type* = 0)
+                      typename std::enable_if<type_traits::is_string_or_string_view<Source>::value && std::is_same<value_type,typename Source::value_type>::value>::type* = 0)
             : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
         {
         }
 
-        string_source(const value_type* data, std::size_t size)
-            : data_(data), current_(data), end_(data+size)
+        string_source(const value_type* data)
+            : data_(data), current_(data), end_(data+std::char_traits<value_type>::length(data))
         {
         }
 
