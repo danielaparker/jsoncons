@@ -76,6 +76,17 @@ typedef typename std::conditional<
     detail::TP2
 >::type bson_decimal128_t;
 
+    inline
+    bool operator==(const bson_decimal128_t& lhs, const bson_decimal128_t& rhs)
+    {
+       return lhs.high == rhs.high && lhs.low == rhs.low;
+    }   
+
+    inline
+    bool operator!=(const bson_decimal128_t& lhs, const bson_decimal128_t& rhs)
+    {
+       return !(lhs == rhs);
+    }   
 
     struct decimal128_limits
     {
@@ -183,7 +194,7 @@ _bson_uint128_divide1B (_bson_uint128_t value,     /* IN */
  */
 
 inline
-void decimal128_to_chars(char* first, char* last, const bson_decimal128_t *dec)
+void decimal128_to_chars(char* first, char* last, const bson_decimal128_t& dec)
 {
    uint32_t COMBINATION_MASK = 0x1f;   /* Extract least significant 5 bits */
    uint32_t EXPONENT_MASK = 0x3fff;    /* Extract least significant 14 bits */
@@ -219,12 +230,12 @@ void decimal128_to_chars(char* first, char* last, const bson_decimal128_t *dec)
 
    memset (significand_str, 0, sizeof (significand_str));
 
-   if ((int64_t) dec->high < 0) { /* negative */
+   if ((int64_t) dec.high < 0) { /* negative */
       *(str_out++) = '-';
    }
 
-   low = (uint32_t) dec->low, midl = (uint32_t) (dec->low >> 32),
-   midh = (uint32_t) dec->high, high = (uint32_t) (dec->high >> 32);
+   low = (uint32_t) dec.low, midl = (uint32_t) (dec.low >> 32),
+   midh = (uint32_t) dec.high, high = (uint32_t) (dec.high >> 32);
 
    /* Decode combination field and exponent */
    combination = (high >> 26) & COMBINATION_MASK;
@@ -501,7 +512,7 @@ _dec128_istreq (const char* a, /* IN */
  */
 
 inline
-bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_t *dec) 
+bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_t& dec) 
 {
     int len = last - first;
 
@@ -533,9 +544,8 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
    uint64_t significand_low = 0;  /* The low 17 digits of the significand */
    uint16_t biased_exponent = 0;  /* The biased exponent */
 
-   JSONCONS_ASSERT (dec);
-   dec->high = 0;
-   dec->low = 0;
+   dec.high = 0;
+   dec.low = 0;
 
    if (*str_read == '+' || *str_read == '-') {
       is_negative = *(str_read++) == '-';
@@ -546,14 +556,14 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
    if (!isdigit (*str_read) && *str_read != '.') {
       if (_dec128_istreq (str_read, "inf") ||
           _dec128_istreq (str_read, "infinity")) {
-         BSON_DECIMAL128_SET_INF (*dec, is_negative);
+         BSON_DECIMAL128_SET_INF (dec, is_negative);
          return true;
       } else if (_dec128_istreq (str_read, "nan")) {
-         BSON_DECIMAL128_SET_NAN (*dec);
+         BSON_DECIMAL128_SET_NAN (dec);
          return true;
       }
 
-      BSON_DECIMAL128_SET_NAN (*dec);
+      BSON_DECIMAL128_SET_NAN (dec);
       return false;
    }
 
@@ -562,7 +572,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
           (len == -1 || str_read < first + len)) {
       if (*str_read == '.') {
          if (saw_radix) {
-            BSON_DECIMAL128_SET_NAN (*dec);
+            BSON_DECIMAL128_SET_NAN (dec);
             return false;
          }
 
@@ -596,7 +606,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
    }
 
    if (saw_radix && !ndigits_read) {
-      BSON_DECIMAL128_SET_NAN (*dec);
+      BSON_DECIMAL128_SET_NAN (dec);
       return false;
    }
 
@@ -612,7 +622,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
       str_read += nread;
 
       if (!read_exponent || nread == 0) {
-         BSON_DECIMAL128_SET_NAN (*dec);
+         BSON_DECIMAL128_SET_NAN (dec);
          return false;
       }
 
@@ -620,7 +630,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
    }
 
    if ((len == -1 || str_read < first + len) && *str_read) {
-      BSON_DECIMAL128_SET_NAN (*dec);
+      BSON_DECIMAL128_SET_NAN (dec);
       return false;
    }
 
@@ -672,7 +682,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
          }
 
          /* Overflow is not permitted, error. */
-         BSON_DECIMAL128_SET_NAN (*dec);
+         BSON_DECIMAL128_SET_NAN (dec);
          return false;
       }
 
@@ -688,14 +698,14 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
             break;
          }
 
-         BSON_DECIMAL128_SET_NAN (*dec);
+         BSON_DECIMAL128_SET_NAN (dec);
          return false;
       }
 
       if (ndigits_stored < ndigits) {
          if (first[ndigits - 1 + includes_sign + saw_radix] - '0' != 0 &&
              significant_digits != 0) {
-            BSON_DECIMAL128_SET_NAN (*dec);
+            BSON_DECIMAL128_SET_NAN (dec);
             return false;
          }
 
@@ -703,7 +713,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
       } else {
          if (digits[last_digit] != 0) {
             /* Inexact rounding is not allowed. */
-            BSON_DECIMAL128_SET_NAN (*dec);
+            BSON_DECIMAL128_SET_NAN (dec);
             return false;
          }
 
@@ -714,7 +724,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
       if (exponent < BSON_DECIMAL128_EXPONENT_MAX) {
          exponent++;
       } else {
-         BSON_DECIMAL128_SET_NAN (*dec);
+         BSON_DECIMAL128_SET_NAN (dec);
          return false;
       }
    }
@@ -732,7 +742,7 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
 
       if (round_digit != 0) {
          /* Inexact (non-zero) rounding is not allowed */
-         BSON_DECIMAL128_SET_NAN (*dec);
+         BSON_DECIMAL128_SET_NAN (dec);
          return false;
       }
    }
@@ -783,19 +793,19 @@ bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_
    /* Encode combination, exponent, and significand. */
    if ((significand.high >> 49) & 1) {
       /* Encode '11' into bits 1 to 3 */
-      dec->high |= (0x3ull << 61);
-      dec->high |= (biased_exponent & 0x3fffull) << 47;
-      dec->high |= significand.high & 0x7fffffffffffull;
+      dec.high |= (0x3ull << 61);
+      dec.high |= (biased_exponent & 0x3fffull) << 47;
+      dec.high |= significand.high & 0x7fffffffffffull;
    } else {
-      dec->high |= (biased_exponent & 0x3fffull) << 49;
-      dec->high |= significand.high & 0x1ffffffffffffull;
+      dec.high |= (biased_exponent & 0x3fffull) << 49;
+      dec.high |= significand.high & 0x1ffffffffffffull;
    }
 
-   dec->low = significand.low;
+   dec.low = significand.low;
 
    /* Encode sign */
    if (is_negative) {
-      dec->high |= 0x8000000000000000ull;
+      dec.high |= 0x8000000000000000ull;
    }
 
    return true;
