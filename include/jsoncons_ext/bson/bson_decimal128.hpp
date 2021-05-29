@@ -20,13 +20,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
 
-    struct decimal128_limits
+    struct decimal128_to_chars_result 
     {
-        static constexpr int max_digits10 = 42;  // BSON_DECIMAL128_STRING-1
+        char* ptr;
+        std::errc ec;
+    };
+
+    struct decimal128_from_chars_result 
+    {
+        const char* ptr;
+        std::errc ec;
     };
 
 /**
@@ -44,8 +52,22 @@ namespace jsoncons { namespace bson {
 #define BSON_DECIMAL128_NAN "NaN"
 
     namespace detail {
-        struct TP1 { uint64_t low; uint64_t high; };
-        struct TP2 { uint64_t high; uint64_t low; };
+        struct TP1 
+        { 
+            uint64_t low; 
+            uint64_t high; 
+
+            constexpr TP1() : low(0), high(0) {}
+            constexpr TP1(uint64_t hi, uint64_t lo) : low(lo), high(hi) {}
+        };
+        struct TP2 
+        { 
+            uint64_t high; 
+            uint64_t low; 
+
+            constexpr TP2() : high(0), low(0) {}
+            constexpr TP2(uint64_t hi, uint64_t lo) : high(hi), low(lo) {}
+        };
     }
 
 typedef typename std::conditional<
@@ -53,6 +75,14 @@ typedef typename std::conditional<
     detail::TP1,
     detail::TP2
 >::type bson_decimal128_t;
+
+
+    struct decimal128_limits
+    {
+        static constexpr int recommended_buffer_size = 42;  // BSON_DECIMAL128_STRING-1
+        static constexpr bson_decimal128_t nan = bson_decimal128_t(0x7c00000000000000ull, 0);
+    };
+
 
 #define BSON_DECIMAL128_EXPONENT_MAX 6111
 #define BSON_DECIMAL128_EXPONENT_MIN -6176
@@ -161,7 +191,7 @@ void decimal128_to_chars(char* first, char* last, const bson_decimal128_t *dec)
    uint32_t COMBINATION_NAN = 31;      /* Value of combination field for NaN */
    uint32_t EXPONENT_BIAS = 6176;      /* decimal128 exponent bias */
 
-   char *str_out = first;      /* output pointer in string */
+   char* str_out = first;      /* output pointer in string */
    char significand_str[35]; /* decoded significand digits */
 
 
@@ -423,8 +453,8 @@ _dec128_tolower (char c)
  *    true if the strings are equal, false otherwise.
  */
 bool
-_dec128_istreq (const char *a, /* IN */
-                const char *b /* IN */)
+_dec128_istreq (const char* a, /* IN */
+                const char* b /* IN */)
 {
    while (*a != '\0' || *b != '\0') {
       /* strings are different lengths. */
@@ -469,19 +499,20 @@ _dec128_istreq (const char *a, /* IN */
  *
  *------------------------------------------------------------------------------
  */
-bool
-bson_decimal128_from_string_w_len (const char *string,     /* IN */
-                                   int len,                /* IN */
-                                   bson_decimal128_t *dec) /* OUT */
+
+inline
+bool decimal128_from_chars(const char* first, const char* last, bson_decimal128_t *dec) 
 {
+    int len = last - first;
+
    _bson_uint128_6464_t significand = {0};
 
-   const char *str_read = string; /* Read pointer for consuming str. */
+   const char* str_read = first; /* Read pointer for consuming str. */
 
    /* Parsing state tracking */
    bool is_negative = false;
    bool saw_radix = false;
-   bool includes_sign = false; /* True if the input string contains a sign. */
+   bool includes_sign = false; /* True if the input first contains a sign. */
    bool found_nonzero = false;
 
    size_t significant_digits = 0; /* Total number of significant digits
@@ -528,7 +559,7 @@ bson_decimal128_from_string_w_len (const char *string,     /* IN */
 
    /* Read digits */
    while (((isdigit (*str_read) || *str_read == '.')) &&
-          (len == -1 || str_read < string + len)) {
+          (len == -1 || str_read < first + len)) {
       if (*str_read == '.') {
          if (saw_radix) {
             BSON_DECIMAL128_SET_NAN (*dec);
@@ -588,7 +619,7 @@ bson_decimal128_from_string_w_len (const char *string,     /* IN */
 #undef SSCANF
    }
 
-   if ((len == -1 || str_read < string + len) && *str_read) {
+   if ((len == -1 || str_read < first + len) && *str_read) {
       BSON_DECIMAL128_SET_NAN (*dec);
       return false;
    }
@@ -608,7 +639,7 @@ bson_decimal128_from_string_w_len (const char *string,     /* IN */
       last_digit = ndigits_stored - 1;
       significant_digits = ndigits;
       /* Mark trailing zeros as non-significant */
-      while (string[first_nonzero + significant_digits - 1 + includes_sign +
+      while (first[first_nonzero + significant_digits - 1 + includes_sign +
                     saw_radix] == '0') {
          significant_digits--;
       }
@@ -662,7 +693,7 @@ bson_decimal128_from_string_w_len (const char *string,     /* IN */
       }
 
       if (ndigits_stored < ndigits) {
-         if (string[ndigits - 1 + includes_sign + saw_radix] - '0' != 0 &&
+         if (first[ndigits - 1 + includes_sign + saw_radix] - '0' != 0 &&
              significant_digits != 0) {
             BSON_DECIMAL128_SET_NAN (*dec);
             return false;
@@ -696,7 +727,7 @@ bson_decimal128_from_string_w_len (const char *string,     /* IN */
       /* There are non-zero digits after last_digit that need rounding. */
       /* We round to nearest, ties to even */
       round_digit =
-         string[first_nonzero + last_digit + includes_sign + saw_radix + 1] -
+         first[first_nonzero + last_digit + includes_sign + saw_radix + 1] -
          '0';
 
       if (round_digit != 0) {
@@ -794,12 +825,11 @@ bson_decimal128_from_string_w_len (const char *string,     /* IN */
  *
  *------------------------------------------------------------------------------
  */
-bool
-decimal128_from_chars(const char* string,     /* IN */
-    bson_decimal128_t* dec) /* OUT */
+/*bool
+decimal128_from_chars(const char* first, const char* last, bson_decimal128_t* dec)
 {
-    return bson_decimal128_from_string_w_len(string, -1, dec);
-}
+    return decimal128_from_string(string, -1, dec);
+}*/
 
 } // namespace bson
 } // namespace jsoncons
