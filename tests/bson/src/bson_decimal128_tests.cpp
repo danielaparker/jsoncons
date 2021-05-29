@@ -937,7 +937,6 @@ TEST_CASE("test_decimal128_from_string__zeros")
    CHECK (negative_zero == bson_decimal128_t(0xb03e000000000000, 0x0000000000000000));
 }
 
-#if 0
 TEST_CASE("test_decimal128_from_string_w_len__special")
 {
    bson_decimal128_t number;
@@ -947,19 +946,19 @@ TEST_CASE("test_decimal128_from_string_w_len__special")
    /* These strings have more bytes than the length indicates. */
    {
        char buf[] = "12345678901234567abcd";
-       decimal128_from_chars(buf, buf+sizeof(buf)-1 17, number);
+       decimal128_from_chars(buf, buf+17, number);
    }
    {
        char buf[] = "989898983458abcd";
-       decimal128_from_chars(buf, buf+sizeof(buf)-1 12, number_two);
+       decimal128_from_chars(buf, buf+12, number_two);
    }
    {
        char buf[] = "-12345678901234567abcd";
-       decimal128_from_chars(buf, buf+sizeof(buf)-1 18, negative_number);
+       decimal128_from_chars(buf, buf+18, negative_number);
    }
 
    CHECK (number == bson_decimal128_t(0x3040000000000000, 0x002bdc545d6b4b87));
    CHECK (number_two == bson_decimal128_t(0x3040000000000000, 0x000000e67a93c822));
    CHECK (negative_number == bson_decimal128_t(0xb040000000000000, 0x002bdc545d6b4b87));
 }
-#endif
+
