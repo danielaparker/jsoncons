@@ -28,21 +28,12 @@
 using namespace jsoncons;
 using namespace jsoncons::bson;
 
-#define DECIMAL128_FROM_ULLS(dec, h, l) \
-   do {                                 \
-      (dec).high = (h);                 \
-      (dec).low = (l);                  \
-   } while (0);
-
-
 TEST_CASE("test_decimal128_to_string__infinity")
 {
-   bson_decimal128_t positive_infinity;
-   bson_decimal128_t negative_infinity;
    char bid_string[decimal128_limits::recommended_buffer_size+1];
 
-   DECIMAL128_FROM_ULLS (positive_infinity, 0x7800000000000000, 0);
-   DECIMAL128_FROM_ULLS (negative_infinity, 0xf800000000000000, 0);
+   bson_decimal128_t positive_infinity(0x7800000000000000, 0);
+   bson_decimal128_t negative_infinity(0xf800000000000000, 0);
 
    decimal128_to_chars(bid_string, bid_string+sizeof(bid_string), positive_infinity);
    CHECK (!strcmp (bid_string, "Infinity"));
@@ -54,20 +45,14 @@ TEST_CASE("test_decimal128_to_string__infinity")
 
 TEST_CASE("test_decimal128_to_string__nan")
 {
-   bson_decimal128_t dec_pnan;
-   bson_decimal128_t dec_nnan;
-   bson_decimal128_t dec_psnan;
-   bson_decimal128_t dec_nsnan;
-   bson_decimal128_t dec_payload_nan;
-
    /* All the above should just be NaN. */
    char bid_string[decimal128_limits::recommended_buffer_size+1];
 
-   DECIMAL128_FROM_ULLS (dec_pnan, 0x7c00000000000000, 0);
-   DECIMAL128_FROM_ULLS (dec_nnan, 0xfc00000000000000, 0);
-   DECIMAL128_FROM_ULLS (dec_psnan, 0x7e00000000000000, 0);
-   DECIMAL128_FROM_ULLS (dec_nsnan, 0xfe00000000000000, 0);
-   DECIMAL128_FROM_ULLS (dec_payload_nan, 0x7e00000000000000, 12);
+   bson_decimal128_t dec_pnan(0x7c00000000000000, 0);
+   bson_decimal128_t dec_nnan(0xfc00000000000000, 0);
+   bson_decimal128_t dec_psnan(0x7e00000000000000, 0);
+   bson_decimal128_t dec_nsnan(0xfe00000000000000, 0);
+   bson_decimal128_t dec_payload_nan(0x7e00000000000000, 12);
 
    decimal128_to_chars(bid_string, bid_string+sizeof(bid_string), dec_pnan);
    CHECK (!strcmp (bid_string, "NaN"));
@@ -89,39 +74,24 @@ TEST_CASE("test_decimal128_to_string__nan")
 TEST_CASE("test_decimal128_to_string__regular")
 {
    char bid_string[decimal128_limits::recommended_buffer_size+1];
-   bson_decimal128_t one;
-   bson_decimal128_t zero;
-   bson_decimal128_t two;
-   bson_decimal128_t negative_one;
-   bson_decimal128_t negative_zero;
-   bson_decimal128_t tenth;
-   bson_decimal128_t smallest_regular;
-   bson_decimal128_t largest_regular;
-   bson_decimal128_t trailing_zeros;
-   bson_decimal128_t all_digits;
-   bson_decimal128_t full_house;
 
-   DECIMAL128_FROM_ULLS (one, 0x3040000000000000, 0x0000000000000001);
-   DECIMAL128_FROM_ULLS (zero, 0x3040000000000000, 0x0000000000000000);
-   DECIMAL128_FROM_ULLS (two, 0x3040000000000000, 0x0000000000000002);
-   DECIMAL128_FROM_ULLS (negative_one, 0xb040000000000000, 0x0000000000000001);
-   DECIMAL128_FROM_ULLS (negative_zero, 0xb040000000000000, 0x0000000000000000);
-   DECIMAL128_FROM_ULLS (
-      tenth, 0x303e000000000000, 0x0000000000000001); /* 0.1 */
+   bson_decimal128_t one(0x3040000000000000, 0x0000000000000001);
+   bson_decimal128_t zero(0x3040000000000000, 0x0000000000000000);
+   bson_decimal128_t two(0x3040000000000000, 0x0000000000000002);
+   bson_decimal128_t negative_one(0xb040000000000000, 0x0000000000000001);
+   bson_decimal128_t negative_zero(0xb040000000000000, 0x0000000000000000);
+   bson_decimal128_t tenth(0x303e000000000000, 0x0000000000000001); /* 0.1 */
    /* 0.001234 */
-   DECIMAL128_FROM_ULLS (
-      smallest_regular, 0x3034000000000000, 0x00000000000004d2);
+   bson_decimal128_t smallest_regular(0x3034000000000000, 0x00000000000004d2);
    /* 12345789012 */
-   DECIMAL128_FROM_ULLS (
-      largest_regular, 0x3040000000000000, 0x0000001cbe991a14);
+   bson_decimal128_t largest_regular(0x3040000000000000, 0x0000001cbe991a14);
    /* 0.00123400000 */
-   DECIMAL128_FROM_ULLS (
-      trailing_zeros, 0x302a000000000000, 0x00000000075aef40);
+   bson_decimal128_t trailing_zeros(0x302a000000000000, 0x00000000075aef40);
    /* 0.1234567890123456789012345678901234 */
-   DECIMAL128_FROM_ULLS (all_digits, 0x2ffc3cde6fff9732, 0xde825cd07e96aff2);
+   bson_decimal128_t all_digits(0x2ffc3cde6fff9732, 0xde825cd07e96aff2);
 
    /* 5192296858534827628530496329220095 */
-   DECIMAL128_FROM_ULLS (full_house, 0x3040ffffffffffff, 0xffffffffffffffff);
+   bson_decimal128_t full_house(0x3040ffffffffffff, 0xffffffffffffffff);
 
    decimal128_to_chars(bid_string, bid_string+sizeof(bid_string), one);
    CHECK (!strcmp ("1", bid_string));
@@ -162,32 +132,17 @@ TEST_CASE("test_decimal128_to_string__scientific")
 {
    char bid_string[decimal128_limits::recommended_buffer_size+1];
 
-   bson_decimal128_t huge;     /* 1.000000000000000000000000000000000E+6144 */
-   bson_decimal128_t tiny;     /* 1E-6176 */
-   bson_decimal128_t neg_tiny; /* -1E-6176 */
-   bson_decimal128_t large;    /* 9.999987654321E+112 */
-   bson_decimal128_t largest;  /* 9.999999999999999999999999999999999E+6144 */
-   bson_decimal128_t tiniest;  /* 9.999999999999999999999999999999999E-6143 */
-   bson_decimal128_t trailing_zero;            /* 1.050E9 */
-   bson_decimal128_t one_trailing_zero;        /* 1.050E4 */
-   bson_decimal128_t move_decimal;             /* 105 */
-   bson_decimal128_t move_decimal_after;       /* 1.05E3 */
-   bson_decimal128_t trailing_zero_no_decimal; /* 1E3 */
-
-   DECIMAL128_FROM_ULLS (huge, 0x5ffe314dc6448d93, 0x38c15b0a00000000);
-   DECIMAL128_FROM_ULLS (tiny, 0x0000000000000000, 0x0000000000000001);
-   DECIMAL128_FROM_ULLS (neg_tiny, 0x8000000000000000, 0x0000000000000001);
-   DECIMAL128_FROM_ULLS (large, 0x3108000000000000, 0x000009184db63eb1);
-   DECIMAL128_FROM_ULLS (largest, 0x5fffed09bead87c0, 0x378d8e63ffffffff);
-   DECIMAL128_FROM_ULLS (tiniest, 0x0001ed09bead87c0, 0x378d8e63ffffffff);
-   DECIMAL128_FROM_ULLS (trailing_zero, 0x304c000000000000, 0x000000000000041a);
-   DECIMAL128_FROM_ULLS (
-      one_trailing_zero, 0x3042000000000000, 0x000000000000041a);
-   DECIMAL128_FROM_ULLS (move_decimal, 0x3040000000000000, 0x0000000000000069);
-   DECIMAL128_FROM_ULLS (
-      move_decimal_after, 0x3042000000000000, 0x0000000000000069);
-   DECIMAL128_FROM_ULLS (
-      trailing_zero_no_decimal, 0x3046000000000000, 0x0000000000000001);
+   bson_decimal128_t huge(0x5ffe314dc6448d93, 0x38c15b0a00000000); /* 1.000000000000000000000000000000000E+6144 */
+   bson_decimal128_t tiny(0x0000000000000000, 0x0000000000000001); /* 1E-6176 */
+   bson_decimal128_t neg_tiny(0x8000000000000000, 0x0000000000000001); /* -1E-6176 */
+   bson_decimal128_t large(0x3108000000000000, 0x000009184db63eb1); /* 9.999987654321E+112 */
+   bson_decimal128_t largest(0x5fffed09bead87c0, 0x378d8e63ffffffff); /* 9.999999999999999999999999999999999E+6144 */
+   bson_decimal128_t tiniest(0x0001ed09bead87c0, 0x378d8e63ffffffff); /* 9.999999999999999999999999999999999E-6143 */
+   bson_decimal128_t trailing_zero(0x304c000000000000, 0x000000000000041a); /* 1.050E9 */
+   bson_decimal128_t one_trailing_zero(0x3042000000000000, 0x000000000000041a); /* 1.050E4 */
+   bson_decimal128_t move_decimal(0x3040000000000000, 0x0000000000000069); /* 105 */
+   bson_decimal128_t move_decimal_after(0x3042000000000000, 0x0000000000000069); /* 1.05E3 */
+   bson_decimal128_t trailing_zero_no_decimal(0x3046000000000000, 0x0000000000000001); /* 1E3 */
 
    decimal128_to_chars(bid_string, bid_string+sizeof(bid_string), huge);
    CHECK (
@@ -234,13 +189,9 @@ TEST_CASE("test_decimal128_to_string__zeros")
 {
    char bid_string[decimal128_limits::recommended_buffer_size+1];
 
-   bson_decimal128_t zero;         /* 0 */
-   bson_decimal128_t pos_exp_zero; /* 0E+300 */
-   bson_decimal128_t neg_exp_zero; /* 0E-600 */
-
-   DECIMAL128_FROM_ULLS (zero, 0x3040000000000000, 0x0000000000000000);
-   DECIMAL128_FROM_ULLS (pos_exp_zero, 0x3298000000000000, 0x0000000000000000);
-   DECIMAL128_FROM_ULLS (neg_exp_zero, 0x2b90000000000000, 0x0000000000000000);
+   bson_decimal128_t zero(0x3040000000000000, 0x0000000000000000); /* 0 */
+   bson_decimal128_t pos_exp_zero(0x3298000000000000, 0x0000000000000000); /* 0E+300 */
+   bson_decimal128_t neg_exp_zero(0x2b90000000000000, 0x0000000000000000); /* 0E-600 */
 
    decimal128_to_chars(bid_string, bid_string+sizeof(bid_string), zero);
    CHECK (!strcmp ("0", bid_string));
