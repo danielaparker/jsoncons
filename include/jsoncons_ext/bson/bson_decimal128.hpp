@@ -311,14 +311,14 @@ namespace jsoncons { namespace bson {
     inline
     decimal128_to_chars_result decimal128_to_chars(char* first, char* last, const decimal128_t& dec)
     {
-        const std::string BSON_DECIMAL128_INF = "Infinity";
-        const std::string BSON_DECIMAL128_NAN = "NaN";
+        const std::string bson_decimal128_inf = "Infinity";
+        const std::string bson_decimal128_nan = "NaN";
 
-        uint32_t COMBINATION_MASK = 0x1f;   /* Extract least significant 5 bits */
-        uint32_t EXPONENT_MASK = 0x3fff;    /* Extract least significant 14 bits */
-        uint32_t COMBINATION_INFINITY = 30; /* Value of combination field for Inf */
-        uint32_t COMBINATION_NAN = 31;      /* Value of combination field for NaN */
-        uint32_t EXPONENT_BIAS = 6176;      /* decimal128 exponent bias */
+        const uint32_t combination_mask = 0x1f;   /* Extract least significant 5 bits */
+        const uint32_t exponent_mask = 0x3fff;    /* Extract least significant 14 bits */
+        const uint32_t combination_infinity = 30; /* Value of combination field for Inf */
+        const uint32_t combination_nan = 31;      /* Value of combination field for NaN */
+        const uint32_t exponent_bias = 6176;      /* decimal128 exponent bias */
 
         char* str_out = first;      /* output pointer in string */
         char significand_str[35]; /* decoded significand digits */
@@ -353,41 +353,41 @@ namespace jsoncons { namespace bson {
         midh = (uint32_t) dec.high, high = (uint32_t) (dec.high >> 32);
  
         /* Decode combination field and exponent */
-        combination = (high >> 26) & COMBINATION_MASK;
+        combination = (high >> 26) & combination_mask;
  
         if (JSONCONS_UNLIKELY ((combination >> 3) == 3)) {
            /* Check for 'special' values */
-           if (combination == COMBINATION_INFINITY) { /* Infinity */
-               if (last-str_out >= static_cast<ptrdiff_t >(BSON_DECIMAL128_INF.size())) 
+           if (combination == combination_infinity) { /* Infinity */
+               if (last-str_out >= static_cast<ptrdiff_t >(bson_decimal128_inf.size())) 
                {
-                   memcpy(str_out, BSON_DECIMAL128_INF.data(), BSON_DECIMAL128_INF.size());
-                   str_out += BSON_DECIMAL128_INF.size();
+                   memcpy(str_out, bson_decimal128_inf.data(), bson_decimal128_inf.size());
+                   str_out += bson_decimal128_inf.size();
                }
                *str_out = 0;
-              //strcpy_s (str_out, last-str_out, BSON_DECIMAL128_INF.c_str());
+              //strcpy_s (str_out, last-str_out, bson_decimal128_inf.c_str());
               return decimal128_to_chars_result{str_out, std::errc()};
-           } else if (combination == COMBINATION_NAN) { /* NaN */
+           } else if (combination == combination_nan) { /* NaN */
                /* first, not str_out, to erase the sign */
                str_out = first;
-               if (last-str_out >= static_cast<ptrdiff_t >(BSON_DECIMAL128_NAN.size())) 
+               if (last-str_out >= static_cast<ptrdiff_t >(bson_decimal128_nan.size())) 
                {
-                   memcpy(str_out, BSON_DECIMAL128_NAN.data(), BSON_DECIMAL128_NAN.size());
-                   str_out += BSON_DECIMAL128_NAN.size();
+                   memcpy(str_out, bson_decimal128_nan.data(), bson_decimal128_nan.size());
+                   str_out += bson_decimal128_nan.size();
                }
                *str_out = 0;
-              //strcpy_s (first, last-first, BSON_DECIMAL128_NAN.c_str());
+              //strcpy_s (first, last-first, bson_decimal128_nan.c_str());
               /* we don't care about the NaN payload. */
                return decimal128_to_chars_result{str_out, std::errc()};
            } else {
-              biased_exponent = (high >> 15) & EXPONENT_MASK;
+              biased_exponent = (high >> 15) & exponent_mask;
               significand_msb = 0x8 + ((high >> 14) & 0x1);
            }
         } else {
            significand_msb = (high >> 14) & 0x7;
-           biased_exponent = (high >> 17) & EXPONENT_MASK;
+           biased_exponent = (high >> 17) & exponent_mask;
         }
  
-        exponent = biased_exponent - EXPONENT_BIAS;
+        exponent = biased_exponent - exponent_bias;
         /* Create string of significand digits */
  
         /* Convert the 114-bit binary number represented by */
@@ -474,7 +474,6 @@ namespace jsoncons { namespace bson {
               for (std::size_t i = 0; i < significand_digits && (str_out - first) < 36; i++) {
                  *(str_out++) = char(*(significand_read++)) + '0';
               }
-              *str_out = '\0';
            } else {
               int32_t radix_position = significand_digits + exponent;
  
@@ -499,7 +498,6 @@ namespace jsoncons { namespace bson {
                    i++) {
                  *(str_out++) = char(*(significand_read++)) + '0';
               }
-              *str_out = '\0';
            }
         }
         return decimal128_to_chars_result{str_out, std::errc()};

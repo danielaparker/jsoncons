@@ -29,14 +29,14 @@ namespace bson = jsoncons::bson;
 
 TEST_CASE("test_decimal128_to_string__infinity")
 {
-    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    char buf[bson::decimal128_limits::recommended_buffer_size];
     
     bson::decimal128_t positive_infinity(0x7800000000000000, 0);
     bson::decimal128_t negative_infinity(0xf800000000000000, 0);
     
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), positive_infinity);
-        std::cout << (uint64_t)buf << ", "<< (uint64_t)rc.ptr << ", " << (uint64_t)(buf+(sizeof(buf)-1)) << "\n";
+        //std::cout << (uint64_t)buf << ", "<< (uint64_t)rc.ptr << "\n";
         CHECK(rc.ec == std::errc());
         CHECK(std::equal(buf, rc.ptr, "Infinity"));
     }
@@ -50,221 +50,221 @@ TEST_CASE("test_decimal128_to_string__infinity")
 
 TEST_CASE("test_decimal128_to_string__nan")
 {
-   /* All the above should just be NaN. */
-   char buf[bson::decimal128_limits::recommended_buffer_size+1];
-
-   bson::decimal128_t dec_pnan(0x7c00000000000000, 0);
-   bson::decimal128_t dec_nnan(0xfc00000000000000, 0);
-   bson::decimal128_t dec_psnan(0x7e00000000000000, 0);
-   bson::decimal128_t dec_nsnan(0xfe00000000000000, 0);
-   bson::decimal128_t dec_payload_nan(0x7e00000000000000, 12);
-
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_pnan);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "NaN"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_nnan);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "NaN"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_psnan);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "NaN"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_nsnan);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "NaN"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_payload_nan);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "NaN"));
-   }
+    /* All the above should just be NaN. */
+    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    
+    bson::decimal128_t dec_pnan(0x7c00000000000000, 0);
+    bson::decimal128_t dec_nnan(0xfc00000000000000, 0);
+    bson::decimal128_t dec_psnan(0x7e00000000000000, 0);
+    bson::decimal128_t dec_nsnan(0xfe00000000000000, 0);
+    bson::decimal128_t dec_payload_nan(0x7e00000000000000, 12);
+    
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_pnan);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "NaN"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_nnan);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "NaN"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_psnan);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "NaN"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_nsnan);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "NaN"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_payload_nan);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "NaN"));
+    }
 }
 
 TEST_CASE("test_decimal128_to_string__regular")
 {
-   char buf[bson::decimal128_limits::recommended_buffer_size+1];
-
-   bson::decimal128_t one(0x3040000000000000, 0x0000000000000001);
-   bson::decimal128_t zero(0x3040000000000000, 0x0000000000000000);
-   bson::decimal128_t two(0x3040000000000000, 0x0000000000000002);
-   bson::decimal128_t negative_one(0xb040000000000000, 0x0000000000000001);
-   bson::decimal128_t negative_zero(0xb040000000000000, 0x0000000000000000);
-   bson::decimal128_t tenth(0x303e000000000000, 0x0000000000000001); /* 0.1 */
-   /* 0.001234 */
-   bson::decimal128_t smallest_regular(0x3034000000000000, 0x00000000000004d2);
-   /* 12345789012 */
-   bson::decimal128_t largest_regular(0x3040000000000000, 0x0000001cbe991a14);
-   /* 0.00123400000 */
-   bson::decimal128_t trailing_zeros(0x302a000000000000, 0x00000000075aef40);
-   /* 0.1234567890123456789012345678901234 */
-   bson::decimal128_t all_digits(0x2ffc3cde6fff9732, 0xde825cd07e96aff2);
-
-   /* 5192296858534827628530496329220095 */
-   bson::decimal128_t full_house(0x3040ffffffffffff, 0xffffffffffffffff);
-
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), one);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "1"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), zero);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), two);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "2"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), negative_one);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "-1"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), negative_zero);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "-0"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tenth);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0.1"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), smallest_regular);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0.001234"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), largest_regular);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "123456789012"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zeros);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0.00123400000"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), all_digits);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0.1234567890123456789012345678901234"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), full_house);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "5192296858534827628530496329220095"));
-   }
+    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    
+    bson::decimal128_t one(0x3040000000000000, 0x0000000000000001);
+    bson::decimal128_t zero(0x3040000000000000, 0x0000000000000000);
+    bson::decimal128_t two(0x3040000000000000, 0x0000000000000002);
+    bson::decimal128_t negative_one(0xb040000000000000, 0x0000000000000001);
+    bson::decimal128_t negative_zero(0xb040000000000000, 0x0000000000000000);
+    bson::decimal128_t tenth(0x303e000000000000, 0x0000000000000001); /* 0.1 */
+    /* 0.001234 */
+    bson::decimal128_t smallest_regular(0x3034000000000000, 0x00000000000004d2);
+    /* 12345789012 */
+    bson::decimal128_t largest_regular(0x3040000000000000, 0x0000001cbe991a14);
+    /* 0.00123400000 */
+    bson::decimal128_t trailing_zeros(0x302a000000000000, 0x00000000075aef40);
+    /* 0.1234567890123456789012345678901234 */
+    bson::decimal128_t all_digits(0x2ffc3cde6fff9732, 0xde825cd07e96aff2);
+    
+    /* 5192296858534827628530496329220095 */
+    bson::decimal128_t full_house(0x3040ffffffffffff, 0xffffffffffffffff);
+    
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), one);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "1"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), zero);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), two);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "2"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), negative_one);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "-1"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), negative_zero);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "-0"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tenth);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0.1"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), smallest_regular);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0.001234"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), largest_regular);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "123456789012"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zeros);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0.00123400000"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), all_digits);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0.1234567890123456789012345678901234"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), full_house);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "5192296858534827628530496329220095"));
+    }
 }
 
 TEST_CASE("test_decimal128_to_string__scientific")
 {
-   char buf[bson::decimal128_limits::recommended_buffer_size+1];
-
-   bson::decimal128_t huge(0x5ffe314dc6448d93, 0x38c15b0a00000000); /* 1.000000000000000000000000000000000E+6144 */
-   bson::decimal128_t tiny(0x0000000000000000, 0x0000000000000001); /* 1E-6176 */
-   bson::decimal128_t neg_tiny(0x8000000000000000, 0x0000000000000001); /* -1E-6176 */
-   bson::decimal128_t large(0x3108000000000000, 0x000009184db63eb1); /* 9.999987654321E+112 */
-   bson::decimal128_t largest(0x5fffed09bead87c0, 0x378d8e63ffffffff); /* 9.999999999999999999999999999999999E+6144 */
-   bson::decimal128_t tiniest(0x0001ed09bead87c0, 0x378d8e63ffffffff); /* 9.999999999999999999999999999999999E-6143 */
-   bson::decimal128_t trailing_zero(0x304c000000000000, 0x000000000000041a); /* 1.050E9 */
-   bson::decimal128_t one_trailing_zero(0x3042000000000000, 0x000000000000041a); /* 1.050E4 */
-   bson::decimal128_t move_decimal(0x3040000000000000, 0x0000000000000069); /* 105 */
-   bson::decimal128_t move_decimal_after(0x3042000000000000, 0x0000000000000069); /* 1.05E3 */
-   bson::decimal128_t trailing_zero_no_decimal(0x3046000000000000, 0x0000000000000001); /* 1E3 */
-
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), huge);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "1.000000000000000000000000000000000E+6144"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tiny);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "1E-6176"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), neg_tiny);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "-1E-6176"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), neg_tiny);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "-1E-6176"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), large);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "9.999987654321E+112"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), largest);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "9.999999999999999999999999999999999E+6144"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tiniest);
-       CHECK(rc.ec == std::errc());
-       CHECK (!strcmp("9.999999999999999999999999999999999E-6143", buf));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zero);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "1.050E+9"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), one_trailing_zero);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "1.050E+4"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), move_decimal);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "105"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), move_decimal_after);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "1.05E+3"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zero_no_decimal);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "1E+3"));
-   }
+    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    
+    bson::decimal128_t huge(0x5ffe314dc6448d93, 0x38c15b0a00000000); /* 1.000000000000000000000000000000000E+6144 */
+    bson::decimal128_t tiny(0x0000000000000000, 0x0000000000000001); /* 1E-6176 */
+    bson::decimal128_t neg_tiny(0x8000000000000000, 0x0000000000000001); /* -1E-6176 */
+    bson::decimal128_t large(0x3108000000000000, 0x000009184db63eb1); /* 9.999987654321E+112 */
+    bson::decimal128_t largest(0x5fffed09bead87c0, 0x378d8e63ffffffff); /* 9.999999999999999999999999999999999E+6144 */
+    bson::decimal128_t tiniest(0x0001ed09bead87c0, 0x378d8e63ffffffff); /* 9.999999999999999999999999999999999E-6143 */
+    bson::decimal128_t trailing_zero(0x304c000000000000, 0x000000000000041a); /* 1.050E9 */
+    bson::decimal128_t one_trailing_zero(0x3042000000000000, 0x000000000000041a); /* 1.050E4 */
+    bson::decimal128_t move_decimal(0x3040000000000000, 0x0000000000000069); /* 105 */
+    bson::decimal128_t move_decimal_after(0x3042000000000000, 0x0000000000000069); /* 1.05E3 */
+    bson::decimal128_t trailing_zero_no_decimal(0x3046000000000000, 0x0000000000000001); /* 1E3 */
+    
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), huge);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "1.000000000000000000000000000000000E+6144"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tiny);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "1E-6176"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), neg_tiny);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "-1E-6176"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), neg_tiny);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "-1E-6176"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), large);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "9.999987654321E+112"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), largest);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "9.999999999999999999999999999999999E+6144"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tiniest);
+        CHECK(rc.ec == std::errc());
+        CHECK (!strcmp("9.999999999999999999999999999999999E-6143", buf));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zero);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "1.050E+9"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), one_trailing_zero);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "1.050E+4"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), move_decimal);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "105"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), move_decimal_after);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "1.05E+3"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zero_no_decimal);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "1E+3"));
+    }
 }
 
 TEST_CASE("test_decimal128_to_string__zeros")
 {
-   char buf[bson::decimal128_limits::recommended_buffer_size+1];
-
-   bson::decimal128_t zero(0x3040000000000000, 0x0000000000000000); /* 0 */
-   bson::decimal128_t pos_exp_zero(0x3298000000000000, 0x0000000000000000); /* 0E+300 */
-   bson::decimal128_t neg_exp_zero(0x2b90000000000000, 0x0000000000000000); /* 0E-600 */
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), zero);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), pos_exp_zero);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0E+300"));
-   }
-   {
-       auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), neg_exp_zero);
-       CHECK(rc.ec == std::errc());
-       CHECK (std::equal(buf, rc.ptr, "0E-600"));
-   }
+    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    
+    bson::decimal128_t zero(0x3040000000000000, 0x0000000000000000); /* 0 */
+    bson::decimal128_t pos_exp_zero(0x3298000000000000, 0x0000000000000000); /* 0E+300 */
+    bson::decimal128_t neg_exp_zero(0x2b90000000000000, 0x0000000000000000); /* 0E-600 */
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), zero);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), pos_exp_zero);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0E+300"));
+    }
+    {
+        auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), neg_exp_zero);
+        CHECK(rc.ec == std::errc());
+        CHECK (std::equal(buf, rc.ptr, "0E-600"));
+    }
 }
 
 TEST_CASE("test_decimal128_from_string__invalid_inputs")
