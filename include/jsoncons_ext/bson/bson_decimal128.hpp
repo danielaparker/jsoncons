@@ -22,6 +22,7 @@
 #include <cstring>
 #include <ctype.h>
 #include <system_error>
+#include <algorithm>
 #include <jsoncons/config/jsoncons_config.hpp>
 
 namespace jsoncons { namespace bson {
