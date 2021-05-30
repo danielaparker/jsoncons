@@ -626,7 +626,7 @@ TEST_CASE("test_decimal128_from_string__simple")
 
    {
        char buf[] = "00012345678901234567";
-       bson::decimal128_from_chars(buf, buf+sizeof(buf)+20, leading_insignificant_zeros);
+       bson::decimal128_from_chars(buf, buf+20, leading_insignificant_zeros);
    }
 
    CHECK (one == bson::decimal128_t(0x3040000000000000, 0x0000000000000001));
