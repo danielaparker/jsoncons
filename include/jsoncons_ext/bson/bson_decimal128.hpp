@@ -104,6 +104,15 @@ namespace jsoncons { namespace bson {
         static constexpr decimal128_t neg_infinity() {return decimal128_t(0x7800000000000000ull + 0x8000000000000000ull, 0);}
     };
 
+    inline
+    bool is_nan(decimal128_t dec) { return dec == decimal128_limits::nan(); }
+
+    inline
+    bool is_inf(decimal128_t dec) { return dec == decimal128_limits::infinity(); }
+
+    inline
+    bool is_neg_inf(decimal128_t dec) { return dec == decimal128_limits::neg_infinity(); }
+
     /**
      * bson_uint128_t:
      *
