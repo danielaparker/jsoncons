@@ -663,7 +663,7 @@ namespace jsoncons { namespace bson {
        if (exponent <= radix_position && radix_position - exponent > (1 << 14)) {
           exponent = decimal128_limits::exponent_min;
        } else {
-          exponent -= radix_position;
+          exponent -= static_cast<int32_t>(radix_position);
        }
 
        /* Attempt to normalize the exponent */
@@ -786,7 +786,7 @@ namespace jsoncons { namespace bson {
        }
 
 
-       biased_exponent = (exponent + (int16_t) decimal128_limits::exponent_bias);
+       biased_exponent = static_cast<uint16_t>(exponent + static_cast<int32_t>(decimal128_limits::exponent_bias));
 
        /* Encode combination, exponent, and significand. */
        if ((significand.high >> 49) & 1) {
