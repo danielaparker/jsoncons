@@ -48,6 +48,8 @@ namespace jsoncons { namespace bson {
  * 4  for exponent digits
  */
 #define BSON_DECIMAL128_STRING 43
+#define BSON_DECIMAL128_INF "Infinity"
+#define BSON_DECIMAL128_NAN "NaN"
 
     struct TP1 
     { 
@@ -300,17 +302,14 @@ namespace jsoncons { namespace bson {
     inline
     void decimal128_to_chars(char* first, char* last, const decimal128_t& dec)
     {
-        const std::string BSON_DECIMAL128_INF = "Infinity";
-        const std::string BSON_DECIMAL128_NAN = "NaN";
+       uint32_t COMBINATION_MASK = 0x1f;   /* Extract least significant 5 bits */
+       uint32_t EXPONENT_MASK = 0x3fff;    /* Extract least significant 14 bits */
+       uint32_t COMBINATION_INFINITY = 30; /* Value of combination field for Inf */
+       uint32_t COMBINATION_NAN = 31;      /* Value of combination field for NaN */
+       uint32_t EXPONENT_BIAS = 6176;      /* decimal128 exponent bias */
 
-        uint32_t COMBINATION_MASK = 0x1f;   /* Extract least significant 5 bits */
-        uint32_t EXPONENT_MASK = 0x3fff;    /* Extract least significant 14 bits */
-        uint32_t COMBINATION_INFINITY = 30; /* Value of combination field for Inf */
-        uint32_t COMBINATION_NAN = 31;      /* Value of combination field for NaN */
-        uint32_t EXPONENT_BIAS = 6176;      /* decimal128 exponent bias */
-
-        char* str_out = first;      /* output pointer in string */
-        char significand_str[35]; /* decoded significand digits */
+       char* str_out = first;      /* output pointer in string */
+       char significand_str[35]; /* decoded significand digits */
 
 
        /* Note: bits in this routine are referred to starting at 0, */
@@ -350,11 +349,11 @@ namespace jsoncons { namespace bson {
        if (JSONCONS_UNLIKELY ((combination >> 3) == 3)) {
           /* Check for 'special' values */
           if (combination == COMBINATION_INFINITY) { /* Infinity */
-             strcpy_s (str_out, last-str_out, BSON_DECIMAL128_INF.c_str());
+             strcpy (str_out, BSON_DECIMAL128_INF);
              return;
           } else if (combination == COMBINATION_NAN) { /* NaN */
              /* first, not str_out, to erase the sign */
-             strcpy_s (first, last-first, BSON_DECIMAL128_NAN.c_str());
+             strcpy (first, BSON_DECIMAL128_NAN);
              /* we don't care about the NaN payload. */
              return;
           } else {
