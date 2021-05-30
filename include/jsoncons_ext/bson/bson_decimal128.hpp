@@ -332,8 +332,6 @@ namespace jsoncons { namespace bson {
        uint8_t significand_msb; /* the most signifcant significand bits (50-46) */
        bson_uint128_t
           significand128; /* temporary storage for significand decoding */
-       size_t i;          /* indexing variables */
-       int j, k;
 
        memset (significand_str, 0, sizeof (significand_str));
 
@@ -389,7 +387,7 @@ namespace jsoncons { namespace bson {
            */
           is_zero = true;
        } else {
-          for (k = 3; k >= 0; k--) {
+          for (int k = 3; k >= 0; k--) {
              uint32_t least_digits = 0;
              detail::bson_uint128_divide1B (
                 significand128, &significand128, &least_digits);
@@ -400,7 +398,7 @@ namespace jsoncons { namespace bson {
                 continue;
              }
 
-             for (j = 8; j >= 0; j--) {
+             for (int j = 8; j >= 0; j--) {
                 significand[k * 9 + j] = least_digits % 10;
                 least_digits /= 10;
              }
@@ -434,15 +432,15 @@ namespace jsoncons { namespace bson {
         */
        if (scientific_exponent < -6 || exponent > 0) {
           /* Scientific format */
-          *(str_out++) = *(significand_read++) + '0';
+          *(str_out++) = char(*(significand_read++)) + '0';
           significand_digits--;
 
           if (significand_digits) {
              *(str_out++) = '.';
           }
 
-          for (i = 0; i < significand_digits && (str_out - first) < 36; i++) {
-             *(str_out++) = *(significand_read++) + '0';
+          for (std::size_t i = 0; i < significand_digits && (str_out - first) < 36; i++) {
+             *(str_out++) = char(*(significand_read++)) + '0';
           }
           /* Exponent */
           *(str_out++) = 'E';
@@ -450,18 +448,18 @@ namespace jsoncons { namespace bson {
        } else {
           /* Regular format with no decimal place */
           if (exponent >= 0) {
-             for (i = 0; i < significand_digits && (str_out - first) < 36; i++) {
-                *(str_out++) = *(significand_read++) + '0';
+             for (std::size_t i = 0; i < significand_digits && (str_out - first) < 36; i++) {
+                *(str_out++) = char(*(significand_read++)) + '0';
              }
              *str_out = '\0';
           } else {
              int32_t radix_position = significand_digits + exponent;
 
              if (radix_position > 0) { /* non-zero digits before radix */
-                for (i = 0;
+                for (std::size_t i = 0;
                      i < radix_position && (str_out < last);
                      i++) {
-                   *(str_out++) = *(significand_read++) + '0';
+                   *(str_out++) = char(*(significand_read++)) + '0';
                 }
              } else { /* leading zero before radix point */
                 *(str_out++) = '0';
@@ -472,11 +470,11 @@ namespace jsoncons { namespace bson {
                 *(str_out++) = '0';
              }
 
-             for (i = 0;
+             for (std::size_t i = 0;
                   (i < significand_digits - (std::max) (radix_position - 1, 0)) &&
                   (str_out < last);
                   i++) {
-                *(str_out++) = *(significand_read++) + '0';
+                *(str_out++) = char(*(significand_read++)) + '0';
              }
              *str_out = '\0';
           }
@@ -514,7 +512,7 @@ namespace jsoncons { namespace bson {
     inline
     bool decimal128_from_chars(const char* first, const char* last, decimal128_t& dec) 
     {
-        int len = last - first;
+        ptrdiff_t len = last - first;
 
        bson_uint128_6464_t significand = {0};
 
