@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <cstring>
 #include <ctype.h>
 #include <system_error>
 #include <jsoncons/config/jsoncons_config.hpp>
@@ -348,11 +349,24 @@ namespace jsoncons { namespace bson {
        if (JSONCONS_UNLIKELY ((combination >> 3) == 3)) {
           /* Check for 'special' values */
           if (combination == COMBINATION_INFINITY) { /* Infinity */
-             strcpy_s (str_out, last-str_out, BSON_DECIMAL128_INF.c_str());
+              if (last-str_out >= static_cast<ptrdiff_t >(BSON_DECIMAL128_INF.size())) 
+              {
+                  memcpy(str_out, BSON_DECIMAL128_INF.data(), BSON_DECIMAL128_INF.size());
+                  str_out += BSON_DECIMAL128_INF.size();
+              }
+              *str_out = 0;
+             //strcpy_s (str_out, last-str_out, BSON_DECIMAL128_INF.c_str());
              return;
           } else if (combination == COMBINATION_NAN) { /* NaN */
-             /* first, not str_out, to erase the sign */
-             strcpy_s (first, last-first, BSON_DECIMAL128_NAN.c_str());
+              /* first, not str_out, to erase the sign */
+              str_out = first;
+              if (last-str_out >= static_cast<ptrdiff_t >(BSON_DECIMAL128_NAN.size())) 
+              {
+                  memcpy(str_out, BSON_DECIMAL128_NAN.data(), BSON_DECIMAL128_NAN.size());
+                  str_out += BSON_DECIMAL128_NAN.size();
+              }
+              *str_out = 0;
+             //strcpy_s (first, last-first, BSON_DECIMAL128_NAN.c_str());
              /* we don't care about the NaN payload. */
              return;
           } else {
