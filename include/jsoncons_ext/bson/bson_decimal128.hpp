@@ -67,7 +67,7 @@ namespace jsoncons { namespace bson {
         constexpr TP2(uint64_t hi, uint64_t lo) : high(hi), low(lo) {}
     };
 
-    typedef typename std::conditional<
+    typedef std::conditional<
         jsoncons::endian::native == jsoncons::endian::little,
         TP1,
         TP2
@@ -94,13 +94,14 @@ namespace jsoncons { namespace bson {
         // 2  for exponent indicator and sign
         // 4  for exponent digits
         static constexpr int recommended_buffer_size = 42;  
-        static constexpr decimal128_t nan = decimal128_t(0x7c00000000000000ull, 0);
-        static constexpr decimal128_t infinity = decimal128_t(0x7800000000000000ull, 0);
-        static constexpr decimal128_t neg_infinity = decimal128_t(0x7800000000000000ull + 0x8000000000000000ull, 0);
         static constexpr int exponent_max = 6111;
         static constexpr int exponent_min = -6176;
         static constexpr int exponent_bias = 6176;
         static constexpr int max_digits = 34;
+
+        static constexpr decimal128_t nan() {return decimal128_t(0x7c00000000000000ull, 0);}
+        static constexpr decimal128_t infinity() {return decimal128_t(0x7800000000000000ull, 0);}
+        static constexpr decimal128_t neg_infinity() {return decimal128_t(0x7800000000000000ull + 0x8000000000000000ull, 0);}
     };
 
     /**
@@ -568,14 +569,14 @@ namespace jsoncons { namespace bson {
        if (!isdigit (*str_read) && *str_read != '.') {
           if (detail::dec128_istreq (str_read, "inf") ||
               detail::dec128_istreq (str_read, "infinity")) {
-              dec = is_negative ? decimal128_limits::neg_infinity : decimal128_limits::infinity;
+              dec = is_negative ? decimal128_limits::neg_infinity() : decimal128_limits::infinity();
              return true;
           } else if (detail::dec128_istreq (str_read, "nan")) {
-             dec = decimal128_limits::nan;
+             dec = decimal128_limits::nan();
              return true;
           }
 
-          dec = decimal128_limits::nan;
+          dec = decimal128_limits::nan();
           return false;
        }
 
@@ -584,7 +585,7 @@ namespace jsoncons { namespace bson {
               (len == -1 || str_read < first + len)) {
           if (*str_read == '.') {
              if (saw_radix) {
-                dec = decimal128_limits::nan;
+                dec = decimal128_limits::nan();
                 return false;
              }
 
@@ -618,7 +619,7 @@ namespace jsoncons { namespace bson {
        }
 
        if (saw_radix && !ndigits_read) {
-          dec = decimal128_limits::nan;
+          dec = decimal128_limits::nan();
           return false;
        }
 
@@ -634,7 +635,7 @@ namespace jsoncons { namespace bson {
           str_read += nread;
 
           if (!read_exponent || nread == 0) {
-             dec = decimal128_limits::nan;
+             dec = decimal128_limits::nan();
              return false;
           }
 
@@ -642,7 +643,7 @@ namespace jsoncons { namespace bson {
        }
 
        if ((len == -1 || str_read < first + len) && *str_read) {
-          dec = decimal128_limits::nan;
+          dec = decimal128_limits::nan();
           return false;
        }
 
@@ -694,7 +695,7 @@ namespace jsoncons { namespace bson {
              }
 
              /* Overflow is not permitted, error. */
-             dec = decimal128_limits::nan;
+             dec = decimal128_limits::nan();
              return false;
           }
 
@@ -710,14 +711,14 @@ namespace jsoncons { namespace bson {
                 break;
              }
 
-             dec = decimal128_limits::nan;
+             dec = decimal128_limits::nan();
              return false;
           }
 
           if (ndigits_stored < ndigits) {
              if (first[ndigits - 1 + includes_sign + saw_radix] - '0' != 0 &&
                  significant_digits != 0) {
-                dec = decimal128_limits::nan;
+                dec = decimal128_limits::nan();
                 return false;
              }
 
@@ -725,7 +726,7 @@ namespace jsoncons { namespace bson {
           } else {
              if (digits[last_digit] != 0) {
                 /* Inexact rounding is not allowed. */
-                dec = decimal128_limits::nan;
+                dec = decimal128_limits::nan();
                 return false;
              }
 
@@ -736,7 +737,7 @@ namespace jsoncons { namespace bson {
           if (exponent < decimal128_limits::exponent_max) {
              exponent++;
           } else {
-             dec = decimal128_limits::nan;
+             dec = decimal128_limits::nan();
              return false;
           }
        }
@@ -754,7 +755,7 @@ namespace jsoncons { namespace bson {
 
           if (round_digit != 0) {
              /* Inexact (non-zero) rounding is not allowed */
-             dec = decimal128_limits::nan;
+             dec = decimal128_limits::nan();
              return false;
           }
        }
