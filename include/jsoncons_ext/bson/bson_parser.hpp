@@ -469,7 +469,7 @@ private:
 
                 char s[bson::decimal128_limits::recommended_buffer_size+1];
                 bson::decimal128_to_chars(s, s+sizeof(s), dec);
-                more_ = visitor.string_value(jsoncons::basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(jsoncons::basic_string_view<char>(s,sizeof(s)), semantic_tag::none, *this, ec);
                 break;
             }
             default:
