@@ -16,6 +16,7 @@
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons_ext/bson/bson_detail.hpp>
+#include <jsoncons_ext/bson/bson_decimal128.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_options.hpp>
 
@@ -450,6 +451,25 @@ private:
                                                   subtype.value(), 
                                                   *this,
                                                   ec);
+                break;
+            }
+            case jsoncons::bson::detail::bson_format::decimal128_cd: 
+            {
+                uint8_t buf[sizeof(uint64_t)*2]; 
+                if (source_.read(buf, sizeof(buf)) != sizeof(buf))
+                {
+                    ec = bson_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+
+                decimal128_t dec;
+                dec.low = binary::little_to_native<uint64_t>(buf, sizeof(uint64_t));
+                dec.high = binary::little_to_native<uint64_t>(buf+sizeof(uint64_t), sizeof(uint64_t));
+
+                char s[bson::decimal128_limits::recommended_buffer_size+1];
+                bson::decimal128_to_chars(s, s+sizeof(s), dec);
+                more_ = visitor.string_value(jsoncons::basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
                 break;
             }
             default:
