@@ -190,7 +190,7 @@ namespace jsoncons { namespace bson {
         {
            uint64_t left_high, left_low, right_high, right_low, product_high,
               product_mid, product_mid2, product_low;
-           bson_uint128_6464_t rt = {0};
+           bson_uint128_6464_t rt = {0,0};
 
            if (!left && !right) {
               *product = rt;
@@ -456,7 +456,7 @@ namespace jsoncons { namespace bson {
              int32_t radix_position = significand_digits + exponent;
 
              if (radix_position > 0) { /* non-zero digits before radix */
-                for (std::size_t i = 0;
+                for (int32_t i = 0;
                      i < radix_position && (str_out < last);
                      i++) {
                    *(str_out++) = char(*(significand_read++)) + '0';
@@ -514,7 +514,7 @@ namespace jsoncons { namespace bson {
     {
         ptrdiff_t len = last - first;
 
-       bson_uint128_6464_t significand = {0};
+       bson_uint128_6464_t significand = {0,0};
 
        const char* str_read = first; /* Read pointer for consuming str. */
 
@@ -660,7 +660,7 @@ namespace jsoncons { namespace bson {
        /* to represent user input */
 
        /* Overflow prevention */
-       if (exponent <= radix_position && radix_position - exponent > (1 << 14)) {
+       if (exponent <= static_cast<int32_t>(radix_position) && static_cast<int32_t>(radix_position) - exponent > (1 << 14)) {
           exponent = decimal128_limits::exponent_min;
        } else {
           exponent -= static_cast<int32_t>(radix_position);
