@@ -468,7 +468,9 @@ namespace jsoncons { namespace bson {
            }
            /* Exponent */
            *(str_out++) = 'E';
-           snprintf (str_out, 6, "%+d", scientific_exponent);
+           int n = snprintf (str_out, 6, "%+d", scientific_exponent);
+           int m = (std::min)(n,5);
+           str_out += m;
         } else {
            /* Regular format with no decimal place */
            if (exponent >= 0) {

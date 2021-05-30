@@ -22,6 +22,7 @@ enum class bson_errc
     string_length_is_non_positive,
     length_is_negative,
     number_too_large,
+    invalid_decimal128_string,
     datetime_too_small,
     datetime_too_large,
     expected_bson_document,
@@ -56,6 +57,8 @@ public:
                 return "An unknown type was found in the stream";
             case bson_errc::number_too_large:
                 return "Number too large";
+            case bson_errc::invalid_decimal128_string:
+                return "Invalid decimal128 string";
             case bson_errc::datetime_too_large:
                 return "datetime too large";
             case bson_errc::datetime_too_small:

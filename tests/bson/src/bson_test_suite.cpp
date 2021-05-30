@@ -204,6 +204,23 @@ TEST_CASE("bson c test suite")
         auto b2 = bson::decode_bson<json>(bytes);
         CHECK(b2 == j);
     }
+    SECTION("decimal128")
+    {
+        std::string in_file = "./bson/input/test58.bson";
+        std::vector<char> input = read_bytes(in_file);
+
+        json j = bson::decode_bson<json>(input);
+        bson::decimal128_t dec(0,1);
+        char buf[bson::decimal128_limits::recommended_buffer_size];
+        auto rc = bson::decimal128_to_chars(buf,buf+sizeof(buf),dec);
+        CHECK(j.at("a") == json(std::string(buf,rc.ptr)));
+        CHECK(j.at("a").tag() == semantic_tag::float128);
+
+        std::vector<char> output;
+        bson::encode_bson(j, output);
+
+        CHECK(output == input);
+    }
     SECTION("document")
     {
         std::string in_file = "./bson/input/test21.bson";

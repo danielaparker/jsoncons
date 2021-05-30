@@ -249,32 +249,50 @@ private:
         return true;
     }
 
-    bool visit_string(const string_view_type& sv, semantic_tag, const ser_context&, std::error_code& ec) override
+    bool visit_string(const string_view_type& sv, semantic_tag tag, const ser_context&, std::error_code& ec) override
     {
         if (stack_.empty())
         {
             ec = bson_errc::expected_bson_document;
             return false;
         }
-        before_value(jsoncons::bson::detail::bson_format::string_cd);
 
-        std::size_t offset = buffer_.size();
-        buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
-        std::size_t string_offset = buffer_.size();
-
-        auto sink = unicode_traits::validate(sv.data(), sv.size());
-        if (sink.ec != unicode_traits::conv_errc())
+        switch (tag)
         {
-            ec = bson_errc::invalid_utf8_text_string;
-            return false;
+            case semantic_tag::float128:
+            {
+                before_value(jsoncons::bson::detail::bson_format::decimal128_cd);
+                decimal128_t dec;
+                auto rc = decimal128_from_chars(sv.data(), sv.data()+sv.size(), dec);
+                if (rc.ec != std::errc())
+                {
+                    ec = bson_errc::invalid_decimal128_string;
+                    return false;
+                }
+                binary::native_to_little(dec.low,std::back_inserter(buffer_));
+                binary::native_to_little(dec.high,std::back_inserter(buffer_));
+                break;
+            }
+            default:
+                before_value(jsoncons::bson::detail::bson_format::string_cd);
+                std::size_t offset = buffer_.size();
+                buffer_.insert(buffer_.end(), sizeof(int32_t), 0);
+                std::size_t string_offset = buffer_.size();
+                auto sink = unicode_traits::validate(sv.data(), sv.size());
+                if (sink.ec != unicode_traits::conv_errc())
+                {
+                    ec = bson_errc::invalid_utf8_text_string;
+                    return false;
+                }
+                for (auto c : sv)
+                {
+                    buffer_.push_back(c);
+                }
+                buffer_.push_back(0x00);
+                std::size_t length = buffer_.size() - string_offset;
+                binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
+                break;
         }
-        for (auto c : sv)
-        {
-            buffer_.push_back(c);
-        }
-        buffer_.push_back(0x00);
-        std::size_t length = buffer_.size() - string_offset;
-        binary::native_to_little(static_cast<uint32_t>(length), buffer_.begin()+offset);
 
         return true;
     }
