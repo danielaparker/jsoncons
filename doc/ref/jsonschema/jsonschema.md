@@ -10,14 +10,14 @@ In addition, the validator understands the following optional [format types](htt
 
 |                      | Draft 7            |
 |----------------------|--------------------|
-| date                 | :heavy_check_mark: |
-| time                 | :heavy_check_mark: |
-| date-time            | :heavy_check_mark: |
-| email                | :heavy_check_mark: |
-| hostname             | :heavy_check_mark: |
-| ipv4                 | :heavy_check_mark: |
-| ipv6                 | :heavy_check_mark: |
-| regex                | :heavy_check_mark: |
+| date                 | <em>&#x2713;</em> |
+| time                 | <em>&#x2713;</em> |
+| date-time            | <em>&#x2713;</em> |
+| email                | <em>&#x2713;</em> |
+| hostname             | <em>&#x2713;</em> |
+| ipv4                 | <em>&#x2713;</em> |
+| ipv6                 | <em>&#x2713;</em> |
+| regex                | <em>&#x2713;</em> |
 
 Any other format type is ignored.
 
