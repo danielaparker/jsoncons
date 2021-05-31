@@ -21,6 +21,7 @@
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_options.hpp>
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
+#include <jsoncons_ext/bson/bson_oid.hpp>
 
 namespace jsoncons { namespace bson {
 
