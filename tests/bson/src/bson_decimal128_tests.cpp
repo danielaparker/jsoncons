@@ -29,7 +29,7 @@ namespace bson = jsoncons::bson;
 
 TEST_CASE("test_decimal128_to_string__infinity")
 {
-    char buf[bson::decimal128_limits::recommended_buffer_size];
+    char buf[bson::decimal128_limits::buf_size];
     
     bson::decimal128_t positive_infinity(0x7800000000000000, 0);
     bson::decimal128_t negative_infinity(0xf800000000000000, 0);
@@ -55,7 +55,7 @@ TEST_CASE("test_decimal128_to_string__infinity")
 TEST_CASE("test_decimal128_to_string__nan")
 {
     /* All the above should just be NaN. */
-    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    char buf[bson::decimal128_limits::buf_size+1];
     
     bson::decimal128_t dec_pnan(0x7c00000000000000, 0);
     bson::decimal128_t dec_nnan(0xfc00000000000000, 0);
@@ -102,7 +102,7 @@ TEST_CASE("test_decimal128_to_string__nan")
 
 TEST_CASE("test_decimal128_to_string__regular")
 {
-    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    char buf[bson::decimal128_limits::buf_size+1];
     
     bson::decimal128_t one(0x3040000000000000, 0x0000000000000001);
     bson::decimal128_t zero(0x3040000000000000, 0x0000000000000000);
@@ -195,7 +195,7 @@ TEST_CASE("test_decimal128_to_string__regular")
 
 TEST_CASE("test_decimal128_to_string__scientific")
 {
-    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    char buf[bson::decimal128_limits::buf_size+1];
     
     bson::decimal128_t huge(0x5ffe314dc6448d93, 0x38c15b0a00000000); /* 1.000000000000000000000000000000000E+6144 */
     bson::decimal128_t tiny(0x0000000000000000, 0x0000000000000001); /* 1E-6176 */
@@ -283,7 +283,7 @@ TEST_CASE("test_decimal128_to_string__scientific")
 
 TEST_CASE("test_decimal128_to_string__zeros")
 {
-    char buf[bson::decimal128_limits::recommended_buffer_size+1];
+    char buf[bson::decimal128_limits::buf_size+1];
     
     bson::decimal128_t zero(0x3040000000000000, 0x0000000000000000); /* 0 */
     bson::decimal128_t pos_exp_zero(0x3298000000000000, 0x0000000000000000); /* 0E+300 */

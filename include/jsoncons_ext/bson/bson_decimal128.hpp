@@ -94,7 +94,7 @@ namespace jsoncons { namespace bson {
         // 35 for digits and radix
         // 2  for exponent indicator and sign
         // 4  for exponent digits
-        static constexpr int recommended_buffer_size = 42;  
+        static constexpr int buf_size = 42;  
         static constexpr int exponent_max = 6111;
         static constexpr int exponent_min = -6176;
         static constexpr int exponent_bias = 6176;

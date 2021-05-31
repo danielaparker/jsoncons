@@ -211,7 +211,7 @@ TEST_CASE("bson c test suite")
 
         json j = bson::decode_bson<json>(input);
         bson::decimal128_t dec(0,1);
-        char buf[bson::decimal128_limits::recommended_buffer_size];
+        char buf[bson::decimal128_limits::buf_size];
         auto rc = bson::decimal128_to_chars(buf,buf+sizeof(buf),dec);
         CHECK(j.at("a") == json(std::string(buf,rc.ptr)));
         CHECK(j.at("a").tag() == semantic_tag::float128);
