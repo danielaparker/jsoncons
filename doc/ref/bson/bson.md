@@ -26,7 +26,8 @@ BSON data item  | jsoncons data item  |jsoncons tag
  datetime       | uint64        | epoch_milli
  double         | double        |                  
  string         | string        |                  
- binary         | byte_string   | ext                  
+ binary         | byte_string   | ext    
+ decimal128 (since 0.165.0)    | string        | float128              
  0x04 (array )  | array         |                  
  0x03 (embedded document)| object        |                  
 
