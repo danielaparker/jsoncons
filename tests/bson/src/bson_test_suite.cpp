@@ -221,6 +221,22 @@ TEST_CASE("bson c test suite")
 
         CHECK(output == input);
     }
+    SECTION("oid")
+    {
+        std::string in_file = "./bson/input/test22.bson";
+        std::vector<char> input = read_bytes(in_file);
+
+        json j = bson::decode_bson<json>(input);
+        bson::oid_t oid("1234567890abcdef1234abcd");
+
+        CHECK(j.at("oid").as<std::string>() == oid.to_string());
+        CHECK(j.at("oid").tag() == semantic_tag::id);
+
+        std::vector<char> output;
+        bson::encode_bson(j, output);
+
+        CHECK(output == input);
+    }
     SECTION("document")
     {
         std::string in_file = "./bson/input/test21.bson";

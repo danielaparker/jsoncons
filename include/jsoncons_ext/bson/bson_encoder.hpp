@@ -274,6 +274,16 @@ private:
                 binary::native_to_little(dec.high,std::back_inserter(buffer_));
                 break;
             }
+            case semantic_tag::id:
+            {
+                before_value(jsoncons::bson::detail::bson_format::object_id_cd);
+                oid_t oid(sv);
+                for (auto b : oid)
+                {
+                    buffer_.push_back(b);
+                }
+                break;
+            }
             default:
                 before_value(jsoncons::bson::detail::bson_format::string_cd);
                 std::size_t offset = buffer_.size();

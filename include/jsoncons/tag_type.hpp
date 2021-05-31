@@ -85,7 +85,8 @@ enum class semantic_tag : uint8_t
     clamped = 0x0e,
     multi_dim_row_major = 0x0f,
     multi_dim_column_major = 0x10,
-    ext = 0x11
+    ext = 0x11,
+    id = 0x12
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec
@@ -115,6 +116,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     JSONCONS_CSTRING(CharT,multi_dim_row_major_name,'m','u','l','t','i','-','d','i','m','-','r','o','w','-','m','a','j','o','r')
     JSONCONS_CSTRING(CharT,multi_dim_column_major_name,'m','u','l','t','i','-','d','i','m','-','c','o','l','u','m','n','-','m','a','j','o','r')
     JSONCONS_CSTRING(CharT,ext_name,'e','x','t')
+    JSONCONS_CSTRING(CharT,id_name,'i','d')
     JSONCONS_CSTRING(CharT, float128_name, 'f', 'l', 'o', 'a', 't', '1', '2', '8')
 
     switch (tag)
@@ -207,6 +209,11 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
         case semantic_tag::ext:
         {
             os << ext_name;
+            break;
+        }
+        case semantic_tag::id:
+        {
+            os << id_name;
             break;
         }
     }

@@ -19,6 +19,7 @@
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_options.hpp>
+#include <jsoncons_ext/bson/bson_oid.hpp>
 
 namespace jsoncons { namespace bson {
 
@@ -307,9 +308,9 @@ private:
                     return;
                 }
 
-                std::vector<char> s;
+                text_buffer_.clear();
                 std::size_t size = static_cast<std::size_t>(len) - static_cast<std::size_t>(1);
-                if (source_reader<Src>::read(source_,s,size) != size)
+                if (source_reader<Src>::read(source_,text_buffer_,size) != size)
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -322,14 +323,14 @@ private:
                     more_ = false;
                     return;
                 }
-                auto result = unicode_traits::validate(s.data(), s.size());
+                auto result = unicode_traits::validate(text_buffer_.data(), text_buffer_.size());
                 if (result.ec != unicode_traits::conv_errc())
                 {
                     ec = bson_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(jsoncons::basic_string_view<char>(s.data(),s.size()), semantic_tag::none, *this, ec);
+                more_ = visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
@@ -467,9 +468,28 @@ private:
                 dec.low = binary::little_to_native<uint64_t>(buf, sizeof(uint64_t));
                 dec.high = binary::little_to_native<uint64_t>(buf+sizeof(uint64_t), sizeof(uint64_t));
 
-                char s[bson::decimal128_limits::buf_size];
-                auto r = bson::decimal128_to_chars(s, s+sizeof(s), dec);
-                more_ = visitor.string_value(jsoncons::basic_string_view<char>(s,static_cast<std::size_t>(r.ptr-s)), semantic_tag::float128, *this, ec);
+                text_buffer_.clear();
+                text_buffer_.resize(bson::decimal128_limits::buf_size);
+                auto r = bson::decimal128_to_chars(&text_buffer_[0], &text_buffer_[0]+text_buffer_.size(), dec);
+                more_ = visitor.string_value(string_view(text_buffer_.data(),static_cast<std::size_t>(r.ptr-text_buffer_.data())), semantic_tag::float128, *this, ec);
+                break;
+            }
+            case jsoncons::bson::detail::bson_format::object_id_cd: 
+            {
+                uint8_t buf[12]; 
+                if (source_.read(buf, sizeof(buf)) != sizeof(buf))
+                {
+                    ec = bson_errc::unexpected_eof;
+                    more_ = false;
+                    return;
+                }
+
+                oid_t oid(buf);
+                std::string s = oid.to_string();
+                text_buffer_.clear();
+                text_buffer_.insert(text_buffer_.begin(), s.begin(), s.end());
+
+                more_ = visitor.string_value(text_buffer_, semantic_tag::id, *this, ec);
                 break;
             }
             default:
