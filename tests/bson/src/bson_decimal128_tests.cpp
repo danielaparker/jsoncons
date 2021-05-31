@@ -38,12 +38,16 @@ TEST_CASE("test_decimal128_to_string__infinity")
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), positive_infinity);
         //std::cout << (uint64_t)buf << ", "<< (uint64_t)rc.ptr << "\n";
         CHECK(rc.ec == std::errc());
-        CHECK(std::equal(buf, rc.ptr, "Infinity"));
+        std::string expected = "Infinity";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), negative_infinity);
         CHECK(rc.ec == std::errc());
-        CHECK(std::equal(buf, rc.ptr, "-Infinity"));
+        std::string expected = "-Infinity";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
 }
 
@@ -62,27 +66,37 @@ TEST_CASE("test_decimal128_to_string__nan")
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_pnan);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "NaN"));
+        std::string expected = "NaN";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_nnan);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "NaN"));
+        std::string expected = "NaN";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_psnan);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "NaN"));
+        std::string expected = "NaN";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_nsnan);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "NaN"));
+        std::string expected = "NaN";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), dec_payload_nan);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "NaN"));
+        std::string expected = "NaN";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
 }
 
@@ -111,12 +125,16 @@ TEST_CASE("test_decimal128_to_string__regular")
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), one);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "1"));
+        std::string expected = "1";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), zero);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "0"));
+        std::string expected = "0";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), two);
@@ -126,22 +144,30 @@ TEST_CASE("test_decimal128_to_string__regular")
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), negative_one);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "-1"));
+        std::string expected = "-1";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), negative_zero);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "-0"));
+        std::string expected = "-0";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tenth);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "0.1"));
+        std::string expected = "0.1";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), smallest_regular);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "0.001234"));
+        std::string expected = "0.001234";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), largest_regular);
@@ -151,7 +177,9 @@ TEST_CASE("test_decimal128_to_string__regular")
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zeros);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "0.00123400000"));
+        std::string expected = "0.00123400000";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), all_digits);
@@ -184,12 +212,16 @@ TEST_CASE("test_decimal128_to_string__scientific")
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), huge);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "1.000000000000000000000000000000000E+6144"));
+        std::string expected = "1.000000000000000000000000000000000E+6144";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tiny);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "1E-6176"));
+        std::string expected = "1E-6176";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), neg_tiny);
@@ -229,17 +261,23 @@ TEST_CASE("test_decimal128_to_string__scientific")
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), move_decimal);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "105"));
+        std::string expected = "105";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), move_decimal_after);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "1.05E+3"));
+        std::string expected = "1.05E+3";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zero_no_decimal);
         CHECK(rc.ec == std::errc());
-        CHECK (std::equal(buf, rc.ptr, "1E+3"));
+        std::string expected = "1E+3";
+        CHECK(static_cast<std::size_t>(rc.ptr - buf) == expected.size());
+        CHECK(std::equal(buf, rc.ptr, expected.begin()));
     }
 }
 
