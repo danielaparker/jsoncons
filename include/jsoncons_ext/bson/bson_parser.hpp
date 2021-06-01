@@ -60,6 +60,7 @@ class basic_bson_parser : public ser_context
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
+    std::size_t bytes_read_;
 public:
     template <class Source>
     basic_bson_parser(Source&& source,
@@ -71,7 +72,8 @@ public:
          done_(false),
          text_buffer_(alloc),
          state_stack_(alloc),
-         nesting_depth_(0)
+         nesting_depth_(0),
+         bytes_read_(0)
 
     {
         state_stack_.emplace_back(parse_mode::root,0);
@@ -204,13 +206,17 @@ private:
             more_ = false;
             return;
         } 
+
         uint8_t buf[sizeof(int32_t)]; 
-        if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+        size_t n = source_.read(buf, sizeof(int32_t));
+        bytes_read_ += n;
+        if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
             more_ = false;
             return;
         }
+
         auto length = binary::little_to_native<int32_t>(buf, sizeof(buf));
 
         more_ = visitor.begin_object(semantic_tag::none, *this, ec);
@@ -233,16 +239,19 @@ private:
             return;
         } 
         uint8_t buf[sizeof(int32_t)]; 
-        if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+        std::size_t n = source_.read(buf, sizeof(int32_t));
+        bytes_read_ += n;
+        if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        /* auto len = */ binary::little_to_native<int32_t>(buf, sizeof(buf));
+        auto len = binary::little_to_native<int32_t>(buf, sizeof(buf));
+        std::cout << "array len: " << len << "\n";
 
         more_ = visitor.begin_array(semantic_tag::none, *this, ec);
-        state_stack_.emplace_back(parse_mode::array,0);
+        state_stack_.emplace_back(parse_mode::array,len);
     }
 
     void end_array(json_visitor& visitor, std::error_code& ec)
@@ -281,7 +290,9 @@ private:
             case jsoncons::bson::detail::bson_format::double_cd:
             {
                 uint8_t buf[sizeof(double)]; 
-                if (source_.read(buf, sizeof(double)) != sizeof(double))
+                std::size_t n = source_.read(buf, sizeof(double));
+                bytes_read_ += n;
+                if (n != sizeof(double))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -358,7 +369,9 @@ private:
             case jsoncons::bson::detail::bson_format::int32_cd: 
             {
                 uint8_t buf[sizeof(int32_t)]; 
-                if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+                std::size_t n = source_.read(buf, sizeof(int32_t));
+                bytes_read_ += n;
+                if (n != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -372,7 +385,9 @@ private:
             case jsoncons::bson::detail::bson_format::timestamp_cd: 
             {
                 uint8_t buf[sizeof(uint64_t)]; 
-                if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
+                std::size_t n = source_.read(buf, sizeof(uint64_t));
+                bytes_read_ += n;
+                if (n != sizeof(uint64_t))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -386,7 +401,9 @@ private:
             case jsoncons::bson::detail::bson_format::int64_cd: 
             {
                 uint8_t buf[sizeof(int64_t)]; 
-                if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
+                std::size_t n = source_.read(buf, sizeof(int64_t));
+                bytes_read_ += n;
+                if (n != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -400,7 +417,9 @@ private:
             case jsoncons::bson::detail::bson_format::datetime_cd: 
             {
                 uint8_t buf[sizeof(int64_t)]; 
-                if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
+                std::size_t n = source_.read(buf, sizeof(int64_t));
+                bytes_read_ += n;
+                if (n != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -413,7 +432,9 @@ private:
             case jsoncons::bson::detail::bson_format::binary_cd: 
             {
                 uint8_t buf[sizeof(int32_t)]; 
-                if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+                std::size_t n = source_.read(buf, sizeof(int32_t));
+                bytes_read_ += n;
+                if (n != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -451,7 +472,9 @@ private:
             case jsoncons::bson::detail::bson_format::decimal128_cd: 
             {
                 uint8_t buf[sizeof(uint64_t)*2]; 
-                if (source_.read(buf, sizeof(buf)) != sizeof(buf))
+                std::size_t n = source_.read(buf, sizeof(buf));
+                bytes_read_ += n;
+                if (n != sizeof(buf))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -471,7 +494,9 @@ private:
             case jsoncons::bson::detail::bson_format::object_id_cd: 
             {
                 uint8_t buf[12]; 
-                if (source_.read(buf, sizeof(buf)) != sizeof(buf))
+                std::size_t n = source_.read(buf, sizeof(buf));
+                bytes_read_ += n;
+                if (n != sizeof(buf))
                 {
                     ec = bson_errc::unexpected_eof;
                     more_ = false;
@@ -494,19 +519,39 @@ private:
 
     }
 
-    void read_cstring(std::error_code&)
+    void read_cstring(std::error_code& ec)
     {
-        character_result<typename Src::value_type> c;
-        while ((c = source_.get_character()) && c.value() != 0)
+        //character_result<typename Src::value_type> c;
+        uint8_t c;
+        while (true)
         {
-            text_buffer_.push_back(c.value());
+            std::size_t n = source_.read(&c, 1);
+            bytes_read_ += n;
+            if (n != 1)
+            {
+                ec = bson_errc::unexpected_eof;
+                more_ = false;
+                return;
+            }
+            if (c == 0)
+            {
+                break;
+            }
+            text_buffer_.push_back(c);
         }
+
+        //while ((c = source_.get_character()) && c.value() != 0)
+        //{
+        //    text_buffer_.push_back(c.value());
+        //}
     }
 
     void read_string(std::error_code& ec)
     {
         uint8_t buf[sizeof(int32_t)]; 
-        if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+        std::size_t n = source_.read(buf, sizeof(int32_t));
+        bytes_read_ += n;
+        if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
             more_ = false;
