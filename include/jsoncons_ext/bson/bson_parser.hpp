@@ -224,12 +224,8 @@ private:
 
     void end_document(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(state_stack_.size() < 2))
-        {
-            ec = bson_errc::invalid_nesting_depth;
-            more_ = false;
-            return;
-        }
+        JSONCONS_ASSERT(state_stack_.size() >= 2);
+
         more_ = visitor.end_object(*this,ec);
         if (JSONCONS_UNLIKELY(state_stack_.back().pos != state_stack_.back().length))
         {
@@ -270,12 +266,7 @@ private:
 
     void end_array(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(state_stack_.size() < 2))
-        {
-            ec = bson_errc::invalid_nesting_depth;
-            more_ = false;
-            return;
-        }
+        JSONCONS_ASSERT(state_stack_.size() >= 2);
 
         more_ = visitor.end_array(*this, ec);
         if (JSONCONS_UNLIKELY(state_stack_.back().pos != state_stack_.back().length))

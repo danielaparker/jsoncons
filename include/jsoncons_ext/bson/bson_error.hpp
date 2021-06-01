@@ -19,7 +19,6 @@ enum class bson_errc
     source_error,
     invalid_utf8_text_string,
     max_nesting_depth_exceeded,
-    invalid_nesting_depth,
     string_length_is_non_positive,
     length_is_negative,
     number_too_large,
@@ -52,8 +51,6 @@ public:
                 return "Illegal UTF-8 encoding in text string";
             case bson_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
-            case bson_errc::invalid_nesting_depth:
-                return "Nesting depth must not be negative";
             case bson_errc::string_length_is_non_positive:
                 return "Request for the length of a string returned a non-positive result";
             case bson_errc::length_is_negative:
