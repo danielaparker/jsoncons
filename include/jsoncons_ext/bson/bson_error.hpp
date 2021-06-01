@@ -19,6 +19,7 @@ enum class bson_errc
     source_error,
     invalid_utf8_text_string,
     max_nesting_depth_exceeded,
+    invalid_nesting_depth,
     string_length_is_non_positive,
     length_is_negative,
     number_too_large,
@@ -27,6 +28,7 @@ enum class bson_errc
     datetime_too_large,
     expected_bson_document,
     invalid_regex_string,
+    size_mismatch,
     unknown_type
 };
 
@@ -50,6 +52,8 @@ public:
                 return "Illegal UTF-8 encoding in text string";
             case bson_errc::max_nesting_depth_exceeded:
                 return "Data item nesting exceeds limit in options";
+            case bson_errc::invalid_nesting_depth:
+                return "Nesting depth must not be negative";
             case bson_errc::string_length_is_non_positive:
                 return "Request for the length of a string returned a non-positive result";
             case bson_errc::length_is_negative:
@@ -68,6 +72,8 @@ public:
                 return "Expected BSON document";
             case bson_errc::invalid_regex_string:
                 return "Invalid regex string";
+            case bson_errc::size_mismatch:
+                return "Document or array size doesn't match bytes read";
             default:
                 return "Unknown BSON parser error";
         }
