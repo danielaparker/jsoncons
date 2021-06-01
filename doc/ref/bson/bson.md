@@ -28,6 +28,8 @@ BSON data item  | jsoncons data item  |jsoncons tag
  string         | string        |                  
  binary         | byte_string   | ext    
  decimal128 (since 0.165.0)    | string        | float128              
+ objectid (since 0.165.0)    | string        | id              
+ regex (since 0.165.0)    | string        | regex              
  0x04 (array )  | array         |                  
  0x03 (embedded document)| object        |                  
 
