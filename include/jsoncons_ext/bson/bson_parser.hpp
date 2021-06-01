@@ -61,7 +61,6 @@ class basic_bson_parser : public ser_context
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
-    std::size_t bytes_read_;
 public:
     template <class Source>
     basic_bson_parser(Source&& source,
@@ -73,8 +72,7 @@ public:
          done_(false),
          text_buffer_(alloc),
          state_stack_(alloc),
-         nesting_depth_(0),
-         bytes_read_(0)
+         nesting_depth_(0)
 
     {
         state_stack_.emplace_back(parse_mode::root,0,0);
@@ -210,7 +208,7 @@ private:
 
         uint8_t buf[sizeof(int32_t)]; 
         size_t n = source_.read(buf, sizeof(int32_t));
-        bytes_read_ += n;
+        state_stack_.back().bytes_read += n;
         if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
@@ -241,7 +239,7 @@ private:
         } 
         uint8_t buf[sizeof(int32_t)]; 
         std::size_t n = source_.read(buf, sizeof(int32_t));
-        bytes_read_ += n;
+        state_stack_.back().bytes_read += n;
         if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
@@ -292,7 +290,7 @@ private:
             {
                 uint8_t buf[sizeof(double)]; 
                 std::size_t n = source_.read(buf, sizeof(double));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(double))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -371,7 +369,7 @@ private:
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int32_t));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -387,7 +385,7 @@ private:
             {
                 uint8_t buf[sizeof(uint64_t)]; 
                 std::size_t n = source_.read(buf, sizeof(uint64_t));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(uint64_t))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -403,7 +401,7 @@ private:
             {
                 uint8_t buf[sizeof(int64_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int64_t));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -419,7 +417,7 @@ private:
             {
                 uint8_t buf[sizeof(int64_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int64_t));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(int64_t))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -434,7 +432,7 @@ private:
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int32_t));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(int32_t))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -474,7 +472,7 @@ private:
             {
                 uint8_t buf[sizeof(uint64_t)*2]; 
                 std::size_t n = source_.read(buf, sizeof(buf));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(buf))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -496,7 +494,7 @@ private:
             {
                 uint8_t buf[12]; 
                 std::size_t n = source_.read(buf, sizeof(buf));
-                bytes_read_ += n;
+                state_stack_.back().bytes_read += n;
                 if (n != sizeof(buf))
                 {
                     ec = bson_errc::unexpected_eof;
@@ -526,7 +524,7 @@ private:
         while (true)
         {
             std::size_t n = source_.read(&c, 1);
-            bytes_read_ += n;
+            state_stack_.back().bytes_read += n;
             if (n != 1)
             {
                 ec = bson_errc::unexpected_eof;
@@ -545,7 +543,7 @@ private:
     {
         uint8_t buf[sizeof(int32_t)]; 
         std::size_t n = source_.read(buf, sizeof(int32_t));
-        bytes_read_ += n;
+        state_stack_.back().bytes_read += n;
         if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
