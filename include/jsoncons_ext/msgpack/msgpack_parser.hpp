@@ -16,7 +16,7 @@
 #include <jsoncons/bigint.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/msgpack/msgpack_detail.hpp>
+#include <jsoncons_ext/msgpack/msgpack_type.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_options.hpp>
 #include <jsoncons/json_visitor2.hpp>
@@ -253,22 +253,22 @@ private:
         {
             switch (type)
             {
-                case jsoncons::msgpack::detail::msgpack_format::nil_cd: 
+                case jsoncons::msgpack::msgpack_type::nil_type: 
                 {
                     more_ = visitor.null_value(semantic_tag::none, *this, ec);
                     break;
                 }
-                case jsoncons::msgpack::detail::msgpack_format::true_cd:
+                case jsoncons::msgpack::msgpack_type::true_type:
                 {
                     more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
                     break;
                 }
-                case jsoncons::msgpack::detail::msgpack_format::false_cd:
+                case jsoncons::msgpack::msgpack_type::false_type:
                 {
                     more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
                     break;
                 }
-                case jsoncons::msgpack::detail::msgpack_format::float32_cd: 
+                case jsoncons::msgpack::msgpack_type::float32_type: 
                 {
                     uint8_t buf[sizeof(float)];
                     if (source_.read(buf, sizeof(float)) != sizeof(float))
@@ -282,7 +282,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::float64_cd: 
+                case jsoncons::msgpack::msgpack_type::float64_type: 
                 {
                     uint8_t buf[sizeof(double)];
                     if (source_.read(buf, sizeof(double)) != sizeof(double))
@@ -296,7 +296,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::uint8_cd: 
+                case jsoncons::msgpack::msgpack_type::uint8_type: 
                 {
                     auto val = source_.get_character();
                     if (!val)
@@ -309,7 +309,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::uint16_cd: 
+                case jsoncons::msgpack::msgpack_type::uint16_type: 
                 {
                     uint8_t buf[sizeof(uint16_t)];
                     if (source_.read(buf, sizeof(uint16_t)) !=sizeof(uint16_t)) 
@@ -323,7 +323,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::uint32_cd: 
+                case jsoncons::msgpack::msgpack_type::uint32_type: 
                 {
                     uint8_t buf[sizeof(uint32_t)];
                     if (source_.read(buf, sizeof(uint32_t)) != sizeof(uint32_t))
@@ -337,7 +337,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::uint64_cd: 
+                case jsoncons::msgpack::msgpack_type::uint64_type: 
                 {
                     uint8_t buf[sizeof(uint64_t)];
                     if (source_.read(buf, sizeof(uint64_t)) != sizeof(uint64_t))
@@ -351,7 +351,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::int8_cd: 
+                case jsoncons::msgpack::msgpack_type::int8_type: 
                 {
                     uint8_t buf[sizeof(int8_t)];
                     if (source_.read(buf, sizeof(int8_t)) != sizeof(int8_t))
@@ -365,7 +365,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::int16_cd: 
+                case jsoncons::msgpack::msgpack_type::int16_type: 
                 {
                     uint8_t buf[sizeof(int16_t)];
                     if (source_.read(buf, sizeof(int16_t)) != sizeof(int16_t))
@@ -379,7 +379,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::int32_cd: 
+                case jsoncons::msgpack::msgpack_type::int32_type: 
                 {
                     uint8_t buf[sizeof(int32_t)];
                     if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -393,7 +393,7 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::int64_cd: 
+                case jsoncons::msgpack::msgpack_type::int64_type: 
                 {
                     uint8_t buf[sizeof(int64_t)];
                     if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
@@ -407,9 +407,9 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::str8_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::str16_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::str32_cd: 
+                case jsoncons::msgpack::msgpack_type::str8_type: 
+                case jsoncons::msgpack::msgpack_type::str16_type: 
+                case jsoncons::msgpack::msgpack_type::str32_type: 
                 {
                     std::size_t len = get_size(type, ec);
                     if (!more_)
@@ -436,9 +436,9 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::bin8_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::bin16_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::bin32_cd: 
+                case jsoncons::msgpack::msgpack_type::bin8_type: 
+                case jsoncons::msgpack::msgpack_type::bin16_type: 
+                case jsoncons::msgpack::msgpack_type::bin32_type: 
                 {
                     std::size_t len = get_size(type,ec);
                     if (!more_)
@@ -459,14 +459,14 @@ private:
                                                       ec);
                     break;
                 }
-                case jsoncons::msgpack::detail::msgpack_format::fixext1_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::fixext2_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::fixext4_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::fixext8_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::fixext16_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::ext8_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::ext16_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::ext32_cd: 
+                case jsoncons::msgpack::msgpack_type::fixext1_type: 
+                case jsoncons::msgpack::msgpack_type::fixext2_type: 
+                case jsoncons::msgpack::msgpack_type::fixext4_type: 
+                case jsoncons::msgpack::msgpack_type::fixext8_type: 
+                case jsoncons::msgpack::msgpack_type::fixext16_type: 
+                case jsoncons::msgpack::msgpack_type::ext8_type: 
+                case jsoncons::msgpack::msgpack_type::ext16_type: 
+                case jsoncons::msgpack::msgpack_type::ext32_type: 
                 {
                     std::size_t len = get_size(type,ec);
                     if (!more_)
@@ -581,15 +581,15 @@ private:
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
-                case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
+                case jsoncons::msgpack::msgpack_type::array16_type: 
+                case jsoncons::msgpack::msgpack_type::array32_type: 
                 {
                     begin_array(visitor,type,ec);
                     break;
                 }
 
-                case jsoncons::msgpack::detail::msgpack_format::map16_cd : 
-                case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
+                case jsoncons::msgpack::msgpack_type::map16_type : 
+                case jsoncons::msgpack::msgpack_type::map32_type : 
                 {
                     begin_object(visitor, type, ec);
                     break;
@@ -658,9 +658,9 @@ private:
     {
         switch (type)
         {
-            case jsoncons::msgpack::detail::msgpack_format::str8_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::bin8_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::ext8_cd: 
+            case jsoncons::msgpack::msgpack_type::str8_type: 
+            case jsoncons::msgpack::msgpack_type::bin8_type: 
+            case jsoncons::msgpack::msgpack_type::ext8_type: 
             {
                 uint8_t buf[sizeof(int8_t)];
                 if (source_.read(buf, sizeof(int8_t)) != sizeof(int8_t))
@@ -673,11 +673,11 @@ private:
                 return static_cast<std::size_t>(len);
             }
 
-            case jsoncons::msgpack::detail::msgpack_format::str16_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::bin16_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::ext16_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::array16_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::map16_cd:
+            case jsoncons::msgpack::msgpack_type::str16_type: 
+            case jsoncons::msgpack::msgpack_type::bin16_type: 
+            case jsoncons::msgpack::msgpack_type::ext16_type: 
+            case jsoncons::msgpack::msgpack_type::array16_type: 
+            case jsoncons::msgpack::msgpack_type::map16_type:
             {
                 uint8_t buf[sizeof(int16_t)];
                 if (source_.read(buf, sizeof(int16_t)) != sizeof(int16_t))
@@ -690,11 +690,11 @@ private:
                 return static_cast<std::size_t>(len);
             }
 
-            case jsoncons::msgpack::detail::msgpack_format::str32_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::bin32_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::ext32_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::array32_cd: 
-            case jsoncons::msgpack::detail::msgpack_format::map32_cd : 
+            case jsoncons::msgpack::msgpack_type::str32_type: 
+            case jsoncons::msgpack::msgpack_type::bin32_type: 
+            case jsoncons::msgpack::msgpack_type::ext32_type: 
+            case jsoncons::msgpack::msgpack_type::array32_type: 
+            case jsoncons::msgpack::msgpack_type::map32_type : 
             {
                 uint8_t buf[sizeof(int32_t)];
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -706,15 +706,15 @@ private:
                 uint32_t len = binary::big_to_native<uint32_t>(buf, sizeof(buf));
                 return static_cast<std::size_t>(len);
             }
-            case jsoncons::msgpack::detail::msgpack_format::fixext1_cd: 
+            case jsoncons::msgpack::msgpack_type::fixext1_type: 
                 return 1;
-            case jsoncons::msgpack::detail::msgpack_format::fixext2_cd: 
+            case jsoncons::msgpack::msgpack_type::fixext2_type: 
                 return 2;
-            case jsoncons::msgpack::detail::msgpack_format::fixext4_cd: 
+            case jsoncons::msgpack::msgpack_type::fixext4_type: 
                 return 4;
-            case jsoncons::msgpack::detail::msgpack_format::fixext8_cd: 
+            case jsoncons::msgpack::msgpack_type::fixext8_type: 
                 return 8;
-            case jsoncons::msgpack::detail::msgpack_format::fixext16_cd: 
+            case jsoncons::msgpack::msgpack_type::fixext16_type: 
                 return 16;
             default:
                 if ((type > 0x8f && type <= 0x9f) // fixarray

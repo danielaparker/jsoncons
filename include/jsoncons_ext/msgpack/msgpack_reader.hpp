@@ -15,7 +15,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/msgpack/msgpack_detail.hpp>
+#include <jsoncons_ext/msgpack/msgpack_type.hpp>
 #include <jsoncons_ext/msgpack/msgpack_error.hpp>
 #include <jsoncons_ext/msgpack/msgpack_parser.hpp>
 

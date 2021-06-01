@@ -14,7 +14,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/ubjson/ubjson_detail.hpp>
+#include <jsoncons_ext/ubjson/ubjson_type.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
 #include <jsoncons_ext/ubjson/ubjson_options.hpp>
 
@@ -153,7 +153,7 @@ public:
                         more_ = false;
                         return;
                     }
-                    if (c.value() == jsoncons::ubjson::detail::ubjson_format::end_array_marker)
+                    if (c.value() == jsoncons::ubjson::ubjson_type::end_array_marker)
                     {
                         source_.ignore(1);
                         end_array(visitor, ec);
@@ -243,7 +243,7 @@ public:
                         more_ = false;
                         return;
                     }
-                    if (c.value() == jsoncons::ubjson::detail::ubjson_format::end_object_marker)
+                    if (c.value() == jsoncons::ubjson::ubjson_type::end_object_marker)
                     {
                         source_.ignore(1);
                         end_object(visitor, ec);
@@ -325,26 +325,26 @@ private:
     {
         switch (type)
         {
-            case jsoncons::ubjson::detail::ubjson_format::null_type: 
+            case jsoncons::ubjson::ubjson_type::null_type: 
             {
                 more_ = visitor.null_value(semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::no_op_type: 
+            case jsoncons::ubjson::ubjson_type::no_op_type: 
             {
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::true_type:
+            case jsoncons::ubjson::ubjson_type::true_type:
             {
                 more_ = visitor.bool_value(true, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::false_type:
+            case jsoncons::ubjson::ubjson_type::false_type:
             {
                 more_ = visitor.bool_value(false, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::int8_type: 
+            case jsoncons::ubjson::ubjson_type::int8_type: 
             {
                 uint8_t buf[sizeof(int8_t)];
                 if (source_.read(buf, sizeof(int8_t)) != sizeof(int8_t))
@@ -357,7 +357,7 @@ private:
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::uint8_type: 
+            case jsoncons::ubjson::ubjson_type::uint8_type: 
             {
                 auto ch = source_.get_character();
                 if (!ch)
@@ -369,7 +369,7 @@ private:
                 more_ = visitor.uint64_value(ch.value(), semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::int16_type: 
+            case jsoncons::ubjson::ubjson_type::int16_type: 
             {
                 uint8_t buf[sizeof(int16_t)];
                 if (source_.read(buf, sizeof(int16_t)) != sizeof(int16_t))
@@ -382,7 +382,7 @@ private:
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::int32_type: 
+            case jsoncons::ubjson::ubjson_type::int32_type: 
             {
                 uint8_t buf[sizeof(int32_t)];
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -395,7 +395,7 @@ private:
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::int64_type: 
+            case jsoncons::ubjson::ubjson_type::int64_type: 
             {
                 uint8_t buf[sizeof(int64_t)];
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))
@@ -408,7 +408,7 @@ private:
                 more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::float32_type: 
+            case jsoncons::ubjson::ubjson_type::float32_type: 
             {
                 uint8_t buf[sizeof(float)];
                 if (source_.read(buf, sizeof(float)) != sizeof(float))
@@ -421,7 +421,7 @@ private:
                 more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::float64_type: 
+            case jsoncons::ubjson::ubjson_type::float64_type: 
             {
                 uint8_t buf[sizeof(double)];
                 if (source_.read(buf, sizeof(double)) != sizeof(double))
@@ -434,7 +434,7 @@ private:
                 more_ = visitor.double_value(val, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::char_type: 
+            case jsoncons::ubjson::ubjson_type::char_type: 
             {
                 uint8_t buf[sizeof(char)];
                 if (source_.read(buf, sizeof(char)) != sizeof(char))
@@ -451,10 +451,12 @@ private:
                     more_ = false;
                     return;
                 }
-                more_ = visitor.string_value(jsoncons::basic_string_view<char>(&c,1), semantic_tag::none, *this, ec);
+                text_buffer_.clear();
+                text_buffer_.push_back(c);
+                more_ = visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::string_type: 
+            case jsoncons::ubjson::ubjson_type::string_type: 
             {
                 std::size_t length = get_length(ec);
                 if (ec)
@@ -478,7 +480,7 @@ private:
                 more_ = visitor.string_value(jsoncons::basic_string_view<char>(text_buffer_.data(),text_buffer_.length()), semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::high_precision_number_type: 
+            case jsoncons::ubjson::ubjson_type::high_precision_number_type: 
             {
                 std::size_t length = get_length(ec);
                 if (ec)
@@ -502,12 +504,12 @@ private:
                 }
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::start_array_marker: 
+            case jsoncons::ubjson::ubjson_type::start_array_marker: 
             {
                 begin_array(visitor,ec);
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::start_object_marker: 
+            case jsoncons::ubjson::ubjson_type::start_object_marker: 
             {
                 begin_object(visitor, ec);
                 break;
@@ -537,7 +539,7 @@ private:
             more_ = false;
             return;
         }
-        if (c.value() == jsoncons::ubjson::detail::ubjson_format::type_marker)
+        if (c.value() == jsoncons::ubjson::ubjson_type::type_marker)
         {
             source_.ignore(1);
             auto item_type = source_.get_character();
@@ -554,7 +556,7 @@ private:
                 more_ = false;
                 return;
             }
-            if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+            if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
@@ -578,7 +580,7 @@ private:
                 return;
             }
         }
-        else if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+        else if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
         {
             source_.ignore(1);
             std::size_t length = get_length(ec);
@@ -626,7 +628,7 @@ private:
             more_ = false;
             return;
         }
-        if (c.value() == jsoncons::ubjson::detail::ubjson_format::type_marker)
+        if (c.value() == jsoncons::ubjson::ubjson_type::type_marker)
         {
             source_.ignore(1);
             auto item_type = source_.get_character();
@@ -643,7 +645,7 @@ private:
                 more_ = false;
                 return;
             }
-            if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+            if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
@@ -676,7 +678,7 @@ private:
                 more_ = false;
                 return;
             }
-            if (c.value() == jsoncons::ubjson::detail::ubjson_format::count_marker)
+            if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
@@ -720,7 +722,7 @@ private:
         }
         switch (type.value())
         {
-            case jsoncons::ubjson::detail::ubjson_format::int8_type: 
+            case jsoncons::ubjson::ubjson_type::int8_type: 
             {
                 uint8_t buf[sizeof(int8_t)];
                 if (source_.read(buf, sizeof(int8_t)) != sizeof(int8_t))
@@ -742,7 +744,7 @@ private:
                 }
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::uint8_type: 
+            case jsoncons::ubjson::ubjson_type::uint8_type: 
             {
                 auto ch = source_.get_character();
                 if (!ch)
@@ -754,7 +756,7 @@ private:
                 length = ch.value();
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::int16_type: 
+            case jsoncons::ubjson::ubjson_type::int16_type: 
             {
                 uint8_t buf[sizeof(int16_t)];
                 if (source_.read(buf, sizeof(int16_t)) != sizeof(int16_t))
@@ -776,7 +778,7 @@ private:
                 }
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::int32_type: 
+            case jsoncons::ubjson::ubjson_type::int32_type: 
             {
                 uint8_t buf[sizeof(int32_t)];
                 if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
@@ -798,7 +800,7 @@ private:
                 }
                 break;
             }
-            case jsoncons::ubjson::detail::ubjson_format::int64_type: 
+            case jsoncons::ubjson::ubjson_type::int64_type: 
             {
                 uint8_t buf[sizeof(int64_t)];
                 if (source_.read(buf, sizeof(int64_t)) != sizeof(int64_t))

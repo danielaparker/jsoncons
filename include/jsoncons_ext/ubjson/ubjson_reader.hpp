@@ -14,7 +14,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/ubjson/ubjson_detail.hpp>
+#include <jsoncons_ext/ubjson/ubjson_type.hpp>
 #include <jsoncons_ext/ubjson/ubjson_error.hpp>
 #include <jsoncons_ext/ubjson/ubjson_parser.hpp>
 
