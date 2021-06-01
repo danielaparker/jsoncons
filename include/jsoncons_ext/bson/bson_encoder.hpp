@@ -285,6 +285,30 @@ private:
                 }
                 break;
             }
+            case semantic_tag::regex:
+            {
+                before_value(jsoncons::bson::detail::bson_format::regex_cd);
+                std::size_t first = sv.find_first_of('/');
+                std::size_t last = sv.find_last_of('/');
+                if (first == string_view::npos || last == string_view::npos || first == last)
+                {
+                    ec = bson_errc::invalid_regex_string;
+                    return false;
+                }
+                string_view regex = sv.substr(first+1,last-1);
+                for (auto c : regex)
+                {
+                    buffer_.push_back(c);
+                }
+                buffer_.push_back(0x00);
+                string_view options = sv.substr(last+1);
+                for (auto c : options)
+                {
+                    buffer_.push_back(c);
+                }
+                buffer_.push_back(0x00);
+                break;
+            }
             default:
                 before_value(jsoncons::bson::detail::bson_format::string_cd);
                 std::size_t offset = buffer_.size();

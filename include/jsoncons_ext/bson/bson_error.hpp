@@ -26,6 +26,7 @@ enum class bson_errc
     datetime_too_small,
     datetime_too_large,
     expected_bson_document,
+    invalid_regex_string,
     unknown_type
 };
 
@@ -65,6 +66,8 @@ public:
                 return "datetime too small";
             case bson_errc::expected_bson_document:
                 return "Expected BSON document";
+            case bson_errc::invalid_regex_string:
+                return "Invalid regex string";
             default:
                 return "Unknown BSON parser error";
         }

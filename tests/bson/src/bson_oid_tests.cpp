@@ -43,7 +43,8 @@ TEST_CASE("test_bson_oid_init_from_string")
         for (const auto& item : gTestOids) 
         {
            bson::oid_t oid(item);
-           std::string s = oid.to_string();
+           std::string s;
+           to_string(oid, s);
            CHECK(item == s);
         }
     }

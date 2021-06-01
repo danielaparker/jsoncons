@@ -86,7 +86,8 @@ enum class semantic_tag : uint8_t
     multi_dim_row_major = 0x0f,
     multi_dim_column_major = 0x10,
     ext = 0x11,
-    id = 0x12
+    id = 0x12,
+    regex = 0x13
 #if !defined(JSONCONS_NO_DEPRECATED)
     , big_integer = bigint
     , big_decimal = bigdec
@@ -118,6 +119,7 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     JSONCONS_CSTRING(CharT,ext_name,'e','x','t')
     JSONCONS_CSTRING(CharT,id_name,'i','d')
     JSONCONS_CSTRING(CharT, float128_name, 'f', 'l', 'o', 'a', 't', '1', '2', '8')
+    JSONCONS_CSTRING(CharT, regex_name, 'r', 'e', 'g', 'e', 'x')
 
     switch (tag)
     {
@@ -214,6 +216,11 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
         case semantic_tag::id:
         {
             os << id_name;
+            break;
+        }
+        case semantic_tag::regex:
+        {
+            os << regex_name;
             break;
         }
     }

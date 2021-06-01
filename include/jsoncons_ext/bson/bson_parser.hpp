@@ -256,10 +256,10 @@ private:
     void read_e_name(json_visitor& visitor, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
     {
         text_buffer_.clear();
-        character_result<typename Src::value_type> c;
-        while ((c = source_.get_character()) && c.value() != 0)
+        read_cstring(ec);
+        if (ec)
         {
-            text_buffer_.push_back(c.value());
+            return;
         }
         if (type == jsoncons::bson::detail::bson_container_type::document)
         {
@@ -293,34 +293,10 @@ private:
             }
             case jsoncons::bson::detail::bson_format::string_cd:
             {
-                uint8_t buf[sizeof(int32_t)]; 
-                if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
-                {
-                    ec = bson_errc::unexpected_eof;
-                    more_ = false;
-                    return;
-                }
-                auto len = binary::little_to_native<int32_t>(buf, sizeof(buf));
-                if (len < 1)
-                {
-                    ec = bson_errc::string_length_is_non_positive;
-                    more_ = false;
-                    return;
-                }
-
                 text_buffer_.clear();
-                std::size_t size = static_cast<std::size_t>(len) - static_cast<std::size_t>(1);
-                if (source_reader<Src>::read(source_,text_buffer_,size) != size)
+                read_string(ec);
+                if (ec)
                 {
-                    ec = bson_errc::unexpected_eof;
-                    more_ = false;
-                    return;
-                }
-                auto c = source_.get_character();
-                if (!c) // discard 0
-                {
-                    ec = bson_errc::unexpected_eof;
-                    more_ = false;
                     return;
                 }
                 auto result = unicode_traits::validate(text_buffer_.data(), text_buffer_.size());
@@ -331,6 +307,24 @@ private:
                     return;
                 }
                 more_ = visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
+                break;
+            }
+            case jsoncons::bson::detail::bson_format::regex_cd:
+            {
+                text_buffer_.clear();
+                text_buffer_.push_back('/');
+                read_cstring(ec);
+                if (ec)
+                {
+                    return;
+                }
+                text_buffer_.push_back('/');
+                read_cstring(ec);
+                if (ec)
+                {
+                    return;
+                }
+                more_ = visitor.string_value(text_buffer_, semantic_tag::regex, *this, ec);
                 break;
             }
             case jsoncons::bson::detail::bson_format::document_cd: 
@@ -485,9 +479,7 @@ private:
                 }
 
                 oid_t oid(buf);
-                std::string s = oid.to_string();
-                text_buffer_.clear();
-                text_buffer_.insert(text_buffer_.begin(), s.begin(), s.end());
+                to_string(oid, text_buffer_);
 
                 more_ = visitor.string_value(text_buffer_, semantic_tag::id, *this, ec);
                 break;
@@ -500,6 +492,48 @@ private:
             }
         }
 
+    }
+
+    void read_cstring(std::error_code& ec)
+    {
+        character_result<typename Src::value_type> c;
+        while ((c = source_.get_character()) && c.value() != 0)
+        {
+            text_buffer_.push_back(c.value());
+        }
+    }
+
+    void read_string(std::error_code& ec)
+    {
+        uint8_t buf[sizeof(int32_t)]; 
+        if (source_.read(buf, sizeof(int32_t)) != sizeof(int32_t))
+        {
+            ec = bson_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        auto len = binary::little_to_native<int32_t>(buf, sizeof(buf));
+        if (len < 1)
+        {
+            ec = bson_errc::string_length_is_non_positive;
+            more_ = false;
+            return;
+        }
+
+        std::size_t size = static_cast<std::size_t>(len) - static_cast<std::size_t>(1);
+        if (source_reader<Src>::read(source_,text_buffer_,size) != size)
+        {
+            ec = bson_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
+        auto c = source_.get_character();
+        if (!c) // discard 0
+        {
+            ec = bson_errc::unexpected_eof;
+            more_ = false;
+            return;
+        }
     }
 };
 

@@ -54,13 +54,6 @@ namespace jsoncons { namespace bson {
             }
         }
 
-        std::string to_string()
-        {
-            std::string s(24,0);
-            init_hex_char_pairs(reinterpret_cast<uint16_t*>(&s[0]));
-            return s;
-        }
-
         const uint8_t* data() const
         {
             return bytes_.data();
@@ -138,26 +131,12 @@ namespace jsoncons { namespace bson {
               return 0;
            }
         }
+    };
 
-        void init_hex_char_pairs(uint16_t* data)
-        {
-            const uint16_t* gHexCharPairs = get_hex_char_pairs(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>());
+    namespace detail {
 
-            data[0] = gHexCharPairs[bytes_[0]];
-            data[1] = gHexCharPairs[bytes_[1]];
-            data[2] = gHexCharPairs[bytes_[2]];
-            data[3] = gHexCharPairs[bytes_[3]];
-            data[4] = gHexCharPairs[bytes_[4]];
-            data[5] = gHexCharPairs[bytes_[5]];
-            data[6] = gHexCharPairs[bytes_[6]];
-            data[7] = gHexCharPairs[bytes_[7]];
-            data[8] = gHexCharPairs[bytes_[8]];
-            data[9] = gHexCharPairs[bytes_[9]];
-            data[10] = gHexCharPairs[bytes_[10]];
-            data[11] = gHexCharPairs[bytes_[11]];
-        }
-
-        static const uint16_t* get_hex_char_pairs(std::true_type) // big endian
+        inline
+        const uint16_t* get_hex_char_pairs(std::true_type) // big endian
         {
             static const uint16_t hex_char_pairs[] = {
                12336, 12337, 12338, 12339, 12340, 12341, 12342, 12343, 12344, 12345, 12385,
@@ -188,7 +167,8 @@ namespace jsoncons { namespace bson {
             return hex_char_pairs;
         }
 
-        static const uint16_t* get_hex_char_pairs(std::false_type) // little endian
+        inline
+        const uint16_t* get_hex_char_pairs(std::false_type) // little endian
         {
             static const uint16_t hex_char_pairs[] = {
                 12336, 12592, 12848, 13104, 13360, 13616, 13872, 14128, 14384, 14640, 24880,
@@ -218,7 +198,36 @@ namespace jsoncons { namespace bson {
 
             return hex_char_pairs;
         }
-    };
+
+        inline
+        void init_hex_char_pairs(const oid_t& oid, uint16_t* data)
+        {
+            const uint8_t* bytes = oid.data();
+            const uint16_t* gHexCharPairs = get_hex_char_pairs(std::integral_constant<bool, jsoncons::endian::native == jsoncons::endian::big>());
+
+            data[0] = gHexCharPairs[bytes[0]];
+            data[1] = gHexCharPairs[bytes[1]];
+            data[2] = gHexCharPairs[bytes[2]];
+            data[3] = gHexCharPairs[bytes[3]];
+            data[4] = gHexCharPairs[bytes[4]];
+            data[5] = gHexCharPairs[bytes[5]];
+            data[6] = gHexCharPairs[bytes[6]];
+            data[7] = gHexCharPairs[bytes[7]];
+            data[8] = gHexCharPairs[bytes[8]];
+            data[9] = gHexCharPairs[bytes[9]];
+            data[10] = gHexCharPairs[bytes[10]];
+            data[11] = gHexCharPairs[bytes[11]];
+        }
+
+    } // namsepace detail
+
+    template <typename StringT>
+    inline 
+    void to_string(const oid_t& oid, StringT& s)
+    {
+        s.resize(24);
+        detail::init_hex_char_pairs(oid, reinterpret_cast<uint16_t*>(&s[0]));
+    }
 
 } // namespace bson
 } // namespace jsoncons

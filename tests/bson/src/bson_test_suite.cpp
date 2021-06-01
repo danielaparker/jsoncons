@@ -229,8 +229,25 @@ TEST_CASE("bson c test suite")
         json j = bson::decode_bson<json>(input);
         bson::oid_t oid("1234567890abcdef1234abcd");
 
-        CHECK(j.at("oid").as<std::string>() == oid.to_string());
+        std::string s;
+        to_string(oid, s);
+        CHECK(j.at("oid").as<std::string>() == s);
         CHECK(j.at("oid").tag() == semantic_tag::id);
+
+        std::vector<char> output;
+        bson::encode_bson(j, output);
+
+        CHECK(output == input);
+    }
+    SECTION("regex")
+    {
+        std::string in_file = "./bson/input/test27.bson";
+        std::vector<char> input = read_bytes(in_file);
+
+        json j = bson::decode_bson<json>(input);
+        //std::cout << j << "\n";
+
+        std::string expected = "/^abcd/ilx";
 
         std::vector<char> output;
         bson::encode_bson(j, output);
