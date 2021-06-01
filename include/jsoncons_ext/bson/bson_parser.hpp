@@ -200,7 +200,7 @@ private:
 
     void begin_document(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(state_stack_.size() > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(static_cast<int>(state_stack_.size()) > options_.max_nesting_depth()))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             more_ = false;
@@ -240,7 +240,7 @@ private:
 
     void begin_array(json_visitor& visitor, std::error_code& ec)
     {
-        if (JSONCONS_UNLIKELY(state_stack_.size() > options_.max_nesting_depth()))
+        if (JSONCONS_UNLIKELY(static_cast<int>(state_stack_.size()) > options_.max_nesting_depth()))
         {
             ec = bson_errc::max_nesting_depth_exceeded;
             more_ = false;
