@@ -996,17 +996,17 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag::epoch_second:
+            case semantic_tag::seconds:
                 write_tag(1);
                 break;
-            case semantic_tag::epoch_milli:
+            case semantic_tag::millis:
                 write_tag(1);
                 if (val != 0)
                 {
                     val /= millis_in_second;
                 }
                 break;
-            case semantic_tag::epoch_nano:
+            case semantic_tag::nanos:
                 write_tag(1);
                 if (val != 0)
                 {
@@ -1044,10 +1044,10 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag::epoch_milli:
-            case semantic_tag::epoch_nano:
+            case semantic_tag::millis:
+            case semantic_tag::nanos:
                 return visit_double(static_cast<double>(value), tag, context, ec);
-            case semantic_tag::epoch_second:
+            case semantic_tag::seconds:
                 write_tag(1);
                 break;
             default:
@@ -1136,10 +1136,10 @@ private:
     {
         switch (tag)
         {
-            case semantic_tag::epoch_milli:
-            case semantic_tag::epoch_nano:
+            case semantic_tag::millis:
+            case semantic_tag::nanos:
                 return visit_double(static_cast<double>(value), tag, context, ec);
-            case semantic_tag::epoch_second:
+            case semantic_tag::seconds:
                 write_tag(1);
                 break;
             default:

@@ -23,8 +23,8 @@ CBOR standard date/time strings are decoded into jsoncons strings tagged with `s
 jsoncons strings tagged with `semantic_tag::datetime` are encoded into CBOR standard date/time strings.
 
 1 (epoch time)  
-CBOR epoch times are decoded into jsoncons int64_t, uint64_t and double and tagged with `semantic_tag::epoch_second`. 
-jsoncons int64_t, uint64_t and double tagged with `semantic_tag::epoch_second` are encoded into CBOR epoch time.
+CBOR epoch times are decoded into jsoncons int64_t, uint64_t and double and tagged with `semantic_tag::seconds`. 
+jsoncons int64_t, uint64_t and double tagged with `semantic_tag::seconds` are encoded into CBOR epoch time.
 
 2,3 (positive and negative bignum)  
 CBOR positive and negative bignums are decoded into jsoncons strings and tagged with `semantic_tag::bigint`.
@@ -81,12 +81,12 @@ CBOR data item|CBOR tag                                         | jsoncons data 
  undefined |&#160;                                              | null          | undefined        
  true or false |&#160;                                          | bool          |                  
  unsigned or negative integer |&#160;                           | int64         |                  
- unsigned or negative integer | 1 (epoch-based date/time)       | int64         | epoch_second        
+ unsigned or negative integer | 1 (epoch-based date/time)       | int64         | seconds        
  unsigned integer |&#160;                                       | uint64        |                  
- unsigned integer | 1 (epoch-based date/time)                   | uint64        | epoch_second        
+ unsigned integer | 1 (epoch-based date/time)                   | uint64        | seconds        
  half-precision float, float, or double |&#160;                 | half          |                  
  float or double |&#160;                                        | double        |                  
- double | 1 (epoch-based date/time)                             | double        | epoch_second        
+ double | 1 (epoch-based date/time)                             | double        | seconds        
  string |&#160;                                                 | string        |                  
  byte string | 2 (positive bignum) or 2 (negative bignum)       | string        | bigint           
  array | 4 (decimal fraction)                                   | string        | bigdec           

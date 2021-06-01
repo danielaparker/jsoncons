@@ -15,7 +15,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/bson/bson_detail.hpp>
+#include <jsoncons_ext/bson/bson_type.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_parser.hpp>
 

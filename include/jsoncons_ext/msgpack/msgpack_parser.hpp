@@ -502,7 +502,7 @@ private:
                             return;
                         }
                         uint32_t val = binary::big_to_native<uint32_t>(buf32, sizeof(buf32));
-                        more_ = visitor.uint64_value(val, semantic_tag::epoch_second, *this, ec);
+                        more_ = visitor.uint64_value(val, semantic_tag::seconds, *this, ec);
                     }
                     else if (is_timestamp && len == 8)
                     {
@@ -522,7 +522,7 @@ private:
                         nano += nsec;
                         text_buffer_.clear();
                         nano.write_string(text_buffer_);
-                        more_ = visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
+                        more_ = visitor.string_value(text_buffer_, semantic_tag::nanos, *this, ec);
                         if (!more_) return;
                     }
                     else if (is_timestamp && len == 12)
@@ -560,7 +560,7 @@ private:
 
                         text_buffer_.clear();
                         nano.write_string(text_buffer_);
-                        more_ = visitor.string_value(text_buffer_, semantic_tag::epoch_nano, *this, ec);
+                        more_ = visitor.string_value(text_buffer_, semantic_tag::nanos, *this, ec);
                         if (!more_) return;
                     }
                     else

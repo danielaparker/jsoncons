@@ -15,7 +15,7 @@
 #include <jsoncons/source.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/config/jsoncons_config.hpp>
-#include <jsoncons_ext/bson/bson_detail.hpp>
+#include <jsoncons_ext/bson/bson_type.hpp>
 #include <jsoncons_ext/bson/bson_decimal128.hpp>
 #include <jsoncons_ext/bson/bson_error.hpp>
 #include <jsoncons_ext/bson/bson_options.hpp>
@@ -147,7 +147,7 @@ public:
                     }
                     if (type != 0x00)
                     {
-                        read_e_name(visitor,jsoncons::bson::detail::bson_container_type::document,ec);
+                        read_e_name(visitor,jsoncons::bson::bson_container_type::document,ec);
                         state_stack_.back().mode = parse_mode::value;
                         state_stack_.back().type = type;
                     }
@@ -170,7 +170,7 @@ public:
                     }
                     if (type != 0x00)
                     {
-                        read_e_name(visitor,jsoncons::bson::detail::bson_container_type::array,ec);
+                        read_e_name(visitor,jsoncons::bson::bson_container_type::array,ec);
                         read_value(visitor, type, ec);
                     }
                     else
@@ -280,7 +280,7 @@ private:
         state_stack_.back().pos += pos;
     }
 
-    void read_e_name(json_visitor& visitor, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
+    void read_e_name(json_visitor& visitor, jsoncons::bson::bson_container_type type, std::error_code& ec)
     {
         text_buffer_.clear();
         read_cstring(ec);
@@ -288,7 +288,7 @@ private:
         {
             return;
         }
-        if (type == jsoncons::bson::detail::bson_container_type::document)
+        if (type == jsoncons::bson::bson_container_type::document)
         {
             auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
             if (JSONCONS_UNLIKELY(result.ec != unicode_traits::conv_errc()))
@@ -305,7 +305,7 @@ private:
     {
         switch (type)
         {
-            case jsoncons::bson::detail::bson_format::double_cd:
+            case jsoncons::bson::bson_type::double_type:
             {
                 uint8_t buf[sizeof(double)]; 
                 std::size_t n = source_.read(buf, sizeof(double));
@@ -320,7 +320,9 @@ private:
                 more_ = visitor.double_value(res, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::string_cd:
+            case jsoncons::bson::bson_type::min_key_type:
+            case jsoncons::bson::bson_type::max_key_type:
+            case jsoncons::bson::bson_type::string_type:
             {
                 text_buffer_.clear();
                 read_string(ec);
@@ -338,7 +340,25 @@ private:
                 more_ = visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::regex_cd:
+            case jsoncons::bson::bson_type::javascript_type:
+            {
+                text_buffer_.clear();
+                read_string(ec);
+                if (ec)
+                {
+                    return;
+                }
+                auto result = unicode_traits::validate(text_buffer_.data(), text_buffer_.size());
+                if (JSONCONS_UNLIKELY(result.ec != unicode_traits::conv_errc()))
+                {
+                    ec = bson_errc::invalid_utf8_text_string;
+                    more_ = false;
+                    return;
+                }
+                more_ = visitor.string_value(text_buffer_, semantic_tag::code, *this, ec);
+                break;
+            }
+            case jsoncons::bson::bson_type::regex_type:
             {
                 text_buffer_.clear();
                 text_buffer_.push_back('/');
@@ -356,23 +376,28 @@ private:
                 more_ = visitor.string_value(text_buffer_, semantic_tag::regex, *this, ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::document_cd: 
+            case jsoncons::bson::bson_type::document_type: 
             {
                 begin_document(visitor,ec);
                 break;
             }
 
-            case jsoncons::bson::detail::bson_format::array_cd: 
+            case jsoncons::bson::bson_type::array_type: 
             {
                 begin_array(visitor,ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::null_cd: 
+            case jsoncons::bson::bson_type::undefined_type: 
+                {
+                    more_ = visitor.null_value(semantic_tag::undefined, *this, ec);
+                    break;
+                }
+            case jsoncons::bson::bson_type::null_type: 
             {
                 more_ = visitor.null_value(semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::bool_cd:
+            case jsoncons::bson::bson_type::bool_type:
             {
                 uint8_t c;
                 std::size_t n = source_.read(&c, 1);
@@ -386,7 +411,7 @@ private:
                 more_ = visitor.bool_value(c != 0, semantic_tag::none, *this, ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::int32_cd: 
+            case jsoncons::bson::bson_type::int32_type: 
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int32_t));
@@ -402,7 +427,7 @@ private:
                 break;
             }
 
-            case jsoncons::bson::detail::bson_format::timestamp_cd: 
+            case jsoncons::bson::bson_type::timestamp_type: 
             {
                 uint8_t buf[sizeof(uint64_t)]; 
                 std::size_t n = source_.read(buf, sizeof(uint64_t));
@@ -418,7 +443,7 @@ private:
                 break;
             }
 
-            case jsoncons::bson::detail::bson_format::int64_cd: 
+            case jsoncons::bson::bson_type::int64_type: 
             {
                 uint8_t buf[sizeof(int64_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int64_t));
@@ -434,7 +459,7 @@ private:
                 break;
             }
 
-            case jsoncons::bson::detail::bson_format::datetime_cd: 
+            case jsoncons::bson::bson_type::datetime_type: 
             {
                 uint8_t buf[sizeof(int64_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int64_t));
@@ -446,10 +471,10 @@ private:
                     return;
                 }
                 auto val = binary::little_to_native<int64_t>(buf, sizeof(buf));
-                more_ = visitor.int64_value(val, semantic_tag::epoch_milli, *this, ec);
+                more_ = visitor.int64_value(val, semantic_tag::millis, *this, ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::binary_cd: 
+            case jsoncons::bson::bson_type::binary_type: 
             {
                 uint8_t buf[sizeof(int32_t)]; 
                 std::size_t n = source_.read(buf, sizeof(int32_t));
@@ -493,7 +518,7 @@ private:
                                                   ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::decimal128_cd: 
+            case jsoncons::bson::bson_type::decimal128_type: 
             {
                 uint8_t buf[sizeof(uint64_t)*2]; 
                 std::size_t n = source_.read(buf, sizeof(buf));
@@ -515,7 +540,7 @@ private:
                 more_ = visitor.string_value(string_view(text_buffer_.data(),static_cast<std::size_t>(r.ptr-text_buffer_.data())), semantic_tag::float128, *this, ec);
                 break;
             }
-            case jsoncons::bson::detail::bson_format::object_id_cd: 
+            case jsoncons::bson::bson_type::object_id_type: 
             {
                 uint8_t buf[12]; 
                 std::size_t n = source_.read(buf, sizeof(buf));

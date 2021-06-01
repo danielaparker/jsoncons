@@ -8,12 +8,15 @@ enum class semantic_tag : uint8_t
     none = 0,
     undefined,
     datetime,
-    epoch_second, // since 0.155.0
-    timestamp = epoch_second,  // deprecated (since 0.155.0)
-    epoch_milli, // since 0.155.0
-    epoch_nano, // since 0.155.0
+    seconds,                  // since 0.165.0
+    epoch_second = seconds,   // (until 0.165.0, since deprecated)
+    millis,                   // since 0.165.0
+    epoch_milli = millis,     // (until 0.165.0, since deprecated)
+    nanos,                    // since 0.165.0
+    epoch_nano = nanos,       // (until 0.165.0, since deprecated)
     bigint,
     bigdec,
+    float128,                 // since 0.165.0
     bigfloat,
     base16,
     base64,
@@ -22,7 +25,10 @@ enum class semantic_tag : uint8_t
     clamped,
     multi_dim_row_major,
     multi_dim_column_major,
-    ext
+    ext,
+    id,                       // since 0.165.0
+    regex,                    // since 0.165.0
+    code                      // since 0.165.0
 };
 ```
 

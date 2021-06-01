@@ -48,7 +48,7 @@ _"I am so happy I have come across your json c++ library!"_
 
 _"I finally decided on jsoncons after evaluating quite a few json libraries out there."_
 
-_"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in javascript"_
+_"I’m using your library for an external interface to pass data, as well as using the conversions from csv to json, which are really helpful for converting data for use in code"_
 
 _"Verified that, for my needs in JSON and CBOR, it is working perfectly"_
 

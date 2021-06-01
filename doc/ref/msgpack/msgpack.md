@@ -26,7 +26,7 @@ MessagePack data item                              |ext type | jsoncons data ite
  fixstr, str 8, str 16, str 32                   |                  | string        |                  
  bin 8, bin 16, bin 32                           |                  | byte_string   |                  
  fixext1, fixext2, fixext4, fixext8, fixext16, ext8, ext16, ext32    |0-127| byte_string               |
- 4 byte length   |-1 (timestamp 32)                |uint64| epoch_second
+ 4 byte length   |-1 (timestamp 32)                |uint64| seconds
  8 byte length   |-1 (timestamp 64)                |string| epoch_nanosecond
  12 byte length  |-1 (timestamp 96)               |string| epoch_nanosecond
  array                                             |                  | array         |                  

@@ -398,7 +398,7 @@ private:
                     {
                         if (item_tag_ == 1)
                         {
-                            tag = semantic_tag::epoch_second;
+                            tag = semantic_tag::seconds;
                         }
                         other_tags_[item_tag] = false;
                     }
@@ -418,7 +418,7 @@ private:
                 {
                     if (item_tag_ == 1)
                     {
-                        tag = semantic_tag::epoch_second;
+                        tag = semantic_tag::seconds;
                     }
                     other_tags_[item_tag] = false;
                 }
@@ -505,7 +505,7 @@ private:
                         {
                             if (item_tag_ == 1)
                             {
-                                tag = semantic_tag::epoch_second;
+                                tag = semantic_tag::seconds;
                             }
                             other_tags_[item_tag] = false;
                         }
