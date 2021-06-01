@@ -208,7 +208,6 @@ private:
 
         uint8_t buf[sizeof(int32_t)]; 
         size_t n = source_.read(buf, sizeof(int32_t));
-        state_stack_.back().bytes_read += n;
         if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
@@ -226,7 +225,9 @@ private:
     {
         --nesting_depth_;
         more_ = visitor.end_object(*this,ec);
+        std::size_t bytes_read = state_stack_.back().bytes_read;
         state_stack_.pop_back();
+        state_stack_.back().bytes_read += bytes_read;
     }
 
     void begin_array(json_visitor& visitor, std::error_code& ec)
@@ -239,7 +240,6 @@ private:
         } 
         uint8_t buf[sizeof(int32_t)]; 
         std::size_t n = source_.read(buf, sizeof(int32_t));
-        state_stack_.back().bytes_read += n;
         if (n != sizeof(int32_t))
         {
             ec = bson_errc::unexpected_eof;
@@ -258,7 +258,9 @@ private:
         --nesting_depth_;
 
         more_ = visitor.end_array(*this, ec);
+        std::size_t bytes_read = state_stack_.back().bytes_read;
         state_stack_.pop_back();
+        state_stack_.back().bytes_read += bytes_read;
     }
 
     void read_e_name(json_visitor& visitor, jsoncons::bson::detail::bson_container_type type, std::error_code& ec)
