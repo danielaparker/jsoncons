@@ -494,7 +494,7 @@ private:
 
     }
 
-    void read_cstring(std::error_code& ec)
+    void read_cstring(std::error_code&)
     {
         character_result<typename Src::value_type> c;
         while ((c = source_.get_character()) && c.value() != 0)
