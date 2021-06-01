@@ -29,11 +29,12 @@ struct parse_state
 {
     parse_mode mode; 
     std::size_t length;
+    std::size_t bytes_read;
     uint8_t type;
     std::size_t index;
 
-    parse_state(parse_mode mode, std::size_t length, uint8_t type = 0) noexcept
-        : mode(mode), length(length), type(type), index(0)
+    parse_state(parse_mode mode, std::size_t length, std::size_t bytes_read, uint8_t type = 0) noexcept
+        : mode(mode), length(length), bytes_read(bytes_read), type(type), index(0)
     {
     }
 
@@ -76,7 +77,7 @@ public:
          bytes_read_(0)
 
     {
-        state_stack_.emplace_back(parse_mode::root,0);
+        state_stack_.emplace_back(parse_mode::root,0,0);
     }
 
     void restart()
@@ -87,7 +88,7 @@ public:
     void reset()
     {
         state_stack_.clear();
-        state_stack_.emplace_back(parse_mode::root,0);
+        state_stack_.emplace_back(parse_mode::root,0,0);
         more_ = true;
         done_ = false;
     }
@@ -220,7 +221,7 @@ private:
         auto length = binary::little_to_native<int32_t>(buf, sizeof(buf));
 
         more_ = visitor.begin_object(semantic_tag::none, *this, ec);
-        state_stack_.emplace_back(parse_mode::document,length);
+        state_stack_.emplace_back(parse_mode::document,length,n);
     }
 
     void end_document(json_visitor& visitor, std::error_code& ec)
@@ -247,11 +248,11 @@ private:
             more_ = false;
             return;
         }
-        auto len = binary::little_to_native<int32_t>(buf, sizeof(buf));
-        std::cout << "array len: " << len << "\n";
+        auto length = binary::little_to_native<int32_t>(buf, sizeof(buf));
+        std::cout << "array length: " << length << "\n";
 
         more_ = visitor.begin_array(semantic_tag::none, *this, ec);
-        state_stack_.emplace_back(parse_mode::array,len);
+        state_stack_.emplace_back(parse_mode::array,length,n);
     }
 
     void end_array(json_visitor& visitor, std::error_code& ec)
@@ -521,7 +522,6 @@ private:
 
     void read_cstring(std::error_code& ec)
     {
-        //character_result<typename Src::value_type> c;
         uint8_t c;
         while (true)
         {
@@ -539,11 +539,6 @@ private:
             }
             text_buffer_.push_back(c);
         }
-
-        //while ((c = source_.get_character()) && c.value() != 0)
-        //{
-        //    text_buffer_.push_back(c.value());
-        //}
     }
 
     void read_string(std::error_code& ec)
