@@ -436,23 +436,20 @@ private:
             }
             case jsoncons::ubjson::ubjson_type::char_type: 
             {
-                uint8_t buf[sizeof(char)];
-                if (source_.read(buf, sizeof(char)) != sizeof(char))
+                text_buffer_.clear();
+                if (source_reader<Src>::read(source_,text_buffer_,1) != 1)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                char c = binary::big_to_native<char>(buf, sizeof(buf));
-                auto result = unicode_traits::validate(&c,1);
+                auto result = unicode_traits::validate(text_buffer_.data(),text_buffer_.size());
                 if (result.ec != unicode_traits::conv_errc())
                 {
                     ec = ubjson_errc::invalid_utf8_text_string;
                     more_ = false;
                     return;
                 }
-                text_buffer_.clear();
-                text_buffer_.push_back(c);
                 more_ = visitor.string_value(text_buffer_, semantic_tag::none, *this, ec);
                 break;
             }
