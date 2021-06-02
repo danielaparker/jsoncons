@@ -23,7 +23,7 @@ BSON data item  | jsoncons data item  |jsoncons tag
  int32 or int64 | int64         |                  
  datetime       | int64         | 
  int32 or int64 | uint64        |                  
- datetime       | uint64        | millis
+ datetime       | uint64        | epoch_milli
  double         | double        |                  
  string         | string        |                  
  binary         | byte_string   | ext    

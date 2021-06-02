@@ -23,11 +23,12 @@ Tag|Description
 ---|-----------
 undefined |  
 datetime  |
-seconds | 
-millis | 
-nanos | 
+epoch_second | 
+epoch_milli | 
+epoch_nano | 
 bigint    | 
 bigdec    | 
+float128  |
 bigfloat  | 
 base16    | 
 base64    | 
@@ -36,6 +37,10 @@ uri       |
 clamped   | 
 multi_dim_row_major | 
 multi_dim_column_major | 
+ext |
+id |
+regex |
+code |
 
 ### Examples
 
