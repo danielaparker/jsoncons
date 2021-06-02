@@ -42,6 +42,8 @@ BSON data item                   | jsoncons data item |jsoncons semantic_tag
 [Document with string and binary](#eg1)  
 [Decode a BSON 128-bit decimal floating point (since 0.165.0)](#eg2)  
 [Encode a BSON 128-bit decimal floating point (since 0.165.0)](#eg3)  
+[Regular expression data](#eg4)  
+[ObjectId data](#eg5)  
 
  <div id="eg1"/>
 
@@ -204,6 +206,86 @@ Output:
 (2) float128
 
 (3) 18,00,00,00,13,61,00,01,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
+```
+
+ <div id="eg4"/>
+
+#### Regular expression data
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <cassert>
+
+using jsoncons::json;
+namespace bson = jsoncons::bson; // for brevity
+
+int main()
+{
+    std::vector<uint8_t> input = {
+        0x16,0x00,0x00,0x00,            // Document has 22 bytes
+        0x0B,                           // Regular expression
+        0x72,0x65,0x67,0x65,0x78,0x00,  // "regex"
+        0x5E,0x61,0x62,0x63,0x64,0x00,  // "^abcd"
+        0x69,0x6C,0x78,0x00,            // "ilx"
+        0x00                            // terminating null
+    };
+
+    json j = bson::decode_bson<json>(input);
+
+    std::cout << "(1) " << j << "\n\n";
+    std::cout << "(2) " << j.at("regex").tag() << "\n\n";
+
+    std::vector<char> output;
+    bson::encode_bson(j, output);
+    assert(output == input);
+}
+```
+Output:
+```
+(1) {"regex":"/^abcd/ilx"}
+
+(2) regex
+```
+
+ <div id="eg5"/>
+
+#### ObjectId data
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <cassert>
+
+using jsoncons::json;
+namespace bson = jsoncons::bson; // for brevity
+
+int main()
+{
+    std::vector<uint8_t> input = {
+        0x16,0x00,0x00,0x00,            // Document has 22 bytes
+        0x07,                           // ObjectId
+        0x6F,0x69,0x64,0x00,            // "oid"
+        0x12,0x34,0x56,0x78,0x90,0xAB,  
+        0xCD,0xEF,0x12,0x34,0xAB,0xCD,  // (byte*12)
+        0x00                            // terminating null
+    };
+
+    json j = bson::decode_bson<json>(input);
+
+    std::cout << "(1) " << j << "\n\n";
+    std::cout << "(2) " << j.at("oid").tag() << "\n\n";
+
+    std::vector<char> output;
+    bson::encode_bson(j, output);
+    assert(output == input);
+}
+```
+Output:
+```
+(1) {"oid":"1234567890abcdef1234abcd"}
+
+(2) id
 ```
 
 ### See also

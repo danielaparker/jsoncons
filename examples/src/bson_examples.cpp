@@ -278,6 +278,48 @@ namespace
         */
     }
 
+    void regex_example()
+    {
+        std::vector<uint8_t> input = {
+            0x16,0x00,0x00,0x00,            // Document has 22 bytes
+            0x0B,                           // Regular expression
+            0x72,0x65,0x67,0x65,0x78,0x00,  // "regex"
+            0x5E,0x61,0x62,0x63,0x64,0x00,  // "^abcd"
+            0x69,0x6C,0x78,0x00,            // "ilx"
+            0x00                            // terminating null
+        };
+
+        json j = bson::decode_bson<json>(input);
+
+        std::cout << "(1) " << j << "\n\n";
+        std::cout << "(2) " << j.at("regex").tag() << "\n\n";
+
+        std::vector<char> output;
+        bson::encode_bson(j, output);
+        assert(output == input);
+    }
+
+    void oid_example()
+    {
+        std::vector<uint8_t> input = {
+            0x16,0x00,0x00,0x00,            // Document has 22 bytes
+            0x07,                           // ObjectId
+            0x6F,0x69,0x64,0x00,            // "oid"
+            0x12,0x34,0x56,0x78,0x90,0xAB,  
+            0xCD,0xEF,0x12,0x34,0xAB,0xCD,  // (byte*12)
+            0x00                            // terminating null
+        };
+
+        json j = bson::decode_bson<json>(input);
+
+        std::cout << "(1) " << j << "\n\n";
+        std::cout << "(2) " << j.at("oid").tag() << "\n\n";
+
+        std::vector<char> output;
+        bson::encode_bson(j, output);
+        assert(output == input);
+    }
+
 } // namespace
 
 void bson_examples()
@@ -297,6 +339,8 @@ void bson_examples()
     binary_example2();
     decode_decimal128();
     encode_decimal128();
+    regex_example();
+    oid_example();
     std::cout << std::endl;
 }
 
