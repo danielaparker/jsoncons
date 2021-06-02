@@ -320,6 +320,7 @@ private:
                 more_ = visitor.double_value(res, semantic_tag::none, *this, ec);
                 break;
             }
+            case jsoncons::bson::bson_type::symbol_type:
             case jsoncons::bson::bson_type::min_key_type:
             case jsoncons::bson::bson_type::max_key_type:
             case jsoncons::bson::bson_type::string_type:
