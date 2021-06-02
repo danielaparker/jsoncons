@@ -464,6 +464,8 @@ int main()
         jsonpointer_examples();
 
         jsonpath_examples();
+
+        bson_examples();
     }
     catch (const std::exception& e)
     {

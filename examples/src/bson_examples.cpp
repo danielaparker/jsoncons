@@ -7,7 +7,9 @@
 #include <iomanip>
 #include <cassert>
 
-using namespace jsoncons;
+using jsoncons::json;
+using jsoncons::ojson;
+namespace bson = jsoncons::bson; // for brevity
 
 namespace
 {
@@ -21,11 +23,11 @@ namespace
         std::vector<uint8_t> purr = {'p','u','r','r'};
         encoder.byte_string_value(purr); // default subtype is user defined
         // or encoder.byte_string_value(purr, 0x80);
-        encoder.int64_value(1431027667, semantic_tag::epoch_second);
+        encoder.int64_value(1431027667, jsoncons::semantic_tag::epoch_second);
         encoder.end_array();
         encoder.flush();
 
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
 
     /* 
         23000000 -- Total number of bytes comprising the document (35 bytes) 
@@ -62,7 +64,7 @@ namespace
         encoder.end_object();
         encoder.flush();
 
-        std::cout << "(1)\n" << byte_string_view(buffer) << "\n";
+        std::cout << "(1)\n" << jsoncons::byte_string_view(buffer) << "\n";
 
         /*
             0x27,0x00,0x00,0x00, // Total number of bytes comprising the document (40 bytes) 
@@ -97,14 +99,14 @@ namespace
 
     void int32_example()
     {
-        ojson j(json_object_arg);
+        ojson j(jsoncons::json_object_arg);
         j.try_emplace("a", -123); // int32
         j.try_emplace("c", 0); // int32
         j.try_emplace("b", 123); // int32
 
         std::vector<char> buffer;
         bson::encode_bson(j, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void int64_example()
@@ -113,7 +115,7 @@ namespace
 
         std::vector<char> buffer;
         bson::encode_bson(m, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void double_example()
@@ -122,7 +124,7 @@ namespace
 
         std::vector<char> buffer;
         bson::encode_bson(m, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void bool_example()
@@ -131,22 +133,22 @@ namespace
 
         std::vector<char> buffer;
         bson::encode_bson(m, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void array_example()
     {
-        json a(json_array_arg);
+        json a(jsoncons::json_array_arg);
         a.push_back("hello");
         a.push_back("world");
 
-        json j(json_object_arg);
+        json j(jsoncons::json_object_arg);
         j["array"] = std::move(a);
 
         std::vector<char> buffer;
         bson::encode_bson(j, buffer);
 
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void utf8_string_example()
@@ -156,17 +158,17 @@ namespace
 
         std::vector<char> buffer;
         bson::encode_bson(j, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void null_example()
     {
         json j;
-        j.try_emplace("hello", null_type()); 
+        j.try_emplace("hello", json::null()); 
 
         std::vector<char> buffer;
         bson::encode_bson(j, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void duration_example1()
@@ -200,12 +202,12 @@ namespace
     {
         json j;
         std::vector<uint8_t> bstr = { '1', '2', '3', '4' };
-        j.try_emplace("binary", byte_string_arg, bstr); // default subtype is user defined
+        j.try_emplace("binary", jsoncons::byte_string_arg, bstr); // default subtype is user defined
         // or j.try_emplace("binary", byte_string_arg, bstr, 0x80);
 
         std::vector<char> buffer;
         bson::encode_bson(j, buffer);
-        std::cout << byte_string_view(buffer) << "\n\n";
+        std::cout << jsoncons::byte_string_view(buffer) << "\n\n";
     }
 
     void binary_example2()
@@ -225,7 +227,55 @@ namespace
         std::cout << "tag: " << j["pD"].tag() << "\n";
         std::cout << "ext_tag: " << j["pD"].ext_tag() << "\n";
         auto bytes = j["pD"].as<std::vector<uint8_t>>();
-        std::cout << "binary data: " << byte_string_view{ bytes } << "\n";
+        std::cout << "binary data: " << jsoncons::byte_string_view{ bytes } << "\n";
+    }
+
+    void decode_decimal128()
+    {
+        std::vector<uint8_t> input = {
+            0x18,0x00,0x00,0x00, // Document has 24 bytes
+            0x13,                // 128-bit decimal floating point
+            0x61,0x00,           // "a"
+            0x01,0x00,0x00,0x00,
+            0x00,0x00,0x00,0x00, // 1E-6176
+            0x00,0x00,0x00,0x00,
+            0x00,0x00,0x00,0x00, 
+            0x00                 // terminating null
+        };
+
+        json j = bson::decode_bson<json>(input);
+
+        std::cout << "(1) " << j << "\n\n";
+        std::cout << "(2) " << j.at("a").tag() << "\n\n";
+
+        std::vector<char> output;
+        bson::encode_bson(j, output);
+        assert(output == input);
+    }
+
+    void encode_decimal128()
+    {
+        json j;
+
+        j.try_emplace("a", "1E-6176", jsoncons::semantic_tag::float128);
+        // or j["a"] = json("1E-6176", jsoncons::semantic_tag::float128);
+
+        std::cout << "(1) " << j << "\n\n";
+        std::cout << "(2) " << j.at("a").tag() << "\n\n";
+
+        std::vector<char> output;
+        bson::encode_bson(j, output);
+        std::cout << "(3) " << jsoncons::byte_string_view(output) << "\n\n";
+        /*
+            18,00,00,00,          // document has 24 bytes
+              13,                 // 128-bit decimal floating point
+                13,00,            // "a"
+                01,00,00,00,
+                00,00,00,00,      // 1E-6176
+                00,00,00,00,
+                00,00,00,00, 
+            00                    // terminating null    
+        */
     }
 
 } // namespace
@@ -245,6 +295,8 @@ void bson_examples()
     duration_example1();
     binary_example1();
     binary_example2();
+    decode_decimal128();
+    encode_decimal128();
     std::cout << std::endl;
 }
 

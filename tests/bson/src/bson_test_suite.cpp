@@ -310,9 +310,12 @@ TEST_CASE("bson c test suite")
         std::vector<char> input = read_bytes(in_file);
 
         json j = bson::decode_bson<json>(input);
+        std::cout << j << "\n";
+        std::cout << j.tag() << "\n";
         bson::decimal128_t dec(0,1);
         char buf[bson::decimal128_limits::buf_size];
         auto rc = bson::decimal128_to_chars(buf,buf+sizeof(buf),dec);
+        //std::cout << "128: " << std::string(buf,rc.ptr) << "\n"; 
         CHECK(j.at("a") == json(std::string(buf,rc.ptr)));
         CHECK(j.at("a").tag() == semantic_tag::float128);
 

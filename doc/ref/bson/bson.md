@@ -39,12 +39,21 @@ BSON data item                   | jsoncons data item |jsoncons semantic_tag
 
 ### Examples
 
+[Document with string and binary](#eg1)  
+[Decoding a BSON 128-bit decimal floating point](#eg2)  
+[Encoding a BSON 128-bit decimal floating point](#eg3)  
+
+ <div id="eg1"/>
+
 #### Document with string and binary
 
 ```c++
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/bson/bson.hpp>
 #include <cassert>
+
+using jsoncons::json;
+namespace bson = jsoncons::bson; // for brevity
 
 int main()
 {
@@ -62,7 +71,7 @@ int main()
     encoder.end_object();
     encoder.flush();
 
-    std::cout << "(1)\n" << byte_string_view(buffer) << "\n\n";
+    std::cout << "(1)\n" << jsoncons::byte_string_view(buffer) << "\n";
 
     /*
         0x27,0x00,0x00,0x00, // Total number of bytes comprising the document (40 bytes) 
@@ -107,6 +116,94 @@ Output:
 }
 
 (3) ext(128)
+```
+
+ <div id="eg2"/>
+
+#### Decoding a BSON 128-bit decimal floating point
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <cassert>
+
+using jsoncons::json;
+namespace bson = jsoncons::bson; // for brevity
+
+int main()
+{
+    std::vector<uint8_t> input = {
+        0x18,0x00,0x00,0x00, // Document has 24 bytes
+        0x13,                // 128-bit decimal floating point
+        0x61,0x00,           // "a"
+        0x01,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00, // 1E-6176
+        0x00,0x00,0x00,0x00,
+        0x00,0x00,0x00,0x00, 
+        0x00                 // terminating null
+    };
+
+    json j = bson::decode_bson<json>(input);
+
+    std::cout << "(1) " << j << "\n\n";
+    std::cout << "(2) " << j.at("a").tag() << "\n\n";
+
+    std::vector<char> output;
+    bson::encode_bson(j, output);
+    assert(output == input);
+}
+```
+Output:
+```
+(1) {"a":"1E-6176"}
+
+(2) float128
+```
+
+ <div id="eg3"/>
+
+#### Encoding a BSON 128-bit decimal floating point
+
+```c++
+#include <jsoncons/json.hpp>
+#include <jsoncons_ext/bson/bson.hpp>
+#include <cassert>
+
+using jsoncons::json;
+namespace bson = jsoncons::bson; // for brevity
+
+int main()
+{
+    json j;
+
+    j.try_emplace("a", "1E-6176", jsoncons::semantic_tag::float128);
+    // or j["a"] = json("1E-6176", jsoncons::semantic_tag::float128);
+
+    std::cout << "(1) " << j << "\n\n";
+    std::cout << "(2) " << j.at("a").tag() << "\n\n";
+
+    std::vector<char> output;
+    bson::encode_bson(j, output);
+    std::cout << "(3) " << jsoncons::byte_string_view(output) << "\n\n";
+    /*
+        18,00,00,00,          // document has 24 bytes
+          13,                 // 128-bit decimal floating point
+            13,00,            // "a"
+            01,00,00,00,
+            00,00,00,00,      // 1E-6176
+            00,00,00,00,
+            00,00,00,00, 
+        00                    // terminating null    
+    */
+}
+```
+Output:
+```
+(1) {"a":"1E-6176"}
+
+(2) float128
+
+(3) 18,00,00,00,13,61,00,01,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
 ```
 
 ### See also
