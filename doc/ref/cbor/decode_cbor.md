@@ -24,21 +24,6 @@ T decode_cbor(std::istream& is,
 template<class T, class InputIt>
 T decode_cbor(InputIt first, InputIt last,
               const cbor_decode_options& options = cbor_decode_options()); (3) (since 0.153.0)
-
-template<class T,class TempAllocator>
-T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-              const std::vector<uint8_t>& source,
-              const cbor_decode_options& options = cbor_decode_options()); (4) (until 0.152.0)
-
-template<class T, class Source, class TempAllocator>
-T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-              const Source& source,
-              const cbor_decode_options& options = cbor_decode_options()); (4) (since 0.152.0)
-
-template<class T,class TempAllocator>
-T decode_cbor(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-              std::istream& is,
-              const cbor_decode_options& options = cbor_decode_options()); (5)
 ```
 
 (1) Reads CBOR data from a contiguous byte sequence provided by `source` into a type T, using the specified (or defaulted) [options](cbor_options.md). 

@@ -16,16 +16,6 @@ T decode_csv(std::basic_istream<CharT>& is,
 template <class T,class InputIt>
 T decode_csv(InputIt first, InputIt last,
              const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); (3) (since 0.153.0)
-
-template <class T,class Source,class TempAllocator>
-T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-             const Source& s, 
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); (4)
-
-template <class T,class CharT>
-T decode_csv(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-             std::basic_istream<CharT>& is, 
-             const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>())); (5)
 ```
 
 (1) Reads CSV data from a contiguous character sequence into a type T, using the specified (or defaulted) [options](basic_csv_options.md). 

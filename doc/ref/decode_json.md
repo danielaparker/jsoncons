@@ -18,17 +18,6 @@ T decode_json(std::basic_istream<CharT>& is,
 template <class T, class Iterator>
 T decode_json(Iterator first, Iterator last,
               const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); (3)
-
-template <class T,class Source,class TempAllocator>
-T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-              const Source& s,
-              const basic_json_decode_options<Source::value_type>& options 
-                  = basic_json_decode_options<Source::value_type>()); (4)
-
-template <class T,class CharT,class TempAllocator>
-T decode_json(temp_allocator_arg_t, const TempAllocator& temp_alloc,
-              std::basic_istream<CharT>& is,
-              const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>()); (5)
 ```
 
 (1) Reads JSON from a contiguous character sequence provided by `s` into a type T, using the specified (or defaulted) [options](basic_json_options.md). 
