@@ -17,7 +17,6 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
-    #if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -273,7 +272,7 @@ TEST_CASE("oss-fuzz issues")
         bson::bson_stream_reader reader(is,visitor,options);
         std::error_code ec;
         REQUIRE_NOTHROW(reader.read(ec));
-        CHECK(ec == bson::bson_errc::unknown_type); //-V521
+        CHECK(ec == bson::bson_errc::unexpected_eof);
     }
 
     // Fuzz target: fuzz_cbor_encoder
@@ -580,7 +579,6 @@ TEST_CASE("oss-fuzz issues")
         std::error_code ec;
         reader.read(ec);
     }
-#endif
     // Fuzz target: jsoncons:fuzz_json_cursor
     // Issue: failed_throw
     SECTION("issue 22091")
@@ -602,6 +600,25 @@ TEST_CASE("oss-fuzz issues")
             }
         }
         CHECK(ec == conv_errc::not_string); //-V521
+    }
+    // Fuzz target: jsoncons:fuzz_bson_encoder
+    // Issue: Index-out-of-bounds in jsoncons::bson::decimal128_from_chars
+    SECTION("issue 34814")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_bson_encoder-5420549982519296";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        std::vector<uint8_t> s1;
+        bson::bson_bytes_encoder encoder(s1);
+        bson::bson_stream_reader reader(is, encoder);
+
+        std::error_code ec;
+        reader.read(ec);
+
+        CHECK(ec == bson::bson_errc::unexpected_eof); 
+        //std::cout << ec.message() << "\n";
     }
 }
 

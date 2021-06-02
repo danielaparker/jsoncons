@@ -265,12 +265,14 @@ namespace jsoncons { namespace bson {
          */
 
         inline
-        bool dec128_istreq (const char* a, /* IN */
-                        const char* b /* IN */)
+        bool dec128_istreq (const char* a, const char* lasta,
+                            const char* b, const char* lastb)
         {
-            while (*a != '\0' || *b != '\0') {
-               /* strings are different lengths. */
-               if (*a == '\0' || *b == '\0') {
+            while (!(a == lasta && b == lastb)) 
+            {
+               // strings are different lengths
+               if (a == lasta || b == lastb) 
+               {
                   return false;
                }
          
@@ -537,6 +539,10 @@ namespace jsoncons { namespace bson {
     inline
     decimal128_from_chars_result decimal128_from_chars(const char* first, const char* last, decimal128_t& dec) 
     {
+        const string_view inf_str = "inf";
+        const string_view infinity_str = "infinity";
+        const string_view nan_str = "nan";
+
         ptrdiff_t len = last - first;
 
         bson_uint128_6464_t significand = {0,0};
@@ -574,14 +580,15 @@ namespace jsoncons { namespace bson {
            is_negative = *(str_read++) == '-';
            includes_sign = true;
         }
- 
+
         /* Check for Infinity or NaN */
         if (!isdigit (*str_read) && *str_read != '.') {
-           if (detail::dec128_istreq (str_read, "inf") ||
-               detail::dec128_istreq (str_read, "infinity")) {
+           if (detail::dec128_istreq (str_read, last, inf_str.data(), inf_str.data()+inf_str.length()) ||
+               detail::dec128_istreq (str_read, last, infinity_str.data(), infinity_str.data()+infinity_str.length())) 
+           {
                dec = is_negative ? decimal128_limits::neg_infinity() : decimal128_limits::infinity();
               return decimal128_from_chars_result{str_read,std::errc()};
-           } else if (detail::dec128_istreq (str_read, "nan")) {
+           } else if (detail::dec128_istreq (str_read, last, nan_str.data(), nan_str.data()+nan_str.length())) {
               dec = decimal128_limits::nan();
               return decimal128_from_chars_result{str_read,std::errc()};
            }
@@ -635,23 +642,20 @@ namespace jsoncons { namespace bson {
  
         /* Read exponent if exists */
         if (*str_read == 'e' || *str_read == 'E') {
-           int nread = 0;
-     #ifdef _MSC_VER
-     #define SSCANF sscanf_s
-     #else
-     #define SSCANF sscanf
-     #endif
-           int read_exponent = SSCANF (++str_read, "%d%n", &exponent, &nread);
-           str_read += nread;
- 
-           if (!read_exponent || nread == 0) {
-              dec = decimal128_limits::nan();
-              return decimal128_from_chars_result{str_read,std::errc::invalid_argument};
+           ++str_read;
+           if (*str_read == '+') {
+               ++str_read;
            }
- 
-     #undef SSCANF
+           auto result = jsoncons::detail::to_integer<int>(str_read, last - str_read);
+           if (result.ec != jsoncons::detail::to_integer_errc()) 
+           {
+               dec = decimal128_limits::nan();
+               return decimal128_from_chars_result{str_read,std::errc::invalid_argument};
+           }
+           str_read = result.ptr;
+           exponent = result.value();
         }
- 
+
         if ((len == -1 || str_read < first + len) && *str_read) {
            dec = decimal128_limits::nan();
            return decimal128_from_chars_result{str_read,std::errc::invalid_argument};
