@@ -40,8 +40,8 @@ BSON data item                   | jsoncons data item |jsoncons semantic_tag
 ### Examples
 
 [Document with string and binary](#eg1)  
-[Decoding a BSON 128-bit decimal floating point](#eg2)  
-[Encoding a BSON 128-bit decimal floating point](#eg3)  
+[Decoding a BSON 128-bit decimal floating point (since 0.165.0)](#eg2)  
+[Encoding a BSON 128-bit decimal floating point (since 0.165.0)](#eg3)  
 
  <div id="eg1"/>
 
@@ -120,7 +120,7 @@ Output:
 
  <div id="eg2"/>
 
-#### Decoding a BSON 128-bit decimal floating point
+#### Decoding a BSON 128-bit decimal floating point (since 0.165.0)
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -162,7 +162,7 @@ Output:
 
  <div id="eg3"/>
 
-#### Encoding a BSON 128-bit decimal floating point
+#### Encoding a BSON 128-bit decimal floating point (since 0.165.0)
 
 ```c++
 #include <jsoncons/json.hpp>
