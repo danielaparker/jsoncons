@@ -280,12 +280,12 @@ TEST_CASE("bson c test suite")
         REQUIRE(doc_size == 16);
         auto result = source.get_character();
         REQUIRE(result);
-        REQUIRE(result.value == 0x12); // 64-bit integer
+        REQUIRE(result.value() == 0x12); // 64-bit integer
         std::string s;
         for (result = source.get_character();
-             result && result.value != 0; result = source.get_character())
+             result && result.value() != 0; result = source.get_character())
         {
-            s.push_back(result.value);
+            s.push_back(result.value());
         }
         REQUIRE(s == std::string("a"));
         source.read(buf, sizeof(int64_t));
@@ -293,7 +293,7 @@ TEST_CASE("bson c test suite")
         CHECK(val == 100000000000000ULL);
         result = source.get_character();
         REQUIRE(result);
-        CHECK(result.value == 0);
+        CHECK(result.value() == 0);
         CHECK(source.eof());
 
         std::vector<char> bytes2;
