@@ -533,10 +533,10 @@ namespace jsoncons {
                 }
                 auto s = cursor.current().template get<jsoncons::basic_string_view<typename Json::char_type>>(ec);
                 if (ec) return val;
-                auto key = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
+                auto r = jsoncons::detail::to_integer<key_type>(s.data(), s.size()); 
                 cursor.next(ec);
                 if (ec) return val;
-                val.emplace(key.value(),decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
+                val.emplace(r.value, decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
                 cursor.next(ec);
             }
             return val;

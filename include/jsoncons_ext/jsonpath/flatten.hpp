@@ -375,14 +375,14 @@ namespace jsoncons { namespace jsonpath {
                                     }
                                     if (it != last-1)
                                     {
-                                        if (r.value()+1 > part->size())
+                                        if (r.value+1 > part->size())
                                         {
                                             Json& ref = part->emplace_back();
                                             part = std::addressof(ref);
                                         }
                                         else
                                         {
-                                            part = &part->at(r.value());
+                                            part = &part->at(r.value);
                                         }
                                     }
                                     else

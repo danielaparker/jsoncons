@@ -1736,12 +1736,12 @@ namespace jmespath {
                         auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
                         if (result1)
                         {
-                            return *resources.create_json(result1.value());
+                            return *resources.create_json(result1.value);
                         }
                         auto result2 = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
                         if (result2)
                         {
-                            return *resources.create_json(result2.value());
+                            return *resources.create_json(result2.value);
                         }
                         jsoncons::detail::to_double_t to_double;
                         try
@@ -4217,7 +4217,7 @@ namespace jmespath {
                                         ec = jmespath_errc::invalid_number;
                                         return jmespath_expression();
                                     }
-                                    push_token(token(jsoncons::make_unique<index_selector>(r.value())), ec);
+                                    push_token(token(jsoncons::make_unique<index_selector>(r.value)), ec);
                                     if (ec) {return jmespath_expression();}
 
                                     buffer.clear();
@@ -4237,7 +4237,7 @@ namespace jmespath {
                                         ec = jmespath_errc::invalid_number;
                                         return jmespath_expression();
                                     }
-                                    slic.start_ = r.value();
+                                    slic.start_ = r.value;
                                     buffer.clear();
                                 }
                                 state_stack_.back() = path_state::rhs_slice_expression_stop;
@@ -4261,7 +4261,7 @@ namespace jmespath {
                                 ec = jmespath_errc::invalid_number;
                                 return jmespath_expression();
                             }
-                            slic.stop_ = jsoncons::optional<int64_t>(r.value());
+                            slic.stop_ = jsoncons::optional<int64_t>(r.value);
                             buffer.clear();
                         }
                         switch(*p_)
@@ -4296,12 +4296,12 @@ namespace jmespath {
                                 ec = jmespath_errc::invalid_number;
                                 return jmespath_expression();
                             }
-                            if (r.value() == 0)
+                            if (r.value == 0)
                             {
                                 ec = jmespath_errc::step_cannot_be_zero;
                                 return jmespath_expression();
                             }
-                            slic.step_ = r.value();
+                            slic.step_ = r.value;
                             buffer.clear();
                         }
                         switch(*p_)

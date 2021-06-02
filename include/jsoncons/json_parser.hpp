@@ -2643,7 +2643,7 @@ private:
         auto result = jsoncons::detail::to_integer_unchecked<int64_t>(string_buffer_.data(), string_buffer_.length());
         if (result)
         {
-            more_ = visitor.int64_value(result.value(), semantic_tag::none, *this, ec);
+            more_ = visitor.int64_value(result.value, semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {
@@ -2657,7 +2657,7 @@ private:
         auto result = jsoncons::detail::to_integer_unchecked<uint64_t>(string_buffer_.data(), string_buffer_.length());
         if (result)
         {
-            more_ = visitor.uint64_value(result.value(), semantic_tag::none, *this, ec);
+            more_ = visitor.uint64_value(result.value, semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {

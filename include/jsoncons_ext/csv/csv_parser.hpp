@@ -1993,7 +1993,7 @@ private:
                     auto result = jsoncons::detail::to_integer_decimal<int64_t>(buffer_.data(), buffer_.length());
                     if (result)
                     {
-                        more_ = visitor_->int64_value(result.value(), semantic_tag::none, *this, ec);
+                        more_ = visitor_->int64_value(result.value, semantic_tag::none, *this, ec);
                     }
                     else // Must be overflow
                     {
@@ -2005,15 +2005,15 @@ private:
                     auto result = jsoncons::detail::to_integer_decimal<uint64_t>(buffer_.data(), buffer_.length());
                     if (result)
                     {
-                        more_ = visitor_->uint64_value(result.value(), semantic_tag::none, *this, ec);
+                        more_ = visitor_->uint64_value(result.value, semantic_tag::none, *this, ec);
                     }
-                    else if (result.error() == jsoncons::detail::to_integer_errc::overflow)
+                    else if (result.ec == jsoncons::detail::to_integer_errc::overflow)
                     {
                         more_ = visitor_->string_value(buffer_, semantic_tag::bigint, *this, ec);
                     }
                     else
                     {
-                        ec = result.error();
+                        ec = result.ec;
                         more_ = false;
                         return;
                     }

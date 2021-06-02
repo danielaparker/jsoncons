@@ -588,24 +588,24 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            auto sink = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
-            if (!sink)
+            auto r = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
+            if (!r)
             {
-                ec = sink.error_code();
+                ec = r.error_code();
                 return false;
             }
-            scale += sink.value();
+            scale += r.value;
         }
         more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
-        auto sink = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
-        if (sink)
+        auto r = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
+        if (r)
         {
-            more = visit_int64(sink.value(), semantic_tag::none, context, ec);
+            more = visit_int64(r.value, semantic_tag::none, context, ec);
             if (!more) {return more;}
         }
-        else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
+        else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
             bigint n = bigint::from_string(s.data(), s.length());
             write_bignum(n);
@@ -613,7 +613,7 @@ private:
         }
         else
         {
-            ec = sink.error_code();
+            ec = r.error_code();
             return false;
         }
         more = visit_end_array(context, ec);
@@ -768,24 +768,24 @@ private:
 
         if (exponent.length() > 0)
         {
-            auto sink = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
-            if (!sink)
+            auto r = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
+            if (!r)
             {
-                ec = sink.error_code();
+                ec = r.error_code();
                 return false;
             }
-            scale += sink.value();
+            scale += r.value;
         }
         more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) return more;
 
-        auto sink = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
-        if (sink)
+        auto r = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
+        if (r)
         {
-            more = visit_int64(sink.value(), semantic_tag::none, context, ec);
+            more = visit_int64(r.value, semantic_tag::none, context, ec);
             if (!more) return more;
         }
-        else if (sink.error_code() == jsoncons::detail::to_integer_errc::overflow)
+        else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)
         {
             bigint n = bigint::from_string_radix(s.data(), s.length(), 16);
             write_bignum(n);
@@ -793,7 +793,7 @@ private:
         }
         else
         {
-            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(sink.error_code().message()));
+            JSONCONS_THROW(json_runtime_error<std::invalid_argument>(r.error_code().message()));
         }
         return visit_end_array(context, ec);
     }

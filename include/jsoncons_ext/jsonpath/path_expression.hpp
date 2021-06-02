@@ -1606,12 +1606,12 @@ namespace detail {
                     auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
                     if (result1)
                     {
-                        return value_type(result1.value());
+                        return value_type(result1.value);
                     }
                     auto result2 = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
                     if (result2)
                     {
-                        return value_type(result2.value());
+                        return value_type(result2.value);
                     }
                     jsoncons::detail::to_double_t to_double;
                     try

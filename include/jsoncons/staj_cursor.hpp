@@ -346,7 +346,7 @@ public:
                     ec = conv_errc::not_integer;
                     return IntegerType();
                 }
-                return result.value();
+                return result.value;
             }
             case staj_event_type::half_value:
                 return static_cast<IntegerType>(value_.half_value_);

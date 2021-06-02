@@ -280,7 +280,7 @@ namespace msgpack {
                         ec = msgpack_errc::invalid_timestamp;
                         return false;
                     }
-                    int64_t seconds = result.value();
+                    int64_t seconds = result.value;
                     write_timestamp(seconds, 0);
                     break;
                 }

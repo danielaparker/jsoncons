@@ -1567,7 +1567,7 @@ namespace variant_detail
                         {
                             return duration_type();
                         }
-                        return duration_type(result.value());
+                        return duration_type(result.value);
                     }
                     case semantic_tag::epoch_nano:
                     {

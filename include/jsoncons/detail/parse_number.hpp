@@ -74,14 +74,14 @@ template <class T,class CharT>
 struct to_integer_result
 {
     const CharT* ptr;
-    T value_;
+    T value;
     to_integer_errc ec;
     constexpr to_integer_result(const CharT* ptr, T value)
-        : ptr(ptr), value_(value), ec(to_integer_errc::success)
+        : ptr(ptr), value(value), ec(to_integer_errc::success)
     {
     }
     constexpr to_integer_result(const CharT* ptr, to_integer_errc ec)
-        : ptr(ptr), value_(), ec(ec)
+        : ptr(ptr), value(), ec(ec)
     {
     }
 
@@ -93,20 +93,9 @@ struct to_integer_result
     {
         return ec == to_integer_errc::success;
     }
-
-    T value() const
-    {
-        return value_;
-    }
-
     std::error_code error_code() const
     {
         return make_error_code(ec);
-    }
-
-    to_integer_errc error() const
-    {
-        return ec;
     }
 };
 
@@ -255,24 +244,24 @@ to_integer_decimal(const CharT* s, std::size_t length)
     }
     if (is_negative)
     {
-        if (u.value() > static_cast<U>(-((type_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
+        if (u.value > static_cast<U>(-((type_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
         {
             return to_integer_result<T,CharT>(u.ptr, to_integer_errc::overflow);
         }
         else
         {
-            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(U(0) - u.value()));
+            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(U(0) - u.value));
         }
     }
     else
     {
-        if (u.value() > static_cast<U>((type_traits::integer_limits<T>::max)()))
+        if (u.value > static_cast<U>((type_traits::integer_limits<T>::max)()))
         {
             return to_integer_result<T,CharT>(u.ptr, to_integer_errc::overflow);
         }
         else
         {
-            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(u.value()));
+            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(u.value));
         }
     }
 }
@@ -484,24 +473,24 @@ to_integer(const CharT* s, std::size_t length)
     }
     if (is_negative)
     {
-        if (u.value() > static_cast<U>(-((type_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
+        if (u.value > static_cast<U>(-((type_traits::integer_limits<T>::lowest)()+T(1))) + U(1))
         {
             return to_integer_result<T,CharT>(u.ptr, to_integer_errc::overflow);
         }
         else
         {
-            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(U(0) - u.value()));
+            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(U(0) - u.value));
         }
     }
     else
     {
-        if (u.value() > static_cast<U>((type_traits::integer_limits<T>::max)()))
+        if (u.value > static_cast<U>((type_traits::integer_limits<T>::max)()))
         {
             return to_integer_result<T,CharT>(u.ptr, to_integer_errc::overflow);
         }
         else
         {
-            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(u.value()));
+            return to_integer_result<T,CharT>(u.ptr, static_cast<T>(u.value));
         }
     }
 }

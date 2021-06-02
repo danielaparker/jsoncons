@@ -300,7 +300,7 @@ namespace jsoncons { namespace jsonpath {
                     auto r = jsoncons::detail::to_integer_decimal<int64_t>(identifier_.data(), identifier_.size());
                     if (r)
                     {
-                        std::size_t index = (r.value() >= 0) ? static_cast<std::size_t>(r.value()) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + r.value());
+                        std::size_t index = (r.value >= 0) ? static_cast<std::size_t>(r.value) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + r.value);
                         if (index < val.size())
                         {
                             this->evaluate_tail(resources, generate_path(path, index, options), 
@@ -2168,7 +2168,7 @@ namespace jsoncons { namespace jsonpath {
                                     ec = jsonpath_errc::invalid_number;
                                     return path_expression_type();
                                 }
-                                push_token(token_type(jsoncons::make_unique<index_selector>(r.value())), ec);
+                                push_token(token_type(jsoncons::make_unique<index_selector>(r.value)), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back(); // index_or_slice_or_union
@@ -2193,7 +2193,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value())), ec);
+                                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value)), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -2217,7 +2217,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    slic.start_ = r.value();
+                                    slic.start_ = r.value;
                                     buffer.clear();
                                 }
                                 push_token(token_type(begin_union_arg), ec);
@@ -2257,7 +2257,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value())), ec);
+                                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value)), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -2280,7 +2280,7 @@ namespace jsoncons { namespace jsonpath {
                                 ec = jsonpath_errc::invalid_number;
                                 return path_expression_type();
                             }
-                            slic.stop_ = jsoncons::optional<int64_t>(r.value());
+                            slic.stop_ = jsoncons::optional<int64_t>(r.value);
                             buffer.clear();
                         }
                         switch(*p_)
@@ -2317,12 +2317,12 @@ namespace jsoncons { namespace jsonpath {
                                 ec = jsonpath_errc::invalid_number;
                                 return path_expression_type();
                             }
-                            if (r.value() == 0)
+                            if (r.value == 0)
                             {
                                 ec = jsonpath_errc::step_cannot_be_zero;
                                 return path_expression_type();
                             }
-                            slic.step_ = r.value();
+                            slic.step_ = r.value;
                             buffer.clear();
                         }
                         switch(*p_)
@@ -2503,7 +2503,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value())), ec);
+                                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value)), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -2521,7 +2521,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    slic.start_ = r.value();
+                                    slic.start_ = r.value;
                                     buffer.clear();
                                 }
                                 state_stack_.back() = path_state::slice_expression_stop;
@@ -2838,7 +2838,7 @@ namespace jsoncons { namespace jsonpath {
                         ec = jsonpath_errc::invalid_number;
                         return path_expression_type();
                     }
-                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value())), ec);
+                    push_token(token_type(jsoncons::make_unique<index_selector>(r.value)), ec);
                     if (ec) {return path_expression_type();}
                     buffer.clear();
                     state_stack_.pop_back(); // index_or_slice_or_union

@@ -3895,7 +3895,7 @@ namespace jsoncons {
                     {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
                     }
-                    return result.value();
+                    return result.value;
                 }
                 case storage_kind::half_value:
                     return static_cast<IntegerType>(cast<half_storage>().value());

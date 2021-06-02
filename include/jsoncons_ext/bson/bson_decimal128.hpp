@@ -653,7 +653,7 @@ namespace jsoncons { namespace bson {
                return decimal128_from_chars_result{str_read,std::errc::invalid_argument};
            }
            str_read = result.ptr;
-           exponent = result.value();
+           exponent = result.value;
         }
 
         if ((len == -1 || str_read < first + len) && *str_read) {

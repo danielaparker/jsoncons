@@ -104,8 +104,8 @@ TEST_CASE("json::as<__int128>()")
 {
     std::string s1 = "-18446744073709551617";
 
-    jsoncons::detail::to_integer_result<__int128> result = jsoncons::detail::to_integer_unchecked<__int128>(s1.data(),s1.size());
-    REQUIRE(result.error() == jsoncons::detail::to_integer_errc::success);
+    auto result = jsoncons::detail::to_integer_unchecked<__int128>(s1.data(),s1.size());
+    REQUIRE(result.ec == jsoncons::detail::to_integer_errc::success);
 
     jsoncons::json j(s1);
 
@@ -115,17 +115,17 @@ TEST_CASE("json::as<__int128>()")
     jsoncons::detail::from_integer(val, s2);
 
     std::string s3;
-    jsoncons::detail::from_integer(result.value(), s3);
+    jsoncons::detail::from_integer(result.value, s3);
 
-    CHECK((result.value() == val));
+    CHECK((result.value == val));
 }
 
 TEST_CASE("json::as<unsigned __int128>()")
 {
     std::string s1 = "18446744073709551616";
 
-    jsoncons::detail::to_integer_result<unsigned __int128> result = jsoncons::detail::to_integer_unchecked<unsigned __int128>(s1.data(),s1.size());
-    REQUIRE(result.error() == jsoncons::detail::to_integer_errc::success);
+    auto result = jsoncons::detail::to_integer_unchecked<unsigned __int128>(s1.data(),s1.size());
+    REQUIRE(result.ec == jsoncons::detail::to_integer_errc::success);
 
     jsoncons::json j(s1);
 
@@ -134,9 +134,9 @@ TEST_CASE("json::as<unsigned __int128>()")
     std::string s2;
     jsoncons::detail::from_integer(val, s2);
     std::string s3;
-    jsoncons::detail::from_integer(result.value(), s3);
+    jsoncons::detail::from_integer(result.value, s3);
 
-    CHECK((result.value() == val));
+    CHECK((result.value == val));
 }
 #pragma GCC diagnostic pop
 #endif

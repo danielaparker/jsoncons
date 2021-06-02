@@ -372,7 +372,7 @@ namespace jsoncons { namespace jsonpointer {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
             }
-            std::size_t index = result.value();
+            std::size_t index = result.value;
             if (index >= current->size())
             {
                 ec = jsonpointer_errc::index_exceeds_array_size;
@@ -413,7 +413,7 @@ namespace jsoncons { namespace jsonpointer {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
             }
-            std::size_t index = result.value();
+            std::size_t index = result.value;
             if (index >= current->size())
             {
                 ec = jsonpointer_errc::index_exceeds_array_size;
@@ -588,7 +588,7 @@ namespace jsoncons { namespace jsonpointer {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value();
+                std::size_t index = result.value;
                 if (index > current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -684,7 +684,7 @@ namespace jsoncons { namespace jsonpointer {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value();
+                std::size_t index = result.value;
                 if (index > current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -784,7 +784,7 @@ namespace jsoncons { namespace jsonpointer {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value();
+                std::size_t index = result.value;
                 if (index >= current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -866,7 +866,7 @@ namespace jsoncons { namespace jsonpointer {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value();
+                std::size_t index = result.value;
                 if (index >= current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -1069,7 +1069,7 @@ namespace jsoncons { namespace jsonpointer {
         for (const auto& item : value.object_range())
         {
             auto r = jsoncons::detail::to_integer_decimal<std::size_t>(item.key().data(),item.key().size());
-            if (!r || (index++ != r.value()))
+            if (!r || (index++ != r.value))
             {
                 safe = false;
                 break;
@@ -1122,7 +1122,7 @@ namespace jsoncons { namespace jsonpointer {
             {
                 auto s = *it;
                 auto r = jsoncons::detail::to_integer_decimal<size_t>(s.data(), s.size());
-                if (r && (index++ == r.value()))
+                if (r && (index++ == r.value))
                 {
                     if (!part->is_array())
                     {
@@ -1130,14 +1130,14 @@ namespace jsoncons { namespace jsonpointer {
                     }
                     if (++it != ptr.end())
                     {
-                        if (r.value()+1 > part->size())
+                        if (r.value+1 > part->size())
                         {
                             Json& ref = part->emplace_back();
                             part = std::addressof(ref);
                         }
                         else
                         {
-                            part = &part->at(r.value());
+                            part = &part->at(r.value);
                         }
                     }
                     else
