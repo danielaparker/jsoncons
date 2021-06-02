@@ -42,8 +42,8 @@ BSON data item                   | jsoncons data item |jsoncons semantic_tag
 [Document with string and binary](#eg1)  
 [Decode a BSON 128-bit decimal floating point (since 0.165.0)](#eg2)  
 [Encode a BSON 128-bit decimal floating point (since 0.165.0)](#eg3)  
-[Regular expression data](#eg4)  
-[ObjectId data](#eg5)  
+[Regular expression data (since 0.165.0)](#eg4)  
+[ObjectId data (since 0.165.0)](#eg5)  
 
  <div id="eg1"/>
 
@@ -210,7 +210,7 @@ Output:
 
  <div id="eg4"/>
 
-#### Regular expression data
+#### Regular expression data (since 0.165.0)
 
 ```c++
 #include <jsoncons/json.hpp>
@@ -250,7 +250,7 @@ Output:
 
  <div id="eg5"/>
 
-#### ObjectId data
+#### ObjectId data (since 0.165.0)
 
 ```c++
 #include <jsoncons/json.hpp>
