@@ -16,22 +16,26 @@ data structures, using [json_type_traits](../json_type_traits.md).
 
 #### Mappings between BSON and jsoncons data items
 
-BSON data item  | jsoncons data item  |jsoncons tag
-----------------|---------------------|------------
- null           | null          |                  
- true or false  | bool          |                  
- int32 or int64 | int64         |                  
- datetime       | int64         | 
- int32 or int64 | uint64        |                  
- datetime       | uint64        | epoch_milli
- double         | double        |                  
- string         | string        |                  
- binary         | byte_string   | ext    
- decimal128 (since 0.165.0)    | string        | float128              
- objectid (since 0.165.0)    | string        | id              
- regex (since 0.165.0)    | string        | regex              
- 0x04 (array )  | array         |                  
- 0x03 (embedded document)| object        |                  
+BSON data item                   | jsoncons data item |jsoncons semantic_tag
+---------------------------------|---------------|------------
+ null                            | null          |  
+ undefined (since 0.165.0)       | null          | undefined                
+ true or false                   | bool          |                  
+ int32 or int64                  | int64         |                  
+ int32 or int64                  | uint64        |                  
+ UTC datetime                    | int64         | epoch_milli
+ Timestamp                       | uint64        |
+ double                          | double        |                  
+ string                          | string        |                  
+ binary                          | byte_string   | ext    
+ decimal128 (since 0.165.0)      | string        | float128              
+ ObjectId (since 0.165.0)        | string        | id              
+ regex (since 0.165.0)           | string        | regex              
+ JavaScript code (since 0.165.0) | string        | code
+ array                           | array         |                  
+ embedded document               | object        |   
+ min_key (since 0.165.0)         | string        |               
+ max_key (since 0.165.0)         | string        |               
 
 ### Examples
 
