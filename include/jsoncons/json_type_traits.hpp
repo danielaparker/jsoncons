@@ -1440,7 +1440,7 @@ namespace variant_detail
 
         static bool is(const Json& j) noexcept
         {
-            return (j.tag() == semantic_tag::seconds || j.tag() == semantic_tag::millis || j.tag() == semantic_tag::nanos);
+            return (j.tag() == semantic_tag::epoch_second || j.tag() == semantic_tag::epoch_milli || j.tag() == semantic_tag::epoch_nano);
         }
 
         static duration_type as(const Json& j)
@@ -1463,11 +1463,11 @@ namespace variant_detail
                 auto count = j.template as<Rep>();
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                         return duration_type(count);
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                         return duration_type(count == 0 ? 0 : count/millis_in_second);
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                         return duration_type(count == 0 ? 0 : count/nanos_in_second);
                     default:
                         return duration_type(count);
@@ -1477,12 +1477,12 @@ namespace variant_detail
             {
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                     {
                         auto count = j.template as<Rep>();
                         return duration_type(count);
                     }
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
                         bigint n = bigint::from_string(sv.data(), sv.length());
@@ -1492,7 +1492,7 @@ namespace variant_detail
                         }
                         return duration_type(static_cast<Rep>(n));
                     }
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
                         bigint n = bigint::from_string(sv.data(), sv.length());
@@ -1525,11 +1525,11 @@ namespace variant_detail
                 auto count = j.template as<Rep>();
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                         return duration_type(count*millis_in_second);
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                         return duration_type(count);
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                         return duration_type(count == 0 ? 0 : count/nanos_in_milli);
                     default:
                         return duration_type(count);
@@ -1540,11 +1540,11 @@ namespace variant_detail
                 auto count = j.template as<double>();
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                         return duration_type(static_cast<Rep>(count * millis_in_second));
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                         return duration_type(static_cast<Rep>(count));
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                         return duration_type(count == 0 ? 0 : static_cast<Rep>(count / nanos_in_milli));
                     default:
                         return duration_type(static_cast<Rep>(count));
@@ -1554,12 +1554,12 @@ namespace variant_detail
             {
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                     {
                         auto count = j.template as<Rep>();
                         return duration_type(count*millis_in_second);
                     }
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
                         auto result = jsoncons::detail::to_integer_decimal<Rep>(sv.data(), sv.size());
@@ -1569,7 +1569,7 @@ namespace variant_detail
                         }
                         return duration_type(result.value());
                     }
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                     {
                         auto sv = j.as_string_view();
                         bigint n = bigint::from_string(sv.data(), sv.length());
@@ -1602,11 +1602,11 @@ namespace variant_detail
                 auto count = j.template as<Rep>();
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                         return duration_type(count*nanos_in_second);
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                         return duration_type(count*nanos_in_milli);
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                         return duration_type(count);
                     default:
                         return duration_type(count);
@@ -1617,11 +1617,11 @@ namespace variant_detail
                 auto count = j.template as<double>();
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                         return duration_type(static_cast<Rep>(count * nanos_in_second));
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                         return duration_type(static_cast<Rep>(count * nanos_in_milli));
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                         return duration_type(static_cast<Rep>(count));
                     default:
                         return duration_type(static_cast<Rep>(count));
@@ -1632,11 +1632,11 @@ namespace variant_detail
                 auto count = j.template as<Rep>();
                 switch (j.tag())
                 {
-                    case semantic_tag::seconds:
+                    case semantic_tag::epoch_second:
                         return duration_type(count*nanos_in_second);
-                    case semantic_tag::millis:
+                    case semantic_tag::epoch_milli:
                         return duration_type(count*nanos_in_milli);
-                    case semantic_tag::nanos:
+                    case semantic_tag::epoch_nano:
                         return duration_type(count);
                     default:
                         return duration_type(count);
@@ -1653,7 +1653,7 @@ namespace variant_detail
         typename std::enable_if<std::is_same<PeriodT,std::ratio<1>>::value,Json>::type
         to_json_(const duration_type& val)
         {
-            return Json(val.count(), semantic_tag::seconds);
+            return Json(val.count(), semantic_tag::epoch_second);
         }
 
         template <class PeriodT=Period>
@@ -1661,7 +1661,7 @@ namespace variant_detail
         typename std::enable_if<std::is_same<PeriodT,std::milli>::value,Json>::type
         to_json_(const duration_type& val)
         {
-            return Json(val.count(), semantic_tag::millis);
+            return Json(val.count(), semantic_tag::epoch_milli);
         }
 
         template <class PeriodT=Period>
@@ -1669,7 +1669,7 @@ namespace variant_detail
         typename std::enable_if<std::is_same<PeriodT,std::nano>::value,Json>::type
         to_json_(const duration_type& val)
         {
-            return Json(val.count(), semantic_tag::nanos);
+            return Json(val.count(), semantic_tag::epoch_nano);
         }
     };
 

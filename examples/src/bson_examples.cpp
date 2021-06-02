@@ -21,7 +21,7 @@ namespace
         std::vector<uint8_t> purr = {'p','u','r','r'};
         encoder.byte_string_value(purr); // default subtype is user defined
         // or encoder.byte_string_value(purr, 0x80);
-        encoder.int64_value(1431027667, semantic_tag::seconds);
+        encoder.int64_value(1431027667, semantic_tag::epoch_second);
         encoder.end_array();
         encoder.flush();
 

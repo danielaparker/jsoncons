@@ -420,7 +420,7 @@ private:
 
         switch (tag)
         {
-            case semantic_tag::seconds:
+            case semantic_tag::epoch_second:
                 if (val < min_value_div_1000)
                 {
                     ec = bson_errc::datetime_too_small;
@@ -434,11 +434,11 @@ private:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(val*millis_in_second,std::back_inserter(buffer_));
                 return true;
-            case semantic_tag::millis:
+            case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(val,std::back_inserter(buffer_));
                 return true;
-            case semantic_tag::nanos:
+            case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 if (val != 0)
                 {
@@ -477,7 +477,7 @@ private:
 
         switch (tag)
         {
-            case semantic_tag::seconds:
+            case semantic_tag::epoch_second:
                 if (val > max_value_div_1000)
                 {
                     ec = bson_errc::datetime_too_large;
@@ -486,11 +486,11 @@ private:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(static_cast<int64_t>(val*millis_in_second),std::back_inserter(buffer_));
                 return true;
-            case semantic_tag::millis:
+            case semantic_tag::epoch_milli:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 binary::native_to_little(static_cast<int64_t>(val),std::back_inserter(buffer_));
                 return true;
-            case semantic_tag::nanos:
+            case semantic_tag::epoch_nano:
                 before_value(jsoncons::bson::bson_type::datetime_type);
                 if (val != 0)
                 {

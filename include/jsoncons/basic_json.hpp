@@ -1573,14 +1573,14 @@ namespace jsoncons {
                 return evaluate().tag() == semantic_tag::datetime;
             }
 
-            JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::seconds")
+            JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_second")
             bool is_epoch_time() const noexcept
             {
                 if (!parent_.contains(key_))
                 {
                     return false;
                 }
-                return evaluate().tag() == semantic_tag::seconds;
+                return evaluate().tag() == semantic_tag::epoch_second;
             }
 
             template <class T>
@@ -4990,10 +4990,10 @@ namespace jsoncons {
             return tag() == semantic_tag::datetime;
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::seconds")
+        JSONCONS_DEPRECATED_MSG("Instead, use tag() == semantic_tag::epoch_second")
         bool is_epoch_time() const noexcept
         {
-            return tag() == semantic_tag::seconds;
+            return tag() == semantic_tag::epoch_second;
         }
 
         JSONCONS_DEPRECATED_MSG("Instead, use contains(const string_view_type&)")

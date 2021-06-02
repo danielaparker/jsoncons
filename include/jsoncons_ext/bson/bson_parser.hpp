@@ -471,7 +471,7 @@ private:
                     return;
                 }
                 auto val = binary::little_to_native<int64_t>(buf, sizeof(buf));
-                more_ = visitor.int64_value(val, semantic_tag::millis, *this, ec);
+                more_ = visitor.int64_value(val, semantic_tag::epoch_milli, *this, ec);
                 break;
             }
             case jsoncons::bson::bson_type::binary_type: 

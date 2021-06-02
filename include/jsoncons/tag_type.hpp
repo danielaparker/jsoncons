@@ -71,9 +71,9 @@ enum class semantic_tag : uint8_t
     none = 0,
     undefined = 0x01,
     datetime = 0x02,
-    seconds = 0x03,
-    millis = 0x04,
-    nanos = 0x05,
+    epoch_second = 0x03,
+    epoch_milli = 0x04,
+    epoch_nano = 0x05,
     bigint = 0x06,
     bigdec = 0x07,
     bigfloat = 0x08,
@@ -94,10 +94,7 @@ enum class semantic_tag : uint8_t
     , big_decimal = bigdec
     , big_float = bigfloat
     , date_time = datetime
-    , timestamp = seconds
-    , epoch_second = seconds
-    , epoch_milli = millis
-    , epoch_nano = nanos
+    , timestamp = epoch_second
 #endif
 };
 
@@ -107,9 +104,9 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
     JSONCONS_CSTRING(CharT,na_name,'n','/','a')
     JSONCONS_CSTRING(CharT,undefined_name,'u','n','d','e','f','i','n','e','d')
     JSONCONS_CSTRING(CharT,datetime_name,'d','a','t','e','t','i','m','e')
-    JSONCONS_CSTRING(CharT,seconds_name,'s','e','c','o','n','d','s')
-    JSONCONS_CSTRING(CharT,millis_name,'m','i','l','l','i','s')
-    JSONCONS_CSTRING(CharT,nanos_name,'n','a','n','o','s')
+    JSONCONS_CSTRING(CharT,epoch_second_name,'e','p','o','c','h','-','s','e','c','o','n','d')
+    JSONCONS_CSTRING(CharT,epoch_milli_name,'e','p','o','c','h','-','m','i','l','l','i')
+    JSONCONS_CSTRING(CharT,epoch_nano_name,'e','p','o','c','h','-','n','a','n','o')
     JSONCONS_CSTRING(CharT,bigint_name,'b','i','g','i','n','t')
     JSONCONS_CSTRING(CharT,bigdec_name,'b','i','g','d','e','c')
     JSONCONS_CSTRING(CharT,bigfloat_name,'b','i','g','f','l','o','a','t')
@@ -143,19 +140,19 @@ std::basic_ostream<CharT>& operator<<(std::basic_ostream<CharT>& os, semantic_ta
             os << datetime_name;
             break;
         }
-        case semantic_tag::seconds:
+        case semantic_tag::epoch_second:
         {
-            os << seconds_name;
+            os << epoch_second_name;
             break;
         }
-        case semantic_tag::millis:
+        case semantic_tag::epoch_milli:
         {
-            os << millis_name;
+            os << epoch_milli_name;
             break;
         }
-        case semantic_tag::nanos:
+        case semantic_tag::epoch_nano:
         {
-            os << nanos_name;
+            os << epoch_nano_name;
             break;
         }
         case semantic_tag::bigint:

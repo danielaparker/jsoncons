@@ -8,12 +8,9 @@ enum class semantic_tag : uint8_t
     none = 0,
     undefined,
     datetime,
-    seconds,                  // since 0.165.0
-    epoch_second = seconds,   // (until 0.165.0, since deprecated)
-    millis,                   // since 0.165.0
-    epoch_milli = millis,     // (until 0.165.0, since deprecated)
-    nanos,                    // since 0.165.0
-    epoch_nano = nanos,       // (until 0.165.0, since deprecated)
+    epoch_seconds,
+    epoch_milli,  
+    epoch_nano,
     bigint,
     bigdec,
     float128,                 // since 0.165.0

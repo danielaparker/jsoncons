@@ -254,7 +254,7 @@ TEST_CASE("test_cbor_parsing")
 
     // seconds
     check_parse_cbor({0xc1,0x1a,0x55,0x4b,0xbf,0xd3},
-                  json(1431027667, semantic_tag::seconds));
+                  json(1431027667, semantic_tag::epoch_second));
 }
 
 TEST_CASE("cbor decimal fraction")
@@ -414,9 +414,9 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     encoder.string_value("18446744073709551616.15", semantic_tag::bigdec);
     encoder.string_value("-18446744073709551617.15", semantic_tag::bigdec);
     encoder.string_value("2018-10-19 12:41:07-07:00", semantic_tag::datetime) ;
-    encoder.int64_value(1431027667, semantic_tag::seconds);
-    encoder.int64_value(-1431027667, semantic_tag::seconds);
-    encoder.double_value(1431027667.5, semantic_tag::seconds);
+    encoder.int64_value(1431027667, semantic_tag::epoch_second);
+    encoder.int64_value(-1431027667, semantic_tag::epoch_second);
+    encoder.double_value(1431027667.5, semantic_tag::epoch_second);
     encoder.end_array();
     encoder.flush();
 
@@ -429,9 +429,9 @@ TEST_CASE("Compare CBOR packed item and jsoncons item")
     expected.emplace_back("1.844674407370955161615e+19", semantic_tag::bigdec);
     expected.emplace_back("-1.844674407370955161715e+19", semantic_tag::bigdec);
     expected.emplace_back("2018-10-19 12:41:07-07:00", semantic_tag::datetime);
-    expected.emplace_back(1431027667, semantic_tag::seconds);
-    expected.emplace_back(-1431027667, semantic_tag::seconds);
-    expected.emplace_back(1431027667.5, semantic_tag::seconds);
+    expected.emplace_back(1431027667, semantic_tag::epoch_second);
+    expected.emplace_back(-1431027667, semantic_tag::epoch_second);
+    expected.emplace_back(1431027667.5, semantic_tag::epoch_second);
 
     json j = cbor::decode_cbor<json>(bytes);
 

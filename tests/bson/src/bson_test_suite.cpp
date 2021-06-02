@@ -210,7 +210,7 @@ TEST_CASE("bson c test suite")
 
         int64_t expected = 1234567890000; // milliseconds
         CHECK(j.at("time_t").as<int64_t>() == expected);
-        CHECK(j.at("time_t").tag() == semantic_tag::millis);
+        CHECK(j.at("time_t").tag() == semantic_tag::epoch_milli);
 
         std::vector<char> output;
         bson::encode_bson(j, output);

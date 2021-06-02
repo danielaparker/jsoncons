@@ -23,8 +23,8 @@ CBOR standard date/time strings are decoded into jsoncons strings tagged with `s
 jsoncons strings tagged with `semantic_tag::datetime` are encoded into CBOR standard date/time strings.
 
 1 (epoch time)  
-CBOR epoch times are decoded into jsoncons int64_t, uint64_t and double and tagged with `semantic_tag::seconds`. 
-jsoncons int64_t, uint64_t and double tagged with `semantic_tag::seconds` are encoded into CBOR epoch time.
+CBOR epoch times are decoded into jsoncons int64_t, uint64_t and double and tagged with `semantic_tag::epoch_second`. 
+jsoncons int64_t, uint64_t and double tagged with `semantic_tag::epoch_second` are encoded into CBOR epoch time.
 
 2,3 (positive and negative bignum)  
 CBOR positive and negative bignums are decoded into jsoncons strings and tagged with `semantic_tag::bigint`.

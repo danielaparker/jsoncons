@@ -272,7 +272,7 @@ namespace msgpack {
         {
             switch (tag)
             {
-                case semantic_tag::seconds:
+                case semantic_tag::epoch_second:
                 {
                     auto result = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
                     if (!result)
@@ -284,7 +284,7 @@ namespace msgpack {
                     write_timestamp(seconds, 0);
                     break;
                 }
-                case semantic_tag::millis:
+                case semantic_tag::epoch_milli:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     if (n != 0)
@@ -306,7 +306,7 @@ namespace msgpack {
                     }
                     break;
                 }
-                case semantic_tag::nanos:
+                case semantic_tag::epoch_nano:
                 {
                     bigint n = bigint::from_string(sv.data(), sv.length());
                     if (n != 0)
@@ -503,10 +503,10 @@ namespace msgpack {
         {
             switch (tag)
             {
-                case semantic_tag::seconds:
+                case semantic_tag::epoch_second:
                     write_timestamp(val, 0);
                     break;
-                case semantic_tag::millis:
+                case semantic_tag::epoch_milli:
                 {
                     if (val != 0)
                     {
@@ -525,7 +525,7 @@ namespace msgpack {
                     }
                     break;
                 }
-                case semantic_tag::nanos:
+                case semantic_tag::epoch_nano:
                 {
                     if (val != 0)
                     {
@@ -624,10 +624,10 @@ namespace msgpack {
         {
             switch (tag)
             {
-                case semantic_tag::seconds:
+                case semantic_tag::epoch_second:
                     write_timestamp(static_cast<int64_t>(val), 0);
                     break;
-                case semantic_tag::millis:
+                case semantic_tag::epoch_milli:
                 {
                     if (val != 0)
                     {
@@ -646,7 +646,7 @@ namespace msgpack {
                     }
                     break;
                 }
-                case semantic_tag::nanos:
+                case semantic_tag::epoch_nano:
                 {
                     if (val != 0)
                     {

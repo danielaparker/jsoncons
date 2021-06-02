@@ -535,10 +535,10 @@ namespace jsoncons {
             return string_value(value, semantic_tag::datetime, context);
         }
 
-        JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::seconds") 
+        JSONCONS_DEPRECATED_MSG("Instead, use int64_value with semantic_tag::epoch_second") 
         bool timestamp_value(int64_t val, const ser_context& context=ser_context()) 
         {
-            return int64_value(val, semantic_tag::seconds, context);
+            return int64_value(val, semantic_tag::epoch_second, context);
         }
 
         JSONCONS_DEPRECATED_MSG("Remove calls to this method, it doesn't do anything") 
