@@ -29,7 +29,7 @@ namespace
     }
 }
 
-// From https://github.com/mongodb/libbson/tree/master/tests
+// Test data is from https://github.com/mongodb/mongo-c-driver/tree/master/src/libbson
 
 TEST_CASE("bson c test suite")
 {

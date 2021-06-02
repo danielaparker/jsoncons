@@ -768,5 +768,8 @@ The jsoncons implementation of the Grisu3 algorithm for printing floating-point 
 
 The macro `JSONCONS_ALL_MEMBER_TRAITS` follows the approach taken by Martin York's [ThorsSerializer](https://github.com/Loki-Astari/ThorsSerializer)
 
+The jsoncons implementations of BSON decimal128 to and from string,
+and ObjectId to and from string, are based on the Apache 2 licensed [libbson](https://github.com/mongodb/mongo-c-driver/tree/master/src/libbson).
+
 Special thanks to our [contributors](https://github.com/danielaparker/jsoncons/blob/master/acknowledgements.md)
  
