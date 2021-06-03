@@ -470,9 +470,21 @@ namespace jsoncons { namespace bson {
            }
            /* Exponent */
            *(str_out++) = 'E';
-           int n = snprintf (str_out, 6, "%+d", scientific_exponent);
-           int m = (std::min)(n,5);
-           str_out += m;
+
+           std::string s;
+           if (scientific_exponent >= 0) {
+               s.push_back('+');
+           }
+           jsoncons::detail::from_integer(scientific_exponent, s);
+           if (str_out + s.size() < last) 
+           {
+               memcpy(str_out, s.data(), s.size());
+           }
+           else
+           {
+               return decimal128_to_chars_result{str_out, std::errc::value_too_large};
+           }
+           str_out += s.size();
         } else {
            /* Regular format with no decimal place */
            if (exponent >= 0) {

@@ -246,7 +246,7 @@ TEST_CASE("test_decimal128_to_string__scientific")
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), tiniest);
         CHECK(rc.ec == std::errc());
-        CHECK (!strcmp("9.999999999999999999999999999999999E-6143", buf));
+        CHECK (std::equal(buf, rc.ptr, "9.999999999999999999999999999999999E-6143"));
     }
     {
         auto rc = bson::decimal128_to_chars(buf, buf+sizeof(buf), trailing_zero);
