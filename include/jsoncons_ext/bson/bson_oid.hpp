@@ -2,6 +2,16 @@
 #define JSONCONS_BSON_BSON_OID_HPP
 
 /*
+ *  Implements class oid_t and non member function bson_oid_to_string
+ *  
+ *  Based on the libjson functions bson_oid_to_string 
+ *  and bson_oid_init_from_string_unsafe , available at
+ *  https://github.com/mongodb/mongo-c-driver/blob/master/src/libbson/src/bson/bson-oid.h
+ *  and https://github.com/mongodb/mongo-c-driver/blob/master/src/libbson/src/bson/bson-oid.c
+ *  
+*/
+
+/*
  * Copyright 2015 MongoDB, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

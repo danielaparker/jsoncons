@@ -1,3 +1,19 @@
+0.165.0
+-------
+
+Enhancements for bson extension:
+
+- Added semantic tags float128, id, regex, and code to support
+bson decode and encode for decimal128, ObjectId, regex,
+and Javascript code.
+
+- Support has been added for ObjectId, regex, decimal128 and
+the other non-deprecated bson types, as requested in issue
+[\#321](https://github.com/danielaparker/jsoncons/issues/321).
+
+- Parsing now checks that the the number of bytes read for a
+document, embedded document and array matches the expected total.
+
 0.164.0
 -------
 

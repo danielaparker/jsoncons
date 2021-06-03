@@ -2,6 +2,16 @@
 #define JSONCONS_BSON_BSON_DECIMAL128_HPP
 
 /*
+ *  Implements decimal128_to_chars and decimal128_from_chars
+ *  
+ *  Based on the libjson functions bson_decimal128_to_string
+ *  and bson_decimal128_from_string_w_len, available at
+ *  https://github.com/mongodb/mongo-c-driver/blob/master/src/libbson/src/bson/bson-decimal128.h
+ *  and https://github.com/mongodb/mongo-c-driver/blob/master/src/libbson/src/bson/bson-decimal128.c
+ *  
+*/
+
+/*
  * Copyright 2015 MongoDB, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
