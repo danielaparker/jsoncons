@@ -433,6 +433,7 @@ namespace jsoncons {
         std::vector<value_type> buffer_;
         const value_type* buffer_data_;
         std::size_t buffer_length_;
+        bool eof_;
 
         // Noncopyable 
         binary_stream_source(const binary_stream_source&) = delete;
@@ -440,13 +441,13 @@ namespace jsoncons {
     public:
         binary_stream_source()
             : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(default_max_buffer_length), buffer_data_(buffer_.data()), buffer_length_(0)
+              buffer_(default_max_buffer_length), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
         {
         }
 
         binary_stream_source(std::istream& is, std::size_t buf_size = default_max_buffer_length)
             : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0),
-              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0)
+              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0), eof_(false)
         {
         }
 
@@ -477,7 +478,7 @@ namespace jsoncons {
 
         bool eof() const
         {
-            return buffer_length_ == 0 && stream_ptr_->eof();  
+            return eof_;  
         }
 
         bool is_error() const
@@ -583,11 +584,17 @@ namespace jsoncons {
             }
             else
             {
+                if (stream_ptr_->eof())
+                {
+                    eof_ = true;
+                    buffer_length_ = 0;
+                    return 0;
+                }
                 JSONCONS_TRY
                 {
                     std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p), length-len);
                     std::size_t len2 = static_cast<std::size_t>(count);
-                    if (len2 == 0)
+                    if (len2 < length-len)
                     {
                         stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                     }
@@ -605,14 +612,20 @@ namespace jsoncons {
     private:
         void read_buffer()
         {
+            if (stream_ptr_->eof())
+            {
+                eof_ = true;
+                buffer_length_ = 0;
+                return;
+            }
+
             buffer_data_ = buffer_.data();
             JSONCONS_TRY
             {
                 std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(buffer_.data()), buffer_.size());
                 buffer_length_ = static_cast<std::size_t>(count);
 
-                //if (buffer_length_ < buffer_.size())
-                if (count == 0)
+                if (buffer_length_ < buffer_.size())
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
