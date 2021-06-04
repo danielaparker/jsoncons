@@ -4,6 +4,7 @@
 
 [Parse JSON from a string](#A1)  
 [Parse JSON from a file](#A2)  
+[Read JSON Lines](#A10)  
 [Parse JSON from an iterator range](#A10)  
 [Parse numbers without loosing precision](#A8)  
 [Validate JSON without incurring parse exceptions](#A3)  
@@ -124,6 +125,46 @@ json j = json::parse(is);
 ```
 
 See [basic_json::parse](ref/json/parse.md). 
+
+<div id="A10"/> 
+
+#### Read JSON Lines
+
+This example is from [JSON Lines Examples](https://jsonlines.org/examples/).
+
+Data:
+```
+["Name", "Session", "Score", "Completed"]
+["Gilbert", "2013", 24, true]
+["Alexa", "2013", 29, true]
+["May", "2012B", 14, false]
+["Deloise", "2012A", 19, true] 
+```
+
+```c++
+std::ifstream is("path_to_data");
+json_decoder<json> decoder;
+json_stream_reader reader(is, decoder);
+
+while (!reader.eof())
+{
+    reader.read_next();
+    if (!reader.eof())
+    {
+        json j = decoder.get_result();
+        std::cout << j << std::endl;
+    }
+}
+```
+Ouput:
+```
+["Name","Session","Score","Completed"]
+["Gilbert","2013",24,true]
+["Alexa","2013",29,true]
+["May","2012B",14,false]
+```
+
+See [JSON Lines](https://jsonlines.org/). 
 
 <div id="A10"/> 
 

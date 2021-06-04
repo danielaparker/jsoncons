@@ -425,8 +425,6 @@ int main()
 
         array_examples();
 
-        json_reader_examples();
-
         run_cbor_typed_array_examples();
 
         jmespath_examples();
@@ -466,6 +464,8 @@ int main()
         jsonpath_examples();
 
         bson_examples();
+
+        json_reader_examples();
     }
     catch (const std::exception& e)
     {

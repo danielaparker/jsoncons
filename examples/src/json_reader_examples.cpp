@@ -91,6 +91,32 @@ namespace {
         }
     }
 
+    // https://jsonlines.org/
+    void read_json_lines()
+    {
+        std::string data = R"(
+["Name", "Session", "Score", "Completed"]
+["Gilbert", "2013", 24, true]
+["Alexa", "2013", 29, true]
+["May", "2012B", 14, false]
+["Deloise", "2012A", 19, true] 
+        )";
+
+        std::string_stream is(data);
+        json_decoder<json> decoder;
+        json_stream_reader reader(is, decoder);
+
+        while (!reader.eof())
+        {
+            reader.read_next();
+            if (!reader.eof())
+            {
+                json j = decoder.get_result();
+                std::cout << j << std::endl;
+            }
+        }
+    }
+
     void read_with_stateful_allocator()
     {
         using my_json = basic_json<char,sorted_policy,FreelistAllocator<char>>;
@@ -133,6 +159,7 @@ void json_reader_examples()
     read_mulitple_json_objects();
     read_with_stateful_allocator();
     custom_iterator_source();
+    read_json_lines();
 
     std::cout << "\n\n";
 }
