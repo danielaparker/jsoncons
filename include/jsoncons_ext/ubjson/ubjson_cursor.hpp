@@ -25,15 +25,15 @@
 namespace jsoncons { 
 namespace ubjson {
 
-template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
 class basic_ubjson_cursor : public basic_staj_cursor<char>, private virtual ser_context
 {
 public:
-    using source_type = Src;
+    using source_type = Source;
     using char_type = char;
     using allocator_type = Allocator;
 private:
-    basic_ubjson_parser<Src,Allocator> parser_;
+    basic_ubjson_parser<Source,Allocator> parser_;
     basic_staj_visitor<char_type> cursor_visitor_;
     bool eof_;
 
@@ -44,11 +44,11 @@ private:
 public:
     using string_view_type = string_view;
 
-    template <class Source>
-    basic_ubjson_cursor(Source&& source,
+    template <class Sourceable>
+    basic_ubjson_cursor(Sourceable&& source,
                       const ubjson_decode_options& options = ubjson_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), options, alloc), 
+       : parser_(std::forward<Sourceable>(source), options, alloc), 
          cursor_visitor_(accept_all), 
          eof_(false)
     {
@@ -60,33 +60,33 @@ public:
 
     // Constructors that set parse error codes
 
-    template <class Source>
-    basic_ubjson_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_ubjson_cursor(Sourceable&& source, 
                         std::error_code& ec)
        : basic_ubjson_cursor(std::allocator_arg, Allocator(),
-                             std::forward<Source>(source), 
+                             std::forward<Sourceable>(source), 
                              ubjson_decode_options(), 
                              ec)
     {
     }
 
-    template <class Source>
-    basic_ubjson_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_ubjson_cursor(Sourceable&& source, 
                         const ubjson_decode_options& options,
                         std::error_code& ec)
        : basic_ubjson_cursor(std::allocator_arg, Allocator(),
-                             std::forward<Source>(source), 
+                             std::forward<Sourceable>(source), 
                              options, 
                              ec)
     {
     }
 
-    template <class Source>
+    template <class Sourceable>
     basic_ubjson_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                        Source&& source,
+                        Sourceable&& source,
                         const ubjson_decode_options& options,
                         std::error_code& ec)
-       : parser_(std::forward<Source>(source), options, alloc), 
+       : parser_(std::forward<Sourceable>(source), options, alloc), 
          cursor_visitor_(accept_all),
          eof_(false)
     {
@@ -169,13 +169,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    template <class Source>
+    template <class Sourceable>
     JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_ubjson_cursor(Source&& source,
+    basic_ubjson_cursor(Sourceable&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
                       const ubjson_decode_options& options = ubjson_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), options, alloc), 
+       : parser_(std::forward<Sourceable>(source), options, alloc), 
          cursor_visitor_(filter), 
          eof_(false)
     {
@@ -185,23 +185,23 @@ public:
         }
     }
 
-    template <class Source>
+    template <class Sourceable>
     JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_ubjson_cursor(Source&& source, 
+    basic_ubjson_cursor(Sourceable&& source, 
                         std::function<bool(const staj_event&, const ser_context&)> filter,
                         std::error_code& ec)
        : basic_ubjson_cursor(std::allocator_arg, Allocator(),
-                             std::forward<Source>(source), filter, ec)
+                             std::forward<Sourceable>(source), filter, ec)
     {
     }
 
-    template <class Source>
+    template <class Sourceable>
     JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_ubjson_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                        Source&& source,
+                        Sourceable&& source,
                         std::function<bool(const staj_event&, const ser_context&)> filter,
                         std::error_code& ec)
-       : parser_(std::forward<Source>(source), alloc), 
+       : parser_(std::forward<Sourceable>(source), alloc), 
          cursor_visitor_(filter),
          eof_(false)
     {

@@ -44,7 +44,7 @@ struct parse_state
     parse_state& operator=(parse_state&&) = default;
 };
 
-template <class Src,class Allocator=std::allocator<char>>
+template <class Source,class Allocator=std::allocator<char>>
 class basic_bson_parser : public ser_context
 {
     using char_type = char;
@@ -54,18 +54,18 @@ class basic_bson_parser : public ser_context
     using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
-    Src source_;
+    Source source_;
     bson_decode_options options_;
     bool more_;
     bool done_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
 public:
-    template <class Source>
-    basic_bson_parser(Source&& source,
+    template <class Sourceable>
+    basic_bson_parser(Sourceable&& source,
                       const bson_decode_options& options = bson_decode_options(),
                       const Allocator alloc = Allocator())
-       : source_(std::forward<Source>(source)), 
+       : source_(std::forward<Sourceable>(source)), 
          options_(options),
          more_(true), 
          done_(false),
@@ -504,7 +504,7 @@ private:
                 }
 
                 std::vector<uint8_t> v;
-                n = source_reader<Src>::read(source_, v, len);
+                n = source_reader<Source>::read(source_, v, len);
                 state_stack_.back().pos += n;
                 if (JSONCONS_UNLIKELY(n != static_cast<std::size_t>(len)))
                 {
@@ -609,7 +609,7 @@ private:
         }
 
         std::size_t size = static_cast<std::size_t>(len) - static_cast<std::size_t>(1);
-        n = source_reader<Src>::read(source_, text_buffer_, size);
+        n = source_reader<Source>::read(source_, text_buffer_, size);
         state_stack_.back().pos += n;
 
         if (JSONCONS_UNLIKELY(n != size))

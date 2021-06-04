@@ -38,7 +38,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class Allocator=std::allocator<char>>
+template <class Source,class Allocator=std::allocator<char>>
 class basic_ubjson_parser : public ser_context
 {
     using char_type = char;
@@ -48,7 +48,7 @@ class basic_ubjson_parser : public ser_context
     using byte_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<uint8_t>;                  
     using parse_state_allocator_type = typename std::allocator_traits<temp_allocator_type>:: template rebind_alloc<parse_state>;                         
 
-    Src source_;
+    Source source_;
     ubjson_decode_options options_;
     bool more_;
     bool done_;
@@ -56,11 +56,11 @@ class basic_ubjson_parser : public ser_context
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
     int nesting_depth_;
 public:
-    template <class Source>
-        basic_ubjson_parser(Source&& source,
+    template <class Sourceable>
+        basic_ubjson_parser(Sourceable&& source,
                           const ubjson_decode_options& options = ubjson_decode_options(),
                           const Allocator alloc = Allocator())
-       : source_(std::forward<Source>(source)), 
+       : source_(std::forward<Sourceable>(source)), 
          options_(options),
          more_(true), 
          done_(false),
@@ -437,7 +437,7 @@ private:
             case jsoncons::ubjson::ubjson_type::char_type: 
             {
                 text_buffer_.clear();
-                if (source_reader<Src>::read(source_,text_buffer_,1) != 1)
+                if (source_reader<Source>::read(source_,text_buffer_,1) != 1)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
@@ -461,7 +461,7 @@ private:
                     return;
                 }
                 text_buffer_.clear();
-                if (source_reader<Src>::read(source_,text_buffer_,length) != length)
+                if (source_reader<Source>::read(source_,text_buffer_,length) != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
@@ -485,7 +485,7 @@ private:
                     return;
                 }
                 text_buffer_.clear();
-                if (source_reader<Src>::read(source_,text_buffer_,length) != length)
+                if (source_reader<Source>::read(source_,text_buffer_,length) != length)
                 {
                     ec = ubjson_errc::unexpected_eof;
                     more_ = false;
@@ -845,7 +845,7 @@ private:
             return;
         }
         text_buffer_.clear();
-        if (source_reader<Src>::read(source_,text_buffer_,length) != length)
+        if (source_reader<Source>::read(source_,text_buffer_,length) != length)
         {
             ec = ubjson_errc::unexpected_eof;
             more_ = false;

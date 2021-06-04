@@ -76,7 +76,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class Allocator=std::allocator<char>>
+template <class Source,class Allocator=std::allocator<char>>
 class basic_cbor_parser : public ser_context
 {
     using char_type = char;
@@ -99,7 +99,7 @@ class basic_cbor_parser : public ser_context
     std::bitset<num_of_tags> other_tags_;
 
     allocator_type alloc_;
-    Src source_;
+    Source source_;
     cbor_decode_options options_;
 
     bool more_;
@@ -136,9 +136,9 @@ class basic_cbor_parser : public ser_context
 
     struct read_byte_string_from_source
     {
-        basic_cbor_parser<Src,Allocator>* source;
+        basic_cbor_parser<Source,Allocator>* source;
 
-        read_byte_string_from_source(basic_cbor_parser<Src,Allocator>* source)
+        read_byte_string_from_source(basic_cbor_parser<Source,Allocator>* source)
             : source(source)
         {
         }
@@ -150,12 +150,12 @@ class basic_cbor_parser : public ser_context
     };
 
 public:
-    template <class Source>
-    basic_cbor_parser(Source&& source,
+    template <class Sourceable>
+    basic_cbor_parser(Sourceable&& source,
                       const cbor_decode_options& options = cbor_decode_options(),
                       const Allocator alloc = Allocator())
        : alloc_(alloc),
-         source_(std::forward<Source>(source)),
+         source_(std::forward<Sourceable>(source)),
          options_(options),
          more_(true), 
          done_(false),
@@ -687,9 +687,9 @@ private:
         uint8_t info = get_additional_information_value(c.value());
 
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
-        auto func = [&s](Src& source, std::size_t length, std::error_code& ec) -> bool
+        auto func = [&s](Source& source, std::size_t length, std::error_code& ec) -> bool
         {
-            if (source_reader<Src>::read(source, s, length) != length)
+            if (source_reader<Source>::read(source, s, length) != length)
             {
                 ec = cbor_errc::unexpected_eof;
                 return false;
@@ -741,9 +741,9 @@ private:
         {
             case jsoncons::cbor::detail::additional_info::indefinite_length:
             {
-                auto func = [&v,&more](Src& source, std::size_t length, std::error_code& ec) -> bool
+                auto func = [&v,&more](Source& source, std::size_t length, std::error_code& ec) -> bool
                 {
-                    if (source_reader<Src>::read(source, v, length) != length)
+                    if (source_reader<Source>::read(source, v, length) != length)
                     {
                         ec = cbor_errc::unexpected_eof;
                         more = false;
@@ -762,7 +762,7 @@ private:
                     more = false;
                     return more;
                 }
-                if (source_reader<Src>::read(source_, v, length) != length)
+                if (source_reader<Source>::read(source_, v, length) != length)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more = false;

@@ -21,52 +21,52 @@
 
 namespace jsoncons { namespace msgpack {
 
-template <class Src,class Allocator=std::allocator<char>>
+template <class Source,class Allocator=std::allocator<char>>
 class basic_msgpack_reader
 {
     using char_type = char;
 
-    basic_msgpack_parser<Src,Allocator> parser_;
+    basic_msgpack_parser<Source,Allocator> parser_;
     basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> adaptor_;
     json_visitor2& visitor_;
 public:
-    template <class Source>
-    basic_msgpack_reader(Source&& source, 
+    template <class Sourceable>
+    basic_msgpack_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const Allocator alloc)
-       : basic_msgpack_reader(std::forward<Source>(source),
+       : basic_msgpack_reader(std::forward<Sourceable>(source),
                            visitor,
                            msgpack_decode_options(),
                            alloc)
     {
     }
 
-    template <class Source>
-    basic_msgpack_reader(Source&& source, 
+    template <class Sourceable>
+    basic_msgpack_reader(Sourceable&& source, 
                       json_visitor& visitor, 
                       const msgpack_decode_options& options = msgpack_decode_options(),
                       const Allocator alloc=Allocator())
-       : parser_(std::forward<Source>(source), options, alloc),
+       : parser_(std::forward<Sourceable>(source), options, alloc),
          adaptor_(visitor, alloc), visitor_(adaptor_)
     {
     }
-    template <class Source>
-    basic_msgpack_reader(Source&& source, 
+    template <class Sourceable>
+    basic_msgpack_reader(Sourceable&& source, 
                       json_visitor2& visitor, 
                       const Allocator alloc)
-       : basic_msgpack_reader(std::forward<Source>(source),
+       : basic_msgpack_reader(std::forward<Sourceable>(source),
                            visitor,
                            msgpack_decode_options(),
                            alloc)
     {
     }
 
-    template <class Source>
-    basic_msgpack_reader(Source&& source, 
+    template <class Sourceable>
+    basic_msgpack_reader(Sourceable&& source, 
                       json_visitor2& visitor, 
                       const msgpack_decode_options& options = msgpack_decode_options(),
                       const Allocator alloc=Allocator())
-       : parser_(std::forward<Source>(source), options, alloc),
+       : parser_(std::forward<Sourceable>(source), options, alloc),
          visitor_(visitor)
     {
     }

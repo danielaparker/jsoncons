@@ -17,7 +17,6 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
-#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -621,7 +620,7 @@ TEST_CASE("oss-fuzz issues")
         //CHECK(ec == bson::bson_errc::unexpected_eof); 
         //std::cout << ec.message() << "\n";
     }
-#endif
+
     // Fuzz target: fuzz_ubjson
     // Issue: Timeout in fuzz_ubjson
     // Diagnosis:  

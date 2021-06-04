@@ -148,12 +148,12 @@ namespace jsoncons {
         }
     };
 
-    template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+    template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
     class basic_json_reader 
     {
     public:
         using char_type = CharT;
-        using source_type = Src;
+        using source_type = Source;
         using string_view_type = jsoncons::basic_string_view<CharT>;
     private:
         typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> char_allocator_type;
@@ -174,9 +174,9 @@ namespace jsoncons {
         basic_json_reader& operator=(const basic_json_reader&) = delete;
 
     public:
-        template <class Source>
-        explicit basic_json_reader(Source&& source, const Allocator& alloc = Allocator())
-            : basic_json_reader(std::forward<Source>(source),
+        template <class Sourceable>
+        explicit basic_json_reader(Sourceable&& source, const Allocator& alloc = Allocator())
+            : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 basic_json_decode_options<CharT>(),
                                 default_json_parsing(),
@@ -184,11 +184,11 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options, 
                           const Allocator& alloc = Allocator())
-            : basic_json_reader(std::forward<Source>(source),
+            : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 options,
                                 default_json_parsing(),
@@ -196,11 +196,11 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        basic_json_reader(Source&& source,
+        template <class Sourceable>
+        basic_json_reader(Sourceable&& source,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
-            : basic_json_reader(std::forward<Source>(source),
+            : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 basic_json_decode_options<CharT>(),
                                 err_handler,
@@ -208,12 +208,12 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
-            : basic_json_reader(std::forward<Source>(source),
+            : basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 options,
                                 err_handler,
@@ -221,11 +221,11 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        basic_json_reader(Sourceable&& source, 
                           basic_json_visitor<CharT>& visitor, 
                           const Allocator& alloc = Allocator())
-            : basic_json_reader(std::forward<Source>(source),
+            : basic_json_reader(std::forward<Sourceable>(source),
                                 visitor,
                                 basic_json_decode_options<CharT>(),
                                 default_json_parsing(),
@@ -233,12 +233,12 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        basic_json_reader(Sourceable&& source, 
                           basic_json_visitor<CharT>& visitor,
                           const basic_json_decode_options<CharT>& options, 
                           const Allocator& alloc = Allocator())
-            : basic_json_reader(std::forward<Source>(source),
+            : basic_json_reader(std::forward<Sourceable>(source),
                                 visitor,
                                 options,
                                 default_json_parsing(),
@@ -246,12 +246,12 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        basic_json_reader(Source&& source,
+        template <class Sourceable>
+        basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
-            : basic_json_reader(std::forward<Source>(source),
+            : basic_json_reader(std::forward<Sourceable>(source),
                                 visitor,
                                 basic_json_decode_options<CharT>(),
                                 err_handler,
@@ -259,15 +259,15 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        basic_json_reader(Source&& source,
+        template <class Sourceable>
+        basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
-             source_(std::forward<Source>(source)),
+             source_(std::forward<Sourceable>(source)),
              buffer_reader_(default_max_buffer_length, alloc)
         {
         }
@@ -438,12 +438,12 @@ namespace jsoncons {
 
     };
 
-    template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+    template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
     class legacy_basic_json_reader 
     {
     public:
         using char_type = CharT;
-        using source_type = Src;
+        using source_type = Source;
         using string_view_type = jsoncons::basic_string_view<CharT>;
     private:
         typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> char_allocator_type;
@@ -464,9 +464,9 @@ namespace jsoncons {
         legacy_basic_json_reader& operator=(const legacy_basic_json_reader&) = delete;
 
     public:
-        template <class Source>
-        explicit legacy_basic_json_reader(Source&& source, const Allocator& alloc = Allocator())
-            : legacy_basic_json_reader(std::forward<Source>(source),
+        template <class Sourceable>
+        explicit legacy_basic_json_reader(Sourceable&& source, const Allocator& alloc = Allocator())
+            : legacy_basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 basic_json_decode_options<CharT>(),
                                 default_json_parsing(),
@@ -474,11 +474,11 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options, 
                           const Allocator& alloc = Allocator())
-            : legacy_basic_json_reader(std::forward<Source>(source),
+            : legacy_basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 options,
                                 default_json_parsing(),
@@ -486,11 +486,11 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source,
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
-            : legacy_basic_json_reader(std::forward<Source>(source),
+            : legacy_basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 basic_json_decode_options<CharT>(),
                                 err_handler,
@@ -498,12 +498,12 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
-            : legacy_basic_json_reader(std::forward<Source>(source),
+            : legacy_basic_json_reader(std::forward<Sourceable>(source),
                                 default_visitor_,
                                 options,
                                 err_handler,
@@ -511,11 +511,11 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source, 
                           basic_json_visitor<CharT>& visitor, 
                           const Allocator& alloc = Allocator())
-            : legacy_basic_json_reader(std::forward<Source>(source),
+            : legacy_basic_json_reader(std::forward<Sourceable>(source),
                                 visitor,
                                 basic_json_decode_options<CharT>(),
                                 default_json_parsing(),
@@ -523,12 +523,12 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source, 
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source, 
                           basic_json_visitor<CharT>& visitor,
                           const basic_json_decode_options<CharT>& options, 
                           const Allocator& alloc = Allocator())
-            : legacy_basic_json_reader(std::forward<Source>(source),
+            : legacy_basic_json_reader(std::forward<Sourceable>(source),
                                 visitor,
                                 options,
                                 default_json_parsing(),
@@ -536,12 +536,12 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source,
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
-            : legacy_basic_json_reader(std::forward<Source>(source),
+            : legacy_basic_json_reader(std::forward<Sourceable>(source),
                                 visitor,
                                 basic_json_decode_options<CharT>(),
                                 err_handler,
@@ -549,32 +549,32 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source,
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator(),
-                          typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
+                          typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
-             source_(std::forward<Source>(source)),
+             source_(std::forward<Sourceable>(source)),
              buffer_reader_(default_max_buffer_length, alloc)
         {
         }
 
-        template <class Source>
-        legacy_basic_json_reader(Source&& source,
+        template <class Sourceable>
+        legacy_basic_json_reader(Sourceable&& source,
                           basic_json_visitor<CharT>& visitor, 
                           const basic_json_decode_options<CharT>& options,
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator(),
-                          typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
+                          typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
              buffer_reader_(0, alloc)
         {
-            jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
+            jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
 
             auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
             if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))

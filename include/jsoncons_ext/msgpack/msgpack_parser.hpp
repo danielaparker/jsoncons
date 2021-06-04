@@ -40,7 +40,7 @@ struct parse_state
     parse_state(parse_state&&) = default;
 };
 
-template <class Src,class Allocator=std::allocator<char>>
+template <class Source,class Allocator=std::allocator<char>>
 class basic_msgpack_parser : public ser_context
 {
     using char_type = char;
@@ -53,7 +53,7 @@ class basic_msgpack_parser : public ser_context
 
     static constexpr int64_t nanos_in_second = 1000000000;
 
-    Src source_;
+    Source source_;
     msgpack_decode_options options_;
     bool more_;
     bool done_;
@@ -63,11 +63,11 @@ class basic_msgpack_parser : public ser_context
     int nesting_depth_;
 
 public:
-    template <class Source>
-    basic_msgpack_parser(Source&& source,
+    template <class Sourceable>
+    basic_msgpack_parser(Sourceable&& source,
                          const msgpack_decode_options& options = msgpack_decode_options(),
                          const Allocator alloc = Allocator())
-       : source_(std::forward<Source>(source)),
+       : source_(std::forward<Sourceable>(source)),
          options_(options),
          more_(true), 
          done_(false),
@@ -227,7 +227,7 @@ private:
 
                 text_buffer_.clear();
 
-                if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
+                if (source_reader<Source>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                 {
                     ec = msgpack_errc::unexpected_eof;
                     more_ = false;
@@ -418,7 +418,7 @@ private:
                     }
 
                     text_buffer_.clear();
-                    if (source_reader<Src>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
+                    if (source_reader<Source>::read(source_,text_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -446,7 +446,7 @@ private:
                         return;
                     }
                     bytes_buffer_.clear();
-                    if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
+                    if (source_reader<Source>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
@@ -566,7 +566,7 @@ private:
                     else
                     {
                         bytes_buffer_.clear();
-                        if (source_reader<Src>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
+                        if (source_reader<Source>::read(source_,bytes_buffer_,len) != static_cast<std::size_t>(len))
                         {
                             ec = msgpack_errc::unexpected_eof;
                             more_ = false;

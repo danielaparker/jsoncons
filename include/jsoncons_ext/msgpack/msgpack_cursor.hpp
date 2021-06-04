@@ -25,15 +25,15 @@
 namespace jsoncons { 
 namespace msgpack {
 
-template<class Src=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
+template<class Source=jsoncons::binary_stream_source,class Allocator=std::allocator<char>>
 class basic_msgpack_cursor : public basic_staj_cursor<char>, private virtual ser_context
 {
 public:
-    using source_type = Src;
+    using source_type = Source;
     using char_type = char;
     using allocator_type = Allocator;
 private:
-    basic_msgpack_parser<Src,Allocator> parser_;
+    basic_msgpack_parser<Source,Allocator> parser_;
     basic_staj_visitor<char_type> cursor_visitor_;
     basic_json_visitor2_to_visitor_adaptor<char_type,Allocator> cursor_handler_adaptor_;
     bool eof_;
@@ -45,11 +45,11 @@ private:
 public:
     using string_view_type = string_view;
 
-    template <class Source>
-    basic_msgpack_cursor(Source&& source,
+    template <class Sourceable>
+    basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options = msgpack_decode_options(),
                          const Allocator& alloc = Allocator())
-        : parser_(std::forward<Source>(source), options, alloc), 
+        : parser_(std::forward<Sourceable>(source), options, alloc), 
           cursor_visitor_(accept_all),
           cursor_handler_adaptor_(cursor_visitor_, alloc),
           eof_(false)
@@ -62,33 +62,33 @@ public:
 
     // Constructors that set parse error codes
 
-    template <class Source>
-    basic_msgpack_cursor(Source&& source,
+    template <class Sourceable>
+    basic_msgpack_cursor(Sourceable&& source,
                          std::error_code& ec)
        : basic_msgpack_cursor(std::allocator_arg, Allocator(),
-                              std::forward<Source>(source), 
+                              std::forward<Sourceable>(source), 
                               msgpack_decode_options(), 
                               ec)
     {
     }
 
-    template <class Source>
-    basic_msgpack_cursor(Source&& source,
+    template <class Sourceable>
+    basic_msgpack_cursor(Sourceable&& source,
                          const msgpack_decode_options& options,
                          std::error_code& ec)
        : basic_msgpack_cursor(std::allocator_arg, Allocator(),
-                              std::forward<Source>(source), 
+                              std::forward<Sourceable>(source), 
                               options, 
                               ec)
     {
     }
 
-    template <class Source>
+    template <class Sourceable>
     basic_msgpack_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                         Source&& source,
+                         Sourceable&& source,
                          const msgpack_decode_options& options,
                          std::error_code& ec)
-       : parser_(std::forward<Source>(source), options, alloc), 
+       : parser_(std::forward<Sourceable>(source), options, alloc), 
          cursor_visitor_(accept_all),
          cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)
@@ -172,13 +172,13 @@ public:
 
 #if !defined(JSONCONS_NO_DEPRECATED)
 
-    template <class Source>
+    template <class Sourceable>
     JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_msgpack_cursor(Source&& source,
+    basic_msgpack_cursor(Sourceable&& source,
                       std::function<bool(const staj_event&, const ser_context&)> filter,
                       const msgpack_decode_options& options = msgpack_decode_options(),
                       const Allocator& alloc = Allocator())
-       : parser_(std::forward<Source>(source), options, alloc), 
+       : parser_(std::forward<Sourceable>(source), options, alloc), 
          cursor_visitor_(filter), 
          cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)
@@ -189,23 +189,23 @@ public:
         }
     }
 
-    template <class Source>
+    template <class Sourceable>
     JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
-    basic_msgpack_cursor(Source&& source,
+    basic_msgpack_cursor(Sourceable&& source,
                          std::function<bool(const staj_event&, const ser_context&)> filter,
                          std::error_code& ec)
        : basic_msgpack_cursor(std::allocator_arg, Allocator(),
-                              std::forward<Source>(source), filter, ec)
+                              std::forward<Sourceable>(source), filter, ec)
     {
     }
 
-    template <class Source>
+    template <class Sourceable>
     JSONCONS_DEPRECATED_MSG("Instead, use pipe syntax for filter")
     basic_msgpack_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                         Source&& source,
+                         Sourceable&& source,
                          std::function<bool(const staj_event&, const ser_context&)> filter,
                          std::error_code& ec)
-       : parser_(std::forward<Source>(source), alloc), 
+       : parser_(std::forward<Sourceable>(source), alloc), 
          cursor_visitor_(filter),
          cursor_handler_adaptor_(cursor_visitor_, alloc),
          eof_(false)

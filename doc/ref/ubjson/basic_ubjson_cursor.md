@@ -4,7 +4,7 @@
 #include <jsoncons_ext/ubjson/ubjson_cursor.hpp>
 
 template<
-    class Src=jsoncons::binary_stream_source,
+    class Source=jsoncons::binary_stream_source,
     class Allocator=std::allocator<char>>
 class basic_ubjson_cursor;
 ```
@@ -33,23 +33,23 @@ ubjson_bytes_cursor   |basic_ubjson_cursor<jsoncons::bytes_source>
 
 #### Constructors
 
-    template <class Source>
-    basic_ubjson_cursor(Source&& source,
+    template <class Sourceable>
+    basic_ubjson_cursor(Sourceable&& source,
                       const ubjson_decode_options& options = ubjson_decode_options(),
                       const Allocator& alloc = Allocator()); (1)
 
-    template <class Source>
-    basic_ubjson_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_ubjson_cursor(Sourceable&& source, 
                         std::error_code& ec); (2)
 
-    template <class Source>
-    basic_ubjson_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_ubjson_cursor(Sourceable&& source, 
                         const ubjson_decode_options& options,
                         std::error_code& ec); (3)
 
-    template <class Source>
+    template <class Sourceable>
     basic_ubjson_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                        Source&& source,
+                        Sourceable&& source,
                         const ubjson_decode_options& options,
                         std::error_code& ec); (4)
 
@@ -96,8 +96,8 @@ Returns the current [context](ser_context.md)
 
 #### Non-member functions
 
-   template <class Src, class Allocator>
-   staj_filter_view operator|(basic_ubjson_cursor<Src,Allocator>& cursor, 
+   template <class Source, class Allocator>
+   staj_filter_view operator|(basic_ubjson_cursor<Source,Allocator>& cursor, 
                               std::function<bool(const staj_event&, const ser_context&)> pred);
 
 ### See also

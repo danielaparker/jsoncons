@@ -5,7 +5,7 @@
 
 template<
     class CharT,
-    class Src=jsoncons::stream_source<CharT>,
+    class Source=jsoncons::stream_source<CharT>,
     class Allocator=std::allocator<char>> basic_json_cursor;
 ```
 
@@ -33,30 +33,30 @@ wjson_cursor    |`basic_json_cursor<wchar_t>`
 
 #### Constructors
 
-    template <class Source>
-    basic_json_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options = basic_json_decode_options<CharT>(),
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const Allocator& alloc = Allocator()); (1)
 
-    template <class Source>
-    basic_json_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_json_cursor(Sourceable&& source, 
                       std::error_code& ec); (2)
 
-    template <class Source>
-    basic_json_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::error_code& ec); (3)
 
-    template <class Source>
-    basic_json_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_json_cursor(Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec); (4)
 
-    template <class Source>
+    template <class Sourceable>
     basic_json_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                      Source&& source, 
+                      Sourceable&& source, 
                       const basic_json_decode_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec); (5)
@@ -106,8 +106,8 @@ Returns the current [context](ser_context.md)
 
 #### Non-member functions
 
-   template <class CharT, class Src, class Allocator>
-   basic_staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Src,Allocator>& cursor, 
+   template <class CharT, class Source, class Allocator>
+   basic_staj_filter_view<CharT> operator|(basic_json_cursor<CharT,Source,Allocator>& cursor, 
                                     std::function<bool(const basic_staj_event<CharT>&, const ser_context&)> pred);
 
 ### Examples

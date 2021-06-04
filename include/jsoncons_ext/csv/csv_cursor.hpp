@@ -26,11 +26,11 @@
 
 namespace jsoncons { namespace csv {
 
-template<class CharT,class Src=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
+template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
 class basic_csv_cursor : public basic_staj_cursor<CharT>, private virtual ser_context
 {
 public:
-    using source_type = Src;
+    using source_type = Source;
     using char_type = CharT;
     using allocator_type = Allocator;
 private:
@@ -52,12 +52,12 @@ public:
 
     // Constructors that throw parse exceptions
 
-    template <class Source>
-    basic_csv_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
@@ -69,17 +69,17 @@ public:
         }
     }
 
-    template <class Source>
-    basic_csv_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options = basic_csv_decode_options<CharT>(),
                      std::function<bool(csv_errc,const ser_context&)> err_handler = default_csv_parsing(),
                      const Allocator& alloc = Allocator(),
-                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
          buffer_reader_(0,alloc)
     {
-        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
         if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
         {
@@ -95,49 +95,49 @@ public:
 
 
     // Constructors that set parse error codes
-    template <class Source>
-    basic_csv_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_csv_cursor(Sourceable&& source, 
                      std::error_code& ec)
         : basic_csv_cursor(std::allocator_arg, Allocator(),
-                           std::forward<Source>(source),
+                           std::forward<Sourceable>(source),
                            basic_csv_decode_options<CharT>(),
                            default_csv_parsing(),
                            ec)
     {
     }
 
-    template <class Source>
-    basic_csv_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::error_code& ec)
         : basic_csv_cursor(std::allocator_arg, Allocator(),
-                           std::forward<Source>(source),
+                           std::forward<Sourceable>(source),
                            options,
                            default_csv_parsing(),
                            ec)
     {
     }
 
-    template <class Source>
-    basic_csv_cursor(Source&& source, 
+    template <class Sourceable>
+    basic_csv_cursor(Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec)
         : basic_csv_cursor(std::allocator_arg, Allocator(),
-                           std::forward<Source>(source),
+                           std::forward<Sourceable>(source),
                            options,
                            err_handler,
                            ec)
     {
     }
 
-    template <class Source>
+    template <class Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                     Source&& source, 
+                     Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
-                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
@@ -149,18 +149,18 @@ public:
         }
     }
 
-    template <class Source>
+    template <class Sourceable>
     basic_csv_cursor(std::allocator_arg_t, const Allocator& alloc, 
-                     Source&& source, 
+                     Sourceable&& source, 
                      const basic_csv_decode_options<CharT>& options,
                      std::function<bool(csv_errc,const ser_context&)> err_handler,
                      std::error_code& ec,
-                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Source>::value>::type* = 0)
+                     typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
          buffer_reader_(0,alloc)
     {
-        jsoncons::basic_string_view<CharT> sv(std::forward<Source>(source));
+        jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
         if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
         {

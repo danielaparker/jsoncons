@@ -5,7 +5,7 @@
 
 template<
     class CharT,
-    class Src=jsoncons::stream_source<CharT>,
+    class Source=jsoncons::stream_source<CharT>,
     class TempAllocator=std::allocator<char>
 >
 class basic_json_reader 
@@ -33,50 +33,50 @@ Type                       |Definition
 Type                       |Definition
 ---------------------------|------------------------------
 char_type                  |CharT
-source_type                |Src
+source_type                |Source
 string_view_type           |
 
 #### Constructors
 
-    template <class Source>
-    explicit basic_json_reader(Source&& source, 
+    template <class Sourceable>
+    explicit basic_json_reader(Sourceable&& source, 
                                const TempAllocator& alloc = TempAllocator()); (1)
 
-    template <class Source>
-    basic_json_reader(Source&& source, 
+    template <class Sourceable>
+    basic_json_reader(Sourceable&& source, 
                       const basic_json_options<CharT>& options, 
                       const TempAllocator& alloc = TempAllocator()); (2)
 
-    template <class Source>
-    basic_json_reader(Source&& source,
+    template <class Sourceable>
+    basic_json_reader(Sourceable&& source,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const TempAllocator& alloc = TempAllocator()); (3)
 
-    template <class Source>
-    basic_json_reader(Source&& source, 
+    template <class Sourceable>
+    basic_json_reader(Sourceable&& source, 
                       const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const TempAllocator& alloc = TempAllocator()); (4)
 
-    template <class Source>
-    basic_json_reader(Source&& source, 
+    template <class Sourceable>
+    basic_json_reader(Sourceable&& source, 
                       basic_json_visitor<CharT>& visitor, 
                       const TempAllocator& alloc = TempAllocator()); (5)
 
-    template <class Source>
-    basic_json_reader(Source&& source, 
+    template <class Sourceable>
+    basic_json_reader(Sourceable&& source, 
                       basic_json_visitor<CharT>& visitor,
                       const basic_json_options<CharT>& options, 
                       const TempAllocator& alloc = TempAllocator()); (6)
 
-    template <class Source>
-    basic_json_reader(Source&& source,
+    template <class Sourceable>
+    basic_json_reader(Sourceable&& source,
                       basic_json_visitor<CharT>& visitor,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
                       const TempAllocator& alloc = TempAllocator()); (7)
 
-    template <class Source>
-    basic_json_reader(Source&& source,
+    template <class Sourceable>
+    basic_json_reader(Sourceable&& source,
                       basic_json_visitor<CharT>& visitor, 
                       const basic_json_options<CharT>& options,
                       std::function<bool(json_errc,const ser_context&)> err_handler, 
