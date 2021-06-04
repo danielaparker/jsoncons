@@ -145,7 +145,7 @@ namespace jsoncons {
             return position_;
         }
 
-        character_result<value_type> get_character()
+        character_result<value_type> get()
         {
             JSONCONS_TRY
             {
@@ -189,7 +189,7 @@ namespace jsoncons {
             }
         }
 
-        character_result<value_type> peek_character() 
+        character_result<value_type> peek() 
         {
             JSONCONS_TRY
             {
@@ -293,7 +293,7 @@ namespace jsoncons {
             return (current_ - data_)/sizeof(value_type) + 1;
         }
 
-        character_result<value_type> get_character()
+        character_result<value_type> get()
         {
             if (current_ < end_)
             {
@@ -319,7 +319,7 @@ namespace jsoncons {
             current_ += len;
         }
 
-        character_result<value_type> peek_character() 
+        character_result<value_type> peek() 
         {
             return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
         }
@@ -372,7 +372,7 @@ namespace jsoncons {
             return position_;
         }
 
-        character_result<value_type> get_character()
+        character_result<value_type> get()
         {
             if (current_ != end_)
             {
@@ -394,7 +394,7 @@ namespace jsoncons {
             }
         }
 
-        character_result<value_type> peek_character() 
+        character_result<value_type> peek() 
         {
             return current_ != end_ ? character_result<value_type>(*current_) : character_result<value_type>();
         }
@@ -421,6 +421,7 @@ namespace jsoncons {
 
     class binary_stream_source 
     {
+        static constexpr std::size_t default_max_buffer_length = 16384;
     public:
         typedef uint8_t value_type;
     private:
@@ -429,26 +430,29 @@ namespace jsoncons {
         std::istream* stream_ptr_;
         std::streambuf* sbuf_;
         std::size_t position_;
+        std::vector<value_type> buffer_;
+        const value_type* buffer_data_;
+        std::size_t buffer_length_;
 
         // Noncopyable 
         binary_stream_source(const binary_stream_source&) = delete;
         binary_stream_source& operator=(const binary_stream_source&) = delete;
     public:
         binary_stream_source()
-            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0)
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
+              buffer_(default_max_buffer_length), buffer_data_(buffer_.data()), buffer_length_(0)
         {
         }
 
-        binary_stream_source(std::istream& is)
-            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0)
+        binary_stream_source(std::istream& is, std::size_t buf_size = default_max_buffer_length)
+            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0),
+              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0)
         {
         }
 
         binary_stream_source(binary_stream_source&& other) noexcept
         {
-            std::swap(stream_ptr_,other.stream_ptr_);
-            std::swap(sbuf_,other.sbuf_);
-            std::swap(position_,other.position_);
+            swap(other);
         }
 
         ~binary_stream_source()
@@ -457,15 +461,23 @@ namespace jsoncons {
 
         binary_stream_source& operator=(binary_stream_source&& other) noexcept
         {
+            swap(other);
+            return *this;
+        }
+
+        void swap(binary_stream_source& other) noexcept
+        {
             std::swap(stream_ptr_,other.stream_ptr_);
             std::swap(sbuf_,other.sbuf_);
             std::swap(position_,other.position_);
-            return *this;
+            std::swap(buffer_,other.buffer_);
+            std::swap(buffer_data_,other.buffer_data_);
+            std::swap(buffer_length_, other.buffer_length_);
         }
 
         bool eof() const
         {
-            return stream_ptr_->eof();  
+            return buffer_length_ == 0 && stream_ptr_->eof();  
         }
 
         bool is_error() const
@@ -478,85 +490,136 @@ namespace jsoncons {
             return position_;
         }
 
-        character_result<value_type> get_character()
+        character_result<value_type> get()
         {
-            JSONCONS_TRY
+            if (buffer_length_ == 0)
             {
-                int c = sbuf_->sbumpc();
-                if (c == traits_type::eof())
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    return character_result<value_type>();
-                }
-                ++position_;
-                return character_result<value_type>(static_cast<value_type>(c));
+                read_buffer();
             }
-            JSONCONS_CATCH(const std::exception&)     
+            if (buffer_length_ > 0)
             {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                value_type c = *buffer_data_;
+                ++buffer_data_;
+                --buffer_length_;
+                ++position_;
+                return c;
+            }
+            else
+            {
                 return character_result<value_type>();
             }
         }
 
-        void ignore(std::size_t count)
+        void ignore(std::size_t length)
         {
-            JSONCONS_TRY
+            std::size_t len = 0;
+            if (buffer_length_ > 0)
             {
-                for (std::size_t i = 0; i < count; ++i)
-                {
-                    int c = sbuf_->sbumpc();
-                    if (c == traits_type::eof())
-                    {
-                        stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                        return;
-                    }
-                    else
-                    {
-                        ++position_;
-                    }
-                }
+                len = (std::min)(buffer_length_, length);
+                position_ += len;
+                buffer_data_ += len;
+                buffer_length_ -= len;
             }
-            JSONCONS_CATCH(const std::exception&)     
+            while (length - len > 0)
             {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                read_buffer();
+                if (buffer_length_ == 0)
+                {
+                    break;
+                }
+                std::size_t len2 = (std::min)(buffer_length_, length-len);
+                position_ += len2;
+                buffer_data_ += len2;
+                buffer_length_ -= len2;
+                len += len2;
             }
         }
 
-        character_result<value_type> peek_character() 
+        character_result<value_type> peek() 
         {
-            JSONCONS_TRY
+            if (buffer_length_ == 0)
             {
-                int c = sbuf_->sgetc();
-                if (c == traits_type::eof())
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    return character_result<value_type>();
-                }
-                return character_result<value_type>(static_cast<value_type>(c));
+                read_buffer();
             }
-            JSONCONS_CATCH(const std::exception&)     
+            if (buffer_length_ > 0)
             {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
+                value_type c = *buffer_data_;
+                return character_result<value_type>(c);
+            }
+            else
+            {
                 return character_result<value_type>();
             }
         }
 
         std::size_t read(value_type* p, std::size_t length)
         {
+            std::size_t len = 0;
+            if (buffer_length_ > 0)
+            {
+                len = (std::min)(buffer_length_, length);
+                memcpy(p, buffer_data_, len);
+                buffer_data_ += len;
+                buffer_length_ -= len;
+            }
+            if (length - len == 0)
+            {
+                return len;
+            }
+            else if (length - len < buffer_.size())
+            {
+                read_buffer();
+                if (buffer_length_ > 0)
+                {
+                    std::size_t count = (std::min)(buffer_length_, length-len);
+                    memcpy(p, buffer_data_, count);
+                    buffer_data_ += count;
+                    buffer_length_ -= count;
+                    len += count;
+                }
+                return len;
+            }
+            else
+            {
+                JSONCONS_TRY
+                {
+                    std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p), length-len);
+                    std::size_t len2 = static_cast<std::size_t>(count);
+                    std::cout << "len2: " << len2 << ", length: " << length << ", len: " << len << "\n"; 
+                    if (len2 == 0)
+                    {
+                        stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    }
+                    len += len2;
+                    position_ += len;
+                    return len;
+                }
+                JSONCONS_CATCH(const std::exception&)     
+                {
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                    return 0;
+                }
+            }
+        }
+    private:
+        void read_buffer()
+        {
+            buffer_data_ = buffer_.data();
             JSONCONS_TRY
             {
-                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p), length); // never negative
-                if (static_cast<std::size_t>(count) < length)
+                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(buffer_.data()), buffer_.size());
+                buffer_length_ = static_cast<std::size_t>(count);
+
+                //if (buffer_length_ < buffer_.size())
+                if (count == 0)
                 {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                 }
-                position_ += length;
-                return static_cast<std::size_t>(count);
             }
             JSONCONS_CATCH(const std::exception&)     
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return 0;
+                buffer_length_ = 0;
             }
         }
     };
@@ -607,7 +670,7 @@ namespace jsoncons {
             return current_ - data_ + 1;
         }
 
-        character_result<value_type> get_character()
+        character_result<value_type> get()
         {
             if (current_ < end_)
             {
@@ -633,7 +696,7 @@ namespace jsoncons {
             current_ += len;
         }
 
-        character_result<value_type> peek_character() 
+        character_result<value_type> peek() 
         {
             return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
         }
@@ -686,7 +749,7 @@ namespace jsoncons {
             return position_;
         }
 
-        character_result<value_type> get_character()
+        character_result<value_type> get()
         {
             if (current_ != end_)
             {
@@ -708,7 +771,7 @@ namespace jsoncons {
             }
         }
 
-        character_result<value_type> peek_character() 
+        character_result<value_type> peek() 
         {
             return current_ != end_ ? character_result<value_type>(static_cast<value_type>(*current_)) : character_result<value_type>();
         }
@@ -777,7 +840,7 @@ namespace jsoncons {
                 std::size_t actual = 0;
                 while (actual < n)
                 {
-                    auto c = source.get_character();
+                    auto c = source.get();
                     if (!c)
                     {
                         break;

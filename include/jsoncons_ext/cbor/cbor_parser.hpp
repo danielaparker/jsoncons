@@ -238,7 +238,7 @@ public:
                 }
                 case parse_mode::indefinite_array:
                 {
-                    auto c = source_.peek_character();
+                    auto c = source_.peek();
                     if (!c)
                     {
                         ec = cbor_errc::unexpected_eof;
@@ -278,7 +278,7 @@ public:
                 }
                 case parse_mode::indefinite_map_key:
                 {
-                    auto c = source_.peek_character();
+                    auto c = source_.peek();
                     if (!c)
                     {
                         ec = cbor_errc::unexpected_eof;
@@ -329,7 +329,7 @@ private:
         {
             return;
         }
-        auto c = source_.peek_character();
+        auto c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -676,7 +676,7 @@ private:
 
     void read_text_string(string_type& s, std::error_code& ec)
     {
-        auto c = source_.peek_character();
+        auto c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -725,7 +725,7 @@ private:
     {
         bool more = true;
         v.clear();
-        auto c = source_.peek_character();
+        auto c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -787,7 +787,7 @@ private:
         bool done = false;
         while (!done)
         {
-            auto c = source_.peek_character();
+            auto c = source_.peek();
             if (!c)
             {
                 ec = cbor_errc::unexpected_eof;
@@ -848,7 +848,7 @@ private:
     {
         uint64_t val = 0;
 
-        auto type = source_.get_character();
+        auto type = source_.get();
         if (!type)
         {
             ec = cbor_errc::unexpected_eof;
@@ -866,7 +866,7 @@ private:
 
             case 0x18: // Unsigned integer (one-byte uint8_t follows)
             {
-                auto c = source_.get_character();
+                auto c = source_.get();
                 if (!c)
                 {
                     ec = cbor_errc::unexpected_eof;
@@ -910,7 +910,7 @@ private:
     {
         int64_t val = 0;
 
-        auto ch = source_.peek_character();
+        auto ch = source_.peek();
         if (!ch)
         {
             ec = cbor_errc::unexpected_eof;
@@ -933,7 +933,7 @@ private:
                     }
                     case 0x18: // Negative integer (one-byte uint8_t follows)
                         {
-                            auto c = source_.get_character();
+                            auto c = source_.get();
                             if (!c)
                             {
                                 ec = cbor_errc::unexpected_eof;
@@ -1018,7 +1018,7 @@ private:
     {
         double val = 0;
 
-        auto type = source_.get_character();
+        auto type = source_.get();
         if (!type)
         {
             ec = cbor_errc::unexpected_eof;
@@ -1074,7 +1074,7 @@ private:
             return;
         }
 
-        auto c = source_.peek_character();
+        auto c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -1112,7 +1112,7 @@ private:
 
         string_type s;
 
-        c = source_.peek_character();
+        c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -1144,7 +1144,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                c = source_.get_character();
+                c = source_.get();
                 if (!c)
                 {
                     ec = cbor_errc::unexpected_eof;
@@ -1152,7 +1152,7 @@ private:
                     return;
                 }
                 uint8_t tag = get_additional_information_value(c.value());
-                c = source_.peek_character();
+                c = source_.peek();
                 if (!c)
                 {
                     ec = cbor_errc::unexpected_eof;
@@ -1233,7 +1233,7 @@ private:
             return;
         }
 
-        auto c = source_.peek_character();
+        auto c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -1269,7 +1269,7 @@ private:
             }
         }
 
-        c = source_.peek_character();
+        c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -1305,7 +1305,7 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                c = source_.get_character();
+                c = source_.get();
                 if (!c)
                 {
                     ec = cbor_errc::unexpected_eof;
@@ -1314,7 +1314,7 @@ private:
                 }
                 uint8_t tag = get_additional_information_value(c.value());
 
-                c = source_.peek_character();
+                c = source_.peek();
                 if (!c)
                 {
                     ec = cbor_errc::unexpected_eof;
@@ -1385,7 +1385,7 @@ private:
 
     void read_tags(std::error_code& ec)
     {
-        auto c = source_.peek_character();
+        auto c = source_.peek();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -1414,7 +1414,7 @@ private:
                     item_tag_ = val;
                     break;
             }
-            c = source_.peek_character();
+            c = source_.peek();
             if (!c)
             {
                 ec = cbor_errc::unexpected_eof;
@@ -1843,7 +1843,7 @@ private:
                                  semantic_tag tag,
                                  std::error_code& ec)
     {
-        auto c = source_.get_character();
+        auto c = source_.get();
         if (!c)
         {
             ec = cbor_errc::unexpected_eof;
@@ -1879,7 +1879,7 @@ private:
             {
                 while (true)
                 {
-                    auto c = source_.peek_character();
+                    auto c = source_.peek();
                     if (!c)
                     {
                         ec = cbor_errc::unexpected_eof;

@@ -633,6 +633,7 @@ TEST_CASE("oss-fuzz issues")
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
         CHECK(is); //-V521
 
+        //json_decoder<json> visitor;
         default_json_visitor visitor;
 
         ubjson::ubjson_stream_reader reader(is,visitor);

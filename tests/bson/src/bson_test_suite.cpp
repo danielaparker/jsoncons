@@ -278,12 +278,12 @@ TEST_CASE("bson c test suite")
         source.read(buf, sizeof(int32_t));
         auto doc_size = binary::little_to_native<int32_t>(buf, sizeof(buf));
         REQUIRE(doc_size == 16);
-        auto result = source.get_character();
+        auto result = source.get();
         REQUIRE(result);
         REQUIRE(result.value() == 0x12); // 64-bit integer
         std::string s;
-        for (result = source.get_character();
-             result && result.value() != 0; result = source.get_character())
+        for (result = source.get();
+             result && result.value() != 0; result = source.get())
         {
             s.push_back(result.value());
         }
@@ -291,7 +291,7 @@ TEST_CASE("bson c test suite")
         source.read(buf, sizeof(int64_t));
         auto val = binary::little_to_native<int64_t>(buf, sizeof(int64_t));
         CHECK(val == 100000000000000ULL);
-        result = source.get_character();
+        result = source.get();
         REQUIRE(result);
         CHECK(result.value() == 0);
         CHECK(source.eof());

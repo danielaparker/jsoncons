@@ -196,7 +196,7 @@ private:
             return;
         }   
 
-        auto ch = source_.get_character();
+        auto ch = source_.get();
         if (!ch)
         {
             ec = msgpack_errc::unexpected_eof;
@@ -298,7 +298,7 @@ private:
 
                 case jsoncons::msgpack::msgpack_type::uint8_type: 
                 {
-                    auto val = source_.get_character();
+                    auto val = source_.get();
                     if (!val)
                     {
                         ec = msgpack_errc::unexpected_eof;
