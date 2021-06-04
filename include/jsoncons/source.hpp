@@ -561,6 +561,7 @@ namespace jsoncons {
                 memcpy(p, buffer_data_, len);
                 buffer_data_ += len;
                 buffer_length_ -= len;
+                position_ += len;
             }
             if (length - len == 0)
             {
@@ -571,11 +572,12 @@ namespace jsoncons {
                 read_buffer();
                 if (buffer_length_ > 0)
                 {
-                    std::size_t count = (std::min)(buffer_length_, length-len);
-                    memcpy(p, buffer_data_, count);
-                    buffer_data_ += count;
-                    buffer_length_ -= count;
-                    len += count;
+                    std::size_t len2 = (std::min)(buffer_length_, length-len);
+                    memcpy(p, buffer_data_, len2);
+                    buffer_data_ += len2;
+                    buffer_length_ -= len2;
+                    position_ += len2;
+                    len += len2;
                 }
                 return len;
             }
@@ -585,13 +587,12 @@ namespace jsoncons {
                 {
                     std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p), length-len);
                     std::size_t len2 = static_cast<std::size_t>(count);
-                    std::cout << "len2: " << len2 << ", length: " << length << ", len: " << len << "\n"; 
                     if (len2 == 0)
                     {
                         stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                     }
                     len += len2;
-                    position_ += len;
+                    position_ += len2;
                     return len;
                 }
                 JSONCONS_CATCH(const std::exception&)     

@@ -81,7 +81,7 @@ TEST_CASE("binary_stream_source tests")
     std::string data = "012345678";
     std::istringstream is(data);
     jsoncons::binary_stream_source source(is,4);
-#if 0
+
     SECTION("get and peek")
     {
         auto p0 = source.peek();
@@ -158,6 +158,18 @@ TEST_CASE("binary_stream_source tests")
         CHECK(source.position() == 9);
     }
 
+    SECTION("read 3")
+    {
+        std::vector<uint8_t> v(10);
+        std::vector<uint8_t> expected = {'0','1','2'};
+
+        std::size_t len = source.read(v.data(),3);
+        CHECK_FALSE(source.eof());
+        CHECK(len == 3);
+        CHECK(std::equal(expected.begin(),expected.end(),v.begin()));
+        CHECK(source.position() == 3);
+    }
+
     SECTION("read 9")
     {
         std::vector<uint8_t> v(10);
@@ -169,7 +181,7 @@ TEST_CASE("binary_stream_source tests")
         CHECK(std::equal(expected.begin(),expected.end(),v.begin()));
         CHECK(source.position() == 9);
     }
-#endif
+
     SECTION("read 10")
     {
         std::vector<uint8_t> v(10);
