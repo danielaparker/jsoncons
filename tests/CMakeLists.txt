@@ -159,6 +159,7 @@ add_executable(unit_tests
                src/order_preserving_json_object_tests.cpp
                src/parse_string_tests.cpp
                src/short_string_tests.cpp
+               src/source_tests.cpp
                src/staj_iterator_tests.cpp
                src/stateful_allocator_tests.cpp
                src/string_to_double_tests.cpp

@@ -158,16 +158,51 @@ TEST_CASE("binary_stream_source tests")
         CHECK(source.position() == 9);
     }
 
-    SECTION("read 3")
+    SECTION("read 1, read1")
     {
         std::vector<uint8_t> v(10);
-        std::vector<uint8_t> expected = {'0','1','2'};
+        std::vector<uint8_t> expected = {'0','1','2','3','4','5','6','7','8'};
+
+        std::size_t len = source.read(v.data(),1);
+        CHECK_FALSE(source.eof());
+        CHECK(len == 1);
+        CHECK(std::equal(expected.begin(),expected.begin()+1,v.begin()));
+        CHECK(source.position() == 1);
+
+        len = source.read(v.data(),1);
+        CHECK_FALSE(source.eof());
+        CHECK(len == 1);
+        CHECK(std::equal(expected.begin()+1,expected.begin()+2,v.begin()));
+        CHECK(source.position() == 2);
+    }
+
+    SECTION("read 3, read 4, read 3")
+    {
+        std::vector<uint8_t> v(10);
+        std::vector<uint8_t> expected = {'0','1','2','3','4','5','6','7','8'};
 
         std::size_t len = source.read(v.data(),3);
         CHECK_FALSE(source.eof());
         CHECK(len == 3);
-        CHECK(std::equal(expected.begin(),expected.end(),v.begin()));
+        CHECK(std::equal(expected.begin(),expected.begin()+3,v.begin()));
         CHECK(source.position() == 3);
+        //for (size_t i = 0; i < 3; ++i)
+        //{
+        //    std::cout << i << ": " << v[i] << " ";
+        //}
+        //std::cout << std::endl;
+
+        len = source.read(v.data(),4);
+        CHECK_FALSE(source.eof());
+        CHECK(len == 4);
+        CHECK(std::equal(expected.begin()+3,expected.begin()+7,v.begin()));
+        CHECK(source.position() == 7);
+
+        len = source.read(v.data(),3);
+        CHECK_FALSE(source.eof());
+        CHECK(len == 2);
+        CHECK(std::equal(expected.begin()+7,expected.begin()+9,v.begin()));
+        CHECK(source.position() == 9);
     }
 
     SECTION("read 9")

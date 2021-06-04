@@ -574,7 +574,7 @@ namespace jsoncons {
                 if (buffer_length_ > 0)
                 {
                     std::size_t len2 = (std::min)(buffer_length_, length-len);
-                    memcpy(p, buffer_data_, len2);
+                    memcpy(p+len, buffer_data_, len2);
                     buffer_data_ += len2;
                     buffer_length_ -= len2;
                     position_ += len2;
@@ -592,7 +592,7 @@ namespace jsoncons {
                 }
                 JSONCONS_TRY
                 {
-                    std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p), length-len);
+                    std::streamsize count = sbuf_->sgetn(reinterpret_cast<char*>(p+len), length-len);
                     std::size_t len2 = static_cast<std::size_t>(count);
                     if (len2 < length-len)
                     {
