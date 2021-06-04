@@ -71,7 +71,7 @@ TEST_CASE("stream_source tests")
         CHECK_FALSE(source.eof());
         CHECK(g8.value() == '8');
         CHECK(source.position() == 9);
-        auto g9 = source.get();
+        /*auto g9 = */source.get();
         CHECK(source.eof());
     }
 }
@@ -137,7 +137,7 @@ TEST_CASE("binary_stream_source tests")
         CHECK_FALSE(source.eof());
         CHECK(g8.value() == '8');
         CHECK(source.position() == 9);
-        auto g9 = source.get();
+        /*auto g9 = */source.get();
         CHECK(source.eof());
     }
 
