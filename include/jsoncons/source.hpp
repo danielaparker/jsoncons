@@ -441,7 +441,7 @@ namespace jsoncons {
     public:
         binary_stream_source()
             : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(default_max_buffer_length), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
+              buffer_(0), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
         {
         }
 
@@ -452,6 +452,8 @@ namespace jsoncons {
         }
 
         binary_stream_source(binary_stream_source&& other) noexcept
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
+              buffer_(), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
         {
             swap(other);
         }
@@ -474,6 +476,7 @@ namespace jsoncons {
             std::swap(buffer_,other.buffer_);
             std::swap(buffer_data_,other.buffer_data_);
             std::swap(buffer_length_, other.buffer_length_);
+            std::swap(eof_, other.eof_);
         }
 
         bool eof() const

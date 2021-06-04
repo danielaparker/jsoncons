@@ -133,12 +133,14 @@ TEST_CASE("binary_stream_source tests")
         CHECK_FALSE(source.eof());
         CHECK(g7.value() == '7');
         CHECK(source.position() == 8);
-        auto g8 = source.get();
-        CHECK_FALSE(source.eof());
+
+        jsoncons::binary_stream_source source2(std::move(source));
+        auto g8 = source2.get();
+        CHECK_FALSE(source2.eof());
         CHECK(g8.value() == '8');
-        CHECK(source.position() == 9);
-        /*auto g9 = */source.get();
-        CHECK(source.eof());
+        CHECK(source2.position() == 9);
+        /*auto g9 = */source2.get();
+        CHECK(source2.eof());
     }
 
     SECTION("ignore")
