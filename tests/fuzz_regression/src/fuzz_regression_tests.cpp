@@ -17,6 +17,7 @@ using namespace jsoncons;
 
 TEST_CASE("oss-fuzz issues")
 {
+#if 0
     // Fuzz target: fuzz_parse
     // Issue: Stack-overflow
     // Diagnosis: During basic_json destruction, an internal compiler stack error occurred in std::vector 
@@ -619,6 +620,25 @@ TEST_CASE("oss-fuzz issues")
 
         //CHECK(ec == bson::bson_errc::unexpected_eof); 
         //std::cout << ec.message() << "\n";
+    }
+#endif
+    // Fuzz target: fuzz_ubjson
+    // Issue: Timeout in fuzz_ubjson
+    // Diagnosis:  
+    // Resolution: 
+    SECTION("issue 31888")
+    {
+        std::string pathname = "fuzz_regression/input/clusterfuzz-testcase-minimized-fuzz_ubjson-5151420333555712";
+
+        std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
+        CHECK(is); //-V521
+
+        default_json_visitor visitor;
+
+        ubjson::ubjson_stream_reader reader(is,visitor);
+        std::error_code ec;
+        REQUIRE_NOTHROW(reader.read(ec));
+        std::cout << ec.message() << "\n";
     }
 }
 
