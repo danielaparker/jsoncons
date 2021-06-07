@@ -366,7 +366,8 @@ namespace jsoncons { namespace jsonpath {
                         {
                             case ']':
                             {
-                                auto r = jsoncons::detail::to_integer<size_t>(buffer.data(), buffer.size());
+                                std::size_t n{0};
+                                auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
                                 if (r)
                                 {
                                     if (!part->is_array())
@@ -375,14 +376,14 @@ namespace jsoncons { namespace jsonpath {
                                     }
                                     if (it != last-1)
                                     {
-                                        if (r.value+1 > part->size())
+                                        if (n+1 > part->size())
                                         {
                                             Json& ref = part->emplace_back();
                                             part = std::addressof(ref);
                                         }
                                         else
                                         {
-                                            part = &part->at(r.value);
+                                            part = &part->at(n);
                                         }
                                     }
                                     else

@@ -340,13 +340,14 @@ public:
         {
             case staj_event_type::string_value:
             {
-                auto result = jsoncons::detail::to_integer<IntegerType>(value_.string_data_, length_);
+                IntegerType val;
+                auto result = jsoncons::detail::to_integer(value_.string_data_, length_, val);
                 if (!result)
                 {
                     ec = conv_errc::not_integer;
                     return IntegerType();
                 }
-                return result.value;
+                return val;
             }
             case staj_event_type::half_value:
                 return static_cast<IntegerType>(value_.half_value_);

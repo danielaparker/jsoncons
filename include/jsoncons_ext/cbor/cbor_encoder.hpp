@@ -588,21 +588,23 @@ private:
         if (!more) {return more;}
         if (exponent.length() > 0)
         {
-            auto r = jsoncons::detail::to_integer<int64_t>(exponent.data(), exponent.length());
+            int64_t val;
+            auto r = jsoncons::detail::to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
                 return false;
             }
-            scale += r.value;
+            scale += val;
         }
         more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) {return more;}
 
-        auto r = jsoncons::detail::to_integer<int64_t>(s.data(),s.length());
+        int64_t val{ 0 };
+        auto r = jsoncons::detail::to_integer(s.data(),s.length(), val);
         if (r)
         {
-            more = visit_int64(r.value, semantic_tag::none, context, ec);
+            more = visit_int64(val, semantic_tag::none, context, ec);
             if (!more) {return more;}
         }
         else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)
@@ -768,21 +770,23 @@ private:
 
         if (exponent.length() > 0)
         {
-            auto r = jsoncons::detail::base16_to_integer<int64_t>(exponent.data(), exponent.length());
+            int64_t val{ 0 };
+            auto r = jsoncons::detail::base16_to_integer(exponent.data(), exponent.length(), val);
             if (!r)
             {
                 ec = r.error_code();
                 return false;
             }
-            scale += r.value;
+            scale += val;
         }
         more = visit_int64(scale, semantic_tag::none, context, ec);
         if (!more) return more;
 
-        auto r = jsoncons::detail::base16_to_integer<int64_t>(s.data(),s.length());
+        int64_t val{ 0 };
+        auto r = jsoncons::detail::base16_to_integer(s.data(),s.length(), val);
         if (r)
         {
-            more = visit_int64(r.value, semantic_tag::none, context, ec);
+            more = visit_int64(val, semantic_tag::none, context, ec);
             if (!more) return more;
         }
         else if (r.error_code() == jsoncons::detail::to_integer_errc::overflow)

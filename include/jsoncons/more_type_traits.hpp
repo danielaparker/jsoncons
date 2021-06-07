@@ -84,6 +84,7 @@ namespace type_traits {
         static constexpr bool is_specialized = true;
         static constexpr bool is_signed = std::numeric_limits<T>::is_signed;
         static constexpr int digits =  std::numeric_limits<T>::digits;
+        static constexpr std::size_t buffer_size = static_cast<std::size_t>(sizeof(T)*CHAR_BIT*0.302) + 3;
 
         static constexpr T(max)() noexcept
         {
@@ -106,6 +107,7 @@ namespace type_traits {
         static constexpr bool is_specialized = true;
         static constexpr bool is_signed = true;
         static constexpr int digits =  sizeof(T)*CHAR_BIT - 1;
+        static constexpr std::size_t buffer_size = (sizeof(T)*CHAR_BIT*0.302) + 3;
 
         static constexpr T(max)() noexcept
         {

@@ -366,13 +366,13 @@ namespace jsoncons { namespace jsonpointer {
                 ec = jsonpointer_errc::index_exceeds_array_size;
                 return current;
             }
-            auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
+            std::size_t index{0};
+            auto result = jsoncons::detail::to_integer_decimal(buffer.data(), buffer.length(), index);
             if (!result)
             {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
             }
-            std::size_t index = result.value;
             if (index >= current->size())
             {
                 ec = jsonpointer_errc::index_exceeds_array_size;
@@ -407,13 +407,13 @@ namespace jsoncons { namespace jsonpointer {
                 ec = jsonpointer_errc::index_exceeds_array_size;
                 return current;
             }
-            auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
+            std::size_t index{0};
+            auto result = jsoncons::detail::to_integer_decimal(buffer.data(), buffer.length(), index);
             if (!result)
             {
                 ec = jsonpointer_errc::invalid_index;
                 return current;
             }
-            std::size_t index = result.value;
             if (index >= current->size())
             {
                 ec = jsonpointer_errc::index_exceeds_array_size;
@@ -582,13 +582,13 @@ namespace jsoncons { namespace jsonpointer {
             }
             else
             {
-                auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
+                std::size_t index{0};
+                auto result = jsoncons::detail::to_integer_decimal(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
                 if (index > current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -678,13 +678,13 @@ namespace jsoncons { namespace jsonpointer {
             }
             else
             {
-                auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
+                std::size_t index{0};
+                auto result = jsoncons::detail::to_integer_decimal(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
                 if (index > current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -778,13 +778,13 @@ namespace jsoncons { namespace jsonpointer {
             }
             else
             {
-                auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
+                std::size_t index{0};
+                auto result = jsoncons::detail::to_integer_decimal(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
                 if (index >= current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -860,13 +860,13 @@ namespace jsoncons { namespace jsonpointer {
             }
             else
             {
-                auto result = jsoncons::detail::to_integer_decimal<std::size_t>(buffer.data(), buffer.length());
+                std::size_t index{};
+                auto result = jsoncons::detail::to_integer_decimal(buffer.data(), buffer.length(), index);
                 if (!result)
                 {
                     ec = jsonpointer_errc::invalid_index;
                     return;
                 }
-                std::size_t index = result.value;
                 if (index >= current->size())
                 {
                     ec = jsonpointer_errc::index_exceeds_array_size;
@@ -1068,8 +1068,9 @@ namespace jsoncons { namespace jsonpointer {
         std::size_t index = 0;
         for (const auto& item : value.object_range())
         {
-            auto r = jsoncons::detail::to_integer_decimal<std::size_t>(item.key().data(),item.key().size());
-            if (!r || (index++ != r.value))
+            std::size_t n;
+            auto r = jsoncons::detail::to_integer_decimal(item.key().data(),item.key().size(), n);
+            if (!r || (index++ != n))
             {
                 safe = false;
                 break;
@@ -1121,8 +1122,9 @@ namespace jsoncons { namespace jsonpointer {
             for (auto it = ptr.begin(); it != ptr.end(); )
             {
                 auto s = *it;
-                auto r = jsoncons::detail::to_integer_decimal<size_t>(s.data(), s.size());
-                if (r && (index++ == r.value))
+                size_t n{0};
+                auto r = jsoncons::detail::to_integer_decimal(s.data(), s.size(), n);
+                if (r.ec == jsoncons::detail::to_integer_errc() && (index++ == n))
                 {
                     if (!part->is_array())
                     {
@@ -1130,14 +1132,14 @@ namespace jsoncons { namespace jsonpointer {
                     }
                     if (++it != ptr.end())
                     {
-                        if (r.value+1 > part->size())
+                        if (n+1 > part->size())
                         {
                             Json& ref = part->emplace_back();
                             part = std::addressof(ref);
                         }
                         else
                         {
-                            part = &part->at(r.value);
+                            part = &part->at(n);
                         }
                     }
                     else

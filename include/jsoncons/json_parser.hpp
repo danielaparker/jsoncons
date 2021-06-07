@@ -2640,10 +2640,11 @@ private:
 
     void end_negative_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        auto result = jsoncons::detail::to_integer_unchecked<int64_t>(string_buffer_.data(), string_buffer_.length());
+        int64_t val;
+        auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {
-            more_ = visitor.int64_value(result.value, semantic_tag::none, *this, ec);
+            more_ = visitor.int64_value(val, semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {
@@ -2654,10 +2655,11 @@ private:
 
     void end_positive_value(basic_json_visitor<char_type>& visitor, std::error_code& ec)
     {
-        auto result = jsoncons::detail::to_integer_unchecked<uint64_t>(string_buffer_.data(), string_buffer_.length());
+        uint64_t val;
+        auto result = jsoncons::detail::to_integer_unchecked(string_buffer_.data(), string_buffer_.length(), val);
         if (result)
         {
-            more_ = visitor.uint64_value(result.value, semantic_tag::none, *this, ec);
+            more_ = visitor.uint64_value(val, semantic_tag::none, *this, ec);
         }
         else // Must be overflow
         {

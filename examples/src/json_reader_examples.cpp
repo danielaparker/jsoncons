@@ -102,7 +102,7 @@ namespace {
 ["Deloise", "2012A", 19, true] 
         )";
 
-        std::string_stream is(data);
+        std::stringstream is(data);
         json_decoder<json> decoder;
         json_stream_reader reader(is, decoder);
 

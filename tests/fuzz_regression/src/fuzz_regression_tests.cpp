@@ -107,7 +107,8 @@ TEST_CASE("oss-fuzz issues")
     SECTION("issue 21663b")
     {
         std::string s = "-6.6E6";
-        auto result = jsoncons::detail::to_integer<int64_t>(s.data(),s.size());
+        int64_t n{ 0 };
+        auto result = jsoncons::detail::to_integer(s.data(),s.size(), n);
         CHECK_FALSE(result); //-V521
     }
 

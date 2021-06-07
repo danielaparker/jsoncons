@@ -3890,12 +3890,13 @@ namespace jsoncons {
                 case storage_kind::short_string_value:
                 case storage_kind::long_string_value:
                 {
-                    auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length());
+                    IntegerType val;
+                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
                     if (!result)
                     {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>(result.error_code().message()));
                     }
-                    return result.value;
+                    return val;
                 }
                 case storage_kind::half_value:
                     return static_cast<IntegerType>(cast<half_storage>().value());
@@ -3940,7 +3941,8 @@ namespace jsoncons {
                 case storage_kind::short_string_value:
                 case storage_kind::long_string_value:
                 {
-                    auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length());
+                    IntegerType val;
+                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case storage_kind::int64_value:
@@ -3980,7 +3982,8 @@ namespace jsoncons {
                 case storage_kind::short_string_value:
                 case storage_kind::long_string_value:
                 {
-                    auto result = jsoncons::detail::to_integer<IntegerType>(as_string_view().data(), as_string_view().length());
+                    IntegerType val;
+                    auto result = jsoncons::detail::to_integer(as_string_view().data(), as_string_view().length(), val);
                     return result ? true : false;
                 }
                 case storage_kind::int64_value:

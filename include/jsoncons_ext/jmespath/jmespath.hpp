@@ -1733,15 +1733,17 @@ namespace jmespath {
                     case json_type::string_value:
                     {
                         auto sv = arg0.as_string_view();
-                        auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
+                        uint64_t uval{ 0 };
+                        auto result1 = jsoncons::detail::to_integer(sv.data(), sv.length(), uval);
                         if (result1)
                         {
-                            return *resources.create_json(result1.value);
+                            return *resources.create_json(uval);
                         }
-                        auto result2 = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
+                        int64_t sval{ 0 };
+                        auto result2 = jsoncons::detail::to_integer(sv.data(), sv.length(), sval);
                         if (result2)
                         {
-                            return *resources.create_json(result2.value);
+                            return *resources.create_json(sval);
                         }
                         jsoncons::detail::to_double_t to_double;
                         try
@@ -4211,13 +4213,14 @@ namespace jmespath {
                                 }
                                 else
                                 {
-                                    auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                                    int64_t val{ 0 };
+                                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
                                         return jmespath_expression();
                                     }
-                                    push_token(token(jsoncons::make_unique<index_selector>(r.value)), ec);
+                                    push_token(token(jsoncons::make_unique<index_selector>(val)), ec);
                                     if (ec) {return jmespath_expression();}
 
                                     buffer.clear();
@@ -4231,13 +4234,14 @@ namespace jmespath {
                             {
                                 if (!buffer.empty())
                                 {
-                                    auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                                    int64_t val;
+                                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
                                     if (!r)
                                     {
                                         ec = jmespath_errc::invalid_number;
                                         return jmespath_expression();
                                     }
-                                    slic.start_ = r.value;
+                                    slic.start_ = val;
                                     buffer.clear();
                                 }
                                 state_stack_.back() = path_state::rhs_slice_expression_stop;
@@ -4255,13 +4259,14 @@ namespace jmespath {
                     {
                         if (!buffer.empty())
                         {
-                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            int64_t val{ 0 };
+                            auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
                                 return jmespath_expression();
                             }
-                            slic.stop_ = jsoncons::optional<int64_t>(r.value);
+                            slic.stop_ = jsoncons::optional<int64_t>(val);
                             buffer.clear();
                         }
                         switch(*p_)
@@ -4290,18 +4295,19 @@ namespace jmespath {
                     {
                         if (!buffer.empty())
                         {
-                            auto r = jsoncons::detail::to_integer<int64_t>(buffer.data(), buffer.size());
+                            int64_t val{ 0 };
+                            auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), val);
                             if (!r)
                             {
                                 ec = jmespath_errc::invalid_number;
                                 return jmespath_expression();
                             }
-                            if (r.value == 0)
+                            if (val == 0)
                             {
                                 ec = jmespath_errc::step_cannot_be_zero;
                                 return jmespath_expression();
                             }
-                            slic.step_ = r.value;
+                            slic.step_ = val;
                             buffer.clear();
                         }
                         switch(*p_)

@@ -1562,12 +1562,13 @@ namespace variant_detail
                     case semantic_tag::epoch_milli:
                     {
                         auto sv = j.as_string_view();
-                        auto result = jsoncons::detail::to_integer_decimal<Rep>(sv.data(), sv.size());
+                        Rep n{0};
+                        auto result = jsoncons::detail::to_integer_decimal(sv.data(), sv.size(), n);
                         if (!result)
                         {
                             return duration_type();
                         }
-                        return duration_type(result.value);
+                        return duration_type(n);
                     }
                     case semantic_tag::epoch_nano:
                     {

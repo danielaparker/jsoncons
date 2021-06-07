@@ -1603,15 +1603,17 @@ namespace detail {
                 case json_type::string_value:
                 {
                     auto sv = arg0.as_string_view();
-                    auto result1 = jsoncons::detail::to_integer<uint64_t>(sv.data(), sv.length());
+                    uint64_t un{0};
+                    auto result1 = jsoncons::detail::to_integer(sv.data(), sv.length(), un);
                     if (result1)
                     {
-                        return value_type(result1.value);
+                        return value_type(un);
                     }
-                    auto result2 = jsoncons::detail::to_integer<int64_t>(sv.data(), sv.length());
+                    int64_t sn{0};
+                    auto result2 = jsoncons::detail::to_integer(sv.data(), sv.length(), sn);
                     if (result2)
                     {
-                        return value_type(result2.value);
+                        return value_type(sn);
                     }
                     jsoncons::detail::to_double_t to_double;
                     try

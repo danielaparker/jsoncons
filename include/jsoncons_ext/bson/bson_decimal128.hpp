@@ -668,14 +668,13 @@ namespace jsoncons { namespace bson {
            if (*str_read == '+') {
                ++str_read;
            }
-           auto result = jsoncons::detail::to_integer<int>(str_read, last - str_read);
+           auto result = jsoncons::detail::to_integer(str_read, last - str_read, exponent);
            if (result.ec != jsoncons::detail::to_integer_errc()) 
            {
                dec = decimal128_limits::nan();
                return decimal128_from_chars_result{str_read,std::errc::invalid_argument};
            }
            str_read = result.ptr;
-           exponent = result.value;
         }
 
         if ((len == -1 || str_read < first + len) && *str_read) {
