@@ -72,7 +72,7 @@ TEST_CASE("detail::to_integer_decimal tests")
     {
         std::string s = "-";
         int64_t val;
-        auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length(), val);
+        auto result = jsoncons::detail::to_integer_decimal(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == jsoncons::detail::to_integer_errc::invalid_number);
     }
@@ -80,7 +80,7 @@ TEST_CASE("detail::to_integer_decimal tests")
     {
         std::string s = "-";
         int64_t val;
-        auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length(), val);
+        auto result = jsoncons::detail::to_integer_decimal(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == jsoncons::detail::to_integer_errc::invalid_number);
     }
@@ -88,7 +88,7 @@ TEST_CASE("detail::to_integer_decimal tests")
     {
         std::string s = "-9223372036854775808";
         int64_t val;
-        auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length(), val);
+        auto result = jsoncons::detail::to_integer_decimal(s.data(), s.length(), val);
         REQUIRE(result);
         CHECK(val == (std::numeric_limits<int64_t>::min)());
     }
@@ -96,7 +96,7 @@ TEST_CASE("detail::to_integer_decimal tests")
     {
         std::string s = "9223372036854775807";
         int64_t val;
-        auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length(), val);
+        auto result = jsoncons::detail::to_integer_decimal(s.data(), s.length(), val);
         REQUIRE(result);
         CHECK(val == (std::numeric_limits<int64_t>::max)());
     }
@@ -104,7 +104,7 @@ TEST_CASE("detail::to_integer_decimal tests")
     {
         std::string s = "-9223372036854775809";
         int64_t val;
-        auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length(), val);
+        auto result = jsoncons::detail::to_integer_decimal(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == jsoncons::detail::to_integer_errc::overflow);
     }
@@ -112,7 +112,7 @@ TEST_CASE("detail::to_integer_decimal tests")
     {
         std::string s = "9223372036854775808";
         int64_t val;
-        auto result = jsoncons::detail::to_integer_decimal<int64_t>(s.data(), s.length(), val);
+        auto result = jsoncons::detail::to_integer_decimal(s.data(), s.length(), val);
         REQUIRE_FALSE(result);
         CHECK(result.ec == jsoncons::detail::to_integer_errc::overflow);
     }
