@@ -79,7 +79,7 @@ struct to_integer_result
     const CharT* ptr;
     to_integer_errc ec;
     constexpr to_integer_result(const CharT* ptr)
-        : ptr(ptr), ec(to_integer_errc::success)
+        : ptr(ptr), ec(to_integer_errc())
     {
     }
     constexpr to_integer_result(const CharT* ptr, to_integer_errc ec)
@@ -93,7 +93,7 @@ struct to_integer_result
 
     constexpr explicit operator bool() const noexcept
     {
-        return ec == to_integer_errc::success;
+        return ec == to_integer_errc();
     }
     std::error_code error_code() const
     {

@@ -535,6 +535,11 @@ namespace jsoncons {
                 if (ec) return val;
                 key_type n{0};
                 auto r = jsoncons::detail::to_integer(s.data(), s.size(), n); 
+                if (r.ec != jsoncons::detail::to_integer_errc())
+                {
+                    ec = json_errc::invalid_number;
+                    return val;
+                }
                 cursor.next(ec);
                 if (ec) return val;
                 val.emplace(n, decode_traits<mapped_type,CharT>::decode(cursor, decoder, ec));
