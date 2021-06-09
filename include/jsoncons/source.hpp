@@ -410,25 +410,21 @@ namespace jsoncons {
             return current_ != end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
         }
 
-        std::size_t read(value_type* data, std::size_t length)
+        template <class Category = iterator_category>
+        typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
+        read(value_type* data, std::size_t length)
         {
-            value_type* p = data;
-            value_type* pend = data + length;
+            std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
+            std::copy(current_, current_+count, data);
 
-            while (p < pend && current_ != end_)
-            {
-                *p = *current_;
-                ++p;
-                ++current_;
-            }
+            current_ += count;
+            position_ += count;
 
-            position_ += (p - data);
-
-            return p - data;
+            return count;
         }
 
         template <class Category = iterator_category>
-        typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
+        typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
         read(value_type* data, std::size_t length)
         {
             value_type* p = data;
@@ -444,22 +440,6 @@ namespace jsoncons {
             position_ += (p - data);
 
             return p - data;
-        }
-
-        template <class Category = iterator_category>
-        typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
-        read(value_type* data, std::size_t length)
-        {
-            value_type* p = data;
-            value_type* pend = data + length;
-
-            std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
-            std::copy(current_, end_, data);
-
-            current_ += count;
-            position_ += count;
-
-            return count;
         }
     };
 
@@ -600,6 +580,19 @@ namespace jsoncons {
         typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
         read(value_type* data, std::size_t length)
         {
+            std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
+            std::copy(current_, current_+count, data);
+
+            current_ += count;
+            position_ += count;
+
+            return count;
+        }
+
+        template <class Category = iterator_category>
+        typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
+        read(value_type* data, std::size_t length)
+        {
             value_type* p = data;
             value_type* pend = data + length;
 
@@ -613,22 +606,6 @@ namespace jsoncons {
             position_ += (p - data);
 
             return p - data;
-        }
-
-        template <class Category = iterator_category>
-        typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
-        read(value_type* data, std::size_t length)
-        {
-            value_type* p = data;
-            value_type* pend = data + length;
-
-            std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
-            std::copy(current_, end_, data);
-
-            current_ += count;
-            position_ += count;
-
-            return count;
         }
     };
 

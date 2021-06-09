@@ -244,10 +244,27 @@ TEST_CASE("binary_stream_source tests")
     }
 }
 
-TEST_CASE("iterator_stream source tests")
+TEST_CASE("random iterator access iterator_stream source tests")
 {
     std::string data = "012345678";
     jsoncons::iterator_source<std::string::iterator> source(data.begin(), data.end());
+
+    SECTION("read 3")
+    {
+        std::vector<char> v(3);
+        source.read(v.data(), 3);
+        CHECK_FALSE(source.eof());
+        CHECK(std::equal(v.begin(), v.begin()+3, data.begin()));
+        CHECK(source.position() == 3);
+    }
+}
+
+TEST_CASE("forward iterator iterator_stream source tests")
+{
+    std::string data = "012345678";
+    std::istringstream is(data);
+    std::istream_iterator<char> iter(is);
+    jsoncons::iterator_source<std::istream_iterator<char>> source(iter, std::istream_iterator<char>());
 
     SECTION("read 3")
     {
