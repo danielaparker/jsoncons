@@ -51,7 +51,7 @@ namespace jsoncons { namespace csv {
 
         basic_csv_parser<CharT,Allocator> parser_;
         Source source_;
-        buffer_reader<CharT,Allocator> buffer_reader_;
+        buffer_reader<Source,Allocator> buffer_reader_;
 
     public:
         // Structural characters
@@ -207,7 +207,7 @@ namespace jsoncons { namespace csv {
 
         basic_csv_parser<CharT,Allocator> parser_;
         Source source_;
-        buffer_reader<CharT,Allocator> buffer_reader_;
+        buffer_reader<Source,Allocator> buffer_reader_;
 
     public:
         // Structural characters

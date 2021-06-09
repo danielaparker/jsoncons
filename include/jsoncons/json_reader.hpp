@@ -167,7 +167,7 @@ namespace jsoncons {
         basic_json_parser<CharT,Allocator> parser_;
 
         source_type source_;
-        json_buffer_reader<CharT,Allocator> buffer_reader_;
+        json_buffer_reader<Source,Allocator> buffer_reader_;
 
         // Noncopyable and nonmoveable
         basic_json_reader(const basic_json_reader&) = delete;
@@ -457,7 +457,7 @@ namespace jsoncons {
         basic_json_parser<CharT,Allocator> parser_;
 
         source_type source_;
-        json_buffer_reader<CharT,Allocator> buffer_reader_;
+        json_buffer_reader<Source,Allocator> buffer_reader_;
 
         // Noncopyable and nonmoveable
         legacy_basic_json_reader(const legacy_basic_json_reader&) = delete;

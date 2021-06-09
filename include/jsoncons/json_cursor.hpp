@@ -40,7 +40,7 @@ private:
     source_type source_;
     basic_json_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
-    json_buffer_reader<CharT,Allocator> buffer_reader_;
+    json_buffer_reader<Source,Allocator> buffer_reader_;
 
     // Noncopyable and nonmoveable
     basic_json_cursor(const basic_json_cursor&) = delete;

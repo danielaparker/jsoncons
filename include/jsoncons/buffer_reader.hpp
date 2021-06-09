@@ -23,16 +23,16 @@ namespace jsoncons {
 
     // buffer_reader
 
-    template<class CharT,class Allocator=std::allocator<char>>
+    template<class Source,class Allocator=std::allocator<char>>
     class buffer_reader 
     {
     public:
-        using char_type = CharT;
+        using value_type = typename Source::value_type;
     private:
-        typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char_type> char_allocator_type;
+        typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> char_allocator_type;
 
-        std::vector<char_type,char_allocator_type> buffer_;
-        const char_type* data_;
+        std::vector<value_type,char_allocator_type> buffer_;
+        const value_type* data_;
         std::size_t length_;
         bool bof_;
         bool eof_;
@@ -40,7 +40,7 @@ namespace jsoncons {
     public:
 
         buffer_reader(std::size_t buffer_length, const Allocator& alloc = Allocator())
-            : buffer_(buffer_length, CharT(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
+            : buffer_(buffer_length, value_type(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
         {
         }
 
@@ -59,10 +59,9 @@ namespace jsoncons {
             buffer_.resize(length);
         }
 
-        const char_type* data() const {return data_;}
+        const value_type* data() const {return data_;}
         std::size_t length() const {return length_;}
 
-        template <class Source>
         void read(Source& source, std::error_code& ec)
         {
             if (!eof_)
@@ -99,16 +98,16 @@ namespace jsoncons {
 
     // json_buffer_reader
 
-    template<class CharT,class Allocator>
+    template<class Source,class Allocator>
     class json_buffer_reader 
     {
     public:
-        using char_type = CharT;
+        using value_type = typename Source::value_type;
     private:
-        typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<char_type> char_allocator_type;
+        typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> char_allocator_type;
 
-        std::vector<char_type,char_allocator_type> buffer_;
-        const char_type* data_;
+        std::vector<value_type,char_allocator_type> buffer_;
+        const value_type* data_;
         std::size_t length_;
         bool bof_;
         bool eof_;
@@ -116,7 +115,7 @@ namespace jsoncons {
     public:
 
         json_buffer_reader(std::size_t buffer_length, const Allocator& alloc)
-            : buffer_(buffer_length, CharT(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
+            : buffer_(buffer_length, value_type(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
         {
         }
 
@@ -135,10 +134,9 @@ namespace jsoncons {
             buffer_.resize(length);
         }
 
-        const char_type* data() const {return data_;}
+        const value_type* data() const {return data_;}
         std::size_t length() const {return length_;}
 
-        template <class Source>
         void read(Source& source, std::error_code& ec)
         {
             if (!eof_)

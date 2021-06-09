@@ -41,7 +41,7 @@ private:
     source_type source_;
     basic_csv_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
-    buffer_reader<CharT,Allocator> buffer_reader_;
+    buffer_reader<Source,Allocator> buffer_reader_;
 
     // Noncopyable and nonmoveable
     basic_csv_cursor(const basic_csv_cursor&) = delete;
