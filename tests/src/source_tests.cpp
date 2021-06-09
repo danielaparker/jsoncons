@@ -22,7 +22,7 @@ TEST_CASE("stream_source tests")
 
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p0.value() == '0');
+        CHECK(p0.value == '0');
         CHECK(source.position() == 0);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -30,7 +30,7 @@ TEST_CASE("stream_source tests")
         CHECK(source.position() == 1);
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p1.value() == '1');
+        CHECK(p1.value == '1');
         CHECK(source.position() == 1);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -47,7 +47,7 @@ TEST_CASE("stream_source tests")
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p4.value() == '4');
+        CHECK(p4.value == '4');
         CHECK(source.position() == 4);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -55,7 +55,7 @@ TEST_CASE("stream_source tests")
         CHECK(source.position() == 5);
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p5.value() == '5');
+        CHECK(p5.value == '5');
         CHECK(source.position() == 5);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -91,7 +91,7 @@ TEST_CASE("binary_stream_source tests")
 
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p0.value() == '0');
+        CHECK(p0.value == '0');
         CHECK(source.position() == 0);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -99,7 +99,7 @@ TEST_CASE("binary_stream_source tests")
         CHECK(source.position() == 1);
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p1.value() == '1');
+        CHECK(p1.value == '1');
         CHECK(source.position() == 1);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -116,7 +116,7 @@ TEST_CASE("binary_stream_source tests")
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p4.value() == '4');
+        CHECK(p4.value == '4');
         CHECK(source.position() == 4);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -124,7 +124,7 @@ TEST_CASE("binary_stream_source tests")
         CHECK(source.position() == 5);
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p5.value() == '5');
+        CHECK(p5.value == '5');
         CHECK(source.position() == 5);
         CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
@@ -155,7 +155,7 @@ TEST_CASE("binary_stream_source tests")
         CHECK(source.position() == 1);
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
-        CHECK(p1.value() == '1');
+        CHECK(p1.value == '1');
         CHECK(source.position() == 1);
         source.ignore(7);
         CHECK_FALSE(source.eof());

@@ -50,37 +50,10 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    class character_result
+    struct character_result
     {
-        CharT value_;
-        bool eof_;
-    public:
-        using value_type = CharT;
-
-        constexpr character_result()
-            : value_(0), eof_(true)
-        {
-        }
-
-        constexpr character_result(CharT value)
-            : value_(value), eof_(false)
-        {
-        }
-
-        constexpr explicit operator bool() const noexcept
-        {
-            return !eof_;
-        }
-
-        constexpr value_type value() const
-        {
-            return value_;
-        }
-
-        constexpr bool eof() const
-        {
-            return eof_;
-        }
+        CharT value;
+        bool eof;
     };
 
     // text sources
@@ -179,12 +152,12 @@ namespace jsoncons {
                     stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
                     return character_result<value_type>();
                 }
-                return character_result<value_type>(static_cast<value_type>(c));
+                return character_result<value_type>{static_cast<value_type>(c), false};
             }
             JSONCONS_CATCH(const std::exception&)     
             {
                 stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit);
-                return character_result<value_type>();
+                return character_result<value_type>{0, true};
             }
         }
 
@@ -289,7 +262,7 @@ namespace jsoncons {
 
         character_result<value_type> peek() 
         {
-            return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
+            return current_ < end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
         }
 
         std::size_t read(value_type* p, std::size_t length)
@@ -351,7 +324,7 @@ namespace jsoncons {
 
         character_result<value_type> peek() 
         {
-            return current_ != end_ ? character_result<value_type>(*current_) : character_result<value_type>();
+            return current_ != end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
         }
 
         std::size_t read(value_type* data, std::size_t length)
@@ -483,11 +456,11 @@ namespace jsoncons {
             if (buffer_length_ > 0)
             {
                 value_type c = *buffer_data_;
-                return character_result<value_type>(c);
+                return character_result<value_type>{c, false};
             }
             else
             {
-                return character_result<value_type>();
+                return character_result<value_type>{0, true};
             }
         }
 
@@ -638,7 +611,7 @@ namespace jsoncons {
 
         character_result<value_type> peek() 
         {
-            return current_ < end_ ? character_result<value_type>(*current_) : character_result<value_type>();
+            return current_ < end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
         }
 
         std::size_t read(value_type* p, std::size_t length)
@@ -700,7 +673,7 @@ namespace jsoncons {
 
         character_result<value_type> peek() 
         {
-            return current_ != end_ ? character_result<value_type>(static_cast<value_type>(*current_)) : character_result<value_type>();
+            return current_ != end_ ? character_result<value_type>{static_cast<value_type>(*current_), false} : character_result<value_type>{0, true};
         }
 
         std::size_t read(value_type* data, std::size_t length)

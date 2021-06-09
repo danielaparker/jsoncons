@@ -147,13 +147,13 @@ public:
                 case parse_mode::indefinite_array:
                 {
                     auto c = source_.peek();
-                    if (!c)
+                    if (c.eof)
                     {
                         ec = ubjson_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    if (c.value() == jsoncons::ubjson::ubjson_type::end_array_marker)
+                    if (c.value == jsoncons::ubjson::ubjson_type::end_array_marker)
                     {
                         source_.ignore(1);
                         end_array(visitor, ec);
@@ -237,13 +237,13 @@ public:
                 case parse_mode::indefinite_map_key:
                 {
                     auto c = source_.peek();
-                    if (!c)
+                    if (c.eof)
                     {
                         ec = ubjson_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    if (c.value() == jsoncons::ubjson::ubjson_type::end_object_marker)
+                    if (c.value == jsoncons::ubjson::ubjson_type::end_object_marker)
                     {
                         source_.ignore(1);
                         end_object(visitor, ec);
@@ -530,13 +530,13 @@ private:
         } 
 
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = ubjson_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        if (c.value() == jsoncons::ubjson::ubjson_type::type_marker)
+        if (c.value == jsoncons::ubjson::ubjson_type::type_marker)
         {
             source_.ignore(1);
             uint8_t b;
@@ -547,13 +547,13 @@ private:
                 return;
             }
             c = source_.peek();
-            if (!c)
+            if (c.eof)
             {
                 ec = ubjson_errc::unexpected_eof;
                 more_ = false;
                 return;
             }
-            if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
+            if (c.value == jsoncons::ubjson::ubjson_type::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
@@ -577,7 +577,7 @@ private:
                 return;
             }
         }
-        else if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
+        else if (c.value == jsoncons::ubjson::ubjson_type::count_marker)
         {
             source_.ignore(1);
             std::size_t length = get_length(ec);
@@ -619,13 +619,13 @@ private:
         } 
 
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = ubjson_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        if (c.value() == jsoncons::ubjson::ubjson_type::type_marker)
+        if (c.value == jsoncons::ubjson::ubjson_type::type_marker)
         {
             source_.ignore(1);
             uint8_t b;
@@ -636,13 +636,13 @@ private:
                 return;
             }
             c = source_.peek();
-            if (!c)
+            if (c.eof)
             {
                 ec = ubjson_errc::unexpected_eof;
                 more_ = false;
                 return;
             }
-            if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
+            if (c.value == jsoncons::ubjson::ubjson_type::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);
@@ -669,13 +669,13 @@ private:
         else
         {
             c = source_.peek();
-            if (!c)
+            if (c.eof)
             {
                 ec = ubjson_errc::unexpected_eof;
                 more_ = false;
                 return;
             }
-            if (c.value() == jsoncons::ubjson::ubjson_type::count_marker)
+            if (c.value == jsoncons::ubjson::ubjson_type::count_marker)
             {
                 source_.ignore(1);
                 std::size_t length = get_length(ec);

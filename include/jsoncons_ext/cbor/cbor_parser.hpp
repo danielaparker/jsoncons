@@ -239,13 +239,13 @@ public:
                 case parse_mode::indefinite_array:
                 {
                     auto c = source_.peek();
-                    if (!c)
+                    if (c.eof)
                     {
                         ec = cbor_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    if (c.value() == 0xff)
+                    if (c.value == 0xff)
                     {
                         source_.ignore(1);
                         end_array(visitor, ec);
@@ -279,13 +279,13 @@ public:
                 case parse_mode::indefinite_map_key:
                 {
                     auto c = source_.peek();
-                    if (!c)
+                    if (c.eof)
                     {
                         ec = cbor_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    if (c.value() == 0xff)
+                    if (c.value == 0xff)
                     {
                         source_.ignore(1);
                         end_object(visitor, ec);
@@ -330,14 +330,14 @@ private:
             return;
         }
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
-        uint8_t info = get_additional_information_value(c.value());
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
+        uint8_t info = get_additional_information_value(c.value);
 
         switch (major_type)
         {
@@ -677,14 +677,14 @@ private:
     void read_text_string(string_type& s, std::error_code& ec)
     {
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
-        uint8_t info = get_additional_information_value(c.value());
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
+        uint8_t info = get_additional_information_value(c.value);
 
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::text_string);
         auto func = [&s](Source& source, std::size_t length, std::error_code& ec) -> bool
@@ -726,14 +726,14 @@ private:
         bool more = true;
         v.clear();
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more = false;
             return more;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
-        uint8_t info = get_additional_information_value(c.value());
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
+        uint8_t info = get_additional_information_value(c.value);
 
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::byte_string);
 
@@ -788,13 +788,13 @@ private:
         while (!done)
         {
             auto c = source_.peek();
-            if (!c)
+            if (c.eof)
             {
                 ec = cbor_errc::unexpected_eof;
                 more_ = false;
                 return;
             }
-            if (nesting_level > 0 && c.value() == 0xff)
+            if (nesting_level > 0 && c.value == 0xff)
             {
                 --nesting_level;
                 if (nesting_level == 0)
@@ -805,14 +805,14 @@ private:
                 continue;
             }
 
-            jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
+            jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
             if (major_type != type)
             {
                 ec = cbor_errc::illegal_chunked_string;
                 more_ = false;
                 return;
             }
-            uint8_t info = get_additional_information_value(c.value());
+            uint8_t info = get_additional_information_value(c.value);
 
             switch (info)
             {
@@ -911,15 +911,15 @@ private:
         int64_t val = 0;
 
         auto ch = source_.peek();
-        if (!ch)
+        if (ch.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return val;
         }
 
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(ch.value());
-        uint8_t info = get_additional_information_value(ch.value());
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(ch.value);
+        uint8_t info = get_additional_information_value(ch.value);
         switch (major_type)
         {
             case jsoncons::cbor::detail::cbor_major_type::negative_integer:
@@ -1075,14 +1075,14 @@ private:
         }
 
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
         int64_t exponent = 0;
-        switch (get_major_type(c.value()))
+        switch (get_major_type(c.value))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
@@ -1113,14 +1113,14 @@ private:
         string_type s;
 
         c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
 
-        switch (get_major_type(c.value()))
+        switch (get_major_type(c.value))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
@@ -1153,14 +1153,14 @@ private:
                 }
                 uint8_t tag = get_additional_information_value(b);
                 c = source_.peek();
-                if (!c)
+                if (c.eof)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
 
-                if (get_major_type(c.value()) == jsoncons::cbor::detail::cbor_major_type::byte_string)
+                if (get_major_type(c.value) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
                     bytes_buffer_.clear();
                     read_byte_string(bytes_buffer_, ec);
@@ -1234,14 +1234,14 @@ private:
         }
 
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
         int64_t exponent = 0;
-        switch (get_major_type(c.value()))
+        switch (get_major_type(c.value))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
@@ -1270,13 +1270,13 @@ private:
         }
 
         c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        switch (get_major_type(c.value()))
+        switch (get_major_type(c.value))
         {
             case jsoncons::cbor::detail::cbor_major_type::unsigned_integer:
             {
@@ -1315,14 +1315,14 @@ private:
                 uint8_t tag = get_additional_information_value(b);
 
                 c = source_.peek();
-                if (!c)
+                if (c.eof)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
 
-                if (get_major_type(c.value()) == jsoncons::cbor::detail::cbor_major_type::byte_string)
+                if (get_major_type(c.value) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
                     bytes_buffer_.clear(); 
                     more_ = read_byte_string(bytes_buffer_, ec);
@@ -1386,13 +1386,13 @@ private:
     void read_tags(std::error_code& ec)
     {
         auto c = source_.peek();
-        if (!c)
+        if (c.eof)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value);
 
         while (major_type == jsoncons::cbor::detail::cbor_major_type::semantic_tag)
         {
@@ -1415,13 +1415,13 @@ private:
                     break;
             }
             c = source_.peek();
-            if (!c)
+            if (c.eof)
             {
                 ec = cbor_errc::unexpected_eof;
                 more_ = false;
                 return;
             }
-            major_type = get_major_type(c.value());
+            major_type = get_major_type(c.value);
         }
     }
 
@@ -1880,13 +1880,13 @@ private:
                 while (true)
                 {
                     auto c = source_.peek();
-                    if (!c)
+                    if (c.eof)
                     {
                         ec = cbor_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    if (c.value() == 0xff)
+                    if (c.value == 0xff)
                     {
                         source_.ignore(1);
                     }
