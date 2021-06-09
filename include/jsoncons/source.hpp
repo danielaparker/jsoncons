@@ -14,6 +14,7 @@
 #include <memory> // std::addressof
 #include <cstring> // std::memcpy
 #include <exception>
+#include <iterator>
 #include <type_traits> // std::enable_if
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/byte_string.hpp> // jsoncons::byte_traits
@@ -283,9 +284,9 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        string_source(const Source& s,
-                      typename std::enable_if<type_traits::is_sequence_of<Source,value_type>::value>::type* = 0)
+        template <class Sourceable>
+        string_source(const Sourceable& s,
+                      typename std::enable_if<type_traits::is_sequence_of<Sourceable,value_type>::value>::type* = 0)
             : data_(s.data()), current_(s.data()), end_(s.data()+s.size())
         {
         }
@@ -370,6 +371,8 @@ namespace jsoncons {
         IteratorT current_;
         IteratorT end_;
         std::size_t position_;
+        using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
+        using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
     public:
         using value_type = typename std::iterator_traits<IteratorT>::value_type;
 
@@ -423,6 +426,41 @@ namespace jsoncons {
 
             return p - data;
         }
+
+        template <class Category = iterator_category>
+        typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
+        read(value_type* data, std::size_t length)
+        {
+            value_type* p = data;
+            value_type* pend = data + length;
+
+            while (p < pend && current_ != end_)
+            {
+                *p = static_cast<value_type>(*current_);
+                ++p;
+                ++current_;
+            }
+
+            position_ += (p - data);
+
+            return p - data;
+        }
+
+        template <class Category = iterator_category>
+        typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
+        read(value_type* data, std::size_t length)
+        {
+            value_type* p = data;
+            value_type* pend = data + length;
+
+            std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
+            std::copy(current_, end_, data);
+
+            current_ += count;
+            position_ += count;
+
+            return count;
+        }
     };
 
     // binary sources
@@ -447,10 +485,10 @@ namespace jsoncons {
         {
         }
 
-        template <class Source>
-        bytes_source(const Source& source,
-                     typename std::enable_if<type_traits::is_byte_sequence<Source>::value,int>::type = 0)
-            : data_(reinterpret_cast<const uint8_t*>(source.data())), 
+        template <class Sourceable>
+        bytes_source(const Sourceable& source,
+                     typename std::enable_if<type_traits::is_byte_sequence<Sourceable>::value,int>::type = 0)
+            : data_(reinterpret_cast<const value_type*>(source.data())), 
               current_(data_), 
               end_(data_+source.size())
         {
@@ -519,6 +557,8 @@ namespace jsoncons {
         IteratorT current_;
         IteratorT end_;
         std::size_t position_;
+        using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
+        using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
     public:
         using value_type = uint8_t;
 
@@ -556,7 +596,9 @@ namespace jsoncons {
             return current_ != end_ ? character_result<value_type>{static_cast<value_type>(*current_), false} : character_result<value_type>{0, true};
         }
 
-        std::size_t read(value_type* data, std::size_t length)
+        template <class Category = iterator_category>
+        typename std::enable_if<std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
+        read(value_type* data, std::size_t length)
         {
             value_type* p = data;
             value_type* pend = data + length;
@@ -571,6 +613,22 @@ namespace jsoncons {
             position_ += (p - data);
 
             return p - data;
+        }
+
+        template <class Category = iterator_category>
+        typename std::enable_if<!std::is_same<Category,std::random_access_iterator_tag>::value, std::size_t>::type
+        read(value_type* data, std::size_t length)
+        {
+            value_type* p = data;
+            value_type* pend = data + length;
+
+            std::size_t count = (std::min)(length, static_cast<std::size_t>(std::distance(current_, end_)));
+            std::copy(current_, end_, data);
+
+            current_ += count;
+            position_ += count;
+
+            return count;
         }
     };
 

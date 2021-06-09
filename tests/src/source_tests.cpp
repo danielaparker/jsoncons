@@ -244,4 +244,32 @@ TEST_CASE("binary_stream_source tests")
     }
 }
 
+TEST_CASE("iterator_stream source tests")
+{
+    std::string data = "012345678";
+    jsoncons::iterator_source<std::string::iterator> source(data.begin(), data.end());
 
+    SECTION("read 3")
+    {
+        std::vector<char> v(3);
+        source.read(v.data(), 3);
+        CHECK_FALSE(source.eof());
+        CHECK(std::equal(v.begin(), v.begin()+3, data.begin()));
+        CHECK(source.position() == 3);
+    }
+}
+
+TEST_CASE("binary_iterator_stream source tests")
+{
+    std::vector<uint8_t> data = { 0,1,2,3,4,5,6,7,8 };
+    jsoncons::binary_iterator_source<std::vector<uint8_t>::iterator> source(data.begin(), data.end());
+
+    SECTION("read 3")
+    {
+        std::vector<uint8_t> v(3);
+        source.read(v.data(), 3);
+        CHECK_FALSE(source.eof());
+        CHECK(std::equal(v.begin(), v.begin()+3, data.begin()));
+        CHECK(source.position() == 3);
+    }
+}
