@@ -58,6 +58,7 @@ class basic_bson_parser : public ser_context
     bson_decode_options options_;
     bool more_;
     bool done_;
+    std::vector<uint8_t,byte_allocator_type> bytes_buffer_;
     std::basic_string<char,std::char_traits<char>,char_allocator_type> text_buffer_;
     std::vector<parse_state,parse_state_allocator_type> state_stack_;
 public:
@@ -503,8 +504,8 @@ private:
                     return;
                 }
 
-                std::vector<uint8_t> v;
-                n = source_reader<Source>::read(source_, v, len);
+                bytes_buffer_.clear();
+                n = source_reader<Source>::read(source_, bytes_buffer_, len);
                 state_stack_.back().pos += n;
                 if (JSONCONS_UNLIKELY(n != static_cast<std::size_t>(len)))
                 {
@@ -513,7 +514,7 @@ private:
                     return;
                 }
 
-                more_ = visitor.byte_string_value(byte_string_view(v), 
+                more_ = visitor.byte_string_value(bytes_buffer_, 
                                                   subtype, 
                                                   *this,
                                                   ec);

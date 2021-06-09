@@ -1162,8 +1162,8 @@ private:
 
                 if (get_major_type(c.value()) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
-                    std::vector<uint8_t> v;
-                    read_byte_string(v, ec);
+                    bytes_buffer_.clear();
+                    read_byte_string(bytes_buffer_, ec);
                     if (ec)
                     {
                         more_ = false;
@@ -1171,12 +1171,12 @@ private:
                     }
                     if (tag == 2)
                     {
-                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                         n.write_string(s);
                     }
                     else if (tag == 3)
                     {
-                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                         n = -1 - n;
                         n.write_string(s);
                     }
@@ -1324,8 +1324,8 @@ private:
 
                 if (get_major_type(c.value()) == jsoncons::cbor::detail::cbor_major_type::byte_string)
                 {
-                    std::vector<uint8_t> v; 
-                    more_ = read_byte_string(v, ec);
+                    bytes_buffer_.clear(); 
+                    more_ = read_byte_string(bytes_buffer_, ec);
                     if (!more_)
                     {
                         return;
@@ -1334,14 +1334,14 @@ private:
                     {
                         s.push_back('0');
                         s.push_back('x');
-                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                         n.write_string_hex(s);
                     }
                     else if (tag == 3)
                     {
                         s.push_back('-');
                         s.push_back('0');
-                        bigint n = bigint::from_bytes_be(1, v.data(), v.size());
+                        bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                         n = -1 - n;
                         n.write_string_hex(s);
                         s[2] = 'x'; // overwrite minus
@@ -1474,14 +1474,14 @@ private:
             {
                 case 0x2:
                 {
-                    std::vector<uint8_t> v;
-                    read(v,ec);
+                    bytes_buffer_.clear();
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
                         more_ = false;
                         return;
                     }
-                    bigint n = bigint::from_bytes_be(1, v.data(), v.size());
+                    bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                     text_buffer_.clear();
                     n.write_string(text_buffer_);
                     more_ = visitor.string_value(text_buffer_, semantic_tag::bigint, *this, ec);
@@ -1489,14 +1489,14 @@ private:
                 }
                 case 0x3:
                 {
-                    std::vector<uint8_t> v;
-                    read(v,ec);
+                    bytes_buffer_.clear();
+                    read(bytes_buffer_,ec);
                     if (ec)
                     {
                         more_ = false;
                         return;
                     }
-                    bigint n = bigint::from_bytes_be(1, v.data(), v.size());
+                    bigint n = bigint::from_bytes_be(1, bytes_buffer_.data(), bytes_buffer_.size());
                     n = -1 - n;
                     text_buffer_.clear();
                     n.write_string(text_buffer_);
@@ -1511,7 +1511,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::base64url, *this, ec);
+                    more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::base64url, *this, ec);
                     break;
                 }
                 case 0x16:
@@ -1522,7 +1522,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::base64, *this, ec);
+                    more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::base64, *this, ec);
                     break;
                 }
                 case 0x17:
@@ -1533,7 +1533,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::base16, *this, ec);
+                    more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::base16, *this, ec);
                     break;
                 }
                 case 0x40:
@@ -1822,7 +1822,7 @@ private:
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), item_tag_, *this, ec);
+                    more_ = visitor.byte_string_value(bytes_buffer_, item_tag_, *this, ec);
                     break;
                 }
             }
@@ -1835,7 +1835,7 @@ private:
             {
                 return;
             }
-            more_ = visitor.byte_string_value(byte_string_view(bytes_buffer_), semantic_tag::none, *this, ec);
+            more_ = visitor.byte_string_value(bytes_buffer_, semantic_tag::none, *this, ec);
         }
     }
 
