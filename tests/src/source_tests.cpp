@@ -10,13 +10,6 @@
 #include <ctime>
 #include <new>
 
-TEST_CASE("wide stream source tests")
-{
-    std::string data = "012345678";
-    std::istringstream is(data);
-    jsoncons::stream_source<char> source(is);
-}
-
 TEST_CASE("stream_source tests")
 {
     std::string data = "012345678";
