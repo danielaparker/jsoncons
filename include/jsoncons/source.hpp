@@ -145,26 +145,6 @@ namespace jsoncons {
             return position_;
         }
 
-        character_result<value_type> get()
-        {
-            JSONCONS_TRY
-            {
-                int_type c = sbuf_->sbumpc();
-                if (c == traits_type::eof())
-                {
-                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
-                    return character_result<value_type>();
-                }
-                ++position_;
-                return character_result<value_type>(static_cast<value_type>(c));
-            }
-            JSONCONS_CATCH(const std::exception&)     
-            {
-                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
-                return character_result<value_type>();
-            }
-        }
-
         void ignore(std::size_t count)
         {
             JSONCONS_TRY
@@ -293,18 +273,6 @@ namespace jsoncons {
             return (current_ - data_)/sizeof(value_type) + 1;
         }
 
-        character_result<value_type> get()
-        {
-            if (current_ < end_)
-            {
-                return character_result<value_type>(*current_++);
-            }
-            else
-           {
-                return character_result<value_type>();
-            }
-        }
-
         void ignore(std::size_t count)
         {
             std::size_t len;
@@ -370,19 +338,6 @@ namespace jsoncons {
         std::size_t position() const
         {
             return position_;
-        }
-
-        character_result<value_type> get()
-        {
-            if (current_ != end_)
-            {
-                ++position_;
-                return character_result<value_type>(*current_++);
-            }
-            else
-           {
-                return character_result<value_type>();
-            }
         }
 
         void ignore(std::size_t count)
@@ -494,26 +449,6 @@ namespace jsoncons {
             return position_;
         }
 
-        character_result<value_type> get()
-        {
-            if (buffer_length_ == 0)
-            {
-                read_buffer();
-            }
-            if (buffer_length_ > 0)
-            {
-                value_type c = *buffer_data_;
-                ++buffer_data_;
-                --buffer_length_;
-                ++position_;
-                return c;
-            }
-            else
-            {
-                return character_result<value_type>();
-            }
-        }
-
         void ignore(std::size_t length)
         {
             std::size_t len = 0;
@@ -526,7 +461,7 @@ namespace jsoncons {
             }
             while (length - len > 0)
             {
-                read_buffer();
+                fill_buffer();
                 if (buffer_length_ == 0)
                 {
                     break;
@@ -543,7 +478,7 @@ namespace jsoncons {
         {
             if (buffer_length_ == 0)
             {
-                read_buffer();
+                fill_buffer();
             }
             if (buffer_length_ > 0)
             {
@@ -573,7 +508,7 @@ namespace jsoncons {
             }
             else if (length - len < buffer_.size())
             {
-                read_buffer();
+                fill_buffer();
                 if (buffer_length_ > 0)
                 {
                     std::size_t len2 = (std::min)(buffer_length_, length-len);
@@ -613,7 +548,7 @@ namespace jsoncons {
             }
         }
     private:
-        void read_buffer()
+        void fill_buffer()
         {
             if (stream_ptr_->eof())
             {
@@ -687,18 +622,6 @@ namespace jsoncons {
             return current_ - data_ + 1;
         }
 
-        character_result<value_type> get()
-        {
-            if (current_ < end_)
-            {
-                return character_result<value_type>(*current_++);
-            }
-            else
-            {
-                return character_result<value_type>();
-            }
-        }
-
         void ignore(std::size_t count)
         {
             std::size_t len;
@@ -764,19 +687,6 @@ namespace jsoncons {
         std::size_t position() const
         {
             return position_;
-        }
-
-        character_result<value_type> get()
-        {
-            if (current_ != end_)
-            {
-                ++position_;
-                return character_result<value_type>(*current_++);
-            }
-            else
-            {
-                return character_result<value_type>();
-            }
         }
 
         void ignore(std::size_t count)
@@ -857,12 +767,12 @@ namespace jsoncons {
                 std::size_t actual = 0;
                 while (actual < n)
                 {
-                    auto c = source.get();
-                    if (!c)
+                    typename Source::value_type c;
+                    if (source.read(&c,1) != 1)
                     {
                         break;
                     }
-                    v.push_back(c.value());
+                    v.push_back(c);
                     ++actual;
                 }
                 unread -= actual;

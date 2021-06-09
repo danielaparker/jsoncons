@@ -18,60 +18,63 @@ TEST_CASE("stream_source tests")
 
     SECTION("test get and peek")
     {
+        char b;
+
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p0.value() == '0');
         CHECK(source.position() == 0);
-        auto g0 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g0.value() == '0');
+        CHECK(b == '0');
         CHECK(source.position() == 1);
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p1.value() == '1');
         CHECK(source.position() == 1);
-        auto g1 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g1.value() == '1');
+        CHECK(b == '1');
         CHECK(source.position() == 2);
-        auto g2 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g2.value() == '2');
+        CHECK(b == '2');
         CHECK(source.position() == 3);
-        auto g3 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g3.value() == '3');
+        CHECK(b == '3');
         CHECK(source.position() == 4);
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p4.value() == '4');
         CHECK(source.position() == 4);
-        auto g4 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g4.value() == '4');
+        CHECK(b == '4');
         CHECK(source.position() == 5);
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p5.value() == '5');
         CHECK(source.position() == 5);
-        auto g5 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g5.value() == '5');
+        CHECK(b == '5');
         CHECK(source.position() == 6);
-        auto g6 = source.get();
+        CHECK(source.read(&b,1) == 1);
+
         CHECK_FALSE(source.eof());
-        CHECK(g6.value() == '6');
+        CHECK(b == '6');
         CHECK(source.position() == 7);
-        auto g7 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g7.value() == '7');
+        CHECK(b == '7');
         CHECK(source.position() == 8);
-        auto g8 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g8.value() == '8');
+        CHECK(b == '8');
         CHECK(source.position() == 9);
-        /*auto g9 = */source.get();
+        CHECK(source.read(&b,1) == 0);
         CHECK(source.eof());
     }
 }
@@ -84,62 +87,64 @@ TEST_CASE("binary_stream_source tests")
 
     SECTION("get and peek")
     {
+        uint8_t b;
+
         auto p0 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p0.value() == '0');
         CHECK(source.position() == 0);
-        auto g0 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g0.value() == '0');
+        CHECK(b == '0');
         CHECK(source.position() == 1);
         auto p1 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p1.value() == '1');
         CHECK(source.position() == 1);
-        auto g1 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g1.value() == '1');
+        CHECK(b == '1');
         CHECK(source.position() == 2);
-        auto g2 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g2.value() == '2');
+        CHECK(b == '2');
         CHECK(source.position() == 3);
-        auto g3 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g3.value() == '3');
+        CHECK(b == '3');
         CHECK(source.position() == 4);
 
         auto p4 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p4.value() == '4');
         CHECK(source.position() == 4);
-        auto g4 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g4.value() == '4');
+        CHECK(b == '4');
         CHECK(source.position() == 5);
         auto p5 = source.peek();
         CHECK_FALSE(source.eof());
         CHECK(p5.value() == '5');
         CHECK(source.position() == 5);
-        auto g5 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g5.value() == '5');
+        CHECK(b == '5');
         CHECK(source.position() == 6);
-        auto g6 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g6.value() == '6');
+        CHECK(b == '6');
         CHECK(source.position() == 7);
-        auto g7 = source.get();
+        CHECK(source.read(&b,1) == 1);
         CHECK_FALSE(source.eof());
-        CHECK(g7.value() == '7');
+        CHECK(b == '7');
         CHECK(source.position() == 8);
 
         jsoncons::binary_stream_source source2(std::move(source));
-        auto g8 = source2.get();
+        CHECK(source2.read(&b,1) == 1);
         CHECK_FALSE(source2.eof());
-        CHECK(g8.value() == '8');
+        CHECK(b == '8');
         CHECK(source2.position() == 9);
-        /*auto g9 = */source2.get();
+        CHECK(source2.read(&b,1) == 0);
         CHECK(source2.eof());
     }
 

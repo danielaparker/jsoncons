@@ -268,6 +268,8 @@ TEST_CASE("bson c test suite")
     }
     SECTION("int64")
     {
+        uint8_t b;
+
         std::string in_file = "./bson/input/test34.bson";
         std::vector<char> bytes = read_bytes(in_file);
 
@@ -278,22 +280,20 @@ TEST_CASE("bson c test suite")
         source.read(buf, sizeof(int32_t));
         auto doc_size = binary::little_to_native<int32_t>(buf, sizeof(buf));
         REQUIRE(doc_size == 16);
-        auto result = source.get();
-        REQUIRE(result);
-        REQUIRE(result.value() == 0x12); // 64-bit integer
+
+        REQUIRE(source.read(&b, 1) == 1);
+        REQUIRE(b == 0x12); // 64-bit integer
         std::string s;
-        for (result = source.get();
-             result && result.value() != 0; result = source.get())
+        while (source.read(&b, 1) == 1 && b != 0)
         {
-            s.push_back(result.value());
+            s.push_back(b);
         }
         REQUIRE(s == std::string("a"));
         source.read(buf, sizeof(int64_t));
         auto val = binary::little_to_native<int64_t>(buf, sizeof(int64_t));
         CHECK(val == 100000000000000ULL);
-        result = source.get();
-        REQUIRE(result);
-        CHECK(result.value() == 0);
+        REQUIRE(source.read(&b, 1) == 1);
+        CHECK(b == 0);
         CHECK(source.eof());
 
         std::vector<char> bytes2;

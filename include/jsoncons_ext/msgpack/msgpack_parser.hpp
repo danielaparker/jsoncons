@@ -196,14 +196,13 @@ private:
             return;
         }   
 
-        auto ch = source_.get();
-        if (!ch)
+        uint8_t type;
+        if (source_.read(&type, 1) == 0)
         {
             ec = msgpack_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        uint8_t type = ch.value();
 
         if (type <= 0xbf)
         {
@@ -298,14 +297,14 @@ private:
 
                 case jsoncons::msgpack::msgpack_type::uint8_type: 
                 {
-                    auto val = source_.get();
-                    if (!val)
+                    uint8_t b;
+                    if (source_.read(&b, 1) == 0)
                     {
                         ec = msgpack_errc::unexpected_eof;
                         more_ = false;
                         return;
                     }
-                    more_ = visitor.uint64_value(val.value(), semantic_tag::none, *this, ec);
+                    more_ = visitor.uint64_value(b, semantic_tag::none, *this, ec);
                     break;
                 }
 

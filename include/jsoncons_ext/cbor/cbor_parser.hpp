@@ -848,14 +848,14 @@ private:
     {
         uint64_t val = 0;
 
-        auto type = source_.get();
-        if (!type)
+        uint8_t initial_b;
+        if (source_.read(&initial_b, 1) == 0)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return 0;
         }
-        uint8_t info = get_additional_information_value(type.value());
+        uint8_t info = get_additional_information_value(initial_b);
         switch (info)
         {
             case JSONCONS_CBOR_0x00_0x17: // Integer 0x00..0x17 (0..23)
@@ -866,14 +866,14 @@ private:
 
             case 0x18: // Unsigned integer (one-byte uint8_t follows)
             {
-                auto c = source_.get();
-                if (!c)
+                uint8_t b;
+                if (source_.read(&b, 1) == 0)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
                     return val;
                 }
-                val = c.value();
+                val = b;
                 break;
             }
 
@@ -933,14 +933,14 @@ private:
                     }
                     case 0x18: // Negative integer (one-byte uint8_t follows)
                         {
-                            auto c = source_.get();
-                            if (!c)
+                            uint8_t b;
+                            if (source_.read(&b, 1) == 0)
                             {
                                 ec = cbor_errc::unexpected_eof;
                                 more_ = false;
                                 return val;
                             }
-                            val = static_cast<int64_t>(-1) - static_cast<int64_t>(c.value());
+                            val = static_cast<int64_t>(-1) - static_cast<int64_t>(b);
                             break;
                         }
 
@@ -1018,14 +1018,14 @@ private:
     {
         double val = 0;
 
-        auto type = source_.get();
-        if (!type)
+        uint8_t b;
+        if (source_.read(&b, 1) == 0)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return 0;
         }
-        uint8_t info = get_additional_information_value(type.value());
+        uint8_t info = get_additional_information_value(b);
         switch (info)
         {
         case 0x1a: // Single-Precision Float (four-byte IEEE 754)
@@ -1144,14 +1144,14 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                c = source_.get();
-                if (!c)
+                uint8_t b;
+                if (source_.read(&b, 1) == 0)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                uint8_t tag = get_additional_information_value(c.value());
+                uint8_t tag = get_additional_information_value(b);
                 c = source_.peek();
                 if (!c)
                 {
@@ -1305,14 +1305,14 @@ private:
             }
             case jsoncons::cbor::detail::cbor_major_type::semantic_tag:
             {
-                c = source_.get();
-                if (!c)
+                uint8_t b;
+                if (source_.read(&b, 1) == 0)
                 {
                     ec = cbor_errc::unexpected_eof;
                     more_ = false;
                     return;
                 }
-                uint8_t tag = get_additional_information_value(c.value());
+                uint8_t tag = get_additional_information_value(b);
 
                 c = source_.peek();
                 if (!c)
@@ -1843,16 +1843,16 @@ private:
                                  semantic_tag tag,
                                  std::error_code& ec)
     {
-        auto c = source_.get();
-        if (!c)
+        uint8_t b;
+        if (source_.read(&b, 1) == 0)
         {
             ec = cbor_errc::unexpected_eof;
             more_ = false;
             return;
         }
-        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(c.value());
+        jsoncons::cbor::detail::cbor_major_type major_type = get_major_type(b);
         JSONCONS_ASSERT(major_type == jsoncons::cbor::detail::cbor_major_type::array);
-        uint8_t info = get_additional_information_value(c.value());
+        uint8_t info = get_additional_information_value(b);
        
         read_shape(info, ec);   
         if (ec)
