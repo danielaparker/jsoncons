@@ -61,6 +61,209 @@ namespace jsoncons {
     template <class CharT>
     class stream_source 
     {
+        static constexpr std::size_t default_max_buffer_length = 16384;
+    public:
+        using value_type = CharT;
+    private:
+        using char_type = typename std::conditional<sizeof(CharT) == sizeof(char),char,CharT>::type;
+        basic_null_istream<char_type> null_is_;
+        std::basic_istream<char_type>* stream_ptr_;
+        std::basic_streambuf<char_type>* sbuf_;
+        std::size_t position_;
+        std::vector<value_type> buffer_;
+        const value_type* buffer_data_;
+        std::size_t buffer_length_;
+        bool eof_;
+
+        // Noncopyable 
+        stream_source(const stream_source&) = delete;
+        stream_source& operator=(const stream_source&) = delete;
+    public:
+        stream_source()
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
+              buffer_(0), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
+        {
+        }
+
+        stream_source(std::basic_istream<char_type>& is, std::size_t buf_size = default_max_buffer_length)
+            : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0),
+              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0), eof_(false)
+        {
+        }
+
+        stream_source(stream_source&& other) noexcept
+            : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
+              buffer_(), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
+        {
+            swap(other);
+        }
+
+        ~stream_source()
+        {
+        }
+
+        stream_source& operator=(stream_source&& other) noexcept
+        {
+            swap(other);
+            return *this;
+        }
+
+        void swap(stream_source& other) noexcept
+        {
+            std::swap(stream_ptr_,other.stream_ptr_);
+            std::swap(sbuf_,other.sbuf_);
+            std::swap(position_,other.position_);
+            std::swap(buffer_,other.buffer_);
+            std::swap(buffer_data_,other.buffer_data_);
+            std::swap(buffer_length_, other.buffer_length_);
+            std::swap(eof_, other.eof_);
+        }
+
+        bool eof() const
+        {
+            return eof_;  
+        }
+
+        bool is_error() const
+        {
+            return stream_ptr_->bad();  
+        }
+
+        std::size_t position() const
+        {
+            return position_;
+        }
+
+        void ignore(std::size_t length)
+        {
+            std::size_t len = 0;
+            if (buffer_length_ > 0)
+            {
+                len = (std::min)(buffer_length_, length);
+                position_ += len;
+                buffer_data_ += len;
+                buffer_length_ -= len;
+            }
+            while (length - len > 0)
+            {
+                fill_buffer();
+                if (buffer_length_ == 0)
+                {
+                    break;
+                }
+                std::size_t len2 = (std::min)(buffer_length_, length-len);
+                position_ += len2;
+                buffer_data_ += len2;
+                buffer_length_ -= len2;
+                len += len2;
+            }
+        }
+
+        character_result<value_type> peek() 
+        {
+            if (buffer_length_ == 0)
+            {
+                fill_buffer();
+            }
+            if (buffer_length_ > 0)
+            {
+                value_type c = *buffer_data_;
+                return character_result<value_type>{c, false};
+            }
+            else
+            {
+                return character_result<value_type>{0, true};
+            }
+        }
+
+        std::size_t read(value_type* p, std::size_t length)
+        {
+            std::size_t len = 0;
+            if (buffer_length_ > 0)
+            {
+                len = (std::min)(buffer_length_, length);
+                memcpy(p, buffer_data_, len);
+                buffer_data_ += len;
+                buffer_length_ -= len;
+                position_ += len;
+            }
+            if (length - len == 0)
+            {
+                return len;
+            }
+            else if (length - len < buffer_.size())
+            {
+                fill_buffer();
+                if (buffer_length_ > 0)
+                {
+                    std::size_t len2 = (std::min)(buffer_length_, length-len);
+                    memcpy(p+len, buffer_data_, len2);
+                    buffer_data_ += len2;
+                    buffer_length_ -= len2;
+                    position_ += len2;
+                    len += len2;
+                }
+                return len;
+            }
+            else
+            {
+                if (stream_ptr_->eof())
+                {
+                    eof_ = true;
+                    buffer_length_ = 0;
+                    return 0;
+                }
+                JSONCONS_TRY
+                {
+                    std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(p+len), length-len);
+                    std::size_t len2 = static_cast<std::size_t>(count);
+                    if (len2 < length-len)
+                    {
+                        stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                    }
+                    len += len2;
+                    position_ += len2;
+                    return len;
+                }
+                JSONCONS_CATCH(const std::exception&)     
+                {
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                    return 0;
+                }
+            }
+        }
+    private:
+        void fill_buffer()
+        {
+            if (stream_ptr_->eof())
+            {
+                eof_ = true;
+                buffer_length_ = 0;
+                return;
+            }
+
+            buffer_data_ = buffer_.data();
+            JSONCONS_TRY
+            {
+                std::streamsize count = sbuf_->sgetn(reinterpret_cast<char_type*>(buffer_.data()), buffer_.size());
+                buffer_length_ = static_cast<std::size_t>(count);
+
+                if (buffer_length_ < buffer_.size())
+                {
+                    stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::eofbit);
+                }
+            }
+            JSONCONS_CATCH(const std::exception&)     
+            {
+                stream_ptr_->clear(stream_ptr_->rdstate() | std::ios::badbit | std::ios::eofbit);
+                buffer_length_ = 0;
+            }
+        }
+    };
+/*
+    template <class CharT>
+    class stream_source 
+    {
     public:
         using value_type = CharT;
     private:
@@ -180,7 +383,7 @@ namespace jsoncons {
             }
         }
     };
-
+*/
     // string_source
 
     template <class CharT>
@@ -353,7 +556,6 @@ namespace jsoncons {
     public:
         typedef uint8_t value_type;
     private:
-        using traits_type = byte_traits;
         basic_null_istream<char> null_is_;
         std::istream* stream_ptr_;
         std::streambuf* sbuf_;
