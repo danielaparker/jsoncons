@@ -56,7 +56,7 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-       : source_(source),
+       : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
          buffer_reader_()
@@ -137,7 +137,7 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec,
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-       : source_(source),
+       : source_(std::forward<Sourceable>(source)),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
          buffer_reader_()
