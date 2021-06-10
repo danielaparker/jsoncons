@@ -73,7 +73,7 @@ TEST_CASE("test_parse_small_string4")
         json_decoder<json> decoder;
         JSONCONS_TRY
         {
-            json_stream_reader reader(is, decoder);
+            json_stream_reader reader(stream_source<char>(is,i), decoder);
             reader.read_next();
         }
         JSONCONS_CATCH (const std::exception&)
@@ -93,8 +93,7 @@ TEST_CASE("test_parse_big_string1")
         json_decoder<json> decoder;
         JSONCONS_TRY
         {
-            json_stream_reader reader(is, decoder);
-            //reader.buffer_length(i);
+            json_stream_reader reader(stream_source<char>(is,i), decoder);
             reader.read_next();
         }
         JSONCONS_CATCH (const std::exception&)
