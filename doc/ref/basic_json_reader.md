@@ -149,10 +149,6 @@ Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if parsing fails
 Override (1) throws if there are any unconsumed non-whitespace characters in the input.
 Override (2) sets `ec` to a [json_errc](jsoncons::json_errc.md) if there are any unconsumed non-whitespace characters left in the input.
 
-    std::size_t buffer_length() const
-
-    void buffer_length(std::size_t length)
-
     std::size_t line() const
 
     std::size_t column() const

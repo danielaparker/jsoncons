@@ -307,9 +307,9 @@ namespace jsoncons {
         {
         }
 
-        string_source(string_source&& val) noexcept = default;
+        string_source(string_source&& val) = default;
 
-        string_source& operator=(string_source&& val) noexcept = default;
+        string_source& operator=(string_source&& val) = default;
 
         bool eof() const
         {
@@ -400,9 +400,9 @@ namespace jsoncons {
         {
         }
 
-        iterator_source(iterator_source&& other) noexcept = default;
+        iterator_source(iterator_source&& other) = default;
 
-        iterator_source& operator=(iterator_source&& other) noexcept = default;
+        iterator_source& operator=(iterator_source&& other) = default;
 
         bool eof() const
         {
@@ -509,9 +509,9 @@ namespace jsoncons {
         {
         }
 
-        bytes_source(bytes_source&&) noexcept = default;
+        bytes_source(bytes_source&&) = default;
 
-        bytes_source& operator=(bytes_source&&) noexcept = default;
+        bytes_source& operator=(bytes_source&&) = default;
 
         bool eof() const
         {
@@ -601,9 +601,9 @@ namespace jsoncons {
         {
         }
 
-        binary_iterator_source(binary_iterator_source&& other) noexcept = default;
+        binary_iterator_source(binary_iterator_source&& other) = default;
 
-        binary_iterator_source& operator=(binary_iterator_source&& other) noexcept = default;
+        binary_iterator_source& operator=(binary_iterator_source&& other) = default;
 
         bool eof() const
         {
