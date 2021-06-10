@@ -51,7 +51,7 @@ namespace jsoncons {
     };
 
     template <class CharT>
-    struct character_result
+    struct char_result
     {
         CharT value;
         bool eof;
@@ -158,7 +158,7 @@ namespace jsoncons {
             }
         }
 
-        character_result<value_type> peek() 
+        char_result<value_type> peek() 
         {
             if (buffer_length_ == 0)
             {
@@ -167,11 +167,11 @@ namespace jsoncons {
             if (buffer_length_ > 0)
             {
                 value_type c = *buffer_data_;
-                return character_result<value_type>{c, false};
+                return char_result<value_type>{c, false};
             }
             else
             {
-                return character_result<value_type>{0, true};
+                return char_result<value_type>{0, true};
             }
         }
 
@@ -340,9 +340,9 @@ namespace jsoncons {
             current_ += len;
         }
 
-        character_result<value_type> peek() 
+        char_result<value_type> peek() 
         {
-            return current_ < end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
+            return current_ < end_ ? char_result<value_type>{*current_, false} : char_result<value_type>{0, true};
         }
 
         span<const value_type> read_buffer() 
@@ -428,9 +428,9 @@ namespace jsoncons {
             }
         }
 
-        character_result<value_type> peek() 
+        char_result<value_type> peek() 
         {
-            return current_ != end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
+            return current_ != end_ ? char_result<value_type>{*current_, false} : char_result<value_type>{0, true};
         }
 
         span<const value_type> read_buffer() 
@@ -542,9 +542,9 @@ namespace jsoncons {
             current_ += len;
         }
 
-        character_result<value_type> peek() 
+        char_result<value_type> peek() 
         {
-            return current_ < end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
+            return current_ < end_ ? char_result<value_type>{*current_, false} : char_result<value_type>{0, true};
         }
 
         span<const value_type> read_buffer() 
@@ -629,9 +629,9 @@ namespace jsoncons {
             }
         }
 
-        character_result<value_type> peek() 
+        char_result<value_type> peek() 
         {
-            return current_ != end_ ? character_result<value_type>{static_cast<value_type>(*current_), false} : character_result<value_type>{0, true};
+            return current_ != end_ ? char_result<value_type>{static_cast<value_type>(*current_), false} : char_result<value_type>{0, true};
         }
 
         span<const value_type> read_buffer() 
