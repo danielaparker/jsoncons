@@ -16,7 +16,7 @@ TEST_CASE("buffer reader tests")
 {
     SECTION("test 1")
     {
-        json_buffer_reader<> reader();
+        json_buffer_reader<Source> reader();
     }
 
 }
