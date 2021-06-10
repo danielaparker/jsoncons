@@ -248,7 +248,7 @@ namespace
         std::cout << "(1) " << j << "\n\n";
         std::cout << "(2) " << j.at("a").tag() << "\n\n";
 
-        std::vector<char> output;
+        std::vector<uint8_t> output;
         bson::encode_bson(j, output);
         assert(output == input);
     }
@@ -294,7 +294,7 @@ namespace
         std::cout << "(1) " << j << "\n\n";
         std::cout << "(2) " << j.at("regex").tag() << "\n\n";
 
-        std::vector<char> output;
+        std::vector<uint8_t> output;
         bson::encode_bson(j, output);
         assert(output == input);
     }
@@ -315,7 +315,7 @@ namespace
         std::cout << "(1) " << j << "\n\n";
         std::cout << "(2) " << j.at("oid").tag() << "\n\n";
 
-        std::vector<char> output;
+        std::vector<uint8_t> output;
         bson::encode_bson(j, output);
         assert(output == input);
     }
