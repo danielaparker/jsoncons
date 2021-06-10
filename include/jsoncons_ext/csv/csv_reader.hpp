@@ -143,7 +143,7 @@ namespace jsoncons { namespace csv {
 
         bool eof() const
         {
-            return buffer_reader_.eof();
+            return source_.eof() && buffer_reader_.length() == 0;
         }
 
     private:
@@ -161,7 +161,7 @@ namespace jsoncons { namespace csv {
                 {
                     buffer_reader_.read(source_, ec);
                     if (ec) return;
-                    if (!buffer_reader_.eof())
+                    if (buffer_reader_.length() > 0)
                     {
                         parser_.update(buffer_reader_.data(),buffer_reader_.length());
                     }
@@ -311,7 +311,7 @@ namespace jsoncons { namespace csv {
 
         bool eof() const
         {
-            return buffer_reader_.eof();
+            return source_.eof() && buffer_reader_.length() == 0;
         }
 
     private:
@@ -329,7 +329,7 @@ namespace jsoncons { namespace csv {
                 {
                     buffer_reader_.read(source_, ec);
                     if (ec) return;
-                    if (!buffer_reader_.eof())
+                    if (buffer_reader_.length() > 0)
                     {
                         parser_.update(buffer_reader_.data(),buffer_reader_.length());
                     }

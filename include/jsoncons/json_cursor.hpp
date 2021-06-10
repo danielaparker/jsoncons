@@ -240,36 +240,37 @@ public:
             ec = json_errc::source_error;
             return;
         }   
-        if (buffer_reader_.eof())
+        if (source_.eof() && buffer_reader_.length() == 0)
         {
             parser_.check_done(ec);
             if (ec) return;
         }
         else
         {
-            while (!buffer_reader_.eof())
+            do
             {
                 if (parser_.source_exhausted())
                 {
                     buffer_reader_.read(source_, ec);
                     if (ec) return;
-                    if (!buffer_reader_.eof())
+                    if (buffer_reader_.length() > 0)
                     {
                         parser_.update(buffer_reader_.data(),buffer_reader_.length());
                     }
                 }
-                if (!buffer_reader_.eof())
+                if (!parser_.source_exhausted())
                 {
                     parser_.check_done(ec);
                     if (ec) return;
                 }
             }
+            while (!eof());
         }
     }
 
     bool eof() const
     {
-        return buffer_reader_.eof();
+        return source_.eof() && buffer_reader_.length() == 0;
     }
 
     std::size_t line() const override
@@ -305,7 +306,7 @@ private:
             {
                 buffer_reader_.read(source_, ec);
                 if (ec) return;
-                if (!buffer_reader_.eof())
+                if (buffer_reader_.length() > 0)
                 {
                     parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
@@ -324,7 +325,7 @@ private:
             {
                 buffer_reader_.read(source_, ec);
                 if (ec) return;
-                if (!buffer_reader_.eof())
+                if (buffer_reader_.length() > 0)
                 {
                     parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }

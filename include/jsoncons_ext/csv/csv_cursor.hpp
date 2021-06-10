@@ -224,58 +224,14 @@ public:
         return true;
     }
 
-    void check_done()
-    {
-        std::error_code ec;
-        check_done(ec);
-        if (ec)
-        {
-            JSONCONS_THROW(ser_error(ec,parser_.line(),parser_.column()));
-        }
-    }
-
     const ser_context& context() const override
     {
         return *this;
     }
 
-    void check_done(std::error_code& ec)
-    {
-        if (source_.is_error())
-        {
-            ec = csv_errc::source_error;
-            return;
-        }   
-        if (buffer_reader_.eof())
-        {
-            parser_.check_done(ec);
-            if (ec) return;
-        }
-        else
-        {
-            while (!buffer_reader_.eof())
-            {
-                if (parser_.source_exhausted())
-                {
-                    buffer_reader_.read(source_, ec);
-                    if (ec) return;
-                    if (!buffer_reader_.eof())
-                    {
-                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
-                    }
-                }
-                if (!buffer_reader_.eof())
-                {
-                    parser_.check_done(ec);
-                    if (ec) return;
-                }
-            }
-        }
-    }
-
     bool eof() const
     {
-        return buffer_reader_.eof();
+        return source_.eof() && buffer_reader_.length() == 0;
     }
 
     std::size_t line() const override
@@ -321,7 +277,7 @@ private:
             {
                 buffer_reader_.read(source_, ec);
                 if (ec) return;
-                if (!buffer_reader_.eof())
+                if (buffer_reader_.length() > 0)
                 {
                     parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }
@@ -340,7 +296,7 @@ private:
             {
                 buffer_reader_.read(source_, ec);
                 if (ec) return;
-                if (!buffer_reader_.eof())
+                if (buffer_reader_.length() > 0)
                 {
                     parser_.update(buffer_reader_.data(),buffer_reader_.length());
                 }

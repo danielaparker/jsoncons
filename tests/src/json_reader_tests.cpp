@@ -89,7 +89,6 @@ TEST_CASE("json_reader constructors")
         //std::cout << pretty_print(j) << "\n";
     }
 }
-#endif
 
 TEST_CASE("test_missing_separator")
 {
@@ -205,6 +204,7 @@ TEST_CASE("test_read_primitive_fail")
     test_json_reader_error("\"string\"{}", jsoncons::json_errc::extra_character);
     test_json_reader_error("\"string\"[]", jsoncons::json_errc::extra_character);
 }
+#endif
 
 TEST_CASE("test_read_multiple")
 {
@@ -264,6 +264,5 @@ TEST_CASE("json_reader read from string test")
     CHECK(j[0][0][0]["category"].as<std::string>() == std::string("reference"));
     CHECK(j[0][0][1]["author"].as<std::string>() == std::string("Brent Weeks"));
 }
-
 
 

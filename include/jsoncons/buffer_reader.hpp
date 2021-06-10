@@ -32,18 +32,12 @@ namespace jsoncons {
         const value_type* data_;
         std::size_t length_;
         bool bof_;
-        bool eof_;
 
     public:
 
         buffer_reader()
-            : data_(nullptr), length_(0), bof_(true), eof_(false)
+            : data_(nullptr), length_(0), bof_(true)
         {
-        }
-
-        bool eof() const
-        {
-            return eof_;
         }
 
         const value_type* data() const {return data_;}
@@ -51,34 +45,27 @@ namespace jsoncons {
 
         void read(Source& source, std::error_code& ec)
         {
-            if (!eof_)
+            if (source.eof())
             {
-                if (source.eof())
-                {
-                    eof_ = true;
-                }
-                else
-                {
-                    auto s = source.read_buffer();
-                    data_ = s.data();
-                    length_ = s.size();
+                length_ = 0;
+            }
+            else
+            {
+                auto s = source.read_buffer();
+                data_ = s.data();
+                length_ = s.size();
 
-                    if (length_ == 0)
+                if (bof_ && length_ > 0)
+                {
+                    auto r = unicode_traits::detect_encoding_from_bom(data_, length_);
+                    if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                     {
-                        eof_ = true;
+                        ec = json_errc::illegal_unicode_character;
+                        return;
                     }
-                    else if (bof_)
-                    {
-                        auto r = unicode_traits::detect_encoding_from_bom(data_, length_);
-                        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
-                        {
-                            ec = json_errc::illegal_unicode_character;
-                            return;
-                        }
-                        length_ -= (r.ptr - data_);
-                        data_ = r.ptr;
-                        bof_ = false;
-                    }
+                    length_ -= (r.ptr - data_);
+                    data_ = r.ptr;
+                    bof_ = false;
                 }
             }
         }
@@ -95,18 +82,12 @@ namespace jsoncons {
         const value_type* data_;
         std::size_t length_;
         bool bof_;
-        bool eof_;
 
     public:
 
         json_buffer_reader()
-            : data_(nullptr), length_(0), bof_(true), eof_(false)
+            : data_(nullptr), length_(0), bof_(true)
         {
-        }
-
-        bool eof() const
-        {
-            return eof_;
         }
 
         const value_type* data() const {return data_;}
@@ -114,34 +95,27 @@ namespace jsoncons {
 
         void read(Source& source, std::error_code& ec)
         {
-            if (!eof_)
+            if (source.eof())
             {
-                if (source.eof())
-                {
-                    eof_ = true;
-                }
-                else
-                {
-                    auto s = source.read_buffer();
-                    data_ = s.data(); 
-                    length_ = s.size();
+                length_ = 0;
+            }
+            else
+            {
+                auto s = source.read_buffer();
+                data_ = s.data(); 
+                length_ = s.size();
 
-                    if (length_ == 0)
+                if (bof_ && length_ > 0)
+                {
+                    auto r = unicode_traits::detect_json_encoding(data_, length_);
+                    if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                     {
-                        eof_ = true;
+                        ec = json_errc::illegal_unicode_character;
+                        return;
                     }
-                    else if (bof_)
-                    {
-                        auto r = unicode_traits::detect_json_encoding(data_, length_);
-                        if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
-                        {
-                            ec = json_errc::illegal_unicode_character;
-                            return;
-                        }
-                        length_ -= (r.ptr - data_);
-                        data_ = r.ptr;
-                        bof_ = false;
-                    }
+                    length_ -= (r.ptr - data_);
+                    data_ = r.ptr;
+                    bof_ = false;
                 }
             }
         }
