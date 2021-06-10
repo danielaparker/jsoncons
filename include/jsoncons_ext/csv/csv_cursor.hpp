@@ -34,7 +34,7 @@ public:
     using char_type = CharT;
     using allocator_type = Allocator;
 private:
-    static constexpr size_t default_max_buffer_length = 16384;
+    static constexpr size_t default_max_buffer_size = 16384;
 
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
@@ -61,7 +61,7 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(default_max_buffer_length,alloc)
+         buffer_reader_(default_max_buffer_size,alloc)
     {
         if (!done())
         {
@@ -141,7 +141,7 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(default_max_buffer_length,alloc)
+         buffer_reader_(default_max_buffer_size,alloc)
     {
         if (!done())
         {

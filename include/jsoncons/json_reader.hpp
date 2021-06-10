@@ -158,7 +158,7 @@ namespace jsoncons {
     private:
         typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> char_allocator_type;
 
-        static constexpr size_t default_max_buffer_length = 16384;
+        static constexpr size_t default_max_buffer_size = 16384;
 
         basic_default_json_visitor<CharT> default_visitor_;
 
@@ -268,7 +268,7 @@ namespace jsoncons {
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_length, alloc)
+             buffer_reader_(default_max_buffer_size, alloc)
         {
         }
 
@@ -448,7 +448,7 @@ namespace jsoncons {
     private:
         typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<CharT> char_allocator_type;
 
-        static constexpr size_t default_max_buffer_length = 16384;
+        static constexpr size_t default_max_buffer_size = 16384;
 
         basic_default_json_visitor<CharT> default_visitor_;
 
@@ -559,7 +559,7 @@ namespace jsoncons {
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_length, alloc)
+             buffer_reader_(default_max_buffer_size, alloc)
         {
         }
 

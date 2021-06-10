@@ -35,7 +35,7 @@ public:
     using string_view_type = jsoncons::basic_string_view<CharT>;
 private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
-    static constexpr size_t default_max_buffer_length = 16384;
+    static constexpr size_t default_max_buffer_size = 16384;
 
     source_type source_;
     basic_json_parser<CharT,Allocator> parser_;
@@ -59,7 +59,7 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(default_max_buffer_length, alloc)
+         buffer_reader_(default_max_buffer_size, alloc)
     {
         if (!done())
         {
@@ -140,7 +140,7 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(default_max_buffer_length, alloc)
+         buffer_reader_(default_max_buffer_size, alloc)
     {
         if (!done())
         {

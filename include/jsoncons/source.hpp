@@ -62,7 +62,7 @@ namespace jsoncons {
     template <class CharT>
     class stream_source 
     {
-        static constexpr std::size_t default_max_buffer_length = 16384;
+        static constexpr std::size_t default_max_buffer_size = 16384;
     public:
         using value_type = CharT;
     private:
@@ -74,7 +74,6 @@ namespace jsoncons {
         std::vector<value_type> buffer_;
         const value_type* buffer_data_;
         std::size_t buffer_length_;
-        bool eof_;
 
         // Noncopyable 
         stream_source(const stream_source&) = delete;
@@ -82,19 +81,19 @@ namespace jsoncons {
     public:
         stream_source()
             : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(0), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
+              buffer_(0), buffer_data_(buffer_.data()), buffer_length_(0)
         {
         }
 
-        stream_source(std::basic_istream<char_type>& is, std::size_t buf_size = default_max_buffer_length)
+        stream_source(std::basic_istream<char_type>& is, std::size_t buf_size = default_max_buffer_size)
             : stream_ptr_(std::addressof(is)), sbuf_(is.rdbuf()), position_(0),
-              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0), eof_(false)
+              buffer_(buf_size), buffer_data_(buffer_.data()), buffer_length_(0)
         {
         }
 
         stream_source(stream_source&& other) noexcept
             : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
-              buffer_(), buffer_data_(buffer_.data()), buffer_length_(0), eof_(true)
+              buffer_(), buffer_data_(buffer_.data()), buffer_length_(0)
         {
             swap(other);
         }
@@ -117,12 +116,11 @@ namespace jsoncons {
             std::swap(buffer_,other.buffer_);
             std::swap(buffer_data_,other.buffer_data_);
             std::swap(buffer_length_, other.buffer_length_);
-            std::swap(eof_, other.eof_);
         }
 
         bool eof() const
         {
-            return eof_;  
+            return buffer_length_ == 0 && stream_ptr_->eof();
         }
 
         bool is_error() const
@@ -177,6 +175,21 @@ namespace jsoncons {
             }
         }
 
+        span<const value_type> read_buffer() 
+        {
+            if (buffer_length_ == 0)
+            {
+                fill_buffer();
+            }
+            const value_type* data = buffer_data_;
+            std::size_t length = buffer_length_;
+            buffer_data_ += buffer_length_;
+            position_ += buffer_length_;
+            buffer_length_ = 0;
+
+            return span<const value_type>(data, length);
+        }
+
         std::size_t read(value_type* p, std::size_t length)
         {
             std::size_t len = 0;
@@ -210,7 +223,6 @@ namespace jsoncons {
             {
                 if (stream_ptr_->eof())
                 {
-                    eof_ = true;
                     buffer_length_ = 0;
                     return 0;
                 }
@@ -238,7 +250,6 @@ namespace jsoncons {
         {
             if (stream_ptr_->eof())
             {
-                eof_ = true;
                 buffer_length_ = 0;
                 return;
             }
@@ -296,21 +307,9 @@ namespace jsoncons {
         {
         }
 
-        string_source(string_source&& val) 
-            : data_(nullptr), current_(nullptr), end_(nullptr)
-        {
-            std::swap(data_,val.data_);
-            std::swap(current_,val.current_);
-            std::swap(end_,val.end_);
-        }
+        string_source(string_source&& val) noexcept = default;
 
-        string_source& operator=(string_source&& val)
-        {
-            std::swap(data_,val.data_);
-            std::swap(current_,val.current_);
-            std::swap(end_,val.end_);
-            return *this;
-        }
+        string_source& operator=(string_source&& val) noexcept = default;
 
         bool eof() const
         {
@@ -324,7 +323,7 @@ namespace jsoncons {
 
         std::size_t position() const
         {
-            return (current_ - data_)/sizeof(value_type) + 1;
+            return (current_ - data_)/sizeof(value_type);
         }
 
         void ignore(std::size_t count)
@@ -344,6 +343,15 @@ namespace jsoncons {
         character_result<value_type> peek() 
         {
             return current_ < end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
+        }
+
+        span<const value_type> read_buffer() 
+        {
+            const value_type* data = current_;
+            std::size_t length = end_ - current_;
+            current_ = end_;
+
+            return span<const value_type>(data, length);
         }
 
         std::size_t read(value_type* p, std::size_t length)
@@ -368,18 +376,33 @@ namespace jsoncons {
     template <class IteratorT>
     class iterator_source
     {
+    public:
+        using value_type = typename std::iterator_traits<IteratorT>::value_type;
+    private:
+        static constexpr std::size_t default_max_buffer_size = 16384;
+
         IteratorT current_;
         IteratorT end_;
         std::size_t position_;
+        std::vector<value_type> buffer_;
+        std::size_t buffer_length_;
+
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
-    public:
-        using value_type = typename std::iterator_traits<IteratorT>::value_type;
 
-        iterator_source(const IteratorT& first, const IteratorT& last)
-            : current_(first), end_(last), position_(0)
+        // Noncopyable 
+        iterator_source(const iterator_source&) = delete;
+        iterator_source& operator=(const iterator_source&) = delete;
+    public:
+
+        iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
+            : current_(first), end_(last), position_(0), buffer_(buf_size), buffer_length_(0)
         {
         }
+
+        iterator_source(iterator_source&& other) noexcept = default;
+
+        iterator_source& operator=(iterator_source&& other) noexcept = default;
 
         bool eof() const
         {
@@ -408,6 +431,18 @@ namespace jsoncons {
         character_result<value_type> peek() 
         {
             return current_ != end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
+        }
+
+        span<const value_type> read_buffer() 
+        {
+            if (buffer_length_ == 0)
+            {
+                buffer_length_ = read(buffer_.data(), buffer_.size());
+            }
+            std::size_t length = buffer_length_;
+            buffer_length_ = 0;
+
+            return span<const value_type>(buffer_.data(), length);
         }
 
         template <class Category = iterator_category>
@@ -474,9 +509,9 @@ namespace jsoncons {
         {
         }
 
-        bytes_source(bytes_source&&) = default;
+        bytes_source(bytes_source&&) noexcept = default;
 
-        bytes_source& operator=(bytes_source&&) = default;
+        bytes_source& operator=(bytes_source&&) noexcept = default;
 
         bool eof() const
         {
@@ -490,7 +525,7 @@ namespace jsoncons {
 
         std::size_t position() const
         {
-            return current_ - data_ + 1;
+            return current_ - data_;
         }
 
         void ignore(std::size_t count)
@@ -510,6 +545,15 @@ namespace jsoncons {
         character_result<value_type> peek() 
         {
             return current_ < end_ ? character_result<value_type>{*current_, false} : character_result<value_type>{0, true};
+        }
+
+        span<const value_type> read_buffer() 
+        {
+            const value_type* data = current_;
+            std::size_t length = end_ - current_;
+            current_ = end_;
+
+            return span<const value_type>(data, length);
         }
 
         std::size_t read(value_type* p, std::size_t length)
@@ -534,18 +578,32 @@ namespace jsoncons {
     template <class IteratorT>
     class binary_iterator_source
     {
+    public:
+        using value_type = uint8_t;
+    private:
+        static constexpr std::size_t default_max_buffer_size = 16384;
+
         IteratorT current_;
         IteratorT end_;
         std::size_t position_;
+        std::vector<value_type> buffer_;
+        std::size_t buffer_length_;
+
         using difference_type = typename std::iterator_traits<IteratorT>::difference_type;
         using iterator_category = typename std::iterator_traits<IteratorT>::iterator_category;
-    public:
-        using value_type = uint8_t;
 
-        binary_iterator_source(const IteratorT& first, const IteratorT& last)
-            : current_(first), end_(last), position_(0)
+        // Noncopyable 
+        binary_iterator_source(const binary_iterator_source&) = delete;
+        binary_iterator_source& operator=(const binary_iterator_source&) = delete;
+    public:
+        binary_iterator_source(const IteratorT& first, const IteratorT& last, std::size_t buf_size = default_max_buffer_size)
+            : current_(first), end_(last), position_(0), buffer_(buf_size), buffer_length_(0)
         {
         }
+
+        binary_iterator_source(binary_iterator_source&& other) noexcept = default;
+
+        binary_iterator_source& operator=(binary_iterator_source&& other) noexcept = default;
 
         bool eof() const
         {
@@ -574,6 +632,18 @@ namespace jsoncons {
         character_result<value_type> peek() 
         {
             return current_ != end_ ? character_result<value_type>{static_cast<value_type>(*current_), false} : character_result<value_type>{0, true};
+        }
+
+        span<const value_type> read_buffer() 
+        {
+            if (buffer_length_ == 0)
+            {
+                buffer_length_ = read(buffer_.data(), buffer_.size());
+            }
+            std::size_t length = buffer_length_;
+            buffer_length_ = 0;
+
+            return span<const value_type>(buffer_.data(), length);
         }
 
         template <class Category = iterator_category>

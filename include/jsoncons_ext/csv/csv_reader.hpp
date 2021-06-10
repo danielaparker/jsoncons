@@ -55,7 +55,7 @@ namespace jsoncons { namespace csv {
 
     public:
         // Structural characters
-        static constexpr size_t default_max_buffer_length = 16384;
+        static constexpr size_t default_max_buffer_size = 16384;
         //!  Parse an input stream of CSV text into a json object
         /*!
           \param is The input stream to read from
@@ -110,7 +110,7 @@ namespace jsoncons { namespace csv {
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_length,alloc)
+             buffer_reader_(default_max_buffer_size,alloc)
         {
         }
 
@@ -211,7 +211,7 @@ namespace jsoncons { namespace csv {
 
     public:
         // Structural characters
-        static constexpr size_t default_max_buffer_length = 16384;
+        static constexpr size_t default_max_buffer_size = 16384;
         //!  Parse an input stream of CSV text into a json object
         /*!
           \param is The input stream to read from
@@ -267,7 +267,7 @@ namespace jsoncons { namespace csv {
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_length,alloc)
+             buffer_reader_(default_max_buffer_size,alloc)
         {
         }
 
