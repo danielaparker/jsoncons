@@ -23,15 +23,12 @@ namespace jsoncons {
 
     // buffer_reader
 
-    template<class Source,class Allocator=std::allocator<char>>
+    template<class Source>
     class buffer_reader 
     {
     public:
         using value_type = typename Source::value_type;
     private:
-        typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> char_allocator_type;
-
-        std::vector<value_type,char_allocator_type> buffer_;
         const value_type* data_;
         std::size_t length_;
         bool bof_;
@@ -39,24 +36,14 @@ namespace jsoncons {
 
     public:
 
-        buffer_reader(std::size_t buffer_length, const Allocator& alloc = Allocator())
-            : buffer_(buffer_length, value_type(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
+        buffer_reader()
+            : data_(nullptr), length_(0), bof_(true), eof_(false)
         {
         }
 
         bool eof() const
         {
             return eof_;
-        }
-
-        std::size_t buffer_length() const
-        {
-            return buffer_.size();
-        }
-
-        void buffer_length(std::size_t length)
-        {
-            buffer_.resize(length);
         }
 
         const value_type* data() const {return data_;}
@@ -72,16 +59,17 @@ namespace jsoncons {
                 }
                 else
                 {
-                    data_ = buffer_.data();
-                    length_ = source.read(buffer_.data(), buffer_.size());
+                    auto s = source.read_buffer();
+                    data_ = s.data();
+                    length_ = s.size();
 
-                    if (buffer_.empty())
+                    if (length_ == 0)
                     {
                         eof_ = true;
                     }
                     else if (bof_)
                     {
-                        auto r = unicode_traits::detect_encoding_from_bom(buffer_.data(), length_);
+                        auto r = unicode_traits::detect_encoding_from_bom(data_, length_);
                         if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                         {
                             ec = json_errc::illegal_unicode_character;
@@ -98,15 +86,12 @@ namespace jsoncons {
 
     // json_buffer_reader
 
-    template<class Source,class Allocator>
+    template<class Source>
     class json_buffer_reader 
     {
     public:
         using value_type = typename Source::value_type;
     private:
-        typedef typename std::allocator_traits<Allocator>:: template rebind_alloc<value_type> char_allocator_type;
-
-        std::vector<value_type,char_allocator_type> buffer_;
         const value_type* data_;
         std::size_t length_;
         bool bof_;
@@ -114,24 +99,14 @@ namespace jsoncons {
 
     public:
 
-        json_buffer_reader(std::size_t buffer_length, const Allocator& alloc)
-            : buffer_(buffer_length, value_type(), alloc), data_(nullptr), length_(0), bof_(true), eof_(false)
+        json_buffer_reader()
+            : data_(nullptr), length_(0), bof_(true), eof_(false)
         {
         }
 
         bool eof() const
         {
             return eof_;
-        }
-
-        std::size_t buffer_length() const
-        {
-            return buffer_.size();
-        }
-
-        void buffer_length(std::size_t length)
-        {
-            buffer_.resize(length);
         }
 
         const value_type* data() const {return data_;}
@@ -147,16 +122,17 @@ namespace jsoncons {
                 }
                 else
                 {
-                    data_ = buffer_.data();
-                    length_ = source.read(buffer_.data(), buffer_.size());
+                    auto s = source.read_buffer();
+                    data_ = s.data(); 
+                    length_ = s.size();
 
-                    if (buffer_.empty())
+                    if (length_ == 0)
                     {
                         eof_ = true;
                     }
                     else if (bof_)
                     {
-                        auto r = unicode_traits::detect_json_encoding(buffer_.data(), length_);
+                        auto r = unicode_traits::detect_json_encoding(data_, length_);
                         if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                         {
                             ec = json_errc::illegal_unicode_character;

@@ -41,7 +41,7 @@ private:
     source_type source_;
     basic_csv_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
-    buffer_reader<Source,Allocator> buffer_reader_;
+    buffer_reader<Source> buffer_reader_;
 
     // Noncopyable and nonmoveable
     basic_csv_cursor(const basic_csv_cursor&) = delete;
@@ -61,7 +61,7 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(default_max_buffer_size,alloc)
+         buffer_reader_()
     {
         if (!done())
         {
@@ -77,7 +77,7 @@ public:
                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(0,alloc)
+         buffer_reader_()
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
@@ -141,7 +141,7 @@ public:
        : source_(source),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(default_max_buffer_size,alloc)
+         buffer_reader_()
     {
         if (!done())
         {
@@ -158,7 +158,7 @@ public:
                      typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all),
-         buffer_reader_(0,alloc)
+         buffer_reader_()
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
@@ -173,16 +173,6 @@ public:
         {
             next(ec);
         }
-    }
-
-    std::size_t buffer_length() const
-    {
-        return buffer_reader_.buffer_length();
-    }
-
-    void buffer_length(std::size_t size)
-    {
-        buffer_reader_.buffer_length(size);
     }
 
     bool done() const override

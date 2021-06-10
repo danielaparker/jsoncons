@@ -51,7 +51,7 @@ namespace jsoncons { namespace csv {
 
         basic_csv_parser<CharT,Allocator> parser_;
         Source source_;
-        buffer_reader<Source,Allocator> buffer_reader_;
+        buffer_reader<Source> buffer_reader_;
 
     public:
         // Structural characters
@@ -110,7 +110,7 @@ namespace jsoncons { namespace csv {
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_size,alloc)
+             buffer_reader_()
         {
         }
 
@@ -144,16 +144,6 @@ namespace jsoncons { namespace csv {
         bool eof() const
         {
             return buffer_reader_.eof();
-        }
-
-        std::size_t buffer_length() const
-        {
-            return buffer_reader_.buffer_length();
-        }
-
-        void buffer_length(std::size_t size)
-        {
-            buffer_reader_.buffer_length(size);
         }
 
     private:
@@ -207,7 +197,7 @@ namespace jsoncons { namespace csv {
 
         basic_csv_parser<CharT,Allocator> parser_;
         Source source_;
-        buffer_reader<Source,Allocator> buffer_reader_;
+        buffer_reader<Source> buffer_reader_;
 
     public:
         // Structural characters
@@ -267,7 +257,7 @@ namespace jsoncons { namespace csv {
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_size,alloc)
+             buffer_reader_()
         {
         }
 
@@ -280,7 +270,7 @@ namespace jsoncons { namespace csv {
                          typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
-             buffer_reader_(0,alloc)
+             buffer_reader_()
         {
             jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
             auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
@@ -322,16 +312,6 @@ namespace jsoncons { namespace csv {
         bool eof() const
         {
             return buffer_reader_.eof();
-        }
-
-        std::size_t buffer_length() const
-        {
-            return buffer_reader_.buffer_length();
-        }
-
-        void buffer_length(std::size_t size)
-        {
-            buffer_reader_.buffer_length(size);
         }
 
     private:

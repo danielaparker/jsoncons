@@ -167,7 +167,7 @@ namespace jsoncons {
         basic_json_parser<CharT,Allocator> parser_;
 
         source_type source_;
-        json_buffer_reader<Source,Allocator> buffer_reader_;
+        json_buffer_reader<Source> buffer_reader_;
 
         // Noncopyable and nonmoveable
         basic_json_reader(const basic_json_reader&) = delete;
@@ -268,18 +268,8 @@ namespace jsoncons {
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_size, alloc)
+             buffer_reader_()
         {
-        }
-
-        std::size_t buffer_length() const
-        {
-            return buffer_reader_.buffer_length();
-        }
-
-        void buffer_length(std::size_t size)
-        {
-            buffer_reader_.buffer_length(size);
         }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -420,22 +410,6 @@ namespace jsoncons {
                 check_done(ec);
             }
         }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use buffer_length()")
-        std::size_t buffer_capacity() const
-        {
-            return buffer_reader_.buffer_length();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(std::size_t)")
-        void buffer_capacity(std::size_t length)
-        {
-            buffer_reader_.buffer_length(length);
-        }
-#endif
-
     };
 
     template<class CharT,class Source=jsoncons::stream_source<CharT>,class Allocator=std::allocator<char>>
@@ -457,7 +431,7 @@ namespace jsoncons {
         basic_json_parser<CharT,Allocator> parser_;
 
         source_type source_;
-        json_buffer_reader<Source,Allocator> buffer_reader_;
+        json_buffer_reader<Source> buffer_reader_;
 
         // Noncopyable and nonmoveable
         legacy_basic_json_reader(const legacy_basic_json_reader&) = delete;
@@ -559,7 +533,7 @@ namespace jsoncons {
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_(default_max_buffer_size, alloc)
+             buffer_reader_()
         {
         }
 
@@ -572,7 +546,7 @@ namespace jsoncons {
                           typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
            : visitor_(visitor),
              parser_(options,err_handler,alloc),
-             buffer_reader_(0, alloc)
+             buffer_reader_()
         {
             jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
 
@@ -583,16 +557,6 @@ namespace jsoncons {
             }
             std::size_t offset = (r.ptr - sv.data());
             parser_.update(sv.data()+offset,sv.size()-offset);
-        }
-
-        std::size_t buffer_length() const
-        {
-            return buffer_reader_.buffer_length();
-        }
-
-        void buffer_length(std::size_t size)
-        {
-            buffer_reader_.buffer_length(size);
         }
 
 #if !defined(JSONCONS_NO_DEPRECATED)
@@ -733,22 +697,6 @@ namespace jsoncons {
                 check_done(ec);
             }
         }
-
-#if !defined(JSONCONS_NO_DEPRECATED)
-
-        JSONCONS_DEPRECATED_MSG("Instead, use buffer_length()")
-        std::size_t buffer_capacity() const
-        {
-            return buffer_reader_.buffer_length();
-        }
-
-        JSONCONS_DEPRECATED_MSG("Instead, use buffer_length(std::size_t)")
-        void buffer_capacity(std::size_t length)
-        {
-            buffer_reader_.buffer_length(length);
-        }
-#endif
-
     };
 
 #if !defined(JSONCONS_NO_DEPRECATED)

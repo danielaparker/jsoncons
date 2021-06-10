@@ -16,7 +16,7 @@ TEST_CASE("buffer reader tests")
 {
     SECTION("test 1")
     {
-        json_buffer_reader<jsoncons::string_source<char>,std::allocator<char>> reader(10,std::allocator<char>());
+        json_buffer_reader<> reader();
     }
 
 }
