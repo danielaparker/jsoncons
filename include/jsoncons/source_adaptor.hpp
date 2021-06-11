@@ -21,10 +21,10 @@
 
 namespace jsoncons {
 
-    // buffer_reader
+    // text_source_adaptor
 
     template<class Source>
-    class buffer_reader 
+    class text_source_adaptor 
     {
     public:
         using value_type = typename Source::value_type;
@@ -35,7 +35,7 @@ namespace jsoncons {
 
     public:
 
-        buffer_reader()
+        text_source_adaptor()
             : data_(nullptr), length_(0), bof_(true)
         {
         }
@@ -43,7 +43,7 @@ namespace jsoncons {
         const value_type* data() const {return data_;}
         std::size_t length() const {return length_;}
 
-        void read(Source& source, std::error_code& ec)
+        void read_buffer(Source& source, std::error_code& ec)
         {
             if (source.eof())
             {
@@ -71,10 +71,10 @@ namespace jsoncons {
         }
     };
 
-    // json_buffer_reader
+    // json_source_adaptor
 
     template<class Source>
-    class json_buffer_reader 
+    class json_source_adaptor 
     {
     public:
         using value_type = typename Source::value_type;
@@ -85,7 +85,7 @@ namespace jsoncons {
 
     public:
 
-        json_buffer_reader()
+        json_source_adaptor()
             : data_(nullptr), length_(0), bof_(true)
         {
         }
@@ -93,7 +93,7 @@ namespace jsoncons {
         const value_type* data() const {return data_;}
         std::size_t length() const {return length_;}
 
-        void read(Source& source, std::error_code& ec)
+        void read_buffer(Source& source, std::error_code& ec)
         {
             if (source.eof())
             {

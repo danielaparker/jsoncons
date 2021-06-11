@@ -39,7 +39,7 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
 
     source_type source_;
-    buffer_reader<Source> source_adaptor_;
+    text_source_adaptor<Source> source_adaptor_;
     basic_csv_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
 
@@ -275,7 +275,7 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                source_adaptor_.read(source_, ec);
+                source_adaptor_.read_buffer(source_, ec);
                 if (ec) return;
                 if (source_adaptor_.length() > 0)
                 {
@@ -294,7 +294,7 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                source_adaptor_.read(source_, ec);
+                source_adaptor_.read_buffer(source_, ec);
                 if (ec) return;
                 if (source_adaptor_.length() > 0)
                 {

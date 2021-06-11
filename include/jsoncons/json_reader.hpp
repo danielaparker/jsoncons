@@ -161,7 +161,7 @@ namespace jsoncons {
         static constexpr size_t default_max_buffer_size = 16384;
 
         source_type source_;
-        json_buffer_reader<Source> source_adaptor_;
+        json_source_adaptor<Source> source_adaptor_;
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_json_parser<CharT,Allocator> parser_;
@@ -304,7 +304,7 @@ namespace jsoncons {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
                     if (source_adaptor_.length() > 0)
                     {
@@ -320,7 +320,7 @@ namespace jsoncons {
                 parser_.skip_whitespace();
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
                     if (source_adaptor_.length() > 0)
                     {
@@ -372,7 +372,7 @@ namespace jsoncons {
                 {
                     if (parser_.source_exhausted())
                     {
-                        source_adaptor_.read(source_, ec);
+                        source_adaptor_.read_buffer(source_, ec);
                         if (ec) return;
                         if (source_adaptor_.length() > 0)
                         {
@@ -423,7 +423,7 @@ namespace jsoncons {
         static constexpr size_t default_max_buffer_size = 16384;
 
         source_type source_;
-        json_buffer_reader<Source> source_adaptor_;
+        json_source_adaptor<Source> source_adaptor_;
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_json_parser<CharT,Allocator> parser_;
@@ -589,7 +589,7 @@ namespace jsoncons {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
                     if (source_adaptor_.length() > 0)
                     {
@@ -605,7 +605,7 @@ namespace jsoncons {
                 parser_.skip_whitespace();
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
                     if (source_adaptor_.length() > 0)
                     {
@@ -657,7 +657,7 @@ namespace jsoncons {
                 {
                     if (parser_.source_exhausted())
                     {
-                        source_adaptor_.read(source_, ec);
+                        source_adaptor_.read_buffer(source_, ec);
                         if (ec) return;
                         if (source_adaptor_.length() > 0)
                         {

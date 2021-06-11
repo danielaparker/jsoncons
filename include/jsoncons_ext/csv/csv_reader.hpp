@@ -46,7 +46,7 @@ namespace jsoncons { namespace csv {
         basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
         Source source_;
-        buffer_reader<Source> source_adaptor_;
+        text_source_adaptor<Source> source_adaptor_;
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_csv_parser<CharT,Allocator> parser_;
@@ -158,7 +158,7 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
                     if (source_adaptor_.length() > 0)
                     {
@@ -196,7 +196,7 @@ namespace jsoncons { namespace csv {
 
         basic_csv_parser<CharT,Allocator> parser_;
         Source source_;
-        buffer_reader<Source> source_adaptor_;
+        text_source_adaptor<Source> source_adaptor_;
 
     public:
         // Structural characters
@@ -326,7 +326,7 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
                     if (source_adaptor_.length() > 0)
                     {

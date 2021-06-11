@@ -103,7 +103,7 @@ add_executable(unit_tests
                msgpack/src/msgpack_tests.cpp
                msgpack/src/msgpack_timestamp_tests.cpp
                src/bigint_tests.cpp
-               src/buffer_reader_tests.cpp
+               src/source_adaptor_tests.cpp
                src/byte_string_tests.cpp
                src/converter_tests.cpp
                src/decode_traits_tests.cpp
