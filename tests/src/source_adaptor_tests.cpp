@@ -1,7 +1,7 @@
 // Copyright 2013 Daniel Parker
 // Distributed under Boost license
 
-#include <jsoncons/buffer_reader.hpp>
+#include <jsoncons/source_adaptor.hpp>
 #include <catch/catch.hpp>
 #include <sstream>
 #include <vector>

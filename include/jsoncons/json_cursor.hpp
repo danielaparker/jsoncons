@@ -21,7 +21,7 @@
 #include <jsoncons/json_parser.hpp>
 #include <jsoncons/staj_cursor.hpp>
 #include <jsoncons/source.hpp>
-#include <jsoncons/buffer_reader.hpp>
+#include <jsoncons/source_adaptor.hpp>
 
 namespace jsoncons {
 
@@ -38,9 +38,9 @@ private:
     static constexpr size_t default_max_buffer_size = 16384;
 
     source_type source_;
+    json_buffer_reader<Source> source_adaptor_;
     basic_json_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
-    json_buffer_reader<Source> buffer_reader_;
 
     // Noncopyable and nonmoveable
     basic_json_cursor(const basic_json_cursor&) = delete;
@@ -57,9 +57,9 @@ public:
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
+         source_adaptor_(),
          parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all),
-         buffer_reader_()
+         cursor_visitor_(accept_all)
     {
         if (!done())
         {
@@ -74,8 +74,8 @@ public:
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all),
-         buffer_reader_()
+         source_adaptor_(),
+         cursor_visitor_(accept_all)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
 
@@ -138,9 +138,9 @@ public:
                       std::error_code& ec,
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
+         source_adaptor_(),
          parser_(options,err_handler,alloc),
-         cursor_visitor_(accept_all),
-         buffer_reader_()
+         cursor_visitor_(accept_all)
     {
         if (!done())
         {
@@ -155,9 +155,9 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec,
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-       : parser_(options, err_handler, alloc),
-         cursor_visitor_(accept_all),
-         buffer_reader_()
+       : source_adaptor_(),
+         parser_(options, err_handler, alloc),
+         cursor_visitor_(accept_all)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
         auto r = unicode_traits::detect_json_encoding(sv.data(), sv.size());
@@ -240,7 +240,7 @@ public:
             ec = json_errc::source_error;
             return;
         }   
-        if (source_.eof() && buffer_reader_.length() == 0)
+        if (source_.eof())
         {
             parser_.check_done(ec);
             if (ec) return;
@@ -251,11 +251,11 @@ public:
             {
                 if (parser_.source_exhausted())
                 {
-                    buffer_reader_.read(source_, ec);
+                    source_adaptor_.read(source_, ec);
                     if (ec) return;
-                    if (buffer_reader_.length() > 0)
+                    if (source_adaptor_.length() > 0)
                     {
-                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
                     }
                 }
                 if (!parser_.source_exhausted())
@@ -270,7 +270,7 @@ public:
 
     bool eof() const
     {
-        return source_.eof() && buffer_reader_.length() == 0;
+        return parser_.source_exhausted() && source_.eof();
     }
 
     std::size_t line() const override
@@ -304,11 +304,11 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                buffer_reader_.read(source_, ec);
+                source_adaptor_.read(source_, ec);
                 if (ec) return;
-                if (buffer_reader_.length() > 0)
+                if (source_adaptor_.length() > 0)
                 {
-                    parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                    parser_.update(source_adaptor_.data(),source_adaptor_.length());
                 }
             }
             parser_.parse_some(cursor_visitor_, ec);
@@ -323,11 +323,11 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                buffer_reader_.read(source_, ec);
+                source_adaptor_.read(source_, ec);
                 if (ec) return;
-                if (buffer_reader_.length() > 0)
+                if (source_adaptor_.length() > 0)
                 {
-                    parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                    parser_.update(source_adaptor_.data(),source_adaptor_.length());
                 }
             }
             parser_.parse_some(visitor, ec);
@@ -335,6 +335,11 @@ private:
         }
     }
 };
+
+using json_stream_cursor = basic_json_cursor<jsoncons::stream_source<char>>;
+using json_string_cursor = basic_json_cursor<jsoncons::string_source<char>>;
+using wjson_stream_cursor = basic_json_cursor<jsoncons::stream_source<wchar_t>>;
+using wjson_string_cursor = basic_json_cursor<jsoncons::string_source<wchar_t>>;
 
 using json_cursor = basic_json_cursor<char>;
 using wjson_cursor = basic_json_cursor<wchar_t>;

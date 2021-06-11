@@ -18,7 +18,7 @@
 #include <jsoncons/json_exception.hpp>
 #include <jsoncons/json_visitor.hpp>
 #include <jsoncons/json_parser.hpp>
-#include <jsoncons/source_adaptor.hpp>
+#include <jsoncons/text_source_adaptor.hpp>
 
 namespace jsoncons {
 
@@ -160,9 +160,8 @@ namespace jsoncons {
 
         static constexpr size_t default_max_buffer_size = 16384;
 
-        source_type source_;
-        json_buffer_reader<Source> source_adaptor_;
         basic_default_json_visitor<CharT> default_visitor_;
+        json_source_adaptor<Source,Allocator> source_;
         basic_json_visitor<CharT>& visitor_;
         basic_json_parser<CharT,Allocator> parser_;
 
@@ -263,7 +262,6 @@ namespace jsoncons {
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
            : source_(std::forward<Sourceable>(source)),
-             source_adaptor_(),
              visitor_(visitor),
              parser_(options,err_handler,alloc)
         {
@@ -304,11 +302,11 @@ namespace jsoncons {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
-                    if (source_adaptor_.length() > 0)
+                    if (s.size() > 0)
                     {
-                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                        parser_.update(s.data(),s.size());
                     }
                 }
                 parser_.parse_some(visitor_, ec);
@@ -320,11 +318,11 @@ namespace jsoncons {
                 parser_.skip_whitespace();
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
-                    if (source_adaptor_.length() > 0)
+                    if (s.size() > 0)
                     {
-                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                        parser_.update(s.data(), s.size());
                     }
                 }
                 else
@@ -372,11 +370,11 @@ namespace jsoncons {
                 {
                     if (parser_.source_exhausted())
                     {
-                        source_adaptor_.read(source_, ec);
+                        auto s = source_.read_buffer(ec);
                         if (ec) return;
-                        if (source_adaptor_.length() > 0)
+                        if (s.size() > 0)
                         {
-                            parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                            parser_.update(s.data(), s.size());
                         }
                     }
                     if (!parser_.source_exhausted())
@@ -422,11 +420,13 @@ namespace jsoncons {
 
         static constexpr size_t default_max_buffer_size = 16384;
 
-        source_type source_;
-        json_buffer_reader<Source> source_adaptor_;
         basic_default_json_visitor<CharT> default_visitor_;
+
         basic_json_visitor<CharT>& visitor_;
+
         basic_json_parser<CharT,Allocator> parser_;
+
+        json_source_adaptor<Source,Allocator> source_;
 
         // Noncopyable and nonmoveable
         legacy_basic_json_reader(const legacy_basic_json_reader&) = delete;
@@ -525,10 +525,10 @@ namespace jsoncons {
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator(),
                           typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-           : source_(std::forward<Sourceable>(source)),
-             source_adaptor_(),
-             visitor_(visitor),
-             parser_(options,err_handler,alloc)
+           : visitor_(visitor),
+             parser_(options,err_handler,alloc),
+             source_(std::forward<Sourceable>(source)),
+             source_()
         {
         }
 
@@ -539,9 +539,9 @@ namespace jsoncons {
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator(),
                           typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-           : source_adaptor_(),
-             visitor_(visitor),
-             parser_(options,err_handler,alloc)
+           : visitor_(visitor),
+             parser_(options,err_handler,alloc),
+             source_()
         {
             jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
 
@@ -589,11 +589,11 @@ namespace jsoncons {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_.read(source_, ec);
                     if (ec) return;
-                    if (source_adaptor_.length() > 0)
+                    if (source_.length() > 0)
                     {
-                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                        parser_.update(source_.data(),source_.length());
                     }
                 }
                 parser_.parse_some(visitor_, ec);
@@ -605,11 +605,11 @@ namespace jsoncons {
                 parser_.skip_whitespace();
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read(source_, ec);
+                    source_.read(source_, ec);
                     if (ec) return;
-                    if (source_adaptor_.length() > 0)
+                    if (source_.length() > 0)
                     {
-                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                        parser_.update(source_.data(),source_.length());
                     }
                 }
                 else
@@ -646,7 +646,7 @@ namespace jsoncons {
                 ec = json_errc::source_error;
                 return;
             }   
-            if (source_.eof())
+            if (source_.eof() && source_.length() == 0)
             {
                 parser_.check_done(ec);
                 if (ec) return;
@@ -657,11 +657,11 @@ namespace jsoncons {
                 {
                     if (parser_.source_exhausted())
                     {
-                        source_adaptor_.read(source_, ec);
+                        source_.read(source_, ec);
                         if (ec) return;
-                        if (source_adaptor_.length() > 0)
+                        if (source_.length() > 0)
                         {
-                            parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                            parser_.update(source_.data(),source_.length());
                         }
                     }
                     if (!parser_.source_exhausted())
@@ -676,7 +676,7 @@ namespace jsoncons {
 
         bool eof() const
         {
-            return parser_.source_exhausted() && source_.eof();
+            return source_.eof() && source_.length() == 0;
         }
 
         void read()

@@ -21,7 +21,7 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons/json_reader.hpp>
 #include <jsoncons/json_decoder.hpp>
-#include <jsoncons/buffer_reader.hpp>
+#include <jsoncons/source_adaptor.hpp>
 #include <jsoncons_ext/csv/csv_options.hpp>
 
 namespace jsoncons { namespace csv {
@@ -45,13 +45,11 @@ namespace jsoncons { namespace csv {
         basic_csv_reader(const basic_csv_reader&) = delete; 
         basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
-        basic_default_json_visitor<CharT> default_visitor_;
-
-        basic_json_visitor<CharT>& visitor_;
-
-        basic_csv_parser<CharT,Allocator> parser_;
         Source source_;
-        buffer_reader<Source> buffer_reader_;
+        buffer_reader<Source> source_adaptor_;
+        basic_default_json_visitor<CharT> default_visitor_;
+        basic_json_visitor<CharT>& visitor_;
+        basic_csv_parser<CharT,Allocator> parser_;
 
     public:
         // Structural characters
@@ -107,10 +105,11 @@ namespace jsoncons { namespace csv {
                          const basic_csv_decode_options<CharT>& options,
                          std::function<bool(csv_errc,const ser_context&)> err_handler, 
                          const Allocator& alloc = Allocator())
-           : visitor_(visitor),
-             parser_(options, err_handler, alloc),
-             source_(std::forward<Sourceable>(source)),
-             buffer_reader_()
+           : source_(std::forward<Sourceable>(source)),
+             source_adaptor_(),
+             visitor_(visitor),
+             parser_(options, err_handler, alloc)
+             
         {
         }
 
@@ -143,7 +142,7 @@ namespace jsoncons { namespace csv {
 
         bool eof() const
         {
-            return source_.eof() && buffer_reader_.length() == 0;
+            return parser_.source_exhausted() && source_.eof();
         }
 
     private:
@@ -159,11 +158,11 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    buffer_reader_.read(source_, ec);
+                    source_adaptor_.read(source_, ec);
                     if (ec) return;
-                    if (buffer_reader_.length() > 0)
+                    if (source_adaptor_.length() > 0)
                     {
-                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
                     }
                 }
                 parser_.parse_some(visitor_, ec);
@@ -197,7 +196,7 @@ namespace jsoncons { namespace csv {
 
         basic_csv_parser<CharT,Allocator> parser_;
         Source source_;
-        buffer_reader<Source> buffer_reader_;
+        buffer_reader<Source> source_adaptor_;
 
     public:
         // Structural characters
@@ -257,7 +256,7 @@ namespace jsoncons { namespace csv {
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
              source_(std::forward<Sourceable>(source)),
-             buffer_reader_()
+             source_adaptor_()
         {
         }
 
@@ -270,7 +269,7 @@ namespace jsoncons { namespace csv {
                          typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
-             buffer_reader_()
+             source_adaptor_()
         {
             jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
             auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
@@ -311,7 +310,7 @@ namespace jsoncons { namespace csv {
 
         bool eof() const
         {
-            return source_.eof() && buffer_reader_.length() == 0;
+            return parser_.source_exhausted() && source_.eof();
         }
 
     private:
@@ -327,11 +326,11 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    buffer_reader_.read(source_, ec);
+                    source_adaptor_.read(source_, ec);
                     if (ec) return;
-                    if (buffer_reader_.length() > 0)
+                    if (source_adaptor_.length() > 0)
                     {
-                        parser_.update(buffer_reader_.data(),buffer_reader_.length());
+                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
                     }
                 }
                 parser_.parse_some(visitor_, ec);
