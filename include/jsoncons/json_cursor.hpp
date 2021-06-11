@@ -73,8 +73,8 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-       : parser_(options, err_handler, alloc),
-         source_adaptor_(),
+       : source_adaptor_(),
+         parser_(options, err_handler, alloc),
          cursor_visitor_(accept_all)
     {
         jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
