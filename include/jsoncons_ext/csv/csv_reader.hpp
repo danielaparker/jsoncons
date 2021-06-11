@@ -158,11 +158,11 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
-                    if (source_adaptor_.length() > 0)
+                    if (s.size() > 0)
                     {
-                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                        parser_.update(s.data(),s.size());
                     }
                 }
                 parser_.parse_some(visitor_, ec);
@@ -326,11 +326,11 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_adaptor_.read_buffer(source_, ec);
                     if (ec) return;
-                    if (source_adaptor_.length() > 0)
+                    if (s.size() > 0)
                     {
-                        parser_.update(source_adaptor_.data(),source_adaptor_.length());
+                        parser_.update(s.data(),s.size());
                     }
                 }
                 parser_.parse_some(visitor_, ec);

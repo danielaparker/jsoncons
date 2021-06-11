@@ -29,45 +29,39 @@ namespace jsoncons {
     public:
         using value_type = typename Source::value_type;
     private:
-        const value_type* data_;
-        std::size_t length_;
         bool bof_;
 
     public:
 
         text_source_adaptor()
-            : data_(nullptr), length_(0), bof_(true)
+            : bof_(true)
         {
         }
 
-        const value_type* data() const {return data_;}
-        std::size_t length() const {return length_;}
-
-        void read_buffer(Source& source, std::error_code& ec)
+        span<const value_type> read_buffer(Source& source, std::error_code& ec)
         {
             if (source.eof())
             {
-                length_ = 0;
+                return span<const value_type>();
             }
-            else
-            {
-                auto s = source.read_buffer();
-                data_ = s.data();
-                length_ = s.size();
 
-                if (bof_ && length_ > 0)
+            auto s = source.read_buffer();
+            const value_type* data = s.data();
+            std::size_t length = s.size();
+
+            if (bof_ && length > 0)
+            {
+                auto r = unicode_traits::detect_encoding_from_bom(data, length);
+                if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                 {
-                    auto r = unicode_traits::detect_encoding_from_bom(data_, length_);
-                    if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
-                    {
-                        ec = json_errc::illegal_unicode_character;
-                        return;
-                    }
-                    length_ -= (r.ptr - data_);
-                    data_ = r.ptr;
-                    bof_ = false;
+                    ec = json_errc::illegal_unicode_character;
+                    return span<const value_type>();
                 }
+                length -= (r.ptr - data);
+                data = r.ptr;
+                bof_ = false;
             }
+            return span<const value_type>(data, length);           
         }
     };
 
@@ -79,45 +73,40 @@ namespace jsoncons {
     public:
         using value_type = typename Source::value_type;
     private:
-        const value_type* data_;
-        std::size_t length_;
         bool bof_;
 
     public:
 
         json_source_adaptor()
-            : data_(nullptr), length_(0), bof_(true)
+            : bof_(true)
         {
         }
 
-        const value_type* data() const {return data_;}
-        std::size_t length() const {return length_;}
-
-        void read_buffer(Source& source, std::error_code& ec)
+        span<const value_type> read_buffer(Source& source, std::error_code& ec)
         {
             if (source.eof())
             {
-                length_ = 0;
+                return span<const value_type>();
             }
-            else
-            {
-                auto s = source.read_buffer();
-                data_ = s.data(); 
-                length_ = s.size();
 
-                if (bof_ && length_ > 0)
+            auto s = source.read_buffer();
+            const value_type* data = s.data();
+            std::size_t length = s.size();
+
+            if (bof_ && length > 0)
+            {
+                auto r = unicode_traits::detect_json_encoding(data, length);
+                if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
                 {
-                    auto r = unicode_traits::detect_json_encoding(data_, length_);
-                    if (!(r.encoding == unicode_traits::encoding_kind::utf8 || r.encoding == unicode_traits::encoding_kind::undetected))
-                    {
-                        ec = json_errc::illegal_unicode_character;
-                        return;
-                    }
-                    length_ -= (r.ptr - data_);
-                    data_ = r.ptr;
-                    bof_ = false;
+                    ec = json_errc::illegal_unicode_character;
+                    return span<const value_type>();
                 }
+                length -= (r.ptr - data);
+                data = r.ptr;
+                bof_ = false;
             }
+            
+            return span<const value_type>(data, length);           
         }
     };
 
