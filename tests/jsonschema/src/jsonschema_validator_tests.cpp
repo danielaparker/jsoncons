@@ -22,7 +22,7 @@ TEST_CASE("jsonschema validator tests")
         json schema = json::parse(R"(
 {
   "$id": "https://example.com/polygon",
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "$defs": {
     "point": {
       "type": "object",

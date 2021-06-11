@@ -523,6 +523,18 @@ namespace jsonschema {
         }
     };
 
+    template <class T, class Json>
+    T get_number(const Json& val, const string_view& keyword) 
+    {
+        if (!val.is_number())
+        {
+            std::string message(keyword);
+            message.append(" must be a number value");
+            JSONCONS_THROW(schema_error(message));
+        }
+        return val.template as<T>();
+    }
+
     template <class Json,class T>
     class number_keyword : public schema_keyword<Json>
     {
@@ -549,7 +561,7 @@ namespace jsonschema {
             auto it = sch.find("maximum");
             if (it != sch.object_range().end()) 
             {
-                maximum_ = it->value().template as<T>();
+                maximum_ = get_number<T>(it->value(), "maximum");
                 absolute_maximum_location_ = make_absolute_keyword_location(uris,"maximum");
                 keywords.insert("maximum");
             }
@@ -557,7 +569,7 @@ namespace jsonschema {
             it = sch.find("minimum");
             if (it != sch.object_range().end()) 
             {
-                minimum_ = it->value().template as<T>();
+                minimum_ = get_number<T>(it->value(), "minimum");
                 absolute_minimum_location_ = make_absolute_keyword_location(uris,"minimum");
                 keywords.insert("minimum");
             }
@@ -565,7 +577,7 @@ namespace jsonschema {
             it = sch.find("exclusiveMaximum");
             if (it != sch.object_range().end()) 
             {
-                exclusive_maximum_ = it->value().template as<T>();
+                exclusive_maximum_ = get_number<T>(it->value(), "exclusiveMaximum");
                 absolute_exclusive_maximum_location_ = make_absolute_keyword_location(uris,"exclusiveMaximum");
                 keywords.insert("exclusiveMaximum");
             }
@@ -573,7 +585,7 @@ namespace jsonschema {
             it = sch.find("exclusiveMinimum");
             if (it != sch.object_range().end()) 
             {
-                exclusive_minimum_ = it->value().template as<T>();
+                exclusive_minimum_ = get_number<T>(it->value(), "exclusiveMinimum");
                 absolute_exclusive_minimum_location_ = make_absolute_keyword_location(uris,"exclusiveMinimum");
                 keywords.insert("exclusiveMinimum");
             }
@@ -581,7 +593,7 @@ namespace jsonschema {
             it = sch.find("multipleOf");
             if (it != sch.object_range().end()) 
             {
-                multiple_of_ = it->value().template as<double>();
+                multiple_of_ = get_number<double>(it->value(), "multipleOf");
                 absolute_multiple_of_location_ = make_absolute_keyword_location(uris,"multipleOf");
                 keywords.insert("multipleOf");
             }

@@ -95,6 +95,7 @@ add_executable(unit_tests
                jsonschema/src/jsonschema_defaults_tests.cpp
                jsonschema/src/jsonschema_output_format_tests.cpp
                jsonschema/src/jsonschema_tests.cpp
+               jsonschema/src/schema_version_tests.cpp
                msgpack/src/decode_msgpack_tests.cpp
                msgpack/src/encode_msgpack_tests.cpp
                msgpack/src/msgpack_bitset_traits_tests.cpp
