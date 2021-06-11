@@ -13,7 +13,8 @@
 #include <jsoncons_ext/jsonpointer/jsonpointer.hpp>
 #include <jsoncons_ext/jsonschema/subschema.hpp>
 #include <jsoncons_ext/jsonschema/schema_keywords.hpp>
-#include <jsoncons_ext/jsonschema/json_schema_draft7.hpp>
+#include <jsoncons_ext/jsonschema/schema_draft7.hpp>
+#include <jsoncons_ext/jsonschema/schema_version.hpp>
 #include <cassert>
 #include <set>
 #include <sstream>
@@ -115,7 +116,7 @@ namespace jsonschema {
         {
             if (uri.path() == "/draft-07/schema") 
             {
-                return jsoncons::jsonschema::json_schema_draft7<Json>::get_schema();
+                return jsoncons::jsonschema::schema_draft7<Json>::get_schema();
             }
 
             JSONCONS_THROW(jsonschema::schema_error("Don't know how to load JSON Schema " + std::string(uri.base())));
@@ -353,6 +354,25 @@ namespace jsonschema {
             return sch;
         }
 
+        void load_root(const Json& sch)
+        {
+            if (sch.is_object())
+            {
+                auto it = sch.find("$schema");
+                if (it != sch.object_range().end())
+                {
+                    auto sv = it->value().as_string_view();
+                    if (!schema_version::contains(sv))
+                    {
+                        std::string message("Unsupported schema version ");
+                        message.append(sv.data(), sv.size());
+                        JSONCONS_THROW(schema_error(message));
+                    }
+                }
+            }
+            load(sch);
+        }
+
         void load(const Json& sch)
         {
             subschema_registries_.clear();
@@ -509,7 +529,7 @@ namespace jsonschema {
     std::shared_ptr<json_schema<Json>> make_schema(const Json& schema)
     {
         schema_loader<Json> loader{default_uri_resolver<Json>()};
-        loader.load(schema);
+        loader.load_root(schema);
 
         return loader.get_schema();
     }
@@ -519,7 +539,7 @@ namespace jsonschema {
     make_schema(const Json& schema, const URIResolver& resolver)
     {
         schema_loader<Json> loader(resolver);
-        loader.load(schema);
+        loader.load_root(schema);
 
         return loader.get_schema();
     }
