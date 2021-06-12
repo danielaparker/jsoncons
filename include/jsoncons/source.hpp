@@ -113,6 +113,7 @@ namespace jsoncons {
                 buffer_ = std::move(other.buffer_);
                 buffer_data_ = buffer_.data() + (other.buffer_data_ - other.buffer_.data());
                 buffer_length_ =  other.buffer_length_;
+                other = stream_source();
             }
         }
 
@@ -130,6 +131,7 @@ namespace jsoncons {
                 buffer_ = std::move(other.buffer_);
                 buffer_data_ = buffer_.data() + (other.buffer_data_ - other.buffer_.data());
                 buffer_length_ =  other.buffer_length_;
+                other = stream_source();
             }
             else
             {
