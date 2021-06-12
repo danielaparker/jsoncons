@@ -261,9 +261,9 @@ namespace jsoncons { namespace csv {
                          std::function<bool(csv_errc,const ser_context&)> err_handler, 
                          const Allocator& alloc = Allocator(),
                          typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-           : visitor_(visitor),
-             parser_(options, err_handler, alloc),
-             source_()
+           : source_(),
+             visitor_(visitor),
+             parser_(options, err_handler, alloc)             
         {
             jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
             auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
