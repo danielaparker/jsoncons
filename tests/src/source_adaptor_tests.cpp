@@ -24,7 +24,7 @@ TEST_CASE("json_source_adaptor constructor tests")
 {
     SECTION("test 1")
     {
-        json_source_adaptor<string_source<char>> source(string_source<char>());
+        json_source_adaptor<string_source<char>> source{string_source<char>()};
         CHECK(source.eof());
     }
 }
