@@ -691,7 +691,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            if (!(instance.template is_integer<int64_t>() || instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>()))
+            if (!(instance.template is_integer<int64_t>() || (instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>())))
             {
                 reporter.error(validation_output(instance_location.string(), "Instance is not an integer", "integer", this->absolute_keyword_location()));
                 if (reporter.fail_early())
