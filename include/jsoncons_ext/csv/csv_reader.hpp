@@ -45,8 +45,8 @@ namespace jsoncons { namespace csv {
         basic_csv_reader(const basic_csv_reader&) = delete; 
         basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
-        text_source_adaptor<Source> source_;
         basic_default_json_visitor<CharT> default_visitor_;
+        text_source_adaptor<Source> source_;
         basic_json_visitor<CharT>& visitor_;
         basic_csv_parser<CharT,Allocator> parser_;
 
@@ -189,11 +189,9 @@ namespace jsoncons { namespace csv {
         legacy_basic_csv_reader& operator = (const legacy_basic_csv_reader&) = delete; 
 
         basic_default_json_visitor<CharT> default_visitor_;
-
-        basic_json_visitor<CharT>& visitor_;
-
-        basic_csv_parser<CharT,Allocator> parser_;
         text_source_adaptor<Source> source_;
+        basic_json_visitor<CharT>& visitor_;
+        basic_csv_parser<CharT,Allocator> parser_;
 
     public:
         // Structural characters
@@ -250,10 +248,9 @@ namespace jsoncons { namespace csv {
                          std::function<bool(csv_errc,const ser_context&)> err_handler, 
                          const Allocator& alloc = Allocator(),
                          typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-           : visitor_(visitor),
-             parser_(options, err_handler, alloc),
-             source_(std::forward<Sourceable>(source)),
-             source_()
+           : source_(std::forward<Sourceable>(source)),
+             visitor_(visitor),
+             parser_(options, err_handler, alloc)
         {
         }
 
