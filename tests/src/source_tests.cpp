@@ -10,6 +10,14 @@
 #include <ctime>
 #include <new>
 
+TEST_CASE("basic_null_istream tests")
+{
+    SECTION("test1")
+    {
+        jsoncons::basic_null_istream<char> is{ jsoncons::basic_null_istream<char>() };
+    }
+}
+
 TEST_CASE("string_source tests")
 {
     std::string data = "012345678";

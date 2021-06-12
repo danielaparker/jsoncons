@@ -27,13 +27,15 @@ namespace jsoncons {
     {
         class null_buffer : public std::basic_streambuf<CharT>
         {
+            null_buffer(const null_buffer&) = delete;
+            null_buffer& operator=(const null_buffer&) = delete;
         public:
             using typename std::basic_streambuf<CharT>::int_type;
             using typename std::basic_streambuf<CharT>::traits_type;
 
             null_buffer() = default;
-            null_buffer(const null_buffer&) = default;
-            null_buffer& operator=(const null_buffer&) = default;
+            null_buffer(null_buffer&&) = default;
+            null_buffer& operator=(null_buffer&&) = default;
 
             int_type overflow( int_type ch = traits_type::eof() ) override
             {
@@ -45,9 +47,17 @@ namespace jsoncons {
           : std::basic_istream<CharT>(&nb_)
         {
         }
-        basic_null_istream(basic_null_istream&&) = default;
 
-        basic_null_istream& operator=(basic_null_istream&&) = default;
+        basic_null_istream(const null_buffer&) = delete;
+        basic_null_istream& operator=(const null_buffer&) = delete;
+        basic_null_istream(basic_null_istream&& other)
+            : std::basic_istream<CharT>(&nb_)
+        {
+        }
+        basic_null_istream& operator=(basic_null_istream&&) 
+        {
+            return *this;
+        }
     };
 
     template <class CharT>
@@ -95,7 +105,15 @@ namespace jsoncons {
             : stream_ptr_(&null_is_), sbuf_(null_is_.rdbuf()), position_(0),
               buffer_(), buffer_data_(buffer_.data()), buffer_length_(0)
         {
-            swap(other);
+            if (other.stream_ptr_ != &other.null_is_)
+            {
+                stream_ptr_ = other.stream_ptr_;
+                sbuf_ = other.sbuf_;
+                position_ = other.position_;
+                buffer_ = std::move(other.buffer_);
+                buffer_data_ = buffer_.data() + (other.buffer_data_ - other.buffer_.data());
+                buffer_length_ =  other.buffer_length_;
+            }
         }
 
         ~stream_source()
@@ -104,18 +122,24 @@ namespace jsoncons {
 
         stream_source& operator=(stream_source&& other) noexcept
         {
-            swap(other);
+            if (other.stream_ptr_ != &other.null_is_)
+            {
+                stream_ptr_ = other.stream_ptr_;
+                sbuf_ = other.sbuf_;
+                position_ = other.position_;
+                buffer_ = std::move(other.buffer_);
+                buffer_data_ = buffer_.data() + (other.buffer_data_ - other.buffer_.data());
+                buffer_length_ =  other.buffer_length_;
+            }
+            else
+            {
+                stream_ptr_ = &null_is_;
+                sbuf_ = null_is_.rdbuf();
+                position_ = 0;
+                buffer_data_ = buffer_.data();
+                buffer_length_ =  0;
+            }
             return *this;
-        }
-
-        void swap(stream_source& other) noexcept
-        {
-            std::swap(stream_ptr_,other.stream_ptr_);
-            std::swap(sbuf_,other.sbuf_);
-            std::swap(position_,other.position_);
-            std::swap(buffer_,other.buffer_);
-            std::swap(buffer_data_,other.buffer_data_);
-            std::swap(buffer_length_, other.buffer_length_);
         }
 
         bool eof() const
