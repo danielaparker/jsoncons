@@ -233,7 +233,7 @@ namespace jsonschema {
                                          const std::vector<uri_wrapper>& uris, 
                                          std::set<std::string>& keywords) override
         {
-            auto sch_orig = jsoncons::make_unique<number_keyword<Json,int64_t>>(schema, uris, keywords);
+            auto sch_orig = jsoncons::make_unique<integer_keyword<Json>>(schema, uris, keywords);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;
@@ -243,7 +243,7 @@ namespace jsonschema {
                                         const std::vector<uri_wrapper>& uris, 
                                         std::set<std::string>& keywords) override
         {
-            auto sch_orig = jsoncons::make_unique<number_keyword<Json,double>>(schema, uris, keywords);
+            auto sch_orig = jsoncons::make_unique<number_keyword<Json>>(schema, uris, keywords);
             auto sch = sch_orig.get();
             subschemas_.emplace_back(std::move(sch_orig));
             return sch;

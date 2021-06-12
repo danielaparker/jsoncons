@@ -536,7 +536,7 @@ namespace jsonschema {
     }
 
     template <class Json,class T>
-    class number_keyword : public schema_keyword<Json>
+    class numericic_type_keywords : public schema_keyword<Json>
     {
         using schema_pointer = typename schema_keyword<Json>::schema_pointer;
 
@@ -552,7 +552,7 @@ namespace jsonschema {
         std::string absolute_multiple_of_location_;
 
     public:
-        number_keyword(const Json& sch, 
+        numericic_type_keywords(const Json& sch, 
                     const std::vector<uri_wrapper>& uris, 
                     std::set<std::string>& keywords)
             : schema_keyword<Json>((!uris.empty() && uris.back().is_absolute()) ? uris.back().string() : ""), 
@@ -599,23 +599,13 @@ namespace jsonschema {
             }
         }
 
-    private:
+    protected:
 
-        void do_validate(const uri_wrapper& instance_location, 
-                         const Json& instance, 
-                         error_reporter& reporter, 
-                         Json&) const override
+        void apply_kewords(T value,
+                           const uri_wrapper& instance_location, 
+                           const Json& instance, 
+                           error_reporter& reporter) const 
         {
-            T value = instance.template as<T>(); 
-            if (Json(value) != instance)
-            {
-                reporter.error(validation_output(instance_location.string(), "Instance is not a number", "number", this->absolute_keyword_location()));
-                if (reporter.fail_early())
-                {
-                    return;
-                }
-            }
-
             if (multiple_of_ && value != 0) // exclude zero
             {
                 if (!is_multiple_of(value, *multiple_of_))
@@ -676,12 +666,70 @@ namespace jsonschema {
                 }
             }
         }
-
+    private:
         static bool is_multiple_of(T x, double multiple_of) 
         {
             double rem = std::remainder(x, multiple_of);
             double eps = std::nextafter(x, 0) - x;
             return std::fabs(rem) < std::fabs(eps);
+        }
+    };
+
+    template <class Json>
+    class integer_keyword : public numericic_type_keywords<Json,int64_t>
+    {
+    public:
+        integer_keyword(const Json& sch, 
+                          const std::vector<uri_wrapper>& uris, 
+                          std::set<std::string>& keywords)
+            : numericic_type_keywords<Json, int64_t>(sch, uris, keywords)
+        {
+        }
+    private:
+        void do_validate(const uri_wrapper& instance_location, 
+                         const Json& instance, 
+                         error_reporter& reporter, 
+                         Json&) const 
+        {
+            if (!(instance.is_integer<int64_t>() || instance.is_double() && static_cast<double>(instance.as<int64_t>()) == instance.as<double>()))
+            {
+                reporter.error(validation_output(instance_location.string(), "Instance is not an integer", "integer", this->absolute_keyword_location()));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+            int64_t value = instance.as<int64_t>(); 
+            this->apply_kewords(value, instance_location, instance, reporter);
+        }
+    };
+
+    template <class Json>
+    class number_keyword : public numericic_type_keywords<Json,double>
+    {
+    public:
+        number_keyword(const Json& sch,
+                          const std::vector<uri_wrapper>& uris, 
+                          std::set<std::string>& keywords)
+            : numericic_type_keywords<Json, double>(sch, uris, keywords)
+        {
+        }
+    private:
+        void do_validate(const uri_wrapper& instance_location, 
+                         const Json& instance, 
+                         error_reporter& reporter, 
+                         Json&) const 
+        {
+            if (!(instance.is_integer<int64_t>() || instance.is_double()))
+            {
+                reporter.error(validation_output(instance_location.string(), "Instance is not a number", "number", this->absolute_keyword_location()));
+                if (reporter.fail_early())
+                {
+                    return;
+                }
+            }
+            double value = instance.as<double>(); 
+            this->apply_kewords(value, instance_location, instance, reporter);
         }
     };
 
