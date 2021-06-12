@@ -691,7 +691,7 @@ namespace jsonschema {
                          error_reporter& reporter, 
                          Json&) const 
         {
-            if (!(instance.is_integer<int64_t>() || instance.is_double() && static_cast<double>(instance.as<int64_t>()) == instance.as<double>()))
+            if (!(instance.is_integer<int64_t>() || instance.is_double() && static_cast<double>(instance.template as<int64_t>()) == instance.template as<double>()))
             {
                 reporter.error(validation_output(instance_location.string(), "Instance is not an integer", "integer", this->absolute_keyword_location()));
                 if (reporter.fail_early())
@@ -699,7 +699,7 @@ namespace jsonschema {
                     return;
                 }
             }
-            int64_t value = instance.as<int64_t>(); 
+            int64_t value = instance.template as<int64_t>(); 
             this->apply_kewords(value, instance_location, instance, reporter);
         }
     };
@@ -728,7 +728,7 @@ namespace jsonschema {
                     return;
                 }
             }
-            double value = instance.as<double>(); 
+            double value = instance.template as<double>(); 
             this->apply_kewords(value, instance_location, instance, reporter);
         }
     };
