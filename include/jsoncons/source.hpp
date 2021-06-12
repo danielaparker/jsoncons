@@ -50,11 +50,11 @@ namespace jsoncons {
 
         basic_null_istream(const null_buffer&) = delete;
         basic_null_istream& operator=(const null_buffer&) = delete;
-        basic_null_istream(basic_null_istream&& other)
+        basic_null_istream(basic_null_istream&&) noexcept
             : std::basic_istream<CharT>(&nb_)
         {
         }
-        basic_null_istream& operator=(basic_null_istream&&) 
+        basic_null_istream& operator=(basic_null_istream&&) noexcept
         {
             return *this;
         }
