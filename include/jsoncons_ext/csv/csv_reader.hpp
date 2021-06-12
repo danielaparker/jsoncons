@@ -45,8 +45,7 @@ namespace jsoncons { namespace csv {
         basic_csv_reader(const basic_csv_reader&) = delete; 
         basic_csv_reader& operator = (const basic_csv_reader&) = delete; 
 
-        Source source_;
-        text_source_adaptor<Source> source_adaptor_;
+        text_source_adaptor<Source> source_;
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_csv_parser<CharT,Allocator> parser_;
@@ -106,7 +105,6 @@ namespace jsoncons { namespace csv {
                          std::function<bool(csv_errc,const ser_context&)> err_handler, 
                          const Allocator& alloc = Allocator())
            : source_(std::forward<Sourceable>(source)),
-             source_adaptor_(),
              visitor_(visitor),
              parser_(options, err_handler, alloc)
              
@@ -158,7 +156,7 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
                     if (s.size() > 0)
                     {
@@ -195,8 +193,7 @@ namespace jsoncons { namespace csv {
         basic_json_visitor<CharT>& visitor_;
 
         basic_csv_parser<CharT,Allocator> parser_;
-        Source source_;
-        text_source_adaptor<Source> source_adaptor_;
+        text_source_adaptor<Source> source_;
 
     public:
         // Structural characters
@@ -256,7 +253,7 @@ namespace jsoncons { namespace csv {
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
              source_(std::forward<Sourceable>(source)),
-             source_adaptor_()
+             source_()
         {
         }
 
@@ -269,7 +266,7 @@ namespace jsoncons { namespace csv {
                          typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
            : visitor_(visitor),
              parser_(options, err_handler, alloc),
-             source_adaptor_()
+             source_()
         {
             jsoncons::basic_string_view<CharT> sv(std::forward<Sourceable>(source));
             auto r = unicode_traits::detect_encoding_from_bom(sv.data(), sv.size());
@@ -326,7 +323,7 @@ namespace jsoncons { namespace csv {
             {
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
                     if (s.size() > 0)
                     {

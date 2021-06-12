@@ -29,23 +29,39 @@ namespace jsoncons {
     public:
         using value_type = typename Source::value_type;
     private:
+        Source source_;
         bool bof_;
 
     public:
-
         text_source_adaptor()
             : bof_(true)
         {
         }
 
-        span<const value_type> read_buffer(Source& source, std::error_code& ec)
+        template <class Sourceable>
+        text_source_adaptor(Sourceable&& source)
+            : source_(std::forward<Sourceable>(source)), bof_(true)
         {
-            if (source.eof())
+        }
+
+        bool eof() const
+        {
+            return source_.eof();
+        }
+
+        bool is_error() const
+        {
+            return source_.is_error();  
+        }
+
+        span<const value_type> read_buffer(std::error_code& ec)
+        {
+            if (source_.eof())
             {
                 return span<const value_type>();
             }
 
-            auto s = source.read_buffer();
+            auto s = source_.read_buffer();
             const value_type* data = s.data();
             std::size_t length = s.size();
 
@@ -73,23 +89,39 @@ namespace jsoncons {
     public:
         using value_type = typename Source::value_type;
     private:
+        Source source_;
         bool bof_;
 
     public:
-
         json_source_adaptor()
             : bof_(true)
         {
         }
 
-        span<const value_type> read_buffer(Source& source, std::error_code& ec)
+        template <class Sourceable>
+        json_source_adaptor(Sourceable&& source)
+            : source_(std::forward<Sourceable>(source)), bof_(true)
         {
-            if (source.eof())
+        }
+
+        bool eof() const
+        {
+            return source_.eof();
+        }
+
+        bool is_error() const
+        {
+            return source_.is_error();  
+        }
+
+        span<const value_type> read_buffer(std::error_code& ec)
+        {
+            if (source_.eof())
             {
                 return span<const value_type>();
             }
 
-            auto s = source.read_buffer();
+            auto s = source_.read_buffer();
             const value_type* data = s.data();
             std::size_t length = s.size();
 

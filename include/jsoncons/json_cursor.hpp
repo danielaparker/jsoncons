@@ -37,8 +37,7 @@ private:
     typedef typename std::allocator_traits<allocator_type>:: template rebind_alloc<CharT> char_allocator_type;
     static constexpr size_t default_max_buffer_size = 16384;
 
-    source_type source_;
-    json_source_adaptor<Source> source_adaptor_;
+    json_source_adaptor<Source> source_;
     basic_json_parser<CharT,Allocator> parser_;
     basic_staj_visitor<CharT> cursor_visitor_;
 
@@ -57,7 +56,6 @@ public:
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         source_adaptor_(),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all)
     {
@@ -73,7 +71,7 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler = default_json_parsing(),
                       const Allocator& alloc = Allocator(),
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-       : source_adaptor_(),
+       : source_(),
          parser_(options, err_handler, alloc),
          cursor_visitor_(accept_all)
     {
@@ -138,7 +136,6 @@ public:
                       std::error_code& ec,
                       typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
        : source_(std::forward<Sourceable>(source)),
-         source_adaptor_(),
          parser_(options,err_handler,alloc),
          cursor_visitor_(accept_all)
     {
@@ -155,7 +152,7 @@ public:
                       std::function<bool(json_errc,const ser_context&)> err_handler,
                       std::error_code& ec,
                       typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-       : source_adaptor_(),
+       : source_(),
          parser_(options, err_handler, alloc),
          cursor_visitor_(accept_all)
     {
@@ -251,7 +248,7 @@ public:
             {
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
                     if (s.size() > 0)
                     {
@@ -304,7 +301,7 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                auto s = source_adaptor_.read_buffer(source_, ec);
+                auto s = source_.read_buffer(ec);
                 if (ec) return;
                 if (s.size() > 0)
                 {
@@ -323,7 +320,7 @@ private:
         {
             if (parser_.source_exhausted())
             {
-                auto s = source_adaptor_.read_buffer(source_, ec);
+                auto s = source_.read_buffer(ec);
                 if (ec) return;
                 if (s.size() > 0)
                 {

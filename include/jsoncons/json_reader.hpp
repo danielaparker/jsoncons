@@ -160,8 +160,7 @@ namespace jsoncons {
 
         static constexpr size_t default_max_buffer_size = 16384;
 
-        source_type source_;
-        json_source_adaptor<Source> source_adaptor_;
+        json_source_adaptor<Source> source_;
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_json_parser<CharT,Allocator> parser_;
@@ -263,7 +262,6 @@ namespace jsoncons {
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator())
            : source_(std::forward<Sourceable>(source)),
-             source_adaptor_(),
              visitor_(visitor),
              parser_(options,err_handler,alloc)
         {
@@ -304,7 +302,7 @@ namespace jsoncons {
             {
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
                     if (s.size() > 0)
                     {
@@ -320,7 +318,7 @@ namespace jsoncons {
                 parser_.skip_whitespace();
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
                     if (s.size() > 0)
                     {
@@ -372,7 +370,7 @@ namespace jsoncons {
                 {
                     if (parser_.source_exhausted())
                     {
-                        auto s = source_adaptor_.read_buffer(source_, ec);
+                        auto s = source_.read_buffer(ec);
                         if (ec) return;
                         if (s.size() > 0)
                         {
@@ -422,8 +420,7 @@ namespace jsoncons {
 
         static constexpr size_t default_max_buffer_size = 16384;
 
-        source_type source_;
-        json_source_adaptor<Source> source_adaptor_;
+        json_source_adaptor<Source> source_;
         basic_default_json_visitor<CharT> default_visitor_;
         basic_json_visitor<CharT>& visitor_;
         basic_json_parser<CharT,Allocator> parser_;
@@ -526,7 +523,6 @@ namespace jsoncons {
                           const Allocator& alloc = Allocator(),
                           typename std::enable_if<!std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
            : source_(std::forward<Sourceable>(source)),
-             source_adaptor_(),
              visitor_(visitor),
              parser_(options,err_handler,alloc)
         {
@@ -539,7 +535,7 @@ namespace jsoncons {
                           std::function<bool(json_errc,const ser_context&)> err_handler, 
                           const Allocator& alloc = Allocator(),
                           typename std::enable_if<std::is_constructible<jsoncons::basic_string_view<CharT>,Sourceable>::value>::type* = 0)
-           : source_adaptor_(),
+           : source_(),
              visitor_(visitor),
              parser_(options,err_handler,alloc)
         {
@@ -589,7 +585,7 @@ namespace jsoncons {
             {
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
                     if (s.size() > 0)
                     {
@@ -605,7 +601,7 @@ namespace jsoncons {
                 parser_.skip_whitespace();
                 if (parser_.source_exhausted())
                 {
-                    auto s = source_adaptor_.read_buffer(source_, ec);
+                    auto s = source_.read_buffer(ec);
                     if (ec) return;
                     if (s.size() > 0)
                     {
@@ -657,7 +653,7 @@ namespace jsoncons {
                 {
                     if (parser_.source_exhausted())
                     {
-                        auto s = source_adaptor_.read_buffer(source_, ec);
+                        auto s = source_.read_buffer(ec);
                         if (ec) return;
                         if (s.size() > 0)
                         {
