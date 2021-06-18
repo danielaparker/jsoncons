@@ -2523,11 +2523,11 @@ namespace jmespath {
             }
         };
 
-        // selector_base
-        class selector_base :  public expression_base
+        // jsonpath_selector
+        class jsonpath_selector :  public expression_base
         {
         public:
-            selector_base()
+            jsonpath_selector()
                 : expression_base(1, false, false)
             {
             }
@@ -2537,7 +2537,7 @@ namespace jmespath {
             }
         };
 
-        class identifier_selector final : public selector_base
+        class identifier_selector final : public jsonpath_selector
         {
         private:
             string_type identifier_;
@@ -2573,7 +2573,7 @@ namespace jmespath {
             }
         };
 
-        class current_node final : public selector_base
+        class current_node final : public jsonpath_selector
         {
         public:
             current_node()
@@ -2597,7 +2597,7 @@ namespace jmespath {
             }
         };
 
-        class index_selector final : public selector_base
+        class index_selector final : public jsonpath_selector
         {
             int64_t index_;
         public:
@@ -2976,7 +2976,7 @@ namespace jmespath {
             }
         };
 
-        class multi_select_list final : public selector_base
+        class multi_select_list final : public jsonpath_selector
         {
             std::vector<std::vector<token>> token_lists_;
         public:
@@ -3034,7 +3034,7 @@ namespace jmespath {
             }
         };
 
-        class multi_select_hash final : public selector_base
+        class multi_select_hash final : public jsonpath_selector
         {
         public:
             std::vector<key_tokens> key_toks_;
@@ -3072,7 +3072,7 @@ namespace jmespath {
             }
         };
 
-        class function_expression final : public selector_base
+        class function_expression final : public jsonpath_selector
         {
         public:
             std::vector<token> toks_;

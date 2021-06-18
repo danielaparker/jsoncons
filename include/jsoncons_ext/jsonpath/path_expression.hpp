@@ -2462,7 +2462,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class selector_base
+    class jsonpath_selector
     {
         bool is_path_;
         std::size_t precedence_level_;
@@ -2477,14 +2477,14 @@ namespace detail {
         using path_node_type = path_node<Json,JsonReference>;
         using path_component_type = path_component<char_type>;
 
-        selector_base(bool is_path,
+        jsonpath_selector(bool is_path,
                       std::size_t precedence_level = 0)
             : is_path_(is_path), 
               precedence_level_(precedence_level)
         {
         }
 
-        virtual ~selector_base() noexcept = default;
+        virtual ~jsonpath_selector() noexcept = default;
 
         bool is_path() const 
         {
@@ -2535,7 +2535,7 @@ namespace detail {
                             node_kind& ndtype,
                             result_options options) const = 0;
 
-        virtual void append_selector(std::unique_ptr<selector_base>&&) 
+        virtual void append_selector(std::unique_ptr<jsonpath_selector>&&) 
         {
         }
 
@@ -2574,7 +2574,7 @@ namespace detail {
     class token
     {
     public:
-        using selector_base_type = selector_base<Json,JsonReference>;
+        using selector_base_type = jsonpath_selector<Json,JsonReference>;
         using expression_base_type = expression_base<Json,JsonReference>;
 
         token_kind type_;
@@ -2956,7 +2956,7 @@ namespace detail {
             const_reference_arg_t,reference_arg_t>::type;
         using path_component_type = path_component<char_type>;
     private:
-        std::unique_ptr<selector_base<Json,JsonReference>> selector_;
+        std::unique_ptr<jsonpath_selector<Json,JsonReference>> selector_;
     public:
 
         path_expression()
@@ -2968,7 +2968,7 @@ namespace detail {
         {
         }
 
-        path_expression(std::unique_ptr<selector_base<Json,JsonReference>>&& selector)
+        path_expression(std::unique_ptr<jsonpath_selector<Json,JsonReference>>&& selector)
             : selector_(std::move(selector))
         {
         }

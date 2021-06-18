@@ -17,97 +17,11 @@
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/path_expression.hpp>
+#include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>
 
-namespace jsoncons { namespace jsonpath {
-
-    // token
-
-    struct slice
-    {
-        jsoncons::optional<int64_t> start_;
-        jsoncons::optional<int64_t> stop_;
-        int64_t step_;
-
-        slice()
-            : start_(), stop_(), step_(1)
-        {
-        }
-
-        slice(const jsoncons::optional<int64_t>& start, const jsoncons::optional<int64_t>& end, int64_t step) 
-            : start_(start), stop_(end), step_(step)
-        {
-        }
-
-        slice(const slice& other)
-            : start_(other.start_), stop_(other.stop_), step_(other.step_)
-        {
-        }
-
-        slice& operator=(const slice& rhs) 
-        {
-            if (this != &rhs)
-            {
-                if (rhs.start_)
-                {
-                    start_ = rhs.start_;
-                }
-                else
-                {
-                    start_.reset();
-                }
-                if (rhs.stop_)
-                {
-                    stop_ = rhs.stop_;
-                }
-                else
-                {
-                    stop_.reset();
-                }
-                step_ = rhs.step_;
-            }
-            return *this;
-        }
-
-        int64_t get_start(std::size_t size) const
-        {
-            if (start_)
-            {
-                auto len = *start_ >= 0 ? *start_ : (static_cast<int64_t>(size) + *start_);
-                return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
-            }
-            else
-            {
-                if (step_ >= 0)
-                {
-                    return 0;
-                }
-                else 
-                {
-                    return static_cast<int64_t>(size);
-                }
-            }
-        }
-
-        int64_t get_stop(std::size_t size) const
-        {
-            if (stop_)
-            {
-                auto len = *stop_ >= 0 ? *stop_ : (static_cast<int64_t>(size) + *stop_);
-                return len <= static_cast<int64_t>(size) ? len : static_cast<int64_t>(size);
-            }
-            else
-            {
-                return step_ >= 0 ? static_cast<int64_t>(size) : -1;
-            }
-        }
-
-        int64_t step() const
-        {
-            return step_; // Allow negative
-        }
-    };
-
-    namespace detail {
+namespace jsoncons { 
+namespace jsonpath {
+namespace detail {
      
     enum class path_state 
     {
@@ -189,726 +103,12 @@ namespace jsoncons { namespace jsonpath {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename path_node_type::pointer;
-        using selector_base_type = selector_base<Json,JsonReference>;
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_tree_type = expression_tree<Json,JsonReference>;
         using path_component_type = path_component<char_type>;
 
     private:
-
-        // path_selector
-        class path_selector : public selector_base_type
-        {
-            std::unique_ptr<selector_base_type> tail_selector_;
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using selector_base_type::generate_path;
-
-            path_selector()
-                : selector_base_type(true, 11), tail_selector_()
-            {
-            }
-
-            path_selector(bool is_path, std::size_t precedence_level)
-                : selector_base_type(is_path, precedence_level), tail_selector_()
-            {
-            }
-
-            void append_selector(std::unique_ptr<selector_base_type>&& expr) override
-            {
-                if (!tail_selector_)
-                {
-                    tail_selector_ = std::move(expr);
-                }
-                else
-                {
-                    tail_selector_->append_selector(std::move(expr));
-                }
-            }
-
-            void evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
-                               const std::vector<path_component_type>& path, 
-                               reference root,
-                               reference val,
-                               std::vector<path_node_type>& nodes,
-                               node_kind& ndtype,
-                               result_options options) const
-            {
-                if (!tail_selector_)
-                {
-                    nodes.emplace_back(path, std::addressof(val));
-                }
-                else
-                {
-                    tail_selector_->select(resources, path, root, val, nodes, ndtype, options);
-                }
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                if (tail_selector_)
-                {
-                    s.append(tail_selector_->to_string(level));
-                }
-                return s;
-            }
-        };
-
-        class identifier_selector final : public path_selector
-        {
-            string_type identifier_;
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            identifier_selector(const string_view_type& identifier)
-                : path_selector(), identifier_(identifier)
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                //std::string buf;
-                //buf.append("identifier selector: ");
-                //unicode_traits::convert(identifier_.data(),identifier_.size(),buf);
-
-                ndtype = node_kind::single;
-                if (val.is_object())
-                {
-                    auto it = val.find(identifier_);
-                    if (it != val.object_range().end())
-                    {
-                        this->evaluate_tail(resources, generate_path(path, identifier_, options), 
-                                                root, it->value(), nodes, ndtype, options);
-                    }
-                }
-                else if (val.is_array())
-                {
-                    int64_t n{0};
-                    auto r = jsoncons::detail::to_integer_decimal(identifier_.data(), identifier_.size(), n);
-                    if (r)
-                    {
-                        std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + n);
-                        if (index < val.size())
-                        {
-                            this->evaluate_tail(resources, generate_path(path, index, options), 
-                                                root, val[index], nodes, ndtype, options);
-                        }
-                    }
-                    else if (identifier_ == length_literal<char_type>() && val.size() > 0)
-                    {
-                        pointer ptr = resources.create_json(val.size());
-                        this->evaluate_tail(resources, generate_path(path, identifier_, options), 
-                                                root, *ptr, nodes, ndtype, options);
-                    }
-                }
-                else if (val.is_string() && identifier_ == length_literal<char_type>())
-                {
-                    string_view_type sv = val.as_string_view();
-                    std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
-                    pointer ptr = resources.create_json(count);
-                    this->evaluate_tail(resources, generate_path(path, identifier_, options), 
-                                            root, *ptr, nodes, ndtype, options);
-                }
-                //std::cout << "end identifier_selector\n";
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("identifier selector ");
-                unicode_traits::convert(identifier_.data(),identifier_.size(),s);
-                s.append(path_selector::to_string(level+1));
-                //s.append("\n");
-
-                return s;
-            }
-        };
-
-        class root_selector final : public path_selector
-        {
-            std::size_t id_;
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            root_selector(std::size_t id)
-                : path_selector(), id_(id)
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference,
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                if (resources.is_cached(id_))
-                {
-                    resources.retrieve_from_cache(id_, nodes, ndtype);
-                }
-                else
-                {
-                    std::vector<path_node_type> v;
-                    this->evaluate_tail(resources, path, 
-                                        root, root, v, ndtype, options);
-                    resources.add_to_cache(id_, v, ndtype);
-                    for (auto&& item : v)
-                    {
-                        nodes.push_back(std::move(item));
-                    }
-                }
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("root_selector ");
-                s.append(path_selector::to_string(level+1));
-
-                return s;
-            }
-        };
-
-        class current_node_selector final : public path_selector
-        {
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            current_node_selector()
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference current,
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                //std::cout << "current_node_selector: " << current << "\n";
-                ndtype = node_kind::single;
-                this->evaluate_tail(resources, path, 
-                                    root, current, nodes, ndtype, options);
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("current_node_selector");
-                s.append(path_selector::to_string(level+1));
-
-                return s;
-            }
-        };
-
-        class index_selector final : public path_selector
-        {
-            int64_t index_;
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            index_selector(int64_t index)
-                : path_selector(), index_(index)
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                ndtype = node_kind::single;
-                if (val.is_array())
-                {
-                    int64_t slen = static_cast<int64_t>(val.size());
-                    if (index_ >= 0 && index_ < slen)
-                    {
-                        std::size_t index = static_cast<std::size_t>(index_);
-                        //std::cout << "path: " << path << ", val: " << val << ", index: " << index << "\n";
-                        //nodes.emplace_back(generate_path(path, index, options),std::addressof(val.at(index)));
-                        //nodes.emplace_back(path, std::addressof(val));
-                        this->evaluate_tail(resources, generate_path(path, index, options), 
-                                                root, val.at(index), nodes, ndtype, options);
-                    }
-                    else if ((slen + index_) >= 0 && (slen+index_) < slen)
-                    {
-                        std::size_t index = static_cast<std::size_t>(slen + index_);
-                        //std::cout << "path: " << path << ", val: " << val << ", index: " << index << "\n";
-                        //nodes.emplace_back(generate_path(path, index ,options),std::addressof(val.at(index)));
-                        this->evaluate_tail(resources, generate_path(path, index, options), 
-                                                root, val.at(index), nodes, ndtype, options);
-                    }
-                }
-            }
-        };
-
-        class wildcard_selector final : public path_selector
-        {
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            wildcard_selector()
-                : path_selector()
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                //std::cout << "wildcard_selector: " << val << "\n";
-                ndtype = node_kind::multi; // always multi
-
-                node_kind tmptype;
-                if (val.is_array())
-                {
-                    for (std::size_t i = 0; i < val.size(); ++i)
-                    {
-                        this->evaluate_tail(resources, generate_path(path, i, options), root, val[i], nodes, tmptype, options);
-                    }
-                }
-                else if (val.is_object())
-                {
-                    for (auto& item : val.object_range())
-                    {
-                        this->evaluate_tail(resources, generate_path(path, item.key(), options), root, item.value(), nodes, tmptype, options);
-                    }
-                }
-                //std::cout << "end wildcard_selector\n";
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("wildcard selector");
-                s.append(path_selector::to_string(level));
-
-                return s;
-            }
-        };
-
-        class recursive_selector final : public path_selector
-        {
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            recursive_selector()
-                : path_selector()
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference val,
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                //std::cout << "wildcard_selector: " << val << "\n";
-                if (val.is_array())
-                {
-                    this->evaluate_tail(resources, path, root, val, nodes, ndtype, options);
-                    for (std::size_t i = 0; i < val.size(); ++i)
-                    {
-                        select(resources, generate_path(path, i, options), root, val[i], nodes, ndtype, options);
-                    }
-                }
-                else if (val.is_object())
-                {
-                    this->evaluate_tail(resources, path, root, val, nodes, ndtype, options);
-                    for (auto& item : val.object_range())
-                    {
-                        select(resources, generate_path(path, item.key(), options), root, item.value(), nodes, ndtype, options);
-                    }
-                }
-                //std::cout << "end wildcard_selector\n";
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("wildcard selector");
-                s.append(path_selector::to_string(level));
-
-                return s;
-            }
-        };
-
-        class union_selector final : public path_selector
-        {
-            std::vector<path_expression_type> expressions_;
-
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            union_selector(std::vector<path_expression_type>&& expressions)
-                : path_selector(), expressions_(std::move(expressions))
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference val, 
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                //std::cout << "union_selector select val: " << val << "\n";
-                ndtype = node_kind::multi;
-
-                auto callback = [&](const std::vector<path_component_type>& p, reference v)
-                {
-                    //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                    this->evaluate_tail(resources, p, root, v, nodes, ndtype, options);
-                };
-                for (auto& expr : expressions_)
-                {
-                    expr.evaluate(resources, path, root, val, callback, options);
-                }
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("union selector ");
-                for (auto& expr : expressions_)
-                {
-                    s.append(expr.to_string(level+1));
-                    //s.push_back('\n');
-                }
-
-                return s;
-            }
-        };
-
-        class filter_expression_selector final : public path_selector
-        {
-            expression_tree_type expr_;
-
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            filter_expression_selector(expression_tree_type&& expr)
-                : path_selector(), expr_(std::move(expr))
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference current, 
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                if (current.is_array())
-                {
-                    for (std::size_t i = 0; i < current.size(); ++i)
-                    {
-                        std::error_code ec;
-                        value_type r = expr_.evaluate_single(resources, root, current[i], options, ec);
-                        bool t = ec ? false : detail::is_true(r);
-                        if (t)
-                        {
-                            this->evaluate_tail(resources, path, root, current[i], nodes, ndtype, options);
-                        }
-                    }
-                }
-                else if (current.is_object())
-                {
-                    for (auto& member : current.object_range())
-                    {
-                        std::error_code ec;
-                        value_type r = expr_.evaluate_single(resources, root, member.value(), options, ec);
-                        bool t = ec ? false : detail::is_true(r);
-                        if (t)
-                        {
-                            this->evaluate_tail(resources, path, root, member.value(), nodes, ndtype, options);
-                        }
-                    }
-                }
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("filter selector ");
-                s.append(expr_.to_string(level+1));
-
-                return s;
-            }
-        };
-
-        class index_expression_selector final : public path_selector
-        {
-            expression_tree_type expr_;
-
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            index_expression_selector(expression_tree_type&& expr)
-                : path_selector(), expr_(std::move(expr))
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference current, 
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                //std::cout << "index_expression_selector current: " << current << "\n";
-
-                std::error_code ec;
-                value_type j = expr_.evaluate_single(resources, root, current, options, ec);
-
-                if (!ec)
-                {
-                    if (j.template is<std::size_t>() && current.is_array())
-                    {
-                        std::size_t start = j.template as<std::size_t>();
-                        this->evaluate_tail(resources, path, root, current.at(start), nodes, ndtype, options);
-                    }
-                    else if (j.is_string() && current.is_object())
-                    {
-                        this->evaluate_tail(resources, path, root, current.at(j.as_string_view()), nodes, ndtype, options);
-                    }
-                }
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("bracket expression selector ");
-                s.append(expr_.to_string(level+1));
-                s.append(path_selector::to_string(level+1));
-
-                return s;
-            }
-        };
-
-        class argument_expression final : public expression_base<Json,JsonReference>
-        {
-            expression_tree_type expr_;
-
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-
-            argument_expression(expression_tree_type&& expr)
-                : expr_(std::move(expr))
-            {
-            }
-
-            value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
-                                       const std::vector<path_component_type>&, 
-                                       reference root,
-                                       reference current, 
-                                       result_options options,
-                                       std::error_code& ec) const override
-            {
-                value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
-                return ec ? Json::null() : ref; 
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("expression selector ");
-                s.append(expr_.to_string(level+1));
-
-                return s;
-            }
-        };
-
-        class slice_selector final : public path_selector
-        {
-            slice slice_;
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            using path_selector::generate_path;
-
-            slice_selector(const slice& slic)
-                : path_selector(), slice_(slic) 
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference current,
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                ndtype = node_kind::multi;
-
-                if (current.is_array())
-                {
-                    auto start = slice_.get_start(current.size());
-                    auto end = slice_.get_stop(current.size());
-                    auto step = slice_.step();
-
-                    if (step > 0)
-                    {
-                        if (start < 0)
-                        {
-                            start = 0;
-                        }
-                        if (end > static_cast<int64_t>(current.size()))
-                        {
-                            end = current.size();
-                        }
-                        for (int64_t i = start; i < end; i += step)
-                        {
-                            std::size_t j = static_cast<std::size_t>(i);
-                            this->evaluate_tail(resources, generate_path(path, j, options), root, current[j], nodes, ndtype, options);
-                        }
-                    }
-                    else if (step < 0)
-                    {
-                        if (start >= static_cast<int64_t>(current.size()))
-                        {
-                            start = static_cast<int64_t>(current.size()) - 1;
-                        }
-                        if (end < -1)
-                        {
-                            end = -1;
-                        }
-                        for (int64_t i = start; i > end; i += step)
-                        {
-                            std::size_t j = static_cast<std::size_t>(i);
-                            if (j < current.size())
-                            {
-                                this->evaluate_tail(resources, generate_path(path,j,options), root, current[j], nodes, ndtype, options);
-                            }
-                        }
-                    }
-                }
-            }
-        };
-
-        class function_selector final : public path_selector
-        {
-        public:
-            using path_component_type = typename selector_base_type::path_component_type;
-            expression_tree_type expr_;
-
-            function_selector(expression_tree_type&& expr)
-                : path_selector(), expr_(std::move(expr))
-            {
-            }
-
-            void select(dynamic_resources<Json,JsonReference>& resources,
-                        const std::vector<path_component_type>& path, 
-                        reference root,
-                        reference current, 
-                        std::vector<path_node_type>& nodes,
-                        node_kind& ndtype,
-                        result_options options) const override
-            {
-                ndtype = node_kind::single;
-                std::error_code ec;
-                value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
-                if (!ec)
-                {
-                    this->evaluate_tail(resources, path, root, *resources.create_json(std::move(ref)), nodes, ndtype, options);
-                }
-            }
-
-            std::string to_string(int level = 0) const override
-            {
-                std::string s;
-                if (level > 0)
-                {
-                    s.append("\n");
-                    s.append(level*2, ' ');
-                }
-                s.append("function_selector ");
-                s.append(expr_.to_string(level+1));
-
-                return s;
-            }
-        };
 
         std::size_t line_;
         std::size_t column_;
@@ -1012,7 +212,7 @@ namespace jsoncons { namespace jsonpath {
                         switch (*p_)
                         {
                             case '.':
-                                push_token(token_type(jsoncons::make_unique<recursive_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<recursive_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 ++p_;
                                 ++column_;
@@ -1276,7 +476,7 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case '*':
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1301,7 +501,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '$':
                                 push_token(token_type(root_node_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<root_selector>(selector_id++)), ec);
+                                push_token(token_type(jsoncons::make_unique<root_selector<Json,JsonReference>>(selector_id++)), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1309,7 +509,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '@':
                                 push_token(token_type(current_node_arg), ec); // ISSUE
-                                push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<current_node_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1352,7 +552,7 @@ namespace jsoncons { namespace jsonpath {
                             }
                             default:
                             {
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
@@ -1881,7 +1081,7 @@ namespace jsoncons { namespace jsonpath {
                         break;
                     }
                     case path_state::identifier:
-                        push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                         if (ec) {return path_expression_type();}
                         buffer.clear();
                         state_stack_.pop_back(); 
@@ -2033,7 +1233,7 @@ namespace jsoncons { namespace jsonpath {
                             case '@':
                                 push_token(token_type(begin_union_arg), ec);
                                 push_token(token_type(current_node_arg), ec); // ISSUE
-                                push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<current_node_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::path_rhs);
@@ -2083,7 +1283,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             }
                             case '*':
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::path_rhs;
                                 ++p_;
@@ -2091,7 +1291,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '$':
                                 push_token(token_type(root_node_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<root_selector>(selector_id++)), ec);
+                                push_token(token_type(jsoncons::make_unique<root_selector<Json,JsonReference>>(selector_id++)), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::path_rhs;
                                 ++p_;
@@ -2099,7 +1299,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '@':
                                 push_token(token_type(current_node_arg), ec); // ISSUE
-                                push_token(token_type(jsoncons::make_unique<current_node_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<current_node_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::path_rhs;
                                 ++p_;
@@ -2170,7 +1370,7 @@ namespace jsoncons { namespace jsonpath {
                                     ec = jsonpath_errc::invalid_number;
                                     return path_expression_type();
                                 }
-                                push_token(token_type(jsoncons::make_unique<index_selector>(n)), ec);
+                                push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back(); // index_or_slice_or_union
@@ -2196,7 +1396,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector>(n)), ec);
+                                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -2262,7 +1462,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector>(n)), ec);
+                                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -2296,7 +1496,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ']':
                             case ',':
-                                push_token(token_type(jsoncons::make_unique<slice_selector>(slic)), ec);
+                                push_token(token_type(jsoncons::make_unique<slice_selector<Json,JsonReference>>(slic)), ec);
                                 if (ec) {return path_expression_type();}
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
@@ -2339,7 +1539,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ']':
                             case ',':
-                                push_token(token_type(jsoncons::make_unique<slice_selector>(slic)), ec);
+                                push_token(token_type(jsoncons::make_unique<slice_selector<Json,JsonReference>>(slic)), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 slic = slice{};
@@ -2359,7 +1559,7 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -2368,7 +1568,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '.':
                                 push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
@@ -2378,7 +1578,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case '[':
                                 push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::path_lhs);                                
@@ -2387,7 +1587,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ',': 
                                 push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                                 push_token(token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
@@ -2445,7 +1645,7 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -2454,7 +1654,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ',': 
                                 push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                                 push_token(token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
@@ -2478,7 +1678,7 @@ namespace jsoncons { namespace jsonpath {
                             case ']':
                             case ',':
                             case '.':
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -2511,7 +1711,7 @@ namespace jsoncons { namespace jsonpath {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector>(n)), ec);
+                                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -2551,7 +1751,7 @@ namespace jsoncons { namespace jsonpath {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -2560,7 +1760,7 @@ namespace jsoncons { namespace jsonpath {
                                 break;
                             case ',': 
                                 push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector>()), ec);
+                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
                                 push_token(token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
@@ -2825,7 +2025,7 @@ namespace jsoncons { namespace jsonpath {
             {
                 if (state_stack_.back() == path_state::unquoted_string || state_stack_.back() == path_state::identifier)
                 {
-                    push_token(token_type(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                    push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                     if (ec) {return path_expression_type();}
                     state_stack_.pop_back(); // unquoted_string
                     buffer.clear();
@@ -2848,7 +2048,7 @@ namespace jsoncons { namespace jsonpath {
                         ec = jsonpath_errc::invalid_number;
                         return path_expression_type();
                     }
-                    push_token(token_type(jsoncons::make_unique<index_selector>(n)), ec);
+                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
                     if (ec) {return path_expression_type();}
                     buffer.clear();
                     state_stack_.pop_back(); // index_or_slice_or_union
@@ -2967,11 +2167,11 @@ namespace jsoncons { namespace jsonpath {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_expression_selector>(expression_tree_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_expression_selector>(expression_tree_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks)))));
                     }
                     //std::cout << "push_token end_filter 2\n";
                     //for (const auto& tok2 : output_stack_)
@@ -3016,11 +2216,11 @@ namespace jsoncons { namespace jsonpath {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<index_expression_selector>(expression_tree_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<index_expression_selector>(expression_tree_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks)))));
                     }
                     break;
                 }
@@ -3051,7 +2251,7 @@ namespace jsoncons { namespace jsonpath {
                     }
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
-                    output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression>(expression_tree_type(std::move(toks)))));
+                    output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression<Json,JsonReference>>(expression_tree_type(std::move(toks)))));
                     break;
                 }
                 case token_kind::selector:
@@ -3102,11 +2302,11 @@ namespace jsoncons { namespace jsonpath {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<union_selector>(std::move(expressions)));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<union_selector<Json,JsonReference>>(std::move(expressions)));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<union_selector>(std::move(expressions))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<union_selector<Json,JsonReference>>(std::move(expressions))));
                     }
                     break;
                 }
@@ -3154,11 +2354,11 @@ namespace jsoncons { namespace jsonpath {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<function_selector>(expression_tree_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<function_selector<Json,JsonReference>>(expression_tree_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<function_selector>(std::move(toks))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<function_selector<Json,JsonReference>>(std::move(toks))));
                     }
                     break;
                 }
