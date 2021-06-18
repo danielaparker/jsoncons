@@ -2026,6 +2026,7 @@ namespace detail {
             {
                 case path_state::unquoted_string:
                 case path_state::identifier:
+                {
                     push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                     if (ec) {return path_expression_type();}
                     state_stack_.pop_back(); // unquoted_string
@@ -2035,7 +2036,9 @@ namespace detail {
                         state_stack_.pop_back(); // identifier
                     }
                     break;
+                }
                 case path_state::digit:
+                {
                     if (buffer.empty())
                     {
                         ec = jsonpath_errc::invalid_number;
@@ -2056,6 +2059,9 @@ namespace detail {
                     {
                         state_stack_.pop_back(); // index
                     }
+                    break;
+                }
+                default:
                     break;
             }
 
