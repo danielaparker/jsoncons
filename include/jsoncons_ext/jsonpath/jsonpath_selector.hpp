@@ -212,8 +212,7 @@ namespace detail {
             //buf.append("identifier selector: ");
             //unicode_traits::convert(identifier_.data(),identifier_.size(),buf);
 
-            static char length_name[] = {'l', 'e', 'n', 'g', 't', 'h', 0};
-
+            static const char_type length_name[] = {'l', 'e', 'n', 'g', 't', 'h', 0};
 
             ndtype = node_kind::single;
             if (val.is_object())
