@@ -2029,11 +2029,7 @@ namespace detail {
                     push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                     if (ec) {return path_expression_type();}
                     state_stack_.pop_back(); // unquoted_string
-                    if (state_stack_.empty())
-                    {
-                        ec = jsonpath_errc::syntax_error;
-                        return path_expression_type();
-                    }
+                    JSONCONS_ASSERT(!state_stack_.empty());
                     if (state_stack_.back() == path_state::identifier_or_function_expr)
                     {
                         state_stack_.pop_back(); // identifier
@@ -2055,11 +2051,7 @@ namespace detail {
                     push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
                     if (ec) {return path_expression_type();}
                     state_stack_.pop_back(); // index_or_slice_or_union
-                    if (state_stack_.empty())
-                    {
-                        ec = jsonpath_errc::syntax_error;
-                        return path_expression_type();
-                    }
+                    JSONCONS_ASSERT(!state_stack_.empty());
                     if (state_stack_.back() == path_state::index)
                     {
                         state_stack_.pop_back(); // index
