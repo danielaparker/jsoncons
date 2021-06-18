@@ -145,18 +145,18 @@ namespace detail {
         void evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
                            const std::vector<path_component_type>& path, 
                            reference root,
-                           reference val,
+                           reference current,
                            std::vector<path_node_type>& nodes,
                            node_kind& ndtype,
                            result_options options) const
         {
             if (!tail_)
             {
-                nodes.emplace_back(path, std::addressof(val));
+                nodes.emplace_back(path, std::addressof(current));
             }
             else
             {
-                tail_->select(resources, path, root, val, nodes, ndtype, options);
+                tail_->select(resources, path, root, current, nodes, ndtype, options);
             }
         }
 
@@ -203,7 +203,7 @@ namespace detail {
         void select(dynamic_resources<Json,JsonReference>& resources,
                     const std::vector<path_component_type>& path, 
                     reference root,
-                    reference val,
+                    reference current,
                     std::vector<path_node_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
@@ -215,38 +215,38 @@ namespace detail {
             static const char_type length_name[] = {'l', 'e', 'n', 'g', 't', 'h', 0};
 
             ndtype = node_kind::single;
-            if (val.is_object())
+            if (current.is_object())
             {
-                auto it = val.find(identifier_);
-                if (it != val.object_range().end())
+                auto it = current.find(identifier_);
+                if (it != current.object_range().end())
                 {
                     this->evaluate_tail(resources, generate_path(path, identifier_, options), 
                                             root, it->value(), nodes, ndtype, options);
                 }
             }
-            else if (val.is_array())
+            else if (current.is_array())
             {
                 int64_t n{0};
                 auto r = jsoncons::detail::to_integer_decimal(identifier_.data(), identifier_.size(), n);
                 if (r)
                 {
-                    std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(val.size()) + n);
-                    if (index < val.size())
+                    std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);
+                    if (index < current.size())
                     {
                         this->evaluate_tail(resources, generate_path(path, index, options), 
-                                            root, val[index], nodes, ndtype, options);
+                                            root, current[index], nodes, ndtype, options);
                     }
                 }
-                else if (identifier_ == length_name && val.size() > 0)
+                else if (identifier_ == length_name && current.size() > 0)
                 {
-                    pointer ptr = resources.create_json(val.size());
+                    pointer ptr = resources.create_json(current.size());
                     this->evaluate_tail(resources, generate_path(path, identifier_, options), 
                                             root, *ptr, nodes, ndtype, options);
                 }
             }
-            else if (val.is_string() && identifier_ == length_name)
+            else if (current.is_string() && identifier_ == length_name)
             {
-                string_view_type sv = val.as_string_view();
+                string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
                 pointer ptr = resources.create_json(count);
                 this->evaluate_tail(resources, generate_path(path, identifier_, options), 
@@ -396,31 +396,29 @@ namespace detail {
         void select(dynamic_resources<Json,JsonReference>& resources,
                     const std::vector<path_component_type>& path, 
                     reference root,
-                    reference val,
+                    reference current,
                     std::vector<path_node_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
             ndtype = node_kind::single;
-            if (val.is_array())
+            if (current.is_array())
             {
-                int64_t slen = static_cast<int64_t>(val.size());
+                int64_t slen = static_cast<int64_t>(current.size());
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t index = static_cast<std::size_t>(index_);
-                    //std::cout << "path: " << path << ", val: " << val << ", index: " << index << "\n";
-                    //nodes.emplace_back(generate_path(path, index, options),std::addressof(val.at(index)));
-                    //nodes.emplace_back(path, std::addressof(val));
                     this->evaluate_tail(resources, generate_path(path, index, options), 
-                                            root, val.at(index), nodes, ndtype, options);
+                                            root, current.at(index), nodes, ndtype, options);
                 }
-                else if ((slen + index_) >= 0 && (slen+index_) < slen)
+                else 
                 {
                     std::size_t index = static_cast<std::size_t>(slen + index_);
-                    //std::cout << "path: " << path << ", val: " << val << ", index: " << index << "\n";
-                    //nodes.emplace_back(generate_path(path, index ,options),std::addressof(val.at(index)));
-                    this->evaluate_tail(resources, generate_path(path, index, options), 
-                                            root, val.at(index), nodes, ndtype, options);
+                    if (index >= 0 && index < current.size())
+                    {
+                        this->evaluate_tail(resources, generate_path(path, index, options), 
+                                            root, current.at(index), nodes, ndtype, options);
+                    }
                 }
             }
         }
@@ -446,25 +444,25 @@ namespace detail {
         void select(dynamic_resources<Json,JsonReference>& resources,
                     const std::vector<path_component_type>& path, 
                     reference root,
-                    reference val,
+                    reference current,
                     std::vector<path_node_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "wildcard_selector: " << val << "\n";
+            //std::cout << "wildcard_selector: " << current << "\n";
             ndtype = node_kind::multi; // always multi
 
             node_kind tmptype;
-            if (val.is_array())
+            if (current.is_array())
             {
-                for (std::size_t i = 0; i < val.size(); ++i)
+                for (std::size_t i = 0; i < current.size(); ++i)
                 {
-                    this->evaluate_tail(resources, generate_path(path, i, options), root, val[i], nodes, tmptype, options);
+                    this->evaluate_tail(resources, generate_path(path, i, options), root, current[i], nodes, tmptype, options);
                 }
             }
-            else if (val.is_object())
+            else if (current.is_object())
             {
-                for (auto& item : val.object_range())
+                for (auto& item : current.object_range())
                 {
                     this->evaluate_tail(resources, generate_path(path, item.key(), options), root, item.value(), nodes, tmptype, options);
                 }
@@ -507,24 +505,24 @@ namespace detail {
         void select(dynamic_resources<Json,JsonReference>& resources,
                     const std::vector<path_component_type>& path, 
                     reference root,
-                    reference val,
+                    reference current,
                     std::vector<path_node_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "wildcard_selector: " << val << "\n";
-            if (val.is_array())
+            //std::cout << "wildcard_selector: " << current << "\n";
+            if (current.is_array())
             {
-                this->evaluate_tail(resources, path, root, val, nodes, ndtype, options);
-                for (std::size_t i = 0; i < val.size(); ++i)
+                this->evaluate_tail(resources, path, root, current, nodes, ndtype, options);
+                for (std::size_t i = 0; i < current.size(); ++i)
                 {
-                    select(resources, generate_path(path, i, options), root, val[i], nodes, ndtype, options);
+                    select(resources, generate_path(path, i, options), root, current[i], nodes, ndtype, options);
                 }
             }
-            else if (val.is_object())
+            else if (current.is_object())
             {
-                this->evaluate_tail(resources, path, root, val, nodes, ndtype, options);
-                for (auto& item : val.object_range())
+                this->evaluate_tail(resources, path, root, current, nodes, ndtype, options);
+                for (auto& item : current.object_range())
                 {
                     select(resources, generate_path(path, item.key(), options), root, item.value(), nodes, ndtype, options);
                 }
@@ -569,12 +567,12 @@ namespace detail {
         void select(dynamic_resources<Json,JsonReference>& resources,
                     const std::vector<path_component_type>& path, 
                     reference root,
-                    reference val, 
+                    reference current, 
                     std::vector<path_node_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
-            //std::cout << "union_selector select val: " << val << "\n";
+            //std::cout << "union_selector select current: " << current << "\n";
             ndtype = node_kind::multi;
 
             auto callback = [&](const std::vector<path_component_type>& p, reference v)
@@ -584,7 +582,7 @@ namespace detail {
             };
             for (auto& expr : expressions_)
             {
-                expr.evaluate(resources, path, root, val, callback, options);
+                expr.evaluate(resources, path, root, current, callback, options);
             }
         }
 
