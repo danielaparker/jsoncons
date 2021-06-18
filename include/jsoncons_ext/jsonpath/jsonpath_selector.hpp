@@ -407,17 +407,18 @@ namespace detail {
                 int64_t slen = static_cast<int64_t>(current.size());
                 if (index_ >= 0 && index_ < slen)
                 {
-                    std::size_t index = static_cast<std::size_t>(index_);
-                    this->evaluate_tail(resources, generate_path(path, index, options), 
-                                            root, current.at(index), nodes, ndtype, options);
+                    std::size_t i = static_cast<std::size_t>(index_);
+                    this->evaluate_tail(resources, generate_path(path, i, options), 
+                                        root, current.at(i), nodes, ndtype, options);
                 }
                 else 
                 {
-                    std::size_t index = static_cast<std::size_t>(slen + index_);
-                    if (index >= 0 && index < current.size())
+                    int64_t index = slen + index_;
+                    if (index >= 0 && index < slen)
                     {
+                        std::size_t i = static_cast<std::size_t>(index);
                         this->evaluate_tail(resources, generate_path(path, index, options), 
-                                            root, current.at(index), nodes, ndtype, options);
+                                            root, current.at(i), nodes, ndtype, options);
                     }
                 }
             }
