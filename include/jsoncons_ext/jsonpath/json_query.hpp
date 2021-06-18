@@ -2015,27 +2015,31 @@ namespace detail {
                 ec = jsonpath_errc::syntax_error;
                 return path_expression_type();
             }
+
             if (state_stack_.back() == path_state::start)
             {
                 ec = jsonpath_errc::unexpected_eof;
                 return path_expression_type();
             }
 
-            if (state_stack_.size() >= 3)
+            switch (state_stack_.back())
             {
-                if (state_stack_.back() == path_state::unquoted_string || state_stack_.back() == path_state::identifier)
-                {
+                case path_state::unquoted_string:
+                case path_state::identifier:
                     push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
                     if (ec) {return path_expression_type();}
                     state_stack_.pop_back(); // unquoted_string
-                    buffer.clear();
+                    if (state_stack_.empty())
+                    {
+                        ec = jsonpath_errc::syntax_error;
+                        return path_expression_type();
+                    }
                     if (state_stack_.back() == path_state::identifier_or_function_expr)
                     {
                         state_stack_.pop_back(); // identifier
                     }
-                }
-                else if (state_stack_.back() == path_state::digit)
-                {
+                    break;
+                case path_state::digit:
                     if (buffer.empty())
                     {
                         ec = jsonpath_errc::invalid_number;
@@ -2050,13 +2054,17 @@ namespace detail {
                     }
                     push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
                     if (ec) {return path_expression_type();}
-                    buffer.clear();
                     state_stack_.pop_back(); // index_or_slice_or_union
+                    if (state_stack_.empty())
+                    {
+                        ec = jsonpath_errc::syntax_error;
+                        return path_expression_type();
+                    }
                     if (state_stack_.back() == path_state::index)
                     {
                         state_stack_.pop_back(); // index
                     }
-                }
+                    break;
             }
 
             if (state_stack_.size() > 2)
