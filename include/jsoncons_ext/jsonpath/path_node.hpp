@@ -16,32 +16,34 @@
 
 namespace jsoncons { 
 namespace jsonpath {
-namespace detail {
+namespace detail { 
 
     template <class CharT>
     class path_node 
     {
     public:
+        using char_type = CharT;
         using string_type = std::basic_string<CharT>;
     private:
         enum path_node_kind {root,identifier,index};
 
-        path_node* parent_;
+        const path_node* parent_;
         path_node_kind node_kind_;
         string_type identifier_;
         std::size_t index_;
     public:
-        path_node(const string_type& identifier)
-            : parent_(nullptr), node_kind_(path_node_kind::root), identifier_(identifier), index_(0)
+        path_node(char_type c)
+            : parent_(nullptr), node_kind_(path_node_kind::root), index_(0)
         {
+            identifier_.push_back(c);
         }
 
-        path_node(path_node* parent, const string_type& identifier)
+        path_node(const path_node* parent, const string_type& identifier)
             : parent_(parent), node_kind_(path_node_kind::identifier), identifier_(identifier), index_(0)
         {
         }
 
-        path_node(path_node* parent, std::size_t index)
+        path_node(const path_node* parent, std::size_t index)
             : parent_(parent), node_kind_(path_node_kind::index), index_(index)
         {
         }
@@ -97,23 +99,23 @@ namespace detail {
                return true;
             }
 
-            bool areEqual;
+            bool are_equal;
             switch (lhs.node_kind_)
             {
                 case path_node_kind::root:
-                    areEqual = rhs.node_kind_ == path_node_kind::root && lhs.identifier_ == rhs.identifier_;
+                    are_equal = rhs.node_kind_ == path_node_kind::root && lhs.identifier_ == rhs.identifier_;
                     break;
                 case path_node_kind::identifier:
-                    areEqual = rhs.node_kind_ == path_node_kind::identifier && lhs.identifier_ == rhs.identifier_;
+                    are_equal = rhs.node_kind_ == path_node_kind::identifier && lhs.identifier_ == rhs.identifier_;
                     break;
                 case path_node_kind::index:
-                    areEqual = rhs.node_kind_ == path_node_kind::index && lhs.index_ == rhs.index_;
+                    are_equal = rhs.node_kind_ == path_node_kind::index && lhs.index_ == rhs.index_;
                     break;
                 default:
-                    areEqual = false;
+                    are_equal = false;
                     break;
             }
-            if (areEqual)
+            if (are_equal)
             {
                 if (!(lhs.parent_ == nullptr && rhs.parent_ == nullptr))
                 {
@@ -126,6 +128,55 @@ namespace detail {
                 else
                 {
                     return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        friend bool operator!=(const path_node& lhs, const path_node& rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        friend bool operator<(const path_node& lhs,const path_node& rhs)
+        {
+            if (&lhs == &rhs)
+            {
+               return false;
+            }
+
+            bool is_less;
+            switch (lhs.node_kind_)
+            {
+                case path_node_kind::root:
+                    is_less = rhs.node_kind_ == path_node_kind::root && lhs.identifier_ < rhs.identifier_;
+                    break;
+                case path_node_kind::identifier:
+                    is_less = rhs.node_kind_ == path_node_kind::identifier && lhs.identifier_ < rhs.identifier_;
+                    break;
+                case path_node_kind::index:
+                    is_less = rhs.node_kind_ == path_node_kind::index && lhs.index_ < rhs.index_;
+                    break;
+                default:
+                    is_less = rhs.node_kind_ == path_node_kind::index;
+                    break;
+            }
+            if (is_less)
+            {
+                if (!(lhs.parent_ == nullptr && rhs.parent_ == nullptr))
+                {
+                    return *lhs.parent_ < *rhs.parent_;
+                }
+                else if (lhs.parent_ == nullptr && rhs.parent_ == nullptr)
+                {
+                    return false;
+                }
+                else
+                {
+                    return lhs.parent_ == nullptr;
                 }
             }
             else

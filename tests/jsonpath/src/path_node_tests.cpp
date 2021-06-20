@@ -12,12 +12,12 @@ using path_node = jsoncons::jsonpath::detail::path_node<char>;
 
 TEST_CASE("test path_node equals")
 {
-    path_node node1("$");
+    path_node node1('$');
     path_node node2(&node1,"foo");
     path_node node3(&node2,"bar");
     path_node node4(&node3,0);
 
-    path_node node11("$");
+    path_node node11('$');
     path_node node12(&node11,"foo");
     path_node node13(&node12,"bar");
     path_node node14(&node13,0);
@@ -34,7 +34,7 @@ TEST_CASE("test path_node equals")
 
 TEST_CASE("test path_node to_string")
 {
-    path_node node1("$");
+    path_node node1('$');
     path_node node2(&node1,"foo");
     path_node node3(&node2,"bar");
     path_node node4(&node3,0);

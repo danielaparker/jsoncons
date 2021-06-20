@@ -99,10 +99,10 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
-        using path_node_type = path_node<Json,JsonReference>;
+        using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using value_type = Json;
         using reference = JsonReference;
-        using pointer = typename path_node_type::pointer;
+        using pointer = typename path_value_pair_type::pointer;
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_tree_type = expression_tree<Json,JsonReference>;
@@ -2472,7 +2472,7 @@ namespace detail {
         using reference = typename evaluator_t::reference;
         using parameter_type = parameter<Json>;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using path_node_type = typename evaluator_t::path_node_type;
+        using path_value_pair_type = typename evaluator_t::path_value_pair_type;
         using path_component_type = typename evaluator_t::path_component_type;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:

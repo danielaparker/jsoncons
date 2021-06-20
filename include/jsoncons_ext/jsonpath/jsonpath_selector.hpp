@@ -116,7 +116,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -146,7 +146,7 @@ namespace detail {
                            const std::vector<path_component_type>& path, 
                            reference root,
                            reference current,
-                           std::vector<path_node_type>& nodes,
+                           std::vector<path_value_pair_type>& nodes,
                            node_kind& ndtype,
                            result_options options) const
         {
@@ -185,7 +185,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename supertype::pointer;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
         using char_type = typename Json::char_type;
@@ -204,7 +204,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current,
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -281,7 +281,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -294,7 +294,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference,
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -304,7 +304,7 @@ namespace detail {
             }
             else
             {
-                std::vector<path_node_type> v;
+                std::vector<path_value_pair_type> v;
                 this->evaluate_tail(resources, path, 
                                     root, root, v, ndtype, options);
                 resources.add_to_cache(id_, v, ndtype);
@@ -338,7 +338,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -350,7 +350,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current,
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -384,7 +384,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -397,7 +397,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current,
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -433,7 +433,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -446,7 +446,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current,
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -494,7 +494,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -507,7 +507,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current,
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -553,7 +553,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using path_expression_type = path_expression<Json, JsonReference>;
         using supertype::generate_path;
@@ -569,7 +569,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current, 
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -616,7 +616,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -629,7 +629,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current, 
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -686,7 +686,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -699,7 +699,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current, 
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -748,7 +748,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
 
         argument_expression(expression_tree<Json,JsonReference>&& expr)
@@ -791,7 +791,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -804,7 +804,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current,
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -865,7 +865,7 @@ namespace detail {
     public:
         using value_type = Json;
         using reference = JsonReference;
-        using path_node_type = typename supertype::path_node_type;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_component_type = typename supertype::path_component_type;
         using supertype::generate_path;
 
@@ -878,7 +878,7 @@ namespace detail {
                     const std::vector<path_component_type>& path, 
                     reference root,
                     reference current, 
-                    std::vector<path_node_type>& nodes,
+                    std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
                     result_options options) const override
         {

@@ -2339,7 +2339,7 @@ namespace detail {
     }
 
     template <class Json,class JsonReference>
-    struct path_node
+    struct path_value_pair
     {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
@@ -2351,29 +2351,29 @@ namespace detail {
         std::vector<path_component_type> path;
         pointer ptr;
 
-        path_node(const std::vector<path_component_type>& p, const pointer& valp)
+        path_value_pair(const std::vector<path_component_type>& p, const pointer& valp)
             : path(p),ptr(valp)
         {
         }
-        path_node(const pointer& valp)
+        path_value_pair(const pointer& valp)
             : ptr(valp)
         {
         }
 
-        path_node(std::vector<path_component_type>&& p, pointer&& valp) noexcept
+        path_value_pair(std::vector<path_component_type>&& p, pointer&& valp) noexcept
             : path(std::move(p)),ptr(valp)
         {
         }
-        path_node(const path_node&) = default;
+        path_value_pair(const path_value_pair&) = default;
 
-        path_node(path_node&& other) noexcept
+        path_value_pair(path_value_pair&& other) noexcept
             : path(std::move(other.path)), ptr(other.ptr)
         {
 
         }
-        path_node& operator=(const path_node&) = default;
+        path_value_pair& operator=(const path_value_pair&) = default;
 
-        path_node& operator=(path_node&& other) noexcept
+        path_value_pair& operator=(path_value_pair&& other) noexcept
         {
             path.swap(other.path);
             ptr = other.ptr;
@@ -2382,20 +2382,20 @@ namespace detail {
     };
  
     template <class Json,class JsonReference>
-    struct path_node_less
+    struct path_value_pair_less
     {
-        bool operator()(const path_node<Json,JsonReference>& a,
-                        const path_node<Json,JsonReference>& b) const noexcept
+        bool operator()(const path_value_pair<Json,JsonReference>& a,
+                        const path_value_pair<Json,JsonReference>& b) const noexcept
         {
             return a.path < b.path;
         }
     };
 
     template <class Json,class JsonReference>
-    struct path_node_equal
+    struct path_value_pair_equal
     {
-        bool operator()(const path_node<Json,JsonReference>& lhs,
-                        const path_node<Json,JsonReference>& rhs) const noexcept
+        bool operator()(const path_value_pair<Json,JsonReference>& lhs,
+                        const path_value_pair<Json,JsonReference>& rhs) const noexcept
         {
             if (lhs.path.size() != rhs.path.size())
             {
@@ -2416,7 +2416,7 @@ namespace detail {
     class dynamic_resources
     {
         std::vector<std::unique_ptr<Json>> temp_json_values_;
-        std::unordered_map<std::size_t,std::pair<std::vector<path_node<Json,JsonReference>>,node_kind>> cache_;
+        std::unordered_map<std::size_t,std::pair<std::vector<path_value_pair<Json,JsonReference>>,node_kind>> cache_;
     public:
 
         bool is_cached(std::size_t id) const
@@ -2424,12 +2424,12 @@ namespace detail {
             return cache_.find(id) != cache_.end();
         }
 
-        void add_to_cache(std::size_t id, const std::vector<path_node<Json,JsonReference>>& val, node_kind ndtype) 
+        void add_to_cache(std::size_t id, const std::vector<path_value_pair<Json,JsonReference>>& val, node_kind ndtype) 
         {
             cache_.emplace(id,std::make_pair(val,ndtype));
         }
 
-        void retrieve_from_cache(std::size_t id, std::vector<path_node<Json,JsonReference>>& nodes, node_kind& ndtype) 
+        void retrieve_from_cache(std::size_t id, std::vector<path_value_pair<Json,JsonReference>>& nodes, node_kind& ndtype) 
         {
             auto it = cache_.find(id);
             if (it != cache_.end())
@@ -2455,7 +2455,7 @@ namespace detail {
     template <class Json,class JsonReference>
     struct node_less
     {
-        bool operator()(const path_node<Json,JsonReference>& a, const path_node<Json,JsonReference>& b) const
+        bool operator()(const path_value_pair<Json,JsonReference>& a, const path_value_pair<Json,JsonReference>& b) const
         {
             return *(a.ptr) < *(b.ptr);
         }
@@ -2474,7 +2474,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        using path_node_type = path_node<Json,JsonReference>;
+        using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using path_component_type = path_component<char_type>;
 
         jsonpath_selector(bool is_path,
@@ -2531,7 +2531,7 @@ namespace detail {
                             const std::vector<path_component_type>& path, 
                             reference root,
                             reference val, 
-                            std::vector<path_node_type>& nodes,
+                            std::vector<path_value_pair_type>& nodes,
                             node_kind& ndtype,
                             result_options options) const = 0;
 
@@ -2555,7 +2555,7 @@ namespace detail {
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
-        using path_node_type = path_node<Json,JsonReference>;
+        using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using path_component_type = path_component<char_type>;
 
         virtual ~expression_base() noexcept = default;
@@ -2945,12 +2945,12 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
-        using path_node_type = path_node<Json,JsonReference>;
-        using path_node_less_type = path_node_less<Json,JsonReference>;
-        using path_node_equal_type = path_node_equal<Json,JsonReference>;
+        using path_value_pair_type = path_value_pair<Json,JsonReference>;
+        using path_value_pair_less_type = path_value_pair_less<Json,JsonReference>;
+        using path_value_pair_equal_type = path_value_pair_equal<Json,JsonReference>;
         using value_type = Json;
-        using reference = typename path_node_type::reference;
-        using pointer = typename path_node_type::pointer;
+        using reference = typename path_value_pair_type::reference;
+        using pointer = typename path_value_pair_type::pointer;
         using token_type = token<Json,JsonReference>;
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
@@ -3016,20 +3016,20 @@ namespace detail {
 
             std::vector<path_component_type> path(ipath);
 
-            std::vector<path_node_type> temp;
+            std::vector<path_value_pair_type> temp;
             node_kind ndtype = node_kind();
             selector_->select(resources, path, root, current, temp, ndtype, options);
 
             if (temp.size() > 1 && (options & result_options::sort) == result_options::sort)
             {
-                std::sort(temp.begin(), temp.end(), path_node_less_type());
+                std::sort(temp.begin(), temp.end(), path_value_pair_less_type());
             }
 
             if (temp.size() > 1 && (options & result_options::nodups) == result_options::nodups)
             {
                 if ((options & result_options::sort) == result_options::sort)
                 {
-                    auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
+                    auto last = std::unique(temp.begin(),temp.end(),path_value_pair_equal_type());
                     temp.erase(last,temp.end());
                     for (auto& node : temp)
                     {
@@ -3038,16 +3038,16 @@ namespace detail {
                 }
                 else
                 {
-                    std::vector<path_node_type> index(temp);
-                    std::sort(index.begin(), index.end(), path_node_less_type());
-                    auto last = std::unique(index.begin(),index.end(),path_node_equal_type());
+                    std::vector<path_value_pair_type> index(temp);
+                    std::sort(index.begin(), index.end(), path_value_pair_less_type());
+                    auto last = std::unique(index.begin(),index.end(),path_value_pair_equal_type());
                     index.erase(last,index.end());
 
-                    std::vector<path_node_type> temp2;
+                    std::vector<path_value_pair_type> temp2;
                     temp2.reserve(index.size());
                     for (auto&& node : temp)
                     {
-                        auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
+                        auto it = std::lower_bound(index.begin(),index.end(),node, path_value_pair_less_type());
                         if (it != index.end() && it->path == node.path) 
                         {
                             temp2.emplace_back(std::move(node));
@@ -3089,16 +3089,16 @@ namespace detail {
     class expression_tree
     {
     public:
-        using path_node_type = path_node<Json,JsonReference>;
+        using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using value_type = Json;
-        using reference = typename path_node_type::reference;
-        using pointer = typename path_node_type::pointer;
+        using reference = typename path_value_pair_type::reference;
+        using pointer = typename path_value_pair_type::pointer;
         using const_pointer = const value_type*;
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
         using string_view_type = typename Json::string_view_type;
-        using path_node_less_type = path_node_less<Json,reference>;
-        using path_node_equal_type = path_node_equal<Json,reference>;
+        using path_value_pair_less_type = path_value_pair_less<Json,reference>;
+        using path_value_pair_equal_type = path_value_pair_equal<Json,reference>;
         using parameter_type = parameter<Json>;
         using token_type = token<Json,reference>;
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<reference>::type>::value,
@@ -3271,36 +3271,36 @@ namespace detail {
                             //}
                             //std::cout << "selector item: " << *ptr << "\n";
                             stack.pop_back();
-                            std::vector<path_node_type> temp;
+                            std::vector<path_value_pair_type> temp;
                             node_kind ndtype = node_kind();
                             tok.selector_->select(resources, path, root, item.value(), temp, ndtype, options);
                             
                             if ((options & result_options::sort) == result_options::sort)
                             {
-                                std::sort(temp.begin(), temp.end(), path_node_less_type());
+                                std::sort(temp.begin(), temp.end(), path_value_pair_less_type());
                             }
 
                             if ((options & result_options::nodups) == result_options::nodups)
                             {
                                 if ((options & result_options::sort) == result_options::sort)
                                 {
-                                    auto last = std::unique(temp.begin(),temp.end(),path_node_equal_type());
+                                    auto last = std::unique(temp.begin(),temp.end(),path_value_pair_equal_type());
                                     temp.erase(last,temp.end());
                                     stack.emplace_back(nodes_to_stack_item(temp, ndtype));
                                 }
                                 else
                                 {
-                                    std::vector<path_node_type> index(temp);
-                                    std::sort(index.begin(), index.end(), path_node_less_type());
-                                    auto last = std::unique(index.begin(),index.end(),path_node_equal_type());
+                                    std::vector<path_value_pair_type> index(temp);
+                                    std::sort(index.begin(), index.end(), path_value_pair_less_type());
+                                    auto last = std::unique(index.begin(),index.end(),path_value_pair_equal_type());
                                     index.erase(last,index.end());
 
-                                    std::vector<path_node_type> temp2;
+                                    std::vector<path_value_pair_type> temp2;
                                     temp2.reserve(index.size());
                                     for (auto&& node : temp)
                                     {
                                         //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
-                                        auto it = std::lower_bound(index.begin(),index.end(),node, path_node_less_type());
+                                        auto it = std::lower_bound(index.begin(),index.end(),node, path_value_pair_less_type());
 
                                         if (it != index.end() && it->path == node.path) 
                                         {
@@ -3356,7 +3356,7 @@ namespace detail {
 
         }
     private:
-        static stack_item_type nodes_to_stack_item(std::vector<path_node_type>& nodes, node_kind tag)
+        static stack_item_type nodes_to_stack_item(std::vector<path_value_pair_type>& nodes, node_kind tag)
         {
             if (nodes.empty())
             {
