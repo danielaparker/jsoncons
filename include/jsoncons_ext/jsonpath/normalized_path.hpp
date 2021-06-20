@@ -29,7 +29,7 @@ namespace detail {
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
     private:
-        enum path_node_kind {root,index,identifier};
+        enum class path_node_kind {root,index,identifier};
 
         const path_node* parent_;
         path_node_kind node_kind_;
@@ -102,14 +102,14 @@ namespace detail {
                     break;
             }
         }
-
-    public:
+    
+    private:
         int compare_node(const path_node& other) const
         {
             bool diff = 0;
             if (node_kind_ != other.node_kind_)
             {
-                diff = node_kind_ - other.node_kind_;
+                diff = static_cast<int>(node_kind_) - static_cast<int>(other.node_kind_);
             }
             else
             {
@@ -194,29 +194,31 @@ namespace detail {
             return buffer;
         }
 
-        friend bool operator==(const normalized_path& lhs, const normalized_path& rhs) 
+        int compare(const normalized_path& other) const
         {
-            if (&lhs == &rhs)
+            if (this == &other)
             {
-               return true;
+               return 0;
             }
-            if (lhs.nodes_.size() != rhs.nodes_.size())
-            {
-                return false;
-            }
-            auto it1 = lhs.nodes_.begin();
-            auto it2 = rhs.nodes_.begin();
-            while (it1 != lhs.nodes_.end())
+
+            auto it1 = nodes_.rbegin();
+            auto it2 = other.nodes_.rbegin();
+            while (it1 != nodes_.rend() && it2 != other.nodes_.rend())
             {
                 int diff = (*it1)->compare_node(*(*it2));
                 if (diff != 0)
                 {
-                    return false;
+                    return diff;
                 }
                 ++it1;
                 ++it2;
             }
-            return true;
+            return (nodes_.size() < other.nodes_.size()) ? -1 : (nodes_.size() == other.nodes_.size()) ? 0 : 1;
+        }
+
+        friend bool operator==(const normalized_path& lhs, const normalized_path& rhs) 
+        {
+            return lhs.compare(rhs) == 0;
         }
 
         friend bool operator!=(const normalized_path& lhs, const normalized_path& rhs)
@@ -226,24 +228,7 @@ namespace detail {
 
         friend bool operator<(const normalized_path& lhs, const normalized_path& rhs) 
         {
-            if (&lhs == &rhs)
-            {
-               return false;
-            }
-
-            auto it1 = lhs.nodes_.rbegin();
-            auto it2 = rhs.nodes_.rbegin();
-            while (it1 != lhs.nodes_.rend() && it2 != rhs.nodes_.rend())
-            {
-                int diff = (*it1)->compare_node(*(*it2));
-                if (diff != 0)
-                {
-                    return diff < 0;
-                }
-                ++it1;
-                ++it2;
-            }
-            return lhs.nodes_.size() < rhs.nodes_.size();
+            return lhs.compare(rhs) < 0;
         }
     };
 
