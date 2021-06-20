@@ -4,13 +4,14 @@
 #if defined(_MSC_VER)
 #include "windows.h" // test no inadvertant macro expansions
 #endif
-#include <jsoncons_ext/jsonpath/path_node.hpp>
+#include <jsoncons_ext/jsonpath/normalized_path.hpp>
 #include <catch/catch.hpp>
 #include <iostream>
 
 using path_node = jsoncons::jsonpath::detail::path_node<char>;
+using normalized_path = jsoncons::jsonpath::detail::normalized_path<char>;
 
-TEST_CASE("test path_node equals")
+TEST_CASE("test normalized_path equals")
 {
     path_node node1('$');
     path_node node2(&node1,"foo");
@@ -22,24 +23,22 @@ TEST_CASE("test path_node equals")
     path_node node13(&node12,"bar");
     path_node node14(&node13,0);
 
-    CHECK(node4 == node14);
-    CHECK(node3 == node13);
-    CHECK(node2 == node12);
-    CHECK(node1 == node11);
+    normalized_path path1(node4);
+    normalized_path path2(node14);
 
-    CHECK_FALSE(node4 == node13);
-    CHECK_FALSE(node3 == node12);
-    CHECK_FALSE(node2 == node11);
+    CHECK(path1 == path2);
 }
 
-TEST_CASE("test path_node to_string")
+TEST_CASE("test normalized_path to_string")
 {
     path_node node1('$');
     path_node node2(&node1,"foo");
     path_node node3(&node2,"bar");
     path_node node4(&node3,0);
 
-    CHECK(node4.to_string() == std::string("$['foo']['bar'][0]"));
+    normalized_path path1(node4);
+
+    CHECK(path1.to_string() == std::string("$['foo']['bar'][0]"));
 }
 
 

@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_PATH_NODE_HPP
-#define JSONCONS_JSONPATH_PATH_NODE_HPP
+#ifndef JSONCONS_JSONPATH_NORMALIZED_PATH_HPP
+#define JSONCONS_JSONPATH_NORMALIZED_PATH_HPP
 
 #include <string>
 #include <vector>
@@ -77,7 +77,6 @@ namespace detail {
             to_string(buffer);
             return buffer;
         }
-
         void to_string(string_type& buffer) const
         {
             if (parent_ != nullptr)
@@ -104,98 +103,6 @@ namespace detail {
             }
         }
 
-        friend bool operator==(const path_node& lhs, const path_node& rhs) 
-        {
-            if (&lhs == &rhs)
-            {
-               return true;
-            }
-
-            bool are_equal;
-            switch (lhs.node_kind_)
-            {
-                case path_node_kind::root:
-                    are_equal = rhs.node_kind_ == path_node_kind::root && lhs.identifier_ == rhs.identifier_;
-                    break;
-                case path_node_kind::identifier:
-                    are_equal = rhs.node_kind_ == path_node_kind::identifier && lhs.identifier_ == rhs.identifier_;
-                    break;
-                case path_node_kind::index:
-                    are_equal = rhs.node_kind_ == path_node_kind::index && lhs.index_ == rhs.index_;
-                    break;
-                default:
-                    are_equal = false;
-                    break;
-            }
-            if (are_equal)
-            {
-                if (!(lhs.parent_ == nullptr && rhs.parent_ == nullptr))
-                {
-                    return *lhs.parent_ == *rhs.parent_;
-                }
-                else if (lhs.parent_ == nullptr && rhs.parent_ == nullptr)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        friend bool operator!=(const path_node& lhs, const path_node& rhs)
-        {
-            return !(lhs == rhs);
-        }
-
-        friend bool operator<(const path_node& lhs,const path_node& rhs)
-        {
-            if (&lhs == &rhs)
-            {
-               return false;
-            }
-
-            std::vector<const path_node*> v1;
-            {
-                const path_node* p = std::addressof(lhs);
-                do
-                {
-                    v1.push_back(p);
-                    p = p->parent_;
-                }
-                while (p != nullptr);
-            }
-
-            std::vector<const path_node*> v2;
-            {
-                const path_node* p = std::addressof(rhs);
-                do
-                {
-                    v2.push_back(p);
-                    p = p->parent_;
-                }
-                while (p != nullptr);
-            }
-
-            auto it1 = v1.rbegin();
-            auto it2 = v2.rbegin();
-            while (it1 != v1.rend() && it2 != v2.rend())
-            {
-                int diff = (*it1)->compare_node(*(*it2));
-                if (diff != 0)
-                {
-                    return diff < 0;
-                }
-                ++it1;
-                ++it2;
-            }
-            return v1.size() < v2.size();
-        }
     public:
         int compare_node(const path_node& other) const
         {
