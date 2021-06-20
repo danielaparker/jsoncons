@@ -118,6 +118,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
+        using normalized_path_type = typename supertype::normalized_path_type;
         using supertype::generate_path;
 
         base_selector()
@@ -555,6 +556,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
+        using normalized_path_type = typename supertype::normalized_path_type;
         using path_expression_type = path_expression<Json, JsonReference>;
         using supertype::generate_path;
     private:
@@ -576,10 +578,10 @@ namespace detail {
             //std::cout << "union_selector select current: " << current << "\n";
             ndtype = node_kind::multi;
 
-            auto callback = [&](const path_node_type& p, reference v)
+            auto callback = [&](const normalized_path_type& p, reference v)
             {
                 //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                this->evaluate_tail(resources, p, root, v, nodes, ndtype, options);
+                this->evaluate_tail(resources, p.tail(), root, v, nodes, ndtype, options);
             };
             for (auto& expr : expressions_)
             {

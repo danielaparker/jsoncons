@@ -2327,6 +2327,7 @@ namespace detail {
         using pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using path_node_type = path_node<char_type>;
+        using normalized_path_type = normalized_path<char_type>;
 
         jsonpath_selector(bool is_path,
                       std::size_t precedence_level = 0)
@@ -2843,9 +2844,8 @@ namespace detail {
 
             if ((options & result_options::path) == result_options::path)
             {
-                auto callback = [&result](const path_node_type& tail, reference)
+                auto callback = [&result](const normalized_path_type& path, reference)
                 {
-                    normalized_path_type path(tail); // REVIEW
                     result.emplace_back(path.to_string());
                 };
                 evaluate(resources, path, root, instance, callback, options);
@@ -2863,7 +2863,7 @@ namespace detail {
         }
 
         template <class Callback>
-        typename std::enable_if<type_traits::is_binary_function_object<Callback,const path_node_type&,reference>::value,void>::type
+        typename std::enable_if<type_traits::is_binary_function_object<Callback,const normalized_path_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
                  const path_node_type& path, 
                  reference root,
@@ -2890,7 +2890,7 @@ namespace detail {
                     temp.erase(last,temp.end());
                     for (auto& node : temp)
                     {
-                        callback(node.path.tail(), *node.ptr);
+                        callback(node.path, *node.ptr);
                     }
                 }
                 else
@@ -2913,7 +2913,7 @@ namespace detail {
                     }
                     for (auto& node : temp2)
                     {
-                        callback(node.path.tail(), *node.ptr);
+                        callback(node.path, *node.ptr);
                     }
                 }
             }
@@ -2921,7 +2921,7 @@ namespace detail {
             {
                 for (auto& node : temp)
                 {
-                    callback(node.path.tail(), *node.ptr);
+                    callback(node.path, *node.ptr);
                 }
             }
         }
