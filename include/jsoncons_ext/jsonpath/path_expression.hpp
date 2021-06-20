@@ -2873,8 +2873,6 @@ namespace detail {
         {
             std::error_code ec;
 
-            //path_node_type path(ipath);
-
             std::vector<path_value_pair_type> temp;
             node_kind ndtype = node_kind();
             selector_->select(resources, path, root, current, temp, ndtype, options);
