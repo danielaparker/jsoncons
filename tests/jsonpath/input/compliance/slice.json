@@ -43,7 +43,7 @@
                 "path" : ["$[3]", "$[4]"]
             },
             {
-                "comment" : "Last two items",
+                "comment" : "Last two items, nodups",
                 "expression" : "$[-2:]",
                 "result" : ["forth", "fifth"],
                 "path" : ["$[3]", "$[4]"],

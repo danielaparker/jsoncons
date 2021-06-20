@@ -132,7 +132,6 @@ TEST_CASE("jsonpath-tests")
 #endif
         jsonpath_tests("./jsonpath/input/compliance/identifiers.json");
         jsonpath_tests("./jsonpath/input/compliance/dot-notation.json"); 
-        jsonpath_tests("./jsonpath/input/compliance/slice.json");
         jsonpath_tests("./jsonpath/input/compliance/indices.json");
         jsonpath_tests("./jsonpath/input/compliance/wildcard.json");
         jsonpath_tests("./jsonpath/input/compliance/recursive-descent.json"); 
@@ -142,6 +141,7 @@ TEST_CASE("jsonpath-tests")
         jsonpath_tests("./jsonpath/input/compliance/expressions.json");
         jsonpath_tests("./jsonpath/input/compliance/syntax.json");
         jsonpath_tests("./jsonpath/input/compliance/functions.json");
+        jsonpath_tests("./jsonpath/input/compliance/slice.json");
 
         //jsonpath_tests("./jsonpath/input/test.json");
     }

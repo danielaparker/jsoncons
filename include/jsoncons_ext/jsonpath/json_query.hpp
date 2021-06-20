@@ -107,6 +107,7 @@ namespace detail {
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_tree_type = expression_tree<Json,JsonReference>;
         using path_node_type = path_node<char_type>;
+        using normalized_path_type = normalized_path<char_type>;
 
     private:
 
@@ -2474,6 +2475,7 @@ namespace detail {
         using json_selector_t = typename evaluator_t::path_expression_type;
         using path_value_pair_type = typename evaluator_t::path_value_pair_type;
         using path_node_type = typename evaluator_t::path_node_type;
+        using normalized_path_type = typename evaluator_t::normalized_path_type;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources_;
@@ -2498,7 +2500,7 @@ namespace detail {
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options())
         {
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-            auto f = [&callback](const path_node_type& path, reference val)
+            auto f = [&callback](const normalized_path_type& path, reference val)
             {
                 callback(path.to_string(), val);
             };
@@ -2512,7 +2514,7 @@ namespace detail {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
                 Json result(json_array_arg);
-                auto callback = [&result](const path_node_type& p, reference)
+                auto callback = [&result](const normalized_path_type& p, reference)
                 {
                     result.emplace_back(p.to_string());
                 };
@@ -2667,6 +2669,7 @@ namespace detail {
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using path_node_type = typename evaluator_t::path_node_type;
+        using normalized_path_type = typename evaluator_t::normalized_path_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
         evaluator_t e;
@@ -2674,7 +2677,7 @@ namespace detail {
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
-        auto f = [&callback](const path_node_type& path, reference val)
+        auto f = [&callback](const normalized_path_type& path, reference val)
         {
             callback(path.to_string(), val);
         };

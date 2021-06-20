@@ -19,8 +19,12 @@ namespace jsonpath {
 namespace detail { 
 
     template <class CharT>
+    class normalized_path; 
+
+    template <class CharT>
     class path_node 
     {
+        friend class normalized_path<CharT>;
     public:
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
@@ -192,7 +196,7 @@ namespace detail {
             }
             return v1.size() < v2.size();
         }
-    private:
+    public:
         int compare_node(const path_node& other) const
         {
             bool diff = 0;
@@ -216,6 +220,123 @@ namespace detail {
                 }
             }
             return diff;
+        }
+
+        void node_to_string(string_type& buffer) const
+        {
+            switch (node_kind_)
+            {
+                case path_node_kind::root:
+                    buffer.append(identifier_);
+                    break;
+                case path_node_kind::index:
+                    buffer.push_back('[');
+                    jsoncons::detail::from_integer(index_, buffer);
+                    buffer.push_back(']');
+                    break;
+                case path_node_kind::identifier:
+                    buffer.push_back('[');
+                    buffer.push_back('\'');
+                    buffer.append(identifier_);
+                    buffer.push_back('\'');
+                    buffer.push_back(']');
+                    break;
+            }
+        }
+    };
+
+    template <class CharT>
+    class normalized_path
+    {
+    public:
+        using char_type = CharT;
+        using string_type = std::basic_string<CharT>;
+        using path_node_type = path_node<CharT>;
+    private:
+        std::vector<const path_node_type*> nodes_;
+    public:
+        normalized_path(const path_node_type& node)
+        {
+            {
+                const path_node_type* p = std::addressof(node);
+                do
+                {
+                    nodes_.push_back(p);
+                    p = p->parent_;
+                }
+                while (p != nullptr);
+            }
+        }
+
+        const path_node_type& tail() const
+        {
+            return *nodes_.front();
+        }
+
+        string_type to_string() const
+        {
+            string_type buffer;
+
+            auto it = nodes_.rbegin();
+            while (it != nodes_.rend())
+            {
+                (*it)->node_to_string(buffer);
+                ++it;
+            }
+
+            return buffer;
+        }
+
+        friend bool operator==(const normalized_path& lhs, const normalized_path& rhs) 
+        {
+            if (&lhs == &rhs)
+            {
+               return true;
+            }
+            if (lhs.nodes_.size() != rhs.nodes_.size())
+            {
+                return false;
+            }
+            auto it1 = lhs.nodes_.begin();
+            auto it2 = rhs.nodes_.begin();
+            while (it1 != lhs.nodes_.end())
+            {
+                int diff = (*it1)->compare_node(*(*it2));
+                if (diff != 0)
+                {
+                    return false;
+                }
+                ++it1;
+                ++it2;
+            }
+            return true;
+        }
+
+        friend bool operator!=(const normalized_path& lhs, const normalized_path& rhs)
+        {
+            return !(lhs == rhs);
+        }
+
+        friend bool operator<(const normalized_path& lhs, const normalized_path& rhs) 
+        {
+            if (&lhs == &rhs)
+            {
+               return false;
+            }
+
+            auto it1 = lhs.nodes_.rbegin();
+            auto it2 = rhs.nodes_.rbegin();
+            while (it1 != lhs.nodes_.rend() && it2 != rhs.nodes_.rend())
+            {
+                int diff = (*it1)->compare_node(*(*it2));
+                if (diff != 0)
+                {
+                    return diff < 0;
+                }
+                ++it1;
+                ++it2;
+            }
+            return lhs.nodes_.size() < rhs.nodes_.size();
         }
     };
 

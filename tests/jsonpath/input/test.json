@@ -1,63 +1,14 @@
 [
     {
-        "given" : [
-           {
-             "d": [
-               "v1",
-               "v2"
-             ]
-           },
-           {
-             "d": [
-               "a",
-               "b"
-             ]
-           },
-           {
-             "d": "v1"
-           },
-           {
-             "d": "v2"
-           },
-           {
-             "d": {}
-           },
-           {
-             "d": []
-           },
-           {
-             "d": null
-           },
-           {
-             "d": -1
-           },
-           {
-             "d": 0
-           },
-           {
-             "d": 1
-           },
-           {
-             "d": "['v1','v2']"
-           },
-           {
-             "d": "['v1', 'v2']"
-           },
-           {
-             "d": "v1,v2"
-           },
-           {
-             "d": "[\"v1\", \"v2\"]"
-           },
-           {
-             "d": "[\"v1\",\"v2\"]"
-           }
-         ],
+        "source" : "https://github.com/cburgmer/json-path-comparison",
+        "given" : ["first", "second", "third", "forth", "fifth"],
         "cases" : [
             {
-                "comment" : "Filter expression with equals array",
-                "expression" : "$[?(@.d==[\"v1\",\"v2\"])]",
-                "result" :  [{"d": ["v1", "v2"]}]
+                "comment" : "Last two items, nodups",
+                "expression" : "$[-2:]",
+                "result" : ["forth", "fifth"],
+                "path" : ["$[3]", "$[4]"],
+                "nodups" : true
             }
         ]
     }

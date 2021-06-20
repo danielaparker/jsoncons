@@ -2203,13 +2203,14 @@ namespace detail {
         using reference = JsonReference;
         using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
         using path_node_type = path_node<char_type>;
+        using normalized_path_type = normalized_path<char_type>;
         using path_pointer = const path_node_type*;
 
-        path_pointer path;
+        normalized_path_type path;
         value_pointer ptr;
 
         path_value_pair(path_pointer p, value_pointer valp) noexcept
-            : path(p), ptr(valp)
+            : path(*p), ptr(valp)
         {
         }
 
@@ -2225,7 +2226,7 @@ namespace detail {
         bool operator()(const path_value_pair<Json,JsonReference>& lhs,
                         const path_value_pair<Json,JsonReference>& rhs) const noexcept
         {
-            return *(lhs.path) < *(rhs.path);
+            return lhs.path < rhs.path;
         }
     };
 
@@ -2235,7 +2236,7 @@ namespace detail {
         bool operator()(const path_value_pair<Json,JsonReference>& lhs,
                         const path_value_pair<Json,JsonReference>& rhs) const noexcept
         {
-            return *(lhs.path) == *(rhs.path);
+            return lhs.path == rhs.path;
         }
     };
 
@@ -2811,6 +2812,7 @@ namespace detail {
         using reference_arg_type = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,
             const_reference_arg_t,reference_arg_t>::type;
         using path_node_type = path_node<char_type>;
+        using normalized_path_type = normalized_path<char_type>;
     private:
         std::unique_ptr<jsonpath_selector<Json,JsonReference>> selector_;
     public:
@@ -2849,7 +2851,7 @@ namespace detail {
             }
             else
             {
-                auto callback = [&result](const path_node_type&, reference val)
+                auto callback = [&result](const normalized_path_type&, reference val)
                 {
                     result.push_back(val);
                 };
@@ -2889,7 +2891,7 @@ namespace detail {
                     temp.erase(last,temp.end());
                     for (auto& node : temp)
                     {
-                        callback(*node.path, *node.ptr);
+                        callback(node.path.tail(), *node.ptr);
                     }
                 }
                 else
@@ -2912,7 +2914,7 @@ namespace detail {
                     }
                     for (auto& node : temp2)
                     {
-                        callback(*node.path, *node.ptr);
+                        callback(node.path.tail(), *node.ptr);
                     }
                 }
             }
@@ -2920,7 +2922,7 @@ namespace detail {
             {
                 for (auto& node : temp)
                 {
-                    callback(*node.path, *node.ptr);
+                    callback(node.path.tail(), *node.ptr);
                 }
             }
         }
