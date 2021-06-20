@@ -107,6 +107,7 @@ namespace detail {
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_tree_type = expression_tree<Json,JsonReference>;
         using normalized_path_type = normalized_path<char_type>;
+        using path_node_type = path_node<char_type>;
 
     private:
 
