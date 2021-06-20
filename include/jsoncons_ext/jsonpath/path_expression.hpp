@@ -2843,8 +2843,9 @@ namespace detail {
 
             if ((options & result_options::path) == result_options::path)
             {
-                auto callback = [&result](const path_node_type& path, reference)
+                auto callback = [&result](const path_node_type& tail, reference)
                 {
+                    normalized_path_type path(tail); // REVIEW
                     result.emplace_back(path.to_string());
                 };
                 evaluate(resources, path, root, instance, callback, options);

@@ -60,50 +60,15 @@ namespace detail {
             std::swap(index_, node.index_);
         }
 
-        std::size_t hash() const
+    private:
+
+        std::size_t node_hash() const
         {
             std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(identifier_);
-            if (parent_ != nullptr)
-            {
-                h = h + 17 * parent_>hash();
-            }
 
             return h;
         }
 
-        string_type to_string() const
-        {
-            string_type buffer;
-            to_string(buffer);
-            return buffer;
-        }
-        void to_string(string_type& buffer) const
-        {
-            if (parent_ != nullptr)
-            {
-                parent_->to_string(buffer);
-            }
-            switch (node_kind_)
-            {
-                case path_node_kind::root:
-                    buffer.append(identifier_);
-                    break;
-                case path_node_kind::identifier:
-                    buffer.push_back('[');
-                    buffer.push_back('\'');
-                    buffer.append(identifier_);
-                    buffer.push_back('\'');
-                    buffer.push_back(']');
-                    break;
-                case path_node_kind::index:
-                    buffer.push_back('[');
-                    jsoncons::detail::from_integer(index_, buffer);
-                    buffer.push_back(']');
-                    break;
-            }
-        }
-    
-    private:
         int compare_node(const path_node& other) const
         {
             bool diff = 0;
@@ -214,6 +179,22 @@ namespace detail {
                 ++it2;
             }
             return (nodes_.size() < other.nodes_.size()) ? -1 : (nodes_.size() == other.nodes_.size()) ? 0 : 1;
+        }
+
+        std::size_t hash() const
+        {
+
+            auto it = nodes_.begin();
+            std::size_t hash = (*it).hash();
+            ++it;
+
+            while (it != nodes_.end())
+            {
+                hash += 17*(*it)->node_hash();
+                ++it;
+            }
+
+            return hash;
         }
 
         friend bool operator==(const normalized_path& lhs, const normalized_path& rhs) 
