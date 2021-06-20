@@ -106,7 +106,6 @@ namespace detail {
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_tree_type = expression_tree<Json,JsonReference>;
-        using path_node_type = path_node<char_type>;
         using normalized_path_type = normalized_path<char_type>;
 
     private:
@@ -2474,7 +2473,6 @@ namespace detail {
         using parameter_type = parameter<Json>;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using path_value_pair_type = typename evaluator_t::path_value_pair_type;
-        using path_node_type = typename evaluator_t::path_node_type;
         using normalized_path_type = typename evaluator_t::normalized_path_type;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:
@@ -2668,7 +2666,6 @@ namespace detail {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using path_node_type = typename evaluator_t::path_node_type;
         using normalized_path_type = typename evaluator_t::normalized_path_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
