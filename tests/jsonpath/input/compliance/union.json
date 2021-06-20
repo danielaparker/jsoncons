@@ -374,7 +374,7 @@
                 "sort" : true             
              },
              {
-                "comment" : "union with path and no duplicates",
+                "comment" : "union with path, no duplicates, and sort",
                 "expression": "$[@['books'][0],'books']",
                 "path" : ["$['books']","$['books'][0]"],
                 "nodups" : true,             

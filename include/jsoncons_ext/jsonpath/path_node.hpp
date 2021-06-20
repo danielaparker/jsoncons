@@ -25,7 +25,7 @@ namespace detail {
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
     private:
-        enum path_node_kind {root,identifier,index};
+        enum path_node_kind {root,index,identifier};
 
         const path_node* parent_;
         path_node_kind node_kind_;
@@ -46,6 +46,14 @@ namespace detail {
         path_node(const path_node* parent, std::size_t index)
             : parent_(parent), node_kind_(path_node_kind::index), index_(index)
         {
+        }
+
+        void swap(path_node& node)
+        {
+            std::swap(parent_, node.parent_);
+            std::swap(node_kind_, node.node_kind_);
+            std::swap(identifier_, node.identifier_);
+            std::swap(index_, node.index_);
         }
 
         std::size_t hash() const
@@ -148,41 +156,66 @@ namespace detail {
                return false;
             }
 
-            bool is_less;
-            switch (lhs.node_kind_)
+            std::vector<const path_node*> v1;
             {
-                case path_node_kind::root:
-                    is_less = rhs.node_kind_ == path_node_kind::root && lhs.identifier_ < rhs.identifier_;
-                    break;
-                case path_node_kind::identifier:
-                    is_less = rhs.node_kind_ == path_node_kind::identifier && lhs.identifier_ < rhs.identifier_;
-                    break;
-                case path_node_kind::index:
-                    is_less = rhs.node_kind_ == path_node_kind::index && lhs.index_ < rhs.index_;
-                    break;
-                default:
-                    is_less = rhs.node_kind_ == path_node_kind::index;
-                    break;
+                const path_node* p = std::addressof(lhs);
+                do
+                {
+                    v1.push_back(p);
+                    p = p->parent_;
+                }
+                while (p != nullptr);
             }
-            if (is_less)
+
+            std::vector<const path_node*> v2;
             {
-                if (!(lhs.parent_ == nullptr && rhs.parent_ == nullptr))
+                const path_node* p = std::addressof(rhs);
+                do
                 {
-                    return *lhs.parent_ < *rhs.parent_;
+                    v2.push_back(p);
+                    p = p->parent_;
                 }
-                else if (lhs.parent_ == nullptr && rhs.parent_ == nullptr)
+                while (p != nullptr);
+            }
+
+            auto it1 = v1.rbegin();
+            auto it2 = v2.rbegin();
+            while (it1 != v1.rend() && it2 != v2.rend())
+            {
+                int diff = (*it1)->compare_node(*(*it2));
+                if (diff != 0)
                 {
-                    return false;
+                    return diff < 0;
                 }
-                else
-                {
-                    return lhs.parent_ == nullptr;
-                }
+                ++it1;
+                ++it2;
+            }
+            return v1.size() < v2.size();
+        }
+    private:
+        int compare_node(const path_node& other) const
+        {
+            bool diff = 0;
+            if (node_kind_ != other.node_kind_)
+            {
+                diff = node_kind_ - other.node_kind_;
             }
             else
             {
-                return false;
+                switch (node_kind_)
+                {
+                    case path_node_kind::root:
+                        diff = identifier_.compare(other.identifier_);
+                        break;
+                    case path_node_kind::index:
+                        diff = index_ - other.index_;
+                        break;
+                    case path_node_kind::identifier:
+                        diff = identifier_.compare(other.identifier_);
+                        break;
+                }
             }
+            return diff;
         }
     };
 

@@ -102,11 +102,11 @@ namespace detail {
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
         using value_type = Json;
         using reference = JsonReference;
-        using pointer = typename path_value_pair_type::pointer;
+        using pointer = typename path_value_pair_type::value_pointer;
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
         using expression_tree_type = expression_tree<Json,JsonReference>;
-        using path_component_type = path_component<char_type>;
+        using path_node_type = path_node<char_type>;
 
     private:
 
@@ -2473,7 +2473,7 @@ namespace detail {
         using parameter_type = parameter<Json>;
         using json_selector_t = typename evaluator_t::path_expression_type;
         using path_value_pair_type = typename evaluator_t::path_value_pair_type;
-        using path_component_type = typename evaluator_t::path_component_type;
+        using path_node_type = typename evaluator_t::path_node_type;
         using function_type = std::function<value_type(jsoncons::span<const parameter_type>, std::error_code& ec)>;
     private:
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources_;
@@ -2497,36 +2497,32 @@ namespace detail {
         typename std::enable_if<type_traits::is_binary_function_object<BinaryCallback,const string_type&,reference>::value,void>::type
         evaluate(reference instance, BinaryCallback callback, result_options options = result_options())
         {
-            std::vector<path_component_type> path = { path_component_type(root_node_arg) };
-
             jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-            auto f = [&callback](const std::vector<path_component_type>& path, reference val)
+            auto f = [&callback](const path_node_type& path, reference val)
             {
-                callback(to_string(path), val);
+                callback(path.to_string(), val);
             };
-            expr_.evaluate(resources, path, instance, instance, f, options);
+            expr_.evaluate(resources, resources.root_path_node(), instance, instance, f, options);
         }
 
         Json evaluate(reference instance, result_options options = result_options())
         {
-            std::vector<path_component_type> path = {path_component_type(root_node_arg)};
-
             if ((options & result_options::path) == result_options::path)
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
                 Json result(json_array_arg);
-                auto callback = [&result](const std::vector<path_component_type>& p, reference)
+                auto callback = [&result](const path_node_type& p, reference)
                 {
-                    result.emplace_back(to_string(p));
+                    result.emplace_back(p.to_string());
                 };
-                expr_.evaluate(resources, path, instance, instance, callback, options);
+                expr_.evaluate(resources, resources.root_path_node(), instance, instance, callback, options);
                 return result;
             }
             else
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-                return expr_.evaluate(resources, path, instance, instance, options);
+                return expr_.evaluate(resources, resources.current_path_node(), instance, instance, options);
             }
         }
 
@@ -2622,20 +2618,18 @@ namespace detail {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using path_component_type = typename evaluator_t::path_component_type;
-
-        std::vector<path_component_type> output_path = { path_component_type(root_node_arg ) };
+        using path_node_type = typename evaluator_t::path_node_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
         evaluator_t e;
         json_selector_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        auto callback = [&new_value](const std::vector<path_component_type>&, reference v)
+        auto callback = [&new_value](const path_node_type&, reference v)
         {
             v = std::forward<T>(new_value);
         };
-        expr.evaluate(resources, output_path, instance, instance, callback, options);
+        expr.evaluate(resources, resources.root_path_node(), instance, instance, callback, options);
     }
 
     template<class Json, class UnaryCallback>
@@ -2647,20 +2641,18 @@ namespace detail {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using path_component_type = typename evaluator_t::path_component_type;
-
-        std::vector<path_component_type> output_path = { path_component_type(root_node_arg) };
+        using path_node_type = typename evaluator_t::path_node_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources;
         evaluator_t e;
         json_selector_t expr = e.compile(static_resources, path);
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-        auto f = [callback](const std::vector<path_component_type>&, reference v)
+        auto f = [callback](const path_node_type&, reference v)
         {
             v = callback(v);
         };
-        expr.evaluate(resources, output_path, instance, instance, f, result_options::nodups);
+        expr.evaluate(resources, resources.root_path_node(), instance, instance, f, result_options::nodups);
     }
 
     template<class Json, class BinaryCallback>
@@ -2674,9 +2666,7 @@ namespace detail {
         using value_type = typename evaluator_t::value_type;
         using reference = typename evaluator_t::reference;
         using json_selector_t = typename evaluator_t::path_expression_type;
-        using path_component_type = typename evaluator_t::path_component_type;
-
-        std::vector<path_component_type> output_path = { path_component_type(root_node_arg) };
+        using path_node_type = typename evaluator_t::path_node_type;
 
         jsoncons::jsonpath::detail::static_resources<value_type,reference> static_resources(funcs);
         evaluator_t e;
@@ -2684,11 +2674,11 @@ namespace detail {
 
         jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
 
-        auto f = [&callback](const std::vector<path_component_type>& path, reference val)
+        auto f = [&callback](const path_node_type& path, reference val)
         {
-            callback(to_string(path), val);
+            callback(path.to_string(), val);
         };
-        expr.evaluate(resources, output_path, instance, instance, f, options);
+        expr.evaluate(resources, resources.root_path_node(), instance, instance, f, options);
     }
 
 } // namespace jsonpath
