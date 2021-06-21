@@ -85,7 +85,7 @@ namespace detail {
                         diff = identifier_.compare(other.identifier_);
                         break;
                     case path_node_kind::index:
-                        diff = index_ - other.index_;
+                        diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
                     case path_node_kind::identifier:
                         diff = identifier_.compare(other.identifier_);
