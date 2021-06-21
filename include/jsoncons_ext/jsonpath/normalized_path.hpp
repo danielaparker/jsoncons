@@ -71,7 +71,7 @@ namespace detail {
 
         int compare_node(const path_node& other) const
         {
-            bool diff = 0;
+            int diff = 0;
             if (node_kind_ != other.node_kind_)
             {
                 diff = static_cast<int>(node_kind_) - static_cast<int>(other.node_kind_);
