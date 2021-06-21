@@ -15,7 +15,7 @@
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <functional> // 
-#include <algorithm> // std::stable_sort
+#include <algorithm> // std::stable_sort, std::reverse
 #include <cmath> // std::abs
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jmespath/jmespath_error.hpp>
@@ -4771,7 +4771,7 @@ namespace jmespath {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_filter)
                     {
-                        toks.insert(toks.begin(), std::move(*it));
+                        toks.emplace_back(std::move(*it));
                         ++it;
                     }
                     if (it == output_stack_.rend())
@@ -4779,6 +4779,7 @@ namespace jmespath {
                         ec = jmespath_errc::unbalanced_braces;
                         return;
                     }
+                    std::reverse(toks.begin(), toks.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
@@ -4808,7 +4809,7 @@ namespace jmespath {
                         std::vector<token> toks;
                         do
                         {
-                            toks.insert(toks.begin(), std::move(*it));
+                            toks.emplace_back(std::move(*it));
                             ++it;
                         } while (it != output_stack_.rend() && it->type() != token_kind::begin_multi_select_list && it->type() != token_kind::separator);
                         if (it->type() == token_kind::separator)
@@ -4817,8 +4818,9 @@ namespace jmespath {
                         }
                         if (toks.front().type() != token_kind::literal)
                         {
-                            toks.emplace(toks.begin(), current_node_arg);
+                            toks.emplace_back(current_node_arg);
                         }
+                        std::reverse(toks.begin(), toks.end());
                         vals.insert(vals.begin(), std::move(toks));
                     }
                     if (it == output_stack_.rend())
@@ -4893,7 +4895,7 @@ namespace jmespath {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_expression_type)
                     {
-                        toks.insert(toks.begin(), std::move(*it));
+                        toks.emplace_back(std::move(*it));
                         ++it;
                     }
                     if (it == output_stack_.rend())
@@ -4902,8 +4904,9 @@ namespace jmespath {
                     }
                     if (toks.front().type() != token_kind::literal)
                     {
-                        toks.emplace(toks.begin(), current_node_arg);
+                        toks.emplace_back(current_node_arg);
                     }
+                    std::reverse(toks.begin(), toks.end());
                     output_stack_.erase(it.base(),output_stack_.end());
                     output_stack_.emplace_back(token(jsoncons::make_unique<function_expression>(std::move(toks))));
                     break;
