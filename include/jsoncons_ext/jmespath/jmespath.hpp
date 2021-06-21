@@ -4779,14 +4779,14 @@ namespace jmespath {
                         ec = jmespath_errc::unbalanced_braces;
                         return;
                     }
+                    if (toks.back().type() != token_kind::literal)
+                    {
+                        toks.emplace_back(current_node_arg);
+                    }
                     std::reverse(toks.begin(), toks.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
-                    if (toks.front().type() != token_kind::literal)
-                    {
-                        toks.emplace(toks.begin(), current_node_arg);
-                    }
                     if (!output_stack_.empty() && output_stack_.back().is_projection() && 
                         (tok.precedence_level() < output_stack_.back().precedence_level() ||
                         (tok.precedence_level() == output_stack_.back().precedence_level() && tok.is_right_associative())))
@@ -4816,7 +4816,7 @@ namespace jmespath {
                         {
                             ++it;
                         }
-                        if (toks.front().type() != token_kind::literal)
+                        if (toks.back().type() != token_kind::literal)
                         {
                             toks.emplace_back(current_node_arg);
                         }
@@ -4853,7 +4853,7 @@ namespace jmespath {
                         std::vector<token> toks;
                         do
                         {
-                            toks.emplace(toks.begin(), std::move(*it));
+                            toks.emplace_back(std::move(*it));
                             ++it;
                         } while (it->type() != token_kind::key);
                         JSONCONS_ASSERT(it->is_key());
@@ -4863,17 +4863,19 @@ namespace jmespath {
                         {
                             ++it;
                         }
-                        if (toks.front().type() != token_kind::literal)
+                        if (toks.back().type() != token_kind::literal)
                         {
-                            toks.emplace(toks.begin(), current_node_arg);
+                            toks.emplace_back(current_node_arg);
                         }
-                        key_toks.emplace(key_toks.begin(), std::move(key), std::move(toks));
+                        std::reverse(toks.begin(), toks.end());
+                        key_toks.emplace_back(std::move(key), std::move(toks));
                     }
                     if (it == output_stack_.rend())
                     {
                         ec = jmespath_errc::unbalanced_braces;
                         return;
                     }
+                    std::reverse(key_toks.begin(), key_toks.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
@@ -4902,7 +4904,7 @@ namespace jmespath {
                     {
                         JSONCONS_THROW(json_runtime_error<std::runtime_error>("Unbalanced braces"));
                     }
-                    if (toks.front().type() != token_kind::literal)
+                    if (toks.back().type() != token_kind::literal)
                     {
                         toks.emplace_back(current_node_arg);
                     }
@@ -4950,7 +4952,7 @@ namespace jmespath {
                             {
                                 ++arg_count;
                             }
-                            toks.insert(toks.begin(), std::move(*it));
+                            toks.emplace_back(std::move(*it));
                             ++it;
                         }
                         if (it == output_stack_.rend())
@@ -4963,12 +4965,13 @@ namespace jmespath {
                             ec = jmespath_errc::invalid_arity;
                             return;
                         }
+                        if (toks.back().type() != token_kind::literal)
+                        {
+                            toks.emplace_back(current_node_arg);
+                        }
+                        std::reverse(toks.begin(), toks.end());
                         toks.push_back(std::move(*it));
                         ++it;
-                        if (toks.front().type() != token_kind::literal)
-                        {
-                            toks.emplace(toks.begin(), current_node_arg);
-                        }
                         output_stack_.erase(it.base(),output_stack_.end());
 
                         if (!output_stack_.empty() && output_stack_.back().is_projection() && 
