@@ -16,7 +16,7 @@
 #include <regex>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
-#include <jsoncons_ext/jsonpath/path_expression.hpp>
+#include <jsoncons_ext/jsonpath/expression.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_selector.hpp>
 
 namespace jsoncons { 
@@ -105,7 +105,7 @@ namespace detail {
         using pointer = typename path_value_pair_type::value_pointer;
         using token_type = token<Json,JsonReference>;
         using path_expression_type = path_expression<Json,JsonReference>;
-        using expression_tree_type = expression_tree<Json,JsonReference>;
+        using expression_type = expression<Json,JsonReference>;
         using normalized_path_type = normalized_path<char_type>;
         using path_node_type = path_node<char_type>;
 
@@ -2174,11 +2174,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_type(std::move(toks)))));
                     }
                     //std::cout << "push_token end_filter 2\n";
                     //for (const auto& tok2 : output_stack_)
@@ -2223,11 +2223,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_type(std::move(toks))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_tree_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_type(std::move(toks)))));
                     }
                     break;
                 }
@@ -2258,7 +2258,7 @@ namespace detail {
                     }
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
-                    output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression<Json,JsonReference>>(expression_tree_type(std::move(toks)))));
+                    output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression<Json,JsonReference>>(expression_type(std::move(toks)))));
                     break;
                 }
                 case token_kind::selector:
@@ -2361,7 +2361,7 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<function_selector<Json,JsonReference>>(expression_tree_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<function_selector<Json,JsonReference>>(expression_type(std::move(toks))));
                     }
                     else
                     {

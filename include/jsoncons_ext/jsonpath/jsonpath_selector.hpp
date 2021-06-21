@@ -16,7 +16,7 @@
 #include <regex>
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
-#include <jsoncons_ext/jsonpath/path_expression.hpp>
+#include <jsoncons_ext/jsonpath/expression.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {
@@ -613,7 +613,7 @@ namespace detail {
     {
         using supertype = base_selector<Json,JsonReference>;
 
-        expression_tree<Json,JsonReference> expr_;
+        expression<Json,JsonReference> expr_;
 
     public:
         using value_type = Json;
@@ -622,7 +622,7 @@ namespace detail {
         using path_node_type = typename supertype::path_node_type;
         using supertype::generate_path;
 
-        filter_expression_selector(expression_tree<Json,JsonReference>&& expr)
+        filter_expression_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
         {
         }
@@ -683,7 +683,7 @@ namespace detail {
     {
         using supertype = base_selector<Json,JsonReference>;
 
-        expression_tree<Json,JsonReference> expr_;
+        expression<Json,JsonReference> expr_;
 
     public:
         using value_type = Json;
@@ -692,7 +692,7 @@ namespace detail {
         using path_node_type = typename supertype::path_node_type;
         using supertype::generate_path;
 
-        index_expression_selector(expression_tree<Json,JsonReference>&& expr)
+        index_expression_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
         {
         }
@@ -745,7 +745,7 @@ namespace detail {
     {
         using supertype = expression_base<Json,JsonReference>;
 
-        expression_tree<Json,JsonReference> expr_;
+        expression<Json,JsonReference> expr_;
 
     public:
         using value_type = Json;
@@ -753,7 +753,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
 
-        argument_expression(expression_tree<Json,JsonReference>&& expr)
+        argument_expression(expression<Json,JsonReference>&& expr)
             : expr_(std::move(expr))
         {
         }
@@ -862,7 +862,7 @@ namespace detail {
     {
         using supertype = base_selector<Json,JsonReference>;
 
-        expression_tree<Json,JsonReference> expr_;
+        expression<Json,JsonReference> expr_;
 
     public:
         using value_type = Json;
@@ -871,7 +871,7 @@ namespace detail {
         using path_node_type = typename supertype::path_node_type;
         using supertype::generate_path;
 
-        function_selector(expression_tree<Json,JsonReference>&& expr)
+        function_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
         {
         }

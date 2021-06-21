@@ -4,8 +4,8 @@
 
 // See https://github.com/danielaparker/jsoncons for latest version
 
-#ifndef JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
-#define JSONCONS_JSONPATH_JSONPATH_EXPRESSION_HPP
+#ifndef JSONCONS_JSONPATH_EXPRESSION_HPP
+#define JSONCONS_JSONPATH_EXPRESSION_HPP
 
 #include <string> // std::basic_string
 #include <vector> // std::vector
@@ -2943,7 +2943,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class expression_tree
+    class expression
     {
     public:
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
@@ -2966,21 +2966,21 @@ namespace detail {
         std::vector<token_type> token_list_;
     public:
 
-        expression_tree()
+        expression()
         {
         }
 
-        expression_tree(expression_tree&& expr)
+        expression(expression&& expr)
             : token_list_(std::move(expr.token_list_))
         {
         }
 
-        expression_tree(std::vector<token_type>&& token_stack)
+        expression(std::vector<token_type>&& token_stack)
             : token_list_(std::move(token_stack))
         {
         }
 
-        expression_tree& operator=(expression_tree&& expr) = default;
+        expression& operator=(expression&& expr) = default;
 
         value_type evaluate_single(dynamic_resources<Json,reference>& resources, 
                                    reference root,
