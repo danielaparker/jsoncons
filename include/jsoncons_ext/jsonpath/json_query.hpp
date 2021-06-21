@@ -2291,7 +2291,7 @@ namespace detail {
                     {
                         if (it->type() == token_kind::selector)
                         {
-                            expressions.emplace(expressions.begin(), path_expression_type(std::move(it->selector_)));
+                            expressions.emplace_back(path_expression_type(std::move(it->selector_)));
                         }
                         do
                         {
@@ -2308,6 +2308,7 @@ namespace detail {
                         ec = jsonpath_errc::unbalanced_parentheses;
                         return;
                     }
+                    std::reverse(expressions.begin(), expressions.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
