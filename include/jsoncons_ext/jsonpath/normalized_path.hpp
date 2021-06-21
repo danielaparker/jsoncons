@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <algorithm> // std::reverse
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
@@ -129,28 +130,28 @@ namespace detail {
     public:
         normalized_path(const path_node_type& node)
         {
+            const path_node_type* p = std::addressof(node);
+            do
             {
-                const path_node_type* p = std::addressof(node);
-                do
-                {
-                    nodes_.push_back(p);
-                    p = p->parent_;
-                }
-                while (p != nullptr);
+                nodes_.push_back(p);
+                p = p->parent_;
             }
+            while (p != nullptr);
+
+            std::reverse(nodes_.begin(), nodes_.end());
         }
 
         const path_node_type& tail() const
         {
-            return *nodes_.front();
+            return *nodes_.back();
         }
 
         string_type to_string() const
         {
             string_type buffer;
 
-            auto it = nodes_.rbegin();
-            while (it != nodes_.rend())
+            auto it = nodes_.begin();
+            while (it != nodes_.end())
             {
                 (*it)->node_to_string(buffer);
                 ++it;
@@ -166,9 +167,9 @@ namespace detail {
                return 0;
             }
 
-            auto it1 = nodes_.rbegin();
-            auto it2 = other.nodes_.rbegin();
-            while (it1 != nodes_.rend() && it2 != other.nodes_.rend())
+            auto it1 = nodes_.begin();
+            auto it2 = other.nodes_.begin();
+            while (it1 != nodes_.end() && it2 != other.nodes_.end())
             {
                 int diff = (*it1)->compare_node(*(*it2));
                 if (diff != 0)

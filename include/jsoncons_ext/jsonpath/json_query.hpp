@@ -14,6 +14,7 @@
 #include <limits> // std::numeric_limits
 #include <utility> // std::move
 #include <regex>
+#include <algorithm> // std::reverse
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
 #include <jsoncons_ext/jsonpath/expression.hpp>
@@ -2161,7 +2162,7 @@ namespace detail {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_filter)
                     {
-                        toks.insert(toks.begin(), std::move(*it));
+                        toks.emplace_back(std::move(*it));
                         ++it;
                     }
                     if (it == output_stack_.rend())
@@ -2169,6 +2170,7 @@ namespace detail {
                         ec = jsonpath_errc::unbalanced_parentheses;
                         return;
                     }
+                    std::reverse(toks.begin(), toks.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
@@ -2210,7 +2212,7 @@ namespace detail {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_expression)
                     {
-                        toks.insert(toks.begin(), std::move(*it));
+                        toks.emplace_back(std::move(*it));
                         ++it;
                     }
                     if (it == output_stack_.rend())
@@ -2218,6 +2220,7 @@ namespace detail {
                         ec = jsonpath_errc::unbalanced_parentheses;
                         return;
                     }
+                    std::reverse(toks.begin(), toks.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
 
@@ -2248,7 +2251,7 @@ namespace detail {
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_expression)
                     {
-                        toks.insert(toks.begin(), std::move(*it));
+                        toks.emplace_back(std::move(*it));
                         ++it;
                     }
                     if (it == output_stack_.rend())
@@ -2256,6 +2259,7 @@ namespace detail {
                         ec = jsonpath_errc::unbalanced_parentheses;
                         return;
                     }
+                    std::reverse(toks.begin(), toks.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
                     output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression<Json,JsonReference>>(expression_type(std::move(toks)))));
@@ -2342,7 +2346,7 @@ namespace detail {
                         {
                             ++arg_count;
                         }
-                        toks.insert(toks.begin(), std::move(*it));
+                        toks.emplace_back(std::move(*it));
                         ++it;
                     }
                     if (it == output_stack_.rend())
@@ -2350,6 +2354,7 @@ namespace detail {
                         ec = jsonpath_errc::unbalanced_parentheses;
                         return;
                     }
+                    std::reverse(toks.begin(), toks.end());
                     if (it->arity() && arg_count != *(it->arity()))
                     {
                         ec = jsonpath_errc::invalid_arity;
