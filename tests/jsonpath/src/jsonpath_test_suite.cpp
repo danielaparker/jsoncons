@@ -39,19 +39,19 @@ void jsonpath_tests(const std::string& fpath)
             std::string expr = test_case["expression"].as<std::string>();
             try
             {
-                jsonpath::result_options flags = jsonpath::result_options();
+                jsonpath::result_options options = jsonpath::result_options();
                 if (test_case.contains("nodups") && test_case.at("nodups").as<bool>())
                 {
-                    flags |= jsonpath::result_options::nodups;
+                    options |= jsonpath::result_options::nodups;
                 }
                 if (test_case.contains("sort") && test_case.at("sort").as<bool>())
                 {
-                    flags |= jsonpath::result_options::sort;
+                    options |= jsonpath::result_options::sort;
                 }
                 auto expression = jsoncons::jsonpath::make_expression<json>(expr);
                 if (test_case.contains("result"))
                 {
-                    jsonpath::result_options rflags = flags | jsonpath::result_options::value;
+                    jsonpath::result_options rflags = options | jsonpath::result_options::value;
                     json actual = expression.evaluate(instance, rflags);
                     const json& expected = test_case["result"];
                     //std::cout << "actual\n:" << actual << "\n";
@@ -70,7 +70,7 @@ void jsonpath_tests(const std::string& fpath)
                 }
                 if (test_case.contains("path"))
                 {
-                    jsonpath::result_options pflags = flags | jsonpath::result_options::path;
+                    jsonpath::result_options pflags = options | jsonpath::result_options::path;
                     json actual = expression.evaluate(instance, pflags);
                     const json& expected = test_case["path"];
                     //std::cout << "actual\n:" << actual << "\n";

@@ -18,7 +18,7 @@
 using namespace jsoncons;
 using namespace jsoncons::literals;
 
-/*void check_get_with_const_ref(const json& example, const std::string& pointer, const json& expected)
+void check_get_with_const_ref(const json& example, const std::string& pointer, const json& expected)
 {
 
     std::error_code ec;
@@ -340,11 +340,11 @@ TEST_CASE("[jsonpointer] Inserting object after deleting it")
 
     jsonpointer::add( oj, "/t", ojson(), ec );
     CHECK(oj.size() == 1);
-}*/
+}
 
 TEST_CASE("[jsonpointer] create_if_missing")
 {
-    /* SECTION("get from empty")
+    SECTION("get from empty")
     {
         std::vector<std::string> keys = {"foo","bar","baz"};
 
@@ -477,6 +477,6 @@ TEST_CASE("[jsonpointer] create_if_missing")
         json expected = json::parse(R"({"foo":{"bar":{"baz":"str"}}})");
 
         CHECK(doc == expected);
-    }*/
+    }
 }
 
