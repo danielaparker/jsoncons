@@ -2353,41 +2353,9 @@ namespace detail {
             return true;
         }
 
-        static const path_node_type& generate_path(dynamic_resources<Json,JsonReference>& resources,
-                                                   const path_node_type& path, 
-                                                   std::size_t index, 
-                                                   result_options options) 
-        {
-            static const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
-            if ((options & require_path) != result_options())
-            {
-                return *resources.create_path_node(&path, index);
-            }
-            else
-            {
-                return path;
-            }
-        }
-
-        static const path_node_type& generate_path(dynamic_resources<Json,JsonReference>& resources,
-                                                   const path_node_type& path, 
-                                                   const string_type& identifier, 
-                                                   result_options options) 
-        {
-            static const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
-            if ((options & require_path) != result_options())
-            {
-                return *resources.create_path_node(&path, identifier);
-            }
-            else
-            {
-                return path;
-            }
-        }
-
         virtual void select(dynamic_resources<Json,JsonReference>& resources,
-                            const path_node_type& path, 
                             reference root,
+                            const path_node_type& path, 
                             reference val, 
                             std::vector<path_value_pair_type>& nodes,
                             node_kind& ndtype,
@@ -2419,8 +2387,8 @@ namespace detail {
         virtual ~expression_base() noexcept = default;
 
         virtual value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
-                                           const path_node_type& path, 
                                            reference root,
+                                           const path_node_type& path, 
                                            reference val, 
                                            result_options options,
                                            std::error_code& ec) const = 0;
@@ -2835,8 +2803,8 @@ namespace detail {
         path_expression& operator=(path_expression&& expr) = default;
 
         Json evaluate(dynamic_resources<Json,JsonReference>& resources, 
-                      const path_node_type& path, 
                       reference root,
+                      const path_node_type& path, 
                       reference instance,
                       result_options options) const
         {
@@ -2848,7 +2816,7 @@ namespace detail {
                 {
                     result.emplace_back(path.to_string());
                 };
-                evaluate(resources, path, root, instance, callback, options);
+                evaluate(resources, root, path, instance, callback, options);
             }
             else
             {
@@ -2856,7 +2824,7 @@ namespace detail {
                 {
                     result.push_back(val);
                 };
-                evaluate(resources, path, root, instance, callback, options);
+                evaluate(resources, root, path, instance, callback, options);
             }
 
             return result;
@@ -2865,8 +2833,8 @@ namespace detail {
         template <class Callback>
         typename std::enable_if<type_traits::is_binary_function_object<Callback,const normalized_path_type&,reference>::value,void>::type
         evaluate(dynamic_resources<Json,JsonReference>& resources, 
-                 const path_node_type& path, 
                  reference root,
+                 const path_node_type& path, 
                  reference current, 
                  Callback callback,
                  result_options options) const
@@ -2875,7 +2843,7 @@ namespace detail {
 
             std::vector<path_value_pair_type> temp;
             node_kind ndtype = node_kind();
-            selector_->select(resources, path, root, current, temp, ndtype, options);
+            selector_->select(resources, root, path, current, temp, ndtype, options);
 
             if (temp.size() > 1 && (options & result_options::sort) == result_options::sort)
             {
@@ -3093,7 +3061,7 @@ namespace detail {
 
                             auto item = std::move(stack.back());
                             stack.pop_back();
-                            value_type val = tok.expression_->evaluate_single(resources, resources.current_path_node(), root, item.value(), options, ec);
+                            value_type val = tok.expression_->evaluate_single(resources, root, resources.current_path_node(), item.value(), options, ec);
                             //std::cout << "ref2: " << ref << "\n";
                             stack.emplace_back(std::move(val));
                             break;
@@ -3129,7 +3097,7 @@ namespace detail {
                             stack.pop_back();
                             std::vector<path_value_pair_type> temp;
                             node_kind ndtype = node_kind();
-                            tok.selector_->select(resources, resources.current_path_node(), root, item.value(), temp, ndtype, options);
+                            tok.selector_->select(resources, root, resources.current_path_node(), item.value(), temp, ndtype, options);
                             
                             if ((options & result_options::sort) == result_options::sort)
                             {

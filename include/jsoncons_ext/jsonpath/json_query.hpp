@@ -2509,7 +2509,7 @@ namespace detail {
             {
                 callback(path.to_string(), val);
             };
-            expr_.evaluate(resources, resources.root_path_node(), instance, instance, f, options);
+            expr_.evaluate(resources, instance, resources.root_path_node(), instance, f, options);
         }
 
         Json evaluate(reference instance, result_options options = result_options())
@@ -2523,13 +2523,13 @@ namespace detail {
                 {
                     result.emplace_back(p.to_string());
                 };
-                expr_.evaluate(resources, resources.root_path_node(), instance, instance, callback, options);
+                expr_.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
                 return result;
             }
             else
             {
                 jsoncons::jsonpath::detail::dynamic_resources<Json,reference> resources;
-                return expr_.evaluate(resources, resources.current_path_node(), instance, instance, options);
+                return expr_.evaluate(resources, instance, resources.current_path_node(), instance, options);
             }
         }
 
@@ -2636,7 +2636,7 @@ namespace detail {
         {
             v = std::forward<T>(new_value);
         };
-        expr.evaluate(resources, resources.root_path_node(), instance, instance, callback, options);
+        expr.evaluate(resources, instance, resources.root_path_node(), instance, callback, options);
     }
 
     template<class Json, class UnaryCallback>
@@ -2659,7 +2659,7 @@ namespace detail {
         {
             v = callback(v);
         };
-        expr.evaluate(resources, resources.root_path_node(), instance, instance, f, result_options::nodups);
+        expr.evaluate(resources, instance, resources.root_path_node(), instance, f, result_options::nodups);
     }
 
     template<class Json, class BinaryCallback>
@@ -2685,7 +2685,7 @@ namespace detail {
         {
             callback(path.to_string(), val);
         };
-        expr.evaluate(resources, resources.root_path_node(), instance, instance, f, options);
+        expr.evaluate(resources, instance, resources.root_path_node(), instance, f, options);
     }
 
 } // namespace jsonpath

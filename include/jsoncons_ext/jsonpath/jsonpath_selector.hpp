@@ -108,6 +108,46 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    struct path_generator
+    {
+        using char_type = typename Json::char_type;
+        using path_node_type = path_node<char_type>;
+        using string_type = std::basic_string<char_type>;
+
+        static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
+                                              const path_node_type& path, 
+                                              std::size_t index, 
+                                              result_options options) 
+        {
+            const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
+            if ((options & require_path) != result_options())
+            {
+                return *resources.create_path_node(&path, index);
+            }
+            else
+            {
+                return path;
+            }
+        }
+
+        static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
+                                              const path_node_type& path, 
+                                              const string_type& identifier, 
+                                              result_options options) 
+        {
+            const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
+            if ((options & require_path) != result_options())
+            {
+                return *resources.create_path_node(&path, identifier);
+            }
+            else
+            {
+                return path;
+            }
+        }
+    };
+
+    template <class Json,class JsonReference>
     class base_selector : public jsonpath_selector<Json,JsonReference>
     {
         using supertype = jsonpath_selector<Json,JsonReference>;
@@ -119,7 +159,6 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
-        using supertype::generate_path;
 
         base_selector()
             : supertype(true, 11), tail_()
@@ -144,8 +183,8 @@ namespace detail {
         }
 
         void evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
-                           const path_node_type& path, 
                            reference root,
+                           const path_node_type& path, 
                            reference current,
                            std::vector<path_value_pair_type>& nodes,
                            node_kind& ndtype,
@@ -157,7 +196,7 @@ namespace detail {
             }
             else
             {
-                tail_->select(resources, path, root, current, nodes, ndtype, options);
+                tail_->select(resources, root, path, current, nodes, ndtype, options);
             }
         }
 
@@ -181,14 +220,13 @@ namespace detail {
     class identifier_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
-
+        using path_generator_type = path_generator<Json,JsonReference>;
     public:
         using value_type = Json;
         using reference = JsonReference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
         using string_view_type = basic_string_view<char_type>;
@@ -202,8 +240,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current,
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -221,8 +259,9 @@ namespace detail {
                 auto it = current.find(identifier_);
                 if (it != current.object_range().end())
                 {
-                    this->evaluate_tail(resources, generate_path(resources, path, identifier_, options), 
-                                        root, it->value(), nodes, ndtype, options);
+                    this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path, identifier_, options),
+                                        it->value(), nodes, ndtype, options);
                 }
             }
             else if (current.is_array())
@@ -234,15 +273,18 @@ namespace detail {
                     std::size_t index = (n >= 0) ? static_cast<std::size_t>(n) : static_cast<std::size_t>(static_cast<int64_t>(current.size()) + n);
                     if (index < current.size())
                     {
-                        this->evaluate_tail(resources, generate_path(resources, path, index, options), 
-                                            root, current[index], nodes, ndtype, options);
+                        this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path, index, options),
+                                            current[index], nodes, ndtype, options);
                     }
                 }
                 else if (identifier_ == length_name && current.size() > 0)
                 {
                     pointer ptr = resources.create_json(current.size());
-                    this->evaluate_tail(resources, generate_path(resources, path, identifier_, options), 
-                                            root, *ptr, nodes, ndtype, options);
+                    this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path, identifier_, options), 
+                                        *ptr, 
+                                        nodes, ndtype, options);
                 }
             }
             else if (current.is_string() && identifier_ == length_name)
@@ -250,8 +292,9 @@ namespace detail {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
                 pointer ptr = resources.create_json(count);
-                this->evaluate_tail(resources, generate_path(resources, path, identifier_, options), 
-                                        root, *ptr, nodes, ndtype, options);
+                this->evaluate_tail(resources, root, 
+                                    path_generator_type::generate(resources, path, identifier_, options), 
+                                    *ptr, nodes, ndtype, options);
             }
             //std::cout << "end identifier_selector\n";
         }
@@ -276,6 +319,7 @@ namespace detail {
     template <class Json,class JsonReference>
     class root_selector final : public base_selector<Json,JsonReference>
     {
+        using path_generator_type = path_generator<Json,JsonReference>;
         using supertype = base_selector<Json,JsonReference>;
 
         std::size_t id_;
@@ -284,7 +328,6 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
 
         root_selector(std::size_t id)
             : base_selector<Json,JsonReference>(), id_(id)
@@ -292,8 +335,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference,
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -306,8 +349,7 @@ namespace detail {
             else
             {
                 std::vector<path_value_pair_type> v;
-                this->evaluate_tail(resources, path, 
-                                    root, root, v, ndtype, options);
+                this->evaluate_tail(resources, root, path, root, v, ndtype, options);
                 resources.add_to_cache(id_, v, ndtype);
                 for (auto&& item : v)
                 {
@@ -341,15 +383,15 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         current_node_selector()
         {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current,
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -357,8 +399,8 @@ namespace detail {
         {
             //std::cout << "current_node_selector: " << current << "\n";
             ndtype = node_kind::single;
-            this->evaluate_tail(resources, path, 
-                                root, current, nodes, ndtype, options);
+            this->evaluate_tail(resources,  
+                                root, path, current, nodes, ndtype, options);
         }
 
         std::string to_string(int level = 0) const override
@@ -387,7 +429,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         index_selector(int64_t index)
             : base_selector<Json,JsonReference>(), index_(index)
@@ -395,8 +437,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current,
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -409,8 +451,9 @@ namespace detail {
                 if (index_ >= 0 && index_ < slen)
                 {
                     std::size_t i = static_cast<std::size_t>(index_);
-                    this->evaluate_tail(resources, generate_path(resources, path, i, options), 
-                                        root, current.at(i), nodes, ndtype, options);
+                    this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path, i, options), 
+                                        current.at(i), nodes, ndtype, options);
                 }
                 else 
                 {
@@ -418,8 +461,9 @@ namespace detail {
                     if (index >= 0 && index < slen)
                     {
                         std::size_t i = static_cast<std::size_t>(index);
-                        this->evaluate_tail(resources, generate_path(resources, path, index, options), 
-                                            root, current.at(i), nodes, ndtype, options);
+                        this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path, index, options), 
+                                            current.at(i), nodes, ndtype, options);
                     }
                 }
             }
@@ -436,7 +480,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         wildcard_selector()
             : base_selector<Json,JsonReference>()
@@ -444,8 +488,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current,
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -459,14 +503,16 @@ namespace detail {
             {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
-                    this->evaluate_tail(resources, generate_path(resources, path, i, options), root, current[i], nodes, tmptype, options);
+                    this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path, i, options), current[i], nodes, tmptype, options);
                 }
             }
             else if (current.is_object())
             {
                 for (auto& item : current.object_range())
                 {
-                    this->evaluate_tail(resources, generate_path(resources, path, item.key(), options), root, item.value(), nodes, tmptype, options);
+                    this->evaluate_tail(resources, root, 
+                                        path_generator_type::generate(resources, path, item.key(), options), item.value(), nodes, tmptype, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -497,7 +543,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         recursive_selector()
             : base_selector<Json,JsonReference>()
@@ -505,8 +551,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current,
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -515,18 +561,20 @@ namespace detail {
             //std::cout << "wildcard_selector: " << current << "\n";
             if (current.is_array())
             {
-                this->evaluate_tail(resources, path, root, current, nodes, ndtype, options);
+                this->evaluate_tail(resources, root, path, current, nodes, ndtype, options);
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
-                    select(resources, generate_path(resources, path, i, options), root, current[i], nodes, ndtype, options);
+                    select(resources, root, 
+                           path_generator_type::generate(resources, path, i, options), current[i], nodes, ndtype, options);
                 }
             }
             else if (current.is_object())
             {
-                this->evaluate_tail(resources, path, root, current, nodes, ndtype, options);
+                this->evaluate_tail(resources, root, path, current, nodes, ndtype, options);
                 for (auto& item : current.object_range())
                 {
-                    select(resources, generate_path(resources, path, item.key(), options), root, item.value(), nodes, ndtype, options);
+                    select(resources, root, 
+                           path_generator_type::generate(resources, path, item.key(), options), item.value(), nodes, ndtype, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -558,7 +606,7 @@ namespace detail {
         using path_node_type = typename supertype::path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
         using path_expression_type = path_expression<Json, JsonReference>;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
     private:
         std::vector<path_expression_type> expressions_;
     public:
@@ -568,8 +616,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current, 
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -581,11 +629,11 @@ namespace detail {
             auto callback = [&](const normalized_path_type& p, reference v)
             {
                 //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                this->evaluate_tail(resources, p.tail(), root, v, nodes, ndtype, options);
+                this->evaluate_tail(resources, root, p.tail(), v, nodes, ndtype, options);
             };
             for (auto& expr : expressions_)
             {
-                expr.evaluate(resources, path, root, current, callback, options);
+                expr.evaluate(resources, root, path, current, callback, options);
             }
         }
 
@@ -620,7 +668,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         filter_expression_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -628,8 +676,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current, 
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -644,7 +692,7 @@ namespace detail {
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, path, root, current[i], nodes, ndtype, options);
+                        this->evaluate_tail(resources, root, path, current[i], nodes, ndtype, options);
                     }
                 }
             }
@@ -657,7 +705,7 @@ namespace detail {
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, path, root, member.value(), nodes, ndtype, options);
+                        this->evaluate_tail(resources, root, path, member.value(), nodes, ndtype, options);
                     }
                 }
             }
@@ -690,7 +738,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         index_expression_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -698,8 +746,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current, 
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -715,11 +763,11 @@ namespace detail {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->evaluate_tail(resources, path, root, current.at(start), nodes, ndtype, options);
+                    this->evaluate_tail(resources, root, path, current.at(start), nodes, ndtype, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    this->evaluate_tail(resources, path, root, current.at(j.as_string_view()), nodes, ndtype, options);
+                    this->evaluate_tail(resources, root, path, current.at(j.as_string_view()), nodes, ndtype, options);
                 }
             }
         }
@@ -759,8 +807,8 @@ namespace detail {
         }
 
         value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
-                                   const path_node_type&, 
                                    reference root,
+                                   const path_node_type&, 
                                    reference current, 
                                    result_options options,
                                    std::error_code& ec) const override
@@ -787,6 +835,7 @@ namespace detail {
     template <class Json,class JsonReference>
     class slice_selector final : public base_selector<Json,JsonReference>
     {
+        using path_generator_type = path_generator<Json, JsonReference>;
         using supertype = base_selector<Json,JsonReference>;
 
         slice slice_;
@@ -795,7 +844,6 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
 
         slice_selector(const slice& slic)
             : base_selector<Json,JsonReference>(), slice_(slic) 
@@ -803,8 +851,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current,
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -831,7 +879,9 @@ namespace detail {
                     for (int64_t i = start; i < end; i += step)
                     {
                         std::size_t j = static_cast<std::size_t>(i);
-                        this->evaluate_tail(resources, generate_path(resources, path, j, options), root, current[j], nodes, ndtype, options);
+                        this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path, j, options), 
+                                            current[j], nodes, ndtype, options);
                     }
                 }
                 else if (step < 0)
@@ -849,7 +899,8 @@ namespace detail {
                         std::size_t j = static_cast<std::size_t>(i);
                         if (j < current.size())
                         {
-                            this->evaluate_tail(resources, generate_path(resources, path,j,options), root, current[j], nodes, ndtype, options);
+                            this->evaluate_tail(resources, root, 
+                                                path_generator_type::generate(resources, path,j,options), current[j], nodes, ndtype, options);
                         }
                     }
                 }
@@ -869,7 +920,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
-        using supertype::generate_path;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         function_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -877,8 +928,8 @@ namespace detail {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
-                    const path_node_type& path, 
                     reference root,
+                    const path_node_type& path, 
                     reference current, 
                     std::vector<path_value_pair_type>& nodes,
                     node_kind& ndtype,
@@ -889,7 +940,7 @@ namespace detail {
             value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
             if (!ec)
             {
-                this->evaluate_tail(resources, path, root, *resources.create_json(std::move(ref)), nodes, ndtype, options);
+                this->evaluate_tail(resources, root, path, *resources.create_json(std::move(ref)), nodes, ndtype, options);
             }
         }
 
