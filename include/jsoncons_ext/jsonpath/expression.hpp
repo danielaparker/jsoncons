@@ -2320,8 +2320,9 @@ namespace detail {
         using reference = JsonReference;
         using path_node_type = path_node<char_type>;
 
-        virtual void accumulate(dynamic_resources<Json,JsonReference>& resources,
-                                const path_node_type& path_tail, 
+        virtual ~node_accumulator() noexcept = default;
+
+        virtual void accumulate(const path_node_type& path_tail, 
                                 reference value) = 0;
     };
 
@@ -2336,8 +2337,7 @@ namespace detail {
 
         std::vector<path_value_pair_type> nodes;
 
-        void accumulate(dynamic_resources<Json,JsonReference>&,
-                        const path_node_type& path_tail, 
+        void accumulate(const path_node_type& path_tail, 
                         reference value) override
         {
             nodes.emplace_back(std::addressof(path_tail), std::addressof(value));

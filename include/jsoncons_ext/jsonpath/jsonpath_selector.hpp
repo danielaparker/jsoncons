@@ -193,7 +193,7 @@ namespace detail {
         {
             if (!tail_)
             {
-                accumulator.accumulate(resources, path, current);
+                accumulator.accumulate(path, current);
             }
             else
             {
@@ -605,6 +605,43 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    class tail_accumulator : public node_accumulator<Json,JsonReference>
+    {
+    public:
+        using char_type = typename Json::char_type;
+        using reference = JsonReference;
+        using path_node_type = path_node<char_type>;
+
+        const base_selector<Json,JsonReference>& tail_;
+        dynamic_resources<Json,JsonReference>& resources_;
+        reference root_;
+        node_accumulator<Json,JsonReference>& accumulator_;
+        node_kind& ndtype_;
+        result_options options_;
+
+        tail_accumulator(const base_selector<Json,JsonReference>& tail, 
+                         dynamic_resources<Json,JsonReference>& resources,
+                         reference root,
+                         node_accumulator<Json,JsonReference>& accumulator,
+                         node_kind& ndtype,
+                         result_options options)
+            : tail_(tail),
+              resources_(resources), 
+              root_(root), 
+              accumulator_(accumulator),
+              ndtype_(ndtype),
+              options_(options)              
+        {
+        }
+
+        void accumulate(const path_node_type& path_tail, 
+                        reference value) override
+        {
+            tail_.evaluate_tail(resources_, root_, path_tail, value, accumulator_, ndtype_, options_);
+        }
+    };
+
+    template <class Json,class JsonReference>
     class union_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
@@ -635,6 +672,13 @@ namespace detail {
         {
             //std::cout << "union_selector select current: " << current << "\n";
             ndtype = node_kind::multi;
+
+            tail_accumulator<Json,JsonReference> accumulator2(*this,
+                                                              resources,
+                                                              root,
+                                                              accumulator,
+                                                              ndtype,
+                                                              options);
 
             auto callback = [&](const normalized_path_type& p, reference v)
             {
