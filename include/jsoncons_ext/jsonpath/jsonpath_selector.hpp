@@ -159,6 +159,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         base_selector()
             : supertype(true, 11), tail_()
@@ -186,17 +187,17 @@ namespace detail {
                            reference root,
                            const path_node_type& path, 
                            reference current,
-                           std::vector<path_value_pair_type>& nodes,
+                           node_accumulator_type& accumulator,
                            node_kind& ndtype,
                            result_options options) const
         {
             if (!tail_)
             {
-                nodes.emplace_back(std::addressof(path), std::addressof(current));
+                accumulator.accumulate(resources, path, current);
             }
             else
             {
-                tail_->select(resources, root, path, current, nodes, ndtype, options);
+                tail_->select(resources, root, path, current, accumulator, ndtype, options);
             }
         }
 
@@ -230,6 +231,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using string_type = std::basic_string<char_type>;
         using string_view_type = basic_string_view<char_type>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
     private:
         string_type identifier_;
     public:
@@ -243,7 +245,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current,
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -261,7 +263,7 @@ namespace detail {
                 {
                     this->evaluate_tail(resources, root, 
                                         path_generator_type::generate(resources, path, identifier_, options),
-                                        it->value(), nodes, ndtype, options);
+                                        it->value(), accumulator, ndtype, options);
                 }
             }
             else if (current.is_array())
@@ -275,7 +277,7 @@ namespace detail {
                     {
                         this->evaluate_tail(resources, root, 
                                             path_generator_type::generate(resources, path, index, options),
-                                            current[index], nodes, ndtype, options);
+                                            current[index], accumulator, ndtype, options);
                     }
                 }
                 else if (identifier_ == length_name && current.size() > 0)
@@ -284,7 +286,7 @@ namespace detail {
                     this->evaluate_tail(resources, root, 
                                         path_generator_type::generate(resources, path, identifier_, options), 
                                         *ptr, 
-                                        nodes, ndtype, options);
+                                        accumulator, ndtype, options);
                 }
             }
             else if (current.is_string() && identifier_ == length_name)
@@ -294,7 +296,7 @@ namespace detail {
                 pointer ptr = resources.create_json(count);
                 this->evaluate_tail(resources, root, 
                                     path_generator_type::generate(resources, path, identifier_, options), 
-                                    *ptr, nodes, ndtype, options);
+                                    *ptr, accumulator, ndtype, options);
             }
             //std::cout << "end identifier_selector\n";
         }
@@ -328,6 +330,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         root_selector(std::size_t id)
             : base_selector<Json,JsonReference>(), id_(id)
@@ -338,23 +341,24 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference,
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
-            if (resources.is_cached(id_))
+            //if (resources.is_cached(id_))
+            //{
+            //    resources.retrieve_from_cache(id_, accumulator, ndtype);
+            //}
+            //else
             {
-                resources.retrieve_from_cache(id_, nodes, ndtype);
-            }
-            else
-            {
-                std::vector<path_value_pair_type> v;
-                this->evaluate_tail(resources, root, path, root, v, ndtype, options);
-                resources.add_to_cache(id_, v, ndtype);
-                for (auto&& item : v)
-                {
-                    nodes.push_back(std::move(item));
-                }
+                //std::vector<path_value_pair_type> v;
+
+                this->evaluate_tail(resources, root, path, root, accumulator, ndtype, options);
+                //resources.add_to_cache(id_, v, ndtype);
+                //for (auto&& item : v)
+                //{
+                //   nodes.push_back(std::move(item));
+                //}
             }
         }
 
@@ -384,6 +388,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         current_node_selector()
         {
@@ -393,14 +398,14 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current,
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
             //std::cout << "current_node_selector: " << current << "\n";
             ndtype = node_kind::single;
             this->evaluate_tail(resources,  
-                                root, path, current, nodes, ndtype, options);
+                                root, path, current, accumulator, ndtype, options);
         }
 
         std::string to_string(int level = 0) const override
@@ -430,6 +435,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         index_selector(int64_t index)
             : base_selector<Json,JsonReference>(), index_(index)
@@ -440,7 +446,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current,
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -453,7 +459,7 @@ namespace detail {
                     std::size_t i = static_cast<std::size_t>(index_);
                     this->evaluate_tail(resources, root, 
                                         path_generator_type::generate(resources, path, i, options), 
-                                        current.at(i), nodes, ndtype, options);
+                                        current.at(i), accumulator, ndtype, options);
                 }
                 else 
                 {
@@ -463,7 +469,7 @@ namespace detail {
                         std::size_t i = static_cast<std::size_t>(index);
                         this->evaluate_tail(resources, root, 
                                             path_generator_type::generate(resources, path, index, options), 
-                                            current.at(i), nodes, ndtype, options);
+                                            current.at(i), accumulator, ndtype, options);
                     }
                 }
             }
@@ -481,6 +487,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         wildcard_selector()
             : base_selector<Json,JsonReference>()
@@ -491,7 +498,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current,
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -504,7 +511,8 @@ namespace detail {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path, i, options), current[i], nodes, tmptype, options);
+                                        path_generator_type::generate(resources, path, i, options), current[i], 
+                                        accumulator, tmptype, options);
                 }
             }
             else if (current.is_object())
@@ -512,7 +520,7 @@ namespace detail {
                 for (auto& item : current.object_range())
                 {
                     this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path, item.key(), options), item.value(), nodes, tmptype, options);
+                                        path_generator_type::generate(resources, path, item.key(), options), item.value(), accumulator, tmptype, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -544,6 +552,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         recursive_selector()
             : base_selector<Json,JsonReference>()
@@ -554,27 +563,27 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current,
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
             //std::cout << "wildcard_selector: " << current << "\n";
             if (current.is_array())
             {
-                this->evaluate_tail(resources, root, path, current, nodes, ndtype, options);
+                this->evaluate_tail(resources, root, path, current, accumulator, ndtype, options);
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, path, i, options), current[i], nodes, ndtype, options);
+                           path_generator_type::generate(resources, path, i, options), current[i], accumulator, ndtype, options);
                 }
             }
             else if (current.is_object())
             {
-                this->evaluate_tail(resources, root, path, current, nodes, ndtype, options);
+                this->evaluate_tail(resources, root, path, current, accumulator, ndtype, options);
                 for (auto& item : current.object_range())
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, path, item.key(), options), item.value(), nodes, ndtype, options);
+                           path_generator_type::generate(resources, path, item.key(), options), item.value(), accumulator, ndtype, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -607,6 +616,7 @@ namespace detail {
         using normalized_path_type = typename supertype::normalized_path_type;
         using path_expression_type = path_expression<Json, JsonReference>;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
     private:
         std::vector<path_expression_type> expressions_;
     public:
@@ -619,7 +629,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current, 
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -629,7 +639,7 @@ namespace detail {
             auto callback = [&](const normalized_path_type& p, reference v)
             {
                 //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                this->evaluate_tail(resources, root, p.tail(), v, nodes, ndtype, options);
+                this->evaluate_tail(resources, root, p.tail(), v, accumulator, ndtype, options);
             };
             for (auto& expr : expressions_)
             {
@@ -669,6 +679,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         filter_expression_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -679,7 +690,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current, 
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -692,7 +703,7 @@ namespace detail {
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, root, path, current[i], nodes, ndtype, options);
+                        this->evaluate_tail(resources, root, path, current[i], accumulator, ndtype, options);
                     }
                 }
             }
@@ -705,7 +716,7 @@ namespace detail {
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, root, path, member.value(), nodes, ndtype, options);
+                        this->evaluate_tail(resources, root, path, member.value(), accumulator, ndtype, options);
                     }
                 }
             }
@@ -739,6 +750,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         index_expression_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -749,7 +761,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current, 
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -763,11 +775,11 @@ namespace detail {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->evaluate_tail(resources, root, path, current.at(start), nodes, ndtype, options);
+                    this->evaluate_tail(resources, root, path, current.at(start), accumulator, ndtype, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    this->evaluate_tail(resources, root, path, current.at(j.as_string_view()), nodes, ndtype, options);
+                    this->evaluate_tail(resources, root, path, current.at(j.as_string_view()), accumulator, ndtype, options);
                 }
             }
         }
@@ -800,6 +812,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
+        using node_accumulator_type = node_accumulator<Json,JsonReference>;
 
         argument_expression(expression<Json,JsonReference>&& expr)
             : expr_(std::move(expr))
@@ -844,6 +857,7 @@ namespace detail {
         using reference = JsonReference;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         slice_selector(const slice& slic)
             : base_selector<Json,JsonReference>(), slice_(slic) 
@@ -854,7 +868,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current,
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -881,7 +895,7 @@ namespace detail {
                         std::size_t j = static_cast<std::size_t>(i);
                         this->evaluate_tail(resources, root, 
                                             path_generator_type::generate(resources, path, j, options), 
-                                            current[j], nodes, ndtype, options);
+                                            current[j], accumulator, ndtype, options);
                     }
                 }
                 else if (step < 0)
@@ -900,7 +914,7 @@ namespace detail {
                         if (j < current.size())
                         {
                             this->evaluate_tail(resources, root, 
-                                                path_generator_type::generate(resources, path,j,options), current[j], nodes, ndtype, options);
+                                                path_generator_type::generate(resources, path,j,options), current[j], accumulator, ndtype, options);
                         }
                     }
                 }
@@ -921,6 +935,7 @@ namespace detail {
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
 
         function_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
@@ -931,7 +946,7 @@ namespace detail {
                     reference root,
                     const path_node_type& path, 
                     reference current, 
-                    std::vector<path_value_pair_type>& nodes,
+                    node_accumulator_type& accumulator,
                     node_kind& ndtype,
                     result_options options) const override
         {
@@ -940,7 +955,7 @@ namespace detail {
             value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
             if (!ec)
             {
-                this->evaluate_tail(resources, root, path, *resources.create_json(std::move(ref)), nodes, ndtype, options);
+                this->evaluate_tail(resources, root, path, *resources.create_json(std::move(ref)), accumulator, ndtype, options);
             }
         }
 
