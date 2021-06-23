@@ -2209,8 +2209,13 @@ namespace detail {
         normalized_path_type path;
         value_pointer ptr;
 
-        path_value_pair(path_pointer p, value_pointer valp) noexcept
-            : path(*p), ptr(valp)
+        path_value_pair(const normalized_path_type& path, value_pointer valp) noexcept
+            : path(path), ptr(valp)
+        {
+        }
+
+        path_value_pair(normalized_path_type&& path, value_pointer valp) noexcept
+            : path(std::move(path)), ptr(valp)
         {
         }
 
@@ -2333,6 +2338,7 @@ namespace detail {
         using char_type = typename Json::char_type;
         using reference = JsonReference;
         using path_node_type = path_node<char_type>;
+        using normalized_path_type = normalized_path<char_type>;
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
 
         std::vector<path_value_pair_type> nodes;
@@ -2340,7 +2346,7 @@ namespace detail {
         void accumulate(const path_node_type& path_tail, 
                         reference value) override
         {
-            nodes.emplace_back(std::addressof(path_tail), std::addressof(value));
+            nodes.emplace_back(normalized_path_type(path_tail), std::addressof(value));
         }
     };
 
