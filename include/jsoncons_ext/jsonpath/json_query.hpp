@@ -2285,13 +2285,13 @@ namespace detail {
                     break;
                 case token_kind::end_union:
                 {
-                    std::vector<path_expression_type> expressions;
+                    std::vector<std::unique_ptr<jsonpath_selector<Json,JsonReference>>> expressions;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_union)
                     {
                         if (it->type() == token_kind::selector)
                         {
-                            expressions.emplace_back(path_expression_type(std::move(it->selector_)));
+                            expressions.emplace_back(std::move(it->selector_));
                         }
                         do
                         {

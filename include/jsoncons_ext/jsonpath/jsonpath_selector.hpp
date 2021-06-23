@@ -655,9 +655,9 @@ namespace detail {
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
     private:
-        std::vector<path_expression_type> expressions_;
+        std::vector<std::unique_ptr<jsonpath_selector<Json,JsonReference>>> expressions_;
     public:
-        union_selector(std::vector<path_expression_type>&& expressions)
+        union_selector(std::vector<std::unique_ptr<jsonpath_selector<Json,JsonReference>>>&& expressions)
             : base_selector<Json,JsonReference>(), expressions_(std::move(expressions))
         {
         }
@@ -680,14 +680,14 @@ namespace detail {
                                                               ndtype,
                                                               options);
 
-            auto callback = [&](const normalized_path_type& p, reference v)
-            {
+            //auto callback = [&](const normalized_path_type& p, reference v)
+            //{
                 //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                this->evaluate_tail(resources, root, p.stem(), v, accumulator, ndtype, options);
-            };
+                //this->evaluate_tail(resources, root, p.stem(), v, accumulator, ndtype, options);
+            //};
             for (auto& expr : expressions_)
             {
-                expr.evaluate(resources, root, path, current, callback, options);
+                expr->select(resources, root, path, current, accumulator2, ndtype, options);
             }
         }
 
@@ -702,7 +702,7 @@ namespace detail {
             s.append("union selector ");
             for (auto& expr : expressions_)
             {
-                s.append(expr.to_string(level+1));
+                s.append(expr->to_string(level+1));
                 //s.push_back('\n');
             }
 
