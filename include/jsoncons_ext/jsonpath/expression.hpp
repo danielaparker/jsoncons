@@ -2079,7 +2079,7 @@ namespace detail {
         }
 
         template <typename... Args>
-        Json* create_json(Args&& ... args)
+        Json* new_json(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
@@ -2404,14 +2404,14 @@ namespace detail {
         }
 
         template <typename T>
-        selector_type* create_selector(T&& val)
+        selector_type* new_selector(T&& val)
         {
             selectors_.emplace_back(jsoncons::make_unique<T>(std::forward<T>(val)));
             return selectors_.back().get();
         }
 
         template <typename... Args>
-        Json* create_json(Args&& ... args)
+        Json* new_json(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
             Json* ptr = temp.get();
@@ -2586,7 +2586,7 @@ namespace detail {
 
         Json& get_value(reference_arg_t, dynamic_resources<Json,JsonReference>& resources) const
         {
-            return *resources.create_json(value_);
+            return *resources.new_json(value_);
         }
 
         token& operator=(token&& other)

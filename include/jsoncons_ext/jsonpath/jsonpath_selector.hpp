@@ -282,7 +282,7 @@ namespace detail {
                 }
                 else if (identifier_ == length_name && current.size() > 0)
                 {
-                    pointer ptr = resources.create_json(current.size());
+                    pointer ptr = resources.new_json(current.size());
                     this->evaluate_tail(resources, root, 
                                         path_generator_type::generate(resources, path, identifier_, options), 
                                         *ptr, 
@@ -293,7 +293,7 @@ namespace detail {
             {
                 string_view_type sv = current.as_string_view();
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
-                pointer ptr = resources.create_json(count);
+                pointer ptr = resources.new_json(count);
                 this->evaluate_tail(resources, root, 
                                     path_generator_type::generate(resources, path, identifier_, options), 
                                     *ptr, accumulator, ndtype, options);
@@ -1000,7 +1000,7 @@ namespace detail {
             value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
             if (!ec)
             {
-                this->evaluate_tail(resources, root, path, *resources.create_json(std::move(ref)), accumulator, ndtype, options);
+                this->evaluate_tail(resources, root, path, *resources.new_json(std::move(ref)), accumulator, ndtype, options);
             }
         }
 
