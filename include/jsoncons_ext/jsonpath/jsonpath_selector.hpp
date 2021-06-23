@@ -605,46 +605,9 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class tail_accumulator : public node_accumulator<Json,JsonReference>
+    class union_selector final : public jsonpath_selector<Json,JsonReference>
     {
-    public:
-        using char_type = typename Json::char_type;
-        using reference = JsonReference;
-        using path_node_type = path_node<char_type>;
-
-        const base_selector<Json,JsonReference>& tail_;
-        dynamic_resources<Json,JsonReference>& resources_;
-        reference root_;
-        node_accumulator<Json,JsonReference>& accumulator_;
-        node_kind& ndtype_;
-        result_options options_;
-
-        tail_accumulator(const base_selector<Json,JsonReference>& tail, 
-                         dynamic_resources<Json,JsonReference>& resources,
-                         reference root,
-                         node_accumulator<Json,JsonReference>& accumulator,
-                         node_kind& ndtype,
-                         result_options options)
-            : tail_(tail),
-              resources_(resources), 
-              root_(root), 
-              accumulator_(accumulator),
-              ndtype_(ndtype),
-              options_(options)              
-        {
-        }
-
-        void accumulate(const path_node_type& path_tail, 
-                        reference value) override
-        {
-            tail_.evaluate_tail(resources_, root_, path_tail, value, accumulator_, ndtype_, options_);
-        }
-    };
-
-    template <class Json,class JsonReference>
-    class union_selector final : public base_selector<Json,JsonReference>
-    {
-        using supertype = base_selector<Json,JsonReference>;
+        using supertype = jsonpath_selector<Json,JsonReference>;
     public:
         using value_type = Json;
         using reference = JsonReference;
@@ -656,11 +619,19 @@ namespace detail {
         using node_accumulator_type = typename supertype::node_accumulator_type;
         using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
-        std::vector<selector_type*> expressions_;
+        std::vector<selector_type*> selectors_;
     public:
-        union_selector(std::vector<selector_type*>&& expressions)
-            : base_selector<Json,JsonReference>(), expressions_(std::move(expressions))
+        union_selector(std::vector<selector_type*>&& selectors)
+            : supertype(true, 11), selectors_(std::move(selectors))
         {
+        }
+
+        void append_selector(selector_type* tail) override
+        {
+            for (auto& selector : selectors_)
+            {
+                selector->append_selector(tail);
+            }
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
@@ -674,21 +645,9 @@ namespace detail {
             //std::cout << "union_selector select current: " << current << "\n";
             ndtype = node_kind::multi;
 
-            tail_accumulator<Json,JsonReference> accumulator2(*this,
-                                                              resources,
-                                                              root,
-                                                              accumulator,
-                                                              ndtype,
-                                                              options);
-
-            //auto callback = [&](const normalized_path_type& p, reference v)
-            //{
-                //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                //this->evaluate_tail(resources, root, p.stem(), v, accumulator, ndtype, options);
-            //};
-            for (auto& expr : expressions_)
+            for (auto& selector : selectors_)
             {
-                expr->select(resources, root, path, current, accumulator2, ndtype, options);
+                selector->select(resources, root, path, current, accumulator, ndtype, options);
             }
         }
 
@@ -701,9 +660,9 @@ namespace detail {
                 s.append(level*2, ' ');
             }
             s.append("union selector ");
-            for (auto& expr : expressions_)
+            for (auto& selector : selectors_)
             {
-                s.append(expr->to_string(level+1));
+                s.append(selector->to_string(level+1));
                 //s.push_back('\n');
             }
 
