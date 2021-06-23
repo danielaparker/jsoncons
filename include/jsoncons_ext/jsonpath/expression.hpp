@@ -1920,205 +1920,6 @@ namespace detail {
         }
     };
 
-    template <class Json, class JsonReference>
-    struct static_resources
-    {
-        using char_type = typename Json::char_type;
-        using string_type = std::basic_string<char_type>;
-        using value_type = Json;
-        using reference = JsonReference;
-        using function_base_type = function_base<Json>;
-
-        std::vector<std::unique_ptr<Json>> temp_json_values_;
-        std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
-        std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
-
-        static_resources()
-        {
-        }
-
-        static_resources(const custom_functions<Json>& functions)
-        {
-            for (const auto& item : functions)
-            {
-                custom_functions_.emplace(item.name(),
-                                          jsoncons::make_unique<decorator_function<Json>>(item.arity(),item.function()));
-            }
-        }
-
-        static_resources(const static_resources&) = default;
-
-        static_resources(static_resources&& other) noexcept 
-            : temp_json_values_(std::move(other.temp_json_values_)),
-              unary_operators_(std::move(other.unary_operators_)),
-              custom_functions_(std::move(other.custom_functions_))
-        {
-        }
-
-        const function_base_type* get_function(const string_type& name, std::error_code& ec) const
-        {
-            static abs_function<Json> abs_func;
-            static contains_function<Json> contains_func;
-            static starts_with_function<Json> starts_with_func;
-            static ends_with_function<Json> ends_with_func;
-            static ceil_function<Json> ceil_func;
-            static floor_function<Json> floor_func;
-            static to_number_function<Json> to_number_func;
-            static sum_function<Json> sum_func;
-            static prod_function<Json> prod_func;
-            static avg_function<Json> avg_func;
-            static min_function<Json> min_func;
-            static max_function<Json> max_func;
-            static length_function<Json> length_func;
-            static keys_function<Json> keys_func;
-#if defined(JSONCONS_HAS_STD_REGEX)
-            static tokenize_function<Json> tokenize_func;
-#endif
-
-            static std::unordered_map<string_type,const function_base_type*> functions =
-            {
-                {string_type{'a','b','s'}, &abs_func},
-                {string_type{'c','o','n','t','a','i','n','s'}, &contains_func},
-                {string_type{'s','t','a','r','t','s','_','w','i','t','h'}, &starts_with_func},
-                {string_type{'e','n','d','s','_','w','i','t','h'}, &ends_with_func},
-                {string_type{'c','e','i','l'}, &ceil_func},
-                {string_type{'f','l','o','o','r'}, &floor_func},
-                {string_type{'t','o','_','n','u','m','b','e','r'}, &to_number_func},
-                {string_type{'s','u','m'}, &sum_func},
-                {string_type{'p','r','o', 'd'}, &prod_func},
-                {string_type{'a','v','g'}, &avg_func},
-                {string_type{'m','i','n'}, &min_func},
-                {string_type{'m','a','x'}, &max_func},
-                {string_type{'l','e','n','g','t','h'}, &length_func},
-                {string_type{'k','e','y','s'}, &keys_func},
-#if defined(JSONCONS_HAS_STD_REGEX)
-                {string_type{'t','o','k','e','n','i','z','e'}, &tokenize_func},
-#endif
-                {string_type{'c','o','u','n','t'}, &length_func}
-            };
-
-            auto it = functions.find(name);
-            if (it == functions.end())
-            {
-                auto it2 = custom_functions_.find(name);
-                if (it2 == custom_functions_.end())
-                {
-                    ec = jsonpath_errc::unknown_function;
-                    return nullptr;
-                }
-                else
-                {
-                    return it2->second.get();
-                }
-            }
-            else
-            {
-                return it->second;
-            }
-        }
-
-        const unary_operator<Json,JsonReference>* get_unary_not() const
-        {
-            static unary_not_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const unary_operator<Json,JsonReference>* get_unary_minus() const
-        {
-            static unary_minus_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const unary_operator<Json,JsonReference>* get_regex_operator(std::basic_regex<char_type>&& pattern) 
-        {
-            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json,JsonReference>>(std::move(pattern)));
-            return unary_operators_.back().get();
-        }
-
-        const binary_operator<Json,JsonReference>* get_or_operator() const
-        {
-            static or_operator<Json,JsonReference> oper;
-
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_and_operator() const
-        {
-            static and_operator<Json,JsonReference> oper;
-
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_eq_operator() const
-        {
-            static eq_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_ne_operator() const
-        {
-            static ne_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_lt_operator() const
-        {
-            static lt_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_lte_operator() const
-        {
-            static lte_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_gt_operator() const
-        {
-            static gt_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_gte_operator() const
-        {
-            static gte_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_plus_operator() const
-        {
-            static plus_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_minus_operator() const
-        {
-            static minus_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_mult_operator() const
-        {
-            static mult_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        const binary_operator<Json,JsonReference>* get_div_operator() const
-        {
-            static div_operator<Json,JsonReference> oper;
-            return &oper;
-        }
-
-        template <typename... Args>
-        Json* create_json(Args&& ... args)
-        {
-            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
-            Json* ptr = temp.get();
-            temp_json_values_.emplace_back(std::move(temp));
-            return ptr;
-        }
-    };
-
     enum class token_kind
     {
         root_node,
@@ -2400,13 +2201,222 @@ namespace detail {
                             node_kind& ndtype,
                             result_options options) const = 0;
 
-        virtual void append_selector(std::unique_ptr<jsonpath_selector>&&) 
+        virtual void append_selector(jsonpath_selector*) 
         {
         }
 
         virtual std::string to_string(int = 0) const
         {
             return std::string();
+        }
+    };
+
+    template <class Json, class JsonReference>
+    struct static_resources
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type>;
+        using value_type = Json;
+        using reference = JsonReference;
+        using function_base_type = function_base<Json>;
+        using selector_type = jsonpath_selector<Json,JsonReference>;
+
+        std::vector<std::unique_ptr<selector_type>> selectors_;
+        std::vector<std::unique_ptr<Json>> temp_json_values_;
+        std::vector<std::unique_ptr<unary_operator<Json,JsonReference>>> unary_operators_;
+        std::unordered_map<string_type,std::unique_ptr<function_base_type>> custom_functions_;
+
+        static_resources()
+        {
+        }
+
+        static_resources(const custom_functions<Json>& functions)
+        {
+            for (const auto& item : functions)
+            {
+                custom_functions_.emplace(item.name(),
+                                          jsoncons::make_unique<decorator_function<Json>>(item.arity(),item.function()));
+            }
+        }
+
+        static_resources(const static_resources&) = default;
+
+        static_resources(static_resources&& other) noexcept 
+            : selectors_(std::move(other.selectors_)),
+              temp_json_values_(std::move(other.temp_json_values_)),
+              unary_operators_(std::move(other.unary_operators_)),
+              custom_functions_(std::move(other.custom_functions_))
+        {
+        }
+
+        const function_base_type* get_function(const string_type& name, std::error_code& ec) const
+        {
+            static abs_function<Json> abs_func;
+            static contains_function<Json> contains_func;
+            static starts_with_function<Json> starts_with_func;
+            static ends_with_function<Json> ends_with_func;
+            static ceil_function<Json> ceil_func;
+            static floor_function<Json> floor_func;
+            static to_number_function<Json> to_number_func;
+            static sum_function<Json> sum_func;
+            static prod_function<Json> prod_func;
+            static avg_function<Json> avg_func;
+            static min_function<Json> min_func;
+            static max_function<Json> max_func;
+            static length_function<Json> length_func;
+            static keys_function<Json> keys_func;
+#if defined(JSONCONS_HAS_STD_REGEX)
+            static tokenize_function<Json> tokenize_func;
+#endif
+
+            static std::unordered_map<string_type,const function_base_type*> functions =
+            {
+                {string_type{'a','b','s'}, &abs_func},
+                {string_type{'c','o','n','t','a','i','n','s'}, &contains_func},
+                {string_type{'s','t','a','r','t','s','_','w','i','t','h'}, &starts_with_func},
+                {string_type{'e','n','d','s','_','w','i','t','h'}, &ends_with_func},
+                {string_type{'c','e','i','l'}, &ceil_func},
+                {string_type{'f','l','o','o','r'}, &floor_func},
+                {string_type{'t','o','_','n','u','m','b','e','r'}, &to_number_func},
+                {string_type{'s','u','m'}, &sum_func},
+                {string_type{'p','r','o', 'd'}, &prod_func},
+                {string_type{'a','v','g'}, &avg_func},
+                {string_type{'m','i','n'}, &min_func},
+                {string_type{'m','a','x'}, &max_func},
+                {string_type{'l','e','n','g','t','h'}, &length_func},
+                {string_type{'k','e','y','s'}, &keys_func},
+#if defined(JSONCONS_HAS_STD_REGEX)
+                {string_type{'t','o','k','e','n','i','z','e'}, &tokenize_func},
+#endif
+                {string_type{'c','o','u','n','t'}, &length_func}
+            };
+
+            auto it = functions.find(name);
+            if (it == functions.end())
+            {
+                auto it2 = custom_functions_.find(name);
+                if (it2 == custom_functions_.end())
+                {
+                    ec = jsonpath_errc::unknown_function;
+                    return nullptr;
+                }
+                else
+                {
+                    return it2->second.get();
+                }
+            }
+            else
+            {
+                return it->second;
+            }
+        }
+
+        const unary_operator<Json,JsonReference>* get_unary_not() const
+        {
+            static unary_not_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const unary_operator<Json,JsonReference>* get_unary_minus() const
+        {
+            static unary_minus_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const unary_operator<Json,JsonReference>* get_regex_operator(std::basic_regex<char_type>&& pattern) 
+        {
+            unary_operators_.push_back(jsoncons::make_unique<regex_operator<Json,JsonReference>>(std::move(pattern)));
+            return unary_operators_.back().get();
+        }
+
+        const binary_operator<Json,JsonReference>* get_or_operator() const
+        {
+            static or_operator<Json,JsonReference> oper;
+
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_and_operator() const
+        {
+            static and_operator<Json,JsonReference> oper;
+
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_eq_operator() const
+        {
+            static eq_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_ne_operator() const
+        {
+            static ne_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_lt_operator() const
+        {
+            static lt_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_lte_operator() const
+        {
+            static lte_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_gt_operator() const
+        {
+            static gt_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_gte_operator() const
+        {
+            static gte_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_plus_operator() const
+        {
+            static plus_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_minus_operator() const
+        {
+            static minus_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_mult_operator() const
+        {
+            static mult_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        const binary_operator<Json,JsonReference>* get_div_operator() const
+        {
+            static div_operator<Json,JsonReference> oper;
+            return &oper;
+        }
+
+        template <typename T>
+        selector_type* create_selector(T&& val)
+        {
+            selectors_.emplace_back(jsoncons::make_unique<T>(std::forward<T>(val)));
+            return selectors_.back().get();
+        }
+
+        template <typename... Args>
+        Json* create_json(Args&& ... args)
+        {
+            auto temp = jsoncons::make_unique<Json>(std::forward<Args>(args)...);
+            Json* ptr = temp.get();
+            temp_json_values_.emplace_back(std::move(temp));
+            return ptr;
         }
     };
 
@@ -2439,14 +2449,14 @@ namespace detail {
     class token
     {
     public:
-        using selector_base_type = jsonpath_selector<Json,JsonReference>;
+        using selector_type = jsonpath_selector<Json,JsonReference>;
         using expression_base_type = expression_base<Json,JsonReference>;
 
         token_kind type_;
 
         union
         {
-            std::unique_ptr<selector_base_type> selector_;
+            selector_type* selector_;
             std::unique_ptr<expression_base_type> expression_;
             const unary_operator<Json,JsonReference>* unary_operator_;
             const binary_operator<Json,JsonReference>* binary_operator_;
@@ -2537,10 +2547,9 @@ namespace detail {
         {
         }
 
-        token(std::unique_ptr<selector_base_type>&& expr)
-            : type_(token_kind::selector)
+        token(selector_type* selector)
+            : type_(token_kind::selector), selector_(selector)
         {
-            new (&selector_) std::unique_ptr<selector_base_type>(std::move(expr));
         }
 
         token(std::unique_ptr<expression_base_type>&& expr)
@@ -2589,7 +2598,7 @@ namespace detail {
                     switch (type_)
                     {
                         case token_kind::selector:
-                            selector_ = std::move(other.selector_);
+                            selector_ = other.selector_;
                             break;
                         case token_kind::expression:
                             expression_ = std::move(other.expression_);
@@ -2696,7 +2705,7 @@ namespace detail {
             switch (type_)
             {
                 case token_kind::selector:
-                    new (&selector_) std::unique_ptr<selector_base_type>(std::move(other.selector_));
+                    selector_ = other.selector_;
                     break;
                 case token_kind::expression:
                     new (&expression_) std::unique_ptr<expression_base_type>(std::move(other.expression_));
@@ -2722,9 +2731,6 @@ namespace detail {
         {
             switch(type_)
             {
-                case token_kind::selector:
-                    selector_.~unique_ptr();
-                    break;
                 case token_kind::expression:
                     expression_.~unique_ptr();
                     break;
@@ -2821,8 +2827,9 @@ namespace detail {
             const_reference_arg_t,reference_arg_t>::type;
         using path_node_type = path_node<char_type>;
         using normalized_path_type = normalized_path<char_type>;
+        using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
-        std::unique_ptr<jsonpath_selector<Json,JsonReference>> selector_;
+        selector_type* selector_;
     public:
 
         path_expression()
@@ -2830,12 +2837,12 @@ namespace detail {
         }
 
         path_expression(path_expression&& expr)
-            : selector_(std::move(expr.selector_))
+            : selector_(expr.selector_)
         {
         }
 
-        path_expression(std::unique_ptr<jsonpath_selector<Json,JsonReference>>&& selector)
-            : selector_(std::move(selector))
+        path_expression(selector_type* selector)
+            : selector_(selector)
         {
         }
 

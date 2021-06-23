@@ -152,7 +152,7 @@ namespace detail {
     {
         using supertype = jsonpath_selector<Json,JsonReference>;
 
-        std::unique_ptr<supertype> tail_;
+        supertype* tail_;
     public:
         using value_type = Json;
         using reference = JsonReference;
@@ -162,24 +162,24 @@ namespace detail {
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
         base_selector()
-            : supertype(true, 11), tail_()
+            : supertype(true, 11), tail_(nullptr)
         {
         }
 
         base_selector(bool is_path, std::size_t precedence_level)
-            : supertype(is_path, precedence_level), tail_()
+            : supertype(is_path, precedence_level), tail_(nullptr)
         {
         }
 
-        void append_selector(std::unique_ptr<supertype>&& expr) override
+        void append_selector(supertype* expr) override
         {
             if (!tail_)
             {
-                tail_ = std::move(expr);
+                tail_ = expr;
             }
             else
             {
-                tail_->append_selector(std::move(expr));
+                tail_->append_selector(expr);
             }
         }
 
@@ -654,10 +654,11 @@ namespace detail {
         using path_expression_type = path_expression<Json, JsonReference>;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
+        using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
-        std::vector<std::unique_ptr<jsonpath_selector<Json,JsonReference>>> expressions_;
+        std::vector<selector_type*> expressions_;
     public:
-        union_selector(std::vector<std::unique_ptr<jsonpath_selector<Json,JsonReference>>>&& expressions)
+        union_selector(std::vector<selector_type*>&& expressions)
             : base_selector<Json,JsonReference>(), expressions_(std::move(expressions))
         {
         }

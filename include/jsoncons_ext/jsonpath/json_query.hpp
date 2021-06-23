@@ -193,7 +193,7 @@ namespace detail {
                                 break;
                             case '$':
                             {
-                                push_token(root_node_arg, ec);
+                                push_token(resources, root_node_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::path_rhs);
                                 ++p_;
@@ -214,7 +214,7 @@ namespace detail {
                         switch (*p_)
                         {
                             case '.':
-                                push_token(token_type(jsoncons::make_unique<recursive_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(resources.create_selector(recursive_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 ++p_;
                                 ++column_;
@@ -245,7 +245,7 @@ namespace detail {
                     case path_state::json_string:
                     {
                         //std::cout << "literal: " << buffer << "\n";
-                        push_token(token_type(literal_arg, Json(buffer)), ec);
+                        push_token(resources, token_type(literal_arg, Json(buffer)), ec);
                         if (ec) {return path_expression_type();}
                         buffer.clear();
                         state_stack_.pop_back(); // json_value
@@ -269,7 +269,7 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 ++eval_stack.back();
-                                push_token(lparen_arg, ec);
+                                push_token(resources, lparen_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 break;
                             }
@@ -289,7 +289,7 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                push_token(token_type(resources.get_unary_not()), ec);
+                                push_token(resources, token_type(resources.get_unary_not()), ec);
                                 if (ec) {return path_expression_type();}
                                 break;
                             }
@@ -320,9 +320,9 @@ namespace detail {
                                     return path_expression_type();
                                 }
                                 buffer.clear();
-                                push_token(current_node_arg, ec);
+                                push_token(resources, current_node_arg, ec);
                                 if (ec) {return path_expression_type();}
-                                push_token(token_type(f), ec);
+                                push_token(resources, token_type(f), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
@@ -345,7 +345,7 @@ namespace detail {
                                 {
                                     return path_expression_type();
                                 }
-                                push_token(token_type(literal_arg, decoder.get_result()), ec);
+                                push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -369,7 +369,7 @@ namespace detail {
                         {
                             return path_expression_type();
                         }
-                        push_token(token_type(literal_arg, decoder.get_result()), ec);
+                        push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
                         if (ec) {return path_expression_type();}
                         buffer.clear();
                         state_stack_.pop_back();
@@ -397,7 +397,7 @@ namespace detail {
                                 {
                                     return path_expression_type();
                                 }
-                                push_token(token_type(literal_arg, decoder.get_result()), ec);
+                                push_token(resources, token_type(literal_arg, decoder.get_result()), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -478,7 +478,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '*':
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(resources.create_selector(wildcard_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -502,16 +502,16 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '$':
-                                push_token(token_type(root_node_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<root_selector<Json,JsonReference>>(selector_id++)), ec);
+                                push_token(resources, token_type(root_node_arg), ec);
+                                push_token(resources, token_type(resources.create_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             case '@':
-                                push_token(token_type(current_node_arg), ec); // ISSUE
-                                push_token(token_type(jsoncons::make_unique<current_node_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(current_node_arg), ec); // ISSUE
+                                push_token(resources, token_type(resources.create_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -543,8 +543,8 @@ namespace detail {
                                     return path_expression_type();
                                 }
                                 buffer.clear();
-                                push_token(current_node_arg, ec);
-                                push_token(token_type(f), ec);
+                                push_token(resources, current_node_arg, ec);
+                                push_token(resources, token_type(f), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
@@ -554,7 +554,7 @@ namespace detail {
                             }
                             default:
                             {
-                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
+                                push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back(); 
@@ -579,8 +579,8 @@ namespace detail {
                                     return path_expression_type();
                                 }
                                 buffer.clear();
-                                push_token(current_node_arg, ec);
-                                push_token(token_type(f), ec);
+                                push_token(resources, current_node_arg, ec);
+                                push_token(resources, token_type(f), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::function_expression;
                                 state_stack_.emplace_back(path_state::zero_or_one_arguments);
@@ -605,9 +605,9 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ',':
-                                push_token(token_type(current_node_arg), ec);
+                                push_token(resources, token_type(current_node_arg), ec);
                                 if (ec) {return path_expression_type();}
-                                push_token(token_type(begin_expression_arg), ec);
+                                push_token(resources, token_type(begin_expression_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::argument);
@@ -624,7 +624,7 @@ namespace detail {
                                     return path_expression_type();
                                 }
                                 eval_stack.pop_back();
-                                push_token(token_type(end_function_arg), ec);
+                                push_token(resources, token_type(end_function_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -648,7 +648,7 @@ namespace detail {
                                 state_stack_.pop_back();
                                 break;
                             default:
-                                push_token(token_type(begin_expression_arg), ec);
+                                push_token(resources, token_type(begin_expression_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::one_or_more_arguments;
                                 state_stack_.emplace_back(path_state::argument);
@@ -669,7 +669,7 @@ namespace detail {
                                 state_stack_.pop_back();
                                 break;
                             case ',':
-                                push_token(token_type(begin_expression_arg), ec);
+                                push_token(resources, token_type(begin_expression_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::argument);
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -690,9 +690,9 @@ namespace detail {
                             case ',':
                             case ')':
                             {
-                                push_token(token_type(end_argument_expression_arg), ec);
-                                push_token(argument_arg, ec);
-                                //push_token(argument_arg, ec);
+                                push_token(resources, token_type(end_argument_expression_arg), ec);
+                                push_token(resources, argument_arg, ec);
+                                //push_token(resources, argument_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 break;
@@ -756,7 +756,7 @@ namespace detail {
                                     ++p_;
                                     ++column_;
                                     --eval_stack.back();
-                                    push_token(rparen_arg, ec);
+                                    push_token(resources, rparen_arg, ec);
                                     if (ec) {return path_expression_type();}
                                 }
                                 else
@@ -802,7 +802,7 @@ namespace detail {
                                     ++p_;
                                     ++column_;
                                     --eval_stack.back();
-                                    push_token(rparen_arg, ec);
+                                    push_token(resources, rparen_arg, ec);
                                     if (ec) {return path_expression_type();}
                                 }
                                 else
@@ -846,28 +846,28 @@ namespace detail {
                             }
                             case '+':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
-                                push_token(token_type(resources.get_plus_operator()), ec);
+                                push_token(resources, token_type(resources.get_plus_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '-':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
-                                push_token(token_type(resources.get_minus_operator()), ec);
+                                push_token(resources, token_type(resources.get_minus_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '*':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
-                                push_token(token_type(resources.get_mult_operator()), ec);
+                                push_token(resources, token_type(resources.get_mult_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 ++p_;
                                 ++column_;
                                 break;
                             case '/':
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
-                                push_token(token_type(resources.get_div_operator()), ec);
+                                push_token(resources, token_type(resources.get_div_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 ++p_;
                                 ++column_;
@@ -886,7 +886,7 @@ namespace detail {
                         switch (*p_)
                         {
                             case '|':
-                                push_token(token_type(resources.get_or_operator()), ec);
+                                push_token(resources, token_type(resources.get_or_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -903,7 +903,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '&':
-                                push_token(token_type(resources.get_and_operator()), ec);
+                                push_token(resources, token_type(resources.get_and_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); // expect_and
                                 ++p_;
@@ -954,7 +954,7 @@ namespace detail {
                                 break;
                             case '=':
                             {
-                                push_token(token_type(resources.get_eq_operator()), ec);
+                                push_token(resources, token_type(resources.get_eq_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::path_or_literal_or_function;
                                 ++p_;
@@ -1011,7 +1011,7 @@ namespace detail {
                                         options |= std::regex_constants::icase;
                                     }
                                     std::basic_regex<char_type> pattern(buffer, options);
-                                    push_token(resources.get_regex_operator(std::move(pattern)), ec);
+                                    push_token(resources, resources.get_regex_operator(std::move(pattern)), ec);
                                     if (ec) {return path_expression_type();}
                                     buffer.clear();
                                 }
@@ -1031,14 +1031,14 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token_type(resources.get_lte_operator()), ec);
+                                push_token(resources, token_type(resources.get_lte_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                push_token(token_type(resources.get_lt_operator()), ec);
+                                push_token(resources, token_type(resources.get_lt_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 break;
@@ -1050,7 +1050,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token_type(resources.get_gte_operator()), ec);
+                                push_token(resources, token_type(resources.get_gte_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -1058,7 +1058,7 @@ namespace detail {
                                 break;
                             default:
                                 //std::cout << "Parse: gt_operator\n";
-                                push_token(token_type(resources.get_gt_operator()), ec);
+                                push_token(resources, token_type(resources.get_gt_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); 
                                 break;
@@ -1070,7 +1070,7 @@ namespace detail {
                         switch(*p_)
                         {
                             case '=':
-                                push_token(token_type(resources.get_ne_operator()), ec);
+                                push_token(resources, token_type(resources.get_ne_operator()), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); 
                                 ++p_;
@@ -1083,7 +1083,7 @@ namespace detail {
                         break;
                     }
                     case path_state::identifier:
-                        push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
+                        push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                         if (ec) {return path_expression_type();}
                         buffer.clear();
                         state_stack_.pop_back(); 
@@ -1173,9 +1173,9 @@ namespace detail {
                                 break;
                             case '(':
                             {
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(begin_expression_arg), ec);
-                                push_token(lparen_arg, ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(begin_expression_arg), ec);
+                                push_token(resources, lparen_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::expression);
@@ -1188,8 +1188,8 @@ namespace detail {
                             }
                             case '?':
                             {
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(begin_filter_arg), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(begin_filter_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::filter_expression);
@@ -1224,8 +1224,8 @@ namespace detail {
                                 state_stack_.emplace_back(path_state::integer);
                                 break;
                             case '$':
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(root_node_arg, ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, root_node_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::path_rhs);                                
@@ -1233,9 +1233,9 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '@':
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(current_node_arg), ec); // ISSUE
-                                push_token(token_type(jsoncons::make_unique<current_node_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(current_node_arg), ec); // ISSUE
+                                push_token(resources, token_type(resources.create_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::path_rhs);
@@ -1262,8 +1262,8 @@ namespace detail {
                                 break;
                             case '(':
                             {
-                                push_token(token_type(begin_expression_arg), ec);
-                                push_token(lparen_arg, ec);
+                                push_token(resources, token_type(begin_expression_arg), ec);
+                                push_token(resources, lparen_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::expression;
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1275,7 +1275,7 @@ namespace detail {
                             }
                             case '?':
                             {
-                                push_token(token_type(begin_filter_arg), ec);
+                                push_token(resources, token_type(begin_filter_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::filter_expression;
                                 state_stack_.emplace_back(path_state::expression_rhs);
@@ -1285,23 +1285,23 @@ namespace detail {
                                 break;
                             }
                             case '*':
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(resources.create_selector(wildcard_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::path_rhs;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '$':
-                                push_token(token_type(root_node_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<root_selector<Json,JsonReference>>(selector_id++)), ec);
+                                push_token(resources, token_type(root_node_arg), ec);
+                                push_token(resources, token_type(resources.create_selector(root_selector<Json,JsonReference>(selector_id++))), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::path_rhs;
                                 ++p_;
                                 ++column_;
                                 break;
                             case '@':
-                                push_token(token_type(current_node_arg), ec); // ISSUE
-                                push_token(token_type(jsoncons::make_unique<current_node_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(current_node_arg), ec); // ISSUE
+                                push_token(resources, token_type(resources.create_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::path_rhs;
                                 ++p_;
@@ -1372,7 +1372,7 @@ namespace detail {
                                     ec = jsonpath_errc::invalid_number;
                                     return path_expression_type();
                                 }
-                                push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
+                                push_token(resources, token_type(resources.create_selector(index_selector<Json,JsonReference>(n))), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back(); // index_or_slice_or_union
@@ -1382,7 +1382,7 @@ namespace detail {
                             }
                             case ',':
                             {
-                                push_token(token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 if (buffer.empty())
                                 {
@@ -1398,12 +1398,12 @@ namespace detail {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
+                                    push_token(resources, token_type(resources.create_selector(index_selector<Json,JsonReference>(n))), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
                                 }
-                                push_token(token_type(separator_arg), ec);
+                                push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
@@ -1426,7 +1426,7 @@ namespace detail {
                                     slic.start_ = n;
                                     buffer.clear();
                                 }
-                                push_token(token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::slice_expression_stop);
@@ -1464,7 +1464,7 @@ namespace detail {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
+                                    push_token(resources, token_type(resources.create_selector(index_selector<Json,JsonReference>(n))), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -1498,7 +1498,7 @@ namespace detail {
                                 break;
                             case ']':
                             case ',':
-                                push_token(token_type(jsoncons::make_unique<slice_selector<Json,JsonReference>>(slic)), ec);
+                                push_token(resources, token_type(resources.create_selector(slice_selector<Json,JsonReference>(slic))), ec);
                                 if (ec) {return path_expression_type();}
                                 slic = slice{};
                                 state_stack_.pop_back(); // bracket_specifier2
@@ -1541,7 +1541,7 @@ namespace detail {
                                 break;
                             case ']':
                             case ',':
-                                push_token(token_type(jsoncons::make_unique<slice_selector<Json,JsonReference>>(slic)), ec);
+                                push_token(resources, token_type(resources.create_selector(slice_selector<Json,JsonReference>(slic))), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 slic = slice{};
@@ -1561,7 +1561,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
+                                push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1569,8 +1569,8 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '.':
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
@@ -1579,8 +1579,8 @@ namespace detail {
                                 ++column_;
                                 break;
                             case '[':
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::path_lhs);                                
@@ -1588,9 +1588,9 @@ namespace detail {
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
-                                push_token(token_type(separator_arg), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
+                                push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
@@ -1622,14 +1622,14 @@ namespace detail {
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(token_type(separator_arg), ec);
+                                push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::union_element);
                                 ++p_;
                                 ++column_;
                                 break;
                             case ']': 
-                                push_token(token_type(end_union_arg), ec);
+                                push_token(resources, token_type(end_union_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 ++p_;
@@ -1647,7 +1647,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
+                                push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1655,9 +1655,9 @@ namespace detail {
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
-                                push_token(token_type(separator_arg), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
+                                push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
@@ -1680,7 +1680,7 @@ namespace detail {
                             case ']':
                             case ',':
                             case '.':
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(resources.create_selector(wildcard_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1713,7 +1713,7 @@ namespace detail {
                                         ec = jsonpath_errc::invalid_number;
                                         return path_expression_type();
                                     }
-                                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
+                                    push_token(resources, token_type(resources.create_selector(index_selector<Json,JsonReference>(n))), ec);
                                     if (ec) {return path_expression_type();}
 
                                     buffer.clear();
@@ -1753,7 +1753,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case ']': 
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
+                                push_token(resources, token_type(resources.create_selector(wildcard_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.pop_back();
@@ -1761,9 +1761,9 @@ namespace detail {
                                 ++column_;
                                 break;
                             case ',': 
-                                push_token(token_type(begin_union_arg), ec);
-                                push_token(token_type(jsoncons::make_unique<wildcard_selector<Json,JsonReference>>()), ec);
-                                push_token(token_type(separator_arg), ec);
+                                push_token(resources, token_type(begin_union_arg), ec);
+                                push_token(resources, token_type(resources.create_selector(wildcard_selector<Json,JsonReference>())), ec);
+                                push_token(resources, token_type(separator_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 buffer.clear();
                                 state_stack_.back() = path_state::union_expression; // union
@@ -1973,7 +1973,7 @@ namespace detail {
                             case ',':
                             case ']':
                             {
-                                push_token(token_type(end_filter_arg), ec);
+                                push_token(resources, token_type(end_filter_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 break;
@@ -1994,7 +1994,7 @@ namespace detail {
                             case ',':
                             case ']':
                             {
-                                push_token(token_type(end_index_expression_arg), ec);
+                                push_token(resources, token_type(end_index_expression_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back();
                                 break;
@@ -2029,7 +2029,7 @@ namespace detail {
                 case path_state::unquoted_string:
                 case path_state::identifier:
                 {
-                    push_token(token_type(jsoncons::make_unique<identifier_selector<Json,JsonReference>>(buffer)), ec);
+                    push_token(resources, token_type(resources.create_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
                     if (ec) {return path_expression_type();}
                     state_stack_.pop_back(); // unquoted_string
                     JSONCONS_ASSERT(!state_stack_.empty());
@@ -2053,7 +2053,7 @@ namespace detail {
                         ec = jsonpath_errc::invalid_number;
                         return path_expression_type();
                     }
-                    push_token(token_type(jsoncons::make_unique<index_selector<Json,JsonReference>>(n)), ec);
+                    push_token(resources, token_type(resources.create_selector(index_selector<Json,JsonReference>(n))), ec);
                     if (ec) {return path_expression_type();}
                     state_stack_.pop_back(); // index_or_slice_or_union
                     JSONCONS_ASSERT(!state_stack_.empty());
@@ -2091,7 +2091,7 @@ namespace detail {
                 return path_expression_type();
             }
 
-            return path_expression_type(std::move(output_stack_.back().selector_));
+            return path_expression_type(output_stack_.back().selector_);
         }
 
         void advance_past_space_character()
@@ -2136,7 +2136,7 @@ namespace detail {
             operator_stack_.erase(it.base(),operator_stack_.end());
         }
 
-        void push_token(token_type&& tok, std::error_code& ec)
+        void push_token(jsoncons::jsonpath::detail::static_resources<value_type,reference>& resources, token_type&& tok, std::error_code& ec)
         {
             //std::cout << tok.to_string() << "\n";
             switch (tok.type())
@@ -2176,11 +2176,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(resources.create_selector(filter_expression_selector<Json,JsonReference>(expression_type(std::move(toks)))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<filter_expression_selector<Json,JsonReference>>(expression_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(resources.create_selector(filter_expression_selector<Json,JsonReference>(expression_type(std::move(toks))))));
                     }
                     //std::cout << "push_token end_filter 2\n";
                     //for (const auto& tok2 : output_stack_)
@@ -2226,11 +2226,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(resources.create_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks)))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<index_expression_selector<Json,JsonReference>>(expression_type(std::move(toks)))));
+                        output_stack_.emplace_back(token_type(resources.create_selector(index_expression_selector<Json,JsonReference>(expression_type(std::move(toks))))));
                     }
                     break;
                 }
@@ -2285,7 +2285,7 @@ namespace detail {
                     break;
                 case token_kind::end_union:
                 {
-                    std::vector<std::unique_ptr<jsonpath_selector<Json,JsonReference>>> expressions;
+                    std::vector<jsonpath_selector<Json,JsonReference>*> expressions;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_union)
                     {
@@ -2314,11 +2314,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<union_selector<Json,JsonReference>>(std::move(expressions)));
+                        output_stack_.back().selector_->append_selector(resources.create_selector(union_selector<Json,JsonReference>(std::move(expressions))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<union_selector<Json,JsonReference>>(std::move(expressions))));
+                        output_stack_.emplace_back(token_type(resources.create_selector(union_selector<Json,JsonReference>(std::move(expressions)))));
                     }
                     break;
                 }
@@ -2367,11 +2367,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(jsoncons::make_unique<function_selector<Json,JsonReference>>(expression_type(std::move(toks))));
+                        output_stack_.back().selector_->append_selector(resources.create_selector(function_selector<Json,JsonReference>(expression_type(std::move(toks)))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(jsoncons::make_unique<function_selector<Json,JsonReference>>(std::move(toks))));
+                        output_stack_.emplace_back(token_type(resources.create_selector(function_selector<Json,JsonReference>(std::move(toks)))));
                     }
                     break;
                 }
