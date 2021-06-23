@@ -160,6 +160,7 @@ namespace detail {
         using path_node_type = typename supertype::path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
         using node_accumulator_type = typename supertype::node_accumulator_type;
+        using selector_type = typename supertype::selector_type;
 
         base_selector()
             : supertype(true, 11), tail_(nullptr)
@@ -171,7 +172,7 @@ namespace detail {
         {
         }
 
-        void append_selector(supertype* expr) override
+        void append_selector(selector_type* expr) override
         {
             if (!tail_)
             {
@@ -321,8 +322,8 @@ namespace detail {
     template <class Json,class JsonReference>
     class root_selector final : public base_selector<Json,JsonReference>
     {
-        using path_generator_type = path_generator<Json,JsonReference>;
         using supertype = base_selector<Json,JsonReference>;
+        using path_generator_type = path_generator<Json,JsonReference>;
 
         std::size_t id_;
     public:
@@ -617,7 +618,7 @@ namespace detail {
         using path_expression_type = path_expression<Json, JsonReference>;
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
-        using selector_type = jsonpath_selector<Json,JsonReference>;
+        using selector_type = typename supertype::selector_type;
     private:
         std::vector<selector_type*> selectors_;
     public:
@@ -852,8 +853,8 @@ namespace detail {
     template <class Json,class JsonReference>
     class slice_selector final : public base_selector<Json,JsonReference>
     {
-        using path_generator_type = path_generator<Json, JsonReference>;
         using supertype = base_selector<Json,JsonReference>;
+        using path_generator_type = path_generator<Json, JsonReference>;
 
         slice slice_;
     public:

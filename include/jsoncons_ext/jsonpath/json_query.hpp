@@ -109,6 +109,7 @@ namespace detail {
         using expression_type = expression<Json,JsonReference>;
         using normalized_path_type = normalized_path<char_type>;
         using path_node_type = path_node<char_type>;
+        using selector_type = jsonpath_selector<Json,JsonReference>;
 
     private:
 
@@ -2285,7 +2286,7 @@ namespace detail {
                     break;
                 case token_kind::end_union:
                 {
-                    std::vector<jsonpath_selector<Json,JsonReference>*> expressions;
+                    std::vector<selector_type*> expressions;
                     auto it = output_stack_.rbegin();
                     while (it != output_stack_.rend() && it->type() != token_kind::begin_union)
                     {

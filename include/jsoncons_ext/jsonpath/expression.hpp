@@ -2168,6 +2168,7 @@ namespace detail {
         using path_node_type = path_node<char_type>;
         using normalized_path_type = normalized_path<char_type>;
         using node_accumulator_type = node_accumulator<Json,JsonReference>;
+        using selector_type = jsonpath_selector<Json,JsonReference>;
 
         jsonpath_selector(bool is_path,
                           std::size_t precedence_level = 0)
