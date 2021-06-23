@@ -41,4 +41,16 @@ TEST_CASE("test normalized_path to_string")
     CHECK(path1.to_string() == std::string("$['foo']['bar'][0]"));
 }
 
+TEST_CASE("test normalized_path with solidus to_string")
+{
+    path_node node1('$');
+    path_node node2(&node1,"foo's");
+    path_node node3(&node2,"bar");
+    path_node node4(&node3,0);
+
+    normalized_path path1(node4);
+
+    CHECK(path1.to_string() == std::string(R"($['foo\'s']['bar'][0])"));
+}
+
 

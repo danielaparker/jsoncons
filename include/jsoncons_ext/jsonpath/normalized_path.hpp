@@ -22,6 +22,8 @@ namespace detail {
     template <class CharT>
     class normalized_path; 
 
+    enum class path_node_kind { root, index, identifier };
+
     template <class CharT>
     class path_node 
     {
@@ -30,7 +32,6 @@ namespace detail {
         using char_type = CharT;
         using string_type = std::basic_string<CharT>;
     private:
-        enum class path_node_kind {root,index,identifier};
 
         const path_node* parent_;
         path_node_kind node_kind_;
@@ -51,6 +52,23 @@ namespace detail {
         path_node(const path_node* parent, std::size_t index)
             : parent_(parent), node_kind_(path_node_kind::index), index_(index)
         {
+        }
+
+        const path_node* parent() const { return parent_;}
+
+        path_node_kind node_kind() const
+        {
+            return node_kind_;
+        }
+
+        const string_type& identifier() const
+        {
+            return identifier_;
+        }
+
+        std::size_t index() const 
+        {
+            return index_;
         }
 
         void swap(path_node& node)
@@ -94,28 +112,6 @@ namespace detail {
             }
             return diff;
         }
-
-        void node_to_string(string_type& buffer) const
-        {
-            switch (node_kind_)
-            {
-                case path_node_kind::root:
-                    buffer.append(identifier_);
-                    break;
-                case path_node_kind::index:
-                    buffer.push_back('[');
-                    jsoncons::detail::from_integer(index_, buffer);
-                    buffer.push_back(']');
-                    break;
-                case path_node_kind::identifier:
-                    buffer.push_back('[');
-                    buffer.push_back('\'');
-                    buffer.append(identifier_);
-                    buffer.push_back('\'');
-                    buffer.push_back(']');
-                    break;
-            }
-        }
     };
 
     template <class CharT>
@@ -155,11 +151,37 @@ namespace detail {
         {
             string_type buffer;
 
-            auto it = nodes_.begin();
-            while (it != nodes_.end())
+            for (const auto& node : nodes_)
             {
-                (*it)->node_to_string(buffer);
-                ++it;
+                switch (node->node_kind())
+                {
+                    case path_node_kind::root:
+                        buffer.append(node->identifier());
+                        break;
+                    case path_node_kind::identifier:
+                        buffer.push_back('[');
+                        buffer.push_back('\'');
+                        for (auto c : node->identifier())
+                        {
+                            if (c == '\'')
+                            {
+                                buffer.push_back('\\');
+                                buffer.push_back('\'');
+                            }
+                            else
+                            {
+                                buffer.push_back(c);
+                            }
+                        }
+                        buffer.push_back('\'');
+                        buffer.push_back(']');
+                        break;
+                    case path_node_kind::index:
+                        buffer.push_back('[');
+                        jsoncons::detail::from_integer(node->index(), buffer);
+                        buffer.push_back(']');
+                        break;
+                }
             }
 
             return buffer;
