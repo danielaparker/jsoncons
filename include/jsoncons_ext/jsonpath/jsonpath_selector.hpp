@@ -683,7 +683,7 @@ namespace detail {
             auto callback = [&](const normalized_path_type& p, reference v)
             {
                 //std::cout << "union select callback: node: " << *node.ptr << "\n";
-                this->evaluate_tail(resources, root, p.tail(), v, accumulator, ndtype, options);
+                this->evaluate_tail(resources, root, p.stem(), v, accumulator, ndtype, options);
             };
             for (auto& expr : expressions_)
             {

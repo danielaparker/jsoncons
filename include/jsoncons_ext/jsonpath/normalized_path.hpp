@@ -141,7 +141,12 @@ namespace detail {
             std::reverse(nodes_.begin(), nodes_.end());
         }
 
-        const path_node_type& tail() const
+        const path_node_type& root() const
+        {
+            return *nodes_.front();
+        }
+
+        const path_node_type& stem() const
         {
             return *nodes_.back();
         }
