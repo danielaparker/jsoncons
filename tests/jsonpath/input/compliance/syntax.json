@@ -14,20 +14,6 @@
      ]
    },
    {
-     "comment": "Invalid start to expression",
-     "given": {"type": "object"},
-     "cases": [
-       {
-         "expression": "$foo",
-         "error": "syntax"
-       },
-       {
-         "expression": "@.foo",
-         "error": "syntax"
-       }
-     ]
-   },
-   {
      "comment": "Dot syntax",
      "given": {"type": "object"},
      "cases": [

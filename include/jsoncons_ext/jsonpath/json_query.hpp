@@ -193,6 +193,7 @@ namespace detail {
                                 advance_past_space_character();
                                 break;
                             case '$':
+                            case '@':
                             {
                                 push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
