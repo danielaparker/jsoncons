@@ -352,7 +352,7 @@ namespace detail {
             }
             else
             {
-                path_stem_value_pair_accumulator<Json,JsonReference> accum;
+                path_stem_value_accumulator<Json,JsonReference> accum;
 
                 this->evaluate_tail(resources, root, path, root, accum, ndtype, options);
                 resources.add_to_cache(id_, std::move(accum.nodes), ndtype);
