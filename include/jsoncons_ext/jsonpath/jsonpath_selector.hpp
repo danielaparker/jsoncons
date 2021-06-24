@@ -122,7 +122,7 @@ namespace detail {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.create_path_node(&path, index);
+                return *resources.new_path_node(&path, index);
             }
             else
             {
@@ -138,7 +138,7 @@ namespace detail {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.create_path_node(&path, identifier);
+                return *resources.new_path_node(&path, identifier);
             }
             else
             {

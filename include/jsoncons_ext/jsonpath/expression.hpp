@@ -2157,7 +2157,7 @@ namespace detail {
         }
 
         template <typename... Args>
-        const path_node_type* create_path_node(Args&& ... args)
+        const path_node_type* new_path_node(Args&& ... args)
         {
             auto temp = jsoncons::make_unique<path_node_type>(std::forward<Args>(args)...);
             path_node_type* ptr = temp.get();
