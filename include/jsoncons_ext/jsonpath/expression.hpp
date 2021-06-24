@@ -2007,16 +2007,16 @@ namespace detail {
         using normalized_path_type = normalized_path<char_type>;
         using path_pointer = const path_node_type*;
 
-        normalized_path_type path;
-        value_pointer ptr;
+        normalized_path_type path_;
+        value_pointer value_ptr_;
 
-        path_value_pair(const normalized_path_type& path, value_pointer valp) noexcept
-            : path(path), ptr(valp)
+        path_value_pair(const normalized_path_type& path, reference value) noexcept
+            : path_(path), value_ptr_(std::addressof(value))
         {
         }
 
         path_value_pair(normalized_path_type&& path, value_pointer valp) noexcept
-            : path(std::move(path)), ptr(valp)
+            : path_(std::move(path)), value_ptr_(valp)
         {
         }
 
@@ -2024,6 +2024,16 @@ namespace detail {
         path_value_pair(path_value_pair&& other) = default;
         path_value_pair& operator=(const path_value_pair&) = default;
         path_value_pair& operator=(path_value_pair&& other) = default;
+
+        normalized_path_type path() const
+        {
+            return path_;
+        }
+
+        reference value() 
+        {
+            return *value_ptr_;
+        }
     };
  
     template <class Json,class JsonReference>
@@ -2032,7 +2042,7 @@ namespace detail {
         bool operator()(const path_value_pair<Json,JsonReference>& lhs,
                         const path_value_pair<Json,JsonReference>& rhs) const noexcept
         {
-            return lhs.path < rhs.path;
+            return lhs.path() < rhs.path();
         }
     };
 
@@ -2042,7 +2052,7 @@ namespace detail {
         bool operator()(const path_value_pair<Json,JsonReference>& lhs,
                         const path_value_pair<Json,JsonReference>& rhs) const noexcept
         {
-            return lhs.path == rhs.path;
+            return lhs.path() == rhs.path();
         }
     };
 
@@ -2957,7 +2967,7 @@ namespace detail {
                     accumulator.nodes.erase(last,accumulator.nodes.end());
                     for (auto& node : accumulator.nodes)
                     {
-                        callback(node.path, *node.ptr);
+                        callback(node.path(), node.value());
                     }
                 }
                 else
@@ -2972,7 +2982,7 @@ namespace detail {
                     for (auto&& node : accumulator.nodes)
                     {
                         auto it = std::lower_bound(index.begin(),index.end(),node, path_value_pair_less_type());
-                        if (it != index.end() && it->path == node.path) 
+                        if (it != index.end() && it->path() == node.path()) 
                         {
                             temp2.emplace_back(std::move(node));
                             index.erase(it);
@@ -2980,7 +2990,7 @@ namespace detail {
                     }
                     for (auto& node : temp2)
                     {
-                        callback(node.path, *node.ptr);
+                        callback(node.path(), node.value());
                     }
                 }
             }
@@ -2988,7 +2998,7 @@ namespace detail {
             {
                 for (auto& node : accumulator.nodes)
                 {
-                    callback(node.path, *node.ptr);
+                    callback(node.path(), node.value());
                 }
             }
         }
@@ -3225,7 +3235,7 @@ namespace detail {
                                         //std::cout << "node: " << node.path << ", " << *node.ptr << "\n";
                                         auto it = std::lower_bound(index.begin(),index.end(),node, path_value_pair_less_type());
 
-                                        if (it != index.end() && it->path == node.path) 
+                                        if (it != index.end() && it->path() == node.path()) 
                                         {
                                             temp2.emplace_back(std::move(node));
                                             index.erase(it);
@@ -3287,7 +3297,7 @@ namespace detail {
             }
             else if (nodes.size() == 1 && (tag == node_kind::single || tag == node_kind()))
             {
-                return stack_item_type(nodes.back().ptr);
+                return stack_item_type(nodes.back().value_ptr_);
             }
             else
             {
@@ -3295,7 +3305,7 @@ namespace detail {
                 j.reserve(nodes.size());
                 for (auto& item : nodes)
                 {
-                    j.emplace_back(*item.ptr);
+                    j.emplace_back(item.value());
                 }
                 return stack_item_type(std::move(j));
             }
