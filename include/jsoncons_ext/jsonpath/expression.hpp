@@ -2046,13 +2046,60 @@ namespace detail {
         }
     };
 
+    template <class Json,class JsonReference>
+    struct path_stem_value_pair
+    {
+        using char_type = typename Json::char_type;
+        using string_type = std::basic_string<char_type,std::char_traits<char_type>>;
+        using value_type = Json;
+        using reference = JsonReference;
+        using value_pointer = typename std::conditional<std::is_const<typename std::remove_reference<JsonReference>::type>::value,typename Json::const_pointer,typename Json::pointer>::type;
+        using path_node_type = path_node<char_type>;
+        using normalized_path_type = normalized_path<char_type>;
+        using path_pointer = const path_node_type*;
+    private:
+        const path_node_type* stem_ptr_;
+        value_pointer value_ptr_;
+    public:
+        path_stem_value_pair(const path_node_type& stem, reference value) noexcept
+            : stem_ptr_(std::addressof(stem)), value_ptr_(std::addressof(value))
+        {
+        }
+
+        const path_node_type& stem() const
+        {
+            return *stem_ptr_;
+        }
+
+        reference value() const
+        {
+            return *value_ptr_;
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class node_accumulator
+    {
+    public:
+        using char_type = typename Json::char_type;
+        using reference = JsonReference;
+        using path_node_type = path_node<char_type>;
+
+        virtual ~node_accumulator() noexcept = default;
+
+        virtual void accumulate(const path_node_type& path_tail, 
+                                reference value) = 0;
+    };
+
     template <class Json, class JsonReference>
     class dynamic_resources
     {
         using path_node_type = path_node<typename Json::char_type>;
+        using path_stem_value_pair_type = path_stem_value_pair<Json,JsonReference>;
         std::vector<std::unique_ptr<Json>> temp_json_values_;
         std::vector<std::unique_ptr<path_node_type>> temp_path_node_values_;
-        std::unordered_map<std::size_t,std::pair<std::vector<path_value_pair<Json,JsonReference>>,node_kind>> cache_;
+        std::unordered_map<std::size_t,std::pair<std::vector<path_stem_value_pair_type>,node_kind>> cache_;
+        using node_accumulator_type = node_accumulator<Json,JsonReference>;
     public:
 
         bool is_cached(std::size_t id) const
@@ -2060,19 +2107,19 @@ namespace detail {
             return cache_.find(id) != cache_.end();
         }
 
-        void add_to_cache(std::size_t id, const std::vector<path_value_pair<Json,JsonReference>>& val, node_kind ndtype) 
+        void add_to_cache(std::size_t id, const std::vector<path_stem_value_pair_type>& val, node_kind ndtype) 
         {
             cache_.emplace(id,std::make_pair(val,ndtype));
         }
 
-        void retrieve_from_cache(std::size_t id, std::vector<path_value_pair<Json,JsonReference>>& nodes, node_kind& ndtype) 
+        void retrieve_from_cache(std::size_t id, node_accumulator_type& accumulator, node_kind& ndtype) 
         {
             auto it = cache_.find(id);
             if (it != cache_.end())
             {
                 for (auto& item : it->second.first)
                 {
-                    nodes.push_back(item);
+                    accumulator.accumulate(item.stem(), item.value());
                 }
                 ndtype = it->second.second;
             }
@@ -2119,20 +2166,6 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class node_accumulator
-    {
-    public:
-        using char_type = typename Json::char_type;
-        using reference = JsonReference;
-        using path_node_type = path_node<char_type>;
-
-        virtual ~node_accumulator() noexcept = default;
-
-        virtual void accumulate(const path_node_type& path_tail, 
-                                reference value) = 0;
-    };
-
-    template <class Json,class JsonReference>
     class path_value_pair_accumulator : public node_accumulator<Json,JsonReference>
     {
     public:
@@ -2148,6 +2181,24 @@ namespace detail {
                         reference value) override
         {
             nodes.emplace_back(normalized_path_type(path_tail), std::addressof(value));
+        }
+    };
+
+    template <class Json,class JsonReference>
+    class path_stem_value_pair_accumulator : public node_accumulator<Json,JsonReference>
+    {
+    public:
+        using reference = JsonReference;
+        using char_type = typename Json::char_type;
+        using path_node_type = path_node<char_type>;
+        using path_stem_value_pair_type = path_stem_value_pair<Json,JsonReference>;
+
+        std::vector<path_stem_value_pair_type> nodes;
+
+        void accumulate(const path_node_type& path_tail, 
+                        reference value) override
+        {
+            nodes.emplace_back(path_tail, value);
         }
     };
 

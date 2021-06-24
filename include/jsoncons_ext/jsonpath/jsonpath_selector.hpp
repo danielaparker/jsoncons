@@ -346,20 +346,17 @@ namespace detail {
                     node_kind& ndtype,
                     result_options options) const override
         {
-            //if (resources.is_cached(id_))
-            //{
-            //    resources.retrieve_from_cache(id_, accumulator, ndtype);
-            //}
-            //else
+            if (resources.is_cached(id_))
             {
-                //std::vector<path_value_pair_type> v;
+                resources.retrieve_from_cache(id_, accumulator, ndtype);
+            }
+            else
+            {
+                path_stem_value_pair_accumulator<Json,JsonReference> accum;
 
-                this->evaluate_tail(resources, root, path, root, accumulator, ndtype, options);
-                //resources.add_to_cache(id_, v, ndtype);
-                //for (auto&& item : v)
-                //{
-                //   nodes.push_back(std::move(item));
-                //}
+                this->evaluate_tail(resources, root, path, root, accum, ndtype, options);
+                resources.add_to_cache(id_, std::move(accum.nodes), ndtype);
+                resources.retrieve_from_cache(id_, accumulator, ndtype);
             }
         }
 
