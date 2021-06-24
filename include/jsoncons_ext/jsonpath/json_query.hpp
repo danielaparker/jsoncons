@@ -194,7 +194,7 @@ namespace detail {
                                 break;
                             case '$':
                             {
-                                push_token(resources, root_node_arg, ec);
+                                push_token(resources, token_type(resources.new_selector(current_node_selector<Json,JsonReference>())), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.emplace_back(path_state::path_rhs);
                                 ++p_;
