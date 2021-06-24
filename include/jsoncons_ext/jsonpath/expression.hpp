@@ -2122,6 +2122,11 @@ namespace detail {
             cache_.emplace(id,std::make_pair(val,ndtype));
         }
 
+        void add_to_cache(std::size_t id, std::vector<path_stem_value_pair_type>&& val, node_kind ndtype) 
+        {
+            cache_.emplace(id,std::make_pair(std::forward<std::vector<path_stem_value_pair_type>>(val),ndtype));
+        }
+
         void retrieve_from_cache(std::size_t id, node_accumulator_type& accumulator, node_kind& ndtype) 
         {
             auto it = cache_.find(id);
