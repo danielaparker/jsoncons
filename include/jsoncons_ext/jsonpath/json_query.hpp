@@ -7,14 +7,6 @@
 #ifndef JSONCONS_JSONPATH_JSON_QUERY_HPP
 #define JSONCONS_JSONPATH_JSON_QUERY_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
-#include <type_traits> // std::is_const
-#include <limits> // std::numeric_limits
-#include <utility> // std::move
-#include <regex>
-#include <algorithm> // std::reverse
 #include <jsoncons/json.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_expression.hpp>
 
