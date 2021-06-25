@@ -287,7 +287,7 @@ namespace jmespath {
         multi_select_hash,
         rhs_slice_expression_stop,
         rhs_slice_expression_step,
-        expect_right_bracket,
+        expect_rbracket,
         expect_dot,
         expect_filter_right_bracket,
         expect_right_brace,
@@ -4089,7 +4089,7 @@ namespace jmespath {
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::expect_right_bracket;
+                                state_stack_.back() = path_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4173,7 +4173,7 @@ namespace jmespath {
                             case '*':
                                 push_token(token(jsoncons::make_unique<list_projection>()), ec);
                                 if (ec) {return jmespath_expression();}
-                                state_stack_.back() = path_state::expect_right_bracket;
+                                state_stack_.back() = path_state::expect_rbracket;
                                 ++p_;
                                 ++column_;
                                 break;
@@ -4251,7 +4251,7 @@ namespace jmespath {
                                 break;
                             }
                             default:
-                                ec = jmespath_errc::expected_right_bracket;
+                                ec = jmespath_errc::expected_rbracket;
                                 return jmespath_expression();
                         }
                         break;
@@ -4286,7 +4286,7 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             default:
-                                ec = jmespath_errc::expected_right_bracket;
+                                ec = jmespath_errc::expected_rbracket;
                                 return jmespath_expression();
                         }
                         break;
@@ -4322,22 +4322,22 @@ namespace jmespath {
                                 ++column_;
                                 break;
                             default:
-                                ec = jmespath_errc::expected_right_bracket;
+                                ec = jmespath_errc::expected_rbracket;
                                 return jmespath_expression();
                         }
                         break;
                     }
-                    case path_state::expect_right_bracket:
+                    case path_state::expect_rbracket:
                     {
                         switch(*p_)
                         {
                             case ']':
-                                state_stack_.pop_back(); // expect_right_bracket
+                                state_stack_.pop_back(); // expect_rbracket
                                 ++p_;
                                 ++column_;
                                 break;
                             default:
-                                ec = jmespath_errc::expected_right_bracket;
+                                ec = jmespath_errc::expected_rbracket;
                                 return jmespath_expression();
                         }
                         break;
@@ -4531,7 +4531,7 @@ namespace jmespath {
                                 break;
                             }
                             default:
-                                ec = jmespath_errc::expected_right_bracket;
+                                ec = jmespath_errc::expected_rbracket;
                                 return jmespath_expression();
                         }
                         break;
@@ -4577,7 +4577,7 @@ namespace jmespath {
                                 break;
                             }
                             default:
-                                ec = jmespath_errc::expected_right_bracket;
+                                ec = jmespath_errc::expected_rbracket;
                                 return jmespath_expression();
                         }
                         break;
@@ -4599,7 +4599,7 @@ namespace jmespath {
                                 break;
                             }
                             default:
-                                ec = jmespath_errc::expected_right_bracket;
+                                ec = jmespath_errc::expected_rbracket;
                                 return jmespath_expression();
                         }
                         break;

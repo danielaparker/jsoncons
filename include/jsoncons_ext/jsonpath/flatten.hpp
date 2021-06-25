@@ -152,7 +152,7 @@ namespace jsoncons { namespace jsonpath {
         single_quoted_name_state,
         double_quoted_name_state,
         index_state,
-        expect_right_bracket,
+        expect_rbracket,
         double_quoted_string_escape_char,
         single_quoted_string_escape_char
     };
@@ -244,7 +244,7 @@ namespace jsoncons { namespace jsonpath {
                                     part = &(res.first->value());
                                 }
                                 buffer.clear();
-                                state = unflatten_state::expect_right_bracket;
+                                state = unflatten_state::expect_rbracket;
                                 break;
                             case '\\':
                                 state = unflatten_state::single_quoted_string_escape_char;
@@ -271,7 +271,7 @@ namespace jsoncons { namespace jsonpath {
                                     part = &(res.first->value());
                                 }
                                 buffer.clear();
-                                state = unflatten_state::expect_right_bracket;
+                                state = unflatten_state::expect_rbracket;
                                 break;
                             case '\\':
                                 state = unflatten_state::double_quoted_string_escape_char;
@@ -405,7 +405,7 @@ namespace jsoncons { namespace jsonpath {
                         }
                         break;
                     }
-                    case unflatten_state::expect_right_bracket:
+                    case unflatten_state::expect_rbracket:
                     {
                         switch (*it)
                         {

@@ -1,15 +1,47 @@
 [
-    {
-        "source" : "https://github.com/cburgmer/json-path-comparison",
-        "given" : ["first", "second", "third", "forth", "fifth"],
-        "cases" : [
-            {
-                "comment" : "Last two items, nodups",
-                "expression" : "$[-2:]",
-                "result" : ["forth", "fifth"],
-                "path" : ["$[3]", "$[4]"],
-                "nodups" : true
-            }
-        ]
-    }
+  {
+     "given": {
+         "store": {
+             "book": [
+                 {
+                     "category": "reference",
+                     "author": "Nigel Rees",
+                     "title": "Sayings of the Century",
+                     "price": 8.95
+                 },
+                 {
+                     "category": "fiction",
+                     "author": "Evelyn Waugh",
+                     "title": "Sword of Honour",
+                     "price": 12.99
+                 },
+                 {
+                     "category": "fiction",
+                     "author": "Herman Melville",
+                     "title": "Moby Dick",
+                     "isbn": "0-553-21311-3",
+                     "price": 8.99
+                 },
+                 {
+                     "category": "fiction",
+                     "author": "J. R. R. Tolkien",
+                     "title": "The Lord of the Rings",
+                     "isbn": "0-395-19395-8",
+                     "price": 22.99
+                 }
+             ],
+             "bicycle": {
+                 "color": "red",
+                 "price": 19.95
+             }
+         }
+     },
+     "cases": [
+       {
+         "comment" : "avg in filter",
+         "expression": "$.store.book[?(@.price > avg($.store.book[*].price))].title",
+         "result": ["The Lord of the Rings"]
+       }
+   ]
+   }
 ]

@@ -17,7 +17,8 @@ namespace jsoncons { namespace jsonpath {
         success = 0,
         expected_root_or_function,
         expected_current_node,
-        expected_right_bracket,
+        expected_rparen,
+        expected_rbracket,
         expected_key,
         expected_separator,
         expected_forward_slash,
@@ -68,8 +69,10 @@ namespace jsoncons { namespace jsonpath {
                     return "Expected '$' or function expression";
                 case jsonpath_errc::expected_current_node:
                     return "Expected @";
-                case jsonpath_errc::expected_right_bracket:
+                case jsonpath_errc::expected_rbracket:
                     return "Expected ]";
+                case jsonpath_errc::expected_rparen:
+                    return "Expected )";
                 case jsonpath_errc::expected_key:
                     return "Expected a name or index following the dot";
                 case jsonpath_errc::expected_slice_start:

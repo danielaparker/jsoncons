@@ -1163,7 +1163,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1438,7 +1438,7 @@ namespace detail {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1475,7 +1475,7 @@ namespace detail {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1512,7 +1512,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1550,7 +1550,7 @@ namespace detail {
                                 state_stack_.pop_back(); // slice_expression_step
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1638,7 +1638,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1668,7 +1668,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1688,7 +1688,7 @@ namespace detail {
                                 state_stack_.pop_back();
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1744,7 +1744,7 @@ namespace detail {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1774,7 +1774,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_right_bracket;
+                                ec = jsonpath_errc::expected_rbracket;
                                 return path_expression_type();
                         }
                         break;

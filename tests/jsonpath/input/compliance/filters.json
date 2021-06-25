@@ -1,4 +1,15 @@
 [
+  {
+       "given":
+           [{"name": "John Smith"}, {"name": null}],
+        "cases": [
+            {
+               "comment" : "Filter expression without enclosing parentheses",
+               "expression": "$[?@.name == 'John Smith']",
+               "result": [{"name": "John Smith"}]
+            }
+        ]
+   },
    {
         "given" : [{"key": 0}, {"key": 42}, {"key": -1}, {"key": 41}, {"key": 43}, {"key": 42.0001}, {"key": 41.9999}, {"key": 100}, {"some": "value"}],
         "cases" : [
