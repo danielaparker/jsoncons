@@ -618,17 +618,26 @@ namespace detail {
         using selector_type = typename supertype::selector_type;
     private:
         std::vector<selector_type*> selectors_;
+        selector_type* tail_;
     public:
         union_selector(std::vector<selector_type*>&& selectors)
-            : supertype(true, 11), selectors_(std::move(selectors))
+            : supertype(true, 11), selectors_(std::move(selectors)), tail_(nullptr)
         {
         }
 
         void append_selector(selector_type* tail) override
         {
-            for (auto& selector : selectors_)
+            if (tail_ == nullptr)
             {
-                selector->append_selector(tail);
+                tail_ = tail;
+                for (auto& selector : selectors_)
+                {
+                    selector->append_selector(tail);
+                }
+            }
+            else
+            {
+                tail_->append_selector(tail);
             }
         }
 

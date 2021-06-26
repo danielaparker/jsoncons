@@ -1131,7 +1131,7 @@ namespace detail {
                                 state_stack_.back() = path_state::expression_rhs;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_rbracket;
+                                ec = jsonpath_errc::expected_rparen;
                                 return path_expression_type();
                         }
                         break;

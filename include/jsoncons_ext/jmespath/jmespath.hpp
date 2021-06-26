@@ -288,6 +288,7 @@ namespace jmespath {
         rhs_slice_expression_stop,
         rhs_slice_expression_step,
         expect_rbracket,
+        expect_rparen,
         expect_dot,
         expect_filter_rbracket,
         expect_rbrace,
@@ -3417,7 +3418,7 @@ namespace jmespath {
                             }
                             case ')':
                             {
-                                if (eval_stack.empty())
+                                /*if (eval_stack.empty())
                                 {
                                     ec = jmespath_errc::unbalanced_parentheses;
                                     return jmespath_expression();
@@ -3430,7 +3431,7 @@ namespace jmespath {
                                     push_token(rparen_arg, ec);
                                     if (ec) {return jmespath_expression();}
                                 }
-                                else
+                                else*/
                                 {
                                     state_stack_.pop_back();
                                 }
@@ -3537,6 +3538,9 @@ namespace jmespath {
                                 ++eval_stack.back();
                                 push_token(lparen_arg, ec);
                                 if (ec) {return jmespath_expression();}
+                                state_stack_.back() = path_state::expect_rparen;
+                                state_stack_.emplace_back(path_state::rhs_expression);
+                                state_stack_.emplace_back(path_state::lhs_expression);
                                 break;
                             }
                             case '!':
@@ -4342,6 +4346,25 @@ namespace jmespath {
                         }
                         break;
                     }
+                    case path_state::expect_rparen:
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character(ec);
+                                break;
+                            case ')':
+                                ++p_;
+                                ++column_;
+                                push_token(rparen_arg, ec);
+                                --eval_stack.back();
+                                if (ec) {return jmespath_expression();}
+                                state_stack_.back() = path_state::rhs_expression;
+                                break;
+                            default:
+                                ec = jmespath_errc::expected_rparen;
+                                return jmespath_expression();
+                        }
+                        break;
                     case path_state::key_val_expr: 
                     {
                         switch (*p_)
