@@ -3365,9 +3365,6 @@ namespace jmespath {
 
             slice slic{};
 
-            std::vector<int64_t> eval_stack;
-            eval_stack.push_back(0);
-
             while (p_ < end_input_)
             {
                 switch (state_stack_.back())
@@ -3418,23 +3415,7 @@ namespace jmespath {
                             }
                             case ')':
                             {
-                                /*if (eval_stack.empty())
-                                {
-                                    ec = jmespath_errc::unbalanced_parentheses;
-                                    return jmespath_expression();
-                                }
-                                if (eval_stack.back() > 0)
-                                {
-                                    ++p_;
-                                    ++column_;
-                                    --eval_stack.back();
-                                    push_token(rparen_arg, ec);
-                                    if (ec) {return jmespath_expression();}
-                                }
-                                else*/
-                                {
-                                    state_stack_.pop_back();
-                                }
+                                state_stack_.pop_back();
                                 break;
                             }
                             case '[':
@@ -3535,7 +3516,6 @@ namespace jmespath {
                             {
                                 ++p_;
                                 ++column_;
-                                ++eval_stack.back();
                                 push_token(lparen_arg, ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::expect_rparen;
@@ -3670,7 +3650,6 @@ namespace jmespath {
                         {
                             case '(':
                             {
-                                eval_stack.push_back(0);
                                 auto f = resources_.get_function(buffer, ec);
                                 if (ec)
                                 {
@@ -3711,13 +3690,6 @@ namespace jmespath {
                                 break;
                             case ')':
                             {
-                                if (eval_stack.empty() || (eval_stack.back() != 0))
-                                {
-                                    ec = jmespath_errc::unbalanced_parentheses;
-                                    return jmespath_expression();
-                                }
-
-                                eval_stack.pop_back();
                                 push_token(token(end_function_arg), ec);
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.pop_back(); 
@@ -4356,7 +4328,6 @@ namespace jmespath {
                                 ++p_;
                                 ++column_;
                                 push_token(rparen_arg, ec);
-                                --eval_stack.back();
                                 if (ec) {return jmespath_expression();}
                                 state_stack_.back() = path_state::rhs_expression;
                                 break;
@@ -4743,12 +4714,6 @@ namespace jmespath {
             //{
             //    std::cout << t.to_string() << std::endl;
             //}
-
-            if (eval_stack.size() != 1 || eval_stack.back() != 0)
-            {
-                ec = jmespath_errc::unbalanced_parentheses;
-                return jmespath_expression();
-            }
 
             return jmespath_expression(std::move(resources_), std::move(output_stack_));
         }
