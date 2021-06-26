@@ -35,7 +35,7 @@ namespace jsoncons { namespace jsonpath {
         argument_parse_error,
         unidentified_error,
         unexpected_eof,
-        expected_colon_dot_left_bracket_comma_or_right_bracket,
+        expected_colon_dot_left_bracket_comma_or_rbracket,
         argument_to_unflatten_invalid,
         invalid_flattened_key,
         step_cannot_be_zero,
@@ -49,8 +49,8 @@ namespace jsoncons { namespace jsonpath {
         expected_comparator,
         expected_or,
         expected_and,
-        expected_comma_or_right_parenthesis,
-        expected_comma_or_right_bracket
+        expected_comma_or_rparen,
+        expected_comma_or_rbracket
     };
 
     class jsonpath_error_category_impl
@@ -103,7 +103,7 @@ namespace jsoncons { namespace jsonpath {
                     return "Unidentified error";
                 case jsonpath_errc::unexpected_eof:
                     return "Unexpected EOF while parsing jsonpath expression";
-                case jsonpath_errc::expected_colon_dot_left_bracket_comma_or_right_bracket:
+                case jsonpath_errc::expected_colon_dot_left_bracket_comma_or_rbracket:
                     return "Expected ':', '.', '[', ',', or ']'";
                 case jsonpath_errc::argument_to_unflatten_invalid:
                     return "Argument to unflatten must be an object";
@@ -131,9 +131,9 @@ namespace jsoncons { namespace jsonpath {
                     return "Expected operator '||'";
                 case jsonpath_errc::expected_and:
                     return "Expected operator '&&'";
-                case jsonpath_errc::expected_comma_or_right_parenthesis:
+                case jsonpath_errc::expected_comma_or_rparen:
                     return "Expected comma or right parenthesis";
-                case jsonpath_errc::expected_comma_or_right_bracket:
+                case jsonpath_errc::expected_comma_or_rbracket:
                     return "Expected comma or right bracket";
                 default:
                     return "Unknown jsonpath parser error";

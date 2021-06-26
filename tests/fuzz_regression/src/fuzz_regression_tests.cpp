@@ -32,7 +32,7 @@ TEST_CASE("oss-fuzz issues")
         options.max_nesting_depth(std::numeric_limits<int>::max());
 
         std::ifstream is(pathname, std::ios_base::in | std::ios_base::binary);
-        REQUIRE_THROWS_WITH(json::parse(is, options), Catch::Matchers::Contains(json_error_category_impl().message((int)json_errc::expected_comma_or_right_bracket).c_str()));
+        REQUIRE_THROWS_WITH(json::parse(is, options), Catch::Matchers::Contains(json_error_category_impl().message((int)json_errc::expected_comma_or_rbracket).c_str()));
     }
 
     // Fuzz target: fuzz_cbo

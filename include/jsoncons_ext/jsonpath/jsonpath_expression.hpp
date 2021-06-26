@@ -40,7 +40,7 @@ namespace detail {
         json_value,
         json_string,
         identifier_or_function_expr,
-        name_or_left_bracket,
+        name_or_lbracket,
         unquoted_string,
         anything,
         number,
@@ -65,7 +65,7 @@ namespace detail {
         digit,
         slice_expression_stop,
         slice_expression_step,
-        comma_or_right_bracket,
+        comma_or_rbracket,
         expect_rparen,
         expect_rbracket,
         quoted_string_escape_char,
@@ -218,14 +218,14 @@ namespace detail {
                                 if (ec) {return path_expression_type();}
                                 ++p_;
                                 ++column_;
-                                state_stack_.back() = path_state::name_or_left_bracket;
+                                state_stack_.back() = path_state::name_or_lbracket;
                                 break;
                             default:
                                 state_stack_.back() = path_state::path_lhs;
                                 break;
                         }
                         break;
-                    case path_state::name_or_left_bracket: 
+                    case path_state::name_or_lbracket: 
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -691,7 +691,7 @@ namespace detail {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_comma_or_right_parenthesis;
+                                ec = jsonpath_errc::expected_comma_or_rparen;
                                 return path_expression_type();
                         }
                         break;
@@ -1080,7 +1080,7 @@ namespace detail {
                                 break;
                         };
                         break;
-                    case path_state::comma_or_right_bracket:
+                    case path_state::comma_or_rbracket:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -1097,7 +1097,7 @@ namespace detail {
                                 ++column_;
                                 break;
                             default:
-                                ec = jsonpath_errc::expected_comma_or_right_bracket;
+                                ec = jsonpath_errc::expected_comma_or_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1949,7 +1949,7 @@ namespace detail {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_comma_or_right_bracket;
+                                ec = jsonpath_errc::expected_comma_or_rbracket;
                                 return path_expression_type();
                         }
                         break;
@@ -1970,7 +1970,7 @@ namespace detail {
                                 break;
                             }
                             default:
-                                ec = jsonpath_errc::expected_comma_or_right_bracket;
+                                ec = jsonpath_errc::expected_comma_or_rbracket;
                                 return path_expression_type();
                         }
                         break;

@@ -146,6 +146,6 @@ TEST_CASE("decode_traits deserialization errors")
         json_cursor cursor(input);
         auto val = decode_traits<test_type,char>::decode(cursor,decoder,ec);
 
-        CHECK(ec == json_errc::expected_comma_or_right_brace);
+        CHECK(ec == json_errc::expected_comma_or_rbrace);
     }
 }

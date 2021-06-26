@@ -45,13 +45,13 @@ TEST_CASE("test_exception_left_brace")
     }
     JSONCONS_CATCH (const ser_error& e)
     {
-        CHECK(e.code() == json_errc::expected_comma_or_right_bracket);
+        CHECK(e.code() == json_errc::expected_comma_or_rbracket);
         CHECK(14 == e.line());
         CHECK(30 == e.column());
     }
     CHECK(false == decoder.is_valid());
 }
-TEST_CASE("test_exception_right_brace")
+TEST_CASE("test_exception_rbrace")
 {
     std::string in_file = "./input/json-exception-2.json";
     std::ifstream is(in_file);
@@ -67,7 +67,7 @@ TEST_CASE("test_exception_right_brace")
     JSONCONS_CATCH (const ser_error& e)
     {
         //std::cout << e.what() << std::endl;
-        CHECK(e.code() == json_errc::expected_comma_or_right_brace);
+        CHECK(e.code() == json_errc::expected_comma_or_rbrace);
         CHECK(17 == e.line());
         CHECK(9 == e.column());
     }

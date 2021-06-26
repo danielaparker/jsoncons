@@ -289,8 +289,8 @@ namespace jmespath {
         rhs_slice_expression_step,
         expect_rbracket,
         expect_dot,
-        expect_filter_right_bracket,
-        expect_right_brace,
+        expect_filter_rbracket,
+        expect_rbrace,
         expect_colon,
         expect_multi_select_list,
         cmp_lt_or_lte,
@@ -4515,7 +4515,7 @@ namespace jmespath {
                         }
                         break;
                     }
-                    case path_state::expect_filter_right_bracket:
+                    case path_state::expect_filter_rbracket:
                     {
                         switch(*p_)
                         {
@@ -4604,7 +4604,7 @@ namespace jmespath {
                         }
                         break;
                     }
-                    case path_state::expect_right_brace:
+                    case path_state::expect_rbrace:
                     {
                         switch(*p_)
                         {
@@ -4637,7 +4637,7 @@ namespace jmespath {
                                 break;
                             }
                             default:
-                                ec = jmespath_errc::expected_right_brace;
+                                ec = jmespath_errc::expected_rbrace;
                                 return jmespath_expression();
                         }
                         break;
@@ -4650,7 +4650,7 @@ namespace jmespath {
                                 advance_past_space_character(ec);
                                 break;
                             case ':':
-                                state_stack_.back() = path_state::expect_right_brace;
+                                state_stack_.back() = path_state::expect_rbrace;
                                 state_stack_.emplace_back(path_state::lhs_expression);
                                 ++p_;
                                 ++column_;

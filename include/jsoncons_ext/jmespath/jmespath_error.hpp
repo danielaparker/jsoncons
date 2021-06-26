@@ -88,7 +88,7 @@ enum class jmespath_errc
     expected_index,
     expected_A_Za_Z_,
     expected_rbracket,
-    expected_right_brace,
+    expected_rbrace,
     expected_colon,
     expected_dot,
     expected_or,
@@ -134,7 +134,7 @@ public:
                 return "Expected A-Z, a-z, or _";
             case jmespath_errc::expected_rbracket:
                 return "Expected ]";
-            case jmespath_errc::expected_right_brace:
+            case jmespath_errc::expected_rbrace:
                 return "Expected }";
             case jmespath_errc::expected_colon:
                 return "Expected :";

@@ -16,7 +16,7 @@ constant                            |Description
 `expected_index`                    | Expected index                                
 `expected_A_Za_Z_`                  | Expected A-Z, a-z, or _                       
 `expected_rbracket`            | Expected ]                                    
-`expected_right_brace`              | Expected }                                    
+`expected_rbrace`              | Expected }                                    
 `expected_colon`                    | Expected :                                    
 `expected_dot`                      | Expected \".\"                                
 `expected_or`                       | Expected \"\|\|\"                               

@@ -212,7 +212,7 @@ TEST_CASE("test_fail11")
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    CHECK(err == jsoncons::json_errc::expected_comma_or_right_brace);
+    CHECK(err == jsoncons::json_errc::expected_comma_or_rbrace);
 }
 
 TEST_CASE("test_fail12")
@@ -433,7 +433,7 @@ TEST_CASE("test_fail22")
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    CHECK(err == jsoncons::json_errc::expected_comma_or_right_bracket);
+    CHECK(err == jsoncons::json_errc::expected_comma_or_rbracket);
 }
 
 TEST_CASE("test_fail23")
@@ -654,7 +654,7 @@ TEST_CASE("test_fail33")
         err = e.code();
         //std::cout << in_file << " " << e.what() << std::endl;
     }
-    CHECK(err == jsoncons::json_errc::expected_comma_or_right_bracket);
+    CHECK(err == jsoncons::json_errc::expected_comma_or_rbracket);
 }
 
 TEST_CASE("test_pass1")
