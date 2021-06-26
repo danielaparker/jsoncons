@@ -1,11 +1,11 @@
 [
    {
-        "given" :  [{"key1" : {"a" : {"a" : 2}}, "key2" : 1}]
+        "given" :  [{"key1" : {"a" : {"a" : 2}}, "key2" : 1},{"key1" : {"a" : {"a" : 1}}, "key2" : 2}],
         "cases" : [
             {
                 "comment" : "Filter less than",
-                "expression" : "$[?(@.key2 == 1),?(@.key2 == 1)].key1.a"
-                "result" : [1]
+                "expression" : "$[?(@.key2 == 1),?(@.key2 == 2)].key1.a.a",
+                "result" : [2,1]
             }
         ]
    }
