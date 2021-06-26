@@ -4688,26 +4688,43 @@ namespace jmespath {
                 
             }
 
-            if (state_stack_.size() >= 2)
+            if (state_stack_.empty())
             {
-                if (state_stack_.back() == path_state::unquoted_string || state_stack_.back() == path_state::val_expr)
-                {
-                    push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
-                    if (ec) {return jmespath_expression();}
-                    state_stack_.pop_back(); // unquoted_string or path_state::val_expr
-                    if (state_stack_.back() == path_state::val_expr || state_stack_.back() == path_state::identifier_or_function_expr)
-                    {
-                        buffer.clear();
-                        state_stack_.pop_back(); // val_expr
-                    }
-                }
+                ec = jmespath_errc::syntax_error;
+                return jmespath_expression();
             }
-            if (state_stack_.size() >= 3 && state_stack_.back() == path_state::expect_dot)
+            while (state_stack_.size() > 1)
             {
-                state_stack_.pop_back(); // path_state::expect_dot
-                if (state_stack_.back() == path_state::lhs_expression)
+                switch (state_stack_.back())
                 {
-                    state_stack_.pop_back(); // lhs_expression
+                    case path_state::rhs_expression:
+                        if (state_stack_.size() > 1)
+                        {
+                            state_stack_.pop_back();
+                        }
+                        else
+                        {
+                            ec = jmespath_errc::syntax_error;
+                            return jmespath_expression();
+                        }
+                        break;
+                    case path_state::val_expr:
+                        push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        if (ec) {return jmespath_expression();}
+                        state_stack_.pop_back(); 
+                        break;
+                    case path_state::identifier_or_function_expr:
+                        push_token(token(jsoncons::make_unique<identifier_selector>(buffer)), ec);
+                        if (ec) {return jmespath_expression();}
+                        state_stack_.pop_back(); 
+                        break;
+                    case path_state::unquoted_string: 
+                        state_stack_.pop_back(); 
+                        break;
+                    default:
+                        ec = jmespath_errc::syntax_error;
+                        return jmespath_expression();
+                        break;
                 }
             }
 

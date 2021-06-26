@@ -1,13 +1,18 @@
 [
-   {
-        "given" :  [{"key1" : {"a" : 1}, "key2" : 1}]
-        "cases" : [
-            {
-                "comment" : "Filter less than",
-                "expression" : "$[?(@.key2 == 1)].key1"
-                "result" : [1]
-            }
-        ]
-   }
+  {
+    "given": {
+      "True": true,
+      "False": false,
+      "Number": 5,
+      "EmptyList": [],
+      "Zero": 0
+    },
+    "cases": [
+      {
+        "expression": "!(True && False)",
+        "result": true
+      }
+    ]
+  }
 ]
 
