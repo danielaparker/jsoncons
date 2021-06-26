@@ -39,7 +39,7 @@
      "cases": [
        {
          "comment" : "avg in filter",
-         "expression": "$.store.book[?(@.price > avg($.store.book[*].price))].title",
+         "expression": "$.store.book[?(@.price) > (avg($.store.book[*].price))].title",
          "result": ["The Lord of the Rings"]
        }
    ]

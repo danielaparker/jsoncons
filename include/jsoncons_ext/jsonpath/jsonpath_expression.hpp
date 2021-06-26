@@ -66,7 +66,8 @@ namespace detail {
         slice_expression_stop,
         slice_expression_step,
         comma_or_right_bracket,
-        expect_right_bracket,
+        expect_rparen,
+        expect_rbracket,
         quoted_string_escape_char,
         escape_u1, 
         escape_u2, 
@@ -177,9 +178,6 @@ namespace detail {
 
             slice slic;
 
-            std::vector<int64_t> eval_stack;
-            eval_stack.push_back(0);
-
             state_stack_.emplace_back(path_state::start);
             while (p_ < end_input_ && !state_stack_.empty())
             {
@@ -270,9 +268,11 @@ namespace detail {
                             {
                                 ++p_;
                                 ++column_;
-                                ++eval_stack.back();
                                 push_token(resources, lparen_arg, ec);
                                 if (ec) {return path_expression_type();}
+                                state_stack_.back() = path_state::expect_rparen;
+                                state_stack_.emplace_back(path_state::expression_rhs);
+                                state_stack_.emplace_back(path_state::path_or_literal_or_function);
                                 break;
                             }
                             case '\'':
@@ -315,7 +315,6 @@ namespace detail {
                         {
                             case '(':
                             {
-                                eval_stack.push_back(0);
                                 auto f = resources.get_function(buffer, ec);
                                 if (ec)
                                 {
@@ -538,7 +537,6 @@ namespace detail {
                                 break;
                             case '(':
                             {
-                                eval_stack.push_back(0);
                                 auto f = resources.get_function(buffer, ec);
                                 if (ec)
                                 {
@@ -574,7 +572,6 @@ namespace detail {
                                 break;
                             case '(':
                             {
-                                eval_stack.push_back(0);
                                 auto f = resources.get_function(buffer, ec);
                                 if (ec)
                                 {
@@ -620,12 +617,6 @@ namespace detail {
                                 break;
                             case ')':
                             {
-                                if (eval_stack.empty() || (eval_stack.back() != 0))
-                                {
-                                    ec = jsonpath_errc::unbalanced_parentheses;
-                                    return path_expression_type();
-                                }
-                                eval_stack.pop_back();
                                 push_token(resources, token_type(end_function_arg), ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.pop_back(); 
@@ -746,34 +737,9 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 break;
-                            case ')':
-                            {
-                                if (eval_stack.empty())
-                                {
-                                    ec = jsonpath_errc::unbalanced_parentheses;
-                                    return path_expression_type();
-                                }
-                                if (eval_stack.back() > 0)
-                                {
-                                    ++p_;
-                                    ++column_;
-                                    --eval_stack.back();
-                                    push_token(resources, rparen_arg, ec);
-                                    if (ec) {return path_expression_type();}
-                                }
-                                else
-                                {
-                                    state_stack_.pop_back();
-                                }
-                                break;
-                            }
-                            case ']':
-                            case ',':
+                            default:
                                 state_stack_.pop_back();
                                 break;
-                            default:
-                                ec = jsonpath_errc::expected_separator;
-                                return path_expression_type();
                         };
                         break;
                     case path_state::expression_rhs: 
@@ -794,23 +760,7 @@ namespace detail {
                                 break;
                             case ')':
                             {
-                                if (eval_stack.empty())
-                                {
-                                    ec = jsonpath_errc::unbalanced_parentheses;
-                                    return path_expression_type();
-                                }
-                                if (eval_stack.back() > 0)
-                                {
-                                    ++p_;
-                                    ++column_;
-                                    --eval_stack.back();
-                                    push_token(resources, rparen_arg, ec);
-                                    if (ec) {return path_expression_type();}
-                                }
-                                else
-                                {
-                                    state_stack_.pop_back();
-                                }
+                                state_stack_.pop_back();
                                 break;
                             }
                             case '|':
@@ -1151,7 +1101,7 @@ namespace detail {
                                 return path_expression_type();
                         }
                         break;
-                    case path_state::expect_right_bracket:
+                    case path_state::expect_rbracket:
                         switch (*p_)
                         {
                             case ' ':case '\t':case '\r':case '\n':
@@ -1161,6 +1111,24 @@ namespace detail {
                                 state_stack_.pop_back();
                                 ++p_;
                                 ++column_;
+                                break;
+                            default:
+                                ec = jsonpath_errc::expected_rbracket;
+                                return path_expression_type();
+                        }
+                        break;
+                    case path_state::expect_rparen:
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case ')':
+                                ++p_;
+                                ++column_;
+                                push_token(resources, rparen_arg, ec);
+                                if (ec) {return path_expression_type();}
+                                state_stack_.back() = path_state::expression_rhs;
                                 break;
                             default:
                                 ec = jsonpath_errc::expected_rbracket;
@@ -1181,9 +1149,9 @@ namespace detail {
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::union_expression; // union
                                 state_stack_.emplace_back(path_state::expression);
+                                state_stack_.emplace_back(path_state::expect_rparen);
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
-                                ++eval_stack.back();
                                 ++p_;
                                 ++column_;
                                 break;
@@ -1268,9 +1236,9 @@ namespace detail {
                                 push_token(resources, lparen_arg, ec);
                                 if (ec) {return path_expression_type();}
                                 state_stack_.back() = path_state::expression;
+                                state_stack_.emplace_back(path_state::expect_rparen);
                                 state_stack_.emplace_back(path_state::expression_rhs);
                                 state_stack_.emplace_back(path_state::path_or_literal_or_function);
-                                ++eval_stack.back();
                                 ++p_;
                                 ++column_;
                                 break;
@@ -2072,11 +2040,6 @@ namespace detail {
             if (state_stack_.size() > 2)
             {
                 ec = jsonpath_errc::unexpected_eof;
-                return path_expression_type();
-            }
-            if (eval_stack.size() != 1 || eval_stack.back() != 0)
-            {
-                ec = jsonpath_errc::unbalanced_parentheses;
                 return path_expression_type();
             }
 
