@@ -2014,14 +2014,16 @@ namespace detail {
                         state_stack_.pop_back();
                         break;
                     case path_state::identifier:
-                        push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                        if (ec) {return path_expression_type();}
+                        if (!buffer.empty()) // Can't be quoted string
+                        {
+                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
+                            if (ec) {return path_expression_type();}
+                        }
                         state_stack_.pop_back(); 
                         break;
                     default:
                         ec = jsonpath_errc::syntax_error;
                         return path_expression_type();
-                        break;
                 }
             }
 
