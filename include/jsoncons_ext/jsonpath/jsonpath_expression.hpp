@@ -1988,53 +1988,41 @@ namespace detail {
                 return path_expression_type();
             }
 
-            if (state_stack_.back() == path_state::start)
+            while (state_stack_.size() > 1)
             {
-                ec = jsonpath_errc::unexpected_eof;
-                return path_expression_type();
-            }
-
-            switch (state_stack_.back())
-            {
-                case path_state::unquoted_string:
-                case path_state::identifier:
+                switch (state_stack_.back())
                 {
-                    push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
-                    if (ec) {return path_expression_type();}
-                    state_stack_.pop_back(); // unquoted_string
-                    JSONCONS_ASSERT(!state_stack_.empty());
-                    if (state_stack_.back() == path_state::identifier_or_function_expr)
-                    {
-                        state_stack_.pop_back(); // identifier
-                    }
-                    break;
-                }
-                case path_state::digit:
-                {
-                    if (buffer.empty())
-                    {
-                        ec = jsonpath_errc::invalid_number;
+                    case path_state::name_or_lbracket: 
+                        state_stack_.back() = path_state::path_lhs;
+                        break;
+                    case path_state::path_lhs: 
+                        state_stack_.back() = path_state::identifier_or_function_expr;
+                        state_stack_.emplace_back(path_state::unquoted_string);
+                        break;
+                    case path_state::identifier_or_function_expr:
+                        if (!buffer.empty()) // Can't be quoted string
+                        {
+                            push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
+                            if (ec) {return path_expression_type();}
+                        }
+                        state_stack_.pop_back(); 
+                        break;
+                    case path_state::unquoted_string: 
+                        state_stack_.pop_back(); // unquoted_string
+                        break;                    
+                    case path_state::path_rhs: 
+                        state_stack_.pop_back();
+                        break;
+                    case path_state::identifier:
+                        push_token(resources, token_type(resources.new_selector(identifier_selector<Json,JsonReference>(buffer))), ec);
+                        if (ec) {return path_expression_type();}
+                        state_stack_.pop_back(); 
+                        break;
+                    default:
+                        ec = jsonpath_errc::syntax_error;
                         return path_expression_type();
-                    }
-                    int64_t n{0};
-                    auto r = jsoncons::detail::to_integer(buffer.data(), buffer.size(), n);
-                    if (!r)
-                    {
-                        ec = jsonpath_errc::invalid_number;
-                        return path_expression_type();
-                    }
-                    push_token(resources, token_type(resources.new_selector(index_selector<Json,JsonReference>(n))), ec);
-                    if (ec) {return path_expression_type();}
-                    state_stack_.pop_back(); // index_or_slice_or_union
-                    JSONCONS_ASSERT(!state_stack_.empty());
-                    if (state_stack_.back() == path_state::index)
-                    {
-                        state_stack_.pop_back(); // index
-                    }
-                    break;
+                        break;
                 }
-                default:
-                    break;
             }
 
             if (state_stack_.size() > 2)

@@ -1,12 +1,12 @@
 [
-   {
-        "given" :  [{"key1" : {"a" : {"a" : 2}}, "key2" : 1},{"key1" : {"a" : {"a" : 1}}, "key2" : 2}],
+    {
+        "given" : [[1, 2, 3], [4, 5, 6]],
         "cases" : [
             {
-                "comment" : "Filter less than",
-                "expression" : "$[?(@.key2 == 1),?(@.key2 == 2)].key1.a.a",
-                "result" : [2,1]
+                "comment" : "jsonpath recursive descent with *",
+                "expression" : "$..",
+                "result" : [[[1,2,3],[4,5,6]],[1,2,3],[4,5,6]]
             }
         ]
-   }
+    }
 ]

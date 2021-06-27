@@ -54,5 +54,15 @@
                 "result" : [{"complex":"string","primitives":[0,1]},"value","string",[0,1],0,1]
             }
         ]
+    },
+    {
+        "given" : [[1, 2, 3], [4, 5, 6]],
+        "cases" : [
+            {
+                "comment" : "jsonpath ending with recursive descent",
+                "expression" : "$..",
+                "result" : [[[1,2,3],[4,5,6]],[1,2,3],[4,5,6]]
+            }
+        ]
     }
 ]
