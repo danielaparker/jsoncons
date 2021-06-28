@@ -812,51 +812,6 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class argument_expression final : public expression_base<Json,JsonReference>
-    {
-        using supertype = expression_base<Json,JsonReference>;
-
-        expression<Json,JsonReference> expr_;
-
-    public:
-        using value_type = Json;
-        using reference = JsonReference;
-        using path_value_pair_type = typename supertype::path_value_pair_type;
-        using path_node_type = typename supertype::path_node_type;
-        using node_accumulator_type = node_accumulator<Json,JsonReference>;
-
-        argument_expression(expression<Json,JsonReference>&& expr)
-            : expr_(std::move(expr))
-        {
-        }
-
-        value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
-                                   reference root,
-                                   const path_node_type&, 
-                                   reference current, 
-                                   result_options options,
-                                   std::error_code& ec) const override
-        {
-            value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
-            return ec ? Json::null() : ref; 
-        }
-
-        std::string to_string(int level = 0) const override
-        {
-            std::string s;
-            if (level > 0)
-            {
-                s.append("\n");
-                s.append(level*2, ' ');
-            }
-            s.append("expression selector ");
-            s.append(expr_.to_string(level+1));
-
-            return s;
-        }
-    };
-
-    template <class Json,class JsonReference>
     class slice_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;

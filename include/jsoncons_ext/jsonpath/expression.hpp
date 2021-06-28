@@ -1940,7 +1940,6 @@ namespace detail {
         function,
         end_function,
         argument,
-        end_of_expression,
         unary_operator,
         binary_operator
     };
@@ -1984,8 +1983,6 @@ namespace detail {
                 return "end_function";
             case jsonpath_token_kind::argument:
                 return "argument";
-            case jsonpath_token_kind::end_of_expression:
-                return "end_of_expression";
             case jsonpath_token_kind::unary_operator:
                 return "unary_operator";
             case jsonpath_token_kind::binary_operator:
@@ -2504,7 +2501,7 @@ namespace detail {
 
         virtual value_type evaluate_single(dynamic_resources<Json,JsonReference>& resources,
                                            reference root,
-                                           const path_node_type& path, 
+                                           //const path_node_type& path, 
                                            reference val, 
                                            result_options options,
                                            std::error_code& ec) const = 0;
@@ -2519,7 +2516,7 @@ namespace detail {
         using selector_type = jsonpath_selector<Json,JsonReference>;
         using expression_base_type = expression_base<Json,JsonReference>;
 
-        jsonpath_token_kind type_;
+        jsonpath_token_kind token_kind_;
 
         union
         {
@@ -2533,111 +2530,111 @@ namespace detail {
     public:
 
         token(const unary_operator<Json,JsonReference>* expr) noexcept
-            : type_(jsonpath_token_kind::unary_operator),
+            : token_kind_(jsonpath_token_kind::unary_operator),
               unary_operator_(expr)
         {
         }
 
         token(const binary_operator<Json,JsonReference>* expr) noexcept
-            : type_(jsonpath_token_kind::binary_operator),
+            : token_kind_(jsonpath_token_kind::binary_operator),
               binary_operator_(expr)
         {
         }
 
         token(current_node_arg_t) noexcept
-            : type_(jsonpath_token_kind::current_node)
+            : token_kind_(jsonpath_token_kind::current_node)
         {
         }
 
         token(root_node_arg_t) noexcept
-            : type_(jsonpath_token_kind::root_node)
+            : token_kind_(jsonpath_token_kind::root_node)
         {
         }
 
         token(end_function_arg_t) noexcept
-            : type_(jsonpath_token_kind::end_function)
+            : token_kind_(jsonpath_token_kind::end_function)
         {
         }
 
         token(separator_arg_t) noexcept
-            : type_(jsonpath_token_kind::separator)
+            : token_kind_(jsonpath_token_kind::separator)
         {
         }
 
         token(lparen_arg_t) noexcept
-            : type_(jsonpath_token_kind::lparen)
+            : token_kind_(jsonpath_token_kind::lparen)
         {
         }
 
         token(rparen_arg_t) noexcept
-            : type_(jsonpath_token_kind::rparen)
+            : token_kind_(jsonpath_token_kind::rparen)
         {
         }
 
         token(end_of_expression_arg_t) noexcept
-            : type_(jsonpath_token_kind::end_of_expression)
+            : token_kind_(jsonpath_token_kind::end_of_expression)
         {
         }
 
         token(begin_union_arg_t) noexcept
-            : type_(jsonpath_token_kind::begin_union)
+            : token_kind_(jsonpath_token_kind::begin_union)
         {
         }
 
         token(end_union_arg_t) noexcept
-            : type_(jsonpath_token_kind::end_union)
+            : token_kind_(jsonpath_token_kind::end_union)
         {
         }
 
         token(begin_filter_arg_t) noexcept
-            : type_(jsonpath_token_kind::begin_filter)
+            : token_kind_(jsonpath_token_kind::begin_filter)
         {
         }
 
         token(end_filter_arg_t) noexcept
-            : type_(jsonpath_token_kind::end_filter)
+            : token_kind_(jsonpath_token_kind::end_filter)
         {
         }
 
         token(begin_expression_arg_t) noexcept
-            : type_(jsonpath_token_kind::begin_expression)
+            : token_kind_(jsonpath_token_kind::begin_expression)
         {
         }
 
         token(end_index_expression_arg_t) noexcept
-            : type_(jsonpath_token_kind::end_index_expression)
+            : token_kind_(jsonpath_token_kind::end_index_expression)
         {
         }
 
         token(end_argument_expression_arg_t) noexcept
-            : type_(jsonpath_token_kind::end_argument_expression)
+            : token_kind_(jsonpath_token_kind::end_argument_expression)
         {
         }
 
         token(selector_type* selector)
-            : type_(jsonpath_token_kind::selector), selector_(selector)
+            : token_kind_(jsonpath_token_kind::selector), selector_(selector)
         {
         }
 
         token(std::unique_ptr<expression_base_type>&& expr)
-            : type_(jsonpath_token_kind::expression)
+            : token_kind_(jsonpath_token_kind::expression)
         {
             new (&expression_) std::unique_ptr<expression_base_type>(std::move(expr));
         }
 
         token(const function_base<Json>* function) noexcept
-            : type_(jsonpath_token_kind::function),
+            : token_kind_(jsonpath_token_kind::function),
               function_(function)
         {
         }
 
         token(argument_arg_t) noexcept
-            : type_(jsonpath_token_kind::argument)
+            : token_kind_(jsonpath_token_kind::argument)
         {
         }
 
         token(literal_arg_t, Json&& value) noexcept
-            : type_(jsonpath_token_kind::literal), value_(std::move(value))
+            : token_kind_(jsonpath_token_kind::literal), value_(std::move(value))
         {
         }
 
@@ -2660,9 +2657,9 @@ namespace detail {
         {
             if (&other != this)
             {
-                if (type_ == other.type_)
+                if (token_kind_ == other.token_kind_)
                 {
-                    switch (type_)
+                    switch (token_kind_)
                     {
                         case jsonpath_token_kind::selector:
                             selector_ = other.selector_;
@@ -2702,38 +2699,38 @@ namespace detail {
 
         jsonpath_token_kind token_kind() const
         {
-            return type_;
+            return token_kind_;
         }
 
         bool is_lparen() const
         {
-            return type_ == jsonpath_token_kind::lparen; 
+            return token_kind_ == jsonpath_token_kind::lparen; 
         }
 
         bool is_rparen() const
         {
-            return type_ == jsonpath_token_kind::rparen; 
+            return token_kind_ == jsonpath_token_kind::rparen; 
         }
 
         bool is_current_node() const
         {
-            return type_ == jsonpath_token_kind::current_node; 
+            return token_kind_ == jsonpath_token_kind::current_node; 
         }
 
         bool is_path() const
         {
-            return type_ == jsonpath_token_kind::selector && selector_->is_path(); 
+            return token_kind_ == jsonpath_token_kind::selector && selector_->is_path(); 
         }
 
         bool is_operator() const
         {
-            return type_ == jsonpath_token_kind::unary_operator || 
-                   type_ == jsonpath_token_kind::binary_operator; 
+            return token_kind_ == jsonpath_token_kind::unary_operator || 
+                   token_kind_ == jsonpath_token_kind::binary_operator; 
         }
 
         std::size_t precedence_level() const
         {
-            switch(type_)
+            switch(token_kind_)
             {
                 case jsonpath_token_kind::selector:
                     return selector_->precedence_level();
@@ -2748,12 +2745,12 @@ namespace detail {
 
         jsoncons::optional<std::size_t> arity() const
         {
-            return type_ == jsonpath_token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
+            return token_kind_ == jsonpath_token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
         }
 
         bool is_right_associative() const
         {
-            switch(type_)
+            switch(token_kind_)
             {
                 case jsonpath_token_kind::selector:
                     return selector_->is_right_associative();
@@ -2768,8 +2765,8 @@ namespace detail {
 
         void construct(token&& other)
         {
-            type_ = other.type_;
-            switch (type_)
+            token_kind_ = other.token_kind_;
+            switch (token_kind_)
             {
                 case jsonpath_token_kind::selector:
                     selector_ = other.selector_;
@@ -2796,7 +2793,7 @@ namespace detail {
 
         void destroy() noexcept 
         {
-            switch(type_)
+            switch(token_kind_)
             {
                 case jsonpath_token_kind::expression:
                     expression_.~unique_ptr();
@@ -2812,7 +2809,7 @@ namespace detail {
         std::string to_string(int level = 0) const
         {
             std::string s;
-            switch (type_)
+            switch (token_kind_)
             {
                 case jsonpath_token_kind::root_node:
                     if (level > 0)
@@ -2868,7 +2865,7 @@ namespace detail {
                         s.append(level*2, ' ');
                     }
                     s.append("token kind: ");
-                    s.append(jsoncons::jsonpath::detail::to_string(type_));
+                    s.append(jsoncons::jsonpath::detail::to_string(token_kind_));
                     break;
             }
             //s.append("\n");
@@ -3057,7 +3054,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class expression
+    class expression : public expression_base<Json,JsonReference>
     {
     public:
         using path_value_pair_type = path_value_pair<Json,JsonReference>;
@@ -3100,7 +3097,7 @@ namespace detail {
                                    reference root,
                                    reference current,
                                    result_options options,
-                                   std::error_code& ec) const
+                                   std::error_code& ec) const override
         {
             std::vector<stack_item_type> stack;
             std::vector<parameter_type> arg_stack;
@@ -3207,7 +3204,7 @@ namespace detail {
 
                             auto item = std::move(stack.back());
                             stack.pop_back();
-                            value_type val = tok.expression_->evaluate_single(resources, root, resources.current_path_node(), item.value(), options, ec);
+                            value_type val = tok.expression_->evaluate_single(resources, root, item.value(), options, ec);
                             //std::cout << "ref2: " << ref << "\n";
                             stack.emplace_back(std::move(val));
                             break;
@@ -3308,7 +3305,7 @@ namespace detail {
             return stack.empty() ? Json::null() : stack.back().value();
         }
  
-        std::string to_string(int level) const
+        std::string to_string(int level) const override
         {
             std::string s;
             if (level > 0)

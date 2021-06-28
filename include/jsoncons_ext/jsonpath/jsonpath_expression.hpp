@@ -2242,7 +2242,7 @@ namespace detail {
                     std::reverse(toks.begin(), toks.end());
                     ++it;
                     output_stack_.erase(it.base(),output_stack_.end());
-                    output_stack_.emplace_back(token_type(jsoncons::make_unique<argument_expression<Json,JsonReference>>(expression_type(std::move(toks)))));
+                    output_stack_.emplace_back(token_type(jsoncons::make_unique<expression_type>(std::move(toks))));
                     break;
                 }
                 case jsonpath_token_kind::selector:
