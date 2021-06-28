@@ -1920,7 +1920,7 @@ namespace detail {
         }
     };
 
-    enum class token_kind
+    enum class jsonpath_token_kind
     {
         root_node,
         current_node,
@@ -1946,49 +1946,49 @@ namespace detail {
     };
 
     inline
-    std::string to_string(token_kind kind)
+    std::string to_string(jsonpath_token_kind kind)
     {
         switch (kind)
         {
-            case token_kind::root_node:
+            case jsonpath_token_kind::root_node:
                 return "root_node";
-            case token_kind::current_node:
+            case jsonpath_token_kind::current_node:
                 return "current_node";
-            case token_kind::lparen:
+            case jsonpath_token_kind::lparen:
                 return "lparen";
-            case token_kind::rparen:
+            case jsonpath_token_kind::rparen:
                 return "rparen";
-            case token_kind::begin_union:
+            case jsonpath_token_kind::begin_union:
                 return "begin_union";
-            case token_kind::end_union:
+            case jsonpath_token_kind::end_union:
                 return "end_union";
-            case token_kind::begin_filter:
+            case jsonpath_token_kind::begin_filter:
                 return "begin_filter";
-            case token_kind::end_filter:
+            case jsonpath_token_kind::end_filter:
                 return "end_filter";
-            case token_kind::begin_expression:
+            case jsonpath_token_kind::begin_expression:
                 return "begin_expression";
-            case token_kind::end_index_expression:
+            case jsonpath_token_kind::end_index_expression:
                 return "end_index_expression";
-            case token_kind::end_argument_expression:
+            case jsonpath_token_kind::end_argument_expression:
                 return "end_argument_expression";
-            case token_kind::separator:
+            case jsonpath_token_kind::separator:
                 return "separator";
-            case token_kind::literal:
+            case jsonpath_token_kind::literal:
                 return "literal";
-            case token_kind::selector:
+            case jsonpath_token_kind::selector:
                 return "selector";
-            case token_kind::function:
+            case jsonpath_token_kind::function:
                 return "function";
-            case token_kind::end_function:
+            case jsonpath_token_kind::end_function:
                 return "end_function";
-            case token_kind::argument:
+            case jsonpath_token_kind::argument:
                 return "argument";
-            case token_kind::end_of_expression:
+            case jsonpath_token_kind::end_of_expression:
                 return "end_of_expression";
-            case token_kind::unary_operator:
+            case jsonpath_token_kind::unary_operator:
                 return "unary_operator";
-            case token_kind::binary_operator:
+            case jsonpath_token_kind::binary_operator:
                 return "binary_operator";
             default:
                 return "";
@@ -2519,7 +2519,7 @@ namespace detail {
         using selector_type = jsonpath_selector<Json,JsonReference>;
         using expression_base_type = expression_base<Json,JsonReference>;
 
-        token_kind type_;
+        jsonpath_token_kind type_;
 
         union
         {
@@ -2533,111 +2533,111 @@ namespace detail {
     public:
 
         token(const unary_operator<Json,JsonReference>* expr) noexcept
-            : type_(token_kind::unary_operator),
+            : type_(jsonpath_token_kind::unary_operator),
               unary_operator_(expr)
         {
         }
 
         token(const binary_operator<Json,JsonReference>* expr) noexcept
-            : type_(token_kind::binary_operator),
+            : type_(jsonpath_token_kind::binary_operator),
               binary_operator_(expr)
         {
         }
 
         token(current_node_arg_t) noexcept
-            : type_(token_kind::current_node)
+            : type_(jsonpath_token_kind::current_node)
         {
         }
 
         token(root_node_arg_t) noexcept
-            : type_(token_kind::root_node)
+            : type_(jsonpath_token_kind::root_node)
         {
         }
 
         token(end_function_arg_t) noexcept
-            : type_(token_kind::end_function)
+            : type_(jsonpath_token_kind::end_function)
         {
         }
 
         token(separator_arg_t) noexcept
-            : type_(token_kind::separator)
+            : type_(jsonpath_token_kind::separator)
         {
         }
 
         token(lparen_arg_t) noexcept
-            : type_(token_kind::lparen)
+            : type_(jsonpath_token_kind::lparen)
         {
         }
 
         token(rparen_arg_t) noexcept
-            : type_(token_kind::rparen)
+            : type_(jsonpath_token_kind::rparen)
         {
         }
 
         token(end_of_expression_arg_t) noexcept
-            : type_(token_kind::end_of_expression)
+            : type_(jsonpath_token_kind::end_of_expression)
         {
         }
 
         token(begin_union_arg_t) noexcept
-            : type_(token_kind::begin_union)
+            : type_(jsonpath_token_kind::begin_union)
         {
         }
 
         token(end_union_arg_t) noexcept
-            : type_(token_kind::end_union)
+            : type_(jsonpath_token_kind::end_union)
         {
         }
 
         token(begin_filter_arg_t) noexcept
-            : type_(token_kind::begin_filter)
+            : type_(jsonpath_token_kind::begin_filter)
         {
         }
 
         token(end_filter_arg_t) noexcept
-            : type_(token_kind::end_filter)
+            : type_(jsonpath_token_kind::end_filter)
         {
         }
 
         token(begin_expression_arg_t) noexcept
-            : type_(token_kind::begin_expression)
+            : type_(jsonpath_token_kind::begin_expression)
         {
         }
 
         token(end_index_expression_arg_t) noexcept
-            : type_(token_kind::end_index_expression)
+            : type_(jsonpath_token_kind::end_index_expression)
         {
         }
 
         token(end_argument_expression_arg_t) noexcept
-            : type_(token_kind::end_argument_expression)
+            : type_(jsonpath_token_kind::end_argument_expression)
         {
         }
 
         token(selector_type* selector)
-            : type_(token_kind::selector), selector_(selector)
+            : type_(jsonpath_token_kind::selector), selector_(selector)
         {
         }
 
         token(std::unique_ptr<expression_base_type>&& expr)
-            : type_(token_kind::expression)
+            : type_(jsonpath_token_kind::expression)
         {
             new (&expression_) std::unique_ptr<expression_base_type>(std::move(expr));
         }
 
         token(const function_base<Json>* function) noexcept
-            : type_(token_kind::function),
+            : type_(jsonpath_token_kind::function),
               function_(function)
         {
         }
 
         token(argument_arg_t) noexcept
-            : type_(token_kind::argument)
+            : type_(jsonpath_token_kind::argument)
         {
         }
 
         token(literal_arg_t, Json&& value) noexcept
-            : type_(token_kind::literal), value_(std::move(value))
+            : type_(jsonpath_token_kind::literal), value_(std::move(value))
         {
         }
 
@@ -2664,22 +2664,22 @@ namespace detail {
                 {
                     switch (type_)
                     {
-                        case token_kind::selector:
+                        case jsonpath_token_kind::selector:
                             selector_ = other.selector_;
                             break;
-                        case token_kind::expression:
+                        case jsonpath_token_kind::expression:
                             expression_ = std::move(other.expression_);
                             break;
-                        case token_kind::unary_operator:
+                        case jsonpath_token_kind::unary_operator:
                             unary_operator_ = other.unary_operator_;
                             break;
-                        case token_kind::binary_operator:
+                        case jsonpath_token_kind::binary_operator:
                             binary_operator_ = other.binary_operator_;
                             break;
-                        case token_kind::function:
+                        case jsonpath_token_kind::function:
                             function_ = other.function_;
                             break;
-                        case token_kind::literal:
+                        case jsonpath_token_kind::literal:
                             value_ = std::move(other.value_);
                             break;
                         default:
@@ -2700,46 +2700,46 @@ namespace detail {
             destroy();
         }
 
-        token_kind type() const
+        jsonpath_token_kind token_kind() const
         {
             return type_;
         }
 
         bool is_lparen() const
         {
-            return type_ == token_kind::lparen; 
+            return type_ == jsonpath_token_kind::lparen; 
         }
 
         bool is_rparen() const
         {
-            return type_ == token_kind::rparen; 
+            return type_ == jsonpath_token_kind::rparen; 
         }
 
         bool is_current_node() const
         {
-            return type_ == token_kind::current_node; 
+            return type_ == jsonpath_token_kind::current_node; 
         }
 
         bool is_path() const
         {
-            return type_ == token_kind::selector && selector_->is_path(); 
+            return type_ == jsonpath_token_kind::selector && selector_->is_path(); 
         }
 
         bool is_operator() const
         {
-            return type_ == token_kind::unary_operator || 
-                   type_ == token_kind::binary_operator; 
+            return type_ == jsonpath_token_kind::unary_operator || 
+                   type_ == jsonpath_token_kind::binary_operator; 
         }
 
         std::size_t precedence_level() const
         {
             switch(type_)
             {
-                case token_kind::selector:
+                case jsonpath_token_kind::selector:
                     return selector_->precedence_level();
-                case token_kind::unary_operator:
+                case jsonpath_token_kind::unary_operator:
                     return unary_operator_->precedence_level();
-                case token_kind::binary_operator:
+                case jsonpath_token_kind::binary_operator:
                     return binary_operator_->precedence_level();
                 default:
                     return 0;
@@ -2748,18 +2748,18 @@ namespace detail {
 
         jsoncons::optional<std::size_t> arity() const
         {
-            return type_ == token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
+            return type_ == jsonpath_token_kind::function ? function_->arity() : jsoncons::optional<std::size_t>();
         }
 
         bool is_right_associative() const
         {
             switch(type_)
             {
-                case token_kind::selector:
+                case jsonpath_token_kind::selector:
                     return selector_->is_right_associative();
-                case token_kind::unary_operator:
+                case jsonpath_token_kind::unary_operator:
                     return unary_operator_->is_right_associative();
-                case token_kind::binary_operator:
+                case jsonpath_token_kind::binary_operator:
                     return binary_operator_->is_right_associative();
                 default:
                     return false;
@@ -2771,22 +2771,22 @@ namespace detail {
             type_ = other.type_;
             switch (type_)
             {
-                case token_kind::selector:
+                case jsonpath_token_kind::selector:
                     selector_ = other.selector_;
                     break;
-                case token_kind::expression:
+                case jsonpath_token_kind::expression:
                     new (&expression_) std::unique_ptr<expression_base_type>(std::move(other.expression_));
                     break;
-                case token_kind::unary_operator:
+                case jsonpath_token_kind::unary_operator:
                     unary_operator_ = other.unary_operator_;
                     break;
-                case token_kind::binary_operator:
+                case jsonpath_token_kind::binary_operator:
                     binary_operator_ = other.binary_operator_;
                     break;
-                case token_kind::function:
+                case jsonpath_token_kind::function:
                     function_ = other.function_;
                     break;
-                case token_kind::literal:
+                case jsonpath_token_kind::literal:
                     new (&value_) Json(std::move(other.value_));
                     break;
                 default:
@@ -2798,10 +2798,10 @@ namespace detail {
         {
             switch(type_)
             {
-                case token_kind::expression:
+                case jsonpath_token_kind::expression:
                     expression_.~unique_ptr();
                     break;
-                case token_kind::literal:
+                case jsonpath_token_kind::literal:
                     value_.~Json();
                     break;
                 default:
@@ -2814,7 +2814,7 @@ namespace detail {
             std::string s;
             switch (type_)
             {
-                case token_kind::root_node:
+                case jsonpath_token_kind::root_node:
                     if (level > 0)
                     {
                         s.append("\n");
@@ -2822,7 +2822,7 @@ namespace detail {
                     }
                     s.append("root node");
                     break;
-                case token_kind::current_node:
+                case jsonpath_token_kind::current_node:
                     if (level > 0)
                     {
                         s.append("\n");
@@ -2830,7 +2830,7 @@ namespace detail {
                     }
                     s.append("current node");
                     break;
-                case token_kind::argument:
+                case jsonpath_token_kind::argument:
                     if (level > 0)
                     {
                         s.append("\n");
@@ -2838,13 +2838,13 @@ namespace detail {
                     }
                     s.append("argument");
                     break;
-                case token_kind::selector:
+                case jsonpath_token_kind::selector:
                     s.append(selector_->to_string(level));
                     break;
-                case token_kind::expression:
+                case jsonpath_token_kind::expression:
                     s.append(expression_->to_string(level));
                     break;
-                case token_kind::literal:
+                case jsonpath_token_kind::literal:
                 {
                     if (level > 0)
                     {
@@ -2855,10 +2855,10 @@ namespace detail {
                     unicode_traits::convert(sbuf.data(), sbuf.size(), s);
                     break;
                 }
-                case token_kind::binary_operator:
+                case jsonpath_token_kind::binary_operator:
                     s.append(binary_operator_->to_string(level));
                     break;
-                case token_kind::function:
+                case jsonpath_token_kind::function:
                     s.append(function_->to_string(level));
                     break;
                 default:
@@ -3117,14 +3117,14 @@ namespace detail {
                 for (auto& tok : token_list_)
                 {
                     //std::cout << "Token: " << tok.to_string() << "\n";
-                    switch (tok.type())
+                    switch (tok.token_kind())
                     { 
-                        case token_kind::literal:
+                        case jsonpath_token_kind::literal:
                         {
                             stack.emplace_back(std::addressof(tok.get_value(reference_arg_type(), resources)));
                             break;
                         }
-                        case token_kind::unary_operator:
+                        case jsonpath_token_kind::unary_operator:
                         {
                             JSONCONS_ASSERT(stack.size() >= 1);
                             auto item = std::move(stack.back());
@@ -3134,7 +3134,7 @@ namespace detail {
                             stack.emplace_back(std::move(val));
                             break;
                         }
-                        case token_kind::binary_operator:
+                        case jsonpath_token_kind::binary_operator:
                         {
                             //std::cout << "binary operator: " << stack.size() << "\n";
                             JSONCONS_ASSERT(stack.size() >= 2);
@@ -3150,15 +3150,15 @@ namespace detail {
                             stack.emplace_back(std::move(val));
                             break;
                         }
-                        case token_kind::root_node:
+                        case jsonpath_token_kind::root_node:
                             //std::cout << "root: " << root << "\n";
                             stack.emplace_back(std::addressof(root));
                             break;
-                        case token_kind::current_node:
+                        case jsonpath_token_kind::current_node:
                             //std::cout << "current: " << current << "\n";
                             stack.emplace_back(std::addressof(current));
                             break;
-                        case token_kind::argument:
+                        case jsonpath_token_kind::argument:
                             JSONCONS_ASSERT(!stack.empty());
                             //std::cout << "argument stack items " << stack.size() << "\n";
                             //for (auto& item : stack)
@@ -3174,7 +3174,7 @@ namespace detail {
                             //std::cout << "\n";
                             stack.pop_back();
                             break;
-                        case token_kind::function:
+                        case jsonpath_token_kind::function:
                         {
                             if (tok.function_->arity() && *(tok.function_->arity()) != arg_stack.size())
                             {
@@ -3198,7 +3198,7 @@ namespace detail {
                             stack.emplace_back(std::move(val));
                             break;
                         }
-                        case token_kind::expression:
+                        case jsonpath_token_kind::expression:
                         {
                             if (stack.empty())
                             {
@@ -3212,7 +3212,7 @@ namespace detail {
                             stack.emplace_back(std::move(val));
                             break;
                         }
-                        case token_kind::selector:
+                        case jsonpath_token_kind::selector:
                         {
                             if (stack.empty())
                             {
