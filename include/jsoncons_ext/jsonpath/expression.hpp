@@ -2571,11 +2571,6 @@ namespace detail {
         {
         }
 
-        token(end_of_expression_arg_t) noexcept
-            : token_kind_(jsonpath_token_kind::end_of_expression)
-        {
-        }
-
         token(begin_union_arg_t) noexcept
             : token_kind_(jsonpath_token_kind::begin_union)
         {
