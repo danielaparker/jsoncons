@@ -2156,11 +2156,11 @@ namespace detail {
 
                     if (!output_stack_.empty() && output_stack_.back().is_path())
                     {
-                        output_stack_.back().selector_->append_selector(resources.new_selector(filter_expression_selector<Json,JsonReference>(expression_type(std::move(toks)))));
+                        output_stack_.back().selector_->append_selector(resources.new_selector(filter_selector<Json,JsonReference>(expression_type(std::move(toks)))));
                     }
                     else
                     {
-                        output_stack_.emplace_back(token_type(resources.new_selector(filter_expression_selector<Json,JsonReference>(expression_type(std::move(toks))))));
+                        output_stack_.emplace_back(token_type(resources.new_selector(filter_selector<Json,JsonReference>(expression_type(std::move(toks))))));
                     }
                     //std::cout << "push_token end_filter 2\n";
                     //for (const auto& tok2 : output_stack_)

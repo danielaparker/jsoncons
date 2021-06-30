@@ -1,3 +1,10 @@
+0.166.0
+-------
+
+Bugs fixed:
+ 
+- Fixed issue with normalized paths produced by JSONPath expressions with filters 
+
 0.165.0
 -------
 

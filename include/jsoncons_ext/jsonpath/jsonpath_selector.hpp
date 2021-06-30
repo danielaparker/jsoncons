@@ -115,34 +115,34 @@ namespace detail {
         using string_type = std::basic_string<char_type>;
 
         static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                              const path_node_type& path, 
+                                              const path_node_type& path_stem, 
                                               std::size_t index, 
                                               result_options options) 
         {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.new_path_node(&path, index);
+                return *resources.new_path_node(&path_stem, index);
             }
             else
             {
-                return path;
+                return path_stem;
             }
         }
 
         static const path_node_type& generate(dynamic_resources<Json,JsonReference>& resources,
-                                              const path_node_type& path, 
+                                              const path_node_type& path_stem, 
                                               const string_type& identifier, 
                                               result_options options) 
         {
             const result_options require_path = result_options::path | result_options::nodups | result_options::sort;
             if ((options & require_path) != result_options())
             {
-                return *resources.new_path_node(&path, identifier);
+                return *resources.new_path_node(&path_stem, identifier);
             }
             else
             {
-                return path;
+                return path_stem;
             }
         }
     };
@@ -186,7 +186,7 @@ namespace detail {
 
         void evaluate_tail(dynamic_resources<Json,JsonReference>& resources,
                            reference root,
-                           const path_node_type& path, 
+                           const path_node_type& path_stem, 
                            reference current,
                            node_accumulator_type& accumulator,
                            node_kind& ndtype,
@@ -194,11 +194,11 @@ namespace detail {
         {
             if (!tail_)
             {
-                accumulator.accumulate(path, current);
+                accumulator.accumulate(path_stem, current);
             }
             else
             {
-                tail_->select(resources, root, path, current, accumulator, ndtype, options);
+                tail_->select(resources, root, path_stem, current, accumulator, ndtype, options);
             }
         }
 
@@ -244,7 +244,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -263,7 +263,7 @@ namespace detail {
                 if (it != current.object_range().end())
                 {
                     this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path, identifier_, options),
+                                        path_generator_type::generate(resources, path_stem, identifier_, options),
                                         it->value(), accumulator, ndtype, options);
                 }
             }
@@ -277,7 +277,7 @@ namespace detail {
                     if (index < current.size())
                     {
                         this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, path, index, options),
+                                            path_generator_type::generate(resources, path_stem, index, options),
                                             current[index], accumulator, ndtype, options);
                     }
                 }
@@ -285,7 +285,7 @@ namespace detail {
                 {
                     pointer ptr = resources.new_json(current.size());
                     this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path, identifier_, options), 
+                                        path_generator_type::generate(resources, path_stem, identifier_, options), 
                                         *ptr, 
                                         accumulator, ndtype, options);
                 }
@@ -296,7 +296,7 @@ namespace detail {
                 std::size_t count = unicode_traits::count_codepoints(sv.data(), sv.size());
                 pointer ptr = resources.new_json(count);
                 this->evaluate_tail(resources, root, 
-                                    path_generator_type::generate(resources, path, identifier_, options), 
+                                    path_generator_type::generate(resources, path_stem, identifier_, options), 
                                     *ptr, accumulator, ndtype, options);
             }
             //std::cout << "end identifier_selector\n";
@@ -340,7 +340,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference,
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -354,7 +354,7 @@ namespace detail {
             {
                 path_stem_value_accumulator<Json,JsonReference> accum;
 
-                this->evaluate_tail(resources, root, path, root, accum, ndtype, options);
+                this->evaluate_tail(resources, root, path_stem, root, accum, ndtype, options);
                 resources.add_to_cache(id_, std::move(accum.nodes), ndtype);
                 resources.retrieve_from_cache(id_, accumulator, ndtype);
             }
@@ -394,7 +394,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -403,7 +403,7 @@ namespace detail {
             //std::cout << "current_node_selector: " << current << "\n";
             ndtype = node_kind::single;
             this->evaluate_tail(resources,  
-                                root, path, current, accumulator, ndtype, options);
+                                root, path_stem, current, accumulator, ndtype, options);
         }
 
         std::string to_string(int level = 0) const override
@@ -442,7 +442,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -456,7 +456,7 @@ namespace detail {
                 {
                     std::size_t i = static_cast<std::size_t>(index_);
                     this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path, i, options), 
+                                        path_generator_type::generate(resources, path_stem, i, options), 
                                         current.at(i), accumulator, ndtype, options);
                 }
                 else 
@@ -466,7 +466,7 @@ namespace detail {
                     {
                         std::size_t i = static_cast<std::size_t>(index);
                         this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, path, index, options), 
+                                            path_generator_type::generate(resources, path_stem, index, options), 
                                             current.at(i), accumulator, ndtype, options);
                     }
                 }
@@ -494,7 +494,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -509,16 +509,17 @@ namespace detail {
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path, i, options), current[i], 
+                                        path_generator_type::generate(resources, path_stem, i, options), current[i], 
                                         accumulator, tmptype, options);
                 }
             }
             else if (current.is_object())
             {
-                for (auto& item : current.object_range())
+                for (auto& member : current.object_range())
                 {
                     this->evaluate_tail(resources, root, 
-                                        path_generator_type::generate(resources, path, item.key(), options), item.value(), accumulator, tmptype, options);
+                                        path_generator_type::generate(resources, path_stem, member.key(), options), 
+                                        member.value(), accumulator, tmptype, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -559,7 +560,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -568,20 +569,20 @@ namespace detail {
             //std::cout << "wildcard_selector: " << current << "\n";
             if (current.is_array())
             {
-                this->evaluate_tail(resources, root, path, current, accumulator, ndtype, options);
+                this->evaluate_tail(resources, root, path_stem, current, accumulator, ndtype, options);
                 for (std::size_t i = 0; i < current.size(); ++i)
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, path, i, options), current[i], accumulator, ndtype, options);
+                           path_generator_type::generate(resources, path_stem, i, options), current[i], accumulator, ndtype, options);
                 }
             }
             else if (current.is_object())
             {
-                this->evaluate_tail(resources, root, path, current, accumulator, ndtype, options);
+                this->evaluate_tail(resources, root, path_stem, current, accumulator, ndtype, options);
                 for (auto& item : current.object_range())
                 {
                     select(resources, root, 
-                           path_generator_type::generate(resources, path, item.key(), options), item.value(), accumulator, ndtype, options);
+                           path_generator_type::generate(resources, path_stem, item.key(), options), item.value(), accumulator, ndtype, options);
                 }
             }
             //std::cout << "end wildcard_selector\n";
@@ -643,7 +644,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -654,7 +655,7 @@ namespace detail {
 
             for (auto& selector : selectors_)
             {
-                selector->select(resources, root, path, current, accumulator, ndtype, options);
+                selector->select(resources, root, path_stem, current, accumulator, ndtype, options);
             }
         }
 
@@ -678,7 +679,7 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
-    class filter_expression_selector final : public base_selector<Json,JsonReference>
+    class filter_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
 
@@ -692,14 +693,14 @@ namespace detail {
         using path_generator_type = path_generator<Json,JsonReference>;
         using node_accumulator_type = typename supertype::node_accumulator_type;
 
-        filter_expression_selector(expression<Json,JsonReference>&& expr)
+        filter_selector(expression<Json,JsonReference>&& expr)
             : base_selector<Json,JsonReference>(), expr_(std::move(expr))
         {
         }
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -714,7 +715,9 @@ namespace detail {
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, root, path, current[i], accumulator, ndtype, options);
+                        this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path_stem, i, options), 
+                                            current[i], accumulator, ndtype, options);
                     }
                 }
             }
@@ -727,7 +730,9 @@ namespace detail {
                     bool t = ec ? false : detail::is_true(r);
                     if (t)
                     {
-                        this->evaluate_tail(resources, root, path, member.value(), accumulator, ndtype, options);
+                        this->evaluate_tail(resources, root, 
+                                            path_generator_type::generate(resources, path_stem, member.key(), options), 
+                                            member.value(), accumulator, ndtype, options);
                     }
                 }
             }
@@ -770,7 +775,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -786,11 +791,11 @@ namespace detail {
                 if (j.template is<std::size_t>() && current.is_array())
                 {
                     std::size_t start = j.template as<std::size_t>();
-                    this->evaluate_tail(resources, root, path, current.at(start), accumulator, ndtype, options);
+                    this->evaluate_tail(resources, root, path_stem, current.at(start), accumulator, ndtype, options);
                 }
                 else if (j.is_string() && current.is_object())
                 {
-                    this->evaluate_tail(resources, root, path, current.at(j.as_string_view()), accumulator, ndtype, options);
+                    this->evaluate_tail(resources, root, path_stem, current.at(j.as_string_view()), accumulator, ndtype, options);
                 }
             }
         }
@@ -832,7 +837,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current,
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -860,7 +865,7 @@ namespace detail {
                     {
                         std::size_t j = static_cast<std::size_t>(i);
                         this->evaluate_tail(resources, root, 
-                                            path_generator_type::generate(resources, path, j, options), 
+                                            path_generator_type::generate(resources, path_stem, j, options), 
                                             current[j], accumulator, ndtype, options);
                     }
                 }
@@ -880,7 +885,7 @@ namespace detail {
                         if (j < current.size())
                         {
                             this->evaluate_tail(resources, root, 
-                                                path_generator_type::generate(resources, path,j,options), current[j], accumulator, ndtype, options);
+                                                path_generator_type::generate(resources, path_stem,j,options), current[j], accumulator, ndtype, options);
                         }
                     }
                 }
@@ -910,7 +915,7 @@ namespace detail {
 
         void select(dynamic_resources<Json,JsonReference>& resources,
                     reference root,
-                    const path_node_type& path, 
+                    const path_node_type& path_stem, 
                     reference current, 
                     node_accumulator_type& accumulator,
                     node_kind& ndtype,
@@ -921,7 +926,7 @@ namespace detail {
             value_type ref = expr_.evaluate_single(resources, root, current, options, ec);
             if (!ec)
             {
-                this->evaluate_tail(resources, root, path, *resources.new_json(std::move(ref)), accumulator, ndtype, options);
+                this->evaluate_tail(resources, root, path_stem, *resources.new_json(std::move(ref)), accumulator, ndtype, options);
             }
         }
 
