@@ -2915,13 +2915,14 @@ namespace detail {
     public:
 
         path_expression()
+            : required_options_()
         {
         }
 
         path_expression(path_expression&& expr) = default;
 
         path_expression(selector_type* selector, bool paths_required)
-            : selector_(selector)
+            : selector_(selector), required_options_()
         {
             if (paths_required)
             {
