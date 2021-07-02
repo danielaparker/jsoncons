@@ -8,8 +8,8 @@
 #include <catch/catch.hpp>
 #include <iostream>
 
-using path_node = jsoncons::jsonpath::detail::path_node<char>;
-using normalized_path = jsoncons::jsonpath::detail::normalized_path<char>;
+using path_node = jsoncons::jsonpath::path_node<char>;
+using normalized_path = jsoncons::jsonpath::normalized_path<char>;
 
 TEST_CASE("test normalized_path equals")
 {

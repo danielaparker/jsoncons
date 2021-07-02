@@ -30,6 +30,8 @@ namespace detail {
         expect_function_expr,
         path_lhs,
         path_rhs,
+        parent_operator,
+        ancestor_depth,
         filter_expression,
         expression_rhs,
         recursive_descent_or_expression_lhs,
@@ -180,6 +182,8 @@ namespace detail {
             p_ = begin_input_;
 
             slice slic;
+            bool paths_required = false;
+            int ancestor_depth = 0;
 
             state_stack_.emplace_back(path_state::start);
             while (p_ < end_input_ && !state_stack_.empty())
@@ -740,11 +744,48 @@ namespace detail {
                                 ++p_;
                                 ++column_;
                                 break;
+                            case '^':
+                                ancestor_depth = 0;
+                                state_stack_.emplace_back(path_state::parent_operator);
+                                state_stack_.emplace_back(path_state::ancestor_depth);
+                                break;
                             default:
                                 state_stack_.pop_back();
                                 break;
                         };
                         break;
+                    case path_state::parent_operator: 
+                    {
+                        push_token(resources, token_type(resources.new_selector(parent_node_selector<Json,JsonReference>(ancestor_depth))), ec);
+                        paths_required = true;
+                        ancestor_depth = 0;
+                        ++p_;
+                        ++column_;
+                        state_stack_.pop_back();
+                        break;
+                    }
+                    case path_state::ancestor_depth: 
+                    {
+                        switch (*p_)
+                        {
+                            case ' ':case '\t':case '\r':case '\n':
+                                advance_past_space_character();
+                                break;
+                            case '^':
+                            {
+                                ++ancestor_depth;
+                                ++p_;
+                                ++column_;
+                                break;
+                            }
+                            default:
+                            {
+                                state_stack_.pop_back();
+                                break;
+                            }
+                        }
+                        break;
+                    }
                     case path_state::expression_rhs: 
                         switch (*p_)
                         {
@@ -2046,6 +2087,17 @@ namespace detail {
                         }
                         state_stack_.pop_back(); 
                         break;
+                    case path_state::parent_operator: 
+                    {
+                        push_token(resources, token_type(resources.new_selector(parent_node_selector<Json,JsonReference>(ancestor_depth))), ec);
+                        if (ec) { return path_expression_type(); }
+                        paths_required = true;
+                        state_stack_.pop_back(); 
+                        break;
+                    }
+                    case path_state::ancestor_depth: 
+                        state_stack_.pop_back(); 
+                        break;
                     default:
                         ec = jsonpath_errc::syntax_error;
                         return path_expression_type();
@@ -2071,7 +2123,7 @@ namespace detail {
                 return path_expression_type();
             }
 
-            return path_expression_type(output_stack_.back().selector_);
+            return path_expression_type(output_stack_.back().selector_, paths_required);
         }
 
         void advance_past_space_character()

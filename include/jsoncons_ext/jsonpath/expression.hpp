@@ -2911,20 +2911,22 @@ namespace detail {
         using selector_type = jsonpath_selector<Json,JsonReference>;
     private:
         selector_type* selector_;
+        result_options required_options_;
     public:
 
         path_expression()
         {
         }
 
-        path_expression(path_expression&& expr)
-            : selector_(expr.selector_)
-        {
-        }
+        path_expression(path_expression&& expr) = default;
 
-        path_expression(selector_type* selector)
+        path_expression(selector_type* selector, bool paths_required)
             : selector_(selector)
         {
+            if (paths_required)
+            {
+                required_options_ |= result_options::path;
+            }
         }
 
         path_expression& operator=(path_expression&& expr) = default;
@@ -2968,6 +2970,7 @@ namespace detail {
         {
             std::error_code ec;
 
+            options |= required_options_;
             node_kind ndtype = node_kind();
 
             const result_options require_more = result_options::nodups | result_options::sort;

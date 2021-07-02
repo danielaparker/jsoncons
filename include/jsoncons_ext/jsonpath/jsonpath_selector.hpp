@@ -154,8 +154,9 @@ namespace detail {
 
         supertype* tail_;
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
@@ -224,8 +225,8 @@ namespace detail {
         using supertype = base_selector<Json,JsonReference>;
         using path_generator_type = path_generator<Json,JsonReference>;
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
         using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
@@ -327,8 +328,9 @@ namespace detail {
 
         std::size_t id_;
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using node_accumulator_type = typename supertype::node_accumulator_type;
@@ -381,8 +383,9 @@ namespace detail {
         using supertype = base_selector<Json,JsonReference>;
 
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
@@ -422,14 +425,79 @@ namespace detail {
     };
 
     template <class Json,class JsonReference>
+    class parent_node_selector final : public base_selector<Json,JsonReference>
+    {
+        using supertype = base_selector<Json,JsonReference>;
+
+        int ancestor_depth_;
+
+    public:
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
+        using path_value_pair_type = typename supertype::path_value_pair_type;
+        using path_node_type = typename supertype::path_node_type;
+        using normalized_path_type = typename supertype::normalized_path_type;
+        using path_generator_type = path_generator<Json,JsonReference>;
+        using node_accumulator_type = typename supertype::node_accumulator_type;
+
+        parent_node_selector(int ancestor_depth)
+        {
+            ancestor_depth_ = ancestor_depth;
+        }
+
+        void select(dynamic_resources<Json,JsonReference>& resources,
+                    reference root,
+                    const path_node_type& path_stem, 
+                    reference,
+                    node_accumulator_type& accumulator,
+                    node_kind& ndtype,
+                    result_options options) const override
+        {
+            const path_node_type* ancestor = std::addressof(path_stem);
+            int index = 0;
+            while (ancestor != nullptr && index < ancestor_depth_)
+            {
+                ancestor = ancestor->parent();
+                ++index;
+            }
+
+            if (ancestor != nullptr)
+            {
+                normalized_path_type path(*ancestor);
+                pointer ptr = jsoncons::jsonpath::select(root,path);
+                if (ptr != nullptr)
+                {
+                    this->evaluate_tail(resources, root, path.stem(), *ptr, accumulator, ndtype, options);        
+                }
+            }
+        }
+
+        std::string to_string(int level = 0) const override
+        {
+            std::string s;
+            if (level > 0)
+            {
+                s.append("\n");
+                s.append(level*2, ' ');
+            }
+            s.append("parent_node_selector");
+            s.append(base_selector<Json,JsonReference>::to_string(level+1));
+
+            return s;
+        }
+    };
+
+    template <class Json,class JsonReference>
     class index_selector final : public base_selector<Json,JsonReference>
     {
         using supertype = base_selector<Json,JsonReference>;
 
         int64_t index_;
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
@@ -480,8 +548,9 @@ namespace detail {
         using supertype = base_selector<Json,JsonReference>;
 
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
@@ -546,8 +615,9 @@ namespace detail {
         using supertype = base_selector<Json,JsonReference>;
 
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
@@ -608,8 +678,9 @@ namespace detail {
     {
         using supertype = jsonpath_selector<Json,JsonReference>;
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using normalized_path_type = typename supertype::normalized_path_type;
@@ -686,8 +757,9 @@ namespace detail {
         expression<Json,JsonReference> expr_;
 
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
@@ -761,8 +833,9 @@ namespace detail {
         expression<Json,JsonReference> expr_;
 
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;
@@ -824,8 +897,9 @@ namespace detail {
 
         slice slice_;
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using node_accumulator_type = typename supertype::node_accumulator_type;
@@ -901,8 +975,9 @@ namespace detail {
         expression<Json,JsonReference> expr_;
 
     public:
-        using value_type = Json;
-        using reference = JsonReference;
+        using value_type = typename supertype::value_type;
+        using reference = typename supertype::reference;
+        using pointer = typename supertype::pointer;
         using path_value_pair_type = typename supertype::path_value_pair_type;
         using path_node_type = typename supertype::path_node_type;
         using path_generator_type = path_generator<Json,JsonReference>;

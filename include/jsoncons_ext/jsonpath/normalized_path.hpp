@@ -14,15 +14,15 @@
 #include <jsoncons/config/jsoncons_config.hpp>
 #include <jsoncons/detail/write_number.hpp>
 #include <jsoncons_ext/jsonpath/jsonpath_error.hpp>
+#include <jsoncons/json_type.hpp>
 
 namespace jsoncons { 
 namespace jsonpath {
-namespace detail { 
 
     template <class CharT>
     class normalized_path; 
 
-    enum class path_node_kind { root, index, identifier };
+    enum class path_node_kind { root, index, name };
 
     template <class CharT>
     class path_node 
@@ -35,17 +35,17 @@ namespace detail {
 
         const path_node* parent_;
         path_node_kind node_kind_;
-        string_type identifier_;
+        string_type name_;
         std::size_t index_;
     public:
         path_node(char_type c)
             : parent_(nullptr), node_kind_(path_node_kind::root), index_(0)
         {
-            identifier_.push_back(c);
+            name_.push_back(c);
         }
 
-        path_node(const path_node* parent, const string_type& identifier)
-            : parent_(parent), node_kind_(path_node_kind::identifier), identifier_(identifier), index_(0)
+        path_node(const path_node* parent, const string_type& name)
+            : parent_(parent), node_kind_(path_node_kind::name), name_(name), index_(0)
         {
         }
 
@@ -61,9 +61,9 @@ namespace detail {
             return node_kind_;
         }
 
-        const string_type& identifier() const
+        const string_type& name() const
         {
-            return identifier_;
+            return name_;
         }
 
         std::size_t index() const 
@@ -75,7 +75,7 @@ namespace detail {
         {
             std::swap(parent_, node.parent_);
             std::swap(node_kind_, node.node_kind_);
-            std::swap(identifier_, node.identifier_);
+            std::swap(name_, node.name_);
             std::swap(index_, node.index_);
         }
 
@@ -83,7 +83,7 @@ namespace detail {
 
         std::size_t node_hash() const
         {
-            std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(identifier_);
+            std::size_t h = node_kind_ == path_node_kind::index ? std::hash<std::size_t>{}(index_) : std::hash<string_type>{}(name_);
 
             return h;
         }
@@ -100,19 +100,168 @@ namespace detail {
                 switch (node_kind_)
                 {
                     case path_node_kind::root:
-                        diff = identifier_.compare(other.identifier_);
+                        diff = name_.compare(other.name_);
                         break;
                     case path_node_kind::index:
                         diff = index_ < other.index_ ? -1 : index_ > other.index_ ? 1 : 0;
                         break;
-                    case path_node_kind::identifier:
-                        diff = identifier_.compare(other.identifier_);
+                    case path_node_kind::name:
+                        diff = name_.compare(other.name_);
                         break;
                 }
             }
             return diff;
         }
     };
+
+    namespace detail {
+
+        template <class Iterator>
+        class normalized_path_iterator
+        { 
+            Iterator it_; 
+
+        public:
+            using iterator_category = std::random_access_iterator_tag;
+
+            using value_type = typename std::remove_pointer<typename std::iterator_traits<Iterator>::value_type>::type;
+            using difference_type = typename std::iterator_traits<Iterator>::difference_type;
+            using pointer = const value_type*;
+            using reference = const value_type&;
+
+            normalized_path_iterator() : it_()
+            { 
+            }
+
+            explicit normalized_path_iterator(Iterator ptr) : it_(ptr)
+            {
+            }
+
+            normalized_path_iterator(const normalized_path_iterator&) = default;
+            normalized_path_iterator(normalized_path_iterator&&) = default;
+            normalized_path_iterator& operator=(const normalized_path_iterator&) = default;
+            normalized_path_iterator& operator=(normalized_path_iterator&&) = default;
+
+            template <class Iter,
+                      class=typename std::enable_if<!std::is_same<Iter,Iterator>::value && std::is_convertible<Iter,Iterator>::value>::type>
+            normalized_path_iterator(const normalized_path_iterator<Iter>& other)
+                : it_(other.it_)
+            {
+            }
+
+            operator Iterator() const
+            { 
+                return it_; 
+            }
+
+            reference operator*() const 
+            {
+                return *(*it_);
+            }
+
+            pointer operator->() const 
+            {
+                return (*it_);
+            }
+
+            normalized_path_iterator& operator++() 
+            {
+                ++it_;
+                return *this;
+            }
+
+            normalized_path_iterator operator++(int) 
+            {
+                normalized_path_iterator temp = *this;
+                ++*this;
+                return temp;
+            }
+
+            normalized_path_iterator& operator--() 
+            {
+                --it_;
+                return *this;
+            }
+
+            normalized_path_iterator operator--(int) 
+            {
+                normalized_path_iterator temp = *this;
+                --*this;
+                return temp;
+            }
+
+            normalized_path_iterator& operator+=(const difference_type offset) 
+            {
+                it_ += offset;
+                return *this;
+            }
+
+            normalized_path_iterator operator+(const difference_type offset) const 
+            {
+                normalized_path_iterator temp = *this;
+                return temp += offset;
+            }
+
+            normalized_path_iterator& operator-=(const difference_type offset) 
+            {
+                return *this += -offset;
+            }
+
+            normalized_path_iterator operator-(const difference_type offset) const 
+            {
+                normalized_path_iterator temp = *this;
+                return temp -= offset;
+            }
+
+            difference_type operator-(const normalized_path_iterator& rhs) const noexcept
+            {
+                return it_ - rhs.it_;
+            }
+
+            reference operator[](const difference_type offset) const noexcept
+            {
+                return *(*(*this + offset));
+            }
+
+            bool operator==(const normalized_path_iterator& rhs) const noexcept
+            {
+                return it_ == rhs.it_;
+            }
+
+            bool operator!=(const normalized_path_iterator& rhs) const noexcept
+            {
+                return !(*this == rhs);
+            }
+
+            bool operator<(const normalized_path_iterator& rhs) const noexcept
+            {
+                return it_ < rhs.it_;
+            }
+
+            bool operator>(const normalized_path_iterator& rhs) const noexcept
+            {
+                return rhs < *this;
+            }
+
+            bool operator<=(const normalized_path_iterator& rhs) const noexcept
+            {
+                return !(rhs < *this);
+            }
+
+            bool operator>=(const normalized_path_iterator& rhs) const noexcept
+            {
+                return !(*this < rhs);
+            }
+
+            inline 
+            friend normalized_path_iterator<Iterator> operator+(
+                difference_type offset, normalized_path_iterator<Iterator> next) 
+            {
+                return next += offset;
+            }
+        };
+
+    } // namespace detail
 
     template <class CharT>
     class normalized_path
@@ -124,6 +273,9 @@ namespace detail {
     private:
         std::vector<const path_node_type*> nodes_;
     public:
+        using iterator = typename detail::normalized_path_iterator<typename std::vector<const path_node_type*>::iterator>;
+        using const_iterator = typename detail::normalized_path_iterator<typename std::vector<const path_node_type*>::const_iterator>;
+
         normalized_path(const path_node_type& node)
         {
             const path_node_type* p = std::addressof(node);
@@ -135,6 +287,26 @@ namespace detail {
             while (p != nullptr);
 
             std::reverse(nodes_.begin(), nodes_.end());
+        }
+
+        iterator begin()
+        {
+            return iterator(nodes_.begin());
+        }
+
+        iterator end()
+        {
+            return iterator(nodes_.end());
+        }
+
+        const_iterator begin() const
+        {
+            return const_iterator(nodes_.begin());
+        }
+
+        const_iterator end() const
+        {
+            return const_iterator(nodes_.end());
         }
 
         const path_node_type& root() const
@@ -156,12 +328,12 @@ namespace detail {
                 switch (node->node_kind())
                 {
                     case path_node_kind::root:
-                        buffer.append(node->identifier());
+                        buffer.append(node->name());
                         break;
-                    case path_node_kind::identifier:
+                    case path_node_kind::name:
                         buffer.push_back('[');
                         buffer.push_back('\'');
-                        for (auto c : node->identifier())
+                        for (auto c : node->name())
                         {
                             if (c == '\'')
                             {
@@ -241,8 +413,37 @@ namespace detail {
         }
     };
 
+    template <class Json>
+    Json* select(Json& root, const normalized_path<typename Json::char_type>& path)
+    {
+        Json* current = std::addressof(root);
+        for (const auto& path_node : path)
+        {
+            if (path_node.node_kind() == path_node_kind::index)
+            {
+                if (current->type() != json_type::array_value || path_node.index() >= current->size())
+                {
+                    return nullptr; 
+                }
+                current = std::addressof(current->at(path_node.index()));
+            }
+            else if (path_node.node_kind() == path_node_kind::name)
+            {
+                if (current->type() != json_type::object_value)
+                {
+                    return nullptr;
+                }
+                auto it = current->find(path_node.name());
+                if (it == current->object_range().end())
+                {
+                    return nullptr;
+                }
+                current = std::addressof(it->value());
+            }
+        }
+        return current;
+    }
 
-} // namespace detail
 } // namespace jsonpath
 } // namespace jsoncons
 

@@ -171,8 +171,6 @@ namespace jsoncons { namespace jsonpointer {
         {
             return !(it1 == it2);
         }
-
-    private:
     };
 
     template <class CharT>
