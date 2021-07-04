@@ -114,8 +114,6 @@ namespace detail {
         using reference = JsonReference;
         using char_type = typename Json::char_type;
         using path_node_type = path_node<char_type>;
-        using normalized_path_type = normalized_path<char_type>;
-        using path_value_pair_type = path_value_pair<Json,JsonReference>;
 
         Json* val;
 
